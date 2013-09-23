@@ -4,7 +4,7 @@ package org.projectodd.restafari.spi;
  * 
  * @author Bob McWhirter
  */
-public interface GetResourceResponder extends BaseResponder {
+public interface GetResourceResponder<T extends Resource> extends BaseResponder {
     
     /** Respond with a resource, ending the interaction.
      * 

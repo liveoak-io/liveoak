@@ -4,12 +4,12 @@ package org.projectodd.restafari.spi;
  * 
  * @author Bob McWhirter
  */
-public interface CreateResourceResponder extends BaseResponder {
+public interface CreateResourceResponder<T extends Resource> extends BaseResponder {
     
     /** Respond with the created resource.
      * 
      * @param resource The created resource.
      */
-    void resourceCreated(Resource resource);
+    void resourceCreated(T resource);
 
 }

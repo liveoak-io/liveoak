@@ -4,12 +4,12 @@ package org.projectodd.restafari.spi;
  * 
  * @author Bob McWhirter
  */
-public interface DeleteResourceResponder {
+public interface DeleteResourceResponder<T extends Resource> {
     
     /** Respond with the deleted resource.
      * 
      * @param resource The deleted resource.
      */
-    void resourceDeleted(Resource resource);
+    void resourceDeleted(T resource);
 
 }

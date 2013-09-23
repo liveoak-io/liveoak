@@ -18,14 +18,14 @@ import java.util.Collection;
  * 
  * @author Bob McWhirter
  */
-public interface GetResourcesResponder extends BaseResponder {
+public interface GetResourcesResponder<T extends Resource> extends BaseResponder {
     
     
     /** Respond with a collection of resources, ending the interaction.
      * 
      * @param resources The collection.
      */
-    void respondWithResources(Collection<Resource> resources);
+    void respondWithResources(Collection<T> resources);
     
     /** Retrieve a streamable responder.
      * 
@@ -35,6 +35,6 @@ public interface GetResourcesResponder extends BaseResponder {
      * 
      * @return
      */
-    AsyncResourcesResponder respondWithResourcesAsync();
+    AsyncResourcesResponder<T> respondWithResourcesAsync();
 
 }

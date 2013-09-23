@@ -17,7 +17,7 @@ package org.projectodd.restafari.spi;
  * 
  * @author Bob McWhirter
  */
-public interface ResourceController {
+public interface ResourceController<T extends Resource> {
     
     /** Initialize this instance of a controller.
      * 
@@ -39,30 +39,32 @@ public interface ResourceController {
      */
     void destory();
     
-    
     /** Retrieve a single resource from a collection.
      * 
+     * @param context The request context.
      * @param collectionName The name of the collection.
      * @param id The identifier of the resource.
      * @param responder The responder to provide the response.
      */
-    void getResource(String collectionName, String id, GetResourceResponder responder);
+    void getResource(RequestContext context, String collectionName, String id, GetResourceResponder<T> responder);
     
     /** Retreive all resources from a collection.
      * 
+     * @param context The request context.
      * @param collectionName The name of the collection.
      * @param pagination The pagination details.
      * @param responder The responder to provide the response.
      */
-    void getResources(String collectionName, Pagination pagination, GetResourcesResponder responder);
+    void getResources(RequestContext context, String collectionName, Pagination pagination, GetResourcesResponder<T> responder);
     
     /** Create a new resource in a collection.
      * 
+     * @param context The request context.
      * @param collectionName The name of the collection.
      * @param resource The new resource state.
      * @param responder The responded to provide the response.
      */
-    void createResource(String collectionName, Resource resource, CreateResourceResponder responder);
+    void createResource(RequestContext context, String collectionName, Resource resource, CreateResourceResponder<T> responder);
     
     /** Update (or create) a new resource in a collection.
      * 
@@ -71,19 +73,21 @@ public interface ResourceController {
      * specified ID does not exist, it should be "inserted", where if one does
      * exist, it should be updated in-place.
      * 
+     * @param context The request context.
      * @param collectionName The name of the collection.
      * @param id The identifier of the resource.
      * @param resource The new resource state.
      * @param responder The responder to provide the response.
      */
-    void updateResource(String collectionName, String id, Resource resource, UpdateResourceResponder responder);
+    void updateResource(RequestContext context, String collectionName, String id, Resource resource, UpdateResourceResponder<T> responder);
     
     /** Detele a resource in a collection.
      * 
+     * @param context The request context.
      * @param collectionName The name of the resource.
      * @param id The identifier of the resource.
      * @param responder The responder to provide the response.
      */
-    void deleteResource(String collectionName, String id, DeleteResourceResponder responder);
+    void deleteResource(RequestContext context, String collectionName, String id, DeleteResourceResponder<T> responder);
 
 }

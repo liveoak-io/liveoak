@@ -10,12 +10,12 @@ package org.projectodd.restafari.spi;
  * 
  * @author Bob McWhirter
  */
-public interface UpdateResourceResponder extends CreateResourceResponder {
+public interface UpdateResourceResponder<T extends Resource> extends CreateResourceResponder<T> {
     
     /** Respond with the updated resource.
      * 
      * @param resource The updated resource.
      */
-    void resourceUpdated(Resource resource);
+    void resourceUpdated(T resource);
 
 }

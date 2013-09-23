@@ -7,13 +7,13 @@ package org.projectodd.restafari.spi;
  * 
  * @author Bob McWhirter
  */
-public interface AsyncResourcesResponder {
+public interface AsyncResourcesResponder<T extends Resource> {
     
     /** Add a resource to the response.
      * 
      * @param resource The resource.
      */
-    void respondWithResource(Resource resource);
+    void respondWithResource(T resource);
     
     /** End the interaction.
      * 
