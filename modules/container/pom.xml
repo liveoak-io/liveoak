@@ -12,17 +12,22 @@
     </parent>
 
     <properties>
-      <module-name>org.projectodd.restafari.core</module-name>
+      <module-name>org.projectodd.restafari.container</module-name>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>restafari-core</artifactId>
-    <name>restafari-core</name>
+    <artifactId>restafari-container</artifactId>
+    <name>restafari-container</name>
 
     <packaging>jar</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.jboss.msc</groupId>
             <artifactId>jboss-msc</artifactId>
