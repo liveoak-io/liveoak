@@ -17,7 +17,7 @@ package org.projectodd.restafari.spi;
  * 
  * @author Bob McWhirter
  */
-public interface ResourceController<T extends Resource> {
+public interface ResourceController {
     
     /** Initialize this instance of a controller.
      * 
@@ -37,7 +37,7 @@ public interface ResourceController<T extends Resource> {
      * Free any resources used by this controller.
      * </p>
      */
-    void destory();
+    void destroy();
     
     /** Retrieve a single resource from a collection.
      * 
@@ -46,7 +46,7 @@ public interface ResourceController<T extends Resource> {
      * @param id The identifier of the resource.
      * @param responder The responder to provide the response.
      */
-    void getResource(RequestContext context, String collectionName, String id, GetResourceResponder<T> responder);
+    void getResource(RequestContext context, String collectionName, String id, Responder responder);
     
     /** Retreive all resources from a collection.
      * 
@@ -55,7 +55,7 @@ public interface ResourceController<T extends Resource> {
      * @param pagination The pagination details.
      * @param responder The responder to provide the response.
      */
-    void getResources(RequestContext context, String collectionName, Pagination pagination, GetResourcesResponder<T> responder);
+    void getResources(RequestContext context, String collectionName, Pagination pagination, Responder responder);
     
     /** Create a new resource in a collection.
      * 
@@ -64,7 +64,7 @@ public interface ResourceController<T extends Resource> {
      * @param resource The new resource state.
      * @param responder The responded to provide the response.
      */
-    void createResource(RequestContext context, String collectionName, Resource resource, CreateResourceResponder<T> responder);
+    void createResource(RequestContext context, String collectionName, Resource resource, Responder responder);
     
     /** Update (or create) a new resource in a collection.
      * 
@@ -79,7 +79,7 @@ public interface ResourceController<T extends Resource> {
      * @param resource The new resource state.
      * @param responder The responder to provide the response.
      */
-    void updateResource(RequestContext context, String collectionName, String id, Resource resource, UpdateResourceResponder<T> responder);
+    void updateResource(RequestContext context, String collectionName, String id, Resource resource, Responder responder);
     
     /** Detele a resource in a collection.
      * 
@@ -88,6 +88,6 @@ public interface ResourceController<T extends Resource> {
      * @param id The identifier of the resource.
      * @param responder The responder to provide the response.
      */
-    void deleteResource(RequestContext context, String collectionName, String id, DeleteResourceResponder<T> responder);
+    void deleteResource(RequestContext context, String collectionName, String id, Responder responder);
 
 }

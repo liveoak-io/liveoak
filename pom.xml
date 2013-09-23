@@ -147,7 +147,12 @@
 
             <dependency>
               <groupId>org.projectodd.restafari</groupId>
-              <artifactId>restafari-core</artifactId>
+              <artifactId>restafari-spi</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.projectodd.restafari</groupId>
+              <artifactId>restafari-container</artifactId>
               <version>${project.version}</version>
             </dependency>
 

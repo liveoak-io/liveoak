@@ -25,6 +25,5 @@ public interface ControllerContext {
      * @return The controller config.
      */
     Config getConfig();
-    
 
 }
