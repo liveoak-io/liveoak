@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>org.projectodd.restafari</groupId>
+        <artifactId>restafari</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <properties>
+      <module-name></module-name>
+    </properties>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>restafari-modules</artifactId>
+    <name>restafari-modules</name>
+
+    <packaging>pom</packaging>
+
+    <dependencies>
+    </dependencies>
+
+    <build>
+      <pluginManagement>
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>org.projectodd.restafari</groupId>
+                <artifactId>restafari-module-assembly</artifactId>
+                <version>${project.version}</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <id>assemble-module</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <descriptorRefs>
+                    <descriptorRef>module</descriptorRef>
+                  </descriptorRefs>
+                  <outputDirectory>../target/modules/${module.path}</outputDirectory>
+                  <finalName>main</finalName>
+                  <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </pluginManagement>
+      <plugins>
+<plugin>
+    <groupId>com.github.goldin</groupId>
+    <artifactId>properties-maven-plugin</artifactId>
+    <version>0.2.5</version>
+    <executions>
+        <execution>
+            <id>set-properties</id>
+            <phase>validate</phase>
+            <goals>
+                <goal>set-properties</goal>
+            </goals>
+            <configuration>
+                <properties>
+                    <property>
+                        <name>module.path</name>
+                        <value>{{ moduleName.replaceAll( '\\.', '/' ) }}</value>
+                    </property>
+                </properties>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+      </plugins>
+    </build>
+
+    <modules>
+      <module>spi</module>
+      <module>core</module>
+    </modules>
+</project>
+

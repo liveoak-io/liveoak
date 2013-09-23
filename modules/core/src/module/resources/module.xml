@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module xmlns="urn:jboss:module:1.0" name="${module-name}">
+
+  <resources>
+    <resource-root path="${project.artifactId}.jar"/>
+    <resource-root path="jboss-msc.jar"/>
+    <resource-root path="jboss-modules.jar"/>
+    <resource-root path="vertx-core.jar"/>
+    <resource-root path="hazelcast.jar"/>
+    <resource-root path="jgroups.jar"/>
+    <resource-root path="jackson-annotations.jar"/>
+    <resource-root path="jackson-core.jar"/>
+    <resource-root path="jackson-databind.jar"/>
+    <resource-root path="log4j.jar"/>
+    <resource-root path="meshly-core.jar"/>
+    <resource-root path="netty-all.jar"/>
+    <resource-root path="slf4j-api.jar"/>
+  </resources>
+
+  <dependencies>
+    <module name="org.projectodd.meshly.spi"/>
+    <system>
+      <paths>
+        <path name="javax/management"/>
+      </paths>
+    </system>
+  </dependencies>
+</module>
+
