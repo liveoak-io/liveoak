@@ -12,7 +12,8 @@ import io.netty.util.concurrent.Future;
 
 import java.net.InetAddress;
 
-import org.projectodd.restafari.container.http.HttpContainerHandler;
+import org.projectodd.restafari.container.http.HttpGetCollectionRequestDecoder;
+import org.projectodd.restafari.container.http.HttpGetResourceRequestDecoder;
 import org.projectodd.restafari.container.http.HttpNoSuchCollectionResponseEncoder;
 import org.projectodd.restafari.container.http.HttpNoSuchResourceResponseEncoder;
 import org.projectodd.restafari.container.http.HttpResourceResponseEncoder;
@@ -51,6 +52,11 @@ public abstract class AbstractServer {
         pipeline.addLast(new HttpRequestDecoder());
         pipeline.addLast(new HttpResponseEncoder());
     }
+    
+    protected void addHttpResourceRequestDecoders(ChannelPipeline pipeline) {
+        pipeline.addLast( new HttpGetCollectionRequestDecoder( this.container ) );
+        pipeline.addLast( new HttpGetResourceRequestDecoder( this.container ) );
+    }
 
     protected void addHttpResourceResponseEncoders(ChannelPipeline pipeline) {
         pipeline.addLast(new HttpResourceResponseEncoder(this.container.getCodecManager()));
@@ -60,7 +66,7 @@ public abstract class AbstractServer {
     }
 
     protected void addHttpContainerHandler(ChannelPipeline pipeline) {
-        pipeline.addLast(new HttpContainerHandler(this.container));
+        pipeline.addLast(new ContainerHandler(this.container));
     }
 
     private Container container;

@@ -25,13 +25,16 @@ public class BasicServerTest {
         
         UnsecureServer server = new UnsecureServer(container, InetAddress.getByName("localhost"), 8080, new NioEventLoopGroup());
 
+        System.err.println( "START SERVER" );
         server.start();
+        System.err.println( "STARTED SERVER" );
 
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         //HttpGet get = new HttpGet( "http://localhost:8080/tacos" );
         //HttpGet get = new HttpGet( "http://localhost:8080/people" );
         HttpGet get = new HttpGet( "http://localhost:8080/people/bob" );
         get.addHeader( "Accept", "text/plain" );
+        System.err.println( "DO GET" );
         CloseableHttpResponse result = httpClient.execute( get );
 
         System.err.println("=============>>>");

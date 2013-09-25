@@ -18,6 +18,7 @@ public class UnsecureServer extends AbstractServer {
         return new ChannelInitializer<NioSocketChannel>() {
             protected void initChannel(NioSocketChannel ch) throws Exception {
                 addHttpCodec( ch.pipeline() );
+                addHttpResourceRequestDecoders( ch.pipeline() );
                 addHttpResourceResponseEncoders(ch.pipeline() );
                 addHttpContainerHandler( ch.pipeline() );
             }

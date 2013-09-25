@@ -1,5 +1,8 @@
 package org.projectodd.restafari.container;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.projectodd.restafari.container.codec.ResourceCodec;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
 import org.projectodd.restafari.container.codec.ToStringCodec;
@@ -12,12 +15,12 @@ public class Container {
         this.codecManager.registerResourceCodec( "text/plain", new ToStringCodec() );
     }
     
-    public void registerResourceController(String path, ResourceController controller) {
-        router.addRoute(path, controller);
+    public void registerResourceController(String type, ResourceController controller) {
+        this.controllers.put( type, new Holder( controller ) );
     }
     
-    public Route findMatchingRoute(String path) {
-        return this.router.findMatchingRoute(path);
+    public Holder getResourceController(String type) {
+        return this.controllers.get( type );
     }
     
     public void registerResourceCodec(String mimeType, ResourceCodec codec) {
@@ -32,7 +35,7 @@ public class Container {
         return this.codecManager;
     }
     
-    private Router router = new Router();
+    private Map<String,Holder> controllers = new HashMap<>();
     private ResourceCodecManager codecManager = new ResourceCodecManager();
 
 }
