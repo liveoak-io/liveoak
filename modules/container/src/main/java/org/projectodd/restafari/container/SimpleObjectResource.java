@@ -80,6 +80,10 @@ public class SimpleObjectResource implements ObjectResource {
         return this.properties.get(name);
     }
 
+    public void setProperty(String name, Object value) {
+        this.properties.put( name, value );
+    }
+
     public <T> T getProperty(String name, Class<T> expectedType) throws InvalidPropertyTypeException {
         Object o = getProperty(name);
         if (o == null) {

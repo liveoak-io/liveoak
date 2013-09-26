@@ -24,7 +24,7 @@ public class HttpResourcesResponseEncoder extends MessageToMessageEncoder<Resour
     protected void encode(ChannelHandlerContext ctx, ResourcesResponse msg, List<Object> out) throws Exception {
         DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK );
         ResourceCodec codec = this.codecManager.getResourceCodec( msg.getMimeType() );
-        ByteBuf encoded = codec.encodeResources(msg.getResources());
+        ByteBuf encoded = codec.encode(msg.getResources());
         
         response.headers().add( HttpHeaders.Names.CONTENT_LENGTH, encoded.readableBytes() );
         response.content().writeBytes( encoded );

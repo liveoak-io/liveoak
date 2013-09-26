@@ -9,11 +9,9 @@ import org.projectodd.restafari.spi.Resource;
 
 public interface ResourceCodec {
     
-    ByteBuf encodeResource(Resource resource) throws IOException;
-    ByteBuf encodeResources(Collection<Resource> resources) throws IOException;
+    ByteBuf encode(Resource resource) throws IOException;
+    ByteBuf encode(Collection<Resource> resources) throws IOException;
 
-    Resource decodeResource(ByteBuf resource);
-    Collection<Resource> decodeResources(ByteBuf resources);
-
+    Object decode(ByteBuf resource) throws IOException;
 
 }

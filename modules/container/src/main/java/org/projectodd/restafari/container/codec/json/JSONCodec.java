@@ -2,16 +2,21 @@ package org.projectodd.restafari.container.codec.json;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.SerializableString;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
+import org.projectodd.restafari.container.SimpleObjectResource;
 import org.projectodd.restafari.container.codec.ResourceCodec;
 import org.projectodd.restafari.spi.ObjectResource;
 import org.projectodd.restafari.spi.Resource;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Bob McWhirter
@@ -19,7 +24,7 @@ import java.util.Collection;
 public class JSONCodec implements ResourceCodec {
 
     @Override
-    public ByteBuf encodeResource(Resource resource) throws IOException {
+    public ByteBuf encode(Resource resource) throws IOException {
         if (!(resource instanceof ObjectResource)) {
             return null;
         }
@@ -40,7 +45,7 @@ public class JSONCodec implements ResourceCodec {
 
 
     @Override
-    public ByteBuf encodeResources(Collection<Resource> resources) throws IOException {
+    public ByteBuf encode(Collection<Resource> resources) throws IOException {
 
         JsonFactory factory = new JsonFactory();
         ByteBuf buf = Unpooled.buffer();
@@ -49,9 +54,9 @@ public class JSONCodec implements ResourceCodec {
 
         generator.writeStartArray();
 
-        for ( Resource each : resources ) {
-            if ( each instanceof ObjectResource ) {
-                encodeObject( generator, (ObjectResource) each);
+        for (Resource each : resources) {
+            if (each instanceof ObjectResource) {
+                encodeObject(generator, (ObjectResource) each);
             }
         }
         generator.writeEndArray();
@@ -60,17 +65,7 @@ public class JSONCodec implements ResourceCodec {
         return buf;
     }
 
-    @Override
-    public Resource decodeResource(ByteBuf resource) {
-        return null;
-    }
-
-    @Override
-    public Collection<Resource> decodeResources(ByteBuf resources) {
-        return null;
-    }
-
-    private void encodeObject(JsonGenerator generator, ObjectResource obj) throws IOException {
+    protected void encodeObject(JsonGenerator generator, ObjectResource obj) throws IOException {
         generator.writeStartObject();
         for (String propertyName : obj.getPropertyNames()) {
             Object value = obj.getProperty(propertyName);
@@ -88,5 +83,72 @@ public class JSONCodec implements ResourceCodec {
         }
         generator.writeEndObject();
     }
+
+    @Override
+    public Object decode(ByteBuf resource) throws IOException {
+        JsonFactory factory = new JsonFactory();
+        ByteBufInputStream in = new ByteBufInputStream(resource);
+        JsonParser parser = factory.createParser(in);
+
+        return decode(parser);
+    }
+
+    protected Object decode(JsonParser parser) throws IOException {
+        JsonToken token = parser.nextToken();
+
+        if (token == JsonToken.VALUE_STRING) {
+            return parser.getValueAsString();
+        }
+
+        if (token == JsonToken.VALUE_NUMBER_INT) {
+            return parser.getValueAsInt();
+        }
+
+        if (token == JsonToken.VALUE_NUMBER_FLOAT) {
+            return parser.getValueAsDouble();
+        }
+
+        if (token == JsonToken.VALUE_FALSE) {
+            return Boolean.FALSE;
+        }
+
+        if (token == JsonToken.VALUE_TRUE) {
+            return Boolean.TRUE;
+        }
+
+        if (token == JsonToken.START_OBJECT) {
+            return decodeObject(parser);
+        }
+
+        if (token == JsonToken.START_ARRAY) {
+            return decodeArray(parser);
+        }
+
+        return null;
+    }
+
+    protected ObjectResource decodeObject(JsonParser parser) throws IOException {
+        SimpleObjectResource resource = new SimpleObjectResource();
+
+        while (parser.nextToken() != JsonToken.END_OBJECT) {
+            String name = parser.getCurrentName();
+            Object value = decode(parser);
+            resource.setProperty(name, value);
+        }
+
+        return resource;
+    }
+
+    protected Collection<Object> decodeArray(JsonParser parser) throws IOException {
+
+        List<Object> array = new ArrayList<>();
+
+        while (parser.nextToken() != JsonToken.END_ARRAY) {
+            array.add(decode(parser));
+        }
+
+        return array;
+    }
+
 
 }

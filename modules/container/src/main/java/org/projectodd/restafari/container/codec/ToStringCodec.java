@@ -3,6 +3,7 @@ package org.projectodd.restafari.container.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import org.projectodd.restafari.spi.Resource;
@@ -10,17 +11,22 @@ import org.projectodd.restafari.spi.Resource;
 public class ToStringCodec implements ResourceCodec {
 
     @Override
-    public ByteBuf encodeResource(Resource resource) {
+    public ByteBuf encode(Resource resource) {
         ByteBuf buf = Unpooled.buffer();
         buf.writeBytes( resource.toString().getBytes() );
         return buf;
     }
 
     @Override
-    public ByteBuf encodeResources(Collection<Resource> resources) {
+    public ByteBuf encode(Collection<Resource> resources) {
         ByteBuf buf = Unpooled.buffer();
         buf.writeBytes( resources.toString().getBytes() );
         return buf;
+    }
+
+    @Override
+    public Object decode(ByteBuf resource) throws IOException {
+        return "good luck with that.";
     }
 
 }
