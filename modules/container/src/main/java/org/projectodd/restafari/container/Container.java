@@ -5,14 +5,14 @@ import java.util.Map;
 
 import org.projectodd.restafari.container.codec.ResourceCodec;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
-import org.projectodd.restafari.container.codec.ToStringCodec;
+import org.projectodd.restafari.container.codec.json.JSONCodec;
 import org.projectodd.restafari.spi.ResourceController;
 
 
 public class Container {
 
     public Container() {
-        this.codecManager.registerResourceCodec( "text/plain", new ToStringCodec() );
+        this.codecManager.registerResourceCodec( "application/json", new JSONCodec() );
     }
     
     public void registerResourceController(String type, ResourceController controller) {
