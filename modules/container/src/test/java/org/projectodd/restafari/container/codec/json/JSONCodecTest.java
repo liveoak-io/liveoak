@@ -4,11 +4,12 @@ import io.netty.buffer.ByteBuf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.projectodd.restafari.container.SimpleObjectResource;
 import org.projectodd.restafari.spi.ObjectResource;
 
 import java.nio.charset.Charset;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Bob McWhirter
@@ -40,8 +41,9 @@ public class JSONCodecTest {
 
         assertEquals( "{\"name\":\"bob\"}", str );
 
-        Object o = codec.decode(result);
-        System.err.println( o );
+        ObjectResource o = (ObjectResource) codec.decode(result);
+
+        assertEquals( o.getStringProperty( "name" ), "bob" );
 
 
     }

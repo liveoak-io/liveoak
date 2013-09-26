@@ -67,17 +67,14 @@ public class JSONCodec implements ResourceCodec {
     }
 
     protected void encodeObject(JsonGenerator generator, ObjectResource obj) throws IOException {
-        System.err.println( "startObject" );
         generator.writeStartObject();
         for (String propertyName : obj.getPropertyNames()) {
             Object value = obj.getProperty(propertyName);
 
-            System.err.println( "write firled: " + propertyName );
             generator.writeFieldName(propertyName);
             if (value instanceof ObjectResource) {
                 encodeObject(generator, (ObjectResource) value);
             } else if (value instanceof String) {
-                System.err.println( "write value: " + value );
                 generator.writeString((String) value);
             } else if (value instanceof Integer) {
                 generator.writeNumber((Integer) value);
