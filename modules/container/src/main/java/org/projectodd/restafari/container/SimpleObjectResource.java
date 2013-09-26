@@ -106,6 +106,11 @@ public class SimpleObjectResource implements ObjectResource {
         return this.properties.keySet();
     }
 
+    public String toString() {
+        return this.properties.toString();
+
+    }
+
     private String id;
     private Map<String, Object> properties = new HashMap<>();
 

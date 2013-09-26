@@ -26,7 +26,7 @@ public class JSONCodecTest {
     }
 
     @Test
-    public void testSomething() throws Exception {
+    public void testCodec() throws Exception {
 
         JSONCodec codec = new JSONCodec();
 
@@ -39,6 +39,9 @@ public class JSONCodecTest {
         String str = result.toString(Charset.forName("utf-8"));
 
         assertEquals( "{\"name\":\"bob\"}", str );
+
+        Object o = codec.decode(result);
+        System.err.println( o );
 
 
     }
