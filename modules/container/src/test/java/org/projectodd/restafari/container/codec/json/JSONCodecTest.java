@@ -33,7 +33,7 @@ public class JSONCodecTest {
 
         ObjectResource resource = new SimpleObjectResource();
 
-        resource.setStringProperty("name", "bob" );
+        resource.setString("name", "bob" );
 
         ByteBuf result = codec.encode(resource);
 
@@ -43,7 +43,7 @@ public class JSONCodecTest {
 
         ObjectResource o = (ObjectResource) codec.decode(result);
 
-        assertEquals( o.getStringProperty( "name" ), "bob" );
+        assertEquals( o.getString( "name" ), "bob" );
 
 
     }
