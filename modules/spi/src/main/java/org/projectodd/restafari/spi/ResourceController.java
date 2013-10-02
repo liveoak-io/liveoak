@@ -29,7 +29,7 @@ public interface ResourceController {
      * 
      * @param context The controller context.
      */
-    void initialize(ControllerContext context);
+    void initialize(ControllerContext context) throws InitializationException;
     
     /** Destroy this instance of a controller.
      * 

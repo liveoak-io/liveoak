@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 import org.projectodd.restafari.container.requests.GetCollectionRequest;
 import org.projectodd.restafari.container.requests.GetResourceRequest;
+import org.projectodd.restafari.container.responses.ErrorResponse;
 import org.projectodd.restafari.container.responses.NoSuchCollectionResponse;
 
 public class ContainerHandler extends ChannelDuplexHandler {
@@ -44,6 +45,11 @@ public class ContainerHandler extends ChannelDuplexHandler {
         
     }
 
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        ctx.pipeline().write(new ErrorResponse(cause.getMessage()));
+        ctx.pipeline().flush();
+    }
 
     private Container container;
 }

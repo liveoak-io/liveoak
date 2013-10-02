@@ -5,6 +5,7 @@ import java.util.Collection;
 public interface Responder {
     
     void resource(Resource resource);
+    //TODO: Add something to the SPI so the container can handle pagination, indicating if there are more results, etc.
     void resources(Collection<Resource> resources);
     
     void resourceCreated(Resource resource);
