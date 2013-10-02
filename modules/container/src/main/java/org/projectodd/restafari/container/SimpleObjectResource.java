@@ -1,8 +1,8 @@
 package org.projectodd.restafari.container;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.projectodd.restafari.spi.InvalidPropertyTypeException;
 import org.projectodd.restafari.spi.ObjectResource;
@@ -21,57 +21,62 @@ public class SimpleObjectResource implements ObjectResource {
     }
 
     @Override
-    public void setStringProperty(String name, String value) {
+    public ObjectResource setString(String name, String value) {
         checkPropertyName( name );
         this.properties.put( name, value );
+        return this;
     }
 
     @Override
-    public String getStringProperty(String name) throws InvalidPropertyTypeException {
+    public String getString(String name) throws InvalidPropertyTypeException {
         return getProperty(name, String.class);
     }
 
     @Override
-    public void setIntegerProperty(String name, int value) {
+    public ObjectResource setInteger(String name, int value) {
         checkPropertyName( name );
         this.properties.put(name, value);
+        return this;
     }
 
     @Override
-    public int getIntegerProperty(String name) throws InvalidPropertyTypeException {
+    public int getInteger(String name) throws InvalidPropertyTypeException {
         return getProperty(name, Integer.class);
     }
 
     @Override
-    public void setDoubleProperty(String name, double value) {
+    public ObjectResource setDouble(String name, double value) {
         checkPropertyName( name );
         this.properties.put( name, value );
+        return this;
     }
 
     @Override
-    public double getDoubleProperty(String name) throws InvalidPropertyTypeException {
+    public double getDouble(String name) throws InvalidPropertyTypeException {
         return getProperty(name, Double.class);
     }
 
     @Override
-    public void setResourceProperty(String name, ObjectResource value) {
+    public ObjectResource setResource(String name, ObjectResource value) {
         checkPropertyName( name );
         this.properties.put( name, value );
+        return this;
     }
 
     @Override
-    public ObjectResource getResourceProperty(String name) throws InvalidPropertyTypeException {
+    public ObjectResource getResource(String name) throws InvalidPropertyTypeException {
         return getProperty( name, ObjectResource.class );
     }
 
     @Override
-    public void setReferenceProperty(String name, ResourceReference value) {
+    public ObjectResource setReference(String name, ResourceReference value) {
         checkPropertyName( name );
         this.properties.put( name, value );
+        return this;
     }
 
     @Override
-    public ResourceReference getReferenceProperty(String name) throws InvalidPropertyTypeException {
+    public ResourceReference getReference(String name) throws InvalidPropertyTypeException {
         return getProperty(name, ResourceReference.class );
     }
 
@@ -102,7 +107,7 @@ public class SimpleObjectResource implements ObjectResource {
     }
 
     @Override
-    public Collection<String> getPropertyNames() {
+    public Set<String> getPropertyNames() {
         return this.properties.keySet();
     }
 

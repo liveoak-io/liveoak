@@ -61,6 +61,7 @@ public class JSONCodec implements ResourceCodec {
             }
         }
         generator.writeEndArray();
+        generator.flush();
 
         out.close();
         return buf;
@@ -68,6 +69,11 @@ public class JSONCodec implements ResourceCodec {
 
     protected void encodeObject(JsonGenerator generator, ObjectResource obj) throws IOException {
         generator.writeStartObject();
+        String id = obj.getId();
+        if (id != null) {
+            generator.writeFieldName("id");
+            generator.writeString(id);
+        }
         for (String propertyName : obj.getPropertyNames()) {
             Object value = obj.getProperty(propertyName);
 

@@ -10,6 +10,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 public class BasicServerTest {
 
     @Test
@@ -20,8 +22,7 @@ public class BasicServerTest {
         controller.addCollection( "dogs" );
         
         Container container = new Container();
-        container.registerResourceController( "/people", controller );
-        container.registerResourceController( "/dogs", controller );
+        container.registerResourceController( "memory", controller, new SimpleConfig() );
         
         UnsecureServer server = new UnsecureServer(container, InetAddress.getByName("localhost"), 8080, new NioEventLoopGroup());
 
@@ -32,22 +33,23 @@ public class BasicServerTest {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         //HttpGet get = new HttpGet( "http://localhost:8080/tacos" );
         //HttpGet get = new HttpGet( "http://localhost:8080/people" );
-        HttpGet get = new HttpGet( "http://localhost:8080/people/bob" );
+        HttpGet get = new HttpGet( "http://localhost:8080/memory/people" );
         get.addHeader( "Accept", "text/plain" );
         System.err.println( "DO GET" );
-        CloseableHttpResponse result = httpClient.execute( get );
+        try {
+            CloseableHttpResponse result = httpClient.execute( get );
+            System.err.println("=============>>>");
+            System.err.println(result);
+            result.getEntity().writeTo( System.err );
+            System.err.println("\n<<<=============");
+            assertEquals(200, result.getStatusLine().getStatusCode());
+        } finally {
+            System.err.println("closing");
+            httpClient.close();
+            System.err.println("closed");
 
-        System.err.println("=============>>>");
-        System.err.println(result);
-        result.getEntity().writeTo( System.err );
-        System.err.println("<<<=============");
-
-        System.err.println("closing");
-        httpClient.close();
-        System.err.println("closed");
-
-        server.stop();
-
+            server.stop();
+        }
     }
 
 }
