@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.projectodd.restafari.container.stomp;
+package org.projectodd.restafari.container.stomp.protocol;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.projectodd.restafari.container.stomp.Headers;
+
 import java.util.Set;
 
 /**
@@ -101,8 +101,8 @@ public class StompFrame {
 
     public enum Command {
         STOMP( false ),
-        CONNET( false ),
-        CONNETED( false ),
+        CONNECT( false ),
+        CONNECTED( false ),
         DISCONNECT( false ),
 
         SEND( true ),

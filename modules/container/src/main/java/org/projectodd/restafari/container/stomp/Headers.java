@@ -23,7 +23,7 @@ public interface Headers {
     Set<String> getHeaderNames();
     String get(String headerName);
     String put(String headerName, String headerValue);
-    void remove(String transaction);
+    void remove(String headerName);
 
     Headers duplicate();
 }

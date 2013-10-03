@@ -1,4 +1,6 @@
-package org.projectodd.restafari.container.stomp;
+package org.projectodd.restafari.container.stomp.protocol;
+
+import org.projectodd.restafari.container.stomp.Headers;
 
 /**
  * @author Bob McWhirter

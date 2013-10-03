@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.projectodd.restafari.container.stomp;
+package org.projectodd.restafari.container.stomp.protocol;
 
-import org.projectodd.restafari.container.stomp.StompFrame.Command;
-import static org.projectodd.restafari.container.stomp.StompFrame.Header.*;
+import org.projectodd.restafari.container.stomp.Headers;
+import org.projectodd.restafari.container.stomp.HeadersImpl;
 
 import java.util.Set;
 
@@ -33,11 +33,11 @@ public class FrameHeader {
 
     }
 
-    public FrameHeader(Command command) {
+    public FrameHeader(StompFrame.Command command) {
         this.command = command;
     }
 
-    public FrameHeader(Command command, Headers headers) {
+    public FrameHeader(StompFrame.Command command, Headers headers) {
         this.command = command;
         this.headers.putAll( headers );
     }
@@ -46,11 +46,11 @@ public class FrameHeader {
         return this.command.hasContent();
     }
 
-    public void setCommand(Command command) {
+    public void setCommand(StompFrame.Command command) {
         this.command = command;
     }
 
-    public Command getCommand() {
+    public StompFrame.Command getCommand() {
         return this.command;
     }
 
@@ -71,7 +71,7 @@ public class FrameHeader {
     }
 
     public int getContentLength() {
-        String value = get( CONTENT_LENGTH.toString() );
+        String value = get( StompFrame.Header.CONTENT_LENGTH.toString() );
         if (value == null) {
             return -1;
         }
@@ -83,6 +83,6 @@ public class FrameHeader {
         return "[FrameHeader: command=" + this.command + "; headers=" + this.headers + "]";
     }
 
-    private Command command;
+    private StompFrame.Command command;
     private HeadersImpl headers = new HeadersImpl();
 }
