@@ -71,8 +71,12 @@ public class MongoController implements ResourceController {
         forCollection(collectionName, responder, collection -> {
             DBCursor cursor = collection.find();
             if (pagination != null) {
-                cursor.limit(pagination.getLimit());
-                cursor.skip(pagination.getOffset());
+                if (pagination.getLimit() > 0) {
+                    cursor.limit(pagination.getLimit());
+                }
+                if (pagination.getOffset() > 0) {
+                    cursor.skip(pagination.getOffset());
+                }
             }
             Collection<Resource> resources = new ArrayList<>(cursor.size());
             while (cursor.hasNext()) {
