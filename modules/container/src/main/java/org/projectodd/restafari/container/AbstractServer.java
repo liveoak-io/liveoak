@@ -6,8 +6,10 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.util.concurrent.Future;
 
 import java.net.InetAddress;
@@ -52,11 +54,16 @@ public abstract class AbstractServer {
     protected void addHttpCodec(ChannelPipeline pipeline) {
         pipeline.addLast(new HttpRequestDecoder());
         pipeline.addLast(new HttpResponseEncoder());
+        pipeline.addLast(new HttpObjectAggregator(1024 * 1024));
     }
-    
+
+    protected void addWebSocketsHandler(ChannelPipeline pipeline) {
+        pipeline.addLast(new WebSocketHandler());
+    }
+
     protected void addHttpResourceRequestDecoders(ChannelPipeline pipeline) {
-        pipeline.addLast( new HttpGetCollectionRequestDecoder( this.container ) );
-        pipeline.addLast( new HttpGetResourceRequestDecoder( this.container ) );
+        pipeline.addLast(new HttpGetCollectionRequestDecoder(this.container));
+        pipeline.addLast(new HttpGetResourceRequestDecoder(this.container));
     }
 
     protected void addHttpResourceResponseEncoders(ChannelPipeline pipeline) {
