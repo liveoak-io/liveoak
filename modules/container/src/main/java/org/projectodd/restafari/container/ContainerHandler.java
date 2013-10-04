@@ -47,6 +47,7 @@ public class ContainerHandler extends ChannelDuplexHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace(System.err);
         ctx.pipeline().write(new ErrorResponse(cause.getMessage()));
         ctx.pipeline().flush();
     }
