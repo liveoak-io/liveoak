@@ -8,19 +8,23 @@ import org.projectodd.restafari.container.codec.json.JSONCodec;
 import org.projectodd.restafari.spi.Config;
 import org.projectodd.restafari.spi.InitializationException;
 import org.projectodd.restafari.spi.ResourceController;
+import org.vertx.java.core.Vertx;
+import org.vertx.java.platform.PlatformLocator;
+import org.vertx.java.platform.PlatformManager;
 
 
 public class Container {
 
     public Container() {
         this.codecManager.registerResourceCodec( "application/json", new JSONCodec() );
+        PlatformManager platformManager = PlatformLocator.factory.createPlatformManager();
+        this.vertx = platformManager.vertx();
     }
 
     public void registerResourceController(String type, ResourceController controller, Config config) throws InitializationException {
         //TODO: Can probably delegate the initialization to the holder when the first get is called (delaying initialization)
         // we can only initialize controllers as they are needed
-        controller.initialize(new SimpleControllerContext(null, null, config));
-
+        controller.initialize(new SimpleControllerContext(this.vertx, null, config));
         this.controllers.put( type, new Holder( controller ) );
     }
 
@@ -32,6 +36,11 @@ public class Container {
         return this.codecManager;
     }
 
+    public Vertx getVertx() {
+        return this.vertx;
+    }
+
     private Map<String,Holder> controllers = new HashMap<>();
     private ResourceCodecManager codecManager = new ResourceCodecManager();
+    private Vertx vertx;
 }
