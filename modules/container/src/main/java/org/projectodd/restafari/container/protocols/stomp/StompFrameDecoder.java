@@ -1,4 +1,4 @@
-package org.projectodd.restafari.container.stomp.protocol;
+package org.projectodd.restafari.container.protocols.stomp;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

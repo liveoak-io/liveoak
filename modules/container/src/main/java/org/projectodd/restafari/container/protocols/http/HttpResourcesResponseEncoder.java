@@ -1,4 +1,4 @@
-package org.projectodd.restafari.container.http;
+package org.projectodd.restafari.container.protocols.http;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

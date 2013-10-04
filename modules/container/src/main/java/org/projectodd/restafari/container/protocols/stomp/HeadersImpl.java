@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.projectodd.restafari.container.stomp;
+package org.projectodd.restafari.container.protocols.stomp;
 
 import java.util.HashMap;
 import java.util.Map;

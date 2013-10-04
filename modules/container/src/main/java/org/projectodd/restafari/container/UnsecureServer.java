@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.projectodd.restafari.container.protocols.ProtocolDetector;
 
 import java.net.InetAddress;
 
@@ -17,11 +18,7 @@ public class UnsecureServer extends AbstractServer {
         
         return new ChannelInitializer<NioSocketChannel>() {
             protected void initChannel(NioSocketChannel ch) throws Exception {
-                addHttpCodec( ch.pipeline() );
-                addWebSocketsHandler(ch.pipeline());
-                addHttpResourceRequestDecoders( ch.pipeline() );
-                addHttpResourceResponseEncoders(ch.pipeline() );
-                addHttpContainerHandler( ch.pipeline() );
+                ch.pipeline().addLast(new ProtocolDetector(getPipelineConfigurator()));
             }
         };
     }

@@ -1,4 +1,4 @@
-package org.projectodd.restafari.container.stomp;
+package org.projectodd.restafari.container.protocols.stomp;
 
 /**
  * @author Bob McWhirter

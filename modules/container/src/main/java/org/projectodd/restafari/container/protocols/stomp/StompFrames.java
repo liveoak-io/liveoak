@@ -1,8 +1,6 @@
-package org.projectodd.restafari.container.stomp.protocol;
+package org.projectodd.restafari.container.protocols.stomp;
 
 import io.netty.buffer.Unpooled;
-import org.projectodd.restafari.container.stomp.Headers;
-import org.projectodd.restafari.container.stomp.StompMessage;
 
 /**
  * @author Bob McWhirter

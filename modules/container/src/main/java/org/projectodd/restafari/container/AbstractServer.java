@@ -3,24 +3,12 @@ package org.projectodd.restafari.container;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpRequestDecoder;
-import io.netty.handler.codec.http.HttpResponseEncoder;
-import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.util.concurrent.Future;
+import org.projectodd.restafari.container.protocols.PipelineConfigurator;
 
 import java.net.InetAddress;
-
-import org.projectodd.restafari.container.http.HttpErrorResponseEncoder;
-import org.projectodd.restafari.container.http.HttpGetCollectionRequestDecoder;
-import org.projectodd.restafari.container.http.HttpGetResourceRequestDecoder;
-import org.projectodd.restafari.container.http.HttpNoSuchCollectionResponseEncoder;
-import org.projectodd.restafari.container.http.HttpNoSuchResourceResponseEncoder;
-import org.projectodd.restafari.container.http.HttpResourceResponseEncoder;
-import org.projectodd.restafari.container.http.HttpResourcesResponseEncoder;
 
 public abstract class AbstractServer {
 
@@ -29,6 +17,7 @@ public abstract class AbstractServer {
         this.host = host;
         this.port = port;
         this.group = group;
+        this.pipelineConfigurator = new PipelineConfigurator( this.container );
     }
 
     public void start() throws InterruptedException {
@@ -49,38 +38,16 @@ public abstract class AbstractServer {
         System.err.println("stopped");
     }
 
+    protected PipelineConfigurator getPipelineConfigurator() {
+        return this.pipelineConfigurator;
+    }
+
     protected abstract ChannelHandler createChildHandler();
-
-    protected void addHttpCodec(ChannelPipeline pipeline) {
-        pipeline.addLast(new HttpRequestDecoder());
-        pipeline.addLast(new HttpResponseEncoder());
-        pipeline.addLast(new HttpObjectAggregator(1024 * 1024));
-    }
-
-    protected void addWebSocketsHandler(ChannelPipeline pipeline) {
-        pipeline.addLast(new WebSocketHandler());
-    }
-
-    protected void addHttpResourceRequestDecoders(ChannelPipeline pipeline) {
-        pipeline.addLast(new HttpGetCollectionRequestDecoder(this.container));
-        pipeline.addLast(new HttpGetResourceRequestDecoder(this.container));
-    }
-
-    protected void addHttpResourceResponseEncoders(ChannelPipeline pipeline) {
-        pipeline.addLast(new HttpResourceResponseEncoder(this.container.getCodecManager()));
-        pipeline.addLast(new HttpResourcesResponseEncoder(this.container.getCodecManager()));
-        pipeline.addLast(new HttpNoSuchCollectionResponseEncoder(this.container.getCodecManager()));
-        pipeline.addLast(new HttpNoSuchResourceResponseEncoder(this.container.getCodecManager()));
-        pipeline.addLast(new HttpErrorResponseEncoder(this.container.getCodecManager()));
-    }
-
-    protected void addHttpContainerHandler(ChannelPipeline pipeline) {
-        pipeline.addLast(new ContainerHandler(this.container));
-    }
 
     private Container container;
     private int port;
     private InetAddress host;
     private EventLoopGroup group;
+    private final PipelineConfigurator pipelineConfigurator;
 
 }
