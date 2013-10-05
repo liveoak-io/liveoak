@@ -16,8 +16,6 @@ import org.projectodd.restafari.container.protocols.PipelineConfigurator;
  */
 public class WebSocketHandshakerHandler extends SimpleChannelInboundHandler<Object> {
 
-    private static final String WEBSOCKETS_UPGRADE = "websocket";
-
     public WebSocketHandshakerHandler(PipelineConfigurator configurator) {
         this.configurator = configurator;
     }
@@ -27,7 +25,7 @@ public class WebSocketHandshakerHandler extends SimpleChannelInboundHandler<Obje
 
         FullHttpRequest req = (FullHttpRequest) msg;
         String upgrade = req.headers().get(HttpHeaders.Names.UPGRADE);
-        if (WEBSOCKETS_UPGRADE.equals(upgrade)) {
+        if (HttpHeaders.Values.WEBSOCKET.equalsIgnoreCase(upgrade)) {
             WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(req.getUri(), null, false);
             WebSocketServerHandshaker handshaker = wsFactory.newHandshaker(req);
             if (handshaker == null) {
