@@ -11,32 +11,32 @@ import java.util.Collections;
 public class SubscriptionManager {
 
     public void resourceCreated(String type, Resource resource) {
-        Collection<Subscription> subscriptions = findSubscriptions( type );
+        Collection<Subscription> subscriptions = getSubscriptions(type);
         for ( Subscription each : subscriptions ) {
-            each.resourceCreated( resource );
+            each.resourceCreated(resource);
         }
     }
 
     public void resourceUpdated(String type, Resource resource) {
-        Collection<Subscription> subscriptions = findSubscriptions( type, resource.getId() );
+        Collection<Subscription> subscriptions = getSubscriptions(type, resource.getId());
         for ( Subscription each : subscriptions ) {
-            each.resourceUpdated( resource );
+            each.resourceUpdated(resource);
         }
     }
 
     public void resourceDeleted(String type, Resource resource) {
-        Collection<Subscription> subscriptions = findSubscriptions( type, resource.getId() );
+        Collection<Subscription> subscriptions = getSubscriptions(type, resource.getId());
         for ( Subscription each : subscriptions ) {
             each.resourceDeleted( resource );
         }
     }
 
-    protected Collection<Subscription> findSubscriptions(String type) {
+    protected Collection<Subscription> getSubscriptions(String type) {
         // find subscriptions for the collection type
         return Collections.emptyList();
     }
 
-    protected Collection<Subscription> findSubscriptions(String type, String id) {
+    protected Collection<Subscription> getSubscriptions(String type, String id) {
         // find subscriptions for the collection type, or the particular resource
         return Collections.emptyList();
     }
