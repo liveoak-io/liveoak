@@ -2,6 +2,7 @@ package org.projectodd.restafari.container.protocols.http;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.util.ReferenceCountUtil;
 
@@ -20,7 +21,7 @@ public class HttpGetCollectionRequestDecoder extends MessageToMessageDecoder<Htt
     @Override
     protected void decode(ChannelHandlerContext ctx, HttpRequest msg, List<Object> out) throws Exception {
         ResourcePath path = new ResourcePath(msg.getUri());
-        if (path.isCollectionPath() ) {
+        if (path.isCollectionPath() && msg.getMethod() == HttpMethod.GET ) {
             GetCollectionRequest request = new GetCollectionRequest(path.getType(), path.getCollectionName() );
             out.add( request );
         } else {

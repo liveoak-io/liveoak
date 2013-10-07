@@ -70,7 +70,7 @@ public class JSONCodec implements ResourceCodec {
     protected void encodeObject(JsonGenerator generator, ObjectResource obj) throws IOException {
         generator.writeStartObject();
         String id = obj.getId();
-        if (id != null) {
+        if (id != null && obj.getProperty("id") == null) {
             generator.writeFieldName("id");
             generator.writeString(id);
         }
@@ -150,8 +150,9 @@ public class JSONCodec implements ResourceCodec {
 
         List<Object> array = new ArrayList<>();
 
-        while (parser.nextToken() != JsonToken.END_ARRAY) {
-            array.add(decode(parser));
+        while (parser.getCurrentToken() != JsonToken.END_ARRAY) {
+            Object o = decode(parser);
+            if (o != null) array.add(o);
         }
 
         return array;

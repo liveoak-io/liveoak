@@ -4,11 +4,15 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 
 import org.projectodd.restafari.container.requests.BaseRequest;
+import org.projectodd.restafari.container.requests.CreateResourceRequest;
+import org.projectodd.restafari.container.requests.DeleteResourceRequest;
 import org.projectodd.restafari.container.requests.GetCollectionRequest;
 import org.projectodd.restafari.container.requests.GetResourceRequest;
+import org.projectodd.restafari.container.requests.UpdateResourceRequest;
 import org.projectodd.restafari.container.responses.ErrorResponse;
 import org.projectodd.restafari.container.responses.NoSuchCollectionResponse;
 import org.projectodd.restafari.spi.Responder;
+import org.projectodd.restafari.spi.Resource;
 
 public class ContainerHandler extends ChannelDuplexHandler {
 
@@ -23,6 +27,12 @@ public class ContainerHandler extends ChannelDuplexHandler {
             dispatchGetCollectionRequest( ctx, (GetCollectionRequest) msg );
         } else if ( msg instanceof GetResourceRequest ) {
             dispatchGetResourceRequest( ctx, (GetResourceRequest) msg );
+        } else if (msg instanceof CreateResourceRequest) {
+            dispatchCreateResourceRequest(ctx, (CreateResourceRequest) msg);
+        } else if (msg instanceof UpdateResourceRequest) {
+            dispatchUpdateResourceRequest(ctx, (UpdateResourceRequest) msg);
+        } else if (msg instanceof DeleteResourceRequest) {
+            dispatchDeleteResourceRequest(ctx, (DeleteResourceRequest) msg);
         }
     }
 
@@ -45,6 +55,38 @@ public class ContainerHandler extends ChannelDuplexHandler {
             holder.getResourceController().getResource(null, msg.getCollectionName(), msg.getResourceId(), createResponder(msg, ctx) );
         }
         
+    }
+
+    private void dispatchUpdateResourceRequest(ChannelHandlerContext ctx, UpdateResourceRequest msg) throws Exception {
+        Holder holder = this.container.getResourceController(msg.getType());
+        if (holder == null) {
+            ctx.pipeline().write(new NoSuchCollectionResponse(msg.getMimeType(), msg.getType()));
+            ctx.pipeline().flush();
+        } else {
+            Resource resource = (Resource) container.getCodecManager().getResourceCodec(msg.getMimeType()).decode(msg.getContent());
+            holder.getResourceController().updateResource(null, msg.getCollectionName(), msg.getResourceId(), resource, createResponder(msg, ctx));
+        }
+    }
+
+    private void dispatchCreateResourceRequest(ChannelHandlerContext ctx, CreateResourceRequest msg) throws Exception {
+        Holder holder = this.container.getResourceController(msg.getType());
+        if (holder == null) {
+            ctx.pipeline().write(new NoSuchCollectionResponse(msg.getMimeType(), msg.getType()));
+            ctx.pipeline().flush();
+        } else {
+            Resource resource = (Resource) container.getCodecManager().getResourceCodec(msg.getMimeType()).decode(msg.getContent());
+            holder.getResourceController().createResource(null, msg.getCollectionName(), resource, createResponder(msg, ctx));
+        }
+    }
+
+    protected void dispatchDeleteResourceRequest(ChannelHandlerContext ctx, DeleteResourceRequest msg) {
+        Holder holder = this.container.getResourceController(msg.getType());
+        if (holder == null) {
+            ctx.pipeline().write(new NoSuchCollectionResponse(msg.getMimeType(), msg.getType()));
+            ctx.pipeline().flush();
+        } else {
+            holder.getResourceController().deleteResource(null, msg.getCollectionName(), msg.getResourceId(), createResponder(msg, ctx));
+        }
     }
 
     @Override

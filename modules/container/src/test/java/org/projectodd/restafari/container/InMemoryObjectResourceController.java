@@ -67,7 +67,12 @@ public class InMemoryObjectResourceController implements ResourceController {
             return;
         }
 
+        if (resource == null) {
+            resource = new SimpleObjectResource();
+        }
+
         String id = UUID.randomUUID().toString();
+        resource.setId(id);
         collection.put(id, resource);
 
         responder.resourceCreated(resource);
@@ -90,6 +95,7 @@ public class InMemoryObjectResourceController implements ResourceController {
         collection.put(id, resource);
 
         if (created) {
+            resource.setId(id);
             responder.resourceCreated(resource);
         } else {
             responder.resourceUpdated(resource);

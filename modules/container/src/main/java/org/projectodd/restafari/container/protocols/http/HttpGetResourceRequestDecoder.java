@@ -2,6 +2,7 @@ package org.projectodd.restafari.container.protocols.http;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.util.ReferenceCountUtil;
 
@@ -21,7 +22,7 @@ public class HttpGetResourceRequestDecoder extends MessageToMessageDecoder<HttpR
     protected void decode(ChannelHandlerContext ctx, HttpRequest msg, List<Object> out) throws Exception {
         System.err.println( "decode: " + msg.getUri() );
         ResourcePath path = new ResourcePath(msg.getUri());
-        if (path.isResourcePath() ) {
+        if (path.isResourcePath() && msg.getMethod() == HttpMethod.GET ) {
             System.err.println( "resource path" );
             GetResourceRequest request = new GetResourceRequest( path.getType(), path.getCollectionName(), path.getResourceId() );
             out.add( request );
