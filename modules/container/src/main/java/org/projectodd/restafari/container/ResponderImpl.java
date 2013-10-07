@@ -11,12 +11,15 @@ import org.projectodd.restafari.container.responses.ResourceDeletedResponse;
 import org.projectodd.restafari.container.responses.ResourceResponse;
 import org.projectodd.restafari.container.responses.ResourceUpdatedResponse;
 import org.projectodd.restafari.container.responses.ResourcesResponse;
+import org.projectodd.restafari.container.subscriptions.SubscriptionManager;
 import org.projectodd.restafari.spi.Resource;
 import org.projectodd.restafari.spi.Responder;
 
 public class ResponderImpl implements Responder {
 
-    public ResponderImpl(String mimeType, ChannelHandlerContext ctx) {
+    public ResponderImpl(SubscriptionManager subscriptionManager , String type, String mimeType, ChannelHandlerContext ctx) {
+        this.subscriptionManager = subscriptionManager;
+        this.type = type;
         this.mimeType = mimeType;
         this.ctx = ctx;
     }
@@ -37,18 +40,21 @@ public class ResponderImpl implements Responder {
     public void resourceCreated(Resource resource) {
         this.ctx.write(new ResourceCreatedResponse( this.mimeType, resource ) );
         this.ctx.flush();
+        this.subscriptionManager.resourceCreated(this.type, resource);
     }
 
     @Override
     public void resourceUpdated(Resource resource) {
         this.ctx.write( new ResourceUpdatedResponse( this.mimeType, resource ) );
         this.ctx.flush();
+        this.subscriptionManager.resourceUpdated(this.type, resource);
     }
 
     @Override
     public void resourceDeleted(Resource resource) {
         this.ctx.write( new ResourceDeletedResponse( this.mimeType, resource ) );
         this.ctx.flush();
+        this.subscriptionManager.resourceDeleted(this.type, resource);
     }
 
     @Override
@@ -69,6 +75,8 @@ public class ResponderImpl implements Responder {
         this.ctx.flush();
     }
 
+    private SubscriptionManager subscriptionManager;
+    private String type;
     private String mimeType;
     private ChannelHandlerContext ctx;
 

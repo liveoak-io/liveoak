@@ -1,6 +1,8 @@
 package org.projectodd.restafari.container;
 
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.ResourceController;
+import org.projectodd.restafari.spi.Responder;
 
 public class Holder {
     

@@ -3,10 +3,7 @@ package org.projectodd.restafari.spi;
 import java.util.Set;
 
 public interface ObjectResource extends Resource {
-    
-    String getId();
-    void setId(String id);
-    
+
     ObjectResource setString(String name, String value);
     String getString(String name) throws InvalidPropertyTypeException;
     

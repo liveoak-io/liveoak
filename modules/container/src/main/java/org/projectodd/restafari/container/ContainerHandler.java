@@ -3,10 +3,12 @@ package org.projectodd.restafari.container;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 
+import org.projectodd.restafari.container.requests.BaseRequest;
 import org.projectodd.restafari.container.requests.GetCollectionRequest;
 import org.projectodd.restafari.container.requests.GetResourceRequest;
 import org.projectodd.restafari.container.responses.ErrorResponse;
 import org.projectodd.restafari.container.responses.NoSuchCollectionResponse;
+import org.projectodd.restafari.spi.Responder;
 
 public class ContainerHandler extends ChannelDuplexHandler {
 
@@ -30,7 +32,7 @@ public class ContainerHandler extends ChannelDuplexHandler {
             ctx.pipeline().write(new NoSuchCollectionResponse(msg.getMimeType(), msg.getType()));
             ctx.pipeline().flush();
         } else {
-            holder.getResourceController().getResources(null, msg.getCollectionName(), msg, new ResponderImpl(msg.getMimeType(), ctx));
+            holder.getResourceController().getResources(null, msg.getCollectionName(), msg, createResponder(msg, ctx ) );
         }
     }
     
@@ -40,7 +42,7 @@ public class ContainerHandler extends ChannelDuplexHandler {
             ctx.pipeline().write(new NoSuchCollectionResponse(msg.getMimeType(), msg.getType()));
             ctx.pipeline().flush();
         } else {
-            holder.getResourceController().getResource(null, msg.getCollectionName(), msg.getResourceId(), new ResponderImpl( msg.getMimeType(), ctx ) );
+            holder.getResourceController().getResource(null, msg.getCollectionName(), msg.getResourceId(), createResponder(msg, ctx) );
         }
         
     }
@@ -51,6 +53,11 @@ public class ContainerHandler extends ChannelDuplexHandler {
         ctx.pipeline().write(new ErrorResponse(cause.getMessage()));
         ctx.pipeline().flush();
     }
+
+    protected Responder createResponder(BaseRequest request, ChannelHandlerContext ctx) {
+        return this.container.createResponder( request.getType(), request.getMimeType(), ctx );
+    }
+
 
     private Container container;
 }
