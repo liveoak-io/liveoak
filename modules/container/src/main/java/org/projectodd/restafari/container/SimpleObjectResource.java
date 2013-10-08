@@ -10,14 +10,20 @@ import org.projectodd.restafari.spi.ResourceReference;
 
 public class SimpleObjectResource implements ObjectResource {
 
+    private static final String ID_PROPERTY = "id";
+
     @Override
     public String getId() {
-        return this.id;
+        try {
+            return getString(ID_PROPERTY);
+        } catch (InvalidPropertyTypeException e) {
+            throw new RuntimeException(e); //TODO: Fix checked exceptions on these methods. We need common object: see TODO in Config
+        }
     }
 
     @Override
     public void setId(String id) {
-        this.id = id;
+        setString(ID_PROPERTY, id);
     }
 
     @Override
@@ -116,7 +122,6 @@ public class SimpleObjectResource implements ObjectResource {
 
     }
 
-    private String id;
     private Map<String, Object> properties = new HashMap<>();
 
 }

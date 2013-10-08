@@ -47,9 +47,15 @@ public class PipelineConfigurator {
         pipeline.remove(WebSocketHandshakerHandler.class);
         pipeline.addLast(new HttpGetCollectionRequestDecoder(this.container));
         pipeline.addLast(new HttpGetResourceRequestDecoder(this.container));
+        pipeline.addLast(new HttpCreateResourceRequestDecoder(this.container));
+        pipeline.addLast(new HttpUpdateResourceRequestDecoder(this.container));
+        pipeline.addLast(new HttpDeleteResourceRequestDecoder(this.container));
 
         pipeline.addLast(new HttpResourceResponseEncoder(this.container.getCodecManager()));
         pipeline.addLast(new HttpResourcesResponseEncoder(this.container.getCodecManager()));
+        pipeline.addLast(new HttpCreateResourceRequestEncoder(this.container));
+        pipeline.addLast(new HttpUpdateResourceRequestEncoder(this.container));
+        pipeline.addLast(new HttpDeleteResourceRequestEncoder(this.container));
         pipeline.addLast(new HttpNoSuchCollectionResponseEncoder(this.container.getCodecManager()));
         pipeline.addLast(new HttpNoSuchResourceResponseEncoder(this.container.getCodecManager()));
         pipeline.addLast(new HttpErrorResponseEncoder(this.container.getCodecManager()));
