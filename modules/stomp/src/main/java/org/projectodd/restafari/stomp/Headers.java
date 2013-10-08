@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.projectodd.restafari.container.protocols.stomp;
+package org.projectodd.restafari.stomp;
 
 import java.util.Set;
 

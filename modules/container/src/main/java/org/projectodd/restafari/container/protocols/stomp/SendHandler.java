@@ -1,10 +1,10 @@
-package org.projectodd.restafari.container.protocols.stomp.commands;
+package org.projectodd.restafari.container.protocols.stomp;
 
-import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.projectodd.restafari.container.ResourcePath;
-import org.projectodd.restafari.container.protocols.stomp.StompContentFrame;
-import org.projectodd.restafari.container.protocols.stomp.StompFrame;
+import org.projectodd.restafari.stomp.AbstractFrameHandler;
+import org.projectodd.restafari.stomp.StompContentFrame;
+import org.projectodd.restafari.stomp.StompFrame;
 import org.projectodd.restafari.container.subscriptions.SubscriptionManager;
 
 /**
@@ -25,6 +25,7 @@ public class SendHandler extends AbstractFrameHandler {
         } else {
             ctx.fireChannelRead(msg);
         }
+
     }
 
     private SubscriptionManager subscriptionManager;

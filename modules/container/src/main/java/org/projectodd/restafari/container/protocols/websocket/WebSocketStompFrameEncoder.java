@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import org.projectodd.restafari.container.protocols.stomp.StompFrameEncoder;
+import org.projectodd.restafari.stomp.StompFrameEncoder;
 
 import java.util.List;
 

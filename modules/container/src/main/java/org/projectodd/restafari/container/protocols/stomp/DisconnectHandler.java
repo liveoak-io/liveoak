@@ -1,12 +1,9 @@
-package org.projectodd.restafari.container.protocols.stomp.commands;
+package org.projectodd.restafari.container.protocols.stomp;
 
-import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.AttributeKey;
-import org.projectodd.restafari.container.protocols.stomp.StompControlFrame;
-import org.projectodd.restafari.container.protocols.stomp.StompFrame;
-
-import java.util.UUID;
+import org.projectodd.restafari.stomp.AbstractControlFrameHandler;
+import org.projectodd.restafari.stomp.StompControlFrame;
+import org.projectodd.restafari.stomp.StompFrame;
 
 /**
  * @author Bob McWhirter

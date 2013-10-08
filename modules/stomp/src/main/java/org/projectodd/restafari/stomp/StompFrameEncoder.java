@@ -1,4 +1,4 @@
-package org.projectodd.restafari.container.protocols.stomp;
+package org.projectodd.restafari.stomp;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

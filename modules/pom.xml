@@ -84,6 +84,7 @@
 
     <modules>
       <module>spi</module>
+      <module>stomp</module>
       <module>container</module>
       <module>mongo</module>
       <module>deployer</module>
