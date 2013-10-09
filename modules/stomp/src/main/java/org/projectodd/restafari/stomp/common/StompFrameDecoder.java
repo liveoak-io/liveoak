@@ -1,9 +1,10 @@
-package org.projectodd.restafari.stomp;
+package org.projectodd.restafari.stomp.common;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
+import org.projectodd.restafari.stomp.Stomp;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -38,6 +39,8 @@ public class StompFrameDecoder extends ReplayingDecoder<Void> {
                 frame = new StompControlFrame( header );
             }
         }
+
+        System.err.println( "decode: " + frame );
 
         out.add( frame );
     }
@@ -89,7 +92,7 @@ public class StompFrameDecoder extends ReplayingDecoder<Void> {
     protected FrameHeader processHeaderLine(FrameHeader header, String line) {
         if (header == null) {
             header = new FrameHeader();
-            StompFrame.Command command = StompFrame.Command.valueOf(line);
+            Stomp.Command command = Stomp.Command.valueOf(line);
             header.setCommand( command );
             return header;
         }

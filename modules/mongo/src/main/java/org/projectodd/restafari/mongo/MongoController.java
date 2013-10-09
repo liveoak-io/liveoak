@@ -43,7 +43,7 @@ public class MongoController implements ResourceController {
                 throw new InitializationException("Unknown database " + dbName);
             }
         } catch (UnknownHostException e) {
-            throw new InitializationException("Could not connect to " + host + " on port " + port);
+            throw new InitializationException("Could not handleConnect to " + host + " on port " + port);
         }
     }
 

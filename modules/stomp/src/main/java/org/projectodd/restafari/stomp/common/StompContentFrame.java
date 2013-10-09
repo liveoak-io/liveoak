@@ -1,18 +1,20 @@
-package org.projectodd.restafari.stomp;
+package org.projectodd.restafari.stomp.common;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import org.projectodd.restafari.stomp.Headers;
+import org.projectodd.restafari.stomp.Stomp;
 
 /**
  * @author Bob McWhirter
  */
 public class StompContentFrame extends StompFrame {
 
-    public StompContentFrame(Command command) {
+    public StompContentFrame(Stomp.Command command) {
         super( command );
     }
 
-    public StompContentFrame(Command command, Headers headers) {
+    public StompContentFrame(Stomp.Command command, Headers headers) {
         super( command, headers );
     }
 

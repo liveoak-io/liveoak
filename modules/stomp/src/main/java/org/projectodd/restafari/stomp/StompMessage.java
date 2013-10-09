@@ -30,6 +30,4 @@ public interface StompMessage {
         void ack(String transactionId) throws StompException;
         void nack(String transactionId) throws StompException;
 
-        StompMessage duplicate();
-
 }

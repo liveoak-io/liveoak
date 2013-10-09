@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-package org.projectodd.restafari.stomp;
+package org.projectodd.restafari.stomp.common;
+
+import org.projectodd.restafari.stomp.Headers;
 
 import java.util.HashMap;
 import java.util.Map;

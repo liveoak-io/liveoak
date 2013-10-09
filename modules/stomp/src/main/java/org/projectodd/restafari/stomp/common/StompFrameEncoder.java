@@ -1,9 +1,11 @@
-package org.projectodd.restafari.stomp;
+package org.projectodd.restafari.stomp.common;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.projectodd.restafari.stomp.Headers;
 
+import java.nio.charset.Charset;
 import java.util.Set;
 
 /**
@@ -21,6 +23,8 @@ public class StompFrameEncoder extends MessageToByteEncoder<StompFrame> {
     protected void encode(ChannelHandlerContext ctx, StompFrame frame, ByteBuf out) throws Exception {
         writeHeader( frame, out );
         writeContent( frame, out );
+
+        System.err.println( "encode: " + out.toString(Charset.defaultCharset() ) );
     }
 
     protected void writeHeader(StompFrame frame, ByteBuf buffer) {
@@ -39,7 +43,7 @@ public class StompFrameEncoder extends MessageToByteEncoder<StompFrame> {
 
         if (frame instanceof StompContentFrame) {
             int length = ((StompContentFrame) frame).getContent().readableBytes();
-            buffer.writeBytes( StompFrame.Header.CONTENT_LENGTH.getBytes() );
+            buffer.writeBytes(Headers.CONTENT_LENGTH.getBytes());
             buffer.writeBytes( HEADER_DELIM );
             buffer.writeBytes( ("" + length).getBytes() );
             buffer.writeByte( NEWLINE );

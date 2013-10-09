@@ -1,13 +1,14 @@
-package org.projectodd.restafari.stomp;
+package org.projectodd.restafari.stomp.common;
 
 import io.netty.channel.ChannelHandlerContext;
+import org.projectodd.restafari.stomp.Stomp;
 
 /**
  * @author Bob McWhirter
  */
 public abstract class AbstractControlFrameHandler extends AbstractFrameHandler {
 
-    public AbstractControlFrameHandler(StompFrame.Command command) {
+    public AbstractControlFrameHandler(Stomp.Command command) {
         super(command);
     }
 

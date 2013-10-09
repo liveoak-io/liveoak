@@ -1,14 +1,15 @@
-package org.projectodd.restafari.stomp;
+package org.projectodd.restafari.stomp.common;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import org.projectodd.restafari.stomp.Stomp;
 
 /**
  * @author Bob McWhirter
  */
 public abstract class AbstractFrameHandler extends ChannelDuplexHandler {
 
-    public AbstractFrameHandler(StompFrame.Command command) {
+    public AbstractFrameHandler(Stomp.Command command) {
         this.command = command;
     }
 
@@ -22,5 +23,5 @@ public abstract class AbstractFrameHandler extends ChannelDuplexHandler {
 
     protected abstract void handleFrame(ChannelHandlerContext ctx, StompFrame frame) throws Exception;
 
-    private StompFrame.Command command;
+    private Stomp.Command command;
 }

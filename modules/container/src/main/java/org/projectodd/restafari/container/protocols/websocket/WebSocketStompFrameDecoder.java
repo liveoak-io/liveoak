@@ -5,7 +5,7 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-import org.projectodd.restafari.stomp.StompFrameDecoder;
+import org.projectodd.restafari.stomp.common.StompFrameDecoder;
 
 import java.util.List;
 

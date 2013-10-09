@@ -4,4 +4,8 @@ package org.projectodd.restafari.stomp;
  * @author Bob McWhirter
  */
 public class StompException extends Exception {
+
+    public StompException(String message) {
+        super( message );
+    }
 }
