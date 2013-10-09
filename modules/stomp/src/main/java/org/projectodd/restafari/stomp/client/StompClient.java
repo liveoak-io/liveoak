@@ -17,6 +17,7 @@ import org.projectodd.restafari.stomp.common.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -62,12 +63,12 @@ public class StompClient {
         this.channel = connectFuture.channel();
     }
 
-    public void connect(String host, int port, Function<StompClient, Void> callback) throws InterruptedException {
+    public void connect(String host, int port, Consumer<StompClient> callback) throws InterruptedException {
         Bootstrap bootstrap = createBootstrap( host );
         ChannelFuture connectFuture = bootstrap.connect(host, port);
         connectFuture.addListener((f) -> {
             this.channel = connectFuture.channel();
-            callback.apply(StompClient.this);
+            callback.accept(this);
         });
     }
 
