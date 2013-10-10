@@ -1,6 +1,7 @@
 package org.projectodd.restafari.stomp.client;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -25,7 +26,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-/** STOMP client.
+/**
+ * STOMP client.
  *
  * <p>This client may be used in synchronous or asynchronous environments</p>
  *
@@ -40,7 +42,8 @@ public class StompClient {
         DISCONNECTING;
     }
 
-    /** Construct a new client.
+    /**
+     * Construct a new client.
      */
     public StompClient() {
 
@@ -58,10 +61,11 @@ public class StompClient {
         bootstrap.handler(new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel ch) throws Exception {
-                ch.pipeline().addLast(new DebugHandler("client-head"));
                 ch.pipeline().addLast(new StompFrameEncoder());
                 ch.pipeline().addLast(new StompFrameDecoder());
                 ch.pipeline().addLast(new ConnectionNegotiatingHandler(clientContext, callback));
+                ch.pipeline().addLast(new StompMessageEncoder());
+                ch.pipeline().addLast(new StompMessageDecoder());
                 ch.pipeline().addLast(new MessageHandler(clientContext, executor));
             }
         });
@@ -69,7 +73,8 @@ public class StompClient {
         return bootstrap;
     }
 
-    /** Retrieve the current state of the connection.
+    /**
+     * Retrieve the current state of the connection.
      *
      * @return The current state.
      */
@@ -78,12 +83,13 @@ public class StompClient {
     }
 
 
-    /** Connect synchronously.
+    /**
+     * Connect synchronously.
      *
      * @param host Host to connect to.
      * @param port Port to connect to.
      * @throws InterruptedException If the connection times out.
-     * @throws StompException If an error occurs during connection.
+     * @throws StompException       If an error occurs during connection.
      */
     public void connectSync(String host, int port) throws InterruptedException, StompException {
         CountDownLatch latch = new CountDownLatch(1);
@@ -93,23 +99,24 @@ public class StompClient {
         latch.await(30, TimeUnit.SECONDS);
     }
 
-    /** Connect asynchronously
+    /**
+     * Connect asynchronously
      *
-     * @param host Host to connect to.
-     * @param port Port to connect to.
+     * @param host     Host to connect to.
+     * @param port     Port to connect to.
      * @param callback Callback to fire after successfully connecting.
-     * @throws InterruptedException
      */
-    public void connect(String host, int port, Consumer<StompClient> callback) throws InterruptedException {
+    public void connect(String host, int port, Consumer<StompClient> callback) {
         this.host = host;
         Bootstrap bootstrap = createBootstrap(host, callback);
         bootstrap.connect(host, port);
     }
 
-    /** Disconnect synchronously
+    /**
+     * Disconnect synchronously
      *
      * @throws InterruptedException If the disconnect times out.
-     * @throws StompException If an error occurs during disconnection.
+     * @throws StompException       If an error occurs during disconnection.
      */
     public void disconnectSync() throws StompException, InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
@@ -119,7 +126,8 @@ public class StompClient {
         latch.await(30, TimeUnit.SECONDS);
     }
 
-    /** Disconnect asynchronously
+    /**
+     * Disconnect asynchronously
      *
      * @param callback Callback to fire after successfully disconnecting.
      */
@@ -128,35 +136,66 @@ public class StompClient {
         this.channel.writeAndFlush(StompFrame.newDisconnectFrame());
     }
 
-    /** Send a message to the server.
+    /**
+     * Send a message to the server.
      *
      * <p>The message should be fully-formed, including a destination
      * header indicating where the message should be sent.</p>
      *
-     * @param message
+     * @param message The message to send.
      */
     public void send(StompMessage message) {
         this.channel.writeAndFlush(message);
     }
 
-    /** Subscribe to a destination.
+    public void send(String destination, ByteBuf content) {
+        StompMessage message = new DefaultStompMessage();
+        message.setDestination(destination);
+        message.setContent(content);
+        send( message );
+    }
+
+    public void send(String destination, String content) {
+        StompMessage message = new DefaultStompMessage();
+        message.setDestination(destination);
+        message.setContentAsString(content);
+        send( message );
+    }
+
+    public void send(String destination, Headers headers, String content) {
+        StompMessage message = new DefaultStompMessage();
+        message.setDestination(destination);
+        message.setContentAsString(content);
+        send( message );
+    }
+
+    public void send(String destination, Headers header, ByteBuf content) {
+        StompMessage message = new DefaultStompMessage();
+        message.setDestination(destination);
+        message.setContent(content);
+        send( message );
+    }
+
+    /**
+     * Subscribe to a destination.
      *
      * @param destination The destination to subscribe to.
-     * @param handler Handler for inbound messages sent from the server.
+     * @param handler     Handler for inbound messages sent from the server.
      */
     public void subscribe(String destination, Consumer<StompMessage> handler) {
         subscribe(destination, new HeadersImpl(), handler);
     }
 
-    /** Subscribe to a destination.
+    /**
+     * Subscribe to a destination.
      *
      * <p>Additional headers may be included to support complex subscriptions.
      * The {@code destination} paramter will be added to the headers on
      * your behalf.</p>
      *
      * @param destination The destination to subscribe to.
-     * @param headers Additional headers.
-     * @param handler Handler for inbound messages sent from the server.
+     * @param headers     Additional headers.
+     * @param handler     Handler for inbound messages sent from the server.
      */
     public void subscribe(String destination, Headers headers, Consumer<StompMessage> handler) {
         String subscriptionId = "sub-" + subscriptionCounter.getAndIncrement();

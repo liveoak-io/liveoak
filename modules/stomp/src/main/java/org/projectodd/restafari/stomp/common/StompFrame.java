@@ -33,7 +33,7 @@ public class StompFrame {
     /**
      * Create a new outbound frame.
      *
-     * @param command
+     * @param command The command for this frame.
      */
     public StompFrame(Stomp.Command command) {
         this.header = new FrameHeader( command );

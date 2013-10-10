@@ -1,6 +1,9 @@
 package org.projectodd.restafari.stomp.server;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
+
+import org.projectodd.restafari.stomp.StompMessage;
 import org.projectodd.restafari.stomp.client.StompClient;
 
 import java.util.concurrent.CountDownLatch;
@@ -20,8 +23,16 @@ public class SimpleServerTest {
 
         StompClient client = new StompClient();
         client.connectSync("localhost", 8675);
+        client.send( "/people/bob", "howdy!" );
         client.disconnectSync();
         server.stop();
+
+        assertEquals(1, serverContext.getSentMessages().size());
+
+        StompMessage msg = serverContext.getSentMessages().get(0);
+
+        assertEquals( "/people/bob", msg.getDestination() );
+        assertEquals( "howdy!", msg.getContentAsString() );
     }
 
     @Test
@@ -34,7 +45,7 @@ public class SimpleServerTest {
         CountDownLatch latch = new CountDownLatch(1);
         StompClient client = new StompClient();
         client.connect("localhost", 8675, (c) -> {
-            System.err.println( "client connected" );
+            c.send( "/people/bob", "dude..." );
             c.disconnect(() -> {
                 try {
                     server.stop();
@@ -46,5 +57,10 @@ public class SimpleServerTest {
         });
 
         latch.await();
+
+        StompMessage msg = serverContext.getSentMessages().get(0);
+
+        assertEquals( "/people/bob", msg.getDestination() );
+        assertEquals( "dude...", msg.getContentAsString() );
     }
 }

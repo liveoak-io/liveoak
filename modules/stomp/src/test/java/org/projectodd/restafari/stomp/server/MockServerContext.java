@@ -3,6 +3,9 @@ package org.projectodd.restafari.stomp.server;
 import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.StompMessage;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Bob McWhirter
  */
@@ -10,7 +13,7 @@ public class MockServerContext implements ServerContext {
 
     @Override
     public void handleConnect(StompConnection connection) {
-        System.err.println( "connected: " + connection );
+        System.err.println("connected: " + connection);
     }
 
     @Override
@@ -30,6 +33,12 @@ public class MockServerContext implements ServerContext {
 
     @Override
     public void handleSend(StompConnection connection, StompMessage message) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.sentMessages.add(message);
     }
+
+    public List<StompMessage> getSentMessages() {
+        return this.sentMessages;
+    }
+
+    private List<StompMessage> sentMessages = new ArrayList<>();
 }

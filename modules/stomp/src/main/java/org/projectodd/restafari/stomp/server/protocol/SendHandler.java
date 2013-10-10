@@ -1,5 +1,6 @@
 package org.projectodd.restafari.stomp.server.protocol;
 
+import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.projectodd.restafari.stomp.Stomp;
 import org.projectodd.restafari.stomp.StompMessage;
@@ -13,24 +14,22 @@ import org.projectodd.restafari.stomp.server.StompConnection;
 /**
  * @author Bob McWhirter
  */
-public class SendHandler extends AbstractFrameHandler {
+public class SendHandler extends ChannelDuplexHandler {
 
 
     public SendHandler(ServerContext serverContext) {
-        super( Stomp.Command.SEND );
         this.serverContext = serverContext;
-
     }
-    @Override
-    public void handleFrame(ChannelHandlerContext ctx, StompFrame msg) throws Exception {
-        if ( msg instanceof StompContentFrame) {
-            StompConnection connection = ctx.attr(ConnectHandler.CONNECTION ).get();
-            StompMessage message = new DefaultStompMessage( msg.getHeaders(), ((StompContentFrame) msg).getContent() );
-            this.serverContext.handleSend(connection, message);
-        } else {
-            ctx.fireChannelRead(msg);
-        }
 
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (msg instanceof StompMessage) {
+            StompMessage stompMessage = (StompMessage) msg;
+            StompConnection connection = ctx.attr(ConnectHandler.CONNECTION).get();
+            this.serverContext.handleSend(connection, stompMessage);
+        } else {
+            super.channelRead(ctx, msg);
+        }
     }
 
     private ServerContext serverContext;

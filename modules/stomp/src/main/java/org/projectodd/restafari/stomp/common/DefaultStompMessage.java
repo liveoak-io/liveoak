@@ -15,6 +15,10 @@ public class DefaultStompMessage implements StompMessage {
 
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
+    public DefaultStompMessage() {
+        this( new HeadersImpl() );
+    }
+
     public DefaultStompMessage(Headers headers) {
         this( headers, null, false );
     }

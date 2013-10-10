@@ -40,8 +40,6 @@ public class StompFrameDecoder extends ReplayingDecoder<Void> {
             }
         }
 
-        System.err.println( "decode: " + frame );
-
         out.add( frame );
     }
 

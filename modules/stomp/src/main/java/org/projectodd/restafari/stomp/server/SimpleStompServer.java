@@ -8,13 +8,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
-import org.projectodd.restafari.stomp.common.DebugHandler;
-import org.projectodd.restafari.stomp.common.StompFrameDecoder;
-import org.projectodd.restafari.stomp.common.StompFrameEncoder;
-import org.projectodd.restafari.stomp.server.protocol.ConnectHandler;
-import org.projectodd.restafari.stomp.server.protocol.DisconnectHandler;
-import org.projectodd.restafari.stomp.server.protocol.SubscribeHandler;
-import org.projectodd.restafari.stomp.server.protocol.UnsubscribeHandler;
+import org.projectodd.restafari.stomp.common.*;
+import org.projectodd.restafari.stomp.server.protocol.*;
 
 /**
  * @author Bob McWhirter
@@ -43,24 +38,23 @@ public class SimpleStompServer {
         return new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel ch) throws Exception {
-                ch.pipeline().addLast( new DebugHandler( "server-head" ) );
                 ch.pipeline().addLast( new StompFrameDecoder() );
                 ch.pipeline().addLast( new StompFrameEncoder() );
+                ch.pipeline().addLast( new StompMessageDecoder() );
+                ch.pipeline().addLast( new StompMessageEncoder() );
+                ch.pipeline().addLast( new SendHandler( SimpleStompServer.this.serverContext ) );
                 ch.pipeline().addLast( new ConnectHandler( SimpleStompServer.this.serverContext ) );
                 ch.pipeline().addLast( new SubscribeHandler( SimpleStompServer.this.serverContext ) );
                 ch.pipeline().addLast( new UnsubscribeHandler( SimpleStompServer.this.serverContext ) );
                 ch.pipeline().addLast( new DisconnectHandler( SimpleStompServer.this.serverContext ) );
-                ch.pipeline().addLast( new DebugHandler( "server-tail" ) );
             }
         };
     }
 
 
     public void stop() throws InterruptedException {
-        System.err.println("stopping");
         Future<?> future = this.group.shutdownGracefully();
         future.sync();
-        System.err.println("stopped");
     }
 
     private final String host;

@@ -30,11 +30,9 @@ public class ConnectionNegotiatingHandler extends AbstractControlFrameHandler {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.err.println("client channel active, send CONNECT");
         StompControlFrame connectFrame = new StompControlFrame(Stomp.Command.CONNECT);
         connectFrame.setHeader(Headers.HOST, this.clientContext.getHost());
         connectFrame.setHeader(Headers.ACCEPT_VERSION, Stomp.Version.supportedVersions());
-        System.err.println( ctx.pipeline() );
         ctx.writeAndFlush(connectFrame);
     }
 
