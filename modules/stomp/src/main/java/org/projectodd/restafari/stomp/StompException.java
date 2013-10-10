@@ -6,6 +6,10 @@ package org.projectodd.restafari.stomp;
 public class StompException extends Exception {
 
     public StompException(String message) {
-        super( message );
+        super(message);
+    }
+
+    public StompException(Throwable cause) {
+        super(cause);
     }
 }

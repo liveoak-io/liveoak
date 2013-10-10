@@ -8,6 +8,7 @@ import org.projectodd.restafari.stomp.common.AbstractControlFrameHandler;
 import org.projectodd.restafari.stomp.common.StompControlFrame;
 import org.projectodd.restafari.stomp.server.ServerContext;
 import org.projectodd.restafari.stomp.server.StompConnection;
+import org.projectodd.restafari.stomp.server.StompServerException;
 
 /**
  * @author Bob McWhirter
@@ -20,7 +21,7 @@ public class DisconnectHandler extends AbstractControlFrameHandler {
     }
 
     @Override
-    protected void handleControlFrame(ChannelHandlerContext ctx, StompControlFrame frame) throws Exception {
+    protected void handleControlFrame(ChannelHandlerContext ctx, StompControlFrame frame) throws StompServerException {
         StompConnection stompConnection = ctx.attr(ConnectHandler.CONNECTION).get();
         this.serverContext.handleDisconnect(stompConnection);
         String receiptId = frame.getHeader(Headers.RECEIPT);

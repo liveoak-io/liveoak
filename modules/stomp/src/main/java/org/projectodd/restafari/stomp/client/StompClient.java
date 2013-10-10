@@ -61,6 +61,7 @@ public class StompClient {
         bootstrap.handler(new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel ch) throws Exception {
+                ch.pipeline().addLast( new DebugHandler("client-head" ) );
                 ch.pipeline().addLast(new StompFrameEncoder());
                 ch.pipeline().addLast(new StompFrameDecoder());
                 ch.pipeline().addLast(new ConnectionNegotiatingHandler(clientContext, callback));

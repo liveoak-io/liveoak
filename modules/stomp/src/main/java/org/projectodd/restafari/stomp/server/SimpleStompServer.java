@@ -38,15 +38,22 @@ public class SimpleStompServer {
         return new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel ch) throws Exception {
+                // bytes into frames
                 ch.pipeline().addLast( new StompFrameDecoder() );
                 ch.pipeline().addLast( new StompFrameEncoder() );
-                ch.pipeline().addLast( new StompMessageDecoder() );
-                ch.pipeline().addLast( new StompMessageEncoder() );
-                ch.pipeline().addLast( new SendHandler( SimpleStompServer.this.serverContext ) );
+                // handle frames
                 ch.pipeline().addLast( new ConnectHandler( SimpleStompServer.this.serverContext ) );
+                ch.pipeline().addLast( new DisconnectHandler( SimpleStompServer.this.serverContext ) );
                 ch.pipeline().addLast( new SubscribeHandler( SimpleStompServer.this.serverContext ) );
                 ch.pipeline().addLast( new UnsubscribeHandler( SimpleStompServer.this.serverContext ) );
-                ch.pipeline().addLast( new DisconnectHandler( SimpleStompServer.this.serverContext ) );
+                // convert some frames to messages
+                ch.pipeline().addLast( new StompMessageDecoder() );
+                ch.pipeline().addLast( new StompMessageEncoder() );
+                // handle messages
+                ch.pipeline().addLast( new SendHandler( SimpleStompServer.this.serverContext ) );
+                // catch errors, return an ERROR message.
+                ch.pipeline().addLast( new ErrorHandler() );
+                ch.pipeline().addLast( new ReceiptHandler() );
             }
         };
     }

@@ -39,9 +39,7 @@ public class DisconnectionNegotiatingHandler extends ChannelDuplexHandler {
                     this.clientContext.setConnectionState(StompClient.ConnectionState.DISCONNECTED);
                     ctx.close();
                     if (this.callback != null) {
-                        ctx.executor().execute(() -> {
-                            this.callback.run();
-                        });
+                        this.callback.run();
                     }
                 }
             }

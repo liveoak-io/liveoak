@@ -34,6 +34,10 @@ public class DefaultStompMessage implements StompMessage {
         this.error = error;
     }
 
+    public DefaultStompMessage(boolean error) {
+        this.error = error;
+    }
+
     @Override
     public String getId() {
         return this.headers.get( Headers.MESSAGE_ID );

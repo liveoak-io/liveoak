@@ -23,8 +23,11 @@ public class SimpleServerTest {
 
         StompClient client = new StompClient();
         client.connectSync("localhost", 8675);
+        System.err.println( "sending" );
         client.send( "/people/bob", "howdy!" );
+        System.err.println( "disconnecting" );
         client.disconnectSync();
+        System.err.println( "disconnected" );
         server.stop();
 
         assertEquals(1, serverContext.getSentMessages().size());

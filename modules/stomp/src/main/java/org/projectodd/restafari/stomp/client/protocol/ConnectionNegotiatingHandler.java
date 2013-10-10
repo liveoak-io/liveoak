@@ -7,6 +7,7 @@ import org.projectodd.restafari.stomp.common.AbstractControlFrameHandler;
 import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.Stomp;
 import org.projectodd.restafari.stomp.common.StompControlFrame;
+import org.projectodd.restafari.stomp.server.StompServerException;
 
 import java.net.SocketAddress;
 import java.util.function.Consumer;
@@ -23,9 +24,9 @@ public class ConnectionNegotiatingHandler extends AbstractControlFrameHandler {
     }
 
     @Override
-    public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise future) throws Exception {
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         this.clientContext.setConnectionState(StompClient.ConnectionState.CONNECTING);
-        super.connect(ctx, remoteAddress, localAddress, future);
+        super.channelRegistered(ctx);
     }
 
     @Override
@@ -34,10 +35,11 @@ public class ConnectionNegotiatingHandler extends AbstractControlFrameHandler {
         connectFrame.setHeader(Headers.HOST, this.clientContext.getHost());
         connectFrame.setHeader(Headers.ACCEPT_VERSION, Stomp.Version.supportedVersions());
         ctx.writeAndFlush(connectFrame);
+        super.channelActive(ctx);
     }
 
     @Override
-    protected void handleControlFrame(ChannelHandlerContext ctx, StompControlFrame frame) throws Exception {
+    protected void handleControlFrame(ChannelHandlerContext ctx, StompControlFrame frame) throws StompServerException {
         String version = frame.getHeader(Headers.VERSION);
         if (version != null) {
             this.clientContext.setVersion(Stomp.Version.forVersionString(version));
@@ -46,11 +48,8 @@ public class ConnectionNegotiatingHandler extends AbstractControlFrameHandler {
         ctx.pipeline().replace(this, "stomp-disconnection-negotiator", new DisconnectionNegotiatingHandler(this.clientContext));
         this.clientContext.setConnectionState(StompClient.ConnectionState.CONNECTED);
         this.clientContext.setChannel(ctx.channel());
-        ctx.fireChannelActive();
         if (this.callback != null) {
-            ctx.executor().execute(() -> {
-                this.callback.accept(clientContext.getClient());
-            });
+            this.callback.accept(clientContext.getClient());
         }
     }
 
