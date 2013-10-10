@@ -15,8 +15,19 @@ import java.util.Set;
  */
 public class StompMessageEncoder extends MessageToMessageEncoder<StompMessage> {
 
+    public StompMessageEncoder(boolean server) {
+        this.server = server;
+
+    }
+
     @Override
     protected void encode(ChannelHandlerContext ctx, StompMessage msg, List<Object> out) throws Exception {
-        out.add( StompFrame.newSendFrame( msg ) );
+        if (server) {
+            out.add(StompFrame.newMessageFrame(msg) );
+        } else {
+            out.add(StompFrame.newSendFrame(msg));
+        }
     }
+
+    private boolean server;
 }

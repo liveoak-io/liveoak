@@ -48,7 +48,7 @@ public class SimpleStompServer {
                 ch.pipeline().addLast( new UnsubscribeHandler( SimpleStompServer.this.serverContext ) );
                 // convert some frames to messages
                 ch.pipeline().addLast( new StompMessageDecoder() );
-                ch.pipeline().addLast( new StompMessageEncoder() );
+                ch.pipeline().addLast( new StompMessageEncoder(true) );
                 // handle messages
                 ch.pipeline().addLast( new SendHandler( SimpleStompServer.this.serverContext ) );
                 // catch errors, return an ERROR message.

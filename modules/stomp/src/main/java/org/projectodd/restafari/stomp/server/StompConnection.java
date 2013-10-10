@@ -1,5 +1,6 @@
 package org.projectodd.restafari.stomp.server;
 
+import io.netty.channel.Channel;
 import org.projectodd.restafari.stomp.StompMessage;
 
 import java.util.UUID;
@@ -9,7 +10,8 @@ import java.util.UUID;
  */
 public class StompConnection {
 
-    public StompConnection() {
+    public StompConnection(Channel channel) {
+        this.channel = channel;
         this.connectionId = UUID.randomUUID().toString();
     }
 
@@ -18,9 +20,10 @@ public class StompConnection {
     }
 
     void send(StompMessage message) {
-
+        this.channel.write( message );
     }
 
     private String connectionId;
+    private Channel channel;
 
 }

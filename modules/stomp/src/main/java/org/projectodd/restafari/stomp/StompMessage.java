@@ -7,27 +7,36 @@ import io.netty.buffer.ByteBuf;
  */
 public interface StompMessage {
 
-        String getId();
-        Headers getHeaders();
+    String getId();
 
-        String getDestination();
-        void setDestination(String destination);
+    Headers getHeaders();
 
-        String getContentType();
-        void setContentType(String contentType);
+    String getDestination();
 
-        String getContentAsString();
-        void setContentAsString(String content);
+    void setDestination(String destination);
 
-        ByteBuf getContent();
-        void setContent(ByteBuf content);
+    String getContentType();
 
-        boolean isError();
+    void setContentType(String contentType);
 
-        void ack() throws StompException;
-        void nack() throws StompException;
+    String getContentAsString();
 
-        void ack(String transactionId) throws StompException;
-        void nack(String transactionId) throws StompException;
+    void setContentAsString(String content);
+
+    ByteBuf getContent();
+
+    void setContent(ByteBuf content);
+
+    boolean isError();
+
+    void ack() throws StompException;
+
+    void nack() throws StompException;
+
+    void ack(String transactionId) throws StompException;
+
+    void nack(String transactionId) throws StompException;
+
+    StompMessage duplicate();
 
 }

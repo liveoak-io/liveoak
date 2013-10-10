@@ -61,11 +61,10 @@ public class StompClient {
         bootstrap.handler(new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel ch) throws Exception {
-                ch.pipeline().addLast( new DebugHandler("client-head" ) );
                 ch.pipeline().addLast(new StompFrameEncoder());
                 ch.pipeline().addLast(new StompFrameDecoder());
                 ch.pipeline().addLast(new ConnectionNegotiatingHandler(clientContext, callback));
-                ch.pipeline().addLast(new StompMessageEncoder());
+                ch.pipeline().addLast(new StompMessageEncoder(false));
                 ch.pipeline().addLast(new StompMessageDecoder());
                 ch.pipeline().addLast(new MessageHandler(clientContext, executor));
             }
@@ -149,6 +148,12 @@ public class StompClient {
         this.channel.writeAndFlush(message);
     }
 
+    /**
+     * Send a message to the server.
+     *
+     * @param destination The destination.
+     * @param content The content bytes.
+     */
     public void send(String destination, ByteBuf content) {
         StompMessage message = new DefaultStompMessage();
         message.setDestination(destination);
@@ -156,6 +161,12 @@ public class StompClient {
         send( message );
     }
 
+    /**
+     * Send a message to the server.
+     *
+     * @param destination The destination.
+     * @param content The content, as a UTF-8 string.
+     */
     public void send(String destination, String content) {
         StompMessage message = new DefaultStompMessage();
         message.setDestination(destination);
@@ -163,15 +174,31 @@ public class StompClient {
         send( message );
     }
 
+    /**
+     * Send a message to the server.
+     *
+     * @param destination The destination.
+     * @param headers Additional headers.
+     * @param content The content, as a UTF-8 string.
+     */
     public void send(String destination, Headers headers, String content) {
         StompMessage message = new DefaultStompMessage();
+        message.getHeaders().putAll( headers );
         message.setDestination(destination);
         message.setContentAsString(content);
         send( message );
     }
 
-    public void send(String destination, Headers header, ByteBuf content) {
+    /**
+     * Send a message to the server.
+     *
+     * @param destination The destination.
+     * @param headers Additional headers.
+     * @param content The content bytes.
+     */
+    public void send(String destination, Headers headers, ByteBuf content) {
         StompMessage message = new DefaultStompMessage();
+        message.getHeaders().putAll( headers );
         message.setDestination(destination);
         message.setContent(content);
         send( message );
@@ -203,6 +230,7 @@ public class StompClient {
         this.subscriptions.put(subscriptionId, handler);
         StompControlFrame frame = new StompControlFrame(Stomp.Command.SUBSCRIBE);
         frame.getHeaders().putAll(headers);
+        frame.setHeader( Headers.ID, subscriptionId );
         frame.setHeader(Headers.DESTINATION, destination);
         this.channel.writeAndFlush(frame);
     }

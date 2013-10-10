@@ -23,7 +23,7 @@ public class UnsubscribeHandler extends AbstractControlFrameHandler {
     @Override
     public void handleControlFrame(ChannelHandlerContext ctx, StompControlFrame msg) throws StompServerException {
         String subscriptionId = msg.getHeader(Headers.ID );
-        StompConnection stompConnection = ctx.attr( ConnectHandler.CONNECTION ).get();
+        StompConnection stompConnection = ctx.channel().attr( ConnectHandler.CONNECTION ).get();
         this.serverContext.handleUnsubscribe(stompConnection, subscriptionId);
     }
 

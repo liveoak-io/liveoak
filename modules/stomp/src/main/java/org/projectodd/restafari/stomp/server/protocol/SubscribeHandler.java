@@ -23,7 +23,7 @@ public class SubscribeHandler extends AbstractControlFrameHandler {
     public void handleControlFrame(ChannelHandlerContext ctx, StompControlFrame msg) throws StompServerException {
         String subscriptionId = msg.getHeader(Headers.ID );
         String destination = msg.getHeader( Headers.DESTINATION );
-        StompConnection stompConnection = ctx.attr(ConnectHandler.CONNECTION).get();
+        StompConnection stompConnection = ctx.channel().attr(ConnectHandler.CONNECTION).get();
         this.serverContext.handleSubscribe(stompConnection, destination, subscriptionId, msg.getHeaders());
     }
 

@@ -25,7 +25,7 @@ public class SendHandler extends SimpleChannelInboundHandler<StompMessage> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, StompMessage msg) throws Exception {
         StompMessage stompMessage = (StompMessage) msg;
-        StompConnection connection = ctx.attr(ConnectHandler.CONNECTION).get();
+        StompConnection connection = ctx.channel().attr(ConnectHandler.CONNECTION).get();
         this.serverContext.handleSend(connection, stompMessage);
 
         ctx.fireChannelRead(msg);

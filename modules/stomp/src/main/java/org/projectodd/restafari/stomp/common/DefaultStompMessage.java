@@ -109,6 +109,10 @@ public class DefaultStompMessage implements StompMessage {
     public void nack(String transactionId) throws StompException {
     }
 
+    public StompMessage duplicate() {
+        return new DefaultStompMessage( this.headers, this.content.duplicate().retain(), this.error );
+    }
+
     private Headers headers;
     private ByteBuf content;
     private boolean error;

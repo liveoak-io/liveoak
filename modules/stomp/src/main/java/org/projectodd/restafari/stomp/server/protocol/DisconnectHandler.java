@@ -22,7 +22,7 @@ public class DisconnectHandler extends AbstractControlFrameHandler {
 
     @Override
     protected void handleControlFrame(ChannelHandlerContext ctx, StompControlFrame frame) throws StompServerException {
-        StompConnection stompConnection = ctx.attr(ConnectHandler.CONNECTION).get();
+        StompConnection stompConnection = ctx.channel().attr(ConnectHandler.CONNECTION).get();
         this.serverContext.handleDisconnect(stompConnection);
         String receiptId = frame.getHeader(Headers.RECEIPT);
         ChannelFuture future = ctx.writeAndFlush(StompControlFrame.newReceiptFrame(receiptId));

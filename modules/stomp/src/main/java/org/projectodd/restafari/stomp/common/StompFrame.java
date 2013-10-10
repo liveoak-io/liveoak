@@ -75,6 +75,12 @@ public class StompFrame {
         return frame;
     }
 
+    public static StompFrame newMessageFrame(StompMessage message) {
+        StompContentFrame frame = new StompContentFrame( Stomp.Command.MESSAGE, message.getHeaders() );
+        frame.setContent(Unpooled.copiedBuffer(message.getContent()));
+        return frame;
+    }
+
     public static StompFrame newConnectedFrame(String sessionId, Stomp.Version version) {
         StompControlFrame frame = new StompControlFrame( Stomp.Command.CONNECTED );
         frame.setHeader( Headers.SESSION, sessionId );

@@ -62,8 +62,8 @@ public class Stomp {
         SEND( true ),
         MESSAGE( true ),
 
-        SUBSCRIBE( true ),
-        UNSUBSCRIBE( true ),
+        SUBSCRIBE( false ),
+        UNSUBSCRIBE( false ),
 
         BEGIN( false ),
         COMMIT( false ),
