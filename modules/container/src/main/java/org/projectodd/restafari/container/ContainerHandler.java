@@ -3,6 +3,10 @@ package org.projectodd.restafari.container;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 
+import io.netty.handler.codec.http.DefaultHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 import org.projectodd.restafari.container.requests.BaseRequest;
 import org.projectodd.restafari.container.requests.CreateResourceRequest;
 import org.projectodd.restafari.container.requests.DeleteResourceRequest;
@@ -33,7 +37,18 @@ public class ContainerHandler extends ChannelDuplexHandler {
             dispatchUpdateResourceRequest(ctx, (UpdateResourceRequest) msg);
         } else if (msg instanceof DeleteResourceRequest) {
             dispatchDeleteResourceRequest(ctx, (DeleteResourceRequest) msg);
+        } else {
+            dispatchNotFound(ctx, msg);
         }
+    }
+
+    protected void dispatchNotFound(ChannelHandlerContext ctx, Object msg) {
+        DefaultHttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1,
+            new HttpResponseStatus(HttpResponseStatus.NOT_FOUND.code(), HttpResponseStatus.NOT_FOUND.reasonPhrase()));
+
+        response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
+        ctx.pipeline().write(response);
+        ctx.pipeline().flush();
     }
 
     protected void dispatchGetCollectionRequest(ChannelHandlerContext ctx, GetCollectionRequest msg) {
