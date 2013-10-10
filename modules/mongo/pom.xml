@@ -57,17 +57,22 @@
         <dependency>
             <groupId>org.projectodd.restafari</groupId>
             <artifactId>restafari-container</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>com.github.joelittlejohn.embedmongo</groupId>
+          <artifactId>embedmongo-maven-plugin</artifactId>
+          <version>0.1.9</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
+
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
@@ -75,6 +80,46 @@
                         <id>assemble-module</id>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <executions>
+                <execution>
+                   <id>test</id>
+                   <phase>integration-test</phase>
+                   <goals><goal>test</goal></goals>
+                </execution>
+                <execution>
+                  <id>default-test</id>
+                  <configuration>
+                    <skip>true</skip>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+            <plugin>
+              <groupId>com.github.joelittlejohn.embedmongo</groupId>
+              <artifactId>embedmongo-maven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>start-mongodb</id>
+                  <phase>pre-integration-test</phase>
+                  <goals><goal>start</goal></goals>
+                  <configuration>
+                    <port>27018</port> <!-- TODO: expose this as a property -->
+                    <logging>file</logging>
+                    <logFile>${project.build.directory}/mongodb.log</logFile>
+                  </configuration>
+                </execution>
+                <execution>
+                  <id>stop-mongodb</id>
+                  <phase>post-integration-test</phase>
+                  <goals>
+                    <goal>stop</goal>
+                  </goals>
+                </execution>
+              </executions>
             </plugin>
         </plugins>
     </build>

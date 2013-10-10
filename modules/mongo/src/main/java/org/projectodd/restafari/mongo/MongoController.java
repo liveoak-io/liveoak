@@ -1,12 +1,8 @@
 package org.projectodd.restafari.mongo;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 import org.bson.types.ObjectId;
+import org.projectodd.restafari.container.SimpleObjectResource;
 import org.projectodd.restafari.spi.Config;
 import org.projectodd.restafari.spi.ControllerContext;
 import org.projectodd.restafari.spi.InitializationException;
@@ -89,17 +85,50 @@ public class MongoController implements ResourceController {
 
     @Override
     public void createResource(RequestContext context, String collectionName, Resource resource, Responder responder) {
-        // Implement
+        DBCollection collection = db.getCollection(collectionName);
+        SimpleObjectResource sor = (SimpleObjectResource)  resource;
+        BasicDBObject object = new BasicDBObject();
+
+        for (String prop : sor.getPropertyNames())     {
+            object.append(prop, sor.getProperty(prop));
+        }
+
+        // Note: insert modifies the object being inserted
+        collection.insert(object);
+        // after insert the object is now the same as it appears in the db
+        responder.resourceCreated(new DBObjectResource(object));
     }
 
     @Override
     public void updateResource(RequestContext context, String collectionName, String id, Resource resource, Responder responder) {
-        // Implement
+        DBCollection collection = db.getCollection(collectionName);
+
+        DBObject object = collection.findOne(new BasicDBObject("_id", new ObjectId(id)));
+
+        SimpleObjectResource sor = (SimpleObjectResource)  resource;
+
+        for (String prop : sor.getPropertyNames()) {
+            object.put(prop, sor.getProperty(prop));
+        }
+
+        collection.save(object);
+
+        responder.resourceUpdated(new DBObjectResource(object));
     }
 
     @Override
     public void deleteResource(RequestContext context, String collectionName, String id, Responder responder) {
-        // Implement
+        DBCollection collection = db.getCollection(collectionName);
+
+        BasicDBObject object = new BasicDBObject();
+        object.append("_id", new ObjectId(id));
+
+        DBObject actualObject = collection.findOne(object);
+        collection.remove(actualObject);
+
+        //TODO: figure out what, if anything, should actually be returned here. Its probably best to indicate this
+        // with just a status code.
+        responder.resourceDeleted(new DBObjectResource(object));
     }
 
     private void forCollection(String name, Responder responder, Consumer<DBCollection> consumer) {
