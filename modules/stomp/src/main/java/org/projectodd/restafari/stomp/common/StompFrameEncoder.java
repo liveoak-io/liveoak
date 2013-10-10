@@ -2,6 +2,7 @@ package org.projectodd.restafari.stomp.common;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.projectodd.restafari.stomp.Headers;
 
@@ -18,13 +19,10 @@ public class StompFrameEncoder extends MessageToByteEncoder<StompFrame> {
     private static final byte NEWLINE = (byte) '\n';
     private static final byte NULL = (byte) 0x00;
 
-
     @Override
     protected void encode(ChannelHandlerContext ctx, StompFrame frame, ByteBuf out) throws Exception {
         writeHeader( frame, out );
         writeContent( frame, out );
-
-        System.err.println( "encode: " + out.toString(Charset.defaultCharset() ) );
     }
 
     protected void writeHeader(StompFrame frame, ByteBuf buffer) {

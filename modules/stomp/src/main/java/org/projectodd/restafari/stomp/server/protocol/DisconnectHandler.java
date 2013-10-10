@@ -25,8 +25,7 @@ public class DisconnectHandler extends AbstractControlFrameHandler {
         StompConnection stompConnection = ctx.attr(ConnectHandler.CONNECTION).get();
         this.serverContext.handleDisconnect(stompConnection);
         String receiptId = frame.getHeader(Headers.RECEIPT);
-        ChannelFuture future = ctx.write(StompControlFrame.newReceiptFrame(receiptId));
-        ctx.flush();
+        ChannelFuture future = ctx.writeAndFlush(StompControlFrame.newReceiptFrame(receiptId));
         future.addListener((f) -> {
             System.err.println( "server close" );
             ctx.close();

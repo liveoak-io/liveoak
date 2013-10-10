@@ -15,8 +15,7 @@ import org.projectodd.restafari.container.UnsecureServer;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import static junit.framework.Assert.fail;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author <a href="mailto:lball@redhat.com">Lance Ball</a>

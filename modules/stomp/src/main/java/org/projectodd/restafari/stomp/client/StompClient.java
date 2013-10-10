@@ -10,31 +10,42 @@ import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.Stomp;
 import org.projectodd.restafari.stomp.StompException;
 import org.projectodd.restafari.stomp.StompMessage;
+import org.projectodd.restafari.stomp.client.protocol.ClientContext;
 import org.projectodd.restafari.stomp.client.protocol.ConnectionNegotiatingHandler;
+import org.projectodd.restafari.stomp.client.protocol.DisconnectionNegotiatingHandler;
 import org.projectodd.restafari.stomp.client.protocol.MessageHandler;
 import org.projectodd.restafari.stomp.common.*;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * @author Bob McWhirter
  */
 public class StompClient {
 
+    public enum ConnectionState {
+        DISCONNECTED,
+        CONNECTING,
+        CONNECTED,
+        DISCONNECTING;
+    }
 
     public StompClient() {
 
     }
 
-    private Bootstrap createBootstrap(String host) {
-        this.clientContext = new ClientContext(host);
-
+    private Bootstrap createBootstrap(String host, Consumer<StompClient> callback) {
         Executor executor = Executors.newCachedThreadPool();
         NioEventLoopGroup group = new NioEventLoopGroup();
+
+        ClientContext clientContext = new ContextImpl();
 
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.channel(NioSocketChannel.class);
@@ -45,9 +56,8 @@ public class StompClient {
                 ch.pipeline().addLast(new DebugHandler("client-head"));
                 ch.pipeline().addLast(new StompFrameEncoder());
                 ch.pipeline().addLast(new StompFrameDecoder());
-                ch.pipeline().addLast(new ConnectionNegotiatingHandler(StompClient.this.clientContext));
-                ch.pipeline().addLast(new MessageHandler(StompClient.this.clientContext, executor));
-                ch.pipeline().addLast(new DebugHandler("client-tail"));
+                ch.pipeline().addLast(new ConnectionNegotiatingHandler(clientContext, callback));
+                ch.pipeline().addLast(new MessageHandler(clientContext, executor));
             }
         });
 
@@ -56,26 +66,30 @@ public class StompClient {
 
 
     public void connectSync(String host, int port) throws InterruptedException, StompException {
-        Bootstrap bootstrap = createBootstrap( host );
-        ChannelFuture connectFuture = bootstrap.connect(host, port);
-        connectFuture.sync();
-        this.clientContext.waitForConnect();
-        this.channel = connectFuture.channel();
+        CountDownLatch latch = new CountDownLatch(1);
+        connect(host, port, (client) -> {
+            latch.countDown();
+        });
+        latch.await(30, TimeUnit.SECONDS);
     }
 
     public void connect(String host, int port, Consumer<StompClient> callback) throws InterruptedException {
-        Bootstrap bootstrap = createBootstrap( host );
-        ChannelFuture connectFuture = bootstrap.connect(host, port);
-        connectFuture.addListener((f) -> {
-            this.channel = connectFuture.channel();
-            callback.accept(this);
-        });
+        this.host = host;
+        Bootstrap bootstrap = createBootstrap(host, callback);
+        bootstrap.connect(host, port);
     }
 
     public void disconnectSync() throws StompException, InterruptedException {
-        this.channel.write(StompFrame.newDisconnectFrame());
-        this.channel.flush();
-        this.clientContext.waitForDisconnect();
+        CountDownLatch latch = new CountDownLatch(1);
+        disconnect(() -> {
+            latch.countDown();
+        });
+        latch.await(30, TimeUnit.SECONDS);
+    }
+
+    public void disconnect(Runnable callback) {
+        this.channel.pipeline().get(DisconnectionNegotiatingHandler.class).setCallback(callback);
+        this.channel.writeAndFlush(StompFrame.newDisconnectFrame());
     }
 
     public void send(StompMessage message) {
@@ -83,13 +97,13 @@ public class StompClient {
         this.channel.flush();
     }
 
-    public void subscribe(String destination, SubscriptionHandler handler) {
+    public void subscribe(String destination, Consumer<StompMessage> handler) {
         subscribe(destination, new HeadersImpl(), handler);
     }
 
-    public void subscribe(String destination, Headers headers, SubscriptionHandler handler) {
+    public void subscribe(String destination, Headers headers, Consumer<StompMessage> handler) {
         String subscriptionId = "sub-" + subscriptionCounter.getAndIncrement();
-        this.clientContext.addSubscription(subscriptionId, handler);
+        this.subscriptions.put(subscriptionId, handler);
         StompControlFrame frame = new StompControlFrame(Stomp.Command.SUBSCRIBE);
         frame.getHeaders().putAll(headers);
         frame.setHeader(Headers.DESTINATION, destination);
@@ -97,7 +111,50 @@ public class StompClient {
         this.channel.flush();
     }
 
-    private ClientContext clientContext;
+    private String host;
+    private ConnectionState connectionState;
+    private Stomp.Version version = Stomp.Version.VERSION_1_2;
     private Channel channel;
     private AtomicInteger subscriptionCounter = new AtomicInteger();
+    private Map<String, Consumer<StompMessage>> subscriptions = new HashMap<>();
+
+    class ContextImpl implements ClientContext {
+
+        public StompClient getClient() {
+            return StompClient.this;
+        }
+
+        public String getHost() {
+            return StompClient.this.host;
+        }
+
+        public void setChannel(Channel channel) {
+            StompClient.this.channel = channel;
+        }
+
+        public Channel getChannel() {
+            return StompClient.this.channel;
+        }
+
+        public void setConnectionState(ConnectionState connectionState) {
+            StompClient.this.connectionState = connectionState;
+        }
+
+        public ConnectionState getConnectionState() {
+            return StompClient.this.connectionState;
+        }
+
+        public void setVersion(Stomp.Version version) {
+            StompClient.this.version = version;
+        }
+
+        public Stomp.Version getVersion() {
+            return StompClient.this.version;
+        }
+
+        public Consumer<StompMessage> getSubscriptionHandler(String subscriptionId) {
+            return StompClient.this.subscriptions.get(subscriptionId);
+        }
+
+    }
 }

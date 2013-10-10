@@ -2,14 +2,13 @@ package org.projectodd.restafari.stomp.client.protocol;
 
 import io.netty.channel.ChannelHandlerContext;
 import org.projectodd.restafari.stomp.*;
-import org.projectodd.restafari.stomp.client.ClientContext;
-import org.projectodd.restafari.stomp.client.SubscriptionHandler;
 import org.projectodd.restafari.stomp.common.AbstractFrameHandler;
 import org.projectodd.restafari.stomp.common.DefaultStompMessage;
 import org.projectodd.restafari.stomp.common.StompContentFrame;
 import org.projectodd.restafari.stomp.common.StompFrame;
 
 import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 
 /**
  * @author Bob McWhirter
@@ -27,11 +26,10 @@ public class MessageHandler extends AbstractFrameHandler {
         if ( frame instanceof StompContentFrame) {
             StompMessage message = new DefaultStompMessage( frame.getHeaders(), ((StompContentFrame) frame).getContent() );
             String subscriptionId = frame.getHeader( Headers.SUBSCRIPTION );
-            SubscriptionHandler handler = this.clientContext.getSubscriptionHandler(subscriptionId);
+            Consumer<StompMessage> handler = this.clientContext.getSubscriptionHandler(subscriptionId);
             this.executor.execute( ()->{
-                handler.onMessage( message );
+                handler.accept( message );
             }  );
-            handler.onMessage( message );
         }
     }
 

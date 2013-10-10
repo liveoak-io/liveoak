@@ -19,9 +19,9 @@ import org.projectodd.restafari.stomp.server.protocol.UnsubscribeHandler;
 /**
  * @author Bob McWhirter
  */
-public class SimpleServer {
+public class SimpleStompServer {
 
-    public SimpleServer(String host, int port, ServerContext serverContext) {
+    public SimpleStompServer(String host, int port, ServerContext serverContext) {
         this.host = host;
         this.port = port;
         this.serverContext = serverContext;
@@ -46,10 +46,10 @@ public class SimpleServer {
                 ch.pipeline().addLast( new DebugHandler( "server-head" ) );
                 ch.pipeline().addLast( new StompFrameDecoder() );
                 ch.pipeline().addLast( new StompFrameEncoder() );
-                ch.pipeline().addLast( new ConnectHandler( SimpleServer.this.serverContext ) );
-                ch.pipeline().addLast( new SubscribeHandler( SimpleServer.this.serverContext ) );
-                ch.pipeline().addLast( new UnsubscribeHandler( SimpleServer.this.serverContext ) );
-                ch.pipeline().addLast( new DisconnectHandler( SimpleServer.this.serverContext ) );
+                ch.pipeline().addLast( new ConnectHandler( SimpleStompServer.this.serverContext ) );
+                ch.pipeline().addLast( new SubscribeHandler( SimpleStompServer.this.serverContext ) );
+                ch.pipeline().addLast( new UnsubscribeHandler( SimpleStompServer.this.serverContext ) );
+                ch.pipeline().addLast( new DisconnectHandler( SimpleStompServer.this.serverContext ) );
                 ch.pipeline().addLast( new DebugHandler( "server-tail" ) );
             }
         };
