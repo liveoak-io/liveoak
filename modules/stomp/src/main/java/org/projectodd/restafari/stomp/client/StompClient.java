@@ -25,7 +25,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-/**
+/** STOMP client.
+ *
+ * <p>This client may be used in synchronous or asynchronous environments</p>
+ *
  * @author Bob McWhirter
  */
 public class StompClient {
@@ -37,6 +40,8 @@ public class StompClient {
         DISCONNECTING;
     }
 
+    /** Construct a new client.
+     */
     public StompClient() {
 
     }
@@ -64,7 +69,22 @@ public class StompClient {
         return bootstrap;
     }
 
+    /** Retrieve the current state of the connection.
+     *
+     * @return The current state.
+     */
+    public ConnectionState getConnectionState() {
+        return this.connectionState;
+    }
 
+
+    /** Connect synchronously.
+     *
+     * @param host Host to connect to.
+     * @param port Port to connect to.
+     * @throws InterruptedException If the connection times out.
+     * @throws StompException If an error occurs during connection.
+     */
     public void connectSync(String host, int port) throws InterruptedException, StompException {
         CountDownLatch latch = new CountDownLatch(1);
         connect(host, port, (client) -> {
@@ -73,12 +93,24 @@ public class StompClient {
         latch.await(30, TimeUnit.SECONDS);
     }
 
+    /** Connect asynchronously
+     *
+     * @param host Host to connect to.
+     * @param port Port to connect to.
+     * @param callback Callback to fire after successfully connecting.
+     * @throws InterruptedException
+     */
     public void connect(String host, int port, Consumer<StompClient> callback) throws InterruptedException {
         this.host = host;
         Bootstrap bootstrap = createBootstrap(host, callback);
         bootstrap.connect(host, port);
     }
 
+    /** Disconnect synchronously
+     *
+     * @throws InterruptedException If the disconnect times out.
+     * @throws StompException If an error occurs during disconnection.
+     */
     public void disconnectSync() throws StompException, InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         disconnect(() -> {
@@ -87,28 +119,52 @@ public class StompClient {
         latch.await(30, TimeUnit.SECONDS);
     }
 
+    /** Disconnect asynchronously
+     *
+     * @param callback Callback to fire after successfully disconnecting.
+     */
     public void disconnect(Runnable callback) {
         this.channel.pipeline().get(DisconnectionNegotiatingHandler.class).setCallback(callback);
         this.channel.writeAndFlush(StompFrame.newDisconnectFrame());
     }
 
+    /** Send a message to the server.
+     *
+     * <p>The message should be fully-formed, including a destination
+     * header indicating where the message should be sent.</p>
+     *
+     * @param message
+     */
     public void send(StompMessage message) {
-        this.channel.write(message);
-        this.channel.flush();
+        this.channel.writeAndFlush(message);
     }
 
+    /** Subscribe to a destination.
+     *
+     * @param destination The destination to subscribe to.
+     * @param handler Handler for inbound messages sent from the server.
+     */
     public void subscribe(String destination, Consumer<StompMessage> handler) {
         subscribe(destination, new HeadersImpl(), handler);
     }
 
+    /** Subscribe to a destination.
+     *
+     * <p>Additional headers may be included to support complex subscriptions.
+     * The {@code destination} paramter will be added to the headers on
+     * your behalf.</p>
+     *
+     * @param destination The destination to subscribe to.
+     * @param headers Additional headers.
+     * @param handler Handler for inbound messages sent from the server.
+     */
     public void subscribe(String destination, Headers headers, Consumer<StompMessage> handler) {
         String subscriptionId = "sub-" + subscriptionCounter.getAndIncrement();
         this.subscriptions.put(subscriptionId, handler);
         StompControlFrame frame = new StompControlFrame(Stomp.Command.SUBSCRIBE);
         frame.getHeaders().putAll(headers);
         frame.setHeader(Headers.DESTINATION, destination);
-        this.channel.write(frame);
-        this.channel.flush();
+        this.channel.writeAndFlush(frame);
     }
 
     private String host;
