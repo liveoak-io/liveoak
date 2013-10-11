@@ -72,7 +72,6 @@
 
     <build>
         <plugins>
-
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
@@ -89,6 +88,13 @@
                    <id>test</id>
                    <phase>integration-test</phase>
                    <goals><goal>test</goal></goals>
+                   <configuration>
+                     <systemPropertyVariables>
+                       <mongo.db>${mongo.db}</mongo.db>
+                       <mongo.port>${mongo.port}</mongo.port>
+                       <mongo.host>${mongo.host}</mongo.host>
+                     </systemPropertyVariables>
+                   </configuration>
                 </execution>
                 <execution>
                   <id>default-test</id>
@@ -98,6 +104,21 @@
                 </execution>
               </executions>
             </plugin>
+          </plugins>
+        </build>
+          <profiles>
+            <profile>
+            <id>embeddedMongo</id>
+            <activation>
+              <property><name>!mongo.db</name></property>
+            </activation>
+            <properties>
+              <mongo.db>test</mongo.db>
+              <mongo.port>27018</mongo.port>
+              <mongo.host>localhost</mongo.host>
+            </properties>
+            <build>
+            <plugins>
             <plugin>
               <groupId>com.github.joelittlejohn.embedmongo</groupId>
               <artifactId>embedmongo-maven-plugin</artifactId>
@@ -107,7 +128,7 @@
                   <phase>pre-integration-test</phase>
                   <goals><goal>start</goal></goals>
                   <configuration>
-                    <port>27018</port> <!-- TODO: expose this as a property -->
+                    <port>${mongo.port}</port>
                     <logging>file</logging>
                     <logFile>${project.build.directory}/mongodb.log</logFile>
                   </configuration>
@@ -121,8 +142,11 @@
                 </execution>
               </executions>
             </plugin>
-        </plugins>
-    </build>
+          </plugins>
+        </build>
+        </profile>
+        </profiles>
+    
 
 </project>
 

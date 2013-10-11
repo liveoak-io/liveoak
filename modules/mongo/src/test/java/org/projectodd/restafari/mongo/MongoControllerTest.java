@@ -37,7 +37,7 @@ public class MongoControllerTest {
         config = new SimpleConfig();
         config.put("db", System.getProperty("mongo.db"));
         config.put("host", System.getProperty("mongo.host"));
-        String port = "27018"; //TODO: load this through a system property instead of hardcoding it here
+        String port = System.getProperty("mongo.port");
         if (port != null) {
             config.put("port", new Integer(port));
         }
@@ -120,7 +120,7 @@ public class MongoControllerTest {
         }
     }
 
-@Test
+    @Test
     public void testSimpleCreate() throws Exception {
         createSimpleItem("http://localhost:8080/storage/items", "{\"foo\":\"bar\"}");
     }
