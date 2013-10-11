@@ -3,7 +3,6 @@ package org.projectodd.restafari.stomp.client;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -152,56 +151,56 @@ public class StompClient {
      * Send a message to the server.
      *
      * @param destination The destination.
-     * @param content The content bytes.
+     * @param content     The content bytes.
      */
     public void send(String destination, ByteBuf content) {
         StompMessage message = new DefaultStompMessage();
-        message.setDestination(destination);
-        message.setContent(content);
-        send( message );
+        message.destination(destination);
+        message.content(content.duplicate().retain());
+        send(message);
     }
 
     /**
      * Send a message to the server.
      *
      * @param destination The destination.
-     * @param content The content, as a UTF-8 string.
+     * @param content     The content, as a UTF-8 string.
      */
     public void send(String destination, String content) {
         StompMessage message = new DefaultStompMessage();
-        message.setDestination(destination);
-        message.setContentAsString(content);
-        send( message );
+        message.destination(destination);
+        message.content(content);
+        send(message);
     }
 
     /**
      * Send a message to the server.
      *
      * @param destination The destination.
-     * @param headers Additional headers.
-     * @param content The content, as a UTF-8 string.
+     * @param headers     Additional headers.
+     * @param content     The content, as a UTF-8 string.
      */
     public void send(String destination, Headers headers, String content) {
         StompMessage message = new DefaultStompMessage();
-        message.getHeaders().putAll( headers );
-        message.setDestination(destination);
-        message.setContentAsString(content);
-        send( message );
+        message.headers().putAll(headers);
+        message.destination(destination);
+        message.content(content);
+        send(message);
     }
 
     /**
      * Send a message to the server.
      *
      * @param destination The destination.
-     * @param headers Additional headers.
-     * @param content The content bytes.
+     * @param headers     Additional headers.
+     * @param content     The content bytes.
      */
     public void send(String destination, Headers headers, ByteBuf content) {
         StompMessage message = new DefaultStompMessage();
-        message.getHeaders().putAll( headers );
-        message.setDestination(destination);
-        message.setContent(content);
-        send( message );
+        message.headers().putAll(headers);
+        message.destination(destination);
+        message.content(content);
+        send(message);
     }
 
     /**
@@ -229,9 +228,9 @@ public class StompClient {
         String subscriptionId = "sub-" + subscriptionCounter.getAndIncrement();
         this.subscriptions.put(subscriptionId, handler);
         StompControlFrame frame = new StompControlFrame(Stomp.Command.SUBSCRIBE);
-        frame.getHeaders().putAll(headers);
-        frame.setHeader( Headers.ID, subscriptionId );
-        frame.setHeader(Headers.DESTINATION, destination);
+        frame.headers().putAll(headers);
+        frame.headers().put(Headers.ID, subscriptionId);
+        frame.headers().put(Headers.DESTINATION, destination);
         this.channel.writeAndFlush(frame);
     }
 

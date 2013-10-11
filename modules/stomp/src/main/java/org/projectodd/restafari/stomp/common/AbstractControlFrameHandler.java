@@ -1,6 +1,7 @@
 package org.projectodd.restafari.stomp.common;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.ReferenceCountUtil;
 import org.projectodd.restafari.stomp.Stomp;
 import org.projectodd.restafari.stomp.server.StompServerException;
 
@@ -19,6 +20,7 @@ public abstract class AbstractControlFrameHandler extends AbstractFrameHandler {
             return;
         }
 
+        ReferenceCountUtil.retain( msg );
         ctx.fireChannelRead( msg );
     }
 

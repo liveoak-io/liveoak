@@ -1,31 +1,38 @@
 package org.projectodd.restafari.stomp;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufHolder;
+
+import java.nio.charset.Charset;
 
 /**
  * @author Bob McWhirter
  */
-public interface StompMessage {
+public interface StompMessage extends ByteBufHolder {
 
-    String getId();
+    String id();
 
-    Headers getHeaders();
+    Headers headers();
 
-    String getDestination();
+    String destination();
 
-    void setDestination(String destination);
+    void destination(String destination);
 
-    String getContentType();
+    String contentType();
 
-    void setContentType(String contentType);
+    void contentType(String contentType);
 
-    String getContentAsString();
+    String content(Charset charset);
 
-    void setContentAsString(String content);
+    String utf8Content();
 
-    ByteBuf getContent();
+    void content(String content, Charset charset);
 
-    void setContent(ByteBuf content);
+    void content(String content);
+
+    ByteBuf content();
+
+    void content(ByteBuf content);
 
     boolean isError();
 

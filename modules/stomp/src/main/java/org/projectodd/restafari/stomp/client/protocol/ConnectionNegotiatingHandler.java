@@ -32,15 +32,15 @@ public class ConnectionNegotiatingHandler extends AbstractControlFrameHandler {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         StompControlFrame connectFrame = new StompControlFrame(Stomp.Command.CONNECT);
-        connectFrame.setHeader(Headers.HOST, this.clientContext.getHost());
-        connectFrame.setHeader(Headers.ACCEPT_VERSION, Stomp.Version.supportedVersions());
+        connectFrame.headers().put(Headers.HOST, this.clientContext.getHost());
+        connectFrame.headers().put(Headers.ACCEPT_VERSION, Stomp.Version.supportedVersions());
         ctx.writeAndFlush(connectFrame);
         super.channelActive(ctx);
     }
 
     @Override
     protected void handleControlFrame(ChannelHandlerContext ctx, StompControlFrame frame) throws StompServerException {
-        String version = frame.getHeader(Headers.VERSION);
+        String version = frame.headers().get(Headers.VERSION);
         if (version != null) {
             this.clientContext.setVersion(Stomp.Version.forVersionString(version));
         }

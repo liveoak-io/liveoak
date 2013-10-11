@@ -25,18 +25,18 @@ public class ErrorHandler extends ChannelDuplexHandler {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         StompMessage errorMessage = new DefaultStompMessage(true);
 
-        errorMessage.getHeaders().put( "status", "500" );
+        errorMessage.headers().put( "status", "500" );
 
         if (cause instanceof StompServerException) {
-            errorMessage.setContentAsString( cause.getMessage() );
+            errorMessage.content( cause.getMessage() );
             String receiptId = ((StompServerException) cause).getReceiptId();
             if (receiptId != null) {
-                errorMessage.getHeaders().put(Headers.RECEIPT_ID, receiptId);
+                errorMessage.headers().put(Headers.RECEIPT_ID, receiptId);
             }
         } else {
-            errorMessage.setContentAsString( "An internal error has occurred." );
+            errorMessage.content( "An internal error has occurred." );
         }
-        //super.exceptionCaught(ctx, cause);
+        ctx.writeAndFlush( errorMessage );
     }
 
 }

@@ -36,11 +36,11 @@ public class MockServerContext implements ServerContext {
     @Override
     public void handleSend(StompConnection connection, StompMessage message) {
         this.sentMessages.add(message);
-        String destination = message.getHeaders().get(Headers.DESTINATION);
+        String destination = message.headers().get(Headers.DESTINATION);
         this.subscriptions.forEach((e) -> {
             if (e.destination.equals(destination)) {
                 StompMessage dupe = message.duplicate();
-                dupe.getHeaders().put( Headers.SUBSCRIPTION, e.subscriptionId );
+                dupe.headers().put( Headers.SUBSCRIPTION, e.subscriptionId );
                 e.connection.send(dupe);
             }
         });

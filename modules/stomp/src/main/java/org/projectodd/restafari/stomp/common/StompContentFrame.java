@@ -32,11 +32,11 @@ public class StompContentFrame extends StompFrame {
         this.content = Unpooled.copiedBuffer(content.getBytes());
     }
 
-    public void setContent(ByteBuf content) {
+    public void content(ByteBuf content) {
         this.content = content;
     }
 
-    public ByteBuf getContent() {
+    public ByteBuf content() {
         return Unpooled.wrappedBuffer( this.content );
     }
 

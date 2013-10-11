@@ -28,7 +28,7 @@ public class MessageHandler extends ChannelDuplexHandler {
             if (stompMessage.isError()) {
 
             } else {
-                String subscriptionId = stompMessage.getHeaders().get( Headers.SUBSCRIPTION );
+                String subscriptionId = stompMessage.headers().get( Headers.SUBSCRIPTION );
                 this.clientContext.getSubscriptionHandler(subscriptionId);
                 Consumer<StompMessage> handler = this.clientContext.getSubscriptionHandler(subscriptionId);
                 this.executor.execute(() -> {

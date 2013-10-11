@@ -3,6 +3,7 @@ package org.projectodd.restafari.stomp.common;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.ReferenceCountUtil;
 import org.projectodd.restafari.stomp.Stomp;
 import org.projectodd.restafari.stomp.server.StompServerException;
 
@@ -26,6 +27,7 @@ public abstract class AbstractFrameHandler extends SimpleChannelInboundHandler<S
             return;
         }
 
+        ReferenceCountUtil.retain( msg );
         ctx.fireChannelRead( msg );
     }
 

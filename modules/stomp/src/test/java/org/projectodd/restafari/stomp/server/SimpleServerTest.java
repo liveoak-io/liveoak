@@ -8,6 +8,7 @@ import org.projectodd.restafari.stomp.StompMessage;
 import org.projectodd.restafari.stomp.client.StompClient;
 
 import java.lang.ref.Reference;
+import java.nio.charset.Charset;
 import java.sql.Ref;
 import java.util.concurrent.CountDownLatch;
 
@@ -42,15 +43,15 @@ public class SimpleServerTest {
 
         assertNotNull(received.object);
         assertTrue(received.object instanceof StompMessage);
-        assertEquals("/people/bob", ((StompMessage) received.object).getDestination());
-        assertEquals("howdy!", ((StompMessage) received.object).getContentAsString());
+        assertEquals("/people/bob", ((StompMessage) received.object).destination());
+        assertEquals("howdy!", ((StompMessage) received.object).utf8Content() );
 
         assertEquals(1, serverContext.getSentMessages().size());
 
         StompMessage msg = serverContext.getSentMessages().get(0);
 
-        assertEquals("/people/bob", msg.getDestination());
-        assertEquals("howdy!", msg.getContentAsString());
+        assertEquals("/people/bob", msg.destination());
+        assertEquals("howdy!", msg.utf8Content() );
     }
 
     @Test
@@ -78,7 +79,7 @@ public class SimpleServerTest {
 
         StompMessage msg = serverContext.getSentMessages().get(0);
 
-        assertEquals("/people/bob", msg.getDestination());
-        assertEquals("dude...", msg.getContentAsString());
+        assertEquals("/people/bob", msg.destination());
+        assertEquals("dude...", msg.utf8Content());
     }
 }

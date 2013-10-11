@@ -4,7 +4,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
 import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.Stomp;
-import org.projectodd.restafari.stomp.StompException;
 import org.projectodd.restafari.stomp.common.AbstractControlFrameHandler;
 import org.projectodd.restafari.stomp.common.StompControlFrame;
 import org.projectodd.restafari.stomp.common.StompFrame;
@@ -32,14 +31,14 @@ public class ConnectHandler extends AbstractControlFrameHandler {
     public void handleControlFrame(ChannelHandlerContext ctx, StompControlFrame frame) throws StompServerException {
         Stomp.Version version = checkVersion(frame);
         Heartbeat hb = checkHeartbeat(frame, version);
-        Headers headers = frame.getHeaders();
+        Headers headers = frame.headers();
         String hostHeader = headers.get(Headers.HOST);
 
         checkHost(frame, headers, version);
         StompConnection stompConnection = new StompConnection( ctx.channel() );
         StompFrame connected = StompFrame.newConnectedFrame(stompConnection.getConnectionId(), version);
         if (hb != null) {
-            connected.setHeader(Headers.HEARTBEAT, hb.getServerSend() + "," + hb.getServerReceive());
+            connected.headers().put(Headers.HEARTBEAT, hb.getServerSend() + "," + hb.getServerReceive());
         }
         this.serverContext.handleConnect(stompConnection);
         ctx.channel().attr(CONNECTION).set(stompConnection);
@@ -48,7 +47,7 @@ public class ConnectHandler extends AbstractControlFrameHandler {
 
     private Heartbeat checkHeartbeat(StompFrame frame, Stomp.Version version) throws StompServerException {
         Heartbeat hb = null;
-        String heartBeat = frame.getHeader(Headers.HEARTBEAT);
+        String heartBeat = frame.headers().get(Headers.HEARTBEAT);
         if (!version.isBefore(Stomp.Version.VERSION_1_1) && heartBeat != null && !heartBeat.equals("")) {
             if (!HEART_BEAT_PATTERN.matcher(heartBeat).matches()) {
                 throw exception(frame, "Heartbeat must be specified in msec as two comma-separated values.");
@@ -74,7 +73,7 @@ public class ConnectHandler extends AbstractControlFrameHandler {
     }
 
     private Stomp.Version checkVersion(StompFrame frame) throws StompServerException {
-        String acceptVersion = frame.getHeader(Headers.ACCEPT_VERSION);
+        String acceptVersion = frame.headers().get(Headers.ACCEPT_VERSION);
         if (acceptVersion == null) {
             return Stomp.Version.VERSION_1_0;
         } else if (!VERSION_PATTERN.matcher(acceptVersion).matches()) {
@@ -95,7 +94,7 @@ public class ConnectHandler extends AbstractControlFrameHandler {
     }
 
     private StompServerException exception(StompFrame frame, String message) {
-        return new StompServerException(message).withReceiptId(frame.getHeader(Headers.RECEIPT));
+        return new StompServerException(message).withReceiptId(frame.headers().get(Headers.RECEIPT));
     }
 
 

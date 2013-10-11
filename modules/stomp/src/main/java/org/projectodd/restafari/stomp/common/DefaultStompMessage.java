@@ -1,6 +1,7 @@
 package org.projectodd.restafari.stomp.common;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufHolder;
 import io.netty.buffer.Unpooled;
 import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.StompException;
@@ -11,26 +12,28 @@ import java.nio.charset.Charset;
 /**
  * @author Bob McWhirter
  */
-public class DefaultStompMessage implements StompMessage {
+public class DefaultStompMessage implements ByteBufHolder, StompMessage {
 
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     public DefaultStompMessage() {
-        this( new HeadersImpl() );
+        this(new HeadersImpl());
     }
 
     public DefaultStompMessage(Headers headers) {
-        this( headers, null, false );
+        this(headers, null, false);
     }
 
     public DefaultStompMessage(Headers headers, ByteBuf content) {
-        this( headers, content, false );
+        this(headers, content, false);
 
     }
 
     public DefaultStompMessage(Headers headers, ByteBuf content, boolean error) {
         this.headers = headers;
-        this.content = content;
+        if (content != null) {
+            this.content = content.duplicate().retain();
+        }
         this.error = error;
     }
 
@@ -39,52 +42,64 @@ public class DefaultStompMessage implements StompMessage {
     }
 
     @Override
-    public String getId() {
-        return this.headers.get( Headers.MESSAGE_ID );
+    public String id() {
+        return this.headers.get(Headers.MESSAGE_ID);
     }
 
     @Override
-    public Headers getHeaders() {
+    public Headers headers() {
         return this.headers;
     }
 
     @Override
-    public String getDestination() {
-        return this.headers.get( Headers.DESTINATION );
+    public String destination() {
+        return this.headers.get(Headers.DESTINATION);
     }
 
     @Override
-    public void setDestination(String destination) {
-        this.headers.put( Headers.DESTINATION, destination );
+    public void destination(String destination) {
+        this.headers.put(Headers.DESTINATION, destination);
     }
 
     @Override
-    public String getContentType() {
-        return this.headers.get( Headers.CONTENT_TYPE );
+    public String contentType() {
+        return this.headers.get(Headers.CONTENT_TYPE);
     }
 
     @Override
-    public void setContentType(String contentType) {
-        this.headers.put( Headers.CONTENT_TYPE, contentType );
+    public void contentType(String contentType) {
+        this.headers.put(Headers.CONTENT_TYPE, contentType);
     }
 
     @Override
-    public String getContentAsString() {
-        return this.content.toString( UTF_8 );
+    public String content(Charset charset) {
+        return this.content.toString(charset);
     }
 
     @Override
-    public void setContentAsString(String content) {
-        this.content = Unpooled.copiedBuffer( content.toCharArray(), UTF_8 );
+    public String utf8Content() {
+        return content(UTF_8);
     }
 
     @Override
-    public ByteBuf getContent() {
+    public void content(String content, Charset charset) {
+        if (this.content != null) {
+            this.content().release();
+        }
+        this.content = Unpooled.copiedBuffer(content.toCharArray(), charset);
+    }
+
+    public void content(String content) {
+        content(content, UTF_8);
+    }
+
+    @Override
+    public ByteBuf content() {
         return this.content;
     }
 
     @Override
-    public void setContent(ByteBuf content) {
+    public void content(ByteBuf content) {
         this.content = content;
     }
 
@@ -110,7 +125,39 @@ public class DefaultStompMessage implements StompMessage {
     }
 
     public StompMessage duplicate() {
-        return new DefaultStompMessage( this.headers, this.content.duplicate().retain(), this.error );
+        return new DefaultStompMessage(this.headers, this.content.duplicate().retain(), this.error);
+    }
+
+    @Override
+    public ByteBufHolder copy() {
+        return new DefaultStompMessage(this.headers, this.content.duplicate().retain(), this.error);
+    }
+
+    @Override
+    public int refCnt() {
+        return this.content.refCnt();
+    }
+
+    @Override
+    public ByteBufHolder retain() {
+        this.content.retain();
+        return this;
+    }
+
+    @Override
+    public ByteBufHolder retain(int increment) {
+        this.content.retain(increment);
+        return this;
+    }
+
+    @Override
+    public boolean release() {
+        return this.content.release();
+    }
+
+    @Override
+    public boolean release(int decrement) {
+        return this.content.release(decrement);
     }
 
     private Headers headers;

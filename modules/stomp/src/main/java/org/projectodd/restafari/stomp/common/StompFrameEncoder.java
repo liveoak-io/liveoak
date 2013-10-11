@@ -2,11 +2,9 @@ package org.projectodd.restafari.stomp.common;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.projectodd.restafari.stomp.Headers;
 
-import java.nio.charset.Charset;
 import java.util.Set;
 
 /**
@@ -21,26 +19,26 @@ public class StompFrameEncoder extends MessageToByteEncoder<StompFrame> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, StompFrame frame, ByteBuf out) throws Exception {
-        writeHeader( frame, out );
-        writeContent( frame, out );
+        writeHeader(frame, out);
+        writeContent(frame, out);
     }
 
     protected void writeHeader(StompFrame frame, ByteBuf buffer) {
         buffer.writeBytes( frame.getCommand().getBytes() );
         buffer.writeByte( NEWLINE );
-        Set<String> headerNames = frame.getHeaderNames();
+        Set<String> headerNames = frame.headers().getHeaderNames();
         for (String name : headerNames) {
             if (name.equalsIgnoreCase( "content-length" )) {
                 continue;
             }
             buffer.writeBytes( name.getBytes() );
             buffer.writeBytes( HEADER_DELIM );
-            buffer.writeBytes( frame.getHeader( name ).getBytes() );
+            buffer.writeBytes( frame.headers().get( name ).getBytes() );
             buffer.writeByte( NEWLINE );
         }
 
         if (frame instanceof StompContentFrame) {
-            int length = ((StompContentFrame) frame).getContent().readableBytes();
+            int length = ((StompContentFrame) frame).content().readableBytes();
             buffer.writeBytes(Headers.CONTENT_LENGTH.getBytes());
             buffer.writeBytes( HEADER_DELIM );
             buffer.writeBytes( ("" + length).getBytes() );
@@ -52,7 +50,7 @@ public class StompFrameEncoder extends MessageToByteEncoder<StompFrame> {
 
     protected void writeContent(StompFrame frame, ByteBuf buffer) {
         if (frame instanceof StompContentFrame) {
-            ByteBuf content = ((StompContentFrame) frame).getContent();
+            ByteBuf content = ((StompContentFrame) frame).content();
             buffer.writeBytes( content );
         }
         buffer.writeByte( NULL );
