@@ -46,4 +46,6 @@ public interface StompMessage extends ByteBufHolder {
 
     StompMessage duplicate();
 
+    StompMessage retain();
+
 }

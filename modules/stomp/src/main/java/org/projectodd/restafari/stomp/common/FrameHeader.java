@@ -50,7 +50,7 @@ public class FrameHeader {
         this.command = command;
     }
 
-    public Stomp.Command getCommand() {
+    public Stomp.Command command() {
         return this.command;
     }
 
@@ -71,7 +71,7 @@ public class FrameHeader {
     }
 
     public int getContentLength() {
-        String value = get( Headers.CONTENT_LENGTH.toString() );
+        String value = get(Headers.CONTENT_LENGTH.toString());
         if (value == null) {
             return -1;
         }

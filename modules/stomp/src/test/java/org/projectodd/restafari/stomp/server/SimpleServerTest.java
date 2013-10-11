@@ -47,7 +47,6 @@ public class SimpleServerTest {
         assertEquals("howdy!", ((StompMessage) received.object).utf8Content() );
 
         assertEquals(1, serverContext.getSentMessages().size());
-
         StompMessage msg = serverContext.getSentMessages().get(0);
 
         assertEquals("/people/bob", msg.destination());
@@ -77,6 +76,7 @@ public class SimpleServerTest {
 
         latch.await();
 
+        assertEquals( 1, serverContext.getSentMessages().size() );
         StompMessage msg = serverContext.getSentMessages().get(0);
 
         assertEquals("/people/bob", msg.destination());

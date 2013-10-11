@@ -1,6 +1,5 @@
 package org.projectodd.restafari.stomp.common;
 
-import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.ReferenceCountUtil;
@@ -18,7 +17,7 @@ public abstract class AbstractFrameHandler extends SimpleChannelInboundHandler<S
 
     public void channelRead0(ChannelHandlerContext ctx, StompFrame msg) throws Exception {
         if (this.command != null) {
-            if (((StompFrame) msg).getCommand().equals(this.command)) {
+            if (((StompFrame) msg).command().equals(this.command)) {
                 handleFrame(ctx, (StompFrame) msg);
                 return;
             }

@@ -24,36 +24,35 @@ public class StompFrameEncoder extends MessageToByteEncoder<StompFrame> {
     }
 
     protected void writeHeader(StompFrame frame, ByteBuf buffer) {
-        buffer.writeBytes( frame.getCommand().getBytes() );
-        buffer.writeByte( NEWLINE );
+        buffer.writeBytes(frame.command().getBytes());
+        buffer.writeByte(NEWLINE);
         Set<String> headerNames = frame.headers().getHeaderNames();
         for (String name : headerNames) {
-            if (name.equalsIgnoreCase( "content-length" )) {
+            if (name.equalsIgnoreCase("content-length")) {
                 continue;
             }
-            buffer.writeBytes( name.getBytes() );
-            buffer.writeBytes( HEADER_DELIM );
-            buffer.writeBytes( frame.headers().get( name ).getBytes() );
-            buffer.writeByte( NEWLINE );
+            buffer.writeBytes(name.getBytes());
+            buffer.writeBytes(HEADER_DELIM);
+            buffer.writeBytes(frame.headers().get(name).getBytes());
+            buffer.writeByte(NEWLINE);
         }
 
         if (frame instanceof StompContentFrame) {
             int length = ((StompContentFrame) frame).content().readableBytes();
             buffer.writeBytes(Headers.CONTENT_LENGTH.getBytes());
-            buffer.writeBytes( HEADER_DELIM );
-            buffer.writeBytes( ("" + length).getBytes() );
-            buffer.writeByte( NEWLINE );
+            buffer.writeBytes(HEADER_DELIM);
+            buffer.writeBytes(("" + length).getBytes());
+            buffer.writeByte(NEWLINE);
         }
 
-        buffer.writeByte( NEWLINE );
+        buffer.writeByte(NEWLINE);
     }
 
     protected void writeContent(StompFrame frame, ByteBuf buffer) {
         if (frame instanceof StompContentFrame) {
             ByteBuf content = ((StompContentFrame) frame).content();
-            buffer.writeBytes( content );
+            buffer.writeBytes(content);
         }
-        buffer.writeByte( NULL );
-        return;
+        buffer.writeByte(NULL);
     }
 }

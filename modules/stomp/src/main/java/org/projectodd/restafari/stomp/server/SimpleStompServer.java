@@ -8,7 +8,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
-import org.projectodd.restafari.stomp.common.*;
+import org.projectodd.restafari.stomp.common.StompFrameDecoder;
+import org.projectodd.restafari.stomp.common.StompFrameEncoder;
+import org.projectodd.restafari.stomp.common.StompMessageDecoder;
+import org.projectodd.restafari.stomp.common.StompMessageEncoder;
 import org.projectodd.restafari.stomp.server.protocol.*;
 
 /**
@@ -41,6 +44,7 @@ public class SimpleStompServer {
                 // bytes into frames
                 ch.pipeline().addLast( new StompFrameDecoder() );
                 ch.pipeline().addLast( new StompFrameEncoder() );
+                //ch.pipeline().addLast( new DebugHandler( "server-head" ) );
                 // handle frames
                 ch.pipeline().addLast( new ConnectHandler( SimpleStompServer.this.serverContext ) );
                 ch.pipeline().addLast( new DisconnectHandler( SimpleStompServer.this.serverContext ) );

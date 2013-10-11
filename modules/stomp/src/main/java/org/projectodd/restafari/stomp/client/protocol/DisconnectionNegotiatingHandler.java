@@ -23,7 +23,7 @@ public class DisconnectionNegotiatingHandler extends ChannelDuplexHandler {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (msg instanceof StompControlFrame && ((StompControlFrame) msg).getCommand() == Stomp.Command.DISCONNECT) {
+        if (msg instanceof StompControlFrame && ((StompControlFrame) msg).command() == Stomp.Command.DISCONNECT) {
             this.receiptId = ((StompControlFrame) msg).headers().get(Headers.RECEIPT);
             this.clientContext.setConnectionState(StompClient.ConnectionState.DISCONNECTING);
         }

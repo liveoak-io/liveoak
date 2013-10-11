@@ -1,6 +1,7 @@
 package org.projectodd.restafari.stomp.common;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufHolder;
 import io.netty.buffer.Unpooled;
 import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.Stomp;
@@ -8,7 +9,7 @@ import org.projectodd.restafari.stomp.Stomp;
 /**
  * @author Bob McWhirter
  */
-public class StompContentFrame extends StompFrame {
+public class StompContentFrame extends StompFrame implements ByteBufHolder {
 
     public StompContentFrame(Stomp.Command command) {
         super( command );
@@ -37,7 +38,48 @@ public class StompContentFrame extends StompFrame {
     }
 
     public ByteBuf content() {
-        return Unpooled.wrappedBuffer( this.content );
+        return this.content;
+    }
+
+    @Override
+    public StompContentFrame copy() {
+        return new StompContentFrame( frameHeader(), this.content.copy() );
+    }
+
+    @Override
+    public StompContentFrame duplicate() {
+        return new StompContentFrame( frameHeader(), this.content.duplicate() );
+    }
+
+    @Override
+    public int refCnt() {
+        return this.content.refCnt();
+    }
+
+    @Override
+    public StompContentFrame retain() {
+        this.content.retain();
+        return this;
+    }
+
+    @Override
+    public StompContentFrame retain(int increment) {
+        this.content.retain( increment );
+        return this;
+    }
+
+    @Override
+    public boolean release() {
+        return this.content.release();
+    }
+
+    @Override
+    public boolean release(int decrement) {
+        return this.content.release( decrement );
+    }
+
+    public String toString() {
+        return "[StompContentFrame: header=" + frameHeader() + "; content=" + this.content + " (" + this.content.refCnt() + ", " + this.content.readableBytes() + ")]";
     }
 
     private ByteBuf content;

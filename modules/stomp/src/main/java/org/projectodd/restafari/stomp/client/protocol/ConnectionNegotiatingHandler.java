@@ -1,15 +1,13 @@
 package org.projectodd.restafari.stomp.client.protocol;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
-import org.projectodd.restafari.stomp.client.StompClient;
-import org.projectodd.restafari.stomp.common.AbstractControlFrameHandler;
 import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.Stomp;
+import org.projectodd.restafari.stomp.client.StompClient;
+import org.projectodd.restafari.stomp.common.AbstractControlFrameHandler;
 import org.projectodd.restafari.stomp.common.StompControlFrame;
 import org.projectodd.restafari.stomp.server.StompServerException;
 
-import java.net.SocketAddress;
 import java.util.function.Consumer;
 
 /**

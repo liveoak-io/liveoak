@@ -2,6 +2,7 @@ package org.projectodd.restafari.stomp.server.protocol;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.ReferenceCountUtil;
 import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.common.StompFrame;
 
@@ -19,7 +20,9 @@ public class ReceiptHandler extends SimpleChannelInboundHandler<StompFrame> {
         if ( receiptId != null ) {
             ctx.writeAndFlush(StompFrame.newReceiptFrame(receiptId));
         }
-        // always pass it upstream
+
+        // retain and keep it moving upstream
+        ReferenceCountUtil.retain( msg );
         ctx.fireChannelRead( msg );
     }
 

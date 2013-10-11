@@ -2,11 +2,8 @@ package org.projectodd.restafari.stomp.client.protocol;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
-import org.projectodd.restafari.stomp.*;
-import org.projectodd.restafari.stomp.common.AbstractFrameHandler;
-import org.projectodd.restafari.stomp.common.DefaultStompMessage;
-import org.projectodd.restafari.stomp.common.StompContentFrame;
-import org.projectodd.restafari.stomp.common.StompFrame;
+import org.projectodd.restafari.stomp.Headers;
+import org.projectodd.restafari.stomp.StompMessage;
 
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;

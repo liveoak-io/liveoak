@@ -12,7 +12,7 @@ import java.nio.charset.Charset;
 /**
  * @author Bob McWhirter
  */
-public class DefaultStompMessage implements ByteBufHolder, StompMessage {
+public class DefaultStompMessage implements StompMessage, ByteBufHolder {
 
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
@@ -21,7 +21,7 @@ public class DefaultStompMessage implements ByteBufHolder, StompMessage {
     }
 
     public DefaultStompMessage(Headers headers) {
-        this(headers, null, false);
+        this(headers, Unpooled.EMPTY_BUFFER, false);
     }
 
     public DefaultStompMessage(Headers headers, ByteBuf content) {
@@ -29,15 +29,13 @@ public class DefaultStompMessage implements ByteBufHolder, StompMessage {
 
     }
 
-    public DefaultStompMessage(Headers headers, ByteBuf content, boolean error) {
-        this.headers = headers;
-        if (content != null) {
-            this.content = content.duplicate().retain();
-        }
-        this.error = error;
+    public DefaultStompMessage(boolean error) {
+        this( new HeadersImpl(), Unpooled.EMPTY_BUFFER, error );
     }
 
-    public DefaultStompMessage(boolean error) {
+    public DefaultStompMessage(Headers headers, ByteBuf content, boolean error) {
+        this.content = content;
+        this.headers = headers;
         this.error = error;
     }
 
@@ -73,7 +71,7 @@ public class DefaultStompMessage implements ByteBufHolder, StompMessage {
 
     @Override
     public String content(Charset charset) {
-        return this.content.toString(charset);
+        return this.content.duplicate().retain().toString(charset);
     }
 
     @Override
@@ -86,7 +84,7 @@ public class DefaultStompMessage implements ByteBufHolder, StompMessage {
         if (this.content != null) {
             this.content().release();
         }
-        this.content = Unpooled.copiedBuffer(content.toCharArray(), charset);
+        this.content = Unpooled.copiedBuffer(content.toCharArray(), charset).retain();
     }
 
     public void content(String content) {
@@ -94,13 +92,16 @@ public class DefaultStompMessage implements ByteBufHolder, StompMessage {
     }
 
     @Override
-    public ByteBuf content() {
-        return this.content;
+    public void content(ByteBuf content) {
+        if ( this.content != null ) {
+            this.content.release();
+        }
+        this.content = content;
     }
 
     @Override
-    public void content(ByteBuf content) {
-        this.content = content;
+    public ByteBuf content() {
+        return this.content;
     }
 
     @Override
@@ -125,12 +126,12 @@ public class DefaultStompMessage implements ByteBufHolder, StompMessage {
     }
 
     public StompMessage duplicate() {
-        return new DefaultStompMessage(this.headers, this.content.duplicate().retain(), this.error);
+        return new DefaultStompMessage(this.headers.duplicate(), this.content.duplicate(), this.error);
     }
 
     @Override
     public ByteBufHolder copy() {
-        return new DefaultStompMessage(this.headers, this.content.duplicate().retain(), this.error);
+        return new DefaultStompMessage(this.headers.duplicate(), this.content.copy(), this.error);
     }
 
     @Override
@@ -139,7 +140,7 @@ public class DefaultStompMessage implements ByteBufHolder, StompMessage {
     }
 
     @Override
-    public ByteBufHolder retain() {
+    public StompMessage retain() {
         this.content.retain();
         return this;
     }
@@ -159,6 +160,11 @@ public class DefaultStompMessage implements ByteBufHolder, StompMessage {
     public boolean release(int decrement) {
         return this.content.release(decrement);
     }
+
+    public String toString() {
+        return "[DefaultStompMessage: headers="+ this.headers + "; error=" + error + "; content=" + this.content + "," + this.content.refCnt() + "]";
+    }
+
 
     private Headers headers;
     private ByteBuf content;

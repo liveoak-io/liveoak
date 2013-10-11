@@ -3,6 +3,7 @@ package org.projectodd.restafari.stomp.common;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import io.netty.util.ReferenceCountUtil;
 
 /**
  * @author Bob McWhirter
@@ -45,13 +46,14 @@ public class DebugHandler extends ChannelDuplexHandler {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        System.err.println( "DEBUG: " + this.name + " write: " + msg );
+        System.err.println("DEBUG: " + this.name + " write: " + msg);
         super.write(ctx, msg, promise);
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.err.println( "DEBUG: " + this.name + " read: " + msg );
+        ReferenceCountUtil.retain( msg );
         super.channelRead(ctx, msg);
     }
 

@@ -35,11 +35,12 @@ public class MockServerContext implements ServerContext {
 
     @Override
     public void handleSend(StompConnection connection, StompMessage message) {
-        this.sentMessages.add(message);
+        StompMessage retainedDupe = message.duplicate().retain();
+        this.sentMessages.add(retainedDupe);
         String destination = message.headers().get(Headers.DESTINATION);
         this.subscriptions.forEach((e) -> {
             if (e.destination.equals(destination)) {
-                StompMessage dupe = message.duplicate();
+                StompMessage dupe = message.duplicate().retain();
                 dupe.headers().put( Headers.SUBSCRIPTION, e.subscriptionId );
                 e.connection.send(dupe);
             }
