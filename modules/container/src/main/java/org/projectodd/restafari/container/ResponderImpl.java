@@ -17,9 +17,10 @@ import org.projectodd.restafari.spi.Responder;
 
 public class ResponderImpl implements Responder {
 
-    public ResponderImpl(SubscriptionManager subscriptionManager , String type, String mimeType, ChannelHandlerContext ctx) {
+    public ResponderImpl(SubscriptionManager subscriptionManager , String type, String collectionName, String mimeType, ChannelHandlerContext ctx) {
         this.subscriptionManager = subscriptionManager;
         this.type = type;
+        this.collectionName = collectionName;
         this.mimeType = mimeType;
         this.ctx = ctx;
     }
@@ -40,21 +41,21 @@ public class ResponderImpl implements Responder {
     public void resourceCreated(Resource resource) {
         this.ctx.write(new ResourceCreatedResponse( this.mimeType, resource ) );
         this.ctx.flush();
-        this.subscriptionManager.resourceCreated(this.type, resource);
+        this.subscriptionManager.resourceCreated(this.type, this.collectionName, resource);
     }
 
     @Override
     public void resourceUpdated(Resource resource) {
         this.ctx.write( new ResourceUpdatedResponse( this.mimeType, resource ) );
         this.ctx.flush();
-        this.subscriptionManager.resourceUpdated(this.type, resource);
+        this.subscriptionManager.resourceUpdated(this.type, this.collectionName, resource);
     }
 
     @Override
     public void resourceDeleted(Resource resource) {
         this.ctx.write( new ResourceDeletedResponse( this.mimeType, resource ) );
         this.ctx.flush();
-        this.subscriptionManager.resourceDeleted(this.type, resource);
+        this.subscriptionManager.resourceDeleted(this.type, this.collectionName, resource);
     }
 
     @Override
@@ -77,6 +78,7 @@ public class ResponderImpl implements Responder {
 
     private SubscriptionManager subscriptionManager;
     private String type;
+    private String collectionName;
     private String mimeType;
     private ChannelHandlerContext ctx;
 

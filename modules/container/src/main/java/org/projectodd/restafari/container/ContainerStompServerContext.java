@@ -1,6 +1,8 @@
 package org.projectodd.restafari.container;
 
 import org.projectodd.restafari.container.Container;
+import org.projectodd.restafari.container.codec.ResourceCodec;
+import org.projectodd.restafari.container.subscriptions.StompSubscription;
 import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.StompMessage;
 import org.projectodd.restafari.stomp.server.StompServerContext;
@@ -24,7 +26,14 @@ public class ContainerStompServerContext implements StompServerContext {
     }
 
     @Override
-    public void handleSubscribe(StompConnection connection, String destination, String subscriptionId, Headers header) {
+    public void handleSubscribe(StompConnection connection, String destination, String subscriptionId, Headers headers) {
+        String contentType = headers.get( "accept" );
+        if ( contentType == null ) {
+            contentType = "application/json";
+        }
+        ResourceCodec codec = this.container.getCodecManager().getResourceCodec(contentType);
+        StompSubscription subscription = new StompSubscription(connection, destination, subscriptionId, contentType, codec);
+        this.container.getSubscriptionManager().addSubscription( subscription );
     }
 
     @Override

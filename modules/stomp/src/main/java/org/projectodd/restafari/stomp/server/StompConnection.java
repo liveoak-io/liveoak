@@ -19,7 +19,7 @@ public class StompConnection {
         return this.connectionId;
     }
 
-    void send(StompMessage message) {
+    public void send(StompMessage message) {
         this.channel.write( message );
     }
 

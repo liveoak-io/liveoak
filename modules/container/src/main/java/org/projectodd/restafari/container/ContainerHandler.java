@@ -7,12 +7,7 @@ import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
-import org.projectodd.restafari.container.requests.BaseRequest;
-import org.projectodd.restafari.container.requests.CreateResourceRequest;
-import org.projectodd.restafari.container.requests.DeleteResourceRequest;
-import org.projectodd.restafari.container.requests.GetCollectionRequest;
-import org.projectodd.restafari.container.requests.GetResourceRequest;
-import org.projectodd.restafari.container.requests.UpdateResourceRequest;
+import org.projectodd.restafari.container.requests.*;
 import org.projectodd.restafari.container.responses.ErrorResponse;
 import org.projectodd.restafari.container.responses.NoSuchCollectionResponse;
 import org.projectodd.restafari.spi.Responder;
@@ -111,8 +106,8 @@ public class ContainerHandler extends ChannelDuplexHandler {
         ctx.pipeline().flush();
     }
 
-    protected Responder createResponder(BaseRequest request, ChannelHandlerContext ctx) {
-        return this.container.createResponder( request.getType(), request.getMimeType(), ctx );
+    protected Responder createResponder(BaseCollectionRequest request, ChannelHandlerContext ctx) {
+        return this.container.createResponder( request.getType(), request.getCollectionName(), request.getMimeType(), ctx );
     }
 
 

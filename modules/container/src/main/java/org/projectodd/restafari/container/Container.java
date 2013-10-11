@@ -45,8 +45,8 @@ public class Container {
         return this.vertx;
     }
 
-    Responder createResponder(String type, String mimeType, ChannelHandlerContext ctx) {
-        return new ResponderImpl(this.subscriptionManager, type, mimeType, ctx);
+    Responder createResponder(String type, String collectionName, String mimeType, ChannelHandlerContext ctx) {
+        return new ResponderImpl(this.subscriptionManager, type, collectionName, mimeType, ctx);
     }
 
     SubscriptionManager getSubscriptionManager() {
