@@ -19,32 +19,45 @@ import org.apache.http.message.BasicHeader;
 import org.junit.Test;
 import org.projectodd.restafari.container.codec.json.JSONCodec;
 import org.projectodd.restafari.spi.Resource;
+import org.projectodd.restafari.stomp.client.StompClient;
 
 import static org.junit.Assert.*;
 
 public class BasicServerTest {
 
+    static class ObjectHolder {
+        public Object object;
+    }
+
     @Test
     public void testServer() throws Exception {
 
         InMemoryObjectResourceController controller = new InMemoryObjectResourceController();
-        controller.addCollection( "people" );
-        controller.addCollection( "dogs" );
+        controller.addCollection("people");
+        controller.addCollection("dogs");
 
         Container container = new Container();
-        container.registerResourceController( "memory", controller, new SimpleConfig() );
+        container.registerResourceController("memory", controller, new SimpleConfig());
 
         UnsecureServer server = new UnsecureServer(container, InetAddress.getByName("localhost"), 8080, new NioEventLoopGroup());
 
-        System.err.println( "START SERVER" );
+        System.err.println("START SERVER");
         server.start();
-        System.err.println( "STARTED SERVER" );
+        System.err.println("STARTED SERVER");
+
+        ObjectHolder subscribedObject = new ObjectHolder();
+
+        StompClient stompClient = new StompClient();
+        stompClient.connectSync("localhost", 8080);
+        stompClient.subscribe("/memory/people", (msg) -> {
+            subscribedObject.object = msg;
+        });
 
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         Header header = new BasicHeader("Accept", "application/json");
         try {
             // Ensure no people resources exist
-            HttpGet get = new HttpGet( "http://localhost:8080/memory/people" );
+            HttpGet get = new HttpGet("http://localhost:8080/memory/people");
             get.addHeader(header);
             Collection<Resource> resources = assertResults(httpClient.execute(get), 200);
             assertTrue(resources.isEmpty());
@@ -65,7 +78,7 @@ public class BasicServerTest {
             //TODO: Add update
 
             // Retrieve all people resources, ensuring only 1 person exists
-            get = new HttpGet( "http://localhost:8080/memory/people" );
+            get = new HttpGet("http://localhost:8080/memory/people");
             get.addHeader(header);
             resources = assertResults(httpClient.execute(get), 200);
             assertEquals(1, resources.size());
@@ -83,6 +96,8 @@ public class BasicServerTest {
             System.err.println("closed");
             server.stop();
         }
+
+        assertNotNull( subscribedObject.object );
     }
 
     private static Resource assertResult(HttpResponse response, int status) throws Exception {

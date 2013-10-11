@@ -63,6 +63,11 @@ public class ResourcePath {
         return this.propertyName != null;
     }
 
+    public String toString() {
+        return "[ResourcePath: type=" + this.type + "; collectionName=" + this.collectionName + "; resourceId=" + this.resourceId + "]";
+
+    }
+
     private String fullPath;
     
     private String type;

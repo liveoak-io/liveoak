@@ -16,7 +16,7 @@ public class SubscriptionManager {
 
     public void resourceCreated(String type, String collectionName, Resource resource) {
         getSubscriptions(type, collectionName, resource.getId()).forEach((e) -> {
-            e.resourceUpdated(resource);
+            e.resourceCreated(resource);
         });
     }
 
@@ -35,8 +35,9 @@ public class SubscriptionManager {
     protected Stream<Subscription> getSubscriptions(String type, String collectionName, String resourceId) {
         return this.subscriptions.stream().filter((e) -> {
             ResourcePath p = e.resourcePath();
-            return (p.getType().equals(type) && p.getCollectionName().equals(collectionName)) &&
+            boolean result =  (p.getType().equals(type) && p.getCollectionName().equals(collectionName)) &&
                     (p.isCollectionPath() || (p.isResourcePath() && p.getResourceId().equals(resourceId)));
+            return result;
         });
     }
 

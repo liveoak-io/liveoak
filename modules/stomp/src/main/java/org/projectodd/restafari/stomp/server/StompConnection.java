@@ -20,7 +20,7 @@ public class StompConnection {
     }
 
     public void send(StompMessage message) {
-        this.channel.write( message );
+        this.channel.writeAndFlush( message );
     }
 
     private String connectionId;
