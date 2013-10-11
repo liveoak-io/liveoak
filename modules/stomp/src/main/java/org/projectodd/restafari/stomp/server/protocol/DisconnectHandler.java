@@ -6,7 +6,7 @@ import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.Stomp;
 import org.projectodd.restafari.stomp.common.AbstractControlFrameHandler;
 import org.projectodd.restafari.stomp.common.StompControlFrame;
-import org.projectodd.restafari.stomp.server.ServerContext;
+import org.projectodd.restafari.stomp.server.StompServerContext;
 import org.projectodd.restafari.stomp.server.StompConnection;
 import org.projectodd.restafari.stomp.server.StompServerException;
 
@@ -15,7 +15,7 @@ import org.projectodd.restafari.stomp.server.StompServerException;
  */
 public class DisconnectHandler extends AbstractControlFrameHandler {
 
-    public DisconnectHandler(ServerContext serverContext) {
+    public DisconnectHandler(StompServerContext serverContext) {
         super(Stomp.Command.DISCONNECT);
         this.serverContext = serverContext;
     }
@@ -31,5 +31,5 @@ public class DisconnectHandler extends AbstractControlFrameHandler {
         });
     }
 
-    private ServerContext serverContext;
+    private StompServerContext serverContext;
 }

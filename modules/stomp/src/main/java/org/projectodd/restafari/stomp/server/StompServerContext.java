@@ -6,7 +6,7 @@ import org.projectodd.restafari.stomp.StompMessage;
 /**
  * @author Bob McWhirter
  */
-public interface ServerContext {
+public interface StompServerContext {
 
     void handleConnect(StompConnection connection);
     void handleDisconnect(StompConnection connection);

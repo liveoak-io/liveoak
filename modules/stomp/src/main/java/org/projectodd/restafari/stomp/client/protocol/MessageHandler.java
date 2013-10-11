@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  */
 public class MessageHandler extends ChannelDuplexHandler {
 
-    public MessageHandler(ClientContext clientContext, Executor executor) {
+    public MessageHandler(StompClientContext clientContext, Executor executor) {
         this.clientContext = clientContext;
         this.executor = executor;
     }
@@ -39,5 +39,5 @@ public class MessageHandler extends ChannelDuplexHandler {
 
 
     private Executor executor;
-    private ClientContext clientContext;
+    private StompClientContext clientContext;
 }

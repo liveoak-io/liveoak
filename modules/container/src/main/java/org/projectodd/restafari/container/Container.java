@@ -49,10 +49,15 @@ public class Container {
         return new ResponderImpl(this.subscriptionManager, type, mimeType, ctx);
     }
 
+    SubscriptionManager getSubscriptionManager() {
+        return this.subscriptionManager;
+    }
+
     private Map<String,Holder> controllers = new HashMap<>();
     private ResourceCodecManager codecManager = new ResourceCodecManager();
     private Vertx vertx;
     private final SubscriptionManager subscriptionManager;
+
 
 }
 

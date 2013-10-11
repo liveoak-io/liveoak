@@ -8,7 +8,7 @@ import org.projectodd.restafari.stomp.common.AbstractControlFrameHandler;
 import org.projectodd.restafari.stomp.common.StompControlFrame;
 import org.projectodd.restafari.stomp.common.StompFrame;
 import org.projectodd.restafari.stomp.server.Heartbeat;
-import org.projectodd.restafari.stomp.server.ServerContext;
+import org.projectodd.restafari.stomp.server.StompServerContext;
 import org.projectodd.restafari.stomp.server.StompConnection;
 import org.projectodd.restafari.stomp.server.StompServerException;
 
@@ -21,7 +21,7 @@ public class ConnectHandler extends AbstractControlFrameHandler {
 
     static final AttributeKey<StompConnection> CONNECTION = new AttributeKey<>("stomp-connection");
 
-    public ConnectHandler(ServerContext serverContext) {
+    public ConnectHandler(StompServerContext serverContext) {
         super(Stomp.Command.CONNECT);
         this.serverContext = serverContext;
     }
@@ -101,6 +101,6 @@ public class ConnectHandler extends AbstractControlFrameHandler {
     private static final Pattern HEART_BEAT_PATTERN = Pattern.compile("^\\d+,\\d+$");
     private static final Pattern VERSION_PATTERN = Pattern.compile("^([^\\s]+,)*[^\\s]*$");
 
-    private ServerContext serverContext;
+    private StompServerContext serverContext;
 
 }

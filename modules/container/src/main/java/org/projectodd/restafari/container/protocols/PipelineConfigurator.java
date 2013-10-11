@@ -6,12 +6,17 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import org.projectodd.restafari.container.Container;
 import org.projectodd.restafari.container.ContainerHandler;
+import org.projectodd.restafari.container.ContainerStompServerContext;
 import org.projectodd.restafari.container.protocols.http.*;
 import org.projectodd.restafari.stomp.common.StompFrameDecoder;
 import org.projectodd.restafari.stomp.common.StompFrameEncoder;
 import org.projectodd.restafari.container.protocols.websocket.WebSocketHandshakerHandler;
 import org.projectodd.restafari.container.protocols.websocket.WebSocketStompFrameDecoder;
 import org.projectodd.restafari.container.protocols.websocket.WebSocketStompFrameEncoder;
+import org.projectodd.restafari.stomp.common.StompMessageDecoder;
+import org.projectodd.restafari.stomp.common.StompMessageEncoder;
+import org.projectodd.restafari.stomp.server.StompServerContext;
+import org.projectodd.restafari.stomp.server.protocol.*;
 
 /**
  * @author Bob McWhirter
@@ -23,13 +28,31 @@ public class PipelineConfigurator {
     }
 
     public void switchToPureStomp(ChannelPipeline pipeline) {
-        pipeline.remove( ProtocolDetector.class );
+        pipeline.remove(ProtocolDetector.class);
+
+        StompServerContext serverContext = new ContainerStompServerContext(this.container);
+
         pipeline.addLast(new StompFrameDecoder());
         pipeline.addLast(new StompFrameEncoder());
+        //ch.pipeline().addLast( new DebugHandler( "server-head" ) );
+        // handle frames
+        pipeline.addLast(new ConnectHandler(serverContext));
+        pipeline.addLast(new DisconnectHandler(serverContext));
+        pipeline.addLast(new SubscribeHandler(serverContext));
+        pipeline.addLast(new UnsubscribeHandler(serverContext));
+        // convert some frames to messages
+        pipeline.addLast(new ReceiptHandler());
+        pipeline.addLast(new StompMessageDecoder());
+        pipeline.addLast(new StompMessageEncoder(true));
+        // handle messages
+        pipeline.addLast(new SendHandler(serverContext));
+        // catch errors, return an ERROR message.
+        pipeline.addLast(new ErrorHandler());
+
     }
 
     public void switchToHttpWebSockets(ChannelPipeline pipeline) {
-        pipeline.remove( ProtocolDetector.class );
+        pipeline.remove(ProtocolDetector.class);
         pipeline.addLast(new HttpRequestDecoder());
         pipeline.addLast(new HttpResponseEncoder());
         pipeline.addLast(new HttpObjectAggregator(1024 * 1024));
@@ -58,7 +81,7 @@ public class PipelineConfigurator {
         pipeline.addLast(new HttpNoSuchCollectionResponseEncoder(this.container.getCodecManager()));
         pipeline.addLast(new HttpNoSuchResourceResponseEncoder(this.container.getCodecManager()));
         pipeline.addLast(new HttpErrorResponseEncoder(this.container.getCodecManager()));
-        pipeline.addLast( new ContainerHandler( this.container ) );
+        pipeline.addLast(new ContainerHandler(this.container));
     }
 
     private Container container;

@@ -19,7 +19,7 @@ import org.projectodd.restafari.stomp.server.protocol.*;
  */
 public class SimpleStompServer {
 
-    public SimpleStompServer(String host, int port, ServerContext serverContext) {
+    public SimpleStompServer(String host, int port, StompServerContext serverContext) {
         this.host = host;
         this.port = port;
         this.serverContext = serverContext;
@@ -70,7 +70,7 @@ public class SimpleStompServer {
 
     private final String host;
     private final int port;
-    private ServerContext serverContext;
+    private StompServerContext serverContext;
     private EventLoopGroup group;
 
 }

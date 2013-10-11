@@ -13,7 +13,7 @@ import org.projectodd.restafari.stomp.common.StompControlFrame;
  */
 public class DisconnectionNegotiatingHandler extends ChannelDuplexHandler {
 
-    public DisconnectionNegotiatingHandler(ClientContext clientContext) {
+    public DisconnectionNegotiatingHandler(StompClientContext clientContext) {
         this.clientContext = clientContext;
     }
 
@@ -47,7 +47,7 @@ public class DisconnectionNegotiatingHandler extends ChannelDuplexHandler {
         super.channelRead(ctx, msg);
     }
 
-    private ClientContext clientContext;
+    private StompClientContext clientContext;
     private String receiptId;
     private Runnable callback;
 }

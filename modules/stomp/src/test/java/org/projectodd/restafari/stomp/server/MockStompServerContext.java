@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * @author Bob McWhirter
  */
-public class MockServerContext implements ServerContext {
+public class MockStompServerContext implements StompServerContext {
 
     @Override
     public void handleConnect(StompConnection connection) {

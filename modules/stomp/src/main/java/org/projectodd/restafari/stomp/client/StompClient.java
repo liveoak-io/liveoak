@@ -10,7 +10,7 @@ import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.Stomp;
 import org.projectodd.restafari.stomp.StompException;
 import org.projectodd.restafari.stomp.StompMessage;
-import org.projectodd.restafari.stomp.client.protocol.ClientContext;
+import org.projectodd.restafari.stomp.client.protocol.StompClientContext;
 import org.projectodd.restafari.stomp.client.protocol.ConnectionNegotiatingHandler;
 import org.projectodd.restafari.stomp.client.protocol.DisconnectionNegotiatingHandler;
 import org.projectodd.restafari.stomp.client.protocol.MessageHandler;
@@ -52,7 +52,7 @@ public class StompClient {
         Executor executor = Executors.newCachedThreadPool();
         NioEventLoopGroup group = new NioEventLoopGroup();
 
-        ClientContext clientContext = new ContextImpl();
+        StompClientContext clientContext = new ContextImplStomp();
 
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.channel(NioSocketChannel.class);
@@ -243,7 +243,7 @@ public class StompClient {
     private AtomicInteger subscriptionCounter = new AtomicInteger();
     private Map<String, Consumer<StompMessage>> subscriptions = new HashMap<>();
 
-    class ContextImpl implements ClientContext {
+    class ContextImplStomp implements StompClientContext {
 
         public StompClient getClient() {
             return StompClient.this;

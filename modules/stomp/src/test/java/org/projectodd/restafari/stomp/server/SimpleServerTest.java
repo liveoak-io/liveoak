@@ -7,9 +7,6 @@ import static org.junit.Assert.*;
 import org.projectodd.restafari.stomp.StompMessage;
 import org.projectodd.restafari.stomp.client.StompClient;
 
-import java.lang.ref.Reference;
-import java.nio.charset.Charset;
-import java.sql.Ref;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -24,7 +21,7 @@ public class SimpleServerTest {
     @Test
     public void testSync() throws Exception {
 
-        MockServerContext serverContext = new MockServerContext();
+        MockStompServerContext serverContext = new MockStompServerContext();
 
         SimpleStompServer server = new SimpleStompServer("localhost", 8675, serverContext);
         server.start();
@@ -55,7 +52,7 @@ public class SimpleServerTest {
 
     @Test
     public void testAsync() throws Exception {
-        MockServerContext serverContext = new MockServerContext();
+        MockStompServerContext serverContext = new MockStompServerContext();
 
         SimpleStompServer server = new SimpleStompServer("localhost", 8675, serverContext);
         server.start();

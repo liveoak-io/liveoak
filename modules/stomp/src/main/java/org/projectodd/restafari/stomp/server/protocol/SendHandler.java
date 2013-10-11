@@ -3,7 +3,7 @@ package org.projectodd.restafari.stomp.server.protocol;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.projectodd.restafari.stomp.StompMessage;
-import org.projectodd.restafari.stomp.server.ServerContext;
+import org.projectodd.restafari.stomp.server.StompServerContext;
 import org.projectodd.restafari.stomp.server.StompConnection;
 
 /**
@@ -12,7 +12,7 @@ import org.projectodd.restafari.stomp.server.StompConnection;
 public class SendHandler extends SimpleChannelInboundHandler<StompMessage> {
 
 
-    public SendHandler(ServerContext serverContext) {
+    public SendHandler(StompServerContext serverContext) {
         this.serverContext = serverContext;
     }
 
@@ -25,6 +25,6 @@ public class SendHandler extends SimpleChannelInboundHandler<StompMessage> {
         // end of the line, do NOT retain or send upstream.
     }
 
-    private ServerContext serverContext;
+    private StompServerContext serverContext;
 
 }

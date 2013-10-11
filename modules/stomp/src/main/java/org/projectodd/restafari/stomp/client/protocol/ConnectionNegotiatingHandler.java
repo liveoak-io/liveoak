@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  */
 public class ConnectionNegotiatingHandler extends AbstractControlFrameHandler {
 
-    public ConnectionNegotiatingHandler(ClientContext clientContext, Consumer<StompClient> callback) {
+    public ConnectionNegotiatingHandler(StompClientContext clientContext, Consumer<StompClient> callback) {
         super(Stomp.Command.CONNECTED);
         this.clientContext = clientContext;
         this.callback = callback;
@@ -51,7 +51,7 @@ public class ConnectionNegotiatingHandler extends AbstractControlFrameHandler {
         }
     }
 
-    private ClientContext clientContext;
+    private StompClientContext clientContext;
     private Consumer<StompClient> callback;
 
 }

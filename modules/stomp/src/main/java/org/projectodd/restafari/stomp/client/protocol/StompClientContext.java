@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * @author Bob McWhirter
  */
-public interface ClientContext {
+public interface StompClientContext {
     void setConnectionState(StompClient.ConnectionState connectionState);
     void setChannel(Channel channel);
     void setVersion(Stomp.Version version);
