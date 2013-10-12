@@ -55,7 +55,7 @@ public class PipelineConfigurator {
         pipeline.remove(ProtocolDetector.class);
         pipeline.addLast(new HttpRequestDecoder());
         pipeline.addLast(new HttpResponseEncoder());
-        pipeline.addLast(new HttpObjectAggregator(1024 * 1024));
+        pipeline.addLast(new HttpObjectAggregator(1024 * 1024)); //TODO: Remove this to support chunked http
         pipeline.addLast(new WebSocketHandshakerHandler(this));
     }
 
@@ -67,6 +67,10 @@ public class PipelineConfigurator {
 
     public void switchToPlainHttp(ChannelPipeline pipeline) {
         pipeline.remove(WebSocketHandshakerHandler.class);
+        pipeline.addLast("http-resource-decoder", new HttpResourceRequestDecoder());
+        pipeline.addLast("http-resource-encoder", new HttpResourceResponseEncoder());
+        pipeline.addLast("http-error-encoder", new HttpErrorResponseEncoder());
+        /*
         pipeline.addLast(new HttpGetCollectionRequestDecoder(this.container));
         pipeline.addLast(new HttpGetResourceRequestDecoder(this.container));
         pipeline.addLast(new HttpCreateResourceRequestDecoder(this.container));
@@ -81,6 +85,7 @@ public class PipelineConfigurator {
         pipeline.addLast(new HttpNoSuchCollectionResponseEncoder(this.container.getCodecManager()));
         pipeline.addLast(new HttpNoSuchResourceResponseEncoder(this.container.getCodecManager()));
         pipeline.addLast(new HttpErrorResponseEncoder(this.container.getCodecManager()));
+        */
         pipeline.addLast(new ContainerHandler(this.container));
     }
 
