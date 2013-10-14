@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.nio.NioEventLoopGroup;
 
 import java.net.InetAddress;
+import java.nio.charset.Charset;
 import java.util.Collection;
 
 import org.apache.http.Header;
@@ -90,6 +91,10 @@ public class BasicServerTest {
             resource = assertResult(httpClient.execute(delete), 200);
             assertNull(resource);
 
+            get = new HttpGet("http://localhost:8080/memory/people/" + createResource.getId());
+            get.addHeader(header);
+            assertResult(httpClient.execute(get), 404);
+
         } finally {
             System.err.println("closing");
             httpClient.close();
@@ -106,7 +111,7 @@ public class BasicServerTest {
         System.err.println("=============>>>");
         System.err.println(response);
         response.getEntity().writeTo(out);
-        System.err.println(new String(buffer.array(), "UTF-8"));
+        System.err.println(buffer.toString(Charset.forName("UTF-8")));
         System.err.println("\n<<<=============");
         assertEquals(status, response.getStatusLine().getStatusCode());
         return (Resource) new JSONCodec().decode(buffer);
@@ -119,7 +124,7 @@ public class BasicServerTest {
         System.err.println("=============>>>");
         System.err.println(response);
         response.getEntity().writeTo(out);
-        System.err.println(new String(buffer.array(), "UTF-8"));
+        System.err.println(buffer.toString(Charset.forName("UTF-8")));
         System.err.println("\n<<<=============");
         assertEquals(status, response.getStatusLine().getStatusCode());
         return (Collection<Resource>) new JSONCodec().decode(buffer);

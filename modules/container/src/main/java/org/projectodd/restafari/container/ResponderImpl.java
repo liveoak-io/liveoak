@@ -1,85 +1,120 @@
 package org.projectodd.restafari.container;
 
 import io.netty.channel.ChannelHandlerContext;
-
-import java.util.Collection;
-
-import org.projectodd.restafari.container.responses.NoSuchCollectionResponse;
-import org.projectodd.restafari.container.responses.NoSuchResourceResponse;
-import org.projectodd.restafari.container.responses.ResourceCreatedResponse;
-import org.projectodd.restafari.container.responses.ResourceDeletedResponse;
-import org.projectodd.restafari.container.responses.ResourceResponse;
-import org.projectodd.restafari.container.responses.ResourceUpdatedResponse;
-import org.projectodd.restafari.container.responses.ResourcesResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import org.projectodd.restafari.container.codec.ResourceCodec;
+import org.projectodd.restafari.container.requests.HttpResourceRequest;
+import org.projectodd.restafari.container.responses.HttpErrors;
+import org.projectodd.restafari.container.responses.DefaultHttpResourceResponse;
 import org.projectodd.restafari.container.subscriptions.SubscriptionManager;
 import org.projectodd.restafari.spi.Resource;
 import org.projectodd.restafari.spi.Responder;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.function.Consumer;
+
 public class ResponderImpl implements Responder {
 
-    public ResponderImpl(SubscriptionManager subscriptionManager , String type, String collectionName, String mimeType, ChannelHandlerContext ctx) {
-        this.subscriptionManager = subscriptionManager;
-        this.type = type;
-        this.collectionName = collectionName;
-        this.mimeType = mimeType;
+    public ResponderImpl(Container container, HttpResourceRequest request, ChannelHandlerContext ctx) {
+        this.container = container;
+        this.request = request;
         this.ctx = ctx;
     }
-    
+
     @Override
     public void resource(Resource resource) {
-        this.ctx.write( new ResourceResponse( this.mimeType, resource ) );
-        this.ctx.flush();
+        writeResponse(resource, null);
     }
 
     @Override
     public void resources(Collection<Resource> resources) {
-        this.ctx.write(new ResourcesResponse( this.mimeType, resources) );
-        this.ctx.flush();
+        writeResponse(resources);
     }
 
     @Override
     public void resourceCreated(Resource resource) {
-        this.ctx.write(new ResourceCreatedResponse( this.mimeType, resource ) );
-        this.ctx.flush();
-        this.subscriptionManager.resourceCreated(this.type, this.collectionName, resource);
+        writeResponse(resource, (sub) -> {
+            sub.resourceCreated(request.getResourceType(), request.getResourcePath().getCollectionName(), resource);
+        });
     }
 
     @Override
     public void resourceUpdated(Resource resource) {
-        this.ctx.write( new ResourceUpdatedResponse( this.mimeType, resource ) );
-        this.ctx.flush();
-        this.subscriptionManager.resourceUpdated(this.type, this.collectionName, resource);
+        writeResponse(resource, (sub) -> {
+            sub.resourceUpdated(request.getResourceType(), request.getResourcePath().getCollectionName(), resource);
+        });
     }
 
     @Override
     public void resourceDeleted(Resource resource) {
-        this.ctx.write( new ResourceDeletedResponse( this.mimeType, resource ) );
-        this.ctx.flush();
-        this.subscriptionManager.resourceDeleted(this.type, this.collectionName, resource);
+        //TODO: Do we want to return the resource that was deleted ?
+        writeResponse(null, (sub) -> {
+            sub.resourceDeleted(request.getResourceType(), request.getResourcePath().getCollectionName(), resource);
+        });
     }
 
     @Override
     public void noSuchCollection(String name) {
-        this.ctx.write( new NoSuchCollectionResponse( this.mimeType, name ) );
-        this.ctx.flush();
+        this.ctx.writeAndFlush(HttpErrors.notFound(request.getUri()));
     }
 
     @Override
     public void noSuchResource(String id) {
-        this.ctx.write( new NoSuchResourceResponse( this.mimeType, id ) );
-        this.ctx.flush();
+        this.ctx.writeAndFlush(HttpErrors.notFound(request.getUri()));
     }
 
     @Override
     public void internalError(String message) {
-        this.ctx.write( new InternalError(message));
-        this.ctx.flush();
+        this.ctx.writeAndFlush(HttpErrors.internalError(message));
     }
 
-    private SubscriptionManager subscriptionManager;
-    private String type;
-    private String collectionName;
-    private String mimeType;
+    private void writeResponse(Resource resource, Consumer<SubscriptionManager> subMgrConsumer) {
+        try {
+            String contentType = getContentType(request);
+            ResourceCodec codec = container.getCodecManager().getResourceCodec(contentType);
+            if (codec == null) {
+                //TODO: Get list of acceptable content types
+                ctx.writeAndFlush(HttpErrors.notAcceptable(request.getMimeType()));
+            } else {
+                // Write the response with content encoded
+                ctx.writeAndFlush(new DefaultHttpResourceResponse(request, codec.encode(resource), contentType));
+                // Notify subscribers
+                if (subMgrConsumer != null) {
+                    subMgrConsumer.accept(container.getSubscriptionManager());
+                }
+            }
+        } catch (IOException e) {
+            ctx.writeAndFlush(HttpErrors.internalError(e.getMessage()));
+        }
+    }
+
+    private void writeResponse(Collection<Resource> resources) {
+        try {
+            String contentType = getContentType(request);
+            ResourceCodec codec = container.getCodecManager().getResourceCodec(contentType);
+            if (codec == null) {
+                //TODO: Get list of acceptable content types
+                ctx.writeAndFlush(HttpErrors.notAcceptable(request.getMimeType()));
+            } else {
+                ctx.writeAndFlush(new DefaultHttpResourceResponse(request, codec.encode(resources), contentType));
+            }
+        } catch (IOException e) {
+            ctx.writeAndFlush(HttpErrors.internalError(e.getMessage()));
+        }
+    }
+
+    private static String getContentType(HttpResourceRequest request) {
+        //TODO: Need to properly parse this, as this can have multiple values i.e. "text/plain; q=0.5, text/html"
+        String accept = request.headers().get(HttpHeaders.Names.ACCEPT);
+        if (accept == null || "*/*".equals(accept)) {
+            accept = request.getMimeType(); // Use mime type of request
+        }
+        return accept;
+    }
+
+    private Container container;
+    private HttpResourceRequest request;
     private ChannelHandlerContext ctx;
 
 }

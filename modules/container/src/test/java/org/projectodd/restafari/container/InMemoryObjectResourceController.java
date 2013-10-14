@@ -30,7 +30,7 @@ public class InMemoryObjectResourceController implements ResourceController {
 
     @Override
     public void getResource(RequestContext context, String collectionName, String id, Responder responder) {
-        System.err.println( "ID: " + id );
+        System.err.println("Retrieving resource for id " +  id);
         Map<String, Resource> collection = this.resources.get(collectionName);
         if (collection == null) {
             responder.noSuchCollection(collectionName);
@@ -48,7 +48,7 @@ public class InMemoryObjectResourceController implements ResourceController {
 
     @Override
     public void getResources(RequestContext context, String collectionName, Pagination pagination, Responder responder) {
-        System.err.println("get resources: " + collectionName);
+        System.err.println("Retrieving resources for collection " +  collectionName);
         Map<String, Resource> collection = this.resources.get(collectionName);
         if (collection == null) {
             System.err.println("no such collection: " + collectionName);
@@ -61,6 +61,7 @@ public class InMemoryObjectResourceController implements ResourceController {
 
     @Override
     public void createResource(RequestContext context, String collectionName, Resource resource, Responder responder) {
+        System.err.println("Creating resource for collection " +  collectionName);
         Map<String, Resource> collection = this.resources.get(collectionName);
         if (collection == null) {
             responder.noSuchCollection(collectionName);
@@ -80,6 +81,7 @@ public class InMemoryObjectResourceController implements ResourceController {
 
     @Override
     public void updateResource(RequestContext context, String collectionName, String id, Resource resource, Responder responder) {
+        System.err.println("Updating resource for id " +  id);
         Map<String, Resource> collection = this.resources.get(collectionName);
         if (collection == null) {
             responder.noSuchCollection(collectionName);
@@ -104,6 +106,7 @@ public class InMemoryObjectResourceController implements ResourceController {
 
     @Override
     public void deleteResource(RequestContext context, String collectionName, String id, Responder responder) {
+        System.err.println("Deleting resource for id " +  id);
         Map<String, Resource> collection = this.resources.get(collectionName);
         if (collection == null) {
             responder.noSuchCollection(collectionName);

@@ -3,14 +3,12 @@ package org.projectodd.restafari.container;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.netty.channel.ChannelHandlerContext;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
 import org.projectodd.restafari.container.codec.json.JSONCodec;
 import org.projectodd.restafari.container.subscriptions.SubscriptionManager;
 import org.projectodd.restafari.spi.Config;
 import org.projectodd.restafari.spi.InitializationException;
 import org.projectodd.restafari.spi.ResourceController;
-import org.projectodd.restafari.spi.Responder;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.platform.PlatformLocator;
 import org.vertx.java.platform.PlatformManager;
@@ -27,8 +25,7 @@ public class Container {
     }
 
     public void registerResourceController(String type, ResourceController controller, Config config) throws InitializationException {
-        //TODO: Can probably delegate the initialization to the holder when the first get is called (delaying initialization)
-        // we can only initialize controllers as they are needed
+        //TODO: Lazy initialization in holder class when resource controller is first accessed
         controller.initialize(new SimpleControllerContext(this.vertx, null, config));
         this.controllers.put( type, new Holder( controller ) );
     }
@@ -43,10 +40,6 @@ public class Container {
 
     public Vertx getVertx() {
         return this.vertx;
-    }
-
-    Responder createResponder(String type, String collectionName, String mimeType, ChannelHandlerContext ctx) {
-        return new ResponderImpl(this.subscriptionManager, type, collectionName, mimeType, ctx);
     }
 
     SubscriptionManager getSubscriptionManager() {

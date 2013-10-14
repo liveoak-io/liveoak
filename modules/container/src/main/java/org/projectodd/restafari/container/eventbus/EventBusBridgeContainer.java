@@ -3,8 +3,6 @@ package org.projectodd.restafari.container.eventbus;
 import org.projectodd.restafari.container.Container;
 import org.projectodd.restafari.container.Holder;
 import org.projectodd.restafari.container.ResourcePath;
-import org.projectodd.restafari.container.requests.GetCollectionRequest;
-import org.projectodd.restafari.container.requests.GetResourceRequest;
 import org.projectodd.restafari.spi.Config;
 import org.projectodd.restafari.spi.InitializationException;
 import org.projectodd.restafari.spi.ResourceController;
@@ -23,16 +21,15 @@ public class EventBusBridgeContainer extends Container {
         eventBus.registerHandler(type + ".get", (Message<String> message) -> {
             System.err.println("!!! Got Message " + message);
             ResourcePath path = new ResourcePath("/" + type + "/" + message.body());
+            String mimeType = "application/json"; //TODO: Gonna have to figure out how/if to specify this
             System.err.println("!!! Path is " + path.getFullPath());
             if (path.isCollectionPath() ) {
                 System.err.println("!!! isCollectionPath with type " + path.getType() + " and name " + path.getCollectionName());
-                GetCollectionRequest request = new GetCollectionRequest(path.getType(), path.getCollectionName());
                 Holder holder = this.getResourceController(type);
-                holder.getResourceController().getResources(null, request.getCollectionName(), request, new EventBusResponderImpl(request.getMimeType(), message, this.getCodecManager()));
+                holder.getResourceController().getResources(null, path.getCollectionName(), null, new EventBusResponderImpl(mimeType, message, this.getCodecManager()));
             } else if (path.isResourcePath()) {
-                GetResourceRequest request = new GetResourceRequest(path.getType(), path.getCollectionName(), path.getResourceId());
                 Holder holder = this.getResourceController(type);
-                holder.getResourceController().getResource(null, request.getCollectionName(), request.getResourceId(), new EventBusResponderImpl(request.getMimeType(), message, this.getCodecManager()));
+                holder.getResourceController().getResource(null, path.getCollectionName(), path.getResourceId(), new EventBusResponderImpl(mimeType, message, this.getCodecManager()));
             }
         }, asyncResult -> {
             System.err.println("!!! Registered eventbus handler");

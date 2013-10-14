@@ -37,8 +37,8 @@ public class JSONCodec implements ResourceCodec {
         JsonGenerator generator = factory.createGenerator(out);
 
         encodeObject(generator, objResource);
+        generator.flush();
 
-        generator.close();
         out.close();
 
         return buf;
