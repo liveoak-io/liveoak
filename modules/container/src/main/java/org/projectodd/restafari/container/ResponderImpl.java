@@ -3,9 +3,11 @@ package org.projectodd.restafari.container;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.projectodd.restafari.container.codec.ResourceCodec;
-import org.projectodd.restafari.container.requests.HttpResourceRequest;
-import org.projectodd.restafari.container.responses.HttpErrors;
-import org.projectodd.restafari.container.responses.DefaultHttpResourceResponse;
+import org.projectodd.restafari.container.requests.BaseRequest;
+import org.projectodd.restafari.container.requests.ResourceRequest;
+import org.projectodd.restafari.container.responses.CollectionResponse;
+import org.projectodd.restafari.container.responses.ErrorResponse;
+import org.projectodd.restafari.container.responses.ResourceResponse;
 import org.projectodd.restafari.container.subscriptions.SubscriptionManager;
 import org.projectodd.restafari.spi.Resource;
 import org.projectodd.restafari.spi.Responder;
@@ -16,112 +18,52 @@ import java.util.function.Consumer;
 
 public class ResponderImpl implements Responder {
 
-    public ResponderImpl(Container container, HttpResourceRequest request, ChannelHandlerContext ctx) {
-        this.container = container;
+    public ResponderImpl(Container container, BaseRequest request, ChannelHandlerContext ctx) {
         this.request = request;
         this.ctx = ctx;
     }
 
     @Override
     public void resource(Resource resource) {
-        writeResponse(resource, null);
+        this.ctx.writeAndFlush(new ResourceResponse(this.request, ResourceResponse.ResponseType.READ, resource));
     }
 
     @Override
     public void resources(Collection<Resource> resources) {
-        writeResponse(resources);
+        this.ctx.writeAndFlush(new CollectionResponse(this.request, CollectionResponse.ResponseType.READ, resources));
     }
 
     @Override
     public void resourceCreated(Resource resource) {
-        writeResponse(resource, (sub) -> {
-            sub.resourceCreated(request.getResourceType(), request.getResourcePath().getCollectionName(), resource);
-        });
+        this.ctx.writeAndFlush(new ResourceResponse(this.request, ResourceResponse.ResponseType.CREATED, resource));
     }
 
     @Override
     public void resourceUpdated(Resource resource) {
-        writeResponse(resource, (sub) -> {
-            sub.resourceUpdated(request.getResourceType(), request.getResourcePath().getCollectionName(), resource);
-        });
+        this.ctx.writeAndFlush(new ResourceResponse(this.request, ResourceResponse.ResponseType.UPDATED, resource));
     }
 
     @Override
     public void resourceDeleted(Resource resource) {
-        //TODO: Do we want to return the resource that was deleted ?
-        writeResponse(null, (sub) -> {
-            sub.resourceDeleted(request.getResourceType(), request.getResourcePath().getCollectionName(), resource);
-        });
+        this.ctx.writeAndFlush(new ResourceResponse(this.request, ResourceResponse.ResponseType.DELETED, resource));
     }
 
     @Override
     public void noSuchCollection(String name) {
-        this.ctx.writeAndFlush(HttpErrors.notFound(request.getUri()));
+        this.ctx.writeAndFlush(new ErrorResponse(this.request, ErrorResponse.ResponseType.NOT_FOUND, name));
     }
 
     @Override
     public void noSuchResource(String id) {
-        this.ctx.writeAndFlush(HttpErrors.notFound(request.getUri()));
+        this.ctx.writeAndFlush(new ErrorResponse(this.request, ErrorResponse.ResponseType.NOT_FOUND, id));
     }
 
     @Override
     public void internalError(String message) {
-        this.ctx.writeAndFlush(HttpErrors.internalError(message));
+        this.ctx.writeAndFlush(new ErrorResponse(this.request, ErrorResponse.ResponseType.INTERNAL_ERROR, message));
     }
 
-    @Override
-    public void collectionDeleted(String name) {
-        writeResponse(null, (sub) -> {
-            sub.collectionDeleted(request.getResourceType(), request.getResourcePath().getCollectionName());
-        });
-    }
-
-    private void writeResponse(Resource resource, Consumer<SubscriptionManager> subMgrConsumer) {
-        try {
-            String contentType = getContentType(request);
-            ResourceCodec codec = container.getCodecManager().getResourceCodec(contentType);
-            if (codec == null) {
-                //TODO: Get list of acceptable content types
-                ctx.writeAndFlush(HttpErrors.notAcceptable(request.getMimeType()));
-            } else {
-                // Write the response with content encoded
-                ctx.writeAndFlush(new DefaultHttpResourceResponse(request, codec.encode(resource), contentType));
-                // Notify subscribers
-                if (subMgrConsumer != null) {
-                    subMgrConsumer.accept(container.getSubscriptionManager());
-                }
-            }
-        } catch (IOException e) {
-            ctx.writeAndFlush(HttpErrors.internalError(e.getMessage()));
-        }
-    }
-
-    private void writeResponse(Collection<Resource> resources) {
-        try {
-            String contentType = getContentType(request);
-            ResourceCodec codec = container.getCodecManager().getResourceCodec(contentType);
-            if (codec == null) {
-                //TODO: Get list of acceptable content types
-                ctx.writeAndFlush(HttpErrors.notAcceptable(request.getMimeType()));
-            } else {
-                ctx.writeAndFlush(new DefaultHttpResourceResponse(request, codec.encode(resources), contentType));
-            }
-        } catch (IOException e) {
-            ctx.writeAndFlush(HttpErrors.internalError(e.getMessage()));
-        }
-    }
-
-    private static String getContentType(HttpResourceRequest request) {
-        //TODO: Need to properly parse this, as this can have multiple values i.e. "text/plain; q=0.5, text/html"
-        String accept = request.headers().get(HttpHeaders.Names.ACCEPT);
-        if (accept == null || "*/*".equals(accept)) {
-            accept = request.getMimeType(); // Use mime type of request
-        }
-        return accept;
-    }
-
-    private Container container;
-    private HttpResourceRequest request;
+    private BaseRequest request;
     private ChannelHandlerContext ctx;
 
 }

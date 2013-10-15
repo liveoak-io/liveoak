@@ -1,20 +1,20 @@
-package org.projectodd.restafari.container.protocols;
+package org.projectodd.restafari.container;
 
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
+import org.projectodd.restafari.container.CollectionHandler;
 import org.projectodd.restafari.container.Container;
-import org.projectodd.restafari.container.ContainerHandler;
 import org.projectodd.restafari.container.ContainerStompServerContext;
+import org.projectodd.restafari.container.ResourceHandler;
+import org.projectodd.restafari.container.protocols.ProtocolDetector;
 import org.projectodd.restafari.container.protocols.http.*;
-import org.projectodd.restafari.stomp.common.StompFrameDecoder;
-import org.projectodd.restafari.stomp.common.StompFrameEncoder;
+import org.projectodd.restafari.container.subscriptions.SubscriptionWatcher;
+import org.projectodd.restafari.stomp.common.*;
 import org.projectodd.restafari.container.protocols.websocket.WebSocketHandshakerHandler;
 import org.projectodd.restafari.container.protocols.websocket.WebSocketStompFrameDecoder;
 import org.projectodd.restafari.container.protocols.websocket.WebSocketStompFrameEncoder;
-import org.projectodd.restafari.stomp.common.StompMessageDecoder;
-import org.projectodd.restafari.stomp.common.StompMessageEncoder;
 import org.projectodd.restafari.stomp.server.StompServerContext;
 import org.projectodd.restafari.stomp.server.protocol.*;
 
@@ -34,7 +34,6 @@ public class PipelineConfigurator {
 
         pipeline.addLast(new StompFrameDecoder());
         pipeline.addLast(new StompFrameEncoder());
-        //ch.pipeline().addLast( new DebugHandler( "server-head" ) );
         // handle frames
         pipeline.addLast(new ConnectHandler(serverContext));
         pipeline.addLast(new DisconnectHandler(serverContext));
@@ -67,26 +66,15 @@ public class PipelineConfigurator {
 
     public void switchToPlainHttp(ChannelPipeline pipeline) {
         pipeline.remove(WebSocketHandshakerHandler.class);
-        pipeline.addLast("http-resource-decoder", new HttpResourceRequestDecoder());
-        pipeline.addLast("http-resource-encoder", new HttpResourceResponseEncoder());
+        //pipeline.addLast( new DebugHandler( "server-1" ) );
+        pipeline.addLast("http-resource-decoder", new HttpResourceRequestDecoder(this.container.getCodecManager()));
+        pipeline.addLast("http-resource-encoder", new HttpResourceResponseEncoder(this.container.getCodecManager()));
+        pipeline.addLast("http-collection-encoder", new HttpCollectionResponseEncoder(this.container.getCodecManager()));
         pipeline.addLast("http-error-encoder", new HttpErrorResponseEncoder());
-        /*
-        pipeline.addLast(new HttpGetCollectionRequestDecoder(this.container));
-        pipeline.addLast(new HttpGetResourceRequestDecoder(this.container));
-        pipeline.addLast(new HttpCreateResourceRequestDecoder(this.container));
-        pipeline.addLast(new HttpUpdateResourceRequestDecoder(this.container));
-        pipeline.addLast(new HttpDeleteResourceRequestDecoder(this.container));
-
-        pipeline.addLast(new HttpResourceResponseEncoder(this.container.getCodecManager()));
-        pipeline.addLast(new HttpResourcesResponseEncoder(this.container.getCodecManager()));
-        pipeline.addLast(new HttpCreateResourceRequestEncoder(this.container));
-        pipeline.addLast(new HttpUpdateResourceRequestEncoder(this.container));
-        pipeline.addLast(new HttpDeleteResourceRequestEncoder(this.container));
-        pipeline.addLast(new HttpNoSuchCollectionResponseEncoder(this.container.getCodecManager()));
-        pipeline.addLast(new HttpNoSuchResourceResponseEncoder(this.container.getCodecManager()));
-        pipeline.addLast(new HttpErrorResponseEncoder(this.container.getCodecManager()));
-        */
-        pipeline.addLast(new ContainerHandler(this.container));
+        //pipeline.addLast( new DebugHandler( "server-2" ) );
+        pipeline.addLast("subscription-watcher", new SubscriptionWatcher(this.container.getSubscriptionManager()));
+        pipeline.addLast("container-resource-handler", new ResourceHandler(this.container));
+        pipeline.addLast("container-collection-handler", new CollectionHandler(this.container));
     }
 
     private Container container;

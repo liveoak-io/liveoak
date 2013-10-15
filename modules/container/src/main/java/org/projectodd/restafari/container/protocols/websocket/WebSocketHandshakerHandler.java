@@ -9,7 +9,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.util.ReferenceCountUtil;
-import org.projectodd.restafari.container.protocols.PipelineConfigurator;
+import org.projectodd.restafari.container.PipelineConfigurator;
 
 /**
  * @author Bob McWhirter

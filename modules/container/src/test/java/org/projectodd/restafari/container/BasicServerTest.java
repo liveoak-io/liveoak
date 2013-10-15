@@ -89,7 +89,8 @@ public class BasicServerTest {
             HttpDelete delete = new HttpDelete("http://localhost:8080/memory/people/" + createResource.getId());
             delete.addHeader(header);
             resource = assertResult(httpClient.execute(delete), 200);
-            assertNull(resource);
+            // let's get a copy of the deleted resource
+            assertNotNull( resource );
 
             get = new HttpGet("http://localhost:8080/memory/people/" + createResource.getId());
             get.addHeader(header);
