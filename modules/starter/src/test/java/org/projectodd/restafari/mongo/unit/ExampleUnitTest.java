@@ -15,12 +15,14 @@
  */
 package org.projectodd.restafari.mongo.unit;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Assert;
 import org.projectodd.restafari.mongo.ServerStarterVerticle;
 import org.junit.Test;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class ExampleUnitTest {
 
@@ -30,9 +32,12 @@ public class ExampleUnitTest {
         vert.start();
 
         try {
-            URL url = new URL("http://localhost:8080/storage");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            Assert.assertEquals(404, con.getResponseCode());
+            HttpGet get = new HttpGet("http://localhost:8080/storage");
+            get.setHeader("Content-Type", "application/json");
+            CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+            CloseableHttpResponse response = httpClient.execute(get);
+
+            Assert.assertEquals(200, response.getStatusLine().getStatusCode());
         } finally {
             vert.stop();
         }
