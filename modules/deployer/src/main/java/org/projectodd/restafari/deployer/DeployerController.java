@@ -108,4 +108,14 @@ public class DeployerController implements ResourceController {
     public void deleteResource(RequestContext context, String collectionName, String id, Responder responder) {
         // again - just undeploy the controller?
     }
+
+    @Override
+    public void getCollections(RequestContext context, Pagination pagination, Responder responder) {
+        responder.internalError("TODO: not yet implemented");
+    }
+
+    @Override
+    public void deleteCollection(RequestContext requestContext, String collectionName, Responder responder) {
+        responder.internalError("TODO: not yet implemented");
+    }
 }

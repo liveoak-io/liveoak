@@ -123,6 +123,16 @@ public class InMemoryObjectResourceController implements ResourceController {
 
     }
 
+    @Override
+    public void getCollections(RequestContext context, Pagination pagination, Responder responder) {
+        responder.internalError("TODO: not yet implemented");
+    }
+
+    @Override
+    public void deleteCollection(RequestContext requestContext, String collectionName, Responder responder) {
+        responder.internalError("TODO: not yet implemented");
+    }
+
     private ControllerContext context;
     private Map<String, Map<String, Resource>> resources = new HashMap<>();
 

@@ -15,5 +15,6 @@ public interface Responder {
     void noSuchCollection(String name);
     void noSuchResource(String id);
     void internalError(String message);
+    void collectionDeleted(String name);
     
 }

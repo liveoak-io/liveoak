@@ -44,7 +44,7 @@ public class ModuleIntegrationTest extends TestVerticle {
             .setPort(8080)
             .getNow("/storage/", new Handler<HttpClientResponse>() {
                 public void handle(HttpClientResponse response) {
-                    assertEquals(404, response.statusCode());
+                    assertEquals(200, response.statusCode());
                     testComplete();
                 }
         });

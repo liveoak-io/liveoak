@@ -69,6 +69,13 @@ public class ResponderImpl implements Responder {
         this.ctx.writeAndFlush(HttpErrors.internalError(message));
     }
 
+    @Override
+    public void collectionDeleted(String name) {
+        writeResponse(null, (sub) -> {
+            sub.collectionDeleted(request.getResourceType(), request.getResourcePath().getCollectionName());
+        });
+    }
+
     private void writeResponse(Resource resource, Consumer<SubscriptionManager> subMgrConsumer) {
         try {
             String contentType = getContentType(request);
