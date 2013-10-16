@@ -56,6 +56,11 @@ public class EventBusResponderImpl implements Responder {
     }
 
     @Override
+    public void collectionDeleted(String name) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public void noSuchCollection(String name) {
         //To change body of implemented methods use File | Settings | File Templates.
     }

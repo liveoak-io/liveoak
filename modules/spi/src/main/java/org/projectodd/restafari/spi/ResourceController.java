@@ -81,7 +81,7 @@ public interface ResourceController {
      */
     void updateResource(RequestContext context, String collectionName, String id, Resource resource, Responder responder);
     
-    /** Detele a resource in a collection.
+    /** Delete a resource in a collection.
      * 
      * @param context The request context.
      * @param collectionName The name of the resource.
@@ -89,5 +89,21 @@ public interface ResourceController {
      * @param responder The responder to provide the response.
      */
     void deleteResource(RequestContext context, String collectionName, String id, Responder responder);
+
+    /**
+     * Return a list of available collections
+     * @param context The request context
+     * @param pagination The pagination details.
+     * @param responder The responder to provide the response.
+     */
+    void getCollections(RequestContext context, Pagination pagination, Responder responder);
+
+    /**
+     * Delete a collection
+     * @param requestContext The request context
+     * @param collectionName The collection to delete
+     * @param responder The responder to provide the response.
+     */
+    void deleteCollection(RequestContext requestContext, String collectionName, Responder responder);
 
 }

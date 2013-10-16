@@ -13,8 +13,7 @@ import org.projectodd.restafari.spi.ResourceController;
 import org.projectodd.restafari.spi.Responder;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -52,6 +51,9 @@ public class MongoController implements ResourceController {
 
     @Override
     public void getResource(RequestContext context, String collectionName, String id, Responder responder) {
+        if (ObjectId.isValid(id))
+        {
+
         forCollection(collectionName, responder, collection -> {
             DBObject dbObject = collection.findOne(new BasicDBObject("_id", new ObjectId(id)));
             if (dbObject == null) {
@@ -60,6 +62,11 @@ public class MongoController implements ResourceController {
                 responder.resource(new DBObjectResource(dbObject));
             }
         });
+
+        } else {
+            responder.noSuchResource(id);
+        }
+
     }
 
     @Override
@@ -121,14 +128,62 @@ public class MongoController implements ResourceController {
         DBCollection collection = db.getCollection(collectionName);
 
         BasicDBObject object = new BasicDBObject();
-        object.append("_id", new ObjectId(id));
 
-        DBObject actualObject = collection.findOne(object);
-        collection.remove(actualObject);
+        if (ObjectId.isValid(id)) {
 
-        //TODO: figure out what, if anything, should actually be returned here. Its probably best to indicate this
-        // with just a status code.
-        responder.resourceDeleted(new DBObjectResource(object));
+            object.append("_id", new ObjectId(id));
+            DBObject actualObject = collection.findOne(object);
+
+            if (actualObject != null) {
+
+                collection.remove(actualObject);
+
+                // TODO: figure out what, if anything, should actually be returned here. Its probably best to indicate this
+                // with just a status code.
+                responder.resourceDeleted(new DBObjectResource(object));
+                return;
+            }
+        }
+        responder.noSuchResource(id);
+    }
+
+    @Override
+    public void getCollections(RequestContext context, Pagination pagination, Responder responder) {
+
+        //NOTE: this is going to not be very optimized for databases containing a large number of collections
+        //since its returned as a set and not as a cursor
+        Set<String> collectionNames = new TreeSet<String>(db.getCollectionNames()); // use TreeSet so its ordered
+
+        // if the offset if beyond the number of elements, just return an empty collection
+        if (pagination.getOffset() > collectionNames.size() || collectionNames.size() == 0)
+        {
+            responder.resources(new ArrayList<Resource>());
+        } else {
+
+            Collection<Resource> resources = new ArrayList<Resource>();
+
+            Object[] nameArray = collectionNames.toArray();
+
+            int limit = (pagination.getOffset() + pagination.getLimit() < collectionNames.size())? pagination.getOffset() + pagination.getLimit()  : collectionNames.size();
+
+            for (int i = pagination.getOffset(); i < limit;i++) {
+                //TODO: figure out what to return here. <name> : <location url> ?
+                resources.add(new DBObjectResource(new BasicDBObject("name", nameArray[i])));
+            }
+            responder.resources(resources);
+        }
+    }
+
+    @Override
+    public void deleteCollection(RequestContext requestContext, String collectionName, Responder responder) {
+        if (db.getCollectionNames().contains(collectionName))
+        {
+            DBCollection collection = db.getCollection(collectionName);
+            collection.drop();
+            responder.collectionDeleted(collectionName);
+        } else {
+            responder.noSuchCollection(collectionName);
+        }
     }
 
     private void forCollection(String name, Responder responder, Consumer<DBCollection> consumer) {

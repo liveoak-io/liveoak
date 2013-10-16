@@ -64,8 +64,16 @@ public class ContainerHandler extends ChannelDuplexHandler {
                             controller.createResource(null, collectionName, resource, responder);
                         });
                         break;
+                    case "DELETE":
+                        controller.deleteCollection(null, collectionName, responder);
                     default:
                         ctx.writeAndFlush(HttpErrors.methodNotAllowed(collectionMethods));
+                }
+            } else if (request.isTypeRequest()) {
+                switch (request.getHttpMethod()) {
+                    case "GET":
+                        controller.getCollections(null, request.getPagination(), responder );
+                        break;
                 }
             } else {
                 ctx.writeAndFlush(HttpErrors.notFound(request.getUri()));

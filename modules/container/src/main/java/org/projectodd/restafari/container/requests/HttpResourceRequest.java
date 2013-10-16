@@ -27,6 +27,10 @@ public interface HttpResourceRequest extends FullHttpRequest {
         return getResourcePath().isResourcePath();
     }
 
+    default boolean isTypeRequest() {
+        return getResourcePath().isTypePath();
+    }
+
     default String getHttpMethod() {
         return getMethod().name().toUpperCase(); // Uppercase it just in case :)
     }

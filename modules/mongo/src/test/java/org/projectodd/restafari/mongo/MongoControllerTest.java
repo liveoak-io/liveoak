@@ -1,208 +1,380 @@
 package org.projectodd.restafari.mongo;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import io.netty.channel.nio.NioEventLoopGroup;
+import static org.junit.Assert.*;
+
+import java.io.ByteArrayOutputStream;
+import java.net.InetAddress;
+
 import org.apache.http.HttpEntity;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.bson.types.ObjectId;
+import org.junit.*;
 import org.projectodd.restafari.container.Container;
 import org.projectodd.restafari.container.SimpleConfig;
 import org.projectodd.restafari.container.UnsecureServer;
 
-import java.io.ByteArrayOutputStream;
-import java.net.InetAddress;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
 
-import static org.junit.Assert.*;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.handler.codec.http.HttpHeaders;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
+ * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
 public class MongoControllerTest {
 
-    private static SimpleConfig config;
-    private static UnsecureServer server;
+    protected static UnsecureServer server;
+    protected static MongoClient mongoClient;
+    protected static DB db;
+
+    protected static String baseURL;
+    protected static final String TYPE = "storage";
 
     @BeforeClass
-    public static void init() throws Exception {
-        config = new SimpleConfig();
-        config.put("db", System.getProperty("mongo.db"));
-        config.put("host", System.getProperty("mongo.host"));
-        String port = System.getProperty("mongo.port");
-        if (port != null) {
-            config.put("port", new Integer(port));
-        }
+    public static void init() throws Exception
+    {
+        String database = System.getProperty("mongo.db", "MongoControllerTest_" + Math.random());
+        Integer port = new Integer(System.getProperty("mongo.port", "27017"));
+        String host = System.getProperty("mongo.host", "localhost");
 
-        if (config.get("db", null) != null) {
-            Container container = new Container();
-            container.registerResourceController("storage", new MongoController(), config);
+        // configure the mongo controller
+        SimpleConfig config = new SimpleConfig();
+        config.put("db", database);
+        config.put("port", port);
+        config.put("host", host);
 
-            server = new UnsecureServer(container, InetAddress.getByName("localhost"), 8080, new NioEventLoopGroup());
+        Container container = new Container();
+        container.registerResourceController("storage", new MongoController(), config);
+        server = new UnsecureServer(container, InetAddress.getByName("localhost"), 8080, new NioEventLoopGroup());
+        server.start();
 
-            System.err.println("START SERVER");
-            server.start();
-            System.err.println("STARTED SERVER");
-        } else {
-            System.err.println("No mongo.db configuration. Skipping tests ...");
-        }
+        baseURL = "http://localhost:8080/" + TYPE;
+
+        // configure a local mongo client to verify the data methods
+        mongoClient = new MongoClient(host, port);
+        db = mongoClient.getDB(database);
     }
 
     @AfterClass
-    public static void dispose() {
-        if (server == null)
-            return;
-
-        try {
+    public static void destroy() throws Exception
+    {
+        if (server != null) // TODO: should there be a server.status or server.state?
+        {
             server.stop();
-        } catch (InterruptedException ignored) {
         }
     }
 
-    @Test
-    public void testNotFound() throws Exception {
-        if (server == null)
-            return;
+    @Before
+    public void preTestMethod() throws Exception {
+        // TODO: if we use the method name as the collection name, we might not need to do this here
+        // assertTrue("Test Database must be empty before starting the tests", db.getCollectionNames().isEmpty());
+    }
 
-        RequestConfig cconfig = RequestConfig.custom().setSocketTimeout(500000).build();
-        CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(cconfig).build();
-
-        HttpGet get = new HttpGet("http://localhost:8080/storage");
-        get.addHeader("Accept", "application/json");
-
-        try {
-            System.err.println("DO GET");
-            CloseableHttpResponse result = httpClient.execute(get);
-            System.err.println("=============>>>");
-            System.err.println(result);
-
-            HttpEntity entity = result.getEntity();
-            if (entity.getContentLength() > 0) {
-                entity.writeTo(System.err);
-            }
-            System.err.println("\n<<<=============");
-            assertEquals(404, result.getStatusLine().getStatusCode());
-
-        } finally {
-            httpClient.close();
-        }
+    @After
+    public void postTestMethod() throws Exception {
+        // TODO: if we use the method name as the collection name, we might not need to do this here
+        // db.dropDatabase();
     }
 
     @Test
-    public void testAutocreateCollection() throws Exception {
+    public void testGetStorageEmpty() throws Exception {
+        DB db = mongoClient.getDB("testGetStorageEmpty");
+        assertEquals(0, db.getCollectionNames().size());
 
-        if (server == null)
-            return;
-
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet get = new HttpGet("http://localhost:8080/storage/movies");
-        get.addHeader("Accept", "application/json");
-
-        try {
-            System.err.println("DO GET");
-            CloseableHttpResponse result = httpClient.execute(get);
-            System.err.println("=============>>>");
-            System.err.println(result);
-            result.getEntity().writeTo(System.err);
-            System.err.println("\n<<<=============");
-            assertEquals(200, result.getStatusLine().getStatusCode());
-
-        } finally {
-            httpClient.close();
-        }
+        CloseableHttpResponse response = testSimpleGetMethod(baseURL);
+        // This should return an empty list since there are no collections
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertEquals("[]", getEntityAsString(response.getEntity()));
     }
 
     @Test
-    public void testSimpleCreate() throws Exception {
-        createSimpleItem("http://localhost:8080/storage/items", "{\"foo\":\"bar\"}");
+    public void testGetStorageCollections() throws Exception {
+        // DB db = mongoClient.getDB("testGetStorageCollections");
+        db.dropDatabase();
+        assertEquals(0, db.getCollectionNames().size());
+        // create a couple of collections
+        db.createCollection("collection1", new BasicDBObject());
+        db.createCollection("collection2", new BasicDBObject());
+        db.createCollection("collection3", new BasicDBObject());
+        // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
+        assertEquals(4, db.getCollectionNames().size());
+
+        CloseableHttpResponse response = testSimpleGetMethod(baseURL);
+        // This should return an empty list since there are no collections
+        assertEquals(200, response.getStatusLine().getStatusCode());
+
+        // String entity = getEntityAsString(response.getEntity());
+        // TODO: verify the entity that gets returned
+        // System.out.println("ENTITY : " + entity);
+    }
+
+    @Test
+    public void testGetStorageCollectionsPagination() throws Exception {
+        // DB db = mongoClient.getDB("testGetStorageCollectionsPagination");
+        db.dropDatabase();
+        assertEquals(0, db.getCollectionNames().size());
+        // create a bunch of collections
+        for (int i = 0; i < 1013; i++)
+        {
+            db.createCollection("collection" + i, new BasicDBObject("count", i));
+        }
+        // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
+        assertEquals(1014, db.getCollectionNames().size());
+
+        CloseableHttpResponse response = testSimpleGetMethod(baseURL);
+        // This should return an empty list since there are no collections
+        assertEquals(200, response.getStatusLine().getStatusCode());
+
+        // String entity = getEntityAsString(response.getEntity());
+        // TODO: verify the entity that gets returned
+        // System.out.println("ENTITY : " + entity);
+    }
+
+    @Test
+    public void testGetEmptyCollection() throws Exception {
+        String methodName = "testEmtpyCollection";
+        // check that the collection really is empty
+        assertFalse(db.getCollectionNames().contains(methodName));
+
+        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/" + methodName);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        // check that we get back an empty collection
+        assertEquals("[]", getEntityAsString(response.getEntity()));
+
+        // check that the collection is still empty
+        assertEquals(0, db.getCollection(methodName).getCount());
     }
 
     @Test
     public void testSimpleGet() throws Exception {
-        String id = createSimpleItem("http://localhost:8080/storage/items", "{\"foo\":\"bar\"}");
+        String methodName = "testSimpleGet";
+        assertEquals(0, db.getCollection(methodName).getCount());
 
-        String result = getSimpleItem("http://localhost:8080/storage/items", id);
+        // create the object using the mongo driver directly
+        BasicDBObject object = new BasicDBObject();
+        object.append("foo", "bar");
+        db.getCollection(methodName).insert(object);
+        assertEquals(1, db.getCollection(methodName).getCount());
+        String id = object.getObjectId("_id").toString();
 
-        String expected = "{\"id\":\"" + id + "\",\"foo\":\"bar\"}";
-        assertEquals(expected, result);
+        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/" + methodName + "/" + id);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+
+        // verify response
+        String responseEntity = getEntityAsString(response.getEntity());
+        assertEquals(id, getId(responseEntity.getBytes()));
+        assertEquals("{\"id\":\"" + id + "\",\"foo\":\"bar\"}", responseEntity);
+    }
+
+    @Test
+    public void testGetInvalidId() throws Exception {
+        String methodName = "testGetInvalidId";
+        assertEquals(0, db.getCollection(methodName).getCount());
+
+        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/" + methodName + "/foobar123");
+        assertEquals(404, response.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    public void testGetNonExistantId() throws Exception {
+        String methodName = "testGetNonExistantId";
+        assertEquals(0, db.getCollection(methodName).getCount());
+
+        ObjectId id = new ObjectId();
+
+        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/" + methodName + "/" + id);
+        assertEquals(404, response.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    public void testSimpleCreate() throws Exception {
+        String methodName = "testSimpleCreate";
+        assertEquals(0, db.getCollection(methodName).getCount());
+
+        CloseableHttpResponse response = testSimplePostMethod(baseURL + "/" + methodName, "{\"foo\":\"bar\"}");
+        assertEquals(201, response.getStatusLine().getStatusCode());
+
+        // verify response
+        String responseEntity = getEntityAsString(response.getEntity());
+        String id = getId(responseEntity.getBytes());
+        assertEquals("{\"id\":\"" + id + "\",\"foo\":\"bar\"}", responseEntity);
+
+        // verify what is stored in the mongo db
+        assertEquals(1, db.getCollection(methodName).getCount());
+        DBObject dbObject = db.getCollection(methodName).findOne();
+        assertEquals("bar", dbObject.get("foo"));
+        assertEquals(new ObjectId(id), dbObject.get("_id"));
     }
 
     @Test
     public void testSimpleDelete() throws Exception {
+        String methodName = "testSimpleDelete";
+        assertEquals(0, db.getCollection(methodName).getCount());
 
-        String id = createSimpleItem("http://localhost:8080/storage/items", "{\"foo\":\"bar\"}");
+        // create the object using the mongo driver directly
+        BasicDBObject object = new BasicDBObject();
+        object.append("foo", "bar");
+        db.getCollection(methodName).insert(object);
+        assertEquals(1, db.getCollection(methodName).getCount());
+        String id = object.getObjectId("_id").toString();
 
-        //test that we can get this newly created object
-        CloseableHttpResponse getResponse = createSimpleGet("http://localhost:8080/storage/items" + "/" + id);
-        assertEquals(200, getResponse.getStatusLine().getStatusCode());
+        // now delete the object
+        CloseableHttpResponse response = testSimpleDeleteMethod(baseURL + "/" + methodName + "/" + id);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertEquals(0, db.getCollection(methodName).getCount());
+    }
 
-        CloseableHttpResponse deleteResponse = createSimpleDelete("http://localhost:8080/storage/items" + "/" + id);
-        assertEquals(200, deleteResponse.getStatusLine().getStatusCode());
+    @Test
+    public void testDeleteNonExistantCollection() throws Exception {
+        String methodName = "testDeleteNonExistantCollection";
+        assertEquals(0, db.getCollection(methodName).getCount());
 
-        //test that we now get a 404 when trying to access this object after its deleted
-        getResponse = createSimpleGet("http://localhost:8080/storage/items" + "/" + id);
-        assertEquals(404, getResponse.getStatusLine().getStatusCode());
+        CloseableHttpResponse response = testSimpleDeleteMethod(baseURL + "/" + methodName);
+        assertEquals(404, response.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    public void testDeleteCollection() throws Exception {
+        String methodName = "testDeleteCollection";
+        assertFalse(db.getCollectionNames().contains(methodName));
+
+        // create the collection
+        db.createCollection(methodName, new BasicDBObject());
+
+        assertTrue(db.getCollectionNames().contains(methodName));
+
+        CloseableHttpResponse response = testSimpleDeleteMethod(baseURL + "/" + methodName);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+
+        // check that it was actually deleted
+        assertFalse(db.getCollectionNames().contains(methodName));
+    }
+
+    @Test
+    public void testDeleteInvalidId() throws Exception {
+        String methodName = "testDeleteInvalidId";
+        assertEquals(0, db.getCollection(methodName).getCount());
+
+        CloseableHttpResponse response = testSimpleDeleteMethod(baseURL + "/" + methodName + "/foobar123");
+        assertEquals(404, response.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    public void testDeleteNonExistantId() throws Exception {
+        String methodName = "testDeleteNonExistantId";
+        assertEquals(0, db.getCollection(methodName).getCount());
+
+        ObjectId id = new ObjectId();
+
+        CloseableHttpResponse response = testSimpleDeleteMethod(baseURL + "/" + methodName + "/" + id.toString());
+        assertEquals(404, response.getStatusLine().getStatusCode());
     }
 
     @Test
     public void testSimpleUpdate() throws Exception {
+        String methodName = "testSimpleDelete";
+        assertEquals(0, db.getCollection(methodName).getCount());
 
-        String id = createSimpleItem("http://localhost:8080/storage/items", "{\"foo\":\"bar\"}");
+        // create the object using the mongo driver directly
+        BasicDBObject object = new BasicDBObject();
+        object.append("foo", "bar");
+        db.getCollection(methodName).insert(object);
+        assertEquals(1, db.getCollection(methodName).getCount());
+        String id = object.getObjectId("_id").toString();
 
-        //test that we can get this newly created object
-        String result = getSimpleItem("http://localhost:8080/storage/items", id);
-        String expected = "{\"id\":\"" + id + "\",\"foo\":\"bar\"}";
-        assertEquals(expected, result);
+        // now update the object
+        CloseableHttpResponse response = testSimplePutMethod(baseURL + "/" + methodName + "/" + id, "{\"foo\":\"baz\"}");
+        String responseEntity = getEntityAsString(response.getEntity());
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertEquals("{\"id\":\"" + id + "\",\"foo\":\"baz\"}", responseEntity);
 
-        CloseableHttpResponse updateResponse = createSimplePut("http://localhost:8080/storage/items" + "/" + id, "{ \"foo\": \"baz\" }");
-
-        //test that we get back now an updated object
-        result = getSimpleItem("http://localhost:8080/storage/items", id);
-        expected = "{\"id\":\"" + id + "\",\"foo\":\"baz\"}";
-        assertEquals(expected, result);
+        assertEquals(1, db.getCollection(methodName).getCount());
+        DBObject dbObject = db.getCollection(methodName).findOne();
+        assertEquals("baz", dbObject.get("foo"));
+        assertEquals(new ObjectId(id), dbObject.get("_id"));
     }
 
-    public String createSimpleItem(String url, String content) throws Exception {
-        CloseableHttpResponse response = createSimplePost("http://localhost:8080/storage/items", content);
-        assertEquals(201, response.getStatusLine().getStatusCode());
-
-        //TODO: test that the location header exists when this feature is added
-        //assertNotNull(response.getFirstHeader("Location"));
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        response.getEntity().writeTo(outputStream);
-        String result = new String(outputStream.toByteArray());
-        outputStream.close();
-
-        String id = getId(result.getBytes());
-        assertNotNull("Could not find the id for the created resource", id);
-
-        String expected = "{\"id\":\"" + id + "\"," + content.substring(1); // substring(1) to remove the staring {
-        assertEquals(expected, result);
-        return id;
+    protected CloseableHttpResponse testSimpleGetMethod(String url) throws Exception {
+        return testSimpleGetMethod(url, "application/json", "application/json");
     }
 
-    public String getSimpleItem(String url, String id) throws Exception {
-        CloseableHttpResponse getResponse = createSimpleGet(url + "/" + id);
-        assertEquals(200, getResponse.getStatusLine().getStatusCode());
+    protected CloseableHttpResponse testSimpleGetMethod(String url, String contentType_header, String accept_header) throws Exception
+    {
+        HttpGet get = new HttpGet(url);
+        get.setHeader(HttpHeaders.Names.CONTENT_TYPE, contentType_header);
+        get.setHeader(HttpHeaders.Names.ACCEPT, accept_header);
 
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        return httpClient.execute(get);
+    }
+
+    protected CloseableHttpResponse testSimplePostMethod(String url, String content) throws Exception {
+        return testSimplePostMethod(url, content, "application/json", "application/json");
+    }
+
+    protected CloseableHttpResponse testSimplePostMethod(String url, String content, String contentType_header, String accept_header) throws Exception {
+        HttpPost post = new HttpPost(url);
+        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, contentType_header);
+        post.setHeader(HttpHeaders.Names.ACCEPT, accept_header);
+
+        StringEntity entity = new StringEntity(content, ContentType.create("text/plain", "UTF-8"));
+        post.setEntity(entity);
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        return httpClient.execute(post);
+    }
+
+    protected CloseableHttpResponse testSimpleDeleteMethod(String url) throws Exception {
+        return testSimpleDeleteMethod(url, "application/json", "application/json");
+    }
+
+    protected CloseableHttpResponse testSimpleDeleteMethod(String url, String contentType_header, String accept_header) throws Exception {
+        HttpDelete delete = new HttpDelete(url);
+        delete.setHeader(HttpHeaders.Names.CONTENT_TYPE, contentType_header);
+        delete.setHeader(HttpHeaders.Names.ACCEPT, accept_header);
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        return httpClient.execute(delete);
+    }
+
+    protected CloseableHttpResponse testSimplePutMethod(String url, String content) throws Exception {
+        return testSimplePutMethod(url, content, "application/json", "application/json");
+    }
+
+    protected CloseableHttpResponse testSimplePutMethod(String url, String content, String contentType_header, String accept_header) throws Exception {
+        HttpPut put = new HttpPut(url);
+        put.setHeader(HttpHeaders.Names.CONTENT_TYPE, contentType_header);
+        put.setHeader(HttpHeaders.Names.ACCEPT, accept_header);
+
+        StringEntity entity = new StringEntity(content, ContentType.create("text/plain", "UTF-8"));
+        put.setEntity(entity);
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        return httpClient.execute(put);
+    }
+
+    protected String getEntityAsString(HttpEntity entity) throws Exception
+    {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        getResponse.getEntity().writeTo(outputStream);
+        entity.writeTo(outputStream);
         String result = new String(outputStream.toByteArray());
         outputStream.close();
 
         return result;
     }
 
-    public String getId(byte[] entity) throws Exception{
+    public String getId(byte[] entity) throws Exception {
         JsonFactory factory = new JsonFactory();
         JsonParser parser = factory.createParser(entity);
 
@@ -210,7 +382,7 @@ public class MongoControllerTest {
         while (parser.nextToken() != JsonToken.END_OBJECT)
         {
             String name = parser.getCurrentName();
-            if (name !=null && name.equals("id"))
+            if (name != null && name.equals("id"))
             {
                 parser.nextToken();
                 id = parser.getValueAsString();
@@ -225,51 +397,4 @@ public class MongoControllerTest {
         return id;
     }
 
-    public CloseableHttpResponse createSimpleGet(String url) throws Exception {
-        HttpGet get = new HttpGet(url);
-        get.addHeader("Accept", "application/json");
-
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        return httpClient.execute(get);
-    }
-
-    public CloseableHttpResponse createSimpleDelete(String url) throws Exception {
-        HttpDelete delete = new HttpDelete(url);
-        delete.addHeader("Accept", "application/json");
-
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        return httpClient.execute(delete);
-    }
-
-    public CloseableHttpResponse createSimplePost(String url, String body) throws Exception {
-        return createSimplePost(url, "application/json", body);
-    }
-
-    public CloseableHttpResponse createSimplePost(String url, String acceptHeader, String body) throws Exception{
-        HttpPost post = new HttpPost(url);
-        post.addHeader("Accept", acceptHeader);
-
-        StringEntity entity = new StringEntity(body, ContentType.create("text/plain", "UTF-8"));
-
-        post.setEntity(entity);
-
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        return httpClient.execute(post);
-    }
-
-    public CloseableHttpResponse createSimplePut(String url, String body) throws Exception {
-        return createSimplePut(url, "application/json", body);
-    }
-
-    public CloseableHttpResponse createSimplePut(String url, String acceptHeader, String body) throws Exception{
-        HttpPut put = new HttpPut(url);
-        put.addHeader("Accept", acceptHeader);
-
-        StringEntity entity = new StringEntity(body, ContentType.create("text/plain", "UTF-8"));
-
-        put.setEntity(entity);
-
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        return httpClient.execute(put);
-    }
 }

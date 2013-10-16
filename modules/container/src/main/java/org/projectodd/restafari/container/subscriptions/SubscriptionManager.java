@@ -32,6 +32,10 @@ public class SubscriptionManager {
         });
     }
 
+    public void collectionDeleted(String type, String collectionName) {
+        //TODO: implement
+    }
+
     protected Stream<Subscription> getSubscriptions(String type, String collectionName, String resourceId) {
         return this.subscriptions.stream().filter((e) -> {
             ResourcePath p = e.resourcePath();
