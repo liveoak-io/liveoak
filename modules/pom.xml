@@ -88,6 +88,7 @@
       <module>container</module>
       <module>mongo</module>
       <module>deployer</module>
+      <module>starter</module>
     </modules>
 </project>
 
