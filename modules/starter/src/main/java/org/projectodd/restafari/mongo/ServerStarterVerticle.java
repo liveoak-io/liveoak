@@ -45,7 +45,8 @@ public class ServerStarterVerticle extends Verticle {
             SimpleConfig config = new SimpleConfig();
             setNonNullOnly(config, "db", getWithFailOver(System.getProperty("mbaas.mongo.db"), conf.getString("db"), "mydb"));
             setNonNullOnly(config, "host", getWithFailOver(System.getProperty("mbaas.mongo.host"), conf.getString("host"), "localhost"));
-            setNonNullOnly(config, "port", getWithFailOver(System.getProperty("mbaas.mongo.port"), conf.getString("port")));
+            String mongoPortProperty = System.getProperty("mbaas.mongo.port");
+            setNonNullOnly(config, "port", getWithFailOver(mongoPortProperty == null ? null : Integer.parseInt(mongoPortProperty), conf.getInteger("port")));
 
             container.registerResource(new MongoDBResource("storage"), config);
         } catch (InitializationException e) {
@@ -113,7 +114,7 @@ public class ServerStarterVerticle extends Verticle {
         return null;
     }
 
-    private void setNonNullOnly(SimpleConfig conf, String key, String value) {
+    private void setNonNullOnly(SimpleConfig conf, String key, Object value) {
         if (value != null)
             conf.put(key, value);
     }
