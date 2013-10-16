@@ -2,10 +2,9 @@ package org.projectodd.restafari.container.subscriptions;
 
 import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.spi.Resource;
+import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -14,35 +13,68 @@ import java.util.stream.Stream;
  */
 public class SubscriptionManager {
 
-    public void resourceCreated(String type, String collectionName, Resource resource) {
-        getSubscriptions(type, collectionName, resource.getId()).forEach((e) -> {
+    public void resourceCreated(Resource resource) {
+        getSubscriptions( resource ).forEach((e) -> {
             e.resourceCreated(resource);
         });
     }
 
-    public void resourceUpdated(String type, String collectionName, Resource resource) {
-        getSubscriptions(type, collectionName, resource.getId()).forEach((e) -> {
+    public void resourceUpdated(Resource resource) {
+        getSubscriptions( resource ).forEach((e) -> {
             e.resourceUpdated(resource);
         });
     }
 
-    public void resourceDeleted(String type, String collectionName, Resource resource) {
-        getSubscriptions(type, collectionName, resource.getId()).forEach((e) -> {
+    public void resourceDeleted(Resource resource) {
+        getSubscriptions( resource ).forEach((e) -> {
             e.resourceDeleted(resource);
         });
     }
 
-    public void collectionDeleted(String type, String collectionName) {
-        //TODO: implement
+    protected Stream<Subscription> getSubscriptions(Resource resource) {
+        ResourcePath resourcePath = resourcePathOf( resource);
+        return this.subscriptions.stream().filter((subscription) -> {
+            ResourcePath subscriptionPath = subscription.resourcePath();
+            return matches( subscriptionPath, resourcePath );
+        });
     }
 
-    protected Stream<Subscription> getSubscriptions(String type, String collectionName, String resourceId) {
-        return this.subscriptions.stream().filter((e) -> {
-            ResourcePath p = e.resourcePath();
-            boolean result =  (p.getType().equals(type) && p.getCollectionName().equals(collectionName)) &&
-                    (p.isCollectionPath() || (p.isResourcePath() && p.getResourceId().equals(resourceId)));
-            return result;
-        });
+    protected boolean matches(ResourcePath subscriptionPath, ResourcePath resourcePath) {
+        List<String> subscriptionSegments = subscriptionPath.segments();
+        List<String> resourceSegments = subscriptionPath.segments();
+
+        if ( subscriptionSegments.size() > resourceSegments.size() ) {
+            return false;
+        }
+
+        int numSegments = subscriptionSegments.size();
+
+        for ( int i = 0 ; i < numSegments ; ++i ) {
+            String subscriptionSegment = subscriptionSegments.get(i);
+            if ( subscriptionSegment.equals( "*" ) ) {
+                continue;
+            }
+            String resourceSegment = resourceSegments.get(i);
+
+            if ( ! subscriptionSegment.equals( resourceSegment ) ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected ResourcePath resourcePathOf(Resource resource) {
+        ResourcePath path = new ResourcePath();
+
+        Resource current = resource;
+
+        while ( current != null ) {
+            path.prependSegment( current.id() );
+            current = current.parent();
+        }
+
+        return path;
     }
 
     public void addSubscription(Subscription subscription) {

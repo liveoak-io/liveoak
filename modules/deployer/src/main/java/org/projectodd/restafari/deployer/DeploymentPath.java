@@ -23,7 +23,7 @@ public class DeploymentPath {
 
     /**
      * Create a new instance that watches the directory path provided for changes,
-     * signalling the DeploymentController to PUT, POST or DELETE a {@linkplain DeploymentResource}
+     * signalling the DeploymentController to PUT, POST or DELETE a deployment.
      *
      * @param dir   The directory path on disk where deployments will be placed
      * @param vertx The vertx object
@@ -60,11 +60,11 @@ public class DeploymentPath {
 
                         // outstanding question here - do we handleSend a message on the event bus to create these?
                         if (kind == ENTRY_CREATE) {
-                            // create a DeploymentResource
+                            // create a DeploymentResourceState
                         } else if (kind == ENTRY_DELETE) {
-                            // delete the DeploymentResource
+                            // delete the DeploymentResourceState
                         } else if (kind == ENTRY_MODIFY) {
-                            // update the DeploymentResource
+                            // update the DeploymentResourceState
                         }
                     }
                     if (!key.reset()) {

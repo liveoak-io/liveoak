@@ -2,13 +2,9 @@ package org.projectodd.restafari.container.subscriptions;
 
 import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.container.codec.ResourceCodec;
+import org.projectodd.restafari.container.codec.ResourceEncoder;
 import org.projectodd.restafari.spi.Resource;
-import org.projectodd.restafari.stomp.Headers;
-import org.projectodd.restafari.stomp.StompMessage;
-import org.projectodd.restafari.stomp.common.DefaultStompMessage;
 import org.projectodd.restafari.stomp.server.StompConnection;
-
-import java.io.IOException;
 
 /**
  * @author Bob McWhirter
@@ -30,40 +26,48 @@ public class StompSubscription implements Subscription {
 
     @Override
     public void resourceCreated(Resource resource) {
+        /*
         try {
-            this.connection.send(createMessage("create", 200, resource));
+            this.connection.send(createMessage("create", 200, resourceState));
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+        */
     }
 
     @Override
     public void resourceUpdated(Resource resource) {
+        /*
         try {
-            this.connection.send(createMessage("update", 200, resource));
+            this.connection.send(createMessage("update", 200, resourceState));
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+        */
     }
 
     @Override
     public void resourceDeleted(Resource resource) {
+        /*
         try {
-            this.connection.send(createMessage("delete", 200, resource));
+            this.connection.send(createMessage("delete", 200, resourceState));
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+        */
     }
 
-    protected StompMessage createMessage(String action, int status, Resource resource) throws IOException {
+    /*
+    protected StompMessage createMessage(String action, int status, ResourceState resourceState) throws IOException {
         StompMessage message = new DefaultStompMessage();
         message.headers().put(Headers.SUBSCRIPTION, this.subscriptionId);
         message.headers().put(Headers.CONTENT_TYPE, this.contentType);
         message.headers().put("action", action);
         message.headers().put("status", "" + status);
-        message.content(this.codec.encode(resource));
+        message.content(this.codec.encode(resourceState));
         return message;
     }
+    */
 
     private StompConnection connection;
     private String destination;

@@ -1,79 +1,72 @@
 package org.projectodd.restafari.container;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
-
+/**
+ * @author Bob McWhirter
+ */
 public class ResourcePath {
 
-    public ResourcePath(String path) {
-        this.fullPath = path;
-        
-        StringTokenizer tokenizer = new StringTokenizer(this.fullPath, "/");
-        
-        if ( tokenizer.hasMoreTokens() ) {
-            this.type = tokenizer.nextToken();
-        }
-        
-        if ( tokenizer.hasMoreTokens() ) {
-            this.collectionName = tokenizer.nextToken();
-        }
-        
-        if ( tokenizer.hasMoreTokens() ) {
-            this.resourceId = tokenizer.nextToken();
-        }
-        
-        if ( tokenizer.hasMoreTokens() ) {
-            this.propertyName = tokenizer.nextToken();
+    public ResourcePath() {
+        this.segments = new ArrayList<>();
+    }
+
+    public ResourcePath(String...segments) {
+        this();
+        for ( int i = 0 ; i < segments.length ; ++i ) {
+            this.segments.add( segments[i] );
         }
     }
-    
-    public String getFullPath() {
-        return this.fullPath;
+
+    public ResourcePath(String uri) {
+        this();
+        StringTokenizer tokens = new StringTokenizer(uri, "/" );
+
+        while ( tokens.hasMoreTokens() ) {
+            this.segments.add( tokens.nextToken() );
+        }
     }
-    
-    public String getType() {
-        return this.type;
+
+    ResourcePath(List<String> segments) {
+        this.segments = segments;
     }
-    
-    public String getCollectionName() {
-        return this.collectionName;
+
+    public void appendSegment(String segment) {
+        this.segments.add( segment );
     }
-    
-    public String getResourceId() {
-        return this.resourceId;
+
+    public void prependSegment(String segment) {
+        this.segments.add( 0, segment );
     }
-    
-    public String getPropertyName() {
-        return this.propertyName;
+
+    public String head() {
+        if ( this.segments.size() > 0 ) {
+            return this.segments.get(0);
+        }
+        return null;
     }
-    
-    public boolean isTypePath() {
-        return this.type != null && this.collectionName == null;
+
+    public ResourcePath subPath() {
+        if ( this.segments.isEmpty() ) {
+            return new ResourcePath();
+        }
+        return new ResourcePath( segments.subList(1, segments.size()));
     }
-    
-    public boolean isCollectionPath() {
-        return this.collectionName != null && this.resourceId == null;
+
+    public boolean isEmpty() {
+        return this.segments.isEmpty();
     }
-    
-    public boolean isResourcePath() {
-        return this.resourceId != null && this.propertyName == null;
-    }
-    
-    public boolean isResourcePropertyPath() {
-        return this.propertyName != null;
+
+    public List<String> segments() {
+        return this.segments;
     }
 
     public String toString() {
-        return "[ResourcePath: type=" + this.type + "; collectionName=" + this.collectionName + "; resourceId=" + this.resourceId + "]";
-
+        return this.segments.toString();
     }
 
-    private String fullPath;
-    
-    private String type;
-    private String collectionName;
-    private String resourceId;
-    private String propertyName;
-
+    private List<String> segments;
 
 }

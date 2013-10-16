@@ -1,25 +1,31 @@
 package org.projectodd.restafari.spi;
 
-import java.util.Set;
+import org.projectodd.restafari.spi.state.ObjectResourceState;
 
+import java.util.stream.Stream;
+
+/** An object-like resource.
+ *
+ * <p>An object-like resource contains children that are indexed
+ * by their names, ostensibly as properties.  The resource may support
+ * updating of these properties.</p>
+ *
+ * @author Bob McWhirter
+ */
 public interface ObjectResource extends Resource {
 
-    ObjectResource setString(String name, String value);
-    String getString(String name) throws InvalidPropertyTypeException;
-    
-    ObjectResource setInteger(String name, int value);
-    int getInteger(String name) throws InvalidPropertyTypeException;
-    
-    ObjectResource setDouble(String name, double value);
-    double getDouble(String name) throws InvalidPropertyTypeException;
-    
-    ObjectResource setResource(String name, ObjectResource value);
-    ObjectResource getResource(String name) throws InvalidPropertyTypeException;
-    
-    ObjectResource setReference(String name, ResourceReference value);
-    ResourceReference getReference(String name) throws InvalidPropertyTypeException;
-    
-    Object getProperty(String name);
-    Set<String> getPropertyNames();
+    /** Update this object's state.
+     *
+     * @param state The inbound representation of the state.
+     * @param responder To respond to the action.
+     */
+    void update(ObjectResourceState state, Responder responder);
+
+
+    /** Write the members of this object to the provided sink.
+     *
+     * @param sink The sink to stream members to.
+     */
+    void writeMembers(ResourceSink sink);
 
 }

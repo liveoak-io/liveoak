@@ -1,6 +1,5 @@
 package org.projectodd.restafari.container;
 
-import org.projectodd.restafari.container.Container;
 import org.projectodd.restafari.container.codec.ResourceCodec;
 import org.projectodd.restafari.container.subscriptions.StompSubscription;
 import org.projectodd.restafari.stomp.Headers;
@@ -13,7 +12,7 @@ import org.projectodd.restafari.stomp.server.StompConnection;
  */
 public class ContainerStompServerContext implements StompServerContext {
 
-    public ContainerStompServerContext(Container container) {
+    public ContainerStompServerContext(DefaultContainer container) {
         this.container = container;
     }
 
@@ -44,5 +43,5 @@ public class ContainerStompServerContext implements StompServerContext {
     public void handleSend(StompConnection connection, StompMessage message) {
     }
 
-    private Container container;
+    private DefaultContainer container;
 }

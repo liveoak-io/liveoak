@@ -1,53 +1,38 @@
 package org.projectodd.restafari.container;
 
-import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.HttpMethod;
-import org.projectodd.restafari.container.codec.ResourceCodec;
-import org.projectodd.restafari.container.requests.ResourceRequest;
-import org.projectodd.restafari.spi.Resource;
-import org.projectodd.restafari.spi.ResourceController;
-import org.projectodd.restafari.spi.Responder;
-
-import java.io.IOException;
-import java.util.function.Consumer;
+import org.projectodd.restafari.container.responders.CreateResponder;
+import org.projectodd.restafari.container.responders.DeleteResponder;
+import org.projectodd.restafari.container.responders.ReadResponder;
+import org.projectodd.restafari.container.responders.UpdateResponder;
 
 public class ResourceHandler extends SimpleChannelInboundHandler<ResourceRequest> {
 
-    public ResourceHandler(Container container) {
+    public ResourceHandler(DefaultContainer container) {
         this.container = container;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResourceRequest msg) throws Exception {
-        final Responder responder = new ResponderImpl(this.container, msg, ctx );
+        String firstSegment = msg.resourcePath().head();
 
-        Holder holder = container.getResourceController(msg.type());
-
-        if( holder == null ) {
-            responder.noSuchCollection( msg.type() );
-            return;
-        }
-
-        ResourceController controller = holder.getResourceController();
-
-        switch ( msg.requestType() ) {
+        switch (msg.requestType()) {
             case CREATE:
-                controller.createResource( null, msg.collectionName(), msg.resource(), responder );
+                this.container.read(firstSegment, new CreateResponder(msg, ctx));
                 break;
             case READ:
-                controller.getResource( null, msg.collectionName(), msg.resourceId(), responder );
+                this.container.read(firstSegment, new ReadResponder(msg, ctx));
                 break;
             case UPDATE:
-                controller.updateResource(null, msg.collectionName(), msg.resourceId(), msg.resource(), responder );
+                this.container.read(firstSegment, new UpdateResponder(msg, ctx));
                 break;
             case DELETE:
-                controller.deleteResource( null, msg.collectionName(), msg.resourceId(), responder);
+                this.container.read(firstSegment, new DeleteResponder(msg, ctx));
                 break;
         }
     }
 
-    private Container container;
+    private DefaultContainer container;
 
 }

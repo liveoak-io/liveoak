@@ -175,6 +175,10 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.easytesting</groupId>
+            <artifactId>fest-assert</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -238,7 +242,7 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
+                <artifactId>maven-resourceStates-plugin</artifactId>
                 <version>2.4.2</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>

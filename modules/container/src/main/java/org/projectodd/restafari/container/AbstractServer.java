@@ -11,7 +11,7 @@ import java.net.InetAddress;
 
 public abstract class AbstractServer {
 
-    public AbstractServer(Container container, InetAddress host, int port, EventLoopGroup group) {
+    public AbstractServer(DefaultContainer container, InetAddress host, int port, EventLoopGroup group) {
         this.container = container;
         this.host = host;
         this.port = port;
@@ -43,7 +43,7 @@ public abstract class AbstractServer {
 
     protected abstract ChannelHandler createChildHandler();
 
-    private Container container;
+    private DefaultContainer container;
     private int port;
     private InetAddress host;
     private EventLoopGroup group;

@@ -2,6 +2,7 @@ package org.projectodd.restafari.container.subscriptions;
 
 import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.spi.Resource;
+import org.projectodd.restafari.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter

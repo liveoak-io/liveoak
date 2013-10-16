@@ -6,11 +6,11 @@
   <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
     <fileSet>
-      <directory>src/assembly/resources</directory>
+      <directory>src/assembly/resourceStates</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>src/module/resources</directory>
+      <directory>src/module/resourceStates</directory>
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </fileSet>

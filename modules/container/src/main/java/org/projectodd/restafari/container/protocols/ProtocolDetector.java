@@ -30,7 +30,7 @@ public class ProtocolDetector extends ReplayingDecoder<Void> {
             ByteBuf lineBuffer = in.readBytes( nonNewlineBytes );
             String line = lineBuffer.toString( UTF_8 );
 
-            //SslHandler sslHandler = context.getPipeline().get( SslHandler.class );
+            //SslHandler sslHandler = context.getPipeline().writeState( SslHandler.class );
 
             in.resetReaderIndex();
             ByteBuf fullBuffer = in.readBytes( super.actualReadableBytes() );

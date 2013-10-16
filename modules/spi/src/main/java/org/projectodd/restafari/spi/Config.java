@@ -2,7 +2,7 @@ package org.projectodd.restafari.spi;
 
 import java.util.Set;
 
-//TODO: I think this and ObjectResource can be (or derive from) the same interface based off of Map.
+//TODO: I think this and ObjectResourceState can be (or derive from) the same interface based off of Map.
 public interface Config {
 
     <T> T put(String name, T value);
