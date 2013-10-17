@@ -18,10 +18,9 @@
 package org.projectodd.restafari.mongo;
 
 import io.netty.channel.nio.NioEventLoopGroup;
-import org.projectodd.restafari.container.Container;
+import org.projectodd.restafari.container.DefaultContainer;
 import org.projectodd.restafari.container.SimpleConfig;
 import org.projectodd.restafari.container.UnsecureServer;
-import org.projectodd.restafari.deployer.DeployerController;
 import org.projectodd.restafari.spi.InitializationException;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
@@ -39,7 +38,7 @@ public class ServerStarterVerticle extends Verticle {
     @Override
     public void start() {
 
-        Container container = new Container();
+        DefaultContainer container = new DefaultContainer();
         try {
             // mongo db configuration
             JsonObject conf = getConf("storage");
@@ -48,11 +47,12 @@ public class ServerStarterVerticle extends Verticle {
             setNonNullOnly(config, "host", getWithFailOver(System.getProperty("mbaas.mongo.host"), conf.getString("host"), "localhost"));
             setNonNullOnly(config, "port", getWithFailOver(System.getProperty("mbaas.mongo.port"), conf.getString("port")));
 
-            container.registerResourceController("storage", new MongoController(), config);
+            container.registerResource(new MongoDBResource("storage"), config);
         } catch (InitializationException e) {
             throw new RuntimeException("Failed to initialize resource controller: MongoController", e);
         }
 
+        /*
         try {
             // deployer configuration
             JsonObject conf = getConf("deployer");
@@ -66,6 +66,7 @@ public class ServerStarterVerticle extends Verticle {
         } catch (InitializationException e) {
             throw new RuntimeException("Failed to initialize resource controller: DeployerController", e);
         }
+        */
 
         try {
             server = new UnsecureServer(container, InetAddress.getByName("localhost"), 8080, new NioEventLoopGroup());
