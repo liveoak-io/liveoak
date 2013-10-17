@@ -1,5 +1,7 @@
 package org.projectodd.restafari.mongo;
 
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -23,31 +25,37 @@ import static org.fest.assertions.Assertions.assertThat;
  */
 public class MongoDBResourceTest {
 
-    private static SimpleConfig config;
     private static UnsecureServer server;
+    protected static MongoClient mongoClient;
+    protected static DB db;
+
+    protected static String baseURL;
+    protected static final String TYPE = "storage";
 
     @BeforeClass
     public static void init() throws Exception {
-        config = new SimpleConfig();
-        config.put("db", System.getProperty("mongo.db"));
-        config.put("host", System.getProperty("mongo.host"));
-        String port = System.getProperty("mongo.port");
-        if (port != null) {
-            config.put("port", new Integer(port));
-        }
+        String database = System.getProperty("mongo.db", "MongoControllerTest_" + Math.random());
+        Integer port = new Integer(System.getProperty("mongo.port", "27017"));
+        String host = System.getProperty("mongo.host", "localhost");
 
-        if (config.get("db", null) != null) {
-            DefaultContainer container = new DefaultContainer();
-            container.registerResource(new MongoDBResource("storage"), config);
+        // configure the mongo controller
+        SimpleConfig config = new SimpleConfig();
+        config.put("db", database);
+        config.put("port", port);
+        config.put("host", host);
 
-            server = new UnsecureServer(container, "localhost", 8080);
+        DefaultContainer container = new DefaultContainer();
+        container.registerResource(new MongoDBResource(TYPE), config);
 
-            System.err.println("START SERVER");
-            server.start();
-            System.err.println("STARTED SERVER");
-        } else {
-            System.err.println("No mongo.db configuration. Skipping tests ...");
-        }
+        server = new UnsecureServer(container, "localhost", 8080);
+        server.start();
+
+
+        baseURL = "http://localhost:8080/" + TYPE;
+
+        // configure a local mongo client to verify the data methods
+        mongoClient = new MongoClient(host, port);
+        db = mongoClient.getDB(database);
     }
 
     @AfterClass
