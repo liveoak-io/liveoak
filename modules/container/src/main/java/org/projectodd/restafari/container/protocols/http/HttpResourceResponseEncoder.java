@@ -76,10 +76,12 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
         if (content != null) {
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus, content);
             response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes());
+            response.headers().add( HttpHeaders.Names.LOCATION, msg.resource().uri().toString() );
         } else {
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus);
             response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
         }
+
 
         out.add( response );
     }

@@ -11,8 +11,8 @@ public interface Subscription {
 
     ResourcePath resourcePath();
 
-    void resourceCreated(Resource resource);
-    void resourceUpdated(Resource resource);
-    void resourceDeleted(Resource resource);
+    void resourceCreated(Resource resource) throws Exception;
+    void resourceUpdated(Resource resource) throws Exception;
+    void resourceDeleted(Resource resource) throws Exception;
 
 }

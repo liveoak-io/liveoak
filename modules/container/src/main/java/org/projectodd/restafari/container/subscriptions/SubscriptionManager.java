@@ -15,19 +15,31 @@ public class SubscriptionManager {
 
     public void resourceCreated(Resource resource) {
         getSubscriptions( resource ).forEach((e) -> {
-            e.resourceCreated(resource);
+            try {
+                e.resourceCreated(resource);
+            } catch (Exception e1) {
+                e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
         });
     }
 
     public void resourceUpdated(Resource resource) {
         getSubscriptions( resource ).forEach((e) -> {
-            e.resourceUpdated(resource);
+            try {
+                e.resourceUpdated(resource);
+            } catch (Exception e1) {
+                e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
         });
     }
 
     public void resourceDeleted(Resource resource) {
         getSubscriptions( resource ).forEach((e) -> {
-            e.resourceDeleted(resource);
+            try {
+                e.resourceDeleted(resource);
+            } catch (Exception e1) {
+                e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
         });
     }
 

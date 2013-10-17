@@ -41,7 +41,6 @@ public class JSONDecoder implements ResourceDecoder {
     @Override
     public ResourceState decode(ByteBuf resource) throws IOException {
 
-        System.err.println("decode: " + resource.toString(Charset.defaultCharset()));
         JsonFactory factory = new JsonFactory();
         ByteBufInputStream in = new ByteBufInputStream(resource);
         JsonParser parser = factory.createParser(in);
@@ -52,7 +51,6 @@ public class JSONDecoder implements ResourceDecoder {
             result = possiblyConvertToCollection((ObjectResourceState) result);
         }
 
-        System.err.println("decoded: " + result);
         return result;
     }
 
