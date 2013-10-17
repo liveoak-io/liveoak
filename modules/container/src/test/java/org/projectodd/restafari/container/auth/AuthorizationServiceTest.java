@@ -67,7 +67,7 @@ public class AuthorizationServiceTest {
 
     private AuthorizationRequestContext createAuthRequestContext(String uri, ResourceRequest.RequestType reqType, String[] realmRoles, String[] appRoles) {
         ResourcePath resPath = new ResourcePath(uri);
-        ResourceRequest req = new ResourceRequest(reqType, resPath, ResourceParams.NONE, null, null);
+        ResourceRequest req = new ResourceRequest.Builder(reqType, resPath).build();
 
         Map<String, String[]> appRolesMap = new HashMap<>();
         appRolesMap.put("authTest", appRoles);

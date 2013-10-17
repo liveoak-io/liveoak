@@ -10,8 +10,10 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import org.projectodd.restafari.container.ResourceParams;
 import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.container.ResourceRequest;
+import org.projectodd.restafari.container.ReturnFieldsImpl;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
 import org.projectodd.restafari.spi.Pagination;
+import org.projectodd.restafari.spi.ReturnFields;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.util.List;
@@ -38,14 +40,43 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         ResourceParams params = ResourceParams.instance(decoder.parameters());
 
         if (msg.getMethod().equals(HttpMethod.POST)) {
-            out.add(new ResourceRequest(ResourceRequest.RequestType.CREATE, new ResourcePath(decoder.path()), params, mimeType, authToken, decodeState(mimeType, msg.content())));
+            out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.CREATE, new ResourcePath(decoder.path()))
+                    .resourceParams(params)
+                    .mimeType(mimeType)
+                    .authorizationToken(authToken)
+                    .resourceState(decodeState(mimeType, msg.content()))
+                    .build());
         } else if (msg.getMethod().equals(HttpMethod.GET)) {
-            out.add(new ResourceRequest(ResourceRequest.RequestType.READ, new ResourcePath(decoder.path()), params, mimeType, authToken, decodePagination(params)));
+            out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.READ, new ResourcePath(decoder.path()))
+                    .resourceParams(params)
+                    .mimeType(mimeType)
+                    .authorizationToken(authToken)
+                    .pagination(decodePagination(params))
+                    .returnFields(decodeReturnFields(params))
+                    .build());
         } else if (msg.getMethod().equals(HttpMethod.PUT)) {
-            out.add(new ResourceRequest(ResourceRequest.RequestType.UPDATE, new ResourcePath(decoder.path()), params, mimeType, authToken, decodeState(mimeType, msg.content())));
+            out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.UPDATE, new ResourcePath(decoder.path()))
+                    .resourceParams(params)
+                    .mimeType(mimeType)
+                    .authorizationToken(authToken)
+                    .resourceState(decodeState(mimeType, msg.content()))
+                    .build());
         } else if (msg.getMethod().equals(HttpMethod.DELETE)) {
-            out.add(new ResourceRequest(ResourceRequest.RequestType.DELETE, new ResourcePath(decoder.path()), params, mimeType, authToken ));
+            out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.DELETE, new ResourcePath(decoder.path()))
+                    .resourceParams(params)
+                    .mimeType(mimeType)
+                    .authorizationToken(authToken)
+                    .build());
         }
+    }
+
+    private ReturnFields decodeReturnFields(ResourceParams params) {
+        String value = params.value("fields");
+        if (value == null || "".equals(value)) {
+            return null;
+        }
+
+        return new ReturnFieldsImpl(value);
     }
 
     protected ResourceState decodeState(String mimeType, ByteBuf content) throws Exception {

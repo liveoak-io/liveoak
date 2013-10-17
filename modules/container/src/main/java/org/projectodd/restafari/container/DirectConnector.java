@@ -40,7 +40,9 @@ public class DirectConnector {
     }
 
     public void create(String path, ResourceState state, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.CREATE, new ResourcePath(path), ResourceParams.NONE, "ignored", null, state);
+        ResourceRequest request = new ResourceRequest.Builder(ResourceRequest.RequestType.CREATE, new ResourcePath(path))
+                .resourceState(state)
+                .build();
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
@@ -62,7 +64,8 @@ public class DirectConnector {
     }
 
     public void read(String path, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.READ, new ResourcePath(path), ResourceParams.NONE, "ignored", null);
+        ResourceRequest request = new ResourceRequest.Builder(ResourceRequest.RequestType.READ, new ResourcePath(path))
+                .build();
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
@@ -91,7 +94,9 @@ public class DirectConnector {
     }
 
     public void update(String path, ResourceState state, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.UPDATE, new ResourcePath(path), ResourceParams.NONE, "ignored", null, state);
+        ResourceRequest request = new ResourceRequest.Builder(ResourceRequest.RequestType.UPDATE, new ResourcePath(path))
+                .resourceState(state)
+                .build();
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
@@ -113,7 +118,8 @@ public class DirectConnector {
     }
 
     public void delete(String path, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.DELETE, new ResourcePath(path), ResourceParams.NONE, "ignored", null);
+        ResourceRequest request = new ResourceRequest.Builder(ResourceRequest.RequestType.DELETE, new ResourcePath(path))
+                .build();
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
