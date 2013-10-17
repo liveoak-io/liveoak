@@ -53,7 +53,9 @@ public class SubscriptionManager {
 
     protected boolean matches(ResourcePath subscriptionPath, ResourcePath resourcePath) {
         List<String> subscriptionSegments = subscriptionPath.segments();
-        List<String> resourceSegments = subscriptionPath.segments();
+        List<String> resourceSegments = resourcePath.segments();
+
+        System.err.println( "compare: " + subscriptionPath + " vs " + resourcePath );
 
         if ( subscriptionSegments.size() > resourceSegments.size() ) {
             return false;

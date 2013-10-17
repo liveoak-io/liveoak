@@ -90,7 +90,9 @@ public class BasicServerTest {
 
         StompClient stompClient = new StompClient();
         stompClient.connect("localhost", 8080, (client) -> {
-            client.subscribe( "/memory/people", (msg)->{
+            // Subscribe only to the contents of /memory/people, and not the
+            // memory/people itself plus contents.
+            client.subscribe( "/memory/people/*", (msg)->{
                 if ( msg.headers().get( "location" ).equals( "/memory/people" ) ) {
                     peopleCreationNotification.object = msg;
                 } else {
@@ -164,11 +166,7 @@ public class BasicServerTest {
 
         response.close();
 
-        assertThat( peopleCreationNotification.object ).isNotNull();
-
-        CollectionResourceState peopleCollState = (CollectionResourceState) decode( ((StompMessage) peopleCreationNotification.object ).content() );
-        assertThat( peopleCollState.id() ).isEqualTo( "people" );
-
+        assertThat( peopleCreationNotification.object ).isNull();
 
         System.err.println("TEST #5");
         // people collection should be enumerable from the root
@@ -224,6 +222,8 @@ public class BasicServerTest {
         assertThat(((ObjectResourceState) state).getProperty("name")).isEqualTo( "bob" );
 
         // check STOMP
+
+        Thread.sleep( 500 );
 
         assertThat( bobCreationNotification.object ).isNotNull();
 
