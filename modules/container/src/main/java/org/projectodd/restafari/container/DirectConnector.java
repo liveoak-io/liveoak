@@ -49,8 +49,6 @@ public class DirectConnector {
         CompletableFuture<Resource> future = new CompletableFuture<>();
 
         create(path, state, (response) -> {
-            System.err.println( "response: " + response );
-            System.err.println( "in-reply-to: " + response.inReplyTo() );
             if (response.responseType() == ResourceResponse.ResponseType.CREATED) {
                 future.complete(response.resource());
             } else {
@@ -71,9 +69,6 @@ public class DirectConnector {
         CompletableFuture<Resource> future = new CompletableFuture<>();
 
         read(path, (response) -> {
-            System.err.println( "response: " + response );
-            System.err.println( "in-reply-to: " + response.inReplyTo() );
-
             if ( response.responseType() == ResourceResponse.ResponseType.READ ) {
                 future.complete( response.resource() );
             } else {
