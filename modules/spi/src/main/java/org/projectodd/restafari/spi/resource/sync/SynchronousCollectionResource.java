@@ -1,5 +1,7 @@
 package org.projectodd.restafari.spi.resource.sync;
 
+import org.projectodd.restafari.spi.CreateNotSupportedException;
+import org.projectodd.restafari.spi.ResourceException;
 import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.async.PaginatedCollectionResource;
@@ -18,7 +20,7 @@ public interface SynchronousCollectionResource extends SynchronousResource, Coll
 
     Stream<Resource> members();
 
-    Resource create(ResourceState state) throws Exception;
+    Resource create(ResourceState state) throws ResourceException;
 
     PaginatedCollectionResource readPage(Pagination pagination);
 
@@ -32,7 +34,10 @@ public interface SynchronousCollectionResource extends SynchronousResource, Coll
         try {
             Resource result = create(state);
             responder.resourceCreated(result);
+        } catch (CreateNotSupportedException e) {
+            responder.createNotSupported( this );
         } catch (Exception e) {
+            // TODO be more specific
             responder.createNotSupported(this);
         }
     }

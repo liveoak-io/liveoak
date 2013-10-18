@@ -5,6 +5,7 @@ import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
+import org.projectodd.restafari.spi.*;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.state.ResourceState;
 
@@ -51,6 +52,8 @@ public class DirectConnector {
         create(path, state, (response) -> {
             if (response.responseType() == ResourceResponse.ResponseType.CREATED) {
                 future.complete(response.resource());
+            } else if (response instanceof ResourceErrorResponse) {
+                handleError((ResourceErrorResponse) response, future);
             } else {
                 future.complete(null);
             }
@@ -65,18 +68,27 @@ public class DirectConnector {
         this.channel.writeInbound(request);
     }
 
-    public Resource read(String path) throws ExecutionException, InterruptedException {
+    public Resource read(String path) throws ResourceException, ExecutionException, InterruptedException {
         CompletableFuture<Resource> future = new CompletableFuture<>();
 
         read(path, (response) -> {
-            if ( response.responseType() == ResourceResponse.ResponseType.READ ) {
-                future.complete( response.resource() );
+            if (response.responseType() == ResourceResponse.ResponseType.READ) {
+                future.complete(response.resource());
+            } else if (response instanceof ResourceErrorResponse) {
+                handleError((ResourceErrorResponse) response, future);
             } else {
-                future.complete( null );
+                future.complete(null);
             }
         });
 
-        return future.get();
+        try {
+            return future.get();
+        } catch (ExecutionException e) {
+            if ( e.getCause() instanceof ResourceException ) {
+                throw (ResourceException) e.getCause();
+            }
+            throw e;
+        }
     }
 
     public void update(String path, ResourceState state, Consumer<ResourceResponse> handler) {
@@ -85,10 +97,67 @@ public class DirectConnector {
         this.channel.writeInbound(request);
     }
 
+    public Resource update(String path, ResourceState state) throws ExecutionException, InterruptedException {
+        CompletableFuture<Resource> future = new CompletableFuture<>();
+
+        update(path, state, (response) -> {
+            if (response.responseType() == ResourceResponse.ResponseType.UPDATED) {
+                future.complete(response.resource());
+            } else if (response instanceof ResourceErrorResponse) {
+                handleError((ResourceErrorResponse) response, future);
+            } else {
+                future.complete(null);
+            }
+        });
+
+        return future.get();
+    }
+
     public void delete(String path, Consumer<ResourceResponse> handler) {
         ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.DELETE, new ResourcePath(path), "ignored");
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
+    }
+
+    public Resource delete(String path) throws ExecutionException, InterruptedException {
+        CompletableFuture<Resource> future = new CompletableFuture<>();
+
+        delete(path, (response) -> {
+            if (response.responseType() == ResourceResponse.ResponseType.UPDATED) {
+                future.complete(response.resource());
+            } else if (response instanceof ResourceErrorResponse) {
+                handleError((ResourceErrorResponse) response, future);
+            } else {
+                future.complete(null);
+            }
+        });
+
+        return future.get();
+    }
+
+    void handleError(ResourceErrorResponse response, CompletableFuture<Resource> future) {
+        switch (((ResourceErrorResponse) response).errorType()) {
+            case NOT_AUTHORIZED:
+                future.completeExceptionally(new NotAuthorizedException(response.inReplyTo().resourcePath().toString()));
+                break;
+            case NOT_ACCEPTABLE:
+                break;
+            case NO_SUCH_RESOURCE:
+                future.completeExceptionally(new ResourceNotFoundException(response.inReplyTo().resourcePath().toString()));
+                break;
+            case CREATE_NOT_SUPPORTED:
+                future.completeExceptionally(new CreateNotSupportedException(response.inReplyTo().resourcePath().toString()));
+                break;
+            case READ_NOT_SUPPORTED:
+                future.completeExceptionally(new ReadNotSupportedException(response.inReplyTo().resourcePath().toString()));
+                break;
+            case UPDATE_NOT_SUPPORTED:
+                future.completeExceptionally(new UpdateNotSupportedException(response.inReplyTo().resourcePath().toString()));
+                break;
+            case DELETE_NOT_SUPPORTED:
+                future.completeExceptionally(new DeleteNotSupportedException(response.inReplyTo().resourcePath().toString()));
+                break;
+        }
     }
 
     void dispatch(Object obj) {

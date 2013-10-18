@@ -1,5 +1,7 @@
 package org.projectodd.restafari.spi.resource.sync;
 
+import org.projectodd.restafari.spi.ResourceException;
+import org.projectodd.restafari.spi.UpdateNotSupportedException;
 import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.async.ObjectResource;
 import org.projectodd.restafari.spi.resource.async.PropertyResource;
@@ -13,7 +15,7 @@ import java.util.stream.Stream;
  * @author Bob McWhirter
  */
 public interface SynchronousObjectResource extends SynchronousResource, ObjectResource, BlockingResource {
-    void update(ObjectResourceState state) throws Exception;
+    void update(ObjectResourceState state) throws ResourceException;
     Stream<PropertyResource> members();
 
     @Override
@@ -21,7 +23,10 @@ public interface SynchronousObjectResource extends SynchronousResource, ObjectRe
         try {
             update(state);
             responder.resourceUpdated(this);
+        } catch (UpdateNotSupportedException e) {
+            responder.updateNotSupported( this );
         } catch (Exception e) {
+            // TODO be more specific
             responder.updateNotSupported(this);
         }
     }

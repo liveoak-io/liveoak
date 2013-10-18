@@ -13,19 +13,19 @@ public class ResourcePath {
         this.segments = new ArrayList<>();
     }
 
-    public ResourcePath(String...segments) {
+    public ResourcePath(String... segments) {
         this();
-        for ( int i = 0 ; i < segments.length ; ++i ) {
-            this.segments.add( segments[i] );
+        for (int i = 0; i < segments.length; ++i) {
+            this.segments.add(segments[i]);
         }
     }
 
     public ResourcePath(String uri) {
         this();
-        StringTokenizer tokens = new StringTokenizer(uri, "/" );
+        StringTokenizer tokens = new StringTokenizer(uri, "/");
 
-        while ( tokens.hasMoreTokens() ) {
-            this.segments.add( tokens.nextToken() );
+        while (tokens.hasMoreTokens()) {
+            this.segments.add(tokens.nextToken());
         }
     }
 
@@ -34,25 +34,25 @@ public class ResourcePath {
     }
 
     public void appendSegment(String segment) {
-        this.segments.add( segment );
+        this.segments.add(segment);
     }
 
     public void prependSegment(String segment) {
-        this.segments.add( 0, segment );
+        this.segments.add(0, segment);
     }
 
     public String head() {
-        if ( this.segments.size() > 0 ) {
+        if (this.segments.size() > 0) {
             return this.segments.get(0);
         }
         return null;
     }
 
     public ResourcePath subPath() {
-        if ( this.segments.isEmpty() ) {
+        if (this.segments.isEmpty()) {
             return new ResourcePath();
         }
-        return new ResourcePath( segments.subList(1, segments.size()));
+        return new ResourcePath(segments.subList(1, segments.size()));
     }
 
     public boolean isEmpty() {
@@ -64,7 +64,11 @@ public class ResourcePath {
     }
 
     public String toString() {
-        return this.segments.toString();
+        StringBuilder builder = new StringBuilder();
+        this.segments.forEach((s) -> {
+            builder.append( "/" ).append( s);
+        });
+        return builder.toString();
     }
 
     private List<String> segments;
