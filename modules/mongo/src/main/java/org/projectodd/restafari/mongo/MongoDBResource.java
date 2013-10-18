@@ -69,9 +69,10 @@ public class MongoDBResource implements CollectionResource, RootResource {
     public void read(String id, Responder responder) {
         if (db.collectionExists(id)) {
             responder.resourceRead(new MongoCollectionResource(this, id));
-        } else {
-            responder.noSuchResource( id );
+        } else  {
+            responder.noSuchResource(id);
         }
+
     }
 
     @Override
@@ -87,9 +88,9 @@ public class MongoDBResource implements CollectionResource, RootResource {
     public void read(Pagination pagination, Responder responder) {
         if (pagination.getLimit() > 0 || pagination.getOffset() > 0) {
             Stream<? extends Resource> members = this.db.getCollectionNames().stream().substream(pagination.getOffset()).limit(pagination.getLimit()).map((name) -> {
-                return new MongoCollectionResource( this, name );
+                return new MongoCollectionResource(this, name);
             });
-            responder.resourceRead(new SimplePaginatedCollectionResource<CollectionResource>(this, pagination, members) );
+            responder.resourceRead(new SimplePaginatedCollectionResource<CollectionResource>(this, pagination, members));
         } else {
             responder.resourceRead(this);
         }
@@ -109,7 +110,7 @@ public class MongoDBResource implements CollectionResource, RootResource {
     @Override
     public void writeMembers(ResourceSink sink) {
         this.db.getCollectionNames().forEach((name) -> {
-            sink.accept( new MongoCollectionResource(this, name) );
+            sink.accept(new MongoCollectionResource(this, name));
         });
 
         sink.close();

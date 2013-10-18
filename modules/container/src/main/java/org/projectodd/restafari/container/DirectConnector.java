@@ -10,6 +10,7 @@ import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 /**
@@ -39,33 +40,66 @@ public class DirectConnector {
     }
 
     public void create(String path, ResourceState state, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.CREATE, new ResourcePath(path), "ignored", state );
-        this.handlers.put( request, handler );
+        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.CREATE, new ResourcePath(path), "ignored", state);
+        this.handlers.put(request, handler);
         this.channel.writeInbound(request);
+    }
+
+    public Resource create(String path, ResourceState state) throws ExecutionException, InterruptedException {
+        CompletableFuture<Resource> future = new CompletableFuture<>();
+
+        create(path, state, (response) -> {
+            System.err.println( "response: " + response );
+            System.err.println( "in-reply-to: " + response.inReplyTo() );
+            if (response.responseType() == ResourceResponse.ResponseType.CREATED) {
+                future.complete(response.resource());
+            } else {
+                future.complete(null);
+            }
+        });
+
+        return future.get();
     }
 
     public void read(String path, Consumer<ResourceResponse> handler) {
         ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.READ, new ResourcePath(path), "ignored");
-        this.handlers.put( request, handler );
+        this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
 
+    public Resource read(String path) throws ExecutionException, InterruptedException {
+        CompletableFuture<Resource> future = new CompletableFuture<>();
+
+        read(path, (response) -> {
+            System.err.println( "response: " + response );
+            System.err.println( "in-reply-to: " + response.inReplyTo() );
+
+            if ( response.responseType() == ResourceResponse.ResponseType.READ ) {
+                future.complete( response.resource() );
+            } else {
+                future.complete( null );
+            }
+        });
+
+        return future.get();
+    }
+
     public void update(String path, ResourceState state, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.UPDATE, new ResourcePath(path), "ignored", state );
-        this.handlers.put( request, handler );
+        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.UPDATE, new ResourcePath(path), "ignored", state);
+        this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
 
     public void delete(String path, Consumer<ResourceResponse> handler) {
         ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.DELETE, new ResourcePath(path), "ignored");
-        this.handlers.put( request, handler );
+        this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
 
     void dispatch(Object obj) {
-        if ( obj instanceof ResourceResponse ) {
+        if (obj instanceof ResourceResponse) {
             Consumer<ResourceResponse> handler = this.handlers.remove(((ResourceResponse) obj).inReplyTo());
-            if ( handler != null ) {
+            if (handler != null) {
                 handler.accept((ResourceResponse) obj);
             }
         }

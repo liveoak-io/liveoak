@@ -22,48 +22,61 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ResourceResponse msg, List<Object> out) throws Exception {
-        HttpResponseStatus responseStatus = null;
+        //HttpResponseStatus responseStatus = null;
         ByteBuf content = null;
+        int responseStatusCode = 0;
+        String responseMessage = null;
         switch (msg.responseType()) {
             case CREATED:
-                responseStatus = HttpResponseStatus.CREATED;
+                responseStatusCode = HttpResponseStatus.CREATED.code();
+                responseMessage = HttpResponseStatus.CREATED.reasonPhrase();
                 content = encodeState(msg.mimeType(), msg.resource());
                 break;
             case READ:
-                responseStatus = HttpResponseStatus.OK;
+                responseStatusCode = HttpResponseStatus.OK.code();
+                responseMessage = HttpResponseStatus.OK.reasonPhrase();
                 content = encodeState(msg.mimeType(), msg.resource());
                 break;
             case UPDATED:
-                responseStatus = HttpResponseStatus.OK;
+                responseStatusCode = HttpResponseStatus.OK.code();
+                responseMessage = HttpResponseStatus.OK.reasonPhrase();
                 content = encodeState(msg.mimeType(), msg.resource());
                 break;
             case DELETED:
-                responseStatus = HttpResponseStatus.OK;
+                responseStatusCode = HttpResponseStatus.OK.code();
+                responseMessage = HttpResponseStatus.OK.reasonPhrase();
                 content = encodeState(msg.mimeType(), msg.resource());
                 break;
             case ERROR:
                 if (msg instanceof ResourceErrorResponse) {
                     switch (((ResourceErrorResponse) msg).errorType()) {
                         case NOT_AUTHORIZED:
-                            responseStatus = HttpResponseStatus.FORBIDDEN;
+                            responseStatusCode = HttpResponseStatus.FORBIDDEN.code();
+                            responseMessage = HttpResponseStatus.FORBIDDEN.reasonPhrase();
                             break;
                         case NOT_ACCEPTABLE:
-                            responseStatus = HttpResponseStatus.NOT_ACCEPTABLE;
+                            responseStatusCode = HttpResponseStatus.NOT_ACCEPTABLE.code();
+                            responseMessage = HttpResponseStatus.NOT_ACCEPTABLE.reasonPhrase();
                             break;
                         case NO_SUCH_RESOURCE:
-                            responseStatus = HttpResponseStatus.NOT_FOUND;
+                            responseStatusCode = HttpResponseStatus.NOT_FOUND.code();
+                            responseMessage = HttpResponseStatus.NOT_FOUND.reasonPhrase();
                             break;
                         case CREATE_NOT_SUPPORTED:
-                            responseStatus = HttpResponseStatus.METHOD_NOT_ALLOWED;
+                            responseStatusCode = HttpResponseStatus.METHOD_NOT_ALLOWED.code();
+                            responseMessage = "Create not supported";
                             break;
                         case READ_NOT_SUPPORTED:
-                            responseStatus = HttpResponseStatus.METHOD_NOT_ALLOWED;
+                            responseStatusCode = HttpResponseStatus.METHOD_NOT_ALLOWED.code();
+                            responseMessage = "Read not supported";
                             break;
                         case UPDATE_NOT_SUPPORTED:
-                            responseStatus = HttpResponseStatus.METHOD_NOT_ALLOWED;
+                            responseStatusCode = HttpResponseStatus.METHOD_NOT_ALLOWED.code();
+                            responseMessage = "Update not supported";
                             break;
                         case DELETE_NOT_SUPPORTED:
-                            responseStatus = HttpResponseStatus.METHOD_NOT_ALLOWED;
+                            responseStatusCode = HttpResponseStatus.METHOD_NOT_ALLOWED.code();
+                            responseMessage = "Delete not supported";
                             break;
                     }
                 }
@@ -71,6 +84,8 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
         }
 
         DefaultFullHttpResponse response = null;
+
+        HttpResponseStatus responseStatus = new HttpResponseStatus( responseStatusCode, responseMessage );
 
         if (content != null) {
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus, content);

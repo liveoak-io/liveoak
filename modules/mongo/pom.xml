@@ -68,6 +68,11 @@
           <artifactId>embedmongo-maven-plugin</artifactId>
           <version>0.1.9</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.projectodd.restafari</groupId>
+            <artifactId>restafari-test-tools</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
