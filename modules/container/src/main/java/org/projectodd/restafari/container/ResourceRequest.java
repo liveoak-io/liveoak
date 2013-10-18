@@ -15,26 +15,29 @@ public class ResourceRequest {
         DELETE,
     }
 
-    public ResourceRequest(RequestType requestType, ResourcePath resourcePath, ResourceParams params, String mimeType) {
+    public ResourceRequest(RequestType requestType, ResourcePath resourcePath, ResourceParams params, String mimeType, String authorizationToken) {
         this.requestType = requestType;
         this.resourcePath = resourcePath;
         this.mimeType = mimeType;
+        this.authorizationToken = authorizationToken;
         this.params = params;
         this.pagination = Pagination.NONE;
     }
 
-    public ResourceRequest(RequestType requestType, ResourcePath resourcePath, ResourceParams params, String mimeType, Pagination pagination) {
+    public ResourceRequest(RequestType requestType, ResourcePath resourcePath, ResourceParams params, String mimeType, String authorizationToken, Pagination pagination) {
         this.requestType = requestType;
         this.resourcePath = resourcePath;
         this.mimeType = mimeType;
+        this.authorizationToken = authorizationToken;
         this.params = params;
         this.pagination = pagination != null ? pagination : Pagination.NONE;
     }
 
-    public ResourceRequest(RequestType requestType, ResourcePath resourcePath, ResourceParams params, String mimeType, ResourceState state) {
+    public ResourceRequest(RequestType requestType, ResourcePath resourcePath, ResourceParams params, String mimeType, String authorizationToken, ResourceState state) {
         this.requestType = requestType;
         this.resourcePath = resourcePath;
         this.mimeType = mimeType;
+        this.authorizationToken = authorizationToken;
         this.params = params;
         this.state = state;
         this.pagination = Pagination.NONE;
@@ -64,6 +67,10 @@ public class ResourceRequest {
         return this.params;
     }
 
+    public String authorizationToken() {
+        return this.authorizationToken;
+    }
+
     public String toString() {
         return "[ResourceRequest: type=" + this.requestType() + "; path=" + this.resourcePath + "]";
     }
@@ -74,4 +81,5 @@ public class ResourceRequest {
     private String mimeType;
     private Pagination pagination;
     private ResourceState state;
+    private String authorizationToken;
 }

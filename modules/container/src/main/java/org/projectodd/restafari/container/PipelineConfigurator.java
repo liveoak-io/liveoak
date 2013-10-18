@@ -4,6 +4,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
+import org.projectodd.restafari.container.auth.AuthorizationHandler;
 import org.projectodd.restafari.container.protocols.ProtocolDetector;
 import org.projectodd.restafari.container.protocols.http.*;
 import org.projectodd.restafari.container.subscriptions.SubscriptionWatcher;
@@ -65,6 +66,7 @@ public class PipelineConfigurator {
         //pipeline.addLast( new DebugHandler( "server-1" ) );
         pipeline.addLast("http-resourceRead-decoder", new HttpResourceRequestDecoder(this.container.getCodecManager()));
         pipeline.addLast("http-resourceRead-encoder", new HttpResourceResponseEncoder(this.container.getCodecManager()));
+        pipeline.addLast("auth-handler", new AuthorizationHandler());
         //pipeline.addLast( new DebugHandler( "server-2" ) );
         pipeline.addLast("subscription-watcher", new SubscriptionWatcher(this.container.getSubscriptionManager()));
         pipeline.addLast("object-handler", new ResourceHandler(this.container));

@@ -1,14 +1,13 @@
 package org.projectodd.restafari.container.auth;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -37,6 +36,31 @@ public class JsonWebToken {
 
         header = parseHeader();
         claims = parseClaims();
+    }
+
+    // Just for unit tests
+    JsonWebToken(String[] realmRoles, Map<String, String[]> appRoles) {
+        claims = new JsonWebToken.Claims();
+        claims.realmAccess = new Access();
+        claims.realmAccess.roles = new HashSet();
+        claims.realmAccess.roles.addAll(Arrays.asList(realmRoles));
+
+        for (Map.Entry<String, String[]> entry : appRoles.entrySet()) {
+            String appName = entry.getKey();
+            String[] roles = entry.getValue();
+            Access acc = new Access();
+            acc.roles = new HashSet();
+            acc.roles.addAll(Arrays.asList(roles));
+            if (claims.resourceAccess == null) {
+                claims.resourceAccess = new HashMap<>();
+            }
+            claims.resourceAccess.put(appName, acc);
+        }
+
+        headerBytes = null;
+        claimsBytes = null;
+        signatureBytes = null;
+        header = null;
     }
 
     public Header getHeader() {
@@ -81,6 +105,8 @@ public class JsonWebToken {
         private String type;
         @JsonProperty(value = "alg", required = false)
         private String algorithm;
+        @JsonProperty(value = "cty", required = false)
+        private String contentType;
 
         public String getType() {
             return type;
@@ -88,6 +114,10 @@ public class JsonWebToken {
 
         public String getAlgorithm() {
             return algorithm;
+        }
+
+        public String getContentType() {
+            return contentType;
         }
     }
 
@@ -117,6 +147,12 @@ public class JsonWebToken {
 
         @JsonProperty(value = "typ", required = false)
         private String type;
+
+        @JsonProperty(value = "issuedFor", required = false)
+        public String issuedFor;
+
+        @JsonProperty(value = "trusted-certs", required = false)
+        protected Set<String> trustedCertificates;
 
         @JsonProperty(value = "realm_access", required = false)
         private Access realmAccess;
@@ -156,6 +192,14 @@ public class JsonWebToken {
             return type;
         }
 
+        public String getIssuedFor() {
+            return issuedFor;
+        }
+
+        public Set<String> getTrustedCertificates() {
+            return trustedCertificates;
+        }
+
         public Access getRealmAccess() {
             return realmAccess;
         }
@@ -163,15 +207,37 @@ public class JsonWebToken {
         public Map<String, Access> getResourceAccess() {
             return resourceAccess;
         }
+
+        @JsonIgnore
+        public boolean isExpired() {
+            long time = System.currentTimeMillis() / 1000;
+            return time > expiration;
+        }
+
+        @JsonIgnore
+        public boolean isNotBefore() {
+            return (System.currentTimeMillis() / 1000) >= notBefore;
+        }
+
+        @JsonIgnore
+        public boolean isActive() {
+            return (!isExpired() || expiration == 0) && (isNotBefore() || notBefore == 0);
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Access {
         @JsonProperty("roles")
         protected java.util.Set<String> roles;
+        @JsonProperty("verify_caller")
+        protected Boolean verifyCaller;
 
         public Set<String> getRoles() {
             return roles;
+        }
+
+        public Boolean getVerifyCaller() {
+            return verifyCaller;
         }
     }
 
