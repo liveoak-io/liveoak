@@ -1,5 +1,8 @@
 package org.projectodd.restafari.mongo;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.ObjectResource;
@@ -51,18 +54,35 @@ public class MongoObjectResource implements ObjectResource {
         state.members().forEach((p) -> {
             this.dbObject.put(p.id(), p.value());
         });
-        responder.resourceUpdated( this );
+
+        this.parent.getDB().getCollection(parent.id()).update(new BasicDBObject().append("_id", this.dbObject.get("_id")), this.dbObject);
+
+        responder.resourceUpdated(this);
     }
 
     @Override
     public void delete(Responder responder) {
-        // TODO
+        DB db = parent.getDB();
+        if (db.collectionExists(parent.id()))
+        {
+          DBCollection dbCollection = db.getCollection(parent.id());
+          DBObject dbObject = dbCollection.findOne(this.dbObject);
+          if (dbObject != null)
+          {
+            dbCollection.remove(dbObject);
+            responder.resourceDeleted(this);
+          }
+        }
+
+        responder.noSuchResource(id());
     }
 
     @Override
     public void writeMembers(ResourceSink sink) {
         this.dbObject.keySet().stream().forEach((name) -> {
-            sink.accept( new MongoPropertyResource(this, name) );
+            // the _id field is handled in the special case in id()
+            if (!name.equals(ID_FIELD))
+                sink.accept( new MongoPropertyResource(this, name) );
         });
         sink.close();
     }

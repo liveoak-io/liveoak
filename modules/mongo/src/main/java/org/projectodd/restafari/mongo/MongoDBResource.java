@@ -76,6 +76,10 @@ public class MongoDBResource implements CollectionResource, RootResource {
 
     @Override
     public void delete(Responder responder) {
+        System.out.println("MONGODBRESOURCE DELETE");
+        if (db.collectionExists(id)) {
+
+        }
         responder.deleteNotSupported(this);
     }
 
