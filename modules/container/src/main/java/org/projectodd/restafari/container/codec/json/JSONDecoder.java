@@ -38,6 +38,8 @@ public class JSONDecoder implements ResourceDecoder {
     public ResourceState decode(ByteBuf resource) throws IOException {
 
         JsonFactory factory = new JsonFactory();
+        factory.configure( JsonParser.Feature.ALLOW_SINGLE_QUOTES, true );
+        factory.configure( JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true );
         ByteBufInputStream in = new ByteBufInputStream(resource);
         JsonParser parser = factory.createParser(in);
         parser.nextToken();

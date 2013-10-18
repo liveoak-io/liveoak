@@ -6,7 +6,16 @@ package org.projectodd.restafari.spi;
  * @author Bob McWhirter
  */
 public interface Pagination {
-    
+
+    static final Pagination NONE = new Pagination() {
+        public int getOffset() {
+            return 0;
+        }
+        public int getLimit() {
+            return -1;
+        }
+    };
+
     /** Get the offset.
      * 
      * <p>

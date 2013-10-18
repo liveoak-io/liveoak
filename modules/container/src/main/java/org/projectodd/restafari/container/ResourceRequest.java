@@ -19,6 +19,7 @@ public class ResourceRequest {
         this.requestType = requestType;
         this.resourcePath = resourcePath;
         this.mimeType = mimeType;
+        this.pagination = Pagination.NONE;
     }
 
     public ResourceRequest(RequestType requestType, ResourcePath resourcePath, String mimeType, Pagination pagination) {
@@ -33,6 +34,7 @@ public class ResourceRequest {
         this.resourcePath = resourcePath;
         this.mimeType = mimeType;
         this.state = state;
+        this.pagination = Pagination.NONE;
     }
 
     public RequestType requestType() {
