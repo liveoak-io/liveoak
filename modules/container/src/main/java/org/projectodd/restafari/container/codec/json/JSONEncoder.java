@@ -84,6 +84,10 @@ public class JSONEncoder implements ResourceEncoder<JSONEncoder.DriverContext> {
             generator.writeNumber((Integer) value);
         } else if (value instanceof Double) {
             generator.writeNumber((Double) value);
+        } else {
+            generator.writeNull();
+            generator.flush();
+            throw new IOException("Unkown Property Type : " + value.getClass());
         }
         generator.flush();
     }

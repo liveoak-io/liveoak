@@ -7,7 +7,14 @@ import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
 import org.projectodd.restafari.spi.resource.async.Responder;
+import org.projectodd.restafari.spi.state.ObjectResourceState;
+import org.projectodd.restafari.spi.state.PropertyResourceState;
 import org.projectodd.restafari.spi.state.ResourceState;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * @author Bob McWhirter
@@ -44,7 +51,12 @@ class MongoCollectionResource implements CollectionResource {
 
     @Override
     public void delete(Responder responder) {
-        responder.deleteNotSupported(this);
+        if (getDB().collectionExists(id())) {
+            getDB().getCollection(id()).drop();
+            responder.resourceDeleted(this);
+        } else {
+            responder.noSuchResource(id());
+        }
     }
 
     DB getDB() {
@@ -73,7 +85,24 @@ class MongoCollectionResource implements CollectionResource {
 
     @Override
     public void create(ResourceState state, Responder responder) {
+        DBCollection dbCollection = this.parent.getDB().getCollection(this.collectionName);
 
+        BasicDBObject basicDBObject = new BasicDBObject();
+        if (state.id() != null) {
+            basicDBObject = new BasicDBObject().append("_id", new ObjectId(state.id()));
+        }
+
+        if (state instanceof ObjectResourceState) {
+            ObjectResourceState ors = (ObjectResourceState) state;
+
+            List<? extends PropertyResourceState> resources = ors.members().collect(Collectors.toList());
+            for (PropertyResourceState resource : resources) {
+                basicDBObject.append(resource.id(), resource.value());
+            }
+        }
+
+        dbCollection.insert(basicDBObject);
+        responder.resourceCreated(new MongoObjectResource(this, basicDBObject));
     }
 
     public String toString() {
