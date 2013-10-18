@@ -55,12 +55,21 @@ public class DefaultContainer implements Container, CollectionResource {
         return this.workerPool;
     }
 
+    public DirectConnector directConnector() {
+        return new DirectConnector( this );
+    }
+
     // ----------------------------------------
     // CollectionResource
     // ----------------------------------------
 
     @Override
     public void read(String id, Responder responder) {
+        if ( id == null ) {
+            responder.resourceRead( this );
+            return;
+        }
+
         if (!this.resources.containsKey(id)) {
             System.err.println( resources );
             responder.noSuchResource(id);

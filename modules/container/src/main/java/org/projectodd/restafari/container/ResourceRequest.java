@@ -57,6 +57,10 @@ public class ResourceRequest {
         return this.pagination;
     }
 
+    public String toString() {
+        return "[ResourceRequest: type=" + this.requestType() + "; path=" + this.resourcePath + "]";
+    }
+
     private RequestType requestType;
     private ResourcePath resourcePath;
     private String mimeType;

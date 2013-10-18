@@ -24,5 +24,9 @@ public class ResourceErrorResponse extends ResourceResponse {
         return this.errorType;
     }
 
+    public String toString() {
+        return "[ResourceErrorResponse: type=" + this.errorType + "]";
+    }
+
     private ErrorType errorType;
 }
