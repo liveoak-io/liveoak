@@ -3,14 +3,9 @@ package org.projectodd.restafari.mongo;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 import org.projectodd.restafari.spi.*;
-
-import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import org.projectodd.restafari.spi.resource.async.AbstractPaginatedCollectionResource;
+import org.projectodd.restafari.spi.resource.async.ResourceSink;
 
 /**
  * @author Bob McWhirter

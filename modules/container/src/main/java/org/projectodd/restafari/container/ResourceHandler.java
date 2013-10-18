@@ -19,16 +19,16 @@ public class ResourceHandler extends SimpleChannelInboundHandler<ResourceRequest
 
         switch (msg.requestType()) {
             case CREATE:
-                this.container.read(firstSegment, new CreateResponder(msg, ctx));
+                this.container.read(firstSegment, new CreateResponder(container.workerPool(), msg, ctx));
                 break;
             case READ:
-                this.container.read(firstSegment, new ReadResponder(msg, ctx));
+                this.container.read(firstSegment, new ReadResponder(container.workerPool(), msg, ctx));
                 break;
             case UPDATE:
-                this.container.read(firstSegment, new UpdateResponder(msg, ctx));
+                this.container.read(firstSegment, new UpdateResponder(container.workerPool(), msg, ctx));
                 break;
             case DELETE:
-                this.container.read(firstSegment, new DeleteResponder(msg, ctx));
+                this.container.read(firstSegment, new DeleteResponder(container.workerPool(), msg, ctx));
                 break;
         }
     }

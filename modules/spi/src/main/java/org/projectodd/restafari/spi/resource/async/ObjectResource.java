@@ -1,8 +1,7 @@
-package org.projectodd.restafari.spi;
+package org.projectodd.restafari.spi.resource.async;
 
+import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
-
-import java.util.stream.Stream;
 
 /** An object-like resource.
  *

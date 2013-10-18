@@ -1,6 +1,11 @@
 package org.projectodd.restafari.deployer;
 
 import org.projectodd.restafari.spi.*;
+import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.RootResource;
+import org.projectodd.restafari.spi.resource.async.CollectionResource;
+import org.projectodd.restafari.spi.resource.async.ResourceSink;
+import org.projectodd.restafari.spi.resource.async.Responder;
 import org.projectodd.restafari.spi.state.ResourceState;
 import org.vertx.java.core.Vertx;
 

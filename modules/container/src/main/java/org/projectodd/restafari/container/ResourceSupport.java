@@ -1,10 +1,9 @@
 package org.projectodd.restafari.container;
 
-import org.projectodd.restafari.spi.Resource;
+import org.projectodd.restafari.spi.resource.Resource;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**

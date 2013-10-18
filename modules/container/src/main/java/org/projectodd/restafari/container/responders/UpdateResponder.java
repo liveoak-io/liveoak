@@ -2,20 +2,21 @@ package org.projectodd.restafari.container.responders;
 
 import io.netty.channel.ChannelHandlerContext;
 import org.projectodd.restafari.container.ResourceRequest;
-import org.projectodd.restafari.container.codec.DefaultObjectResourceState;
-import org.projectodd.restafari.spi.CollectionResource;
-import org.projectodd.restafari.spi.ObjectResource;
+import org.projectodd.restafari.spi.resource.async.CollectionResource;
+import org.projectodd.restafari.spi.resource.async.ObjectResource;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
-import org.projectodd.restafari.spi.Resource;
+import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.state.ResourceState;
+
+import java.util.concurrent.Executor;
 
 /**
  * @author Bob McWhirter
  */
 public class UpdateResponder extends TraversingResponder {
 
-    public UpdateResponder(ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
-        super(inReplyTo, ctx);
+    public UpdateResponder(Executor executor, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
+        super(executor, inReplyTo, ctx);
     }
 
     @Override

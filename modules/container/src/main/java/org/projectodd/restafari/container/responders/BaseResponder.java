@@ -4,10 +4,8 @@ import io.netty.channel.ChannelHandlerContext;
 import org.projectodd.restafari.container.ResourceErrorResponse;
 import org.projectodd.restafari.container.ResourceRequest;
 import org.projectodd.restafari.container.ResourceResponse;
-import org.projectodd.restafari.spi.Resource;
-import org.projectodd.restafari.spi.Responder;
-
-import java.util.stream.Stream;
+import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Responder;
 
 /**
  * @author Bob McWhirter

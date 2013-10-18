@@ -3,13 +3,11 @@ package org.projectodd.restafari.mongo;
 import com.mongodb.*;
 import org.bson.types.ObjectId;
 import org.projectodd.restafari.spi.*;
+import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.CollectionResource;
+import org.projectodd.restafari.spi.resource.async.ResourceSink;
+import org.projectodd.restafari.spi.resource.async.Responder;
 import org.projectodd.restafari.spi.state.ResourceState;
-
-import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * @author Bob McWhirter

@@ -1,4 +1,7 @@
-package org.projectodd.restafari.spi;
+package org.projectodd.restafari.spi.resource;
+
+import org.projectodd.restafari.spi.InitializationException;
+import org.projectodd.restafari.spi.ResourceContext;
 
 /** A root resource capable of being registered with a container.
  *
@@ -9,7 +12,7 @@ public interface RootResource extends Resource {
     /** Initialize the resource.
      *
      * @param context The initialization context.
-     * @throws InitializationException If an error occurs.
+     * @throws org.projectodd.restafari.spi.InitializationException If an error occurs.
      */
     void initialize(ResourceContext context) throws InitializationException;
 

@@ -1,6 +1,6 @@
-package org.projectodd.restafari.spi;
+package org.projectodd.restafari.spi.resource.async;
 
-import java.util.stream.Stream;
+import org.projectodd.restafari.spi.resource.Resource;
 
 /** Object to report on results of actions performed by Resources.
  *

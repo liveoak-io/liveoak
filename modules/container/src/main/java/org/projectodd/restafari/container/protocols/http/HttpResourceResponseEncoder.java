@@ -7,9 +7,8 @@ import io.netty.handler.codec.http.*;
 import org.projectodd.restafari.container.ResourceErrorResponse;
 import org.projectodd.restafari.container.ResourceResponse;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
-import org.projectodd.restafari.spi.*;
+import org.projectodd.restafari.spi.resource.Resource;
 
-import java.io.IOException;
 import java.util.List;
 
 /**

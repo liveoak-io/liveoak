@@ -2,6 +2,12 @@ package org.projectodd.restafari.mongo;
 
 import com.mongodb.*;
 import org.projectodd.restafari.spi.*;
+import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.RootResource;
+import org.projectodd.restafari.spi.resource.async.CollectionResource;
+import org.projectodd.restafari.spi.resource.async.ResourceSink;
+import org.projectodd.restafari.spi.resource.async.Responder;
+import org.projectodd.restafari.spi.resource.async.SimplePaginatedCollectionResource;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.net.UnknownHostException;

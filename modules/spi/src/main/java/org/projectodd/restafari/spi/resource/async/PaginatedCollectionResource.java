@@ -1,6 +1,6 @@
-package org.projectodd.restafari.spi;
+package org.projectodd.restafari.spi.resource.async;
 
-import java.util.stream.Stream;
+import org.projectodd.restafari.spi.Pagination;
 
 /** A collection resource representing a subset of a larger collection.
  *

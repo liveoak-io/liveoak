@@ -1,6 +1,8 @@
 package org.projectodd.restafari.container;
 
 import org.projectodd.restafari.spi.*;
+import org.projectodd.restafari.spi.resource.BlockingResource;
+import org.projectodd.restafari.spi.resource.RootResource;
 
 public class InMemoryDBResource extends InMemoryCollectionResource implements RootResource {
 

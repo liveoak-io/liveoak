@@ -2,18 +2,12 @@ package org.projectodd.restafari.container.codec.json;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import org.projectodd.restafari.container.codec.*;
-import org.projectodd.restafari.spi.CollectionResource;
-import org.projectodd.restafari.spi.ObjectResource;
-import org.projectodd.restafari.spi.PropertyResource;
-import org.projectodd.restafari.spi.Resource;
-import org.projectodd.restafari.spi.state.CollectionResourceState;
-import org.projectodd.restafari.spi.state.ObjectResourceState;
-import org.projectodd.restafari.spi.state.PropertyResourceState;
-import org.projectodd.restafari.spi.state.ResourceState;
+import org.projectodd.restafari.spi.resource.async.CollectionResource;
+import org.projectodd.restafari.spi.resource.async.ObjectResource;
+import org.projectodd.restafari.spi.resource.async.PropertyResource;
+import org.projectodd.restafari.spi.resource.Resource;
 
 import java.io.IOException;
 

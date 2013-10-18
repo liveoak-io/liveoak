@@ -2,6 +2,8 @@ package org.projectodd.restafari.container;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.projectodd.restafari.container.codec.ResourceCodec;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
@@ -9,6 +11,11 @@ import org.projectodd.restafari.container.codec.json.JSONDecoder;
 import org.projectodd.restafari.container.codec.json.JSONEncoder;
 import org.projectodd.restafari.container.subscriptions.SubscriptionManager;
 import org.projectodd.restafari.spi.*;
+import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.RootResource;
+import org.projectodd.restafari.spi.resource.async.CollectionResource;
+import org.projectodd.restafari.spi.resource.async.ResourceSink;
+import org.projectodd.restafari.spi.resource.async.Responder;
 import org.projectodd.restafari.spi.state.ResourceState;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.platform.PlatformLocator;
@@ -23,6 +30,7 @@ public class DefaultContainer implements Container, CollectionResource {
         this.vertx = platformManager.vertx();
 
         this.subscriptionManager = new SubscriptionManager();
+        this.workerPool = Executors.newCachedThreadPool();
     }
 
     public void registerResource(RootResource resource, Config config) throws InitializationException {
@@ -41,6 +49,10 @@ public class DefaultContainer implements Container, CollectionResource {
 
     SubscriptionManager getSubscriptionManager() {
         return this.subscriptionManager;
+    }
+
+    Executor workerPool() {
+        return this.workerPool;
     }
 
     // ----------------------------------------
@@ -96,6 +108,7 @@ public class DefaultContainer implements Container, CollectionResource {
     private ResourceCodecManager codecManager = new ResourceCodecManager();
     private Vertx vertx;
     private final SubscriptionManager subscriptionManager;
+    private Executor workerPool;
 
 }
 

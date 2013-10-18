@@ -9,20 +9,16 @@ import org.projectodd.restafari.container.codec.DefaultCollectionResourceState;
 import org.projectodd.restafari.container.codec.DefaultObjectResourceState;
 import org.projectodd.restafari.container.codec.DefaultPropertyResourceState;
 import org.projectodd.restafari.container.codec.ResourceDecoder;
-import org.projectodd.restafari.spi.Resource;
 import org.projectodd.restafari.spi.state.CollectionResourceState;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
 import org.projectodd.restafari.spi.state.PropertyResourceState;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.*;
 
 /**
  * @author Bob McWhirter

@@ -2,15 +2,17 @@ package org.projectodd.restafari.container.responders;
 
 import io.netty.channel.ChannelHandlerContext;
 import org.projectodd.restafari.container.ResourceRequest;
-import org.projectodd.restafari.spi.Resource;
+import org.projectodd.restafari.spi.resource.Resource;
+
+import java.util.concurrent.Executor;
 
 /**
  * @author Bob McWhirter
  */
 public class ReadResponder extends TraversingResponder {
 
-    public ReadResponder(ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
-        super( inReplyTo, ctx );
+    public ReadResponder(Executor executor, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
+        super( executor, inReplyTo, ctx );
     }
 
     @Override

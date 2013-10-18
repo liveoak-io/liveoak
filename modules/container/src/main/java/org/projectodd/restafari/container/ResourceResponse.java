@@ -1,6 +1,6 @@
 package org.projectodd.restafari.container;
 
-import org.projectodd.restafari.spi.Resource;
+import org.projectodd.restafari.spi.resource.Resource;
 
 /**
  * @author Bob McWhirter

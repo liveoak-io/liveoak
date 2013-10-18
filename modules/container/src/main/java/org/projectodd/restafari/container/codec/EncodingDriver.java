@@ -2,8 +2,8 @@ package org.projectodd.restafari.container.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.projectodd.restafari.spi.Resource;
-import org.projectodd.restafari.spi.ResourceSink;
+import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.ResourceSink;
 
 import java.io.IOException;
 

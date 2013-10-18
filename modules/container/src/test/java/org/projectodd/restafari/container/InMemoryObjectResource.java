@@ -1,12 +1,15 @@
 package org.projectodd.restafari.container;
 
-import org.projectodd.restafari.spi.*;
+import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.ObjectResource;
+import org.projectodd.restafari.spi.resource.async.ResourceSink;
+import org.projectodd.restafari.spi.resource.async.Responder;
+import org.projectodd.restafari.spi.resource.async.SimplePropertyResource;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
 import org.projectodd.restafari.spi.state.PropertyResourceState;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Bob McWhirter

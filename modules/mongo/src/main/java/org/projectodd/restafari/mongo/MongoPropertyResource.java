@@ -1,8 +1,8 @@
 package org.projectodd.restafari.mongo;
 
-import org.projectodd.restafari.spi.PropertyResource;
-import org.projectodd.restafari.spi.Resource;
-import org.projectodd.restafari.spi.Responder;
+import org.projectodd.restafari.spi.resource.async.PropertyResource;
+import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Responder;
 
 /**
  * @author Bob McWhirter

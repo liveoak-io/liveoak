@@ -2,15 +2,11 @@ package org.projectodd.restafari.container.subscriptions;
 
 import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.container.codec.ResourceCodec;
-import org.projectodd.restafari.container.codec.ResourceEncoder;
-import org.projectodd.restafari.spi.Resource;
-import org.projectodd.restafari.spi.state.ResourceState;
+import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.StompMessage;
 import org.projectodd.restafari.stomp.common.DefaultStompMessage;
 import org.projectodd.restafari.stomp.server.StompConnection;
-
-import java.io.IOException;
 
 /**
  * @author Bob McWhirter

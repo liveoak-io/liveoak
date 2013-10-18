@@ -1,4 +1,6 @@
-package org.projectodd.restafari.spi;
+package org.projectodd.restafari.spi.resource.async;
+
+import org.projectodd.restafari.spi.resource.Resource;
 
 import java.util.function.Consumer;
 
