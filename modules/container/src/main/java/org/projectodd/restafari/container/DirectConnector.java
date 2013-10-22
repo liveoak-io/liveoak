@@ -1,7 +1,6 @@
 package org.projectodd.restafari.container;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -41,7 +40,7 @@ public class DirectConnector {
     }
 
     public void create(String path, ResourceState state, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.CREATE, new ResourcePath(path), "ignored", state);
+        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.CREATE, new ResourcePath(path), ResourceParams.NONE, "ignored", state);
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
@@ -63,7 +62,7 @@ public class DirectConnector {
     }
 
     public void read(String path, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.READ, new ResourcePath(path), "ignored");
+        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.READ, new ResourcePath(path), ResourceParams.NONE, "ignored");
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
@@ -92,7 +91,7 @@ public class DirectConnector {
     }
 
     public void update(String path, ResourceState state, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.UPDATE, new ResourcePath(path), "ignored", state);
+        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.UPDATE, new ResourcePath(path), ResourceParams.NONE, "ignored", state);
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
@@ -114,7 +113,7 @@ public class DirectConnector {
     }
 
     public void delete(String path, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.DELETE, new ResourcePath(path), "ignored");
+        ResourceRequest request = new ResourceRequest(ResourceRequest.RequestType.DELETE, new ResourcePath(path), ResourceParams.NONE, "ignored");
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }

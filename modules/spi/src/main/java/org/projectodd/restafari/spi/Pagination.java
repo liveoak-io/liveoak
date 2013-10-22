@@ -7,12 +7,16 @@ package org.projectodd.restafari.spi;
  */
 public interface Pagination {
 
+    static final int DEFAULT_LIMIT = 100;
+
+    static final int MAX_LIMIT = 10000;
+
     static final Pagination NONE = new Pagination() {
         public int getOffset() {
             return 0;
         }
         public int getLimit() {
-            return -1;
+            return DEFAULT_LIMIT;
         }
     };
 

@@ -3,10 +3,12 @@ package org.projectodd.restafari.container;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.nio.NioEventLoopGroup;
 
 import java.net.InetAddress;
 import java.nio.charset.Charset;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -85,8 +87,8 @@ public class BasicServerTest {
     @Test
     public void testServer() throws Exception {
 
-        ObjectHolder peopleCreationNotification = new ObjectHolder();
-        ObjectHolder bobCreationNotification = new ObjectHolder();
+        CompletableFuture<StompMessage> peopleCreationNotification = new CompletableFuture<>();
+        CompletableFuture<StompMessage> bobCreationNotification = new CompletableFuture<>();
 
         StompClient stompClient = new StompClient();
         stompClient.connect("localhost", 8080, (client) -> {
@@ -94,9 +96,9 @@ public class BasicServerTest {
             // memory/people itself plus contents.
             client.subscribe( "/memory/people/*", (msg)->{
                 if ( msg.headers().get( "location" ).equals( "/memory/people" ) ) {
-                    peopleCreationNotification.object = msg;
+                    peopleCreationNotification.complete(msg);
                 } else {
-                    bobCreationNotification.object = msg;
+                    bobCreationNotification.complete(msg);
                 }
             });
         });
@@ -167,7 +169,7 @@ public class BasicServerTest {
 
         response.close();
 
-        assertThat( peopleCreationNotification.object ).isNull();
+        assertThat( peopleCreationNotification.getNow(null) ).isNull();
 
         System.err.println("TEST #5");
         // people collection should be enumerable from the root
@@ -206,6 +208,7 @@ public class BasicServerTest {
         ObjectResourceState selfObj = (ObjectResourceState) memoryCollection.getProperty("_self");
         assertThat(selfObj.getProperty("href")).isEqualTo("/memory/people");
 
+        System.err.println("TEST #6");
         // Post a person
 
         postRequest = new HttpPost( "http://localhost:8080/memory/people");
@@ -224,14 +227,73 @@ public class BasicServerTest {
 
         // check STOMP
 
-        Thread.sleep( 500 );
+        StompMessage obj = bobCreationNotification.get(30000, TimeUnit.SECONDS);
+        assertThat(obj).isNotNull();
 
-        assertThat( bobCreationNotification.object ).isNotNull();
-
-        ObjectResourceState bobObjState = (ObjectResourceState) decode( ((StompMessage) bobCreationNotification.object ).content() );
+        ObjectResourceState bobObjState = (ObjectResourceState) decode( obj.content() );
         assertThat( bobObjState.getProperty( "name" ) ).isEqualTo( "bob" );
 
         assertThat( ((ObjectResourceState)state).getProperty( "id" ) ).isEqualTo( bobObjState.getProperty( "id" ) );
+
+        response.close();
+
+        System.err.println("TEST #7");
+        // test pagination
+
+        postRequest = new HttpPost( "http://localhost:8080/memory/people");
+        postRequest.setEntity( new StringEntity("{ \"name\": \"crusty\" }" ) );
+        response = httpClient.execute( postRequest );
+        ObjectResourceState crustyState = (ObjectResourceState) decode(response);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
+        response.close();
+
+        // now that we have two people we can do paging requests
+
+        // Retrieve first people resource, ensuring only the first one is returned
+        // Assumption: unsorted GET on collection returns items in the order they were added to collection
+        getRequest = new HttpGet("http://localhost:8080/memory/people?limit=1");
+        getRequest.addHeader(header);
+        response = httpClient.execute(getRequest);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+
+        state = decode(response);
+        assertThat(state).isNotNull();
+        assertThat(state).isInstanceOf(CollectionResourceState.class);
+        Stream<? extends ResourceState> members = ((CollectionResourceState) state).members();
+        assertThat(members.count()).isEqualTo(1);
+
+        ResourceState memberState = members.findFirst().get();
+        assertThat(memberState).isInstanceOf(ObjectResourceState.class);
+
+        ObjectResourceState member = (ObjectResourceState) memberState;
+        assertThat(member.id()).isEqualTo(bobObjState.id());
+
+        response.close();
+
+        // Retrieve second people resource, ensuring only the second one is returned
+        // Assumption: unsorted GET on collection returns items in the order they were added to collection
+        getRequest = new HttpGet("http://localhost:8080/memory/people?offset=1&limit=1");
+        getRequest.addHeader(header);
+        response = httpClient.execute(getRequest);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+
+        state = decode(response);
+        assertThat(state).isNotNull();
+        assertThat(state).isInstanceOf(CollectionResourceState.class);
+        members = ((CollectionResourceState) state).members();
+        assertThat(members.count()).isEqualTo(1);
+
+        memberState = members.findFirst().get();
+        assertThat(memberState).isInstanceOf(ObjectResourceState.class);
+
+        member = (ObjectResourceState) memberState;
+        assertThat(member.id()).isEqualTo(crustyState.id());
 
         response.close();
     }
