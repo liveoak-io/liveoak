@@ -7,7 +7,6 @@ import org.projectodd.restafari.spi.resource.RootResource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
 import org.projectodd.restafari.spi.resource.async.Responder;
-import org.projectodd.restafari.spi.resource.async.SimplePaginatedCollectionResource;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.net.UnknownHostException;
@@ -69,7 +68,7 @@ public class MongoDBResource implements CollectionResource, RootResource {
     public void read(String id, Responder responder) {
         if (db.collectionExists(id)) {
             responder.resourceRead(new MongoCollectionResource(this, id));
-        } else  {
+        } else {
             responder.noSuchResource(id);
         }
 
@@ -85,14 +84,20 @@ public class MongoDBResource implements CollectionResource, RootResource {
     }
 
     @Override
-    public void read(Pagination pagination, Responder responder) {
-        if (pagination.getLimit() > 0 || pagination.getOffset() > 0) {
-            Stream<? extends Resource> members = this.db.getCollectionNames().stream().substream(pagination.getOffset()).limit(pagination.getLimit()).map((name) -> {
-                return new MongoCollectionResource(this, name);
-            });
-            responder.resourceRead(new SimplePaginatedCollectionResource<CollectionResource>(this, pagination, members));
-        } else {
-            responder.resourceRead(this);
+    public void readContent(Pagination pagination, ResourceSink sink) {
+        Stream<String> members = this.db.getCollectionNames().stream().substream(pagination.getOffset());
+        if (pagination.getLimit() > 0) {
+            members = members.limit(pagination.getLimit());
+        }
+
+        members.forEach((name) -> {
+            sink.accept(new MongoCollectionResource(this, name));
+        });
+
+        try {
+            sink.close();
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 
@@ -107,13 +112,5 @@ public class MongoDBResource implements CollectionResource, RootResource {
         responder.resourceCreated(new MongoCollectionResource(this, id));
     }
 
-    @Override
-    public void writeMembers(ResourceSink sink) {
-        this.db.getCollectionNames().forEach((name) -> {
-            sink.accept(new MongoCollectionResource(this, name));
-        });
-
-        sink.close();
-    }
 
 }

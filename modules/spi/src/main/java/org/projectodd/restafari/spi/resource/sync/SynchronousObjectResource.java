@@ -32,10 +32,14 @@ public interface SynchronousObjectResource extends SynchronousResource, ObjectRe
     }
 
     @Override
-    default void writeMembers(ResourceSink sink) {
+    default void readContent(ResourceSink sink) {
         members().forEach((m) -> {
             sink.accept( m );
         });
-        sink.close();
+        try {
+            sink.close();
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 }

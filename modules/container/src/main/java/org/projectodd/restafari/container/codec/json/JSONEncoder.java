@@ -1,125 +1,154 @@
 package org.projectodd.restafari.container.codec.json;
 
-import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
-import org.projectodd.restafari.container.codec.*;
+import org.projectodd.restafari.container.codec.ResourceEncoder;
+import org.projectodd.restafari.container.codec.EncodingContext;
+import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.BinaryResource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.async.ObjectResource;
 import org.projectodd.restafari.spi.resource.async.PropertyResource;
-import org.projectodd.restafari.spi.resource.Resource;
-
-import java.io.IOException;
 
 /**
  * @author Bob McWhirter
  */
-public class JSONEncoder implements ResourceEncoder<JSONEncoder.DriverContext> {
+public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
 
-    public static class DriverContext {
-        public JsonGenerator generator;
+    public JsonGenerator createAttachment(ByteBuf buffer) throws Exception {
+        JsonFactory factory = new JsonFactory();
+        ByteBufOutputStream out = new ByteBufOutputStream(buffer);
+        JsonGenerator generator = factory.createGenerator(out);
+        generator.setPrettyPrinter(new DefaultPrettyPrinter("\\n"));
+        return generator;
     }
 
-    @Override
-    public DriverContext createEncodingContext() {
-        return new DriverContext();
-    }
-
-    public JSONEncoder() {
-    }
-
-    @Override
-    public void encode(Resource resource, EncodingDriver<DriverContext> driver) throws IOException {
-        if (driver.encodingContext().generator == null) {
-            JsonFactory factory = new JsonFactory();
-            ByteBufOutputStream out = new ByteBufOutputStream(driver.buffer());
-            driver.encodingContext().generator = factory.createGenerator(out);
-            driver.encodingContext().generator.setPrettyPrinter(new DefaultPrettyPrinter("\\n"));
+    public void encode(EncodingContext<JsonGenerator> context) throws Exception {
+        System.err.println( "JSON.encode: " + context.object() );
+        Object o = context.object();
+        JsonGenerator generator = context.attachment();
+        if (o instanceof CollectionResource) {
+            encodeCollection(context);
+        } else if (o instanceof ObjectResource) {
+            encodeObject(context);
+        } else if (o instanceof PropertyResource) {
+            encodeProperty(context);
+        } else if (o instanceof BinaryResource) {
+            encodeBinary(context);
+        } else {
+            encodeValue(context);
         }
-
-        if (resource instanceof ObjectResource) {
-            encodeObject((ObjectResource) resource, driver);
-        } else if (resource instanceof PropertyResource) {
-            encodeProperty((PropertyResource) resource, driver);
-        } else if (resource instanceof CollectionResource) {
-            encodeCollection((CollectionResource) resource, driver);
-        }
+        generator.flush();
     }
 
-    protected void encodeObject(ObjectResource obj, EncodingDriver<DriverContext> driver) throws IOException {
 
-        JsonGenerator generator = driver.encodingContext().generator;
+    protected void encodeCollection(EncodingContext<JsonGenerator> context) throws Exception {
+        JsonGenerator generator = context.attachment();
         generator.writeStartObject();
-        String id = obj.id();
-        if (id != null) {
-            generator.writeFieldName("id");
-            generator.writeString(id);
-            generator.writeFieldName("_self");
-            generator.writeStartObject();
-            generator.writeFieldName("href");
-            generator.writeString(obj.uri().toString());
-            generator.writeFieldName("type");
-            generator.writeString("object");
+        encodeProlog(context);
+
+        if (context.shouldEncodeContent()) {
+            generator.writeFieldName("content");
+            generator.writeStartArray();
+            context.encodeContent(() -> {
+                try {
+                    generator.writeEndArray();
+                    generator.writeEndObject();
+                    context.end();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        } else {
             generator.writeEndObject();
+            context.end();
         }
-        generator.flush();
-        if (driver.shouldExpand(obj)) {
-            obj.writeMembers(driver);
-        }
-        generator.writeEndObject();
-        generator.flush();
     }
 
-    protected void encodeProperty(PropertyResource prop, EncodingDriver<DriverContext> driver) throws IOException {
+    protected void encodeObject(EncodingContext<JsonGenerator> context) throws Exception {
+        JsonGenerator generator = context.attachment();
+        generator.writeStartObject();
+        encodeProlog(context);
+        context.encodeContent(() -> {
+            try {
+                generator.writeEndObject();
+                context.end();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 
-        JsonGenerator generator = driver.encodingContext().generator;
-        Object value = prop.get();
+    }
+
+    protected void encodeProperty(EncodingContext<JsonGenerator> context) throws Exception {
+        Resource prop = (Resource) context.object();
+        JsonGenerator generator = context.attachment();
 
         generator.writeFieldName(prop.id());
-        if (value instanceof Resource) {
-            encode((Resource) value, driver);
-        } else if (value instanceof String) {
-            generator.writeString((String) value);
-        } else if (value instanceof Integer) {
-            generator.writeNumber((Integer) value);
-        } else if (value instanceof Double) {
-            generator.writeNumber((Double) value);
-        } else {
-            generator.writeNull();
-            generator.flush();
-            throw new IOException("Unkown Property Type : " + value.getClass());
-        }
-        generator.flush();
+        context.encodeContent(() -> {
+            context.end();
+        });
     }
 
-    protected void encodeCollection(CollectionResource collection, EncodingDriver<DriverContext> driver) throws IOException {
-        JsonGenerator generator = driver.encodingContext().generator;
+    protected void encodeBinary(EncodingContext<JsonGenerator> context) throws Exception {
+
+        JsonGenerator generator = context.attachment();
         generator.writeStartObject();
-        String id = collection.id();
+        encodeProlog(context);
+
+        generator.writeFieldName("content");
+        context.encodeContent(() -> {
+            try {
+                generator.writeEndObject();
+                context.end();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    protected void encodeValue(EncodingContext<JsonGenerator> context) throws Exception {
+
+        Object value = context.object();
+        JsonGenerator generator = context.attachment();
+
+        if (value instanceof String) {
+            generator.writeString(value.toString());
+        } else if (value instanceof Double) {
+            generator.writeNumber((Double) value);
+        } else if (value instanceof ByteBuf) {
+            byte[] bytes = new byte[((ByteBuf) value).readableBytes()];
+            ((ByteBuf) value).readBytes(bytes);
+            generator.writeBinary(bytes);
+        }
+
+        context.end();
+    }
+
+    protected void encodeProlog(EncodingContext<JsonGenerator> context) throws Exception {
+        JsonGenerator generator = context.attachment();
+        Resource resource = (Resource) context.object();
+        String id = resource.id();
         if (id != null) {
             generator.writeFieldName("id");
             generator.writeString(id);
             generator.writeFieldName("_self");
             generator.writeStartObject();
             generator.writeFieldName("href");
-            generator.writeString(collection.uri().toString());
+            generator.writeString(resource.uri().toString());
             generator.writeFieldName("type");
-            generator.writeString("collection");
+            if ( resource instanceof CollectionResource ) {
+                generator.writeString("collection");
+            } else if ( resource instanceof ObjectResource ) {
+                generator.writeString("object");
+            } else if ( resource instanceof BinaryResource ) {
+                generator.writeString("binary");
+            }
             generator.writeEndObject();
         }
-        generator.flush();
-
-        if (driver.shouldExpand(collection)) {
-            generator.writeFieldName("members");
-            generator.writeStartArray();
-            generator.flush();
-            collection.writeMembers(driver);
-            generator.writeEndArray();
-        }
-        generator.writeEndObject();
-        generator.flush();
-
     }
-
 
 }

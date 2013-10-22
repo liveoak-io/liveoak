@@ -1,5 +1,6 @@
 package org.projectodd.restafari.mongo;
 
+import org.projectodd.restafari.spi.resource.async.PropertyContentSink;
 import org.projectodd.restafari.spi.resource.async.PropertyResource;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.Responder;
@@ -22,6 +23,11 @@ public class MongoPropertyResource implements PropertyResource {
     @Override
     public Object get() {
         return this.object.dbObject().get( this.name);
+    }
+
+    @Override
+    public void readContent(PropertyContentSink sink) {
+        sink.accept( this.object );
     }
 
     @Override

@@ -64,15 +64,7 @@ class MongoCollectionResource implements CollectionResource {
     }
 
     @Override
-    public void read(Pagination pagination, Responder responder) {
-        if (pagination.getLimit() > 0 || pagination.getOffset() > 0) {
-            responder.resourceRead(new PaginatedMongoCollectionResource(this, pagination));
-        } else {
-            responder.resourceRead(this);
-        }
-    }
-
-    public void writeMembers(ResourceSink sink) {
+    public void readContent(Pagination pagination, ResourceSink sink) {
         DBCollection c = this.parent.getDB().getCollection( this.collectionName );
         DBCursor cursor = c.find();
 
@@ -80,7 +72,11 @@ class MongoCollectionResource implements CollectionResource {
             sink.accept(new MongoObjectResource(this, e));
         });
 
-        sink.close();
+        try {
+            sink.close();
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     @Override
@@ -95,7 +91,7 @@ class MongoCollectionResource implements CollectionResource {
         if (state instanceof ObjectResourceState) {
             ObjectResourceState ors = (ObjectResourceState) state;
 
-            List<? extends PropertyResourceState> resources = ors.members().collect(Collectors.toList());
+            List<PropertyResourceState> resources = ors.members().collect(Collectors.toList());
             for (PropertyResourceState resource : resources) {
                 basicDBObject.append(resource.id(), resource.value());
             }

@@ -28,7 +28,7 @@ public class JSONDecoder implements ResourceDecoder {
     private static final Set<String> SIMPLE_COLLECTION_PROPERTIES = new HashSet<String>() {{
         add("id");
         add("self");
-        add("members");
+        add("content");
     }};
 
     public JSONDecoder() {
@@ -57,7 +57,7 @@ public class JSONDecoder implements ResourceDecoder {
         List<PropertyResourceState> p = state.members().collect(Collectors.toList());
 
         Object selfProp = state.getProperty("_self");
-        Object membersProp = null;
+        Object contentProp = null;
 
         boolean isCollection = false;
 
@@ -68,17 +68,17 @@ public class JSONDecoder implements ResourceDecoder {
             }
         }
 
-        membersProp = state.getProperty("members");
-        if (membersProp != null && membersProp instanceof CollectionResourceState) {
+        contentProp = state.getProperty("content");
+        if (contentProp != null && contentProp instanceof CollectionResourceState) {
             isCollection = true;
         } else {
-            membersProp = null;
+            contentProp = null;
         }
 
         if (isCollection) {
             DefaultCollectionResourceState collection = new DefaultCollectionResourceState(state.id());
-            if (membersProp != null) {
-                ((CollectionResourceState) membersProp).members().forEach((m) -> {
+            if (contentProp != null) {
+                ((CollectionResourceState) contentProp).members().forEach((m) -> {
                     collection.addResource(m);
                 });
             }

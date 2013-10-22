@@ -67,7 +67,7 @@ public class PipelineConfigurator {
         pipeline.addLast("http-resourceRead-encoder", new HttpResourceResponseEncoder(this.container.getCodecManager()));
         //pipeline.addLast( new DebugHandler( "server-2" ) );
         pipeline.addLast("subscription-watcher", new SubscriptionWatcher(this.container.getSubscriptionManager()));
-        pipeline.addLast("resource-handler", new ResourceHandler(this.container));
+        pipeline.addLast("object-handler", new ResourceHandler(this.container));
     }
 
     private DefaultContainer container;

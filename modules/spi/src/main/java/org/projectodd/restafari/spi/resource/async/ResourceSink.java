@@ -8,9 +8,5 @@ import java.util.function.Consumer;
  *
  * @author Bob McWhirter
  */
-public interface ResourceSink extends Consumer<Resource> {
-
-    /** Indicate completion.
-     */
-    void close();
+public interface ResourceSink extends Consumer<Resource>, AutoCloseable {
 }

@@ -49,7 +49,7 @@ public class ServerStarterVerticle extends Verticle {
 
             container.registerResource(new MongoDBResource("storage"), config);
         } catch (InitializationException e) {
-            throw new RuntimeException("Failed to initialize resource controller: MongoController", e);
+            throw new RuntimeException("Failed to initialize object controller: MongoController", e);
         }
 
         /*
@@ -64,7 +64,7 @@ public class ServerStarterVerticle extends Verticle {
 
             container.registerResourceController("deployer", new DeployerController(), config);
         } catch (InitializationException e) {
-            throw new RuntimeException("Failed to initialize resource controller: DeployerController", e);
+            throw new RuntimeException("Failed to initialize object controller: DeployerController", e);
         }
         */
 

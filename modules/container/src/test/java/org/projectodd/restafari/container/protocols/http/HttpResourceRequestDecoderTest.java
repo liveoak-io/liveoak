@@ -15,9 +15,6 @@ import org.projectodd.restafari.container.codec.json.JSONDecoder;
 import org.projectodd.restafari.container.codec.json.JSONEncoder;
 import org.projectodd.restafari.spi.Pagination;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
-import org.projectodd.restafari.spi.state.ResourceState;
-
-import java.math.BigDecimal;
 
 import static org.fest.assertions.Assertions.*;
 

@@ -19,6 +19,7 @@ package org.projectodd.restafari.mongo;
 import com.mongodb.BasicDBObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.bson.types.ObjectId;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -30,6 +31,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class MongoDBResourceDeleteTest extends BaseMongoDBTest{
 
+    @Ignore
     @Test
     public void testSimpleDelete() throws Exception {
         String methodName = "testSimpleDelete";
@@ -48,6 +50,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest{
         assertEquals(0, db.getCollection(methodName).getCount());
     }
 
+    @Ignore
     @Test
     public void testDeleteNonExistantCollection() throws Exception {
         String methodName = "testDeleteNonExistantCollection";
@@ -57,6 +60,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest{
         assertEquals(404, response.getStatusLine().getStatusCode());
     }
 
+    @Ignore
     @Test
     public void testDeleteCollection() throws Exception {
         String methodName = "testDeleteCollection";
@@ -74,6 +78,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest{
         assertFalse(db.getCollectionNames().contains(methodName));
     }
 
+    @Ignore
     @Test
     public void testDeleteInvalidId() throws Exception {
         String methodName = "testDeleteInvalidId";
@@ -83,6 +88,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest{
         assertEquals(404, response.getStatusLine().getStatusCode());
     }
 
+    @Ignore
     @Test
     public void testDeleteNonExistantId() throws Exception {
         String methodName = "testDeleteNonExistantId";

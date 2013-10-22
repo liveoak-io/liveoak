@@ -36,11 +36,11 @@ public class JSONCodecTest {
 
         JSONEncoder codec = new JSONEncoder();
 
-        ObjectResourceState resource = new SimpleObjectResourceState();
+        ObjectResourceState object = new SimpleObjectResourceState();
 
-        resource.setString("name", "bob" );
+        object.setString("name", "bob" );
 
-        ByteBuf result = codec.encode(resource);
+        ByteBuf result = codec.encode(object);
 
         String str = result.toString(Charset.forName("utf-8"));
 

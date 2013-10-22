@@ -85,21 +85,20 @@ public class DefaultContainer implements Container, CollectionResource {
     }
 
     @Override
-    public void read(Pagination pagination, Responder responder) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public void create(ResourceState state, Responder responder) {
         responder.createNotSupported(this);
     }
 
     @Override
-    public void writeMembers(ResourceSink sink) {
+    public void readContent(Pagination pagination, ResourceSink sink) {
         this.resources.values().forEach((e) -> {
             sink.accept( e );
         });
-        sink.close();
+        try {
+            sink.close();
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     @Override

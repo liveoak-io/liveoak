@@ -10,13 +10,6 @@ import org.projectodd.restafari.spi.state.ResourceState;
  */
 public interface CollectionResource extends Resource {
 
-    /** Read the state of this resource, optionally with pagination information.
-     *
-     * @param pagination Pagination information, which may indicate no pagination.
-     * @param responder To respond to the action.
-     */
-    void read(Pagination pagination, Responder responder);
-
     /** Create a new child resource of this collection.
      *
      * @param state The state for the child, which may include an ID.
@@ -28,6 +21,6 @@ public interface CollectionResource extends Resource {
      *
      * @param sink The sink to stream members to.
      */
-    void writeMembers(ResourceSink sink);
+    void readContent(Pagination pagination, ResourceSink sink);
 
 }

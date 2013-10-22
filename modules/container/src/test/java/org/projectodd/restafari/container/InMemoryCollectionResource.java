@@ -42,16 +42,6 @@ public class InMemoryCollectionResource implements CollectionResource {
     }
 
     @Override
-    public void read(Pagination pagination, Responder responder) {
-        if (pagination.getOffset() > 0 || pagination.getLimit() > 0) {
-            Stream<? extends Resource> members = this.collection.values().stream().substream(pagination.getOffset()).limit(pagination.getLimit());
-            responder.resourceRead(new SimplePaginatedCollectionResource<CollectionResource>(this, pagination, members));
-        } else {
-            responder.resourceRead(this);
-        }
-    }
-
-    @Override
     public void create(ResourceState state, Responder responder) {
         String id = state.id();
         if (id == null) {
@@ -70,11 +60,15 @@ public class InMemoryCollectionResource implements CollectionResource {
     }
 
     @Override
-    public void writeMembers(ResourceSink sink) {
+    public void readContent(Pagination pagination, ResourceSink sink) {
         this.collection.values().stream().forEach((m) -> {
             sink.accept( m );
         });
-        sink.close();
+        try {
+            sink.close();
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     @Override

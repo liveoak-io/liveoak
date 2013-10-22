@@ -78,12 +78,16 @@ public class MongoObjectResource implements ObjectResource {
     }
 
     @Override
-    public void writeMembers(ResourceSink sink) {
+    public void readContent(ResourceSink sink) {
         this.dbObject.keySet().stream().forEach((name) -> {
             // the _id field is handled in the special case in id()
             if (!name.equals(ID_FIELD))
                 sink.accept( new MongoPropertyResource(this, name) );
         });
-        sink.close();
+        try {
+            sink.close();
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 }

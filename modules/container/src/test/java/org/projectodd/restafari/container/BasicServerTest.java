@@ -109,7 +109,7 @@ public class BasicServerTest {
         CloseableHttpResponse response = null;
 
         System.err.println("TEST #1");
-        // Root resource should exist.
+        // Root object should exist.
         getRequest = new HttpGet("http://localhost:8080/memory");
         getRequest.addHeader(header);
 
@@ -120,7 +120,7 @@ public class BasicServerTest {
         //    "self" : {
         //      "href" : "/memory"
         //    },
-        //   "members" : [ ]
+        //   "content" : [ ]
         // }
 
         assertThat(response).isNotNull();
@@ -148,8 +148,9 @@ public class BasicServerTest {
         // create people collection with direct PUT
 
         putRequest = new HttpPut("http://localhost:8080/memory/people");
-        putRequest.setEntity(new StringEntity("{ \"members\": [] }"));
+        putRequest.setEntity(new StringEntity("{ \"content\": [] }"));
         response = this.httpClient.execute(putRequest);
+        System.err.println( "response: " + response );
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
 
@@ -182,12 +183,12 @@ public class BasicServerTest {
         //          "self" : {
         //            "href" : "/memory"
         //          },
-        //          "members" : [ {
+        //          "content" : [ {
         //            "id" : "people",
         //            "self" : {
         //                "href" : "/memory/people"
         //            },
-        //            "members" : [ ]
+        //            "content" : [ ]
         //          } ]
         //        }
 

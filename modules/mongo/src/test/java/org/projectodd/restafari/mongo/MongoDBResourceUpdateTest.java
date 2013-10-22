@@ -22,6 +22,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.bson.types.ObjectId;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -32,6 +33,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
 
+    @Ignore
     @Test
     public void testSimpleUpdate() throws Exception {
         String methodName = "testSimpleDelete";

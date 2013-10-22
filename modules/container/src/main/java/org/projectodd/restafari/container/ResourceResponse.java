@@ -43,7 +43,7 @@ public class ResourceResponse {
     }
 
     public String toString() {
-        return "[ResourceResponse: type=" + this.responseType + "; resource=" + this.resource + "]";
+        return "[ResourceResponse: type=" + this.responseType + "; object=" + this.resource + "]";
     }
 
     private ResourceRequest inReplyTo;

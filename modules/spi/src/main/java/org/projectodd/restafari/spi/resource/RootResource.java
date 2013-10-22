@@ -19,4 +19,9 @@ public interface RootResource extends Resource {
     /** Free resources used by the resource and shutdown.
      */
     void destroy();
+
+
+    default Resource parent() {
+        return null;
+    }
 }

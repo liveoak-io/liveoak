@@ -22,6 +22,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.bson.types.ObjectId;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -33,6 +34,7 @@ import static org.junit.Assert.assertFalse;
 public class MongoDBResourceCreateTest extends BaseMongoDBTest{
 
     @Test
+    @Ignore
     public void testSimpleCreate() throws Exception {
         String methodName = "testSimpleCreate";
         assertFalse(db.collectionExists(methodName));

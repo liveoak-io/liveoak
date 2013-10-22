@@ -4,7 +4,6 @@ import org.projectodd.restafari.spi.CreateNotSupportedException;
 import org.projectodd.restafari.spi.ResourceException;
 import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
-import org.projectodd.restafari.spi.resource.async.PaginatedCollectionResource;
 import org.projectodd.restafari.spi.Pagination;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
@@ -22,13 +21,6 @@ public interface SynchronousCollectionResource extends SynchronousResource, Coll
 
     Resource create(ResourceState state) throws ResourceException;
 
-    PaginatedCollectionResource readPage(Pagination pagination);
-
-    @Override
-    default void read(Pagination pagination, Responder responder) {
-        responder.resourceRead(readPage(pagination));
-    }
-
     @Override
     default void create(ResourceState state, Responder responder) {
         try {
@@ -43,10 +35,19 @@ public interface SynchronousCollectionResource extends SynchronousResource, Coll
     }
 
     @Override
-    default void writeMembers(ResourceSink sink) {
-        members().forEach((m) -> {
+    default void readContent(Pagination pagination, ResourceSink sink) {
+        Stream<Resource> stream = members().substream( pagination.getOffset() );
+
+        if ( pagination.getLimit() > 0 ) {
+            stream = stream.limit( pagination.getLimit() );
+        }
+        stream.forEach((m) -> {
             sink.accept( m );
         });
-        sink.close();
+        try {
+            sink.close();
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 }

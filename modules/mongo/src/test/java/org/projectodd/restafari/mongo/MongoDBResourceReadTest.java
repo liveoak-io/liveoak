@@ -26,6 +26,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.bson.types.ObjectId;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -37,6 +38,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
+    @Ignore
     @Test
     public void testSimpleGet() throws Exception {
         String methodName = "testSimpleGet";
@@ -63,6 +65,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals("/storage/testSimpleGet/" + id, jsonNode.get("_self").get("href").asText());
     }
 
+    @Ignore
     @Test
     public void testGetInvalidId() throws Exception {
         String methodName = "testGetInvalidId";
@@ -72,6 +75,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals(404, response.getStatusLine().getStatusCode());
     }
 
+    @Ignore
     @Test
     public void testGetNonExistantId() throws Exception {
         String methodName = "testGetNonExistantId";
@@ -83,6 +87,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals(404, response.getStatusLine().getStatusCode());
     }
 
+    @Ignore
     @Test
     public void testGetEmptyCollection() throws Exception {
         String methodName = "testEmtpyCollection";
@@ -110,6 +115,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals(0, db.getCollection(methodName).getCount());
     }
 
+    @Ignore
     @Test
     public void testGetStorageCollectionsPagination() throws Exception {
         // DB db = mongoClient.getDB("testGetStorageCollectionsPagination");

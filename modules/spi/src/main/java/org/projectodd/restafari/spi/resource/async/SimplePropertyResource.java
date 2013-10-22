@@ -24,6 +24,11 @@ public class SimplePropertyResource implements PropertyResource {
     }
 
     @Override
+    public void readContent(PropertyContentSink sink) {
+        sink.accept( this.value );
+    }
+
+    @Override
     public Resource parent() {
         return parent;
     }

@@ -1,8 +1,11 @@
 package org.projectodd.restafari.container.codec;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.state.ResourceState;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Bob McWhirter
@@ -15,15 +18,25 @@ public class ResourceCodec {
     }
 
     public ByteBuf encode(Resource resource) throws Exception {
-        return newEncodingDriver().encode( resource );
+        CompletableFuture<ByteBuf> future = new CompletableFuture<>();
+        System.err.println( "calling encode" );
+        newEncodingContext(resource, future).encode();
+        System.err.println( "called encode, waiting" );
+        ByteBuf result = future.get();
+        System.err.println( "encoded: "+ result );
+        return result;
     }
 
     public ResourceState decode(ByteBuf resource) throws Exception {
-        return this.decoder.decode( resource );
+        return this.decoder.decode(resource);
     }
 
-    protected EncodingDriver newEncodingDriver() throws Exception {
-        EncodingDriver driver = new EncodingDriver( this.encoder );
+    protected EncodingContext newEncodingContext(Resource resource, CompletableFuture<ByteBuf> future) throws Exception {
+        ByteBuf buffer = Unpooled.buffer();
+        Object attachment = this.encoder.createAttachment(buffer);
+        EncodingContext driver = new RootEncodingContext(this.encoder, attachment, resource, () -> {
+            future.complete( buffer );
+        });
         return driver;
     }
 

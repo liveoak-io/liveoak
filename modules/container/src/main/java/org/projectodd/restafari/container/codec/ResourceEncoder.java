@@ -1,10 +1,13 @@
 package org.projectodd.restafari.container.codec;
 
-import java.io.IOException;
+import io.netty.buffer.ByteBuf;
 
-import org.projectodd.restafari.spi.resource.Resource;
-
+/**
+ * @author Bob McWhirter
+ */
 public interface ResourceEncoder<T> {
-    void encode(Resource resource, EncodingDriver<T> driver) throws IOException;
-    T createEncodingContext();
+
+    T createAttachment(ByteBuf output) throws Exception;
+
+    void encode(EncodingContext<T> context) throws Exception;
 }

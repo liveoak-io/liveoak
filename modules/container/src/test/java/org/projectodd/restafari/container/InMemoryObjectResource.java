@@ -59,11 +59,19 @@ public class InMemoryObjectResource implements ObjectResource {
     }
 
     @Override
-    public void writeMembers(ResourceSink sink) {
+    public void readContent(ResourceSink sink) {
         this.state.members().forEach((prop) -> {
             sink.accept( new SimplePropertyResource(this, prop.id(), prop.value() ) );
         });
-        sink.close();
+        try {
+            sink.close();
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    public String toString() {
+        return "[InMemoryObjectResource: id=" + this.id + "]";
     }
 
     private InMemoryCollectionResource parent;
