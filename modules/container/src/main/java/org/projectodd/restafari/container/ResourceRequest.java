@@ -15,24 +15,27 @@ public class ResourceRequest {
         DELETE,
     }
 
-    public ResourceRequest(RequestType requestType, ResourcePath resourcePath, String mimeType) {
+    public ResourceRequest(RequestType requestType, ResourcePath resourcePath, ResourceParams params, String mimeType) {
         this.requestType = requestType;
         this.resourcePath = resourcePath;
         this.mimeType = mimeType;
+        this.params = params;
         this.pagination = Pagination.NONE;
     }
 
-    public ResourceRequest(RequestType requestType, ResourcePath resourcePath, String mimeType, Pagination pagination) {
+    public ResourceRequest(RequestType requestType, ResourcePath resourcePath, ResourceParams params, String mimeType, Pagination pagination) {
         this.requestType = requestType;
         this.resourcePath = resourcePath;
         this.mimeType = mimeType;
-        this.pagination = pagination;
+        this.params = params;
+        this.pagination = pagination != null ? pagination : Pagination.NONE;
     }
 
-    public ResourceRequest(RequestType requestType, ResourcePath resourcePath, String mimeType, ResourceState state) {
+    public ResourceRequest(RequestType requestType, ResourcePath resourcePath, ResourceParams params, String mimeType, ResourceState state) {
         this.requestType = requestType;
         this.resourcePath = resourcePath;
         this.mimeType = mimeType;
+        this.params = params;
         this.state = state;
         this.pagination = Pagination.NONE;
     }
@@ -57,12 +60,17 @@ public class ResourceRequest {
         return this.pagination;
     }
 
+    public ResourceParams params() {
+        return this.params;
+    }
+
     public String toString() {
         return "[ResourceRequest: type=" + this.requestType() + "; path=" + this.resourcePath + "]";
     }
 
     private RequestType requestType;
     private ResourcePath resourcePath;
+    private ResourceParams params;
     private String mimeType;
     private Pagination pagination;
     private ResourceState state;

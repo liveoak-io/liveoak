@@ -41,7 +41,22 @@ public class InMemoryCollectionResource implements CollectionResource {
         }
     }
 
+/*
+    public void read(Pagination pagination, Responder responder) {
+        boolean skipPagination = pagination == null || pagination == Pagination.NONE;
+        if (!skipPagination)
+            skipPagination = pagination.getOffset() == 0 && pagination.getLimit() >= this.collection.size();
+
+        if (skipPagination) {
+            responder.resourceRead(this);
+        } else {
+            Stream<? extends Resource> members = this.collection.values().stream().substream(pagination.getOffset()).limit(pagination.getLimit());
+            responder.resourceRead(new SimplePaginatedCollectionResource<CollectionResource>(this, pagination, members));
+        }
+    }
+*/
     @Override
+
     public void create(ResourceState state, Responder responder) {
         String id = state.id();
         if (id == null) {
