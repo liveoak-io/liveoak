@@ -12,7 +12,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectodd.restafari.container.DefaultContainer;
@@ -20,11 +19,15 @@ import org.projectodd.restafari.container.SimpleConfig;
 import org.projectodd.restafari.container.UnsecureServer;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.jgroups.util.Util.assertFalse;
+import static org.jgroups.util.Util.assertTrue;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  */
 public class MongoDBResourceTest {
+
+    //NOTE: will be soon be removed. Do not add any test classes here anymore //
 
     private static UnsecureServer server;
     protected static MongoClient mongoClient;
@@ -51,7 +54,6 @@ public class MongoDBResourceTest {
         server = new UnsecureServer(container, "localhost", 8080);
         server.start();
 
-
         baseURL = "http://localhost:8080/" + TYPE;
 
         // configure a local mongo client to verify the data methods
@@ -70,92 +72,86 @@ public class MongoDBResourceTest {
         }
     }
 
-//    @Test
-//    public void testRootFound() throws Exception {
-//        if (server == null)
-//            return;
-//
-//        RequestConfig cconfig = RequestConfig.custom().setSocketTimeout(500000).build();
-//        CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(cconfig).build();
-//
-//        HttpGet get = new HttpGet("http://localhost:8080/storage");
-//        get.addHeader("Accept", "application/json");
-//
-//        try {
-//            System.err.println("DO GET");
-//            CloseableHttpResponse result = httpClient.execute(get);
-//            System.err.println("=============>>>");
-//            System.err.println(result);
-//
-//            HttpEntity entity = result.getEntity();
-//            if (entity.getContentLength() > 0) {
-//                entity.writeTo(System.err);
-//            }
-//            System.err.println("\n<<<=============");
-//            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(200);
-//
-//        } finally {
-//            httpClient.close();
-//        }
-//    }
-//
-//    @Test
-//    public void testUncreatedCollectionNotFound() throws Exception {
-//
-//        if (server == null)
-//            return;
-//
-//        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-//        HttpGet get = new HttpGet("http://localhost:8080/storage/movies");
-//        get.addHeader("Accept", "application/json");
-//
-//        try {
-//            System.err.println("DO GET");
-//            CloseableHttpResponse result = httpClient.execute(get);
-//            System.err.println("=============>>>");
-//            System.err.println(result);
-//            result.getEntity().writeTo(System.err);
-//            System.err.println("\n<<<=============");
-//            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(404);
-//
-//        } finally {
-//            httpClient.close();
-//        }
-//    }
+    @Test
+    public void testRootFound() throws Exception {
 
-//    @Test
-//    public void testCreateCollection() throws Exception {
-//
-//        if (server == null)
-//            return;
-//
-//        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-//
-//        HttpPut put = new HttpPut("http://localhost:8080/storage/movies");
-//        put.setEntity(new StringEntity("{ \"id\": \"movies\", \"members\": [] }"));
-//
-//        CloseableHttpResponse result = httpClient.execute(put);
-//        System.err.println("=============>>>");
-//        System.err.println(result);
-//        result.getEntity().writeTo(System.err);
-//        System.err.println("\n<<<=============");
-//        assertThat(result.getStatusLine().getStatusCode()).isEqualTo(201);
-//
-//
-//        HttpGet get = new HttpGet("http://localhost:8080/storage/movies");
-//        get.addHeader("Accept", "application/json");
-//
-//        try {
-//            System.err.println("DO GET");
-//            result = httpClient.execute(get);
-//            System.err.println("=============>>>");
-//            System.err.println(result);
-//            result.getEntity().writeTo(System.err);
-//            System.err.println("\n<<<=============");
-//            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(200);
-//
-//        } finally {
-//            httpClient.close();
-//        }
-//    }
+        RequestConfig cconfig = RequestConfig.custom().setSocketTimeout(500000).build();
+        CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(cconfig).build();
+
+        HttpGet get = new HttpGet("http://localhost:8080/storage");
+        get.addHeader("Accept", "application/json");
+
+        try {
+            System.err.println("DO GET");
+            CloseableHttpResponse result = httpClient.execute(get);
+            System.err.println("=============>>>");
+            System.err.println(result);
+
+            HttpEntity entity = result.getEntity();
+            if (entity.getContentLength() > 0) {
+                entity.writeTo(System.err);
+            }
+            System.err.println("\n<<<=============");
+            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(200);
+
+        } finally {
+            httpClient.close();
+        }
+    }
+
+    @Test
+    public void testUncreatedCollectionNotFound() throws Exception {
+        db.getCollection("movies").drop();
+        assertFalse(db.collectionExists("movies"));
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:8080/storage/movies");
+        get.addHeader("Accept", "application/json");
+
+        try {
+            System.err.println("DO GET");
+            CloseableHttpResponse result = httpClient.execute(get);
+            System.err.println("=============>>>");
+            System.err.println(result);
+            result.getEntity().writeTo(System.err);
+            System.err.println("\n<<<=============");
+            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(404);
+
+        } finally {
+            httpClient.close();
+        }
+    }
+
+    @Test
+    public void testCreateCollection() throws Exception {
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
+        HttpPut put = new HttpPut("http://localhost:8080/storage/movies");
+        put.setEntity(new StringEntity("{ \"id\": \"movies\", \"members\": [] }"));
+
+        CloseableHttpResponse result = httpClient.execute(put);
+        System.err.println("=============>>>");
+        System.err.println(result);
+        result.getEntity().writeTo(System.err);
+        System.err.println("\n<<<=============");
+        assertThat(result.getStatusLine().getStatusCode()).isEqualTo(201);
+
+
+        HttpGet get = new HttpGet("http://localhost:8080/storage/movies");
+        get.addHeader("Accept", "application/json");
+
+        try {
+            System.err.println("DO GET");
+            result = httpClient.execute(get);
+            System.err.println("=============>>>");
+            System.err.println(result);
+            result.getEntity().writeTo(System.err);
+            System.err.println("\n<<<=============");
+            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(200);
+
+        } finally {
+            httpClient.close();
+        }
+    }
 }

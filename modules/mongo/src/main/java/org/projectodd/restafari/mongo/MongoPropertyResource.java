@@ -1,5 +1,6 @@
 package org.projectodd.restafari.mongo;
 
+import com.mongodb.DBObject;
 import org.projectodd.restafari.spi.resource.async.PropertyContentSink;
 import org.projectodd.restafari.spi.resource.async.PropertyResource;
 import org.projectodd.restafari.spi.resource.Resource;
@@ -10,30 +11,39 @@ import org.projectodd.restafari.spi.resource.async.Responder;
  */
 public class MongoPropertyResource implements PropertyResource {
 
-    public MongoPropertyResource(MongoObjectResource object, String name) {
-        this.object = object;
+	//TODO: fix issues with mongo resource parents
+    protected MongoObjectResource parent;
+    protected String name;
+
+    public MongoPropertyResource (MongoObjectResource parent, String name) {
+        this.parent = parent;
         this.name = name;
     }
 
     @Override
-    public void set(Object value) {
-        this.object.dbObject().put( this.name, value );
+    public Object get() {
+        Object object = this.parent.dbObject().get(this.name);
+
+        if (object instanceof DBObject) {
+            return new MongoObjectResource(null, (DBObject)object);
+        }
+
+        return this.parent.dbObject().get(this.name);
     }
 
     @Override
-    public Object get() {
-        return this.object.dbObject().get( this.name);
+    public void set(Object value) {
+        this.parent.dbObject().put(this.name, value);
     }
 
     @Override
     public void readContent(PropertyContentSink sink) {
-        Object value = get();
-        sink.accept( value );
+        sink.accept(get());
     }
 
     @Override
     public Resource parent() {
-        return this.object;
+        return this.parent;
     }
 
     @Override
@@ -48,14 +58,11 @@ public class MongoPropertyResource implements PropertyResource {
 
     @Override
     public void delete(Responder responder) {
-        this.object.dbObject().removeField( this.name );
+        this.parent.dbObject().removeField( this.name );
         responder.resourceDeleted( this );
     }
 
     public String toString() {
-        return "[MongoProperty: obj=" + this.object + "; name=" + this.name + "]";
+        return "[MongoProperty: obj=" + this.parent.dbObject() + "; name=" + this.name + "]";
     }
-
-    private MongoObjectResource object;
-    private String name;
 }

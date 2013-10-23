@@ -11,6 +11,8 @@ import org.projectodd.restafari.spi.resource.async.Responder;
 import org.projectodd.restafari.spi.resource.async.SimplePropertyResource;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
 
+import java.util.ArrayList;
+
 /**
  * @author Bob McWhirter
  */
@@ -18,10 +20,12 @@ public class MongoObjectResource implements ObjectResource {
 
     private static final String ID_FIELD = "_id";
 
-    private MongoCollectionResource parent;
+	//TODO: fix the issues with mongo resources and parent objects
+    //private MongoCollectionResource parent;
+    private MongoDBResource parent;
     private final DBObject dbObject;
 
-    public MongoObjectResource(MongoCollectionResource parent, DBObject dbObject) {
+    public MongoObjectResource(MongoDBResource parent, DBObject dbObject) {
         this.parent = parent;
         this.dbObject = dbObject;
         if ( dbObject == null ) {
@@ -90,18 +94,13 @@ public class MongoObjectResource implements ObjectResource {
             // the _id field is handled in the special case in id()
             if (!name.equals(ID_FIELD)) {
                 Object object = this.dbObject.get(name);
-                System.out.println("OBJECT : " + object + " : " +object.getClass());
                 if (object instanceof String || object instanceof Integer || object instanceof Double){
                     sink.accept(new MongoPropertyResource(this, name) );
                 } else if (object instanceof DBObject) {
-                    sink.accept(new MongoObjectResource(null, (DBObject)object));
+                    sink.accept(new MongoPropertyResource(this, name));
                 }  else if (object instanceof ArrayList) {
-                   // MongoCollectionResource mcr = new MongoCollectionResource(this, name);
-
-
-                    //sink.accept(new MongoCollectionResource())
+                   //TODO: add support for arrays/collections
                 }
-                //sink.accept(new MongoCollectionResource(this, ))
             }
         });
         try {
