@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module xmlns="urn:jboss:module:1.0" name="${module-name}">
+
+  <resources>
+    <resource-root resourcePath="${project.artifactId}.jar"/>
+  </resources>
+
+  <dependencies>
+    <module name="org.projectodd.meshly.spi"/>
+    <system>
+      <paths>
+        <resourcePath name="javax/management"/>
+      </paths>
+    </system>
+  </dependencies>
+</module>
+
