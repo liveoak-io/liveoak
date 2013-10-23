@@ -2,17 +2,21 @@
 
 <module xmlns="urn:jboss:module:1.0" name="${module-name}">
 
+  <main-class name="org.projectodd.restafari.bootstrap.Bootstrap"/>
+
   <resources>
-    <resource-root resourcePath="${project.artifactId}.jar"/>
+    <resource-root path="${project.artifactId}.jar"/>
   </resources>
 
+<!--
   <dependencies>
     <module name="org.projectodd.meshly.spi"/>
     <system>
       <paths>
-        <resourcePath name="javax/management"/>
+        <resource-path name="javax/management"/>
       </paths>
     </system>
   </dependencies>
+-->
 </module>
 
