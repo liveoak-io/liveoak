@@ -20,6 +20,11 @@ public class ResourceCodecManager {
 
     public ByteBuf encode(String mimeType, Resource resource) throws Exception {
         ResourceCodec codec = this.codecs.get(mimeType);
+        if ( codec == null ) {
+            // TODO appropriate notify of invalid/unacceptable codec.
+            // TODO and property parse multiple mime-types in the Accept: header.
+            codec = this.codecs.get( "application/json" );
+        }
         return codec.encode(resource);
     }
 

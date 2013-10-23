@@ -30,10 +30,14 @@ public class ProtocolDetector extends ReplayingDecoder<Void> {
             ByteBuf lineBuffer = in.readBytes( nonNewlineBytes );
             String line = lineBuffer.toString( UTF_8 );
 
+            //System.err.println( "LINE: " + line );
+
             //SslHandler sslHandler = context.getPipeline().writeState( SslHandler.class );
 
             in.resetReaderIndex();
             ByteBuf fullBuffer = in.readBytes( super.actualReadableBytes() );
+
+            System.err.println( "fullBuffer: " + fullBuffer.toString( Charset.defaultCharset() ));
 
             if (line.startsWith( "CONNECT" ) || line.startsWith( "STOMP" )) {
                 System.err.println( "switch to STOMP" );

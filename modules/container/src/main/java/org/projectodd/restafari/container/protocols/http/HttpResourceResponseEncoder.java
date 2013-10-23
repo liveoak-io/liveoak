@@ -22,7 +22,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ResourceResponse msg, List<Object> out) throws Exception {
-        //HttpResponseStatus responseStatus = null;
+        System.err.println( "respond! " + msg + " // " + msg.inReplyTo().mimeType() );
         ByteBuf content = null;
         int responseStatusCode = 0;
         String responseMessage = null;
@@ -95,6 +95,8 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus);
             response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
         }
+        response.headers().add( HttpHeaders.Names.CONTENT_TYPE, msg.inReplyTo().mimeType() );
+
 
 
         out.add( response );

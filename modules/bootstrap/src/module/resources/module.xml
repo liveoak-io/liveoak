@@ -9,6 +9,7 @@
   </resources>
 
   <dependencies>
+    <module name="org.projectodd.restafari.spi"/>
     <module name="org.projectodd.restafari.container"
             services="import"/>
   </dependencies>
