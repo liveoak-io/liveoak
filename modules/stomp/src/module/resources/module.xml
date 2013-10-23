@@ -2,15 +2,12 @@
 
 <module xmlns="urn:jboss:module:1.0" name="${module-name}">
 
-  <main-class name="org.projectodd.restafari.bootstrap.Bootstrap"/>
-
   <resources>
     <resource-root path="${project.artifactId}.jar"/>
   </resources>
 
   <dependencies>
-    <module name="org.projectodd.restafari.container"
-            services="import"/>
+    <module name="io.netty"/>
   </dependencies>
 
 </module>

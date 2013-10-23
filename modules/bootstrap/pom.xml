@@ -50,16 +50,12 @@
       <scope>provided</scope>
     </dependency>
 
-<!--
-    <dependency>
-      <groupId>org.projectodd.restafari</groupId>
-      <artifactId>restafari-spi</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.projectodd.restafari</groupId>
       <artifactId>restafari-container</artifactId>
+      <scope>provided</scope>
     </dependency>
--->
+
     <dependency>
       <groupId>org.projectodd.restafari</groupId>
       <artifactId>restafari-test-tools</artifactId>

@@ -3,10 +3,11 @@
 <module xmlns="urn:jboss:module:1.0" name="${module-name}">
 
   <resources>
-    <resource-root path="${project.artifactId}.jar"/>
+    <resource-root path="netty-all.jar"/>
   </resources>
 
   <dependencies>
   </dependencies>
+
 </module>
 
