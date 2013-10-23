@@ -14,9 +14,9 @@ public class ResourceParams {
 
 
     public static ResourceParams instance(Map<String, List<String>> params) {
-        if (params == null || params.size() == 0)
+        if (params == null || params.size() == 0) {
             return NONE;
-
+        }
         return new ResourceParams(params);
     }
 
@@ -40,9 +40,9 @@ public class ResourceParams {
 
     public String value(String name) {
         List<String> values = params.get(name);
-        if (values != null && values.size() > 0)
+        if (values != null && values.size() > 0) {
             return values.get(0);
-
+        }
         return null;
     }
 
@@ -52,9 +52,9 @@ public class ResourceParams {
 
     public int getIntValue(String name, int def) {
         String val = value(name);
-        if (val == null)
+        if (val == null) {
             return def;
-
+        }
         return Integer.parseInt(val);
     }
 }

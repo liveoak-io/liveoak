@@ -6,7 +6,7 @@ package org.projectodd.restafari.spi;
  * @author Bob McWhirter
  */
 public interface Pagination {
-
+    // TODO: read limits from configuration i.e. move this somewhere else
     static final int DEFAULT_LIMIT = 100;
 
     static final int MAX_LIMIT = 10000;

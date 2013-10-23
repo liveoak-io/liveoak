@@ -66,10 +66,11 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
     }
 
     private static int limit(int value, int lower, int upper) {
-        if (value < lower)
+        if (value < lower) {
             return lower;
-        if (value > upper)
+        } else if (value > upper) {
             return upper;
+        }
         return value;
     }
 

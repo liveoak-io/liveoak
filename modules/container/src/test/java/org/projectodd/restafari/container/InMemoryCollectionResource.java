@@ -78,9 +78,9 @@ public class InMemoryCollectionResource implements CollectionResource {
                 || pagination == Pagination.NONE
                 || (pagination.getOffset() == 0 && pagination.getLimit() >= values.size());
 
-        if (skipPagination)
+        if (skipPagination) {
             return values.stream();
-
+        }
         return values.stream().substream(pagination.getOffset()).limit(pagination.getLimit());
     }
 
