@@ -7,6 +7,7 @@ import org.projectodd.restafari.spi.resource.RootResource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
 import org.projectodd.restafari.spi.resource.async.Responder;
+import org.projectodd.restafari.spi.resource.async.SimplePaginatedCollectionResource;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.net.UnknownHostException;
@@ -110,7 +111,7 @@ public class MongoDBResource implements CollectionResource, RootResource {
         if (id == null) {
             id = UUID.randomUUID().toString();
         }
-        db.createCollection(id, null);
+        db.createCollection(id, new BasicDBObject()); //send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
         responder.resourceCreated(new MongoCollectionResource(this, id));
     }
 

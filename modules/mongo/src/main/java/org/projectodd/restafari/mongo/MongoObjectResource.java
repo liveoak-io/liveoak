@@ -89,8 +89,19 @@ public class MongoObjectResource implements ObjectResource {
         this.dbObject.keySet().stream().forEach((name) -> {
             // the _id field is handled in the special case in id()
             if (!name.equals(ID_FIELD)) {
-                System.err.println( "SINK: " + name );
-                sink.accept( new MongoPropertyResource(this, name) );
+                Object object = this.dbObject.get(name);
+                System.out.println("OBJECT : " + object + " : " +object.getClass());
+                if (object instanceof String || object instanceof Integer || object instanceof Double){
+                    sink.accept(new MongoPropertyResource(this, name) );
+                } else if (object instanceof DBObject) {
+                    sink.accept(new MongoObjectResource(null, (DBObject)object));
+                }  else if (object instanceof ArrayList) {
+                   // MongoCollectionResource mcr = new MongoCollectionResource(this, name);
+
+
+                    //sink.accept(new MongoCollectionResource())
+                }
+                //sink.accept(new MongoCollectionResource(this, ))
             }
         });
         try {

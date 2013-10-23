@@ -91,7 +91,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
     public void testGetEmptyCollection() throws Exception {
         String methodName = "testEmtpyCollection";
         // check that the collection really is empty
-        assertFalse(db.getCollectionNames().contains(methodName));
+        assertFalse(db.collectionExists(methodName));
 
         CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/" + methodName);
         // collection does not exist yet, so should return 404

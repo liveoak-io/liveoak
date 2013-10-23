@@ -13,13 +13,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.projectodd.restafari.container.DefaultContainer;
 import org.projectodd.restafari.container.SimpleConfig;
 import org.projectodd.restafari.container.UnsecureServer;
-
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -40,9 +37,45 @@ public class BaseMongoDBTest {
     protected static String baseURL;
     protected static final String TYPE = "storage";
 
+/*    protected String mongoDatabaseName;
+    protected Integer mongoPort;
+    protected String mongoHost;
+
+    public BaseMongoDBTest() {
+        mongoDatabaseName = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
+        mongoPort = new Integer(System.getProperty("mongo.port", "27017"));
+        mongoHost = System.getProperty("mongo.host", "localhost");
+    }
+
+    @Override
+    public RootResource createRootResource() {
+        return new MongoDBResource(TYPE);
+    }
+
+    @Override
+    public Config createConfig() {
+        SimpleConfig config = new SimpleConfig();
+        config.put("db", this.mongoDatabaseName);
+        config.put("port", this.mongoPort);
+        config.put("host", this.mongoHost);
+        return config;
+    }
+
+    @Override
+    @Before
+    public void setUpContainer() throws Exception {
+       super.setUpContainer();
+
+        // configure a local mongo client to verify the data methods
+        mongoClient = new MongoClient(this.mongoHost, this.mongoPort);
+        db = mongoClient.getDB(this.mongoDatabaseName);
+    }
+
+*/
+
     @BeforeClass
     public static void init() throws Exception {
-        String database = System.getProperty("mongo.db", "db" + UUID.randomUUID());
+        String database = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
         Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");
 
@@ -97,7 +130,7 @@ public class BaseMongoDBTest {
         assertEquals("storage", jsonNode.get("id").asText());
         assertEquals("/storage", jsonNode.get("_self").get("href").asText());
         assertEquals("collection", jsonNode.get("_self").get("type").asText());
-        assertEquals("[]", jsonNode.get("content").toString());
+        assertEquals("[]", jsonNode.get("members").toString());
     }
 
     @Test
@@ -112,7 +145,6 @@ public class BaseMongoDBTest {
         // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
         assertEquals(4, db.getCollectionNames().size());
 
-
         CloseableHttpResponse response = testSimpleGetMethod(baseURL);
         // This should return an empty list since there are no collections
         assertEquals(200, response.getStatusLine().getStatusCode());
@@ -126,11 +158,11 @@ public class BaseMongoDBTest {
         assertEquals("/storage", jsonNode.get("_self").get("href").asText());
         assertEquals("collection", jsonNode.get("_self").get("type").asText());
         assertEquals("{\"id\":\"collection1\",\"_self\":{\"href\":\"/storage/collection1\",\"type\":\"collection\"}}",
-                jsonNode.get("content").get(0).toString());
+                jsonNode.get("members").get(0).toString());
         assertEquals("{\"id\":\"collection2\",\"_self\":{\"href\":\"/storage/collection2\",\"type\":\"collection\"}}",
-                jsonNode.get("content").get(1).toString());
+                jsonNode.get("members").get(1).toString());
         assertEquals("{\"id\":\"collection3\",\"_self\":{\"href\":\"/storage/collection3\",\"type\":\"collection\"}}",
-                jsonNode.get("content").get(2).toString());
+                jsonNode.get("members").get(2).toString());
     }
 
     protected CloseableHttpResponse testSimpleGetMethod(String url) throws Exception {
@@ -190,4 +222,110 @@ public class BaseMongoDBTest {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         return httpClient.execute(put);
     }
+
+/*
+    protected Map<String, CollectionResource> getCollectionResources(Resource resource) {
+        TestResourceSink resourceSink = new TestResourceSink();
+
+        if (resource instanceof CollectionResource) {
+            ((CollectionResource)resource).writeMembers(resourceSink);
+        } else if (resource instanceof ObjectResource) {
+            ((ObjectResource)resource).writeMembers(resourceSink);
+        } else {
+            fail();
+        }
+
+        assertEquals(resourceSink.getCollectionResources().size(), resourceSink.getResources().size());
+        return resourceSink.getCollectionResources();
+    }
+
+    protected Map<String, ObjectResource> getObjectResources(Resource resource) {
+        TestResourceSink resourceSink = new TestResourceSink();
+
+        if (resource instanceof CollectionResource) {
+            ((CollectionResource)resource).writeMembers(resourceSink);
+        } else if (resource instanceof ObjectResource) {
+            ((ObjectResource)resource).writeMembers(resourceSink);
+        } else {
+            fail();
+        }
+
+        assertTrue(resourceSink.getObjectResources().size() == resourceSink.getResources().size());
+        return resourceSink.getObjectResources();
+    }
+
+
+    protected Map<String, PropertyResource> getPropertyResources(Resource resource) {
+        TestResourceSink resourceSink = new TestResourceSink();
+
+        if (resource instanceof CollectionResource) {
+            ((CollectionResource)resource).writeMembers(resourceSink);
+        } else if (resource instanceof ObjectResource) {
+            ((ObjectResource)resource).writeMembers(resourceSink);
+        } else {
+            fail();
+        }
+
+        assertTrue(resourceSink.getPropertyResources().size() == resourceSink.getResources().size());
+        return resourceSink.getPropertyResources();
+    }
+
+    protected Map<String, Resource> getResources(Resource resource) {
+        TestResourceSink resourceSink = new TestResourceSink();
+
+        if (resource instanceof CollectionResource) {
+            ((CollectionResource)resource).writeMembers(resourceSink);
+        } else if (resource instanceof ObjectResource) {
+            ((ObjectResource)resource).writeMembers(resourceSink);
+        } else {
+            fail();
+        }
+
+        return resourceSink.getResources();
+    }
+
+    protected class TestResourceSink implements ResourceSink {
+
+        protected Map<String, Resource> resources = new HashMap<String, Resource>();
+        protected Map<String, CollectionResource> collectionResources = new HashMap<String, CollectionResource>();
+        protected Map<String, ObjectResource> objectResources = new HashMap<String, ObjectResource>();
+        protected Map<String, PropertyResource> propertyResources = new HashMap<String, PropertyResource>();
+
+        @Override
+        public void close() {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public void accept(Resource resource) {
+            this.resources.put(resource.id(), resource);
+            if (resource instanceof CollectionResource) {
+                this.collectionResources.put(resource.id(), (CollectionResource) resource);
+            } else if (resource instanceof ObjectResource) {
+                this.objectResources.put(resource.id(), (ObjectResource) resource);
+            } else if (resource instanceof PropertyResource) {
+                this.propertyResources.put(resource.id(), (PropertyResource) resource);
+            }
+        }
+
+        public Map<String, Resource> getResources() {
+            return this.resources;
+        }
+
+        public Map<String, CollectionResource> getCollectionResources() {
+            return this.collectionResources;
+        }
+
+        public Map<String, ObjectResource> getObjectResources() {
+            return this.objectResources;
+        }
+
+        public Map<String, PropertyResource> getPropertyResources() {
+            return this.propertyResources;
+        }
+    }
+
+*/
+
+
 }
