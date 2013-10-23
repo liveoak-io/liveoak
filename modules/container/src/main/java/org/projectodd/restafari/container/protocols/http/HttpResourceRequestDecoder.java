@@ -15,7 +15,6 @@ import org.projectodd.restafari.spi.Pagination;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Bob McWhirter
@@ -33,17 +32,19 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
             mimeType = "application/json";
         }
 
+        String authToken = getAuthorizationToken(msg);
+
         QueryStringDecoder decoder = new QueryStringDecoder(msg.getUri());
         ResourceParams params = ResourceParams.instance(decoder.parameters());
 
         if (msg.getMethod().equals(HttpMethod.POST)) {
-            out.add(new ResourceRequest(ResourceRequest.RequestType.CREATE, new ResourcePath(decoder.path()), params, mimeType, decodeState(mimeType, msg.content())));
+            out.add(new ResourceRequest(ResourceRequest.RequestType.CREATE, new ResourcePath(decoder.path()), params, mimeType, authToken, decodeState(mimeType, msg.content())));
         } else if (msg.getMethod().equals(HttpMethod.GET)) {
-            out.add(new ResourceRequest(ResourceRequest.RequestType.READ, new ResourcePath(decoder.path()), params, mimeType, decodePagination(params)));
+            out.add(new ResourceRequest(ResourceRequest.RequestType.READ, new ResourcePath(decoder.path()), params, mimeType, authToken, decodePagination(params)));
         } else if (msg.getMethod().equals(HttpMethod.PUT)) {
-            out.add(new ResourceRequest(ResourceRequest.RequestType.UPDATE, new ResourcePath(decoder.path()), params, mimeType, decodeState(mimeType, msg.content())));
+            out.add(new ResourceRequest(ResourceRequest.RequestType.UPDATE, new ResourcePath(decoder.path()), params, mimeType, authToken, decodeState(mimeType, msg.content())));
         } else if (msg.getMethod().equals(HttpMethod.DELETE)) {
-            out.add(new ResourceRequest(ResourceRequest.RequestType.DELETE, new ResourcePath(decoder.path()), params, mimeType ));
+            out.add(new ResourceRequest(ResourceRequest.RequestType.DELETE, new ResourcePath(decoder.path()), params, mimeType, authToken ));
         }
     }
 
@@ -63,6 +64,18 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
                 return limit;
             }
         };
+    }
+
+    protected String getAuthorizationToken(FullHttpRequest req) {
+        String[] authorization = req.headers().contains(HttpHeaders.Names.AUTHORIZATION) ? req.headers().get(HttpHeaders.Names.AUTHORIZATION).split(" ") : null;
+        if (authorization == null) {
+            return null;
+        } else if (authorization.length != 2 || !authorization[0].equalsIgnoreCase("Bearer")) {
+            System.err.println("Authorization header is invalid or it's of different type than 'Bearer'. Ignoring");
+            return null;
+        } else {
+            return authorization[1];
+        }
     }
 
     private static int limit(int value, int lower, int upper) {
