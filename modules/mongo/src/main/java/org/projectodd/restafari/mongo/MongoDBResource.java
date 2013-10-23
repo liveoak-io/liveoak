@@ -91,7 +91,9 @@ public class MongoDBResource implements CollectionResource, RootResource {
         }
 
         members.forEach((name) -> {
-            sink.accept(new MongoCollectionResource(this, name));
+            if (!name.equals("system.indexes")) {
+                sink.accept(new MongoCollectionResource(this, name));
+            }
         });
 
         try {

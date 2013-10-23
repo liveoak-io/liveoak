@@ -19,6 +19,13 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
         this.completionHandler = completionHandler;
     }
 
+    public int depth() {
+        if ( this.parent == null ) {
+            return 0;
+        }
+        return this.parent.depth() + 1;
+    }
+
     public T attachment() {
         if (this.parent != null) {
             return this.parent.attachment();
@@ -50,7 +57,10 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
     }
 
     public boolean shouldEncodeContent() {
-        return true;
+        if ( this.object instanceof PropertyResource ) {
+            return true;
+        }
+        return depth() < 1;
     }
 
     public void encodeContent(Runnable endContentHandler) {

@@ -29,6 +29,8 @@ import org.bson.types.ObjectId;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.InputStream;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -38,7 +40,6 @@ import static org.junit.Assert.assertNotNull;
  */
 public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
-    @Ignore
     @Test
     public void testSimpleGet() throws Exception {
         String methodName = "testSimpleGet";
@@ -56,6 +57,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
         // verify response
         ObjectMapper mapper = new ObjectMapper();
+
         JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
 
         assertEquals(3, jsonNode.size()); // id, _self, bar
@@ -65,7 +67,6 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals("/storage/testSimpleGet/" + id, jsonNode.get("_self").get("href").asText());
     }
 
-    @Ignore
     @Test
     public void testGetInvalidId() throws Exception {
         String methodName = "testGetInvalidId";
@@ -75,7 +76,6 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals(404, response.getStatusLine().getStatusCode());
     }
 
-    @Ignore
     @Test
     public void testGetNonExistantId() throws Exception {
         String methodName = "testGetNonExistantId";
@@ -87,7 +87,6 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals(404, response.getStatusLine().getStatusCode());
     }
 
-    @Ignore
     @Test
     public void testGetEmptyCollection() throws Exception {
         String methodName = "testEmtpyCollection";
@@ -109,21 +108,19 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals(3, jsonNode.size()); // id, _self, members
         assertEquals(methodName, jsonNode.get("id").asText());
         assertEquals("{\"href\":\"/storage/testEmtpyCollection\",\"type\":\"collection\"}", jsonNode.get("_self").toString());
-        assertEquals("[]", jsonNode.get("members").toString());
+        assertEquals("[]", jsonNode.get("content").toString());
 
         // check that the collection is still empty
         assertEquals(0, db.getCollection(methodName).getCount());
     }
 
-    @Ignore
     @Test
     public void testGetStorageCollectionsPagination() throws Exception {
         // DB db = mongoClient.getDB("testGetStorageCollectionsPagination");
         db.dropDatabase();
         assertEquals(0, db.getCollectionNames().size());
         // create a bunch of collections
-        for (int i = 0; i < 1013; i++)
-        {
+        for (int i = 0; i < 1013; i++) {
             db.createCollection("collection" + i, new BasicDBObject("count", i));
         }
         // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)

@@ -24,6 +24,9 @@ public class MongoObjectResource implements ObjectResource {
     public MongoObjectResource(MongoCollectionResource parent, DBObject dbObject) {
         this.parent = parent;
         this.dbObject = dbObject;
+        if ( dbObject == null ) {
+            new Exception().printStackTrace();
+        }
     }
 
     DBObject dbObject() {
@@ -36,7 +39,11 @@ public class MongoObjectResource implements ObjectResource {
     }
 
     public String id() {
-        return this.dbObject.get(ID_FIELD).toString();
+        Object candidateId = this.dbObject.get(ID_FIELD);
+        if ( candidateId == null ) {
+            return null;
+        }
+        return candidateId.toString();
     }
 
     @Override
@@ -81,13 +88,19 @@ public class MongoObjectResource implements ObjectResource {
     public void readContent(ResourceSink sink) {
         this.dbObject.keySet().stream().forEach((name) -> {
             // the _id field is handled in the special case in id()
-            if (!name.equals(ID_FIELD))
+            if (!name.equals(ID_FIELD)) {
+                System.err.println( "SINK: " + name );
                 sink.accept( new MongoPropertyResource(this, name) );
+            }
         });
         try {
             sink.close();
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+    }
+
+    public String toString() {
+        return "[MongoObject: obj=" + this.dbObject() + "]";
     }
 }

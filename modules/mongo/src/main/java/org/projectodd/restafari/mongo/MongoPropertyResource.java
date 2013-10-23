@@ -27,7 +27,8 @@ public class MongoPropertyResource implements PropertyResource {
 
     @Override
     public void readContent(PropertyContentSink sink) {
-        sink.accept( this.object );
+        Object value = get();
+        sink.accept( value );
     }
 
     @Override
@@ -49,6 +50,10 @@ public class MongoPropertyResource implements PropertyResource {
     public void delete(Responder responder) {
         this.object.dbObject().removeField( this.name );
         responder.resourceDeleted( this );
+    }
+
+    public String toString() {
+        return "[MongoProperty: obj=" + this.object + "; name=" + this.name + "]";
     }
 
     private MongoObjectResource object;

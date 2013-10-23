@@ -34,13 +34,13 @@ import static org.junit.Assert.assertFalse;
 public class MongoDBResourceCreateTest extends BaseMongoDBTest{
 
     @Test
-    @Ignore
     public void testSimpleCreate() throws Exception {
         String methodName = "testSimpleCreate";
         assertFalse(db.collectionExists(methodName));
         db.createCollection(methodName, new BasicDBObject());
 
         CloseableHttpResponse response = testSimplePostMethod(baseURL + "/" + methodName, "{\"foo\":\"bar\"}");
+
         assertEquals(201, response.getStatusLine().getStatusCode());
 
         // verify response

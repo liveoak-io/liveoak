@@ -19,6 +19,8 @@ import org.projectodd.restafari.container.DefaultContainer;
 import org.projectodd.restafari.container.SimpleConfig;
 import org.projectodd.restafari.container.UnsecureServer;
 
+import java.util.UUID;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -40,7 +42,7 @@ public class BaseMongoDBTest {
 
     @BeforeClass
     public static void init() throws Exception {
-        String database = System.getProperty("mongo.db", "MongoControllerTest_" + Math.random());
+        String database = System.getProperty("mongo.db", "db" + UUID.randomUUID());
         Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");
 
@@ -62,10 +64,12 @@ public class BaseMongoDBTest {
         // configure a local mongo client to verify the data methods
         mongoClient = new MongoClient(host, port);
         db = mongoClient.getDB(database);
+        db.dropDatabase();
     }
 
     @AfterClass
     public static void dispose() {
+        mongoClient.close();
         if (server == null)
             return;
 
@@ -78,11 +82,7 @@ public class BaseMongoDBTest {
     @Test
     public void testGetStorageEmpty() throws Exception {
         //DB db = mongoClient.getDB("testGetStorageEmpty");
-        try {
-            db.dropDatabase(); //TODO: create a new DB here instead of dropping the old one
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        db.dropDatabase(); //TODO: create a new DB here instead of dropping the old one
         assertEquals(0, db.getCollectionNames().size());
 
         CloseableHttpResponse response = testSimpleGetMethod(baseURL);
@@ -101,14 +101,9 @@ public class BaseMongoDBTest {
     }
 
     @Test
-    @Ignore
     public void testGetStorageCollections() throws Exception {
         //DB db = mongoClient.getDB("testGetStorageCollections");
-        try {
         db.dropDatabase(); //TODO: create a new DB here instead of dropping the old one
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         assertEquals(0, db.getCollectionNames().size());
         // create a couple of collections
         db.createCollection("collection1", new BasicDBObject());
@@ -116,6 +111,7 @@ public class BaseMongoDBTest {
         db.createCollection("collection3", new BasicDBObject());
         // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
         assertEquals(4, db.getCollectionNames().size());
+
 
         CloseableHttpResponse response = testSimpleGetMethod(baseURL);
         // This should return an empty list since there are no collections
@@ -130,11 +126,11 @@ public class BaseMongoDBTest {
         assertEquals("/storage", jsonNode.get("_self").get("href").asText());
         assertEquals("collection", jsonNode.get("_self").get("type").asText());
         assertEquals("{\"id\":\"collection1\",\"_self\":{\"href\":\"/storage/collection1\",\"type\":\"collection\"}}",
-                jsonNode.get("members").get(0).toString());
+                jsonNode.get("content").get(0).toString());
         assertEquals("{\"id\":\"collection2\",\"_self\":{\"href\":\"/storage/collection2\",\"type\":\"collection\"}}",
-                jsonNode.get("members").get(1).toString());
+                jsonNode.get("content").get(1).toString());
         assertEquals("{\"id\":\"collection3\",\"_self\":{\"href\":\"/storage/collection3\",\"type\":\"collection\"}}",
-                jsonNode.get("members").get(2).toString());
+                jsonNode.get("content").get(2).toString());
     }
 
     protected CloseableHttpResponse testSimpleGetMethod(String url) throws Exception {

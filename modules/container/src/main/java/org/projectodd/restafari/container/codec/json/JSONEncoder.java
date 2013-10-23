@@ -13,16 +13,21 @@ import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.async.ObjectResource;
 import org.projectodd.restafari.spi.resource.async.PropertyResource;
 
+import java.nio.charset.Charset;
+
 /**
  * @author Bob McWhirter
  */
 public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
+
+    private static ByteBuf CURRENT = null;
 
     public JsonGenerator createAttachment(ByteBuf buffer) throws Exception {
         JsonFactory factory = new JsonFactory();
         ByteBufOutputStream out = new ByteBufOutputStream(buffer);
         JsonGenerator generator = factory.createGenerator(out);
         generator.setPrettyPrinter(new DefaultPrettyPrinter("\\n"));
+        CURRENT = buffer;
         return generator;
     }
 
@@ -119,10 +124,20 @@ public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
             generator.writeString(value.toString());
         } else if (value instanceof Double) {
             generator.writeNumber((Double) value);
+        } else if ( value instanceof Float ) {
+            generator.writeNumber( (Float) value );
+        } else if ( value instanceof Short ) {
+            generator.writeNumber( (Short) value );
+        } else if ( value instanceof Integer ) {
+            generator.writeNumber( (Integer) value );
+        } else if ( value instanceof Long ) {
+            generator.writeNumber( (Long) value );
         } else if (value instanceof ByteBuf) {
             byte[] bytes = new byte[((ByteBuf) value).readableBytes()];
             ((ByteBuf) value).readBytes(bytes);
             generator.writeBinary(bytes);
+        } else {
+            System.err.println( "UNKNOWN VALUE TYPE: " + value + " // " + value.getClass() );
         }
 
         context.end();

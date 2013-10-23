@@ -33,7 +33,6 @@ import static org.junit.Assert.assertNotNull;
  */
 public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
 
-    @Ignore
     @Test
     public void testSimpleUpdate() throws Exception {
         String methodName = "testSimpleDelete";
