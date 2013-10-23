@@ -7,7 +7,8 @@ import org.projectodd.restafari.spi.state.CollectionResourceState;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
 import org.projectodd.restafari.spi.state.ResourceState;
 
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -41,22 +42,7 @@ public class InMemoryCollectionResource implements CollectionResource {
         }
     }
 
-/*
-    public void read(Pagination pagination, Responder responder) {
-        boolean skipPagination = pagination == null || pagination == Pagination.NONE;
-        if (!skipPagination)
-            skipPagination = pagination.getOffset() == 0 && pagination.getLimit() >= this.collection.size();
-
-        if (skipPagination) {
-            responder.resourceRead(this);
-        } else {
-            Stream<? extends Resource> members = this.collection.values().stream().substream(pagination.getOffset()).limit(pagination.getLimit());
-            responder.resourceRead(new SimplePaginatedCollectionResource<CollectionResource>(this, pagination, members));
-        }
-    }
-*/
     @Override
-
     public void create(ResourceState state, Responder responder) {
         String id = state.id();
         if (id == null) {
@@ -76,14 +62,26 @@ public class InMemoryCollectionResource implements CollectionResource {
 
     @Override
     public void readContent(Pagination pagination, ResourceSink sink) {
-        this.collection.values().stream().forEach((m) -> {
-            sink.accept( m );
+        Stream<Resource> stream = applyPagination(pagination, this.collection.values());
+        stream.forEach((m) -> {
+            sink.accept(m);
         });
         try {
             sink.close();
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+    }
+
+    private Stream<Resource> applyPagination(Pagination pagination, Collection<Resource> values) {
+        boolean skipPagination = pagination == null
+                || pagination == Pagination.NONE
+                || (pagination.getOffset() == 0 && pagination.getLimit() >= values.size());
+
+        if (skipPagination)
+            return values.stream();
+
+        return values.stream().substream(pagination.getOffset()).limit(pagination.getLimit());
     }
 
     @Override
@@ -98,5 +96,5 @@ public class InMemoryCollectionResource implements CollectionResource {
 
     private InMemoryCollectionResource parent;
     private String id;
-    private Map<String, Resource> collection = new HashMap<>();
+    private Map<String, Resource> collection = new LinkedHashMap<>();
 }
