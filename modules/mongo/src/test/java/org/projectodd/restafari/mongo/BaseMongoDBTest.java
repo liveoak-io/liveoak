@@ -18,6 +18,8 @@ import org.projectodd.restafari.container.DefaultContainer;
 import org.projectodd.restafari.container.SimpleConfig;
 import org.projectodd.restafari.container.UnsecureServer;
 
+import java.util.UUID;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -75,7 +77,7 @@ public class BaseMongoDBTest {
 
     @BeforeClass
     public static void init() throws Exception {
-        String database = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
+        String database = System.getProperty("mongo.db", "MongoResourceTest_" + UUID.randomUUID());
         Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");
 
@@ -110,59 +112,6 @@ public class BaseMongoDBTest {
             server.stop();
         } catch (InterruptedException ignored) {
         }
-    }
-
-    @Test
-    public void testGetStorageEmpty() throws Exception {
-        //DB db = mongoClient.getDB("testGetStorageEmpty");
-        db.dropDatabase(); //TODO: create a new DB here instead of dropping the old one
-        assertEquals(0, db.getCollectionNames().size());
-
-        CloseableHttpResponse response = testSimpleGetMethod(baseURL);
-        // This should return an empty list since there are no collections
-        assertEquals(200, response.getStatusLine().getStatusCode());
-
-        // verify response
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
-
-        assertEquals(3, jsonNode.size());  // id, _self, members
-        assertEquals("storage", jsonNode.get("id").asText());
-        assertEquals("/storage", jsonNode.get("_self").get("href").asText());
-        assertEquals("collection", jsonNode.get("_self").get("type").asText());
-        assertEquals("[]", jsonNode.get("members").toString());
-    }
-
-    @Test
-    public void testGetStorageCollections() throws Exception {
-        //DB db = mongoClient.getDB("testGetStorageCollections");
-        db.dropDatabase(); //TODO: create a new DB here instead of dropping the old one
-        assertEquals(0, db.getCollectionNames().size());
-        // create a couple of collections
-        db.createCollection("collection1", new BasicDBObject());
-        db.createCollection("collection2", new BasicDBObject());
-        db.createCollection("collection3", new BasicDBObject());
-        // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
-        assertEquals(4, db.getCollectionNames().size());
-
-        CloseableHttpResponse response = testSimpleGetMethod(baseURL);
-        // This should return an empty list since there are no collections
-        assertEquals(200, response.getStatusLine().getStatusCode());
-
-        // verify response
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
-
-        assertEquals(3, jsonNode.size());  // id, _self, members
-        assertEquals("storage", jsonNode.get("id").asText());
-        assertEquals("/storage", jsonNode.get("_self").get("href").asText());
-        assertEquals("collection", jsonNode.get("_self").get("type").asText());
-        assertEquals("{\"id\":\"collection1\",\"_self\":{\"href\":\"/storage/collection1\",\"type\":\"collection\"}}",
-                jsonNode.get("members").get(0).toString());
-        assertEquals("{\"id\":\"collection2\",\"_self\":{\"href\":\"/storage/collection2\",\"type\":\"collection\"}}",
-                jsonNode.get("members").get(1).toString());
-        assertEquals("{\"id\":\"collection3\",\"_self\":{\"href\":\"/storage/collection3\",\"type\":\"collection\"}}",
-                jsonNode.get("members").get(2).toString());
     }
 
     protected CloseableHttpResponse testSimpleGetMethod(String url) throws Exception {

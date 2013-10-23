@@ -21,6 +21,8 @@ import static org.junit.Assert.*;
  */
 public class NewMongoDBResourceTest extends AbstractResourceTestCase {
 
+    //NOTE: will be soon be removed. Do not add any test classes here anymore //
+
     @Override
     public RootResource createRootResource() {
         return new MongoDBResource("storage");
