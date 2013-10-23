@@ -8,6 +8,7 @@ import org.projectodd.restafari.spi.Config;
 import org.projectodd.restafari.spi.InitializationException;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.RootResource;
+import org.vertx.java.core.Vertx;
 
 
 /**
@@ -17,6 +18,8 @@ public abstract class AbstractResourceTestCase {
 
     private DefaultContainer container;
     protected DirectConnector connector;
+    protected Vertx vertx;
+
 
     public abstract RootResource createRootResource();
 
@@ -29,5 +32,6 @@ public abstract class AbstractResourceTestCase {
         this.container = new DefaultContainer();
         this.container.registerResource( createRootResource(), createConfig() );
         this.connector = this.container.directConnector();
+        this.vertx = this.container.vertx();
     }
 }
