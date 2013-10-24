@@ -7,6 +7,7 @@ import io.netty.handler.codec.http.*;
 import org.projectodd.restafari.container.ResourceErrorResponse;
 import org.projectodd.restafari.container.ResourceResponse;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
+import org.projectodd.restafari.container.mime.MediaType;
 import org.projectodd.restafari.spi.resource.Resource;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ResourceResponse msg, List<Object> out) throws Exception {
-        System.err.println( "respond! " + msg + " // " + msg.inReplyTo().mimeType() );
+        System.err.println( "respond! " + msg + " // " + msg.inReplyTo().mediaType() );
         ByteBuf content = null;
         int responseStatusCode = 0;
         String responseMessage = null;
@@ -30,22 +31,22 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
             case CREATED:
                 responseStatusCode = HttpResponseStatus.CREATED.code();
                 responseMessage = HttpResponseStatus.CREATED.reasonPhrase();
-                content = encodeState(msg.mimeType(), msg.resource());
+                content = encodeState(msg.mediaType(), msg.resource());
                 break;
             case READ:
                 responseStatusCode = HttpResponseStatus.OK.code();
                 responseMessage = HttpResponseStatus.OK.reasonPhrase();
-                content = encodeState(msg.mimeType(), msg.resource());
+                content = encodeState(msg.mediaType(), msg.resource());
                 break;
             case UPDATED:
                 responseStatusCode = HttpResponseStatus.OK.code();
                 responseMessage = HttpResponseStatus.OK.reasonPhrase();
-                content = encodeState(msg.mimeType(), msg.resource());
+                content = encodeState(msg.mediaType(), msg.resource());
                 break;
             case DELETED:
                 responseStatusCode = HttpResponseStatus.OK.code();
                 responseMessage = HttpResponseStatus.OK.reasonPhrase();
-                content = encodeState(msg.mimeType(), msg.resource());
+                content = encodeState(msg.mediaType(), msg.resource());
                 break;
             case ERROR:
                 if (msg instanceof ResourceErrorResponse) {
@@ -95,15 +96,13 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus);
             response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
         }
-        response.headers().add( HttpHeaders.Names.CONTENT_TYPE, msg.inReplyTo().mimeType() );
-
-
+        response.headers().add( HttpHeaders.Names.CONTENT_TYPE, msg.inReplyTo().mediaType() );
 
         out.add( response );
     }
 
-    protected ByteBuf encodeState(String mimeType, Resource resource) throws Exception {
-        return this.codecManager.encode( mimeType, resource );
+    protected ByteBuf encodeState(MediaType mediaType, Resource resource) throws Exception {
+        return this.codecManager.encode( mediaType, resource );
     }
 
     private ResourceCodecManager codecManager;

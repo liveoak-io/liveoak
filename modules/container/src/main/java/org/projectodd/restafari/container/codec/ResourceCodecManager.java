@@ -1,6 +1,8 @@
 package org.projectodd.restafari.container.codec;
 
 import io.netty.buffer.ByteBuf;
+import org.projectodd.restafari.container.mime.MediaType;
+import org.projectodd.restafari.container.mime.MediaTypeMatcher;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.state.ResourceState;
 
@@ -9,29 +11,41 @@ import java.util.Map;
 
 public class ResourceCodecManager {
 
-    public void registerResourceCodec(String mimeType, ResourceCodec codec) {
-        this.codecs.put(mimeType, codec);
+    public void registerResourceCodec(String mediaType, ResourceCodec codec) {
+        this.codecs.put(new MediaType( mediaType ), codec);
     }
 
-    public ResourceState decode(String mimeType, ByteBuf buf) throws Exception {
-        ResourceCodec codec = this.codecs.get(mimeType);
+    public ResourceState decode(MediaType mediaType, ByteBuf buf) throws Exception {
+        System.err.println( "deocde with " + mediaType );
+        ResourceCodec codec = this.codecs.get(mediaType);
+        System.err.println( "codec: " + codec );
+        System.err.println( this.codecs );
         return codec.decode(buf);
     }
 
-    public ByteBuf encode(String mimeType, Resource resource) throws Exception {
-        ResourceCodec codec = this.codecs.get(mimeType);
+    public ByteBuf encode(MediaType mediaType, Resource resource) throws Exception {
+        ResourceCodec codec = this.codecs.get(mediaType);
         if ( codec == null ) {
-            // TODO appropriate notify of invalid/unacceptable codec.
-            // TODO and property parse multiple mime-types in the Accept: header.
-            codec = this.codecs.get( "application/json" );
+            return encode( MediaType.JSON, resource );
         }
         return codec.encode(resource);
     }
 
-    public ResourceCodec getResourceCodec(String mimeType) {
-        return this.codecs.get( mimeType );
+    public ResourceCodec getResourceCodec(MediaType mediaType) {
+        return this.codecs.get( mediaType );
     }
 
-    private Map<String, ResourceCodec> codecs = new HashMap<>();
+    public MediaType determineMediaType(String acceptMediaTypes) {
+        if ( acceptMediaTypes == null ) {
+            return MediaType.JSON;
+        }
+        MediaTypeMatcher matcher = new MediaTypeMatcher( acceptMediaTypes );
+
+        MediaType match = matcher.findBestMatch( this.codecs.keySet() );
+
+        return match;
+    }
+
+    private Map<MediaType, ResourceCodec> codecs = new HashMap<>();
 
 }

@@ -1,6 +1,7 @@
 package org.projectodd.restafari.container.mime;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -70,7 +71,7 @@ public class MediaTypeMatcher {
         return this.mediaTypes;
     }
 
-    public MediaType findBestMatch(List<MediaType> types) {
+    public MediaType findBestMatch(Collection<MediaType> types) {
         for ( MediaType mine : this.mediaTypes ) {
             for ( MediaType other : types ) {
                 if ( other.isCompatible( mine ) ) {

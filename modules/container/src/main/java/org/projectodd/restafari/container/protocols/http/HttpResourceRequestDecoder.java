@@ -12,6 +12,7 @@ import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.container.ResourceRequest;
 import org.projectodd.restafari.container.ReturnFieldsImpl;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
+import org.projectodd.restafari.container.mime.MediaType;
 import org.projectodd.restafari.spi.Pagination;
 import org.projectodd.restafari.spi.ReturnFields;
 import org.projectodd.restafari.spi.state.ResourceState;
@@ -29,10 +30,9 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
 
     @Override
     protected void decode(ChannelHandlerContext ctx, FullHttpRequest msg, List<Object> out) throws Exception {
-        String mimeType = msg.headers().get(HttpHeaders.Names.ACCEPT );
-        if ( mimeType == null ) {
-            mimeType = "application/json";
-        }
+        String acceptHeader = msg.headers().get(HttpHeaders.Names.ACCEPT );
+
+        MediaType mediaType = this.codecManager.determineMediaType(acceptHeader);
 
         String authToken = getAuthorizationToken(msg);
 
@@ -42,14 +42,14 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         if (msg.getMethod().equals(HttpMethod.POST)) {
             out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.CREATE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
-                    .mimeType(mimeType)
+                    .mediaType(mediaType)
                     .authorizationToken(authToken)
-                    .resourceState(decodeState(mimeType, msg.content()))
+                    .resourceState(decodeState(mediaType, msg.content()))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.GET)) {
             out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.READ, new ResourcePath(decoder.path()))
                     .resourceParams(params)
-                    .mimeType(mimeType)
+                    .mediaType(mediaType)
                     .authorizationToken(authToken)
                     .pagination(decodePagination(params))
                     .returnFields(decodeReturnFields(params))
@@ -57,14 +57,14 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         } else if (msg.getMethod().equals(HttpMethod.PUT)) {
             out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.UPDATE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
-                    .mimeType(mimeType)
+                    .mediaType(mediaType)
                     .authorizationToken(authToken)
-                    .resourceState(decodeState(mimeType, msg.content()))
+                    .resourceState(decodeState(mediaType, msg.content()))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.DELETE)) {
             out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.DELETE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
-                    .mimeType(mimeType)
+                    .mediaType(mediaType)
                     .authorizationToken(authToken)
                     .build());
         }
@@ -79,8 +79,8 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         return new ReturnFieldsImpl(value);
     }
 
-    protected ResourceState decodeState(String mimeType, ByteBuf content) throws Exception {
-        return codecManager.decode( mimeType, content );
+    protected ResourceState decodeState(MediaType mediaType, ByteBuf content) throws Exception {
+        return codecManager.decode( mediaType, content );
     }
 
     protected Pagination decodePagination(ResourceParams params) {

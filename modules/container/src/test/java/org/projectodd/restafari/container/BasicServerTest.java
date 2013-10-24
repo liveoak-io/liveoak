@@ -22,6 +22,7 @@ import org.apache.http.message.BasicHeader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.projectodd.restafari.container.mime.MediaType;
 import org.projectodd.restafari.spi.state.CollectionResourceState;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
 import org.projectodd.restafari.spi.state.ResourceState;
@@ -76,14 +77,14 @@ public class BasicServerTest {
         System.err.println("===================");
         System.err.println(buffer.toString(Charset.defaultCharset()));
         System.err.println("===================");
-        return this.container.getCodecManager().decode("application/json", buffer);
+        return this.container.getCodecManager().decode(MediaType.JSON, buffer);
     }
 
     private ResourceState decode(ByteBuf buffer) throws Exception {
         System.err.println("===================");
         System.err.println(buffer.toString(Charset.defaultCharset()));
         System.err.println("===================");
-        return this.container.getCodecManager().decode("application/json", buffer);
+        return this.container.getCodecManager().decode(MediaType.JSON, buffer);
     }
 
     @Test

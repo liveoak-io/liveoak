@@ -2,6 +2,7 @@ package org.projectodd.restafari.container.subscriptions;
 
 import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.container.codec.ResourceCodec;
+import org.projectodd.restafari.container.mime.MediaType;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.StompMessage;
@@ -13,11 +14,11 @@ import org.projectodd.restafari.stomp.server.StompConnection;
  */
 public class StompSubscription implements Subscription {
 
-    public StompSubscription(StompConnection connection, String destination, String subscriptionId, String contentType, ResourceCodec codec) {
+    public StompSubscription(StompConnection connection, String destination, String subscriptionId, MediaType mediaType, ResourceCodec codec) {
         this.connection = connection;
         this.destination = destination;
         this.subscriptionId = subscriptionId;
-        this.contentType = contentType;
+        this.mediaType = mediaType;
         this.codec = codec;
         this.resourcePath = new ResourcePath(destination);
     }
@@ -44,7 +45,7 @@ public class StompSubscription implements Subscription {
     protected StompMessage createMessage(String action, int status, Resource resource) throws Exception {
         StompMessage message = new DefaultStompMessage();
         message.headers().put(Headers.SUBSCRIPTION, this.subscriptionId);
-        message.headers().put(Headers.CONTENT_TYPE, this.contentType);
+        message.headers().put(Headers.CONTENT_TYPE, this.mediaType.toString());
         message.headers().put("action", action);
         message.headers().put("status", "" + status);
         message.headers().put("location", resource.uri().toString() );
@@ -55,7 +56,7 @@ public class StompSubscription implements Subscription {
     private StompConnection connection;
     private String destination;
     private String subscriptionId;
-    private String contentType;
+    private MediaType mediaType;
     private ResourceCodec codec;
 
     private final ResourcePath resourcePath;

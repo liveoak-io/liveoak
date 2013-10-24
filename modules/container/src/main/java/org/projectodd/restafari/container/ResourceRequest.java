@@ -1,5 +1,6 @@
 package org.projectodd.restafari.container;
 
+import org.projectodd.restafari.container.mime.MediaType;
 import org.projectodd.restafari.spi.Pagination;
 import org.projectodd.restafari.spi.ReturnFields;
 import org.projectodd.restafari.spi.state.ResourceState;
@@ -35,8 +36,8 @@ public class ResourceRequest {
         return this.resourcePath;
     }
 
-    public String mimeType() {
-        return this.mimeType;
+    public MediaType mediaType() {
+        return this.mediaType;
     }
 
     public ResourceState state() {
@@ -66,7 +67,7 @@ public class ResourceRequest {
     private RequestType requestType;
     private ResourcePath resourcePath;
     private ResourceParams params;
-    private String mimeType;
+    private MediaType mediaType;
     private Pagination pagination;
     private ResourceState state;
     private String authorizationToken;
@@ -86,8 +87,8 @@ public class ResourceRequest {
             return this;
         }
 
-        public Builder mimeType(String mimeType) {
-            obj.mimeType = mimeType;
+        public Builder mediaType(MediaType mediaType) {
+            obj.mediaType = mediaType;
             return this;
         }
 
@@ -112,8 +113,8 @@ public class ResourceRequest {
         }
 
         public ResourceRequest build() {
-            if (obj.mimeType == null) {
-                obj.mimeType = "ignored";
+            if (obj.mediaType == null) {
+                obj.mediaType = MediaType.JSON;
             }
 
             if (obj.pagination == null) {

@@ -9,6 +9,8 @@ import java.util.Map;
  */
 public class MediaType {
 
+    public static final MediaType JSON = new MediaType( "application/json" );
+
 
     public MediaType(String type) {
         int slashLoc = type.indexOf("/");
@@ -120,6 +122,32 @@ public class MediaType {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if ( other instanceof MediaType ) {
+            MediaType that = (MediaType) other;
+
+            if ( this.type.equals( that.type ) ) {
+                if ( this.subtype.equals( that.subtype ) ) {
+                    if ( this.suffix == null && that.suffix == null ) {
+                        return true;
+                    } else if ( this.suffix != null && that.suffix != null ) {
+                        return this.suffix.equals( that.suffix );
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.type.hashCode() + this.subtype.hashCode() + ( this.suffix != null ? this.subtype.hashCode() : 0 );
     }
 
     public String toString() {
