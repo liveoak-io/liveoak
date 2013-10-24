@@ -19,6 +19,14 @@ public class MediaTypeTest {
     }
 
     @Test
+    public void testCompatibilityWithStars() throws Exception {
+        assertThat(new MediaType("application", "json")).is(compatibleWith(new MediaType("*", "*")));
+        assertThat(new MediaType("application", "json")).is(compatibleWith(new MediaType("application", "*")));
+        assertThat(new MediaType("application", "*")).is(compatibleWith(new MediaType("application", "*")));
+        assertThat(new MediaType("application", "json")).is(compatibleWith(new MediaType("*", "json")));
+    }
+
+    @Test
     public void testParseWithoutParameters() throws Exception {
         MediaType test = new MediaType("application/json");
         assertThat(test.type()).isEqualTo("application");
@@ -67,6 +75,7 @@ public class MediaTypeTest {
         assertThat( test.parameters().get( "q") ).isEqualTo( "0.8" );
         assertThat( test.parameters().get( "bob") ).isEqualTo( "tall" );
     }
+
 
     public static Condition<Object> compatibleWith(MediaType other) {
         return new Condition<Object>() {

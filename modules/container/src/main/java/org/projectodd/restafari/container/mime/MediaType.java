@@ -90,7 +90,9 @@ public class MediaType {
 
     public boolean isCompatible(MediaType other) {
         if (!this.type.equals(other.type)) {
-            return false;
+            if ( ! this.type.equals( "*" ) && ! other.type.equals("*" ) ) {
+                return false;
+            }
         }
 
         if (this.subtype.equals(other.subtype)) {
@@ -104,7 +106,10 @@ public class MediaType {
                 return true;
             }
             return false;
+        } else if ( this.subtype.equals( "*" ) || other.subtype.equals( "*" ) ) {
+            return true;
         }
+
 
         if (this.suffix != null && this.suffix.equals(other.subtype)) {
             return true;
