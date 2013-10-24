@@ -71,7 +71,7 @@ public class MediaTypeMatcher {
         return this.mediaTypes;
     }
 
-    public MediaType findBestMatch(Collection<MediaType> types) {
+    public MediaType findBestMatch(List<MediaType> types) {
         for ( MediaType mine : this.mediaTypes ) {
             for ( MediaType other : types ) {
                 if ( other.isCompatible( mine ) ) {

@@ -95,6 +95,8 @@
       <module>vertx</module>
 
       <module>test-tools</module>
+
+      <module>netty</module>
     </modules>
 </project>
 
