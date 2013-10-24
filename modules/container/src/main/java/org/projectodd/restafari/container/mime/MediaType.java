@@ -10,7 +10,7 @@ import java.util.Map;
 public class MediaType {
 
     public static final MediaType JSON = new MediaType( "application/json" );
-
+    public static final MediaType HTML = new MediaType( "text/html" );
 
     public MediaType(String type) {
         int slashLoc = type.indexOf("/");

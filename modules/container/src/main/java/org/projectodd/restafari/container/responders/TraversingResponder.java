@@ -23,6 +23,7 @@ public abstract class TraversingResponder extends BaseResponder {
 
     @Override
     public void resourceRead(Resource resource) {
+        this.currentResource = resource;
         if (this.remainingPath.isEmpty()) {
             doPerform(resource);
         } else {
@@ -44,7 +45,6 @@ public abstract class TraversingResponder extends BaseResponder {
         } else {
             resource.read(next, this);
         }
-
     }
 
     protected void doPerform(Resource resource) {
@@ -57,8 +57,27 @@ public abstract class TraversingResponder extends BaseResponder {
         }
     }
 
+    @Override
+    public void noSuchResource(String id) {
+        if ( this.remainingPath.segments().isEmpty() ) {
+            int lastDotLoc = id.lastIndexOf( '.' );
+            if ( lastDotLoc >= 0 ) {
+                String idWithoutExtension = id.substring( 0, lastDotLoc );
+                doRead( idWithoutExtension, currentResource );
+                return;
+            }
+        }
+
+        super.noSuchResource( id );
+    }
+
+    protected Resource currentResource() {
+        return this.currentResource;
+    }
+
     protected abstract void perform(Resource resource);
 
     private ResourcePath remainingPath;
     private Executor executor;
+    private Resource currentResource;
 }

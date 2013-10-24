@@ -31,7 +31,7 @@ public class ContainerStompServerContext implements StompServerContext {
         if ( acceptMediaType == null ) {
             acceptMediaType = "application/json";
         }
-        MediaType mediaType = this.container.getCodecManager().determineMediaType( acceptMediaType );
+        MediaType mediaType = this.container.getCodecManager().determineMediaType( acceptMediaType, null );
         if ( mediaType == null ) {
             mediaType = MediaType.JSON;
         }

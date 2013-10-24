@@ -30,13 +30,24 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
 
     @Override
     protected void decode(ChannelHandlerContext ctx, FullHttpRequest msg, List<Object> out) throws Exception {
-        String acceptHeader = msg.headers().get(HttpHeaders.Names.ACCEPT );
 
-        MediaType mediaType = this.codecManager.determineMediaType(acceptHeader);
+        QueryStringDecoder decoder = new QueryStringDecoder(msg.getUri());
+
+        String path = decoder.path();
+
+        int lastDotLoc = path.lastIndexOf( '.' );
+
+        String extension = null;
+
+        if ( lastDotLoc > 0 ) {
+            extension = path.substring( lastDotLoc + 1 );
+        }
+
+        String acceptHeader = msg.headers().get(HttpHeaders.Names.ACCEPT );
+        MediaType mediaType = this.codecManager.determineMediaType(acceptHeader, extension);
 
         String authToken = getAuthorizationToken(msg);
 
-        QueryStringDecoder decoder = new QueryStringDecoder(msg.getUri());
         ResourceParams params = ResourceParams.instance(decoder.parameters());
 
         if (msg.getMethod().equals(HttpMethod.POST)) {

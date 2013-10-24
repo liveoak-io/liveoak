@@ -38,11 +38,12 @@ public class ResourceCodecManager {
     }
 
 
-    public MediaType determineMediaType(String acceptMediaTypes) {
-        if (acceptMediaTypes == null) {
+    public MediaType determineMediaType(String acceptMediaTypes, String extension) {
+        if (acceptMediaTypes == null && extension == null) {
             return MediaType.JSON;
         }
-        MediaTypeMatcher matcher = new MediaTypeMatcher(acceptMediaTypes);
+
+        MediaTypeMatcher matcher = new MediaTypeMatcher(acceptMediaTypes, extension);
 
         MediaType match = matcher.findBestMatch(this.codecs.stream().map((e) -> {
             return e.mediaType;

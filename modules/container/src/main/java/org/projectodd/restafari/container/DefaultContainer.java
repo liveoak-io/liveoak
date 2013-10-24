@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 
 import org.projectodd.restafari.container.codec.ResourceCodec;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
+import org.projectodd.restafari.container.codec.html.HTMLEncoder;
 import org.projectodd.restafari.container.codec.json.JSONDecoder;
 import org.projectodd.restafari.container.codec.json.JSONEncoder;
 import org.projectodd.restafari.container.subscriptions.SubscriptionManager;
@@ -26,6 +27,7 @@ public class DefaultContainer implements Container, CollectionResource {
 
     public DefaultContainer() {
         this.codecManager.registerResourceCodec("application/json", new ResourceCodec( new JSONEncoder(), new JSONDecoder() ) );
+        this.codecManager.registerResourceCodec("text/html", new ResourceCodec( new HTMLEncoder(), null ) );
         PlatformManager platformManager = PlatformLocator.factory.createPlatformManager();
         this.vertx = platformManager.vertx();
 

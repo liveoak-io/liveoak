@@ -19,11 +19,7 @@ public class UpdateResponder extends TraversingResponder {
         super(executor, inReplyTo, ctx);
     }
 
-    @Override
-    public void resourceRead(Resource resource) {
-        this.currentResource = resource;
-        super.resourceRead(resource);
-    }
+
 
     @Override
     public void perform(Resource resource) {
@@ -36,15 +32,14 @@ public class UpdateResponder extends TraversingResponder {
 
     @Override
     public void noSuchResource(String id) {
-        if (isSeekingTail() && this.currentResource instanceof CollectionResource) {
+        if (isSeekingTail() && currentResource() instanceof CollectionResource) {
             // Turn it into a Create on its parent, for upsert semantics
             ResourceState state = inReplyTo().state();
             state.id( id );
-            ((CollectionResource) this.currentResource).create(inReplyTo().state(), createBaseResponder());
+            ((CollectionResource) currentResource() ).create(inReplyTo().state(), createBaseResponder());
         } else {
             super.noSuchResource(id);
         }
     }
 
-    private Resource currentResource;
 }
