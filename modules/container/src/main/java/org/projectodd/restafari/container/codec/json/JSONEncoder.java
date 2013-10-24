@@ -32,7 +32,7 @@ public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
     }
 
     public void encode(EncodingContext<JsonGenerator> context) throws Exception {
-        System.err.println( "JSON.encode: " + context.object() );
+        System.err.println("JSON.encode: " + context.object());
         Object o = context.object();
         JsonGenerator generator = context.attachment();
         if (o instanceof CollectionResource) {
@@ -47,6 +47,13 @@ public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
             encodeValue(context);
         }
         generator.flush();
+    }
+
+    @Override
+    public void close(EncodingContext<JsonGenerator> context) throws Exception {
+        JsonGenerator generator = context.attachment();
+        generator.flush();
+        generator.close();
     }
 
 
@@ -92,8 +99,15 @@ public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
         Resource prop = (Resource) context.object();
         JsonGenerator generator = context.attachment();
 
-        generator.writeFieldName(prop.id());
+        if (context.depth() > 0) {
+            System.err.println("write field: " + prop.id());
+            generator.writeFieldName(prop.id());
+            System.err.println("write delegate to content for : " + prop.id());
+        } else {
+            System.err.println( "only write content" );
+        }
         context.encodeContent(() -> {
+            System.err.println("after content encoding");
             context.end();
         });
     }
@@ -124,20 +138,20 @@ public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
             generator.writeString(value.toString());
         } else if (value instanceof Double) {
             generator.writeNumber((Double) value);
-        } else if ( value instanceof Float ) {
-            generator.writeNumber( (Float) value );
-        } else if ( value instanceof Short ) {
-            generator.writeNumber( (Short) value );
-        } else if ( value instanceof Integer ) {
-            generator.writeNumber( (Integer) value );
-        } else if ( value instanceof Long ) {
-            generator.writeNumber( (Long) value );
+        } else if (value instanceof Float) {
+            generator.writeNumber((Float) value);
+        } else if (value instanceof Short) {
+            generator.writeNumber((Short) value);
+        } else if (value instanceof Integer) {
+            generator.writeNumber((Integer) value);
+        } else if (value instanceof Long) {
+            generator.writeNumber((Long) value);
         } else if (value instanceof ByteBuf) {
             byte[] bytes = new byte[((ByteBuf) value).readableBytes()];
             ((ByteBuf) value).readBytes(bytes);
             generator.writeBinary(bytes);
         } else {
-            System.err.println( "UNKNOWN VALUE TYPE: " + value + " // " + ((value == null)? null : value.getClass()) );
+            System.err.println("UNKNOWN VALUE TYPE: " + value + " // " + ((value == null) ? null : value.getClass()));
         }
 
         context.end();
@@ -155,11 +169,11 @@ public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
             generator.writeFieldName("href");
             generator.writeString(resource.uri().toString());
             generator.writeFieldName("type");
-            if ( resource instanceof CollectionResource ) {
+            if (resource instanceof CollectionResource) {
                 generator.writeString("collection");
-            } else if ( resource instanceof ObjectResource ) {
+            } else if (resource instanceof ObjectResource) {
                 generator.writeString("object");
-            } else if ( resource instanceof BinaryResource ) {
+            } else if (resource instanceof BinaryResource) {
                 generator.writeString("binary");
             }
             generator.writeEndObject();

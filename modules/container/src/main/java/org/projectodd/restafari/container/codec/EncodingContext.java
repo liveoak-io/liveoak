@@ -9,8 +9,9 @@ public interface EncodingContext<T> {
     Object object();
     ResourceEncoder<T> encoder();
     void encode() throws Exception;
-
     void end();
+
+    int depth();
 
     boolean shouldEncodeContent();
     void encodeContent(Runnable contentCompletionHandler);

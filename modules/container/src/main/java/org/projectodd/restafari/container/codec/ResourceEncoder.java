@@ -10,4 +10,6 @@ public interface ResourceEncoder<T> {
     T createAttachment(ByteBuf output) throws Exception;
 
     void encode(EncodingContext<T> context) throws Exception;
+
+    void close(EncodingContext<T> context) throws Exception;
 }

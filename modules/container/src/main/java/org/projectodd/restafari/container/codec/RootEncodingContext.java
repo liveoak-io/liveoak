@@ -23,6 +23,15 @@ public class RootEncodingContext<T> extends AbstractEncodingContext<T>  {
         return this.encoder;
     }
 
+    public void end() {
+        try {
+            encoder.close(this);
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        super.end();
+    }
+
     private ResourceEncoder<T> encoder;
     private T attachment;
 
