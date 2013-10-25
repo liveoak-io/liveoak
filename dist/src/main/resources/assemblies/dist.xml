@@ -1,0 +1,43 @@
+<assembly>
+  <id>dist</id>
+  <formats>
+    <format>dir</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>../modules/target/modules</directory>
+      <outputDirectory>/modules</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>../launcher/bin</directory>
+      <outputDirectory>/bin</outputDirectory>
+      <fileMode>0555</fileMode>
+      <includes>
+        <include>mboss</include>
+      </includes>
+    </fileSet>
+    <fileSet> 
+      <directory>src/main/resources/bin</directory>
+      <outputDirectory>/bin</outputDirectory>
+    </fileSet> 
+    <fileSet>
+      <directory>../launcher/etc</directory>
+      <outputDirectory>/etc</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>../launcher/target</directory>
+      <outputDirectory>/lib</outputDirectory>
+    </fileSet>
+  </fileSets>
+<!--
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+    </dependencySet>
+  </dependencySets>
+-->
+</assembly>
