@@ -26,6 +26,10 @@ public class MongoDBResource implements CollectionResource, RootResource {
         this.id = id;
     }
 
+    public MongoDBResource() {
+
+    }
+
     @Override
     public Resource parent() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
@@ -37,6 +41,14 @@ public class MongoDBResource implements CollectionResource, RootResource {
 
     @Override
     public void initialize(ResourceContext context) throws InitializationException {
+
+        if (this.id == null) {
+            this.id = context.config().get("id", null);
+            if (this.id == null) {
+                throw new InitializationException("no id specified");
+            }
+        }
+
         Config config = context.config();
         String host = config.get("host", "localhost");
         int port = config.get("port", 27017);

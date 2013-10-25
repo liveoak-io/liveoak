@@ -26,6 +26,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ResourceResponse msg, List<Object> out) throws Exception {
+
         int responseStatusCode = 0;
         String responseMessage = null;
 

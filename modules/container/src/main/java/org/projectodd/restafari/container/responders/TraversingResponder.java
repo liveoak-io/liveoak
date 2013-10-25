@@ -41,10 +41,18 @@ public abstract class TraversingResponder extends BaseResponder {
     protected void doRead(String next, Resource resource) {
         if (resource instanceof BlockingResource) {
             this.executor.execute(() -> {
-                resource.read(next, this);
+                try {
+                    resource.read(next, this);
+                } catch (RuntimeException e) {
+                    noSuchResource(next);
+                }
             });
         } else {
-            resource.read(next, this);
+            try {
+                resource.read(next, this);
+            } catch (RuntimeException e) {
+                noSuchResource( next );
+            }
         }
     }
 

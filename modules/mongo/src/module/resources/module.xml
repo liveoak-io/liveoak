@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module xmlns="urn:jboss:module:1.0" name="${module-name}">
+
+  <resources>
+    <resource-root path="${project.artifactId}.jar"/>
+    <resource-root path="mongo-java-driver.jar"/>
+  </resources>
+
+  <dependencies>
+    <module name="org.projectodd.restafari.spi"/>
+    <system>
+      <paths>
+        <path name="javax/net"/>
+      </paths>
+    </system>
+  </dependencies>
+</module>
+

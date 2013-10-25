@@ -7,6 +7,16 @@
       config: {
         root: '.'
       }
+    },
+
+    storage: {
+      type: 'jboss-module',
+      module-id: 'org.projectodd.restafari.mongo',
+      class-name: 'org.projectodd.restafari.mongo.MongoDBResource',
+      config: {
+        db: 'mboss'
+      }
     }
   }
+
 }

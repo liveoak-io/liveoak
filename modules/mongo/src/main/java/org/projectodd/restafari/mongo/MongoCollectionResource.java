@@ -47,6 +47,7 @@ class MongoCollectionResource extends MongoDBResource {
         DBObject dbObject = this.parent.getDB().getCollection(this.collectionName).findOne(new BasicDBObject("_id", new ObjectId(id)));
         if (dbObject == null) {
             responder.noSuchResource(id);
+            return;
         }
 
         responder.resourceRead(new MongoObjectResource(this, dbObject));
@@ -68,7 +69,7 @@ class MongoCollectionResource extends MongoDBResource {
 
     @Override
     public void readContent(Pagination pagination, ResourceSink sink) {
-        DBCollection c = this.parent.getDB().getCollection( this.collectionName );
+        DBCollection c = this.parent.getDB().getCollection(this.collectionName);
         DBCursor cursor = c.find();
 
         cursor.forEach((e) -> {
@@ -88,9 +89,9 @@ class MongoCollectionResource extends MongoDBResource {
 
         BasicDBObject basicDBObject = null;
         try {
-            basicDBObject = (BasicDBObject)getObject(state);
+            basicDBObject = (BasicDBObject) getObject(state);
             dbCollection.insert(basicDBObject);
-        } catch (Exception e ) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -102,11 +103,11 @@ class MongoCollectionResource extends MongoDBResource {
         return "[MongoCollectionResource: id=" + id() + "]";
     }
 
-    protected Object getObject (ResourceState resourceState) {
+    protected Object getObject(ResourceState resourceState) {
         if (resourceState instanceof PropertyResourceState) {
             PropertyResourceState pRS = (PropertyResourceState) resourceState;
             if (pRS.value() instanceof ResourceState) {
-                return getObject((ResourceState)pRS.value());
+                return getObject((ResourceState) pRS.value());
             } else {
                 return pRS.value();
             }
@@ -114,7 +115,7 @@ class MongoCollectionResource extends MongoDBResource {
             BasicDBObject basicDBObject = new BasicDBObject();
             // if the state already has an id set, use it here. Otherwise one will be autocreated on insert
             String rid = resourceState.id();
-            if (rid != null)  {
+            if (rid != null) {
                 basicDBObject.append("_id", rid);
             }
 
@@ -122,7 +123,7 @@ class MongoCollectionResource extends MongoDBResource {
                 CollectionResourceState collectionResourceState = (CollectionResourceState) resourceState;
                 List<? extends ResourceState> resourceStates = collectionResourceState.members().collect(Collectors.toList());
                 ArrayList resourceList = new ArrayList();
-                for (ResourceState state: resourceStates) {
+                for (ResourceState state : resourceStates) {
                     resourceList.add(getObject(state));
                 }
 

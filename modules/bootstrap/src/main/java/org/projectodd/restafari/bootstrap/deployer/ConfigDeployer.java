@@ -54,32 +54,40 @@ public class ConfigDeployer {
                         String className = resourceData.get("class-name").toString();
                         Object configObj = resourceData.get("config");
 
+                        SimpleConfig resourceConfig = null;
                         if (configObj instanceof Map) {
                             Map<String, Object> config = (Map<String, Object>) configObj;
-                            config.put("id", id);
-                            SimpleConfig resourceConfig = new SimpleConfig(config);
-
-                            ModuleLoader loader = ModuleLoader.forClass(Bootstrap.class);
-                            try {
-                                Module module = loader.loadModule(ModuleIdentifier.create(moduleId));
-                                Class<? extends RootResource> resourceClass = (Class<? extends RootResource>) module.getClassLoader().loadClass(className);
-
-                                RootResource resource = resourceClass.newInstance();
-
-                                this.container.registerResource(resource, resourceConfig);
-                            } catch (ModuleLoadException e) {
-                                System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
-                            } catch (ClassNotFoundException e) {
-                                System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
-                            } catch (InstantiationException e) {
-                                System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
-                            } catch (IllegalAccessException e) {
-                                System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
-                            } catch (InitializationException e) {
-                                System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
-                            }
+                            resourceConfig = new SimpleConfig(config);
+                        } else {
+                            resourceConfig = new SimpleConfig();
                         }
+                        resourceConfig.put("id", id);
+
+                        ModuleLoader loader = ModuleLoader.forClass(Bootstrap.class);
+                        try {
+                            Module module = loader.loadModule(ModuleIdentifier.create(moduleId));
+                            Class<? extends RootResource> resourceClass = (Class<? extends RootResource>) module.getClassLoader().loadClass(className);
+
+                            RootResource resource = resourceClass.newInstance();
+
+                            this.container.registerResource(resource, resourceConfig);
+                            System.err.println("registered resource: " + resource);
+                        } catch (ModuleLoadException e) {
+                            System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
+                        } catch (ClassNotFoundException e) {
+                            System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
+                        } catch (InstantiationException e) {
+                            System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
+                        } catch (IllegalAccessException e) {
+                            System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
+                        } catch (InitializationException e) {
+                            System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
+                        }
+                    } else {
+                        System.err.println("unknown resource deployment type: " + type);
                     }
+                } else {
+                    System.err.println("invalid configuration: " + resourceDataObj);
                 }
             }
         }

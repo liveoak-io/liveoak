@@ -35,6 +35,7 @@
 
     <properties>
         <mongo.version>2.11.3</mongo.version>
+        <module-name>org.projectodd.restafari.mongo</module-name>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
