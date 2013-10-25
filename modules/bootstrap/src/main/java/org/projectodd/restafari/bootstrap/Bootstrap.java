@@ -3,6 +3,7 @@ package org.projectodd.restafari.bootstrap;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoader;
+import org.projectodd.restafari.bootstrap.deployer.ConfigDeployer;
 import org.projectodd.restafari.container.DefaultContainer;
 import org.projectodd.restafari.container.SimpleConfig;
 import org.projectodd.restafari.container.UnsecureServer;
@@ -23,16 +24,10 @@ public class Bootstrap {
 
         container.registerResource(new ContainerResource("_container"), new SimpleConfig());
 
-        ModuleLoader loader = ModuleLoader.forClass(Bootstrap.class);
-        Module module = loader.loadModule(ModuleIdentifier.create("org.projectodd.restafari.filesystem"));
-
-        Class<? extends RootResource> resourceClass = (Class<? extends RootResource>) module.getClassLoader().loadClass( "org.projectodd.restafari.filesystem.FilesystemResource");
-
-        RootResource resource = resourceClass.newInstance();
-        SimpleConfig fsConfig = new SimpleConfig();
-        fsConfig.put( "id", "assets" );
-        fsConfig.put( "root", "." );
-        container.registerResource( resource, fsConfig );
+        if ( args.length > 0 ) {
+            ConfigDeployer deployer = new ConfigDeployer( container );
+            deployer.deploy( args[0] );
+        }
 
         server.start();
     }

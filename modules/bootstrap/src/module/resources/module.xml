@@ -11,6 +11,7 @@
   <dependencies>
     <module name="org.projectodd.restafari.spi" services="import"/>
     <module name="org.projectodd.restafari.container"/>
+    <module name="com.fasterxml.jackson.core"/>
     <system>
       <paths> 
         <path name="org/jboss/modules"/>

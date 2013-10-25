@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 
 bindir=$(dirname $0)
+etcdir=$bindir/../etc
 modulepath=$bindir/../../modules/target/modules
 jboss_modules_jar=$bindir/../target/jboss-modules.jar
 
@@ -8,4 +9,4 @@ jboss_modules_jar=$bindir/../target/jboss-modules.jar
 java $JAVA_OPTS \
   -jar $jboss_modules_jar \
   -modulepath $modulepath \
-  org.projectodd.restafari.bootstrap:main $*
+  org.projectodd.restafari.bootstrap:main $etcdir/mboss-config.json $*
