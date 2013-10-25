@@ -91,11 +91,8 @@
       <module>container</module>
       <module>mongo</module>
       <module>deployer</module>
-      <module>starter</module>
       <module>filesystem</module>
       <module>vertx</module>
-
-      <module>test-tools</module>
 
       <module>3rdparty</module>
     </modules>

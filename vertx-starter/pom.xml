@@ -4,15 +4,15 @@
 
     <parent>
         <groupId>org.projectodd.restafari</groupId>
-        <artifactId>restafari-modules</artifactId>
+        <artifactId>restafari</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>restafari-starter</artifactId>
-    <name>restafari-starter</name>
+    <artifactId>restafari-vertx-starter</artifactId>
+    <name>restafari-vertx-starter</name>
 
     <packaging>jar</packaging>
 

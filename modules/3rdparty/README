@@ -1,0 +1,6 @@
+
+This is for jboss-module modules composed of 3rd-party
+jars and resources. Projects here should contain NO code
+and other be used to assemble appropriately-named and
+organized modules.
+

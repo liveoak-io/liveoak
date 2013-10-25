@@ -28,7 +28,7 @@
 
     <parent>
         <groupId>org.projectodd.restafari</groupId>
-        <artifactId>restafari-modules</artifactId>
+        <artifactId>restafari</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>

@@ -43,8 +43,12 @@
 
     <modules>
       <module>support/module-assembly</module>
-      <module>modules</module>
       <module>launcher</module>
+
+      <module>test-tools</module>
+      <module>vertx-starter</module>
+
+      <module>modules</module>
     </modules>
 
     <developers>

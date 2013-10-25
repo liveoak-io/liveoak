@@ -34,6 +34,7 @@
     </parent>
 
     <properties>
+      <module-name>org.projectodd.restafari.deployer</module-name>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>

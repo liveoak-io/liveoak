@@ -39,6 +39,10 @@
 
   <packaging>jar</packaging>
 
+    <properties>
+      <module-name>org.projectodd.restafari.vertx</module-name>
+    </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.projectodd.restafari</groupId>

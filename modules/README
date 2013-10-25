@@ -1,0 +1,6 @@
+This directory should contain jboss-modules style modules.
+
+Each module should have a ${module-name} property set
+in its pom.xml in order to build the appropriate module
+layout.
+
