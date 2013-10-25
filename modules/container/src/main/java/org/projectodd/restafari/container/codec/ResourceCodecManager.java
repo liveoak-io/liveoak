@@ -106,7 +106,7 @@ public class ResourceCodecManager {
         }
 
         @Override
-        public void close() throws Exception {
+        public void close() {
             future.complete(this.buffer);
         }
 

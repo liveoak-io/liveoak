@@ -29,8 +29,6 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
         int responseStatusCode = 0;
         String responseMessage = null;
 
-        System.err.println( "respond with: "+ msg);
-
         boolean shouldEncodeState = false;
         switch (msg.responseType()) {
             case CREATED:
@@ -94,19 +92,14 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
 
         EncodingResult encodingResult = null;
         if (shouldEncodeState) {
-            System.err.println( "encoding state" );
             MediaTypeMatcher matcher = msg.inReplyTo().mediaTypeMatcher();
             try {
                 encodingResult = encodeState(matcher, msg.resource());
             } catch (IncompatibleMediaTypeException e) {
                 e.printStackTrace();
-                System.err.println("reformulating error response");
                 responseStatus = new HttpResponseStatus(HttpResponseStatus.NOT_ACCEPTABLE.code(), e.getMessage() );
-                System.err.println( "new response status: " + responseStatus );
                 response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus );
-                System.err.println( "new response " + response );
                 response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
-                System.err.println("adding response: " + response);
                 out.add( response );
                 return;
             }

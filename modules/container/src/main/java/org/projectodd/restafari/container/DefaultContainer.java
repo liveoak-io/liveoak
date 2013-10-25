@@ -73,7 +73,6 @@ public class DefaultContainer implements Container, CollectionResource {
         }
 
         if (!this.resources.containsKey(id)) {
-            System.err.println( resources );
             responder.noSuchResource(id);
             return;
         }

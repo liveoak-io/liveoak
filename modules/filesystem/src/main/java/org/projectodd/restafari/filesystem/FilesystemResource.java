@@ -76,24 +76,10 @@ public class FilesystemResource implements RootResource, CollectionResource, FSR
 
     @Override
     public void readContent(Pagination pagination, ResourceSink sink) {
-        System.err.println("READ CONTENT: " + this.root);
-        try {
-            System.err.println("VERTX: " + this.vertx );
-            System.err.println("FS: " + this.vertx.fileSystem());
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
         this.vertx.fileSystem().readDir(this.root.getPath(), (result) -> {
-            System.err.println("async read calledback");
             if (result.failed()) {
-                try {
-                    System.err.println("failure, close sink");
-                    sink.close();
-                } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
+                sink.close();
             } else {
-                System.err.println("FOUND: " + Arrays.asList(result.result()));
                 for (String filename : result.result()) {
                     File child = new File(filename);
                     if (child.isDirectory()) {
@@ -102,12 +88,7 @@ public class FilesystemResource implements RootResource, CollectionResource, FSR
                         sink.accept(new FileResource(this, child));
                     }
                 }
-                System.err.println("AND CLOSE " + sink);
-                try {
-                    sink.close();
-                } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
+                sink.close();
             }
         });
     }

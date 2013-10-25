@@ -109,7 +109,7 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
         }
 
         @Override
-        public void close() throws Exception {
+        public void close() {
             encodeNextContent();
         }
 
@@ -123,7 +123,7 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
         }
 
         @Override
-        public void close() throws Exception {
+        public void close() {
             encodeNextContent();
         }
     }
@@ -148,7 +148,7 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
         }
 
         @Override
-        public void close() throws Exception {
+        public void close() {
             ChildEncodingContext child = new ChildEncodingContext(AbstractEncodingContext.this, buffer);
             children.add( child );
             encodeNextContent();

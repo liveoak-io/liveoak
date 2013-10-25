@@ -50,7 +50,6 @@ public class HTMLEncoder implements ResourceEncoder<HTMLEncoder.EncoderState> {
 
     @Override
     public void encode(EncodingContext<EncoderState> context) throws Exception {
-        System.err.println( "HTML.encode: " + context.object() );
         Object o = context.object();
         if (o instanceof CollectionResource) {
             encodeCollection(context);

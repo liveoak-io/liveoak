@@ -60,7 +60,6 @@ public abstract class TraversingResponder extends BaseResponder {
 
     @Override
     public void noSuchResource(String id) {
-        System.err.println( "no such resource: " + id );
         if (this.remainingPath.segments().isEmpty()) {
             if (currentResource != null) {
                 int lastDotLoc = id.lastIndexOf('.');

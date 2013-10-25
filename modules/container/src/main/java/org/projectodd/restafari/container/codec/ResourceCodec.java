@@ -19,11 +19,8 @@ public class ResourceCodec {
 
     public ByteBuf encode(Resource resource) throws Exception {
         CompletableFuture<ByteBuf> future = new CompletableFuture<>();
-        System.err.println( "calling encode" );
         newEncodingContext(resource, future).encode();
-        System.err.println( "called encode, waiting" );
         ByteBuf result = future.get();
-        System.err.println( "encoded: "+ result );
         return result;
     }
 

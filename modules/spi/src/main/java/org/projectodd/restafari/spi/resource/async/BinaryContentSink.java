@@ -8,6 +8,5 @@ import java.util.function.Consumer;
  * @author Bob McWhirter
  */
 public interface BinaryContentSink extends Consumer<ByteBuf>, AutoCloseable {
-
-
+    void close();
 }

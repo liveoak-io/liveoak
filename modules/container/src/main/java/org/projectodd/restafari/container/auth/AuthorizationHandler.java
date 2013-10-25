@@ -49,7 +49,6 @@ public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRe
         } catch (Exception e) {
             String message = "Error when obtaining token: " + e.getMessage();
 
-            System.err.println(message);
             if (verboseLogging) {
                 e.printStackTrace();
             }
@@ -61,7 +60,6 @@ public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRe
         if (authService.isAuthorized(new AuthorizationRequestContext(token, req))) {
             ctx.fireChannelRead(req);
         } else {
-            System.err.println("Not authorized to access resource of resource request: " + req);
             sendAuthorizationError(ctx, req);
         }
     }

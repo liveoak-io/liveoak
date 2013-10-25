@@ -33,13 +33,13 @@ public class FileResource implements FSResource, BinaryResource {
     @Override
     public MediaType mediaType() {
         String name = this.file.getName();
-        int lastDotLoc = name.lastIndexOf( '.' );
+        int lastDotLoc = name.lastIndexOf('.');
         MediaType mediaType = null;
-        if ( lastDotLoc > 0 ) {
-            mediaType = MediaType.lookup( name.substring( lastDotLoc + 1 ));
+        if (lastDotLoc > 0) {
+            mediaType = MediaType.lookup(name.substring(lastDotLoc + 1));
         }
 
-        if ( mediaType == null ) {
+        if (mediaType == null) {
             mediaType = MediaType.OCTET_STREAM;
         }
         return mediaType;
@@ -52,34 +52,22 @@ public class FileResource implements FSResource, BinaryResource {
 
     @Override
     public void read(String id, Responder responder) {
-        responder.readNotSupported( this );
+        responder.readNotSupported(this);
     }
 
     @Override
     public void readContent(BinaryContentSink sink) {
-        System.err.println( "readContent of file to " + sink );
         vertx().fileSystem().open(file.getPath(), (result) -> {
             if (result.succeeded()) {
                 AsyncFile asyncFile = result.result();
                 asyncFile.dataHandler((buffer) -> {
-                    System.err.println( "send chunk" );
                     sink.accept(buffer.getByteBuf());
                 });
                 asyncFile.endHandler((end) -> {
-                    try {
-                        System.err.println( "close sink" );
-                        sink.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
+                    sink.close();
                 });
             } else {
-                try {
-                    System.err.println( "close sink due to failure" );
-                    sink.close();
-                } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
+                sink.close();
             }
         });
     }

@@ -33,11 +33,7 @@ public class DirectoryResource implements FSResource, CollectionResource {
     public void readContent(Pagination pagination, ResourceSink sink) {
         this.parent.vertx().fileSystem().readDir(this.file.getPath(), (result) -> {
             if (result.failed()) {
-                try {
-                    sink.close();
-                } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
+                sink.close();
             } else {
                 for (String filename : result.result()) {
                     File child = new File(filename);
@@ -47,12 +43,7 @@ public class DirectoryResource implements FSResource, CollectionResource {
                         sink.accept(new FileResource(this, child));
                     }
                 }
-                System.err.println( "dir close: "+ sink );
-                try {
-                    sink.close();
-                } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
+                sink.close();
             }
         });
     }
@@ -72,10 +63,10 @@ public class DirectoryResource implements FSResource, CollectionResource {
         File path = new File(this.file, id);
         this.parent.vertx().fileSystem().exists(path.getPath(), (existResult) -> {
             if (existResult.succeeded() && existResult.result()) {
-                if ( path.isDirectory() ) {
-                    responder.resourceRead( new DirectoryResource( this, path ) );
+                if (path.isDirectory()) {
+                    responder.resourceRead(new DirectoryResource(this, path));
                 } else {
-                    responder.resourceRead( new FileResource( this, path ));
+                    responder.resourceRead(new FileResource(this, path));
                 }
             } else {
                 responder.noSuchResource(id);

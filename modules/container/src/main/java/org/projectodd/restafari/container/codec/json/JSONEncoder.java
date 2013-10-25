@@ -32,7 +32,6 @@ public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
     }
 
     public void encode(EncodingContext<JsonGenerator> context) throws Exception {
-        System.err.println("JSON.encode: " + context.object());
         Object o = context.object();
         JsonGenerator generator = context.attachment();
         if (o instanceof CollectionResource) {
@@ -100,14 +99,9 @@ public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
         JsonGenerator generator = context.attachment();
 
         if (context.depth() > 0) {
-            System.err.println("write field: " + prop.id());
             generator.writeFieldName(prop.id());
-            System.err.println("write delegate to content for : " + prop.id());
-        } else {
-            System.err.println( "only write content" );
         }
         context.encodeContent(() -> {
-            System.err.println("after content encoding");
             context.end();
         });
     }
