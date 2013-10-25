@@ -52,6 +52,12 @@
 
     <dependency>
       <groupId>org.projectodd.restafari</groupId>
+      <artifactId>restafari-spi</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectodd.restafari</groupId>
       <artifactId>restafari-container</artifactId>
       <scope>provided</scope>
     </dependency>

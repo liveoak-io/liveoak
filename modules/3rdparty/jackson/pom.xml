@@ -6,26 +6,36 @@
 
     <parent>
         <groupId>org.projectodd.restafari</groupId>
-        <artifactId>restafari-modules</artifactId>
+        <artifactId>restafari-3rdparty-modules</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <properties>
-      <module-name>io.netty</module-name>
+      <module-name>com.fasterxml.jackson.core</module-name>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>restafari-netty-module</artifactId>
-    <name>restafari-netty-module</name>
+    <artifactId>restafari-jackson-module</artifactId>
+    <name>restafari-jackson-module</name>
 
     <packaging>pom</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
             <scope>compile</scope>
         </dependency>
     </dependencies>

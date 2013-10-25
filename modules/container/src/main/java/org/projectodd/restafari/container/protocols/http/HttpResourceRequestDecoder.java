@@ -2,17 +2,17 @@ package org.projectodd.restafari.container.protocols.http;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.codec.http.*;
 import org.projectodd.restafari.container.ResourceParams;
 import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.container.ResourceRequest;
 import org.projectodd.restafari.container.ReturnFieldsImpl;
+import org.projectodd.restafari.container.codec.MediaTypeMatcher;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
-import org.projectodd.restafari.container.mime.MediaType;
+import org.projectodd.restafari.container.codec.UnsupportedMediaTypeException;
+import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.spi.Pagination;
 import org.projectodd.restafari.spi.ReturnFields;
 import org.projectodd.restafari.spi.state.ResourceState;
@@ -26,6 +26,20 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
 
     public HttpResourceRequestDecoder(ResourceCodecManager codecManager) {
         this.codecManager = codecManager;
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if ( cause instanceof DecoderException ) {
+            Throwable rootCause = cause.getCause();
+            if ( rootCause instanceof UnsupportedMediaTypeException ) {
+                DefaultFullHttpResponse response = new DefaultFullHttpResponse( HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_ACCEPTABLE );
+                response.headers().add( HttpHeaders.Names.CONTENT_LENGTH, 0 );
+                ctx.writeAndFlush( response );
+                return;
+            }
+        }
+        super.exceptionCaught( ctx, cause );
     }
 
     @Override
@@ -44,41 +58,49 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         }
 
         String acceptHeader = msg.headers().get(HttpHeaders.Names.ACCEPT );
-        MediaType mediaType = this.codecManager.determineMediaType(acceptHeader, extension);
+        if ( acceptHeader == null ) {
+            acceptHeader = "application/json";
+        }
+        MediaTypeMatcher mediaTypeMatcher = new MediaTypeMatcher( acceptHeader, extension );
 
         String authToken = getAuthorizationToken(msg);
 
         ResourceParams params = ResourceParams.instance(decoder.parameters());
 
         if (msg.getMethod().equals(HttpMethod.POST)) {
+            String contentTypeHeader = msg.headers().get( HttpHeaders.Names.CONTENT_TYPE );
+            MediaType contentType = new MediaType( contentTypeHeader );
             out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.CREATE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
-                    .mediaType(mediaType)
+                    .mediaTypeMatcher(mediaTypeMatcher)
                     .authorizationToken(authToken)
-                    .resourceState(decodeState(mediaType, msg.content()))
+                    .resourceState(decodeState(contentType, msg.content()))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.GET)) {
             out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.READ, new ResourcePath(decoder.path()))
                     .resourceParams(params)
-                    .mediaType(mediaType)
+                    .mediaTypeMatcher(mediaTypeMatcher)
                     .authorizationToken(authToken)
                     .pagination(decodePagination(params))
                     .returnFields(decodeReturnFields(params))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.PUT)) {
+            String contentTypeHeader = msg.headers().get( HttpHeaders.Names.CONTENT_TYPE );
+            MediaType contentType = new MediaType( contentTypeHeader );
             out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.UPDATE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
-                    .mediaType(mediaType)
+                    .mediaTypeMatcher(mediaTypeMatcher)
                     .authorizationToken(authToken)
-                    .resourceState(decodeState(mediaType, msg.content()))
+                    .resourceState(decodeState(contentType, msg.content()))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.DELETE)) {
             out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.DELETE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
-                    .mediaType(mediaType)
+                    .mediaTypeMatcher(mediaTypeMatcher)
                     .authorizationToken(authToken)
                     .build());
         }
+
     }
 
     private ReturnFields decodeReturnFields(ResourceParams params) {

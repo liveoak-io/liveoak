@@ -1,7 +1,7 @@
 package org.projectodd.restafari.container;
 
 import org.projectodd.restafari.container.codec.ResourceCodec;
-import org.projectodd.restafari.container.mime.MediaType;
+import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.container.subscriptions.StompSubscription;
 import org.projectodd.restafari.stomp.Headers;
 import org.projectodd.restafari.stomp.StompMessage;

@@ -1,6 +1,7 @@
 package org.projectodd.restafari.container;
 
-import org.projectodd.restafari.container.mime.MediaType;
+import org.projectodd.restafari.container.codec.MediaTypeMatcher;
+import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.spi.resource.Resource;
 
 /**
@@ -27,8 +28,8 @@ public class ResourceResponse {
         this.resource = resource;
     }
 
-    public MediaType mediaType() {
-        return this.inReplyTo.mediaType();
+    public MediaTypeMatcher mediaTypeMatcher() {
+        return this.inReplyTo.mediaTypeMatcher();
     }
 
     public ResourceRequest inReplyTo() {

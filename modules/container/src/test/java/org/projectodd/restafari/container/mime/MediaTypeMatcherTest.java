@@ -1,6 +1,8 @@
 package org.projectodd.restafari.container.mime;
 
 import org.junit.Test;
+import org.projectodd.restafari.container.codec.MediaTypeMatcher;
+import org.projectodd.restafari.spi.MediaType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,8 +74,8 @@ public class MediaTypeMatcherTest {
         MediaType match = matcher.findBestMatch(candidates);
 
         assertThat( match ).isNotNull();
-        assertThat( match.type() ).isEqualTo( "text" );
-        assertThat( match.subtype() ).isEqualTo( "xml" );
+        assertThat( match.type() ).isEqualTo("text");
+        assertThat( match.subtype() ).isEqualTo("xml");
     }
 
     @Test

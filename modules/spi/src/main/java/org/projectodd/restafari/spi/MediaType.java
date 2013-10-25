@@ -1,4 +1,4 @@
-package org.projectodd.restafari.container.mime;
+package org.projectodd.restafari.spi;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,9 +10,63 @@ import java.util.Map;
 public class MediaType {
 
     public static final MediaType JSON = new MediaType( "application/json" );
+    public static final MediaType XML = new MediaType( "text/xml" );
+
     public static final MediaType HTML = new MediaType( "text/html" );
+    public static final MediaType TEXT = new MediaType( "text/plain" );
+
+    public static final MediaType PNG = new MediaType( "image/png" );
+    public static final MediaType JPG = new MediaType( "text/jpeg" );
+    public static final MediaType GIF = new MediaType( "text/gif" );
+
+    public static final MediaType JAVASCRIPT = new MediaType( "application/javascript" );
+    public static final MediaType ECMASCRIPT = new MediaType( "application/ecmascript" );
+    public static final MediaType CSS = new MediaType( "text/css" );
+
+    public static final MediaType OCTET_STREAM = new MediaType( "application/octet-stream" );
+    public static final MediaType PDF = new MediaType( "application/pdf" );
+
+    public static final MediaType ZIP = new MediaType( "application/zip" );
+    public static final MediaType GZIP = new MediaType( "application/gzip" );
+
+    private static Map<String,MediaType> EXTENSIONS = new HashMap<>();
+
+    public static void registerExtensions(MediaType mediaType, String...extensions) {
+        for ( String ext : extensions ) {
+            EXTENSIONS.put( ext, mediaType );
+        }
+    }
+
+    public static MediaType lookup(String extension) {
+        return EXTENSIONS.get( extension );
+    }
+
+    static {
+        registerExtensions( JSON, "json" );
+        registerExtensions( XML, "xml" );
+
+        registerExtensions( HTML, "htm", "html", "xhtml" );
+        registerExtensions( TEXT, "txt" );
+
+        registerExtensions( PNG, "png" );
+        registerExtensions( JPG, "jpg", "jpeg" );
+        registerExtensions( GIF, "gif" );
+
+        registerExtensions( JAVASCRIPT, "js" );
+        registerExtensions( CSS, "css" );
+
+        registerExtensions( PDF, "pdf" );
+
+        registerExtensions( ZIP, "zip" );
+        registerExtensions( GZIP, "gz" );
+    }
+
+
 
     public MediaType(String type) {
+        if ( type == null ) {
+            type = "application/json";
+        }
         int slashLoc = type.indexOf("/");
         if (slashLoc < 0) {
             throw new IllegalArgumentException("media-type must be in the form of 'type/subtype'");

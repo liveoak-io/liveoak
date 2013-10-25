@@ -6,8 +6,11 @@ import io.netty.handler.codec.MessageToMessageEncoder;
 import io.netty.handler.codec.http.*;
 import org.projectodd.restafari.container.ResourceErrorResponse;
 import org.projectodd.restafari.container.ResourceResponse;
+import org.projectodd.restafari.container.codec.EncodingResult;
+import org.projectodd.restafari.container.codec.IncompatibleMediaTypeException;
+import org.projectodd.restafari.container.codec.MediaTypeMatcher;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
-import org.projectodd.restafari.container.mime.MediaType;
+import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.spi.resource.Resource;
 
 import java.util.List;
@@ -23,30 +26,32 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ResourceResponse msg, List<Object> out) throws Exception {
-        System.err.println( "respond! " + msg + " // " + msg.inReplyTo().mediaType() );
-        ByteBuf content = null;
         int responseStatusCode = 0;
         String responseMessage = null;
+
+        System.err.println( "respond with: "+ msg);
+
+        boolean shouldEncodeState = false;
         switch (msg.responseType()) {
             case CREATED:
                 responseStatusCode = HttpResponseStatus.CREATED.code();
                 responseMessage = HttpResponseStatus.CREATED.reasonPhrase();
-                content = encodeState(msg.mediaType(), msg.resource());
+                shouldEncodeState = true;
                 break;
             case READ:
                 responseStatusCode = HttpResponseStatus.OK.code();
                 responseMessage = HttpResponseStatus.OK.reasonPhrase();
-                content = encodeState(msg.mediaType(), msg.resource());
+                shouldEncodeState = true;
                 break;
             case UPDATED:
                 responseStatusCode = HttpResponseStatus.OK.code();
                 responseMessage = HttpResponseStatus.OK.reasonPhrase();
-                content = encodeState(msg.mediaType(), msg.resource());
+                shouldEncodeState = true;
                 break;
             case DELETED:
                 responseStatusCode = HttpResponseStatus.OK.code();
                 responseMessage = HttpResponseStatus.OK.reasonPhrase();
-                content = encodeState(msg.mediaType(), msg.resource());
+                shouldEncodeState = true;
                 break;
             case ERROR:
                 if (msg instanceof ResourceErrorResponse) {
@@ -85,24 +90,46 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
         }
 
         DefaultFullHttpResponse response = null;
+        HttpResponseStatus responseStatus = null;
 
-        HttpResponseStatus responseStatus = new HttpResponseStatus( responseStatusCode, responseMessage );
+        EncodingResult encodingResult = null;
+        if (shouldEncodeState) {
+            System.err.println( "encoding state" );
+            MediaTypeMatcher matcher = msg.inReplyTo().mediaTypeMatcher();
+            try {
+                encodingResult = encodeState(matcher, msg.resource());
+            } catch (IncompatibleMediaTypeException e) {
+                e.printStackTrace();
+                System.err.println("reformulating error response");
+                responseStatus = new HttpResponseStatus(HttpResponseStatus.NOT_ACCEPTABLE.code(), e.getMessage() );
+                System.err.println( "new response status: " + responseStatus );
+                response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus );
+                System.err.println( "new response " + response );
+                response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
+                System.err.println("adding response: " + response);
+                out.add( response );
+                return;
+            }
+        }
 
-        if (content != null) {
+        responseStatus = new HttpResponseStatus(responseStatusCode, responseMessage);
+
+        if (encodingResult != null) {
+            ByteBuf content = encodingResult.encoded();
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus, content);
             response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes());
-            response.headers().add( HttpHeaders.Names.LOCATION, msg.resource().uri().toString() );
+            response.headers().add(HttpHeaders.Names.LOCATION, msg.resource().uri().toString());
+            response.headers().add(HttpHeaders.Names.CONTENT_TYPE, encodingResult.mediaType() );
         } else {
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus);
             response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
         }
-        response.headers().add( HttpHeaders.Names.CONTENT_TYPE, msg.inReplyTo().mediaType() );
 
-        out.add( response );
+        out.add(response);
     }
 
-    protected ByteBuf encodeState(MediaType mediaType, Resource resource) throws Exception {
-        return this.codecManager.encode( mediaType, resource );
+    protected EncodingResult encodeState(MediaTypeMatcher mediaTypeMatcher, Resource resource) throws Exception {
+        return this.codecManager.encode(mediaTypeMatcher, resource);
     }
 
     private ResourceCodecManager codecManager;

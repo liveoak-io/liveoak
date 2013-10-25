@@ -12,8 +12,8 @@ import java.util.concurrent.Executor;
  */
 public class CreateResponder extends TraversingResponder {
 
-    public CreateResponder(Executor executor, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
-        super( executor, inReplyTo, ctx );
+    public CreateResponder(Executor executor, Resource root, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
+        super( executor, root, inReplyTo, ctx );
     }
 
     @Override

@@ -184,6 +184,7 @@ public class AuthTest {
             default: throw new IllegalArgumentException("Unsupported method: " + method);
         }
         httpMethod.addHeader(new BasicHeader("Accept", "application/json"));
+        httpMethod.addHeader(new BasicHeader("Content-Type", "application/json"));
         return httpMethod;
     }
 

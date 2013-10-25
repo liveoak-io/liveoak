@@ -23,6 +23,9 @@ public class FilesystemResource implements RootResource, CollectionResource, FSR
     private String id;
     private Vertx vertx;
 
+    public FilesystemResource() {
+    }
+
     public FilesystemResource(String id) {
         this.id = id;
     }
@@ -33,11 +36,21 @@ public class FilesystemResource implements RootResource, CollectionResource, FSR
 
     @Override
     public void initialize(ResourceContext context) throws InitializationException {
+
+        if (this.id == null) {
+            this.id = context.config().get("id", null);
+            if (this.id == null) {
+                throw new InitializationException("no id specified");
+            }
+        }
+
         String rootStr = context.config().get("root", null);
         if (rootStr == null) {
             throw new InitializationException("no filesystem root specified");
         }
+
         this.root = new File(rootStr);
+
         if (!this.root.canRead()) {
             throw new InitializationException("unable to read filesystem at: " + this.root.getAbsolutePath());
         }
@@ -63,24 +76,33 @@ public class FilesystemResource implements RootResource, CollectionResource, FSR
 
     @Override
     public void readContent(Pagination pagination, ResourceSink sink) {
+        System.err.println("READ CONTENT: " + this.root);
+        try {
+            System.err.println("VERTX: " + this.vertx );
+            System.err.println("FS: " + this.vertx.fileSystem());
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
         this.vertx.fileSystem().readDir(this.root.getPath(), (result) -> {
+            System.err.println("async read calledback");
             if (result.failed()) {
                 try {
+                    System.err.println("failure, close sink");
                     sink.close();
                 } catch (Exception e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
             } else {
-                System.err.println( "FOUND: " + Arrays.asList( result.result() ));
+                System.err.println("FOUND: " + Arrays.asList(result.result()));
                 for (String filename : result.result()) {
-                    File child = new File( filename );
-                    if ( child.isDirectory() ) {
-                        sink.accept( new DirectoryResource( this, child ) );
+                    File child = new File(filename);
+                    if (child.isDirectory()) {
+                        sink.accept(new DirectoryResource(this, child));
                     } else {
-                        sink.accept( new FileResource( this, child ) );
+                        sink.accept(new FileResource(this, child));
                     }
                 }
-                System.err.println( "AND CLOSE " + sink );
+                System.err.println("AND CLOSE " + sink);
                 try {
                     sink.close();
                 } catch (Exception e) {
@@ -96,10 +118,10 @@ public class FilesystemResource implements RootResource, CollectionResource, FSR
         File path = new File(this.root, id);
         this.vertx.fileSystem().exists(path.getPath(), (existResult) -> {
             if (existResult.succeeded() && existResult.result()) {
-                if ( path.isDirectory() ) {
-                    responder.resourceRead( new DirectoryResource( this, path ) );
+                if (path.isDirectory()) {
+                    responder.resourceRead(new DirectoryResource(this, path));
                 } else {
-                    responder.resourceRead( new FileResource( this, path ));
+                    responder.resourceRead(new FileResource(this, path));
                 }
             } else {
                 responder.noSuchResource(id);

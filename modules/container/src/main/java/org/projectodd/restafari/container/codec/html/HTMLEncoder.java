@@ -50,6 +50,7 @@ public class HTMLEncoder implements ResourceEncoder<HTMLEncoder.EncoderState> {
 
     @Override
     public void encode(EncodingContext<EncoderState> context) throws Exception {
+        System.err.println( "HTML.encode: " + context.object() );
         Object o = context.object();
         if (o instanceof CollectionResource) {
             encodeCollection(context);
@@ -58,7 +59,7 @@ public class HTMLEncoder implements ResourceEncoder<HTMLEncoder.EncoderState> {
         } else if (o instanceof PropertyResource) {
             encodeProperty(context);
         } else if (o instanceof BinaryResource) {
-            //encodeBinary(context);
+            encodeBinary(context);
         } else {
             encodeValue(context);
         }
@@ -216,6 +217,33 @@ public class HTMLEncoder implements ResourceEncoder<HTMLEncoder.EncoderState> {
 
         writer.add(factory.createCharacters("" + value));
         context.end();
+    }
+
+    protected void encodeBinary(EncodingContext<EncoderState> context) throws Exception {
+        Resource resource = (Resource) context.object();
+        XMLEventWriter writer = context.attachment().writer;
+        XMLEventFactory factory = context.attachment().factory;
+        writer.add(factory.createStartElement("", "", "div"));
+
+        writer.add(factory.createStartElement("", "", "div"));
+
+        if (context.depth() == 0 && resource.parent() != null) {
+            writer.add(factory.createStartElement("", "", "a"));
+            writer.add(factory.createAttribute("href", resource.parent().uri().toString()));
+            writer.add(factory.createCharacters(resource.parent().id()));
+            writer.add(factory.createEndElement("", "", "a"));
+            writer.add(factory.createCharacters(" : "));
+        }
+
+        writer.add(factory.createStartElement("", "", "b"));
+        writer.add(factory.createStartElement("", "", "a"));
+        writer.add(factory.createAttribute("href", resource.uri().toString()));
+        writer.add(factory.createCharacters(resource.id()));
+        writer.add(factory.createEndElement("", "", "b"));
+        writer.add(factory.createEndElement("", "", "div"));
+        writer.add(factory.createEndElement("", "", "div"));
+        context.end();
+
     }
 
 

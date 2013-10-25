@@ -4,19 +4,13 @@
 
   <resources>
     <resource-root path="${project.artifactId}.jar"/>
-    <resource-root path="vertx-core.jar"/>
-    <resource-root path="vertx-platform.jar"/>
-    <resource-root path="hazelcast.jar"/>
-    <resource-root path="jackson-annotations.jar"/>
-    <resource-root path="jackson-core.jar"/>
-    <resource-root path="jackson-databind.jar"/>
-    <resource-root path="log4j.jar"/>
-    <resource-root path="slf4j-api.jar"/>
     <resource-root path="commons-codec.jar"/>
   </resources>
 
   <dependencies>
     <module name="io.netty"/>
+    <module name="io.vertx"/>
+    <module name="com.fasterxml.jackson.core"/>
     <module name="org.projectodd.restafari.stomp"/>
     <module name="org.projectodd.restafari.spi"/>
     <system>

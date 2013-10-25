@@ -129,6 +129,7 @@ public class MongoDBResourceTest {
 
         HttpPut put = new HttpPut("http://localhost:8080/storage/movies");
         put.setEntity(new StringEntity("{ \"id\": \"movies\", \"members\": [] }"));
+        put.setHeader( "Content-Type", "application/json" );
 
         CloseableHttpResponse result = httpClient.execute(put);
         System.err.println("=============>>>");

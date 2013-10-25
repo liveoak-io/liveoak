@@ -1,6 +1,7 @@
 package org.projectodd.restafari.container;
 
-import org.projectodd.restafari.container.mime.MediaType;
+import org.projectodd.restafari.container.codec.MediaTypeMatcher;
+import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.spi.Pagination;
 import org.projectodd.restafari.spi.ReturnFields;
 import org.projectodd.restafari.spi.state.ResourceState;
@@ -36,8 +37,8 @@ public class ResourceRequest {
         return this.resourcePath;
     }
 
-    public MediaType mediaType() {
-        return this.mediaType;
+    public MediaTypeMatcher mediaTypeMatcher() {
+        return this.mediaTypeMatcher;
     }
 
     public ResourceState state() {
@@ -67,7 +68,7 @@ public class ResourceRequest {
     private RequestType requestType;
     private ResourcePath resourcePath;
     private ResourceParams params;
-    private MediaType mediaType;
+    private MediaTypeMatcher mediaTypeMatcher;
     private Pagination pagination;
     private ResourceState state;
     private String authorizationToken;
@@ -87,8 +88,8 @@ public class ResourceRequest {
             return this;
         }
 
-        public Builder mediaType(MediaType mediaType) {
-            obj.mediaType = mediaType;
+        public Builder mediaTypeMatcher(MediaTypeMatcher mediaTypeMatcher) {
+            obj.mediaTypeMatcher = mediaTypeMatcher;
             return this;
         }
 
@@ -113,8 +114,8 @@ public class ResourceRequest {
         }
 
         public ResourceRequest build() {
-            if (obj.mediaType == null) {
-                obj.mediaType = MediaType.JSON;
+            if (obj.mediaTypeMatcher == null) {
+                obj.mediaTypeMatcher = new MediaTypeMatcher("application/json" );
             }
 
             if (obj.pagination == null) {

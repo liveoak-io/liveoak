@@ -2,6 +2,7 @@ package org.projectodd.restafari.container.mime;
 
 import org.fest.assertions.Condition;
 import org.junit.Test;
+import org.projectodd.restafari.spi.MediaType;
 
 import static org.fest.assertions.Assertions.*;
 
@@ -55,7 +56,7 @@ public class MediaTypeTest {
         assertThat(test.subtype()).isEqualTo("foo");
         assertThat(test.suffix()).isEqualTo("json");
         assertThat( test.parameters() ).hasSize(1);
-        assertThat( test.parameters().get( "q") ).isEqualTo( "0.8" );
+        assertThat( test.parameters().get("q") ).isEqualTo( "0.8" );
     }
 
     @Test
@@ -65,15 +66,15 @@ public class MediaTypeTest {
         assertThat(test.subtype()).isEqualTo("json");
         assertThat(test.suffix()).isNull();
         assertThat( test.parameters() ).hasSize(2);
-        assertThat( test.parameters().get( "q") ).isEqualTo( "0.8" );
+        assertThat( test.parameters().get("q") ).isEqualTo("0.8");
         assertThat( test.parameters().get( "bob") ).isEqualTo( "tall" );
 
         test = new MediaType("application/foo+json; q=0.8 ; bob=tall");
         assertThat(test.type()).isEqualTo("application");
         assertThat(test.subtype()).isEqualTo("foo");
         assertThat(test.suffix()).isEqualTo("json");
-        assertThat( test.parameters().get( "q") ).isEqualTo( "0.8" );
-        assertThat( test.parameters().get( "bob") ).isEqualTo( "tall" );
+        assertThat( test.parameters().get("q") ).isEqualTo( "0.8" );
+        assertThat( test.parameters().get("bob") ).isEqualTo( "tall" );
     }
 
 

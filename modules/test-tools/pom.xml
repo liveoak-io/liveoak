@@ -49,14 +49,32 @@
         <dependency>
             <groupId>org.projectodd.restafari</groupId>
             <artifactId>restafari-spi</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.projectodd.restafari</groupId>
             <artifactId>restafari-container</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectodd.restafari</groupId>
+            <artifactId>restafari-stomp</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-platform</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

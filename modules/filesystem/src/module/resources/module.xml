@@ -7,7 +7,8 @@
   </resources>
 
   <dependencies>
-    <module name="io.vertx" services="export" export="true"/>
+    <module name="org.projectodd.restafari.spi"/>
   </dependencies>
+
 </module>
 

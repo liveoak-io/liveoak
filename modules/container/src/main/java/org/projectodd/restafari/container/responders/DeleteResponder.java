@@ -11,8 +11,8 @@ import java.util.concurrent.Executor;
  */
 public class DeleteResponder extends TraversingResponder {
 
-    public DeleteResponder(Executor executor, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
-        super( executor, inReplyTo, ctx );
+    public DeleteResponder(Executor executor, Resource root, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
+        super( executor, root, inReplyTo, ctx );
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.projectodd.restafari.filesystem;
 
+import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.BinaryContentSink;
 import org.projectodd.restafari.spi.resource.async.BinaryResource;
@@ -30,8 +31,18 @@ public class FileResource implements FSResource, BinaryResource {
     }
 
     @Override
-    public String mimeType() {
-        return "text/plain";
+    public MediaType mediaType() {
+        String name = this.file.getName();
+        int lastDotLoc = name.lastIndexOf( '.' );
+        MediaType mediaType = null;
+        if ( lastDotLoc > 0 ) {
+            mediaType = MediaType.lookup( name.substring( lastDotLoc + 1 ));
+        }
+
+        if ( mediaType == null ) {
+            mediaType = MediaType.OCTET_STREAM;
+        }
+        return mediaType;
     }
 
     @Override
@@ -46,14 +57,17 @@ public class FileResource implements FSResource, BinaryResource {
 
     @Override
     public void readContent(BinaryContentSink sink) {
+        System.err.println( "readContent of file to " + sink );
         vertx().fileSystem().open(file.getPath(), (result) -> {
             if (result.succeeded()) {
                 AsyncFile asyncFile = result.result();
                 asyncFile.dataHandler((buffer) -> {
+                    System.err.println( "send chunk" );
                     sink.accept(buffer.getByteBuf());
                 });
                 asyncFile.endHandler((end) -> {
                     try {
+                        System.err.println( "close sink" );
                         sink.close();
                     } catch (Exception e) {
                         e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -61,6 +75,7 @@ public class FileResource implements FSResource, BinaryResource {
                 });
             } else {
                 try {
+                    System.err.println( "close sink due to failure" );
                     sink.close();
                 } catch (Exception e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

@@ -1,7 +1,8 @@
-package org.projectodd.restafari.container.mime;
+package org.projectodd.restafari.container.codec;
+
+import org.projectodd.restafari.spi.MediaType;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -12,14 +13,9 @@ public class MediaTypeMatcher {
     public MediaTypeMatcher(String mediaTypes, String extension) {
         this( mediaTypes );
         if ( extension != null ) {
-            // TODO be more robust in mediatype-to-extension mapping.
-            switch ( extension ) {
-                case "json":
-                    this.mediaTypes.add( 0, MediaType.JSON );
-                    break;
-                case "html":
-                    this.mediaTypes.add( 0, MediaType.HTML );
-                    break;
+            MediaType extensionMediaType = MediaType.lookup(extension);
+            if ( extensionMediaType != null ) {
+                this.mediaTypes.add(0, extensionMediaType );
             }
         }
     }

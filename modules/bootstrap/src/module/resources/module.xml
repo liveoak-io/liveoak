@@ -9,9 +9,13 @@
   </resources>
 
   <dependencies>
-    <module name="org.projectodd.restafari.spi"/>
-    <module name="org.projectodd.restafari.container"
-            services="import"/>
+    <module name="org.projectodd.restafari.spi" services="import"/>
+    <module name="org.projectodd.restafari.container"/>
+    <system>
+      <paths> 
+        <path name="org/jboss/modules"/>
+      </paths> 
+    </system>
   </dependencies>
 
 </module>

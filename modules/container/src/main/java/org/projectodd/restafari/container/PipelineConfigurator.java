@@ -70,6 +70,7 @@ public class PipelineConfigurator {
         //pipeline.addLast( new DebugHandler( "server-2" ) );
         pipeline.addLast("subscription-watcher", new SubscriptionWatcher(this.container.getSubscriptionManager()));
         pipeline.addLast("object-handler", new ResourceHandler(this.container));
+        pipeline.addLast("error-handler", new ErrorHandler() );
     }
 
     private DefaultContainer container;

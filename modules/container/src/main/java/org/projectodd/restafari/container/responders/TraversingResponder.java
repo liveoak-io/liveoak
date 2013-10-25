@@ -15,9 +15,10 @@ import java.util.function.Function;
  */
 public abstract class TraversingResponder extends BaseResponder {
 
-    public TraversingResponder(Executor executor, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
+    public TraversingResponder(Executor executor, Resource root, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
         super(inReplyTo, ctx);
         this.executor = executor;
+        this.currentResource = root;
         this.remainingPath = inReplyTo.resourcePath().subPath();
     }
 
@@ -59,16 +60,19 @@ public abstract class TraversingResponder extends BaseResponder {
 
     @Override
     public void noSuchResource(String id) {
-        if ( this.remainingPath.segments().isEmpty() ) {
-            int lastDotLoc = id.lastIndexOf( '.' );
-            if ( lastDotLoc >= 0 ) {
-                String idWithoutExtension = id.substring( 0, lastDotLoc );
-                doRead( idWithoutExtension, currentResource );
-                return;
+        System.err.println( "no such resource: " + id );
+        if (this.remainingPath.segments().isEmpty()) {
+            if (currentResource != null) {
+                int lastDotLoc = id.lastIndexOf('.');
+                if (lastDotLoc >= 0) {
+                    String idWithoutExtension = id.substring(0, lastDotLoc);
+                    doRead(idWithoutExtension, currentResource);
+                    return;
+                }
             }
         }
 
-        super.noSuchResource( id );
+        super.noSuchResource(id);
     }
 
     protected Resource currentResource() {

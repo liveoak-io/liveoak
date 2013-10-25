@@ -7,7 +7,6 @@ import io.netty.buffer.Unpooled;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -22,7 +21,7 @@ import org.apache.http.message.BasicHeader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.projectodd.restafari.container.mime.MediaType;
+import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.spi.state.CollectionResourceState;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
 import org.projectodd.restafari.spi.state.ResourceState;
@@ -154,6 +153,7 @@ public class BasicServerTest {
 
         putRequest = new HttpPut("http://localhost:8080/memory/people");
         putRequest.setEntity(new StringEntity("{ \"content\": [] }"));
+        putRequest.setHeader( "Content-Type", "application/json" );
         response = this.httpClient.execute(putRequest);
         System.err.println( "response: " + response );
         assertThat(response).isNotNull();
@@ -216,6 +216,7 @@ public class BasicServerTest {
 
         postRequest = new HttpPost( "http://localhost:8080/memory/people");
         postRequest.setEntity( new StringEntity("{ \"name\": \"bob\" }" ) );
+        postRequest.setHeader( "Content-Type", "application/json" );
 
         response = httpClient.execute( postRequest );
         assertThat(response).isNotNull();
@@ -245,6 +246,7 @@ public class BasicServerTest {
 
         postRequest = new HttpPost( "http://localhost:8080/memory/people");
         postRequest.setEntity( new StringEntity("{ \"name\": \"krusty\" }" ) );
+        postRequest.setHeader( "Content-Type", "application/json" );
         response = httpClient.execute( postRequest );
         ObjectResourceState crustyState = (ObjectResourceState) decode(response);
 
