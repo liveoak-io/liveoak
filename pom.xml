@@ -49,6 +49,8 @@
       <module>vertx-starter</module>
 
       <module>modules</module>
+
+      <module>dist</module>
     </modules>
 
     <developers>
@@ -181,6 +183,17 @@
                 <artifactId>restafari-container</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.projectodd.restafari</groupId>
+                <artifactId>restafari-launcher</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectodd.restafari</groupId>
+                <artifactId>restafari-mongo</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.projectodd.restafari</groupId>
@@ -189,6 +202,18 @@
                 <scope>test</scope>
             </dependency>
 
+            <dependency>
+                <groupId>org.projectodd.restafari</groupId>
+                <artifactId>restafari-modules</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.projectodd.restafari</groupId>
+                <artifactId>restafari-launcher</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

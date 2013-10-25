@@ -2,8 +2,8 @@
 
 bindir=$(dirname $0)
 etcdir=$bindir/../etc
-modulepath=$bindir/../../modules/target/modules
-jboss_modules_jar=$bindir/../target/jboss-modules.jar
+
+. $bindir/installation.conf
 
 
 java $JAVA_OPTS \
