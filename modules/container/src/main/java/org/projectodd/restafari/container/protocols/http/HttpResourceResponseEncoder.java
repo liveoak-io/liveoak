@@ -83,6 +83,10 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
                             responseStatusCode = HttpResponseStatus.METHOD_NOT_ALLOWED.code();
                             responseMessage = "Delete not supported";
                             break;
+                        case INTERNAL_ERROR:
+                            responseStatusCode = HttpResponseStatus.INTERNAL_SERVER_ERROR.code();
+                            responseMessage = HttpResponseStatus.INTERNAL_SERVER_ERROR.reasonPhrase();
+                            break;
                     }
                 }
                 break;
@@ -99,6 +103,13 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
             } catch (IncompatibleMediaTypeException e) {
                 e.printStackTrace();
                 responseStatus = new HttpResponseStatus(HttpResponseStatus.NOT_ACCEPTABLE.code(), e.getMessage() );
+                response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus );
+                response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
+                out.add( response );
+                return;
+            } catch (Throwable e) {
+                e.printStackTrace();
+                responseStatus = new HttpResponseStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR.code(), HttpResponseStatus.INTERNAL_SERVER_ERROR.reasonPhrase() );
                 response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus );
                 response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
                 out.add( response );
