@@ -18,9 +18,10 @@ import org.projectodd.restafari.container.DefaultContainer;
 import org.projectodd.restafari.container.SimpleConfig;
 import org.projectodd.restafari.container.UnsecureServer;
 
+import java.util.UUID;
+
 import static org.fest.assertions.Assertions.assertThat;
 import static org.jgroups.util.Util.assertFalse;
-import static org.jgroups.util.Util.assertTrue;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
@@ -38,7 +39,7 @@ public class MongoDBResourceTest {
 
     @BeforeClass
     public static void init() throws Exception {
-        String database = System.getProperty("mongo.db", "MongoControllerTest_" + Math.random());
+        String database = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
         Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");
 
@@ -129,7 +130,7 @@ public class MongoDBResourceTest {
 
         HttpPut put = new HttpPut("http://localhost:8080/storage/movies");
         put.setEntity(new StringEntity("{ \"id\": \"movies\", \"members\": [] }"));
-        put.setHeader( "Content-Type", "application/json" );
+        put.setHeader("Content-Type", "application/json");
 
         CloseableHttpResponse result = httpClient.execute(put);
         System.err.println("=============>>>");
