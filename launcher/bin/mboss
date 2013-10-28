@@ -7,6 +7,7 @@ etcdir=$bindir/../etc
 
 
 java $JAVA_OPTS \
+  -Djs.client.dir=$js_client_dir \
   -jar $jboss_modules_jar \
   -modulepath $modulepath \
   org.projectodd.restafari.bootstrap:main $etcdir/mboss-config.json $*

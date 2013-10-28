@@ -8,14 +8,17 @@ import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoadException;
 import org.jboss.modules.ModuleLoader;
 import org.projectodd.restafari.bootstrap.Bootstrap;
+import org.projectodd.restafari.bootstrap.StringPropertyReplacer;
 import org.projectodd.restafari.container.DefaultContainer;
 import org.projectodd.restafari.container.SimpleConfig;
+import org.projectodd.restafari.spi.ConfigurationException;
 import org.projectodd.restafari.spi.InitializationException;
 import org.projectodd.restafari.spi.resource.RootResource;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Bob McWhirter
@@ -62,6 +65,22 @@ public class ConfigDeployer {
                             resourceConfig = new SimpleConfig();
                         }
                         resourceConfig.put("id", id);
+
+                        Set<String> names = resourceConfig.names();
+
+                        for (String name : names) {
+                            try {
+                                String configValue = resourceConfig.get(name, null);
+                                if (configValue != null) {
+                                    configValue = StringPropertyReplacer.replaceProperties(configValue, System.getProperties());
+                                    resourceConfig.put(name, configValue);
+                                }
+                            } catch (ConfigurationException e) {
+                                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                            }
+
+                        }
+
 
                         ModuleLoader loader = ModuleLoader.forClass(Bootstrap.class);
                         try {

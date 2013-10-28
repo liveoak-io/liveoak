@@ -7,6 +7,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import org.projectodd.restafari.stomp.common.StompFrameDecoder;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 /** WebSocket to STOMP frame decoder.

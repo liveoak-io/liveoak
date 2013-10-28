@@ -6,6 +6,7 @@ import io.netty.handler.codec.MessageToMessageEncoder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.projectodd.restafari.stomp.common.StompFrameEncoder;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 /** STOMP frame to WebSocket frame encoder
@@ -26,7 +27,7 @@ public class WebSocketStompFrameEncoder extends MessageToMessageEncoder<ByteBuf>
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        out.add( new TextWebSocketFrame( msg ) );
+        out.add( new TextWebSocketFrame( msg.retain() ) );
     }
 
 }

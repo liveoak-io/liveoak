@@ -35,7 +35,7 @@ public class ConnectHandler extends AbstractControlFrameHandler {
         String hostHeader = headers.get(Headers.HOST);
 
         checkHost(frame, headers, version);
-        StompConnection stompConnection = new StompConnection( ctx.channel() );
+        StompConnection stompConnection = new StompConnection(ctx.channel());
         StompFrame connected = StompFrame.newConnectedFrame(stompConnection.getConnectionId(), version);
         if (hb != null) {
             connected.headers().put(Headers.HEARTBEAT, hb.getServerSend() + "," + hb.getServerReceive());

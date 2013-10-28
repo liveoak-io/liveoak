@@ -57,8 +57,25 @@ public class PipelineConfigurator {
 
     public void switchToWebSockets(ChannelPipeline pipeline) {
         pipeline.remove(WebSocketHandshakerHandler.class);
+        //pipeline.addLast( new DebugHandler( "server-1" ) );
         pipeline.addLast(new WebSocketStompFrameDecoder());
         pipeline.addLast(new WebSocketStompFrameEncoder());
+
+        StompServerContext serverContext = new ContainerStompServerContext(this.container);
+
+        // handle frames
+        pipeline.addLast(new ConnectHandler(serverContext));
+        pipeline.addLast(new DisconnectHandler(serverContext));
+        pipeline.addLast(new SubscribeHandler(serverContext));
+        pipeline.addLast(new UnsubscribeHandler(serverContext));
+        // convert some frames to messages
+        pipeline.addLast(new ReceiptHandler());
+        pipeline.addLast(new StompMessageDecoder());
+        pipeline.addLast(new StompMessageEncoder(true));
+        // handle messages
+        pipeline.addLast(new SendHandler(serverContext));
+        // catch errors, return an ERROR message.
+        pipeline.addLast(new ErrorHandler());
     }
 
     public void switchToPlainHttp(ChannelPipeline pipeline) {
