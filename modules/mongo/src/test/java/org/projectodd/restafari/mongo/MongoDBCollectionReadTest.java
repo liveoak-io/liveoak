@@ -142,11 +142,11 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertEquals("storage", jsonNode.get("id").asText());
         assertEquals("/storage", jsonNode.get("_self").get("href").asText());
         assertEquals("collection", jsonNode.get("_self").get("type").asText());
-        assertEquals("{\"id\":\"collection1\",\"_self\":{\"href\":\"/storage/collection1\",\"type\":\"collection\"}}",
+        assertEquals("{\"id\":\"collection1\",\"_self\":{\"href\":\"/storage/collection1\",\"type\":\"collection\"},\"content\":[]}",
                 jsonNode.get("content").get(0).toString());
-        assertEquals("{\"id\":\"collection2\",\"_self\":{\"href\":\"/storage/collection2\",\"type\":\"collection\"}}",
+        assertEquals("{\"id\":\"collection2\",\"_self\":{\"href\":\"/storage/collection2\",\"type\":\"collection\"},\"content\":[]}",
                 jsonNode.get("content").get(1).toString());
-        assertEquals("{\"id\":\"collection3\",\"_self\":{\"href\":\"/storage/collection3\",\"type\":\"collection\"}}",
+        assertEquals("{\"id\":\"collection3\",\"_self\":{\"href\":\"/storage/collection3\",\"type\":\"collection\"},\"content\":[]}",
                 jsonNode.get("content").get(2).toString());
     }
 }

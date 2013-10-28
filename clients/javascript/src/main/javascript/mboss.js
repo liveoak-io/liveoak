@@ -956,11 +956,16 @@ mBoss.prototype = {
       type: "POST",
       data: JSON.stringify( data ),
       contentType: 'application/json',
-      dataType: 'json'
+      dataType: 'json',
     });
   },
 
   read: function(path, callback) {
+    $.ajax( path, {
+      type: "GET", 
+      dataType: 'json',
+      success: callback,
+    } );
   },
 
   update: function(path, data) {

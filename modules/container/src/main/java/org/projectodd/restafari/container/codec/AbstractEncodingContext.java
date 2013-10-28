@@ -60,6 +60,11 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
         if ( this.object instanceof PropertyResource ) {
             return true;
         }
+
+        if ( this.parent != null && this.parent.object instanceof CollectionResource ) {
+            return depth() < 2;
+        }
+
         return depth() < 1;
     }
 

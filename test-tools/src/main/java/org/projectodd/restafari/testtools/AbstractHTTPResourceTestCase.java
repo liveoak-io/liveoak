@@ -6,7 +6,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.After;
 import org.junit.Before;
 import org.projectodd.restafari.container.DefaultContainer;
-import org.projectodd.restafari.container.DirectConnector;
 import org.projectodd.restafari.container.SimpleConfig;
 import org.projectodd.restafari.container.UnsecureServer;
 import org.projectodd.restafari.spi.Config;
