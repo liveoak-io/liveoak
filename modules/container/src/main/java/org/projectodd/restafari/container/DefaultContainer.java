@@ -67,17 +67,22 @@ public class DefaultContainer implements Container, CollectionResource {
 
     @Override
     public void read(String id, Responder responder) {
-        if ( id == null ) {
-            responder.resourceRead( this );
-            return;
-        }
+        try {
+            if ( id == null ) {
+                responder.resourceRead( this );
+                return;
+            }
 
-        if (!this.resources.containsKey(id)) {
-            responder.noSuchResource(id);
-            return;
-        }
+            if (!this.resources.containsKey(id)) {
+                responder.noSuchResource(id);
+                return;
+            }
 
-        responder.resourceRead(this.resources.get(id));
+            responder.resourceRead(this.resources.get(id));
+
+        } catch (Throwable t) {
+            responder.internalError(t.getMessage());
+        }
     }
 
     @Override

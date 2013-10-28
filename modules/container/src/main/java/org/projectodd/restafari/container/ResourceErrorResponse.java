@@ -13,6 +13,7 @@ public class ResourceErrorResponse extends ResourceResponse {
         READ_NOT_SUPPORTED,
         UPDATE_NOT_SUPPORTED,
         DELETE_NOT_SUPPORTED,
+        INTERNAL_ERROR
     }
 
     public ResourceErrorResponse(ResourceRequest inReplyTo, ErrorType errorType) {

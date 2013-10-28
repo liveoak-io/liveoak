@@ -66,4 +66,11 @@ public interface Responder {
      */
     void noSuchResource(String id);
 
+    /** Indicate a temporary error condition that normally should not occur during
+     * the processing of this request. Examples include DB unreachable, DB error ...
+     *
+     * @param message
+     */
+    void internalError(String message);
+
 }

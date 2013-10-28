@@ -71,6 +71,11 @@ public class BaseResponder implements Responder {
         this.ctx.writeAndFlush( new ResourceErrorResponse( this.inReplyTo, ResourceErrorResponse.ErrorType.NO_SUCH_RESOURCE) );
     }
 
+    @Override
+    public void internalError(String message) {
+        this.ctx.writeAndFlush( new ResourceErrorResponse( this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR) );
+    }
+
     private final ResourceRequest inReplyTo;
     private final ChannelHandlerContext ctx;
 }
