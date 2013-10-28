@@ -1,5 +1,14 @@
 
 { resources: {
+    app: {
+      type: 'jboss-module',
+      module-id:   'org.projectodd.restafari.filesystem',
+      class-name:  'org.projectodd.restafari.filesystem.FilesystemResource',
+      config: {
+        root: '${user.dir}'
+      }
+    },
+
     client: {
       type: 'jboss-module',
       module-id:   'org.projectodd.restafari.filesystem',

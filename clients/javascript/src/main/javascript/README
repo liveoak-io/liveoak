@@ -1,0 +1,4 @@
+
+Current we cat together rest.js and stomp.js into mboss.js.
+
+Surely there is a better way to manage this.
