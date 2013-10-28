@@ -11,10 +11,10 @@ import org.projectodd.restafari.spi.resource.RootResource;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
 import org.projectodd.restafari.testtools.AbstractResourceTestCase;
 
-import java.util.concurrent.ExecutionException;
+import java.util.UUID;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
@@ -30,7 +30,7 @@ public class NewMongoDBResourceTest extends AbstractResourceTestCase {
 
     @Override
     public Config createConfig() {
-        String database = System.getProperty("mongo.db", "MongoControllerTest_" + Math.random());
+        String database = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
         Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");
 
