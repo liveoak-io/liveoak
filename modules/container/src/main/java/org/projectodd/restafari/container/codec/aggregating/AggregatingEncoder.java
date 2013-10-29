@@ -25,7 +25,7 @@ public class AggregatingEncoder implements ExpansionControllingEncoder<ByteBuf> 
     }
 
     @Override
-    public boolean shouldEncodeContent(Object object) {
+    public boolean shouldEncodeContent(EncodingContext<ByteBuf> object) {
         return true;
     }
 

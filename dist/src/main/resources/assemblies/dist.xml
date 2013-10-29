@@ -16,6 +16,10 @@
         <include>mboss.js</include>
       </includes>
     </fileSet> 
+    <fileSet> 
+      <directory>../launcher/src/main/css</directory>
+      <outputDirectory>/css</outputDirectory>
+    </fileSet>
     <fileSet>
       <directory>../launcher/bin</directory>
       <outputDirectory>/bin</outputDirectory>

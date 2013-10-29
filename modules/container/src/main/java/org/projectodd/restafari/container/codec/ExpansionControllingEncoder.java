@@ -6,5 +6,5 @@ import org.projectodd.restafari.spi.resource.Resource;
  * @author Bob McWhirter
  */
 public interface ExpansionControllingEncoder<T> extends ResourceEncoder<T>  {
-    boolean shouldEncodeContent(Object object);
+    boolean shouldEncodeContent(EncodingContext<T> context);
 }

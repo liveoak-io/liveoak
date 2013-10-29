@@ -94,19 +94,14 @@ public class DirectoryResource implements FSResource, CollectionResource {
     @Override
     public void read(String id, Responder responder) {
         File path = new File(this.file, id);
-        System.err.println( "look for: " + path + " from " + this.file );
         vertx().fileSystem().exists(path.getPath(), (existResult) -> {
-            System.err.println( "exists result: " + existResult );
             if (existResult.succeeded() && existResult.result()) {
                 if (path.isDirectory()) {
-                    System.err.println( "found dir: " + path );
                     responder.resourceRead(new DirectoryResource(this, path));
                 } else {
-                    System.err.println( "found file: " + path );
                     responder.resourceRead(new FileResource(this, path));
                 }
             } else {
-                System.err.println( "no such!" );
                 responder.noSuchResource(id);
             }
         });

@@ -28,7 +28,7 @@ public class DefaultContainer implements Container, CollectionResource {
 
     public DefaultContainer() {
         this.codecManager.registerResourceCodec("application/json", new ResourceCodec( new JSONEncoder(), new JSONDecoder() ) );
-        this.codecManager.registerResourceCodec("text/html", new ResourceCodec( new HTMLEncoder(), null ) );
+        this.codecManager.registerResourceCodec("text/html", new ResourceCodec( new HTMLEncoder( this ), null ) );
         //this.codecManager.registerResourceCodec("application/javascript" , new ResourceCodec( new AggregatingEncoder( MediaType.JAVASCRIPT), null ) );
 
         PlatformManager platformManager = PlatformLocator.factory.createPlatformManager();

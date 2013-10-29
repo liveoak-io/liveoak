@@ -2,8 +2,9 @@ package org.projectodd.restafari.container.codec.html;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
+import org.projectodd.restafari.container.DefaultContainer;
 import org.projectodd.restafari.container.codec.EncodingContext;
-import org.projectodd.restafari.container.codec.ResourceEncoder;
+import org.projectodd.restafari.container.codec.ExpansionControllingEncoder;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.BinaryResource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
@@ -14,15 +15,21 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Bob McWhirter
  */
-public class HTMLEncoder implements ResourceEncoder<HTMLEncoder.EncoderState> {
+public class HTMLEncoder implements ExpansionControllingEncoder<HTMLEncoder.EncoderState> {
 
     public static class EncoderState {
         public XMLEventWriter writer;
         public XMLEventFactory factory;
+    }
+
+    public HTMLEncoder(DefaultContainer container) {
+        this.container = container;
     }
 
     @Override
@@ -33,6 +40,21 @@ public class HTMLEncoder implements ResourceEncoder<HTMLEncoder.EncoderState> {
         state.factory = XMLEventFactory.newFactory();
 
         state.writer.add(state.factory.createStartDocument());
+        state.writer.add(state.factory.createStartElement("", "", "head"));
+
+        state.writer.add(state.factory.createStartElement("", "", "link"));
+        state.writer.add(state.factory.createAttribute("rel", "stylesheet"));
+        state.writer.add(state.factory.createAttribute("type", "text/css"));
+        state.writer.add(state.factory.createAttribute("href", "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"));
+        state.writer.add(state.factory.createEndElement("", "", "link"));
+
+        state.writer.add(state.factory.createStartElement("", "", "link"));
+        state.writer.add(state.factory.createAttribute("rel", "stylesheet"));
+        state.writer.add(state.factory.createAttribute("type", "text/css"));
+        state.writer.add(state.factory.createAttribute("href", "/css/mboss.css"));
+        state.writer.add(state.factory.createEndElement("", "", "link"));
+
+        state.writer.add(state.factory.createEndElement("", "", "head"));
         return state;
     }
 
@@ -42,11 +64,21 @@ public class HTMLEncoder implements ResourceEncoder<HTMLEncoder.EncoderState> {
         XMLEventWriter writer = context.attachment().writer;
         XMLEventFactory factory = context.attachment().factory;
 
+        writer.add(factory.createStartElement("", "", "div"));
+        writer.add(factory.createAttribute("class", "footer"));
+        writer.add(factory.createCharacters("mBoss HTML resource browser"));
+        writer.add(factory.createEndElement("", "", "div"));
         writer.add(factory.createEndDocument());
 
         state.writer.flush();
         state.writer.close();
     }
+
+    @Override
+    public boolean shouldEncodeContent(EncodingContext<HTMLEncoder.EncoderState> context) {
+        return (context.object() instanceof PropertyResource && context.depth() <= 1) || context.depth() == 0;
+    }
+
 
     @Override
     public void encode(EncodingContext<EncoderState> context) throws Exception {
@@ -64,36 +96,63 @@ public class HTMLEncoder implements ResourceEncoder<HTMLEncoder.EncoderState> {
         }
     }
 
+    protected void resourceLink(EncodingContext<EncoderState> context) throws XMLStreamException {
+        Resource resource = (Resource) context.object();
+        XMLEventWriter writer = context.attachment().writer;
+        XMLEventFactory factory = context.attachment().factory;
+
+        List<Resource> lineage = new ArrayList<>();
+
+        Resource current = resource;
+
+        if (context.depth() > 0) {
+            lineage.add(current);
+        } else {
+            while (current != null) {
+                lineage.add(0, current);
+                current = current.parent();
+            }
+            if (lineage.get(0) != this.container) {
+                lineage.add(0, this.container);
+            }
+        }
+
+        for (Resource each : lineage) {
+            writer.add(factory.createStartElement("", "", "a"));
+            writer.add(factory.createAttribute("href", each.uri().toString()));
+
+            String id = each.id();
+            if ("".equals(id)) {
+                id = "ROOT";
+            }
+
+            writer.add(factory.createCharacters(id));
+            writer.add(factory.createEndElement("", "", "a"));
+            if (context.depth() == 0) {
+                writer.add(factory.createCharacters("/"));
+            }
+        }
+
+    }
+
     protected void encodeCollection(EncodingContext<EncoderState> context) throws Exception {
         Resource resource = (Resource) context.object();
         XMLEventWriter writer = context.attachment().writer;
         XMLEventFactory factory = context.attachment().factory;
 
         writer.add(factory.createStartElement("", "", "div"));
+        writer.add(factory.createAttribute("class", "collection resource"));
 
         writer.add(factory.createStartElement("", "", "div"));
-        if (context.depth() == 0 && resource.parent() != null) {
-            writer.add(factory.createStartElement("", "", "a"));
-            writer.add(factory.createAttribute("href", resource.parent().uri().toString()));
-            writer.add(factory.createCharacters(resource.parent().id()));
-            writer.add(factory.createEndElement("", "", "a"));
-            writer.add(factory.createCharacters(" : "));
-        }
-        writer.add(factory.createStartElement("", "", "b"));
-        writer.add(factory.createStartElement("", "", "a"));
-        writer.add(factory.createAttribute("href", resource.uri().toString()));
-        writer.add(factory.createCharacters(resource.id()));
-        writer.add(factory.createEndElement("", "", "b"));
+        writer.add(factory.createAttribute("class", "self"));
+
+        resourceLink(context);
+
         writer.add(factory.createEndElement("", "", "div"));
 
         if (context.shouldEncodeContent()) {
             writer.add(factory.createStartElement("", "", "div"));
             writer.add(factory.createAttribute("class", "content"));
-            writer.add(factory.createStartElement("", "", "div"));
-            writer.add(factory.createStartElement("", "", "b"));
-            writer.add(factory.createCharacters("content"));
-            writer.add(factory.createEndElement("", "", "b"));
-            writer.add(factory.createEndElement("", "", "div"));
             context.encodeContent(() -> {
                 try {
                     writer.add(factory.createEndElement("", "", "div"));
@@ -115,22 +174,13 @@ public class HTMLEncoder implements ResourceEncoder<HTMLEncoder.EncoderState> {
         XMLEventFactory factory = context.attachment().factory;
 
         writer.add(factory.createStartElement("", "", "div"));
+        writer.add(factory.createAttribute("class", "object resource"));
 
         writer.add(factory.createStartElement("", "", "div"));
+        writer.add(factory.createAttribute("class", "self"));
 
-        if (context.depth() == 0 && resource.parent() != null) {
-            writer.add(factory.createStartElement("", "", "a"));
-            writer.add(factory.createAttribute("href", resource.parent().uri().toString()));
-            writer.add(factory.createCharacters(resource.parent().id()));
-            writer.add(factory.createEndElement("", "", "a"));
-            writer.add(factory.createCharacters(" : "));
-        }
+        resourceLink(context);
 
-        writer.add(factory.createStartElement("", "", "b"));
-        writer.add(factory.createStartElement("", "", "a"));
-        writer.add(factory.createAttribute("href", resource.uri().toString()));
-        writer.add(factory.createCharacters(resource.id()));
-        writer.add(factory.createEndElement("", "", "b"));
         writer.add(factory.createEndElement("", "", "div"));
 
         // ----------------------------------------
@@ -169,7 +219,17 @@ public class HTMLEncoder implements ResourceEncoder<HTMLEncoder.EncoderState> {
         XMLEventWriter writer = context.attachment().writer;
         XMLEventFactory factory = context.attachment().factory;
 
-        if ( context.depth() == 0 ) {
+        if (context.depth() == 0) {
+            writer.add(factory.createStartElement("", "", "div"));
+            writer.add(factory.createAttribute("class", "property resource"));
+
+            writer.add(factory.createStartElement("", "", "div"));
+            writer.add(factory.createAttribute("class", "self"));
+
+            resourceLink(context);
+
+            writer.add(factory.createEndElement("", "", "div"));
+
             writer.add(factory.createStartElement("", "", "table"));
             writer.add(factory.createStartElement("", "", "tr"));
 
@@ -199,8 +259,9 @@ public class HTMLEncoder implements ResourceEncoder<HTMLEncoder.EncoderState> {
                 writer.add(factory.createEndElement("", "", "td"));
                 writer.add(factory.createEndElement("", "", "tr"));
 
-                if ( context.depth() == 0 ) {
+                if (context.depth() == 0) {
                     writer.add(factory.createEndElement("", "", "table"));
+                    writer.add(factory.createEndElement("", "", "div"));
                 }
                 context.end();
             } catch (XMLStreamException e) {
@@ -223,27 +284,20 @@ public class HTMLEncoder implements ResourceEncoder<HTMLEncoder.EncoderState> {
         XMLEventWriter writer = context.attachment().writer;
         XMLEventFactory factory = context.attachment().factory;
         writer.add(factory.createStartElement("", "", "div"));
+        writer.add(factory.createAttribute("class", "binary resource"));
 
         writer.add(factory.createStartElement("", "", "div"));
+        writer.add(factory.createAttribute("class", "self"));
 
-        if (context.depth() == 0 && resource.parent() != null) {
-            writer.add(factory.createStartElement("", "", "a"));
-            writer.add(factory.createAttribute("href", resource.parent().uri().toString()));
-            writer.add(factory.createCharacters(resource.parent().id()));
-            writer.add(factory.createEndElement("", "", "a"));
-            writer.add(factory.createCharacters(" : "));
-        }
+        resourceLink(context);
 
-        writer.add(factory.createStartElement("", "", "b"));
-        writer.add(factory.createStartElement("", "", "a"));
-        writer.add(factory.createAttribute("href", resource.uri().toString()));
-        writer.add(factory.createCharacters(resource.id()));
-        writer.add(factory.createEndElement("", "", "b"));
         writer.add(factory.createEndElement("", "", "div"));
         writer.add(factory.createEndElement("", "", "div"));
         context.end();
 
     }
+
+    private DefaultContainer container;
 
 
 }

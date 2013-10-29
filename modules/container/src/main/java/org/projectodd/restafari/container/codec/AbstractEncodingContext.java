@@ -58,7 +58,7 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
 
     public boolean shouldEncodeContent() {
         if ( encoder() instanceof ExpansionControllingEncoder ) {
-            return ((ExpansionControllingEncoder) encoder()).shouldEncodeContent( this.object );
+            return ((ExpansionControllingEncoder) encoder()).shouldEncodeContent( this );
         }
 
 
