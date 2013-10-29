@@ -1,5 +1,6 @@
 package org.projectodd.restafari.filesystem;
 
+import org.projectodd.restafari.container.DirectConnector;
 import org.projectodd.restafari.spi.InitializationException;
 import org.projectodd.restafari.spi.Pagination;
 import org.projectodd.restafari.spi.ResourceContext;
@@ -12,24 +13,28 @@ import org.projectodd.restafari.spi.state.ResourceState;
 import org.vertx.java.core.Vertx;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Bob McWhirter
  */
-public class FilesystemResource implements RootResource, CollectionResource, FSResource {
+public class FilesystemResource extends DirectoryResource implements RootResource, FSResource {
 
-    private File root;
     private String id;
     private Vertx vertx;
 
     public FilesystemResource() {
+        super( null, null );
     }
 
     public FilesystemResource(String id) {
+        super( null, null );
         this.id = id;
     }
 
+    @Override
     public Vertx vertx() {
         return this.vertx;
     }
@@ -49,10 +54,10 @@ public class FilesystemResource implements RootResource, CollectionResource, FSR
             throw new InitializationException("no filesystem root specified");
         }
 
-        this.root = new File(rootStr);
+        this.file = new File(rootStr);
 
-        if (!this.root.canRead()) {
-            throw new InitializationException("unable to read filesystem at: " + this.root.getAbsolutePath());
+        if (!this.file.canRead()) {
+            throw new InitializationException("unable to read filesystem at: " + this.file.getAbsolutePath());
         }
 
         this.vertx = context.vertx();
@@ -69,53 +74,7 @@ public class FilesystemResource implements RootResource, CollectionResource, FSR
         return this.id;
     }
 
-    @Override
-    public void create(ResourceState state, Responder responder) {
-        responder.createNotSupported(this);
-    }
-
-    @Override
-    public void readContent(Pagination pagination, ResourceSink sink) {
-        this.vertx.fileSystem().readDir(this.root.getPath(), (result) -> {
-            if (result.failed()) {
-                sink.close();
-            } else {
-                for (String filename : result.result()) {
-                    File child = new File(filename);
-                    if (child.isDirectory()) {
-                        sink.accept(new DirectoryResource(this, child));
-                    } else {
-                        sink.accept(new FileResource(this, child));
-                    }
-                }
-                sink.close();
-            }
-        });
-    }
-
-
-    @Override
-    public void read(String id, Responder responder) {
-        File path = new File(this.root, id);
-        this.vertx.fileSystem().exists(path.getPath(), (existResult) -> {
-            if (existResult.succeeded() && existResult.result()) {
-                if (path.isDirectory()) {
-                    responder.resourceRead(new DirectoryResource(this, path));
-                } else {
-                    responder.resourceRead(new FileResource(this, path));
-                }
-            } else {
-                responder.noSuchResource(id);
-            }
-        });
-    }
-
-    @Override
-    public void delete(Responder responder) {
-        responder.deleteNotSupported(this);
-    }
-
     public String toString() {
-        return "[FilesystemResource: root=" + this.root.getAbsolutePath() + "]";
+        return "[FilesystemResource: root=" + this.file.getAbsolutePath() + "]";
     }
 }

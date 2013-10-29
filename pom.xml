@@ -194,6 +194,11 @@
                 <artifactId>restafari-mongo</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.projectodd.restafari</groupId>
+                <artifactId>restafari-filesystem</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.projectodd.restafari</groupId>

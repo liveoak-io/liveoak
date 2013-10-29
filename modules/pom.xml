@@ -92,6 +92,7 @@
       <module>mongo</module>
       <module>deployer</module>
       <module>filesystem</module>
+      <module>aggregating-filesystem</module>
       <module>vertx</module>
 
       <module>3rdparty</module>

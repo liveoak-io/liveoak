@@ -9,6 +9,8 @@ import org.projectodd.restafari.spi.state.ResourceState;
 import org.vertx.java.core.Vertx;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Bob McWhirter
@@ -24,6 +26,10 @@ public class DirectoryResource implements FSResource, CollectionResource {
         return this.parent.vertx();
     }
 
+    public File file() {
+        return this.file;
+    }
+
     @Override
     public void create(ResourceState state, Responder responder) {
         responder.createNotSupported(this);
@@ -31,16 +37,43 @@ public class DirectoryResource implements FSResource, CollectionResource {
 
     @Override
     public void readContent(Pagination pagination, ResourceSink sink) {
-        this.parent.vertx().fileSystem().readDir(this.file.getPath(), (result) -> {
+        vertx().fileSystem().readDir(this.file.getPath(), (result) -> {
             if (result.failed()) {
                 sink.close();
             } else {
+                List<File> sorted = new ArrayList<>();
+
                 for (String filename : result.result()) {
                     File child = new File(filename);
-                    if (child.isDirectory()) {
-                        sink.accept(new DirectoryResource(this, child));
+                    sorted.add( child );
+                }
+
+                sorted.sort((left, right) -> {
+                    if ( left.isDirectory() && right.isDirectory()) {
+                        return 0;
+                    }
+
+                    if ( left.isFile() && right.isFile() ) {
+                        return 0;
+                    }
+
+                    if ( left.isDirectory() ) {
+                        return -1;
+                    }
+
+                    if ( left.isFile() ) {
+                        return 1;
+                    }
+
+                    return 0;
+
+                });
+
+                for ( File each : sorted ) {
+                    if ( each.isDirectory() ) {
+                        sink.accept( new DirectoryResource( this, each ));
                     } else {
-                        sink.accept(new FileResource(this, child));
+                        sink.accept( new FileResource( this, each ));
                     }
                 }
                 sink.close();
@@ -61,14 +94,19 @@ public class DirectoryResource implements FSResource, CollectionResource {
     @Override
     public void read(String id, Responder responder) {
         File path = new File(this.file, id);
-        this.parent.vertx().fileSystem().exists(path.getPath(), (existResult) -> {
+        System.err.println( "look for: " + path + " from " + this.file );
+        vertx().fileSystem().exists(path.getPath(), (existResult) -> {
+            System.err.println( "exists result: " + existResult );
             if (existResult.succeeded() && existResult.result()) {
                 if (path.isDirectory()) {
+                    System.err.println( "found dir: " + path );
                     responder.resourceRead(new DirectoryResource(this, path));
                 } else {
+                    System.err.println( "found file: " + path );
                     responder.resourceRead(new FileResource(this, path));
                 }
             } else {
+                System.err.println( "no such!" );
                 responder.noSuchResource(id);
             }
         });
@@ -84,5 +122,5 @@ public class DirectoryResource implements FSResource, CollectionResource {
     }
 
     private FSResource parent;
-    private File file;
+    protected File file;
 }

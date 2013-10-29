@@ -11,8 +11,8 @@
 
     client: {
       type: 'jboss-module',
-      module-id:   'org.projectodd.restafari.filesystem',
-      class-name:  'org.projectodd.restafari.filesystem.FilesystemResource',
+      module-id:   'org.projectodd.restafari.filesystem.aggregating',
+      class-name:  'org.projectodd.restafari.filesystem.aggregating.AggregatingFilesystemResource',
       config: {
         root: '${js.client.dir}'
       }

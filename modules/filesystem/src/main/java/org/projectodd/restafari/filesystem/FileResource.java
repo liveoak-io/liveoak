@@ -30,6 +30,10 @@ public class FileResource implements FSResource, BinaryResource {
         return this.parent;
     }
 
+    public File file() {
+        return this.file;
+    }
+
     @Override
     public MediaType mediaType() {
         String name = this.file.getName();
