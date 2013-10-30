@@ -69,9 +69,6 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
 
         ResourceParams params = DefaultResourceParams.instance(decoder.parameters());
 
-        DefaultRequestContext requestCtx = new DefaultRequestContext(null, decodePagination(params), decodeReturnFields(params), params);
-        DefaultRequestContext.associate(requestCtx);
-
         if (msg.getMethod().equals(HttpMethod.POST)) {
             String contentTypeHeader = msg.headers().get( HttpHeaders.Names.CONTENT_TYPE );
             MediaType contentType = new MediaType( contentTypeHeader );
@@ -86,8 +83,8 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .authorizationToken(authToken)
-                    .pagination(requestCtx.getPagination())
-                    .returnFields(requestCtx.getReturnFields())
+                    .pagination(decodePagination(params))
+                    .returnFields(decodeReturnFields(params))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.PUT)) {
             String contentTypeHeader = msg.headers().get( HttpHeaders.Names.CONTENT_TYPE );

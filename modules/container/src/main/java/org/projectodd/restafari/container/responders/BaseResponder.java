@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import org.projectodd.restafari.container.ResourceErrorResponse;
 import org.projectodd.restafari.container.ResourceRequest;
 import org.projectodd.restafari.container.ResourceResponse;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.Responder;
 
@@ -74,6 +75,11 @@ public class BaseResponder implements Responder {
     @Override
     public void internalError(String message) {
         this.ctx.writeAndFlush( new ResourceErrorResponse( this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR) );
+    }
+
+    @Override
+    public RequestContext requestContext() {
+        return inReplyTo.requestContext();
     }
 
     private final ResourceRequest inReplyTo;

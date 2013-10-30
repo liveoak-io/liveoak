@@ -11,15 +11,14 @@ import java.security.Principal;
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class DefaultRequestContext extends RequestContext {
+public class DefaultRequestContext implements RequestContext {
 
-    public static void associate(RequestContext ctx) {
-        ctl.set(ctx);
-    }
 
-    public static void dissociate() {
-        ctl.remove();
-    }
+    private Application app;
+    private Principal principal;
+    private Pagination pagination;
+    private ReturnFields returnFields;
+    private ResourceParams resourceParams;
 
     public DefaultRequestContext(Principal principal, Pagination pagination, ReturnFields returnFields, ResourceParams resourceParams) {
         this.principal = principal;
@@ -72,10 +71,4 @@ public class DefaultRequestContext extends RequestContext {
     void setResourceParams(ResourceParams resourceParams) {
         this.resourceParams = resourceParams;
     }
-
-    private Application app;
-    private Principal principal;
-    private Pagination pagination;
-    private ReturnFields returnFields;
-    private ResourceParams resourceParams;
 }

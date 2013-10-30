@@ -40,17 +40,11 @@ public abstract class TraversingResponder extends BaseResponder {
 
     protected void doRead(String next, Resource resource) {
         if (resource instanceof BlockingResource) {
-            // propagate RequestContext to another thread via associate()
-            RequestContext ctx = RequestContext.instance();
-            //DefaultRequestContext.dissociate();
             this.executor.execute(() -> {
                 try {
-                    DefaultRequestContext.associate(ctx);
                     resource.read(next, this);
                 } catch (RuntimeException e) {
                     noSuchResource(next);
-                } finally {
-                    DefaultRequestContext.dissociate();
                 }
             });
         } else {
@@ -58,30 +52,17 @@ public abstract class TraversingResponder extends BaseResponder {
                 resource.read(next, this);
             } catch (RuntimeException e) {
                 noSuchResource( next );
-            } finally {
-                //DefaultRequestContext.dissociate();
             }
         }
     }
 
     protected void doPerform(Resource resource) {
         if (resource instanceof BlockingResource) {
-            RequestContext ctx = RequestContext.instance();
-            //DefaultRequestContext.dissociate();
             this.executor.execute(() -> {
-                try {
-                    DefaultRequestContext.associate(ctx);
-                    perform(resource);
-                } finally {
-                    DefaultRequestContext.dissociate();
-                }
+                perform(resource);
             });
         } else {
-            try {
-                perform(resource);
-            } finally {
-                //DefaultRequestContext.dissociate();
-            }
+            perform(resource);
         }
     }
 

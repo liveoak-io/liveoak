@@ -49,7 +49,7 @@ public class StompSubscription implements Subscription {
         message.headers().put("action", action);
         message.headers().put("status", "" + status);
         message.headers().put("location", resource.uri().toString() );
-        message.content(this.codec.encode(resource));
+        message.content(this.codec.encode(null, resource));
         return message;
     }
 

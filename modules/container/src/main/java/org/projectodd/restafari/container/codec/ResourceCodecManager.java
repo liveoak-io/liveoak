@@ -3,6 +3,7 @@ package org.projectodd.restafari.container.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.projectodd.restafari.spi.MediaType;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.BinaryContentSink;
 import org.projectodd.restafari.spi.resource.async.BinaryResource;
@@ -26,7 +27,7 @@ public class ResourceCodecManager {
         return codec.decode(buf);
     }
 
-    public EncodingResult encode(MediaTypeMatcher mediaTypeMatcher, Resource resource) throws Exception {
+    public EncodingResult encode(RequestContext ctx, MediaTypeMatcher mediaTypeMatcher, Resource resource) throws Exception {
 
         if (resource instanceof BinaryResource) {
             MediaType match = mediaTypeMatcher.findBestMatch(Collections.singletonList(((BinaryResource) resource).mediaType()));
@@ -55,7 +56,7 @@ public class ResourceCodecManager {
             bestMatch = MediaType.JSON;
         }
 
-        return new EncodingResult(bestMatch, codec.encode(resource));
+        return new EncodingResult(bestMatch, codec.encode(ctx, resource));
     }
 
     public ResourceCodec getResourceCodec(MediaType mediaType) {

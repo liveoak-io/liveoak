@@ -2,6 +2,7 @@ package org.projectodd.restafari.container;
 
 import org.projectodd.restafari.container.codec.MediaTypeMatcher;
 import org.projectodd.restafari.spi.Pagination;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.ResourceParams;
 import org.projectodd.restafari.spi.ReturnFields;
 import org.projectodd.restafari.spi.state.ResourceState;
@@ -61,6 +62,10 @@ public class ResourceRequest {
         return this.returnFields;
     }
 
+    public RequestContext requestContext() {
+        return this.requestContext;
+    }
+
     public String toString() {
         return "[ResourceRequest: type=" + this.requestType() + "; path=" + this.resourcePath + "]";
     }
@@ -73,7 +78,7 @@ public class ResourceRequest {
     private ResourceState state;
     private String authorizationToken;
     private ReturnFields returnFields;
-
+    private RequestContext requestContext;
 
     public static class Builder {
 
@@ -126,6 +131,7 @@ public class ResourceRequest {
                 obj.params = ResourceParams.NONE;
             }
 
+            obj.requestContext = new DefaultRequestContext(null, obj.pagination, obj.returnFields, obj.params);
             return obj;
         }
     }
