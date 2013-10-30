@@ -25,15 +25,12 @@
         <vertx.version>2.0.1-final</vertx.version>
         <netty.version>4.0.2.Final</netty.version>
         <jboss.modules.version>1.3.0.Beta2</jboss.modules.version>
-        <jboss.msc.version>1.2.0.Beta2</jboss.msc.version>
         <jboss.logging.version>3.1.1.GA</jboss.logging.version>
-        <jgroups.version>3.3.1.Final</jgroups.version>
         <jackson.version>2.2.2</jackson.version>
+        <mongo.version>2.11.3</mongo.version>
+
         <httpclient.version>4.3-beta2</httpclient.version>
 
-        <cassandra.version>2.0.0-rc1</cassandra.version>
-
-        <jruby.version>1.7.4</jruby.version>
         <quartz.version>2.2.0</quartz.version>
 
         <junit.version>4.11</junit.version>
@@ -118,31 +115,16 @@
                 <version>${jboss.modules.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.msc</groupId>
-                <artifactId>jboss-msc</artifactId>
-                <version>${jboss.msc.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
                 <version>${jboss.logging.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.jgroups</groupId>
-                <artifactId>jgroups</artifactId>
-                <version>${jgroups.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cassandra</groupId>
-                <artifactId>cassandra-all</artifactId>
-                <version>${cassandra.version}</version>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>${mongo.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.jruby</groupId>
-                <artifactId>jruby-complete</artifactId>
-                <version>${jruby.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
@@ -188,7 +170,6 @@
                 <artifactId>restafari-launcher</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.projectodd.restafari</groupId>
                 <artifactId>restafari-mongo</artifactId>
@@ -199,19 +180,22 @@
                 <artifactId>restafari-filesystem</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.projectodd.restafari</groupId>
                 <artifactId>restafari-test-tools</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
-
             <dependency>
                 <groupId>org.projectodd.restafari</groupId>
                 <artifactId>restafari-modules</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.projectodd.restafari</groupId>
+                <artifactId>restafari-module-assembly</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.projectodd.restafari</groupId>

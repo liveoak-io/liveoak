@@ -34,7 +34,6 @@
     </parent>
 
     <properties>
-        <mongo.version>2.11.3</mongo.version>
         <module-name>org.projectodd.restafari.mongo</module-name>
     </properties>
 
@@ -54,7 +53,6 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
-            <version>${mongo.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectodd.restafari</groupId>
