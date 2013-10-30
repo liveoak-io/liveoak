@@ -48,7 +48,7 @@ public class ServerStarterVerticle extends Verticle {
             String mongoPortProperty = System.getProperty("mbaas.mongo.port");
             setNonNullOnly(config, "port", getWithFailOver(mongoPortProperty == null ? null : Integer.parseInt(mongoPortProperty), conf.getInteger("port")));
 
-            container.registerResource(new MongoDBResource("storage"), config);
+            container.registerResource(new RootMongoResource("storage"), config);
         } catch (InitializationException e) {
             throw new RuntimeException("Failed to initialize object controller: MongoController", e);
         }

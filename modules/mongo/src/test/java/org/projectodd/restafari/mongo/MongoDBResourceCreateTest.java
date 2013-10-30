@@ -102,7 +102,13 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest{
 
         // verify response
         ObjectMapper mapper = new ObjectMapper();
-        //IOUtils.copy(response.getEntity().getContent(), System.out);
+        IOUtils.copy(response.getEntity().getContent(), System.out);
+
+        //System.out.println("MONGO: " + db.getCollection(methodName).findOne());
+
+        CloseableHttpResponse readResponse = testSimpleGetMethod(baseURL + "/" + methodName + "/helloworld/obj");
+        //System.out.println("READ: " + readResponse.getStatusLine().toString());
+        //IOUtils.copy(readResponse.getEntity().getContent(), System.out);
 
 //        JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
 //        assertEquals(5, jsonNode.size()); // id, _self, bar

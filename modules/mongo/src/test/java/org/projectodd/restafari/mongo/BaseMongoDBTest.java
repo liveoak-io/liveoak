@@ -51,7 +51,7 @@ public class BaseMongoDBTest {
 
     @Override
     public RootResource createRootResource() {
-        return new MongoDBResource(TYPE);
+        return new MongoResource(TYPE);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class BaseMongoDBTest {
         config.put("host", host);
 
         DefaultContainer container = new DefaultContainer();
-        container.registerResource(new MongoDBResource(TYPE), config);
+        container.registerResource(new RootMongoResource(TYPE), config);
 
         //TODO: pass these params in instead of hardcoding them
         server = new UnsecureServer(container, "localhost", 8080);
