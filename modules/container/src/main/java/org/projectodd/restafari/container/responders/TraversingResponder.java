@@ -1,10 +1,8 @@
 package org.projectodd.restafari.container.responders;
 
 import io.netty.channel.ChannelHandlerContext;
-import org.projectodd.restafari.container.DefaultRequestContext;
 import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.container.ResourceRequest;
-import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.Resource;
 
@@ -42,14 +40,14 @@ public abstract class TraversingResponder extends BaseResponder {
         if (resource instanceof BlockingResource) {
             this.executor.execute(() -> {
                 try {
-                    resource.read(next, this);
+                    resource.read(TraversingResponder.this.inReplyTo().requestContext(), next, this);
                 } catch (RuntimeException e) {
                     noSuchResource(next);
                 }
             });
         } else {
             try {
-                resource.read(next, this);
+                resource.read(TraversingResponder.this.inReplyTo().requestContext(), next, this);
             } catch (RuntimeException e) {
                 noSuchResource( next );
             }

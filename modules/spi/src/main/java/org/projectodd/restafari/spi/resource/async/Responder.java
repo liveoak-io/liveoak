@@ -1,6 +1,5 @@
 package org.projectodd.restafari.spi.resource.async;
 
-import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 
 /** Object to report on results of actions performed by Resources.
@@ -73,10 +72,4 @@ public interface Responder {
      * @param message
      */
     void internalError(String message);
-
-
-    /**
-     *  Get current request context
-     */
-    RequestContext requestContext();
 }

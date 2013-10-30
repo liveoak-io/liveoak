@@ -1,5 +1,6 @@
 package org.projectodd.restafari.spi.resource.sync;
 
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.ResourceException;
 import org.projectodd.restafari.spi.UpdateNotSupportedException;
 import org.projectodd.restafari.spi.resource.BlockingResource;
@@ -19,7 +20,7 @@ public interface SynchronousObjectResource extends SynchronousResource, ObjectRe
     Stream<PropertyResource> members();
 
     @Override
-    default void update(ObjectResourceState state, Responder responder) {
+    default void update(RequestContext ctx, ObjectResourceState state, Responder responder) {
         try {
             update(state);
             responder.resourceUpdated(this);
@@ -32,7 +33,7 @@ public interface SynchronousObjectResource extends SynchronousResource, ObjectRe
     }
 
     @Override
-    default void readContent(ResourceSink sink) {
+    default void readContent(RequestContext ctx, ResourceSink sink) {
         members().forEach((m) -> {
             sink.accept( m );
         });

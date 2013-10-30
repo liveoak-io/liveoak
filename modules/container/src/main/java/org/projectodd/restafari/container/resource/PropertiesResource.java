@@ -1,5 +1,6 @@
 package org.projectodd.restafari.container.resource;
 
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.ObjectResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
@@ -19,12 +20,12 @@ public class PropertiesResource implements ObjectResource {
     }
 
     @Override
-    public void update(ObjectResourceState state, Responder responder) {
+    public void update(RequestContext ctx, ObjectResourceState state, Responder responder) {
         responder.updateNotSupported( this );
     }
 
     @Override
-    public void readContent(ResourceSink sink) {
+    public void readContent(RequestContext ctx, ResourceSink sink) {
         Properties allProps = System.getProperties();
         for ( String key : allProps.stringPropertyNames() ) {
             sink.accept( new SimplePropertyResource( this, key, allProps.getProperty( key ) ));
@@ -49,7 +50,7 @@ public class PropertiesResource implements ObjectResource {
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         String value = System.getProperty( id );
         if ( value != null ) {
             responder.resourceRead( new SimplePropertyResource( this, id, value ));
@@ -59,7 +60,7 @@ public class PropertiesResource implements ObjectResource {
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         responder.deleteNotSupported( this );
     }
 

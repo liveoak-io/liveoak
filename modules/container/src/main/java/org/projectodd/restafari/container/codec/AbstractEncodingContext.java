@@ -20,6 +20,10 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
         this.completionHandler = completionHandler;
     }
 
+    public RequestContext requestContext() {
+        return ctx;
+    }
+
     public int depth() {
         if ( this.parent == null ) {
             return 0;
@@ -79,13 +83,13 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
             this.endContentHandler = endContentHandler;
 
             if (this.object instanceof CollectionResource) {
-                ((CollectionResource) this.object).readContent(ctx.getPagination(), new MyCollectionContentSink());
+                ((CollectionResource) this.object).readContent(ctx, new MyCollectionContentSink());
             } else if (this.object instanceof ObjectResource) {
-                ((ObjectResource) this.object).readContent(new MyObjectContentSink());
+                ((ObjectResource) this.object).readContent(ctx, new MyObjectContentSink());
             } else if (this.object instanceof PropertyResource) {
-                ((PropertyResource) this.object).readContent(new MyPropertyContentSink());
+                ((PropertyResource) this.object).readContent(ctx, new MyPropertyContentSink());
             } else if (this.object instanceof BinaryResource) {
-                ((BinaryResource) this.object).readContent(new MyBinaryContentSink());
+                ((BinaryResource) this.object).readContent(ctx, new MyBinaryContentSink());
             }
         } else {
             endContentHandler.run();
@@ -121,11 +125,6 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
         }
 
         @Override
-        public RequestContext requestContext() {
-            return ctx;
-        }
-
-        @Override
         public void close() {
             encodeNextContent();
         }
@@ -137,11 +136,6 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
         public void accept(Resource resource) {
             ChildEncodingContext child = new ChildEncodingContext(ctx, AbstractEncodingContext.this, resource);
             children.add(child);
-        }
-
-        @Override
-        public RequestContext requestContext() {
-            return ctx;
         }
 
         @Override

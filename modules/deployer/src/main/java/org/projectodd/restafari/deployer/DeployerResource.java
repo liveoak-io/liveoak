@@ -41,12 +41,12 @@ public class DeployerResource implements RootResource, CollectionResource {
     }
 
     @Override
-    public void create(ResourceState state, Responder responder) {
+    public void create(RequestContext ctx, ResourceState state, Responder responder) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void readContent(Pagination pagination, ResourceSink sink) {
+    public void readContent(RequestContext ctx, ResourceSink sink) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -61,12 +61,12 @@ public class DeployerResource implements RootResource, CollectionResource {
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 }

@@ -78,7 +78,7 @@ public class MongoDBResource implements CollectionResource, RootResource, Blocki
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         if (db.collectionExists(id)) {
             responder.resourceRead(new MongoCollectionResource(this, id));
         } else {
@@ -88,13 +88,14 @@ public class MongoDBResource implements CollectionResource, RootResource, Blocki
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         //TODO: add delete support
         responder.deleteNotSupported(this);
     }
 
     @Override
-    public void readContent(Pagination pagination, ResourceSink sink) {
+    public void readContent(RequestContext ctx, ResourceSink sink) {
+        Pagination pagination = ctx.getPagination();
         Stream<String> members = this.db.getCollectionNames().stream().substream(pagination.getOffset());
         if (pagination.getLimit() > 0) {
             members = members.limit(pagination.getLimit());
@@ -114,7 +115,7 @@ public class MongoDBResource implements CollectionResource, RootResource, Blocki
     }
 
     @Override
-    public void create(ResourceState state, Responder responder) {
+    public void create(RequestContext ctx, ResourceState state, Responder responder) {
 
         String id = state.id();
         if (id == null) {

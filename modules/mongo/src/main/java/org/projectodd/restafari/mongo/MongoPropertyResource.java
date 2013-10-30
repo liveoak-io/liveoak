@@ -1,6 +1,7 @@
 package org.projectodd.restafari.mongo;
 
 import com.mongodb.DBObject;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.async.PropertyContentSink;
 import org.projectodd.restafari.spi.resource.async.PropertyResource;
 import org.projectodd.restafari.spi.resource.Resource;
@@ -21,7 +22,7 @@ public class MongoPropertyResource implements PropertyResource {
     }
 
     @Override
-    public Object get() {
+    public Object get(RequestContext ctx) {
         Object object = this.parent.dbObject().get(this.name);
 
         if (object instanceof DBObject) {
@@ -37,8 +38,8 @@ public class MongoPropertyResource implements PropertyResource {
     }
 
     @Override
-    public void readContent(PropertyContentSink sink) {
-        sink.accept(get());
+    public void readContent(RequestContext ctx, PropertyContentSink sink) {
+        sink.accept(get(ctx));
     }
 
     @Override
@@ -52,12 +53,12 @@ public class MongoPropertyResource implements PropertyResource {
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         responder.noSuchResource( id );
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         this.parent.dbObject().removeField( this.name );
         responder.resourceDeleted( this );
     }

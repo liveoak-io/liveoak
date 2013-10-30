@@ -1,6 +1,6 @@
 package org.projectodd.restafari.vertx.resource;
 
-import org.projectodd.restafari.spi.Pagination;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
@@ -29,17 +29,17 @@ public class VertxCollectionResource extends AbstractVertxResource implements Co
     }
 
     @Override
-    public void create(ResourceState state, Responder responder) {
+    public void create(RequestContext ctx, ResourceState state, Responder responder) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void readContent(Pagination pagination, ResourceSink sink) {
+    public void readContent(RequestContext ctx, ResourceSink sink) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         JsonObject request = new JsonObject();
         request.putString("action", "read");
         request.putString("id", id);

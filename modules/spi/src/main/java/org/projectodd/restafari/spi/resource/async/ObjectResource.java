@@ -1,5 +1,6 @@
 package org.projectodd.restafari.spi.resource.async;
 
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
 
@@ -18,13 +19,13 @@ public interface ObjectResource extends Resource {
      * @param state The inbound representation of the state.
      * @param responder To respond to the action.
      */
-    void update(ObjectResourceState state, Responder responder);
+    void update(RequestContext ctx, ObjectResourceState state, Responder responder);
 
 
     /** Write the members of this object to the provided sink.
      *
      * @param sink The sink to stream members to.
      */
-    void readContent(ResourceSink sink);
+    void readContent(RequestContext ctx, ResourceSink sink);
 
 }

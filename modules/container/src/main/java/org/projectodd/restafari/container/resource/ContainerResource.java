@@ -1,7 +1,7 @@
 package org.projectodd.restafari.container.resource;
 
 import org.projectodd.restafari.spi.InitializationException;
-import org.projectodd.restafari.spi.Pagination;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.ResourceContext;
 import org.projectodd.restafari.spi.resource.RootResource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
@@ -29,12 +29,12 @@ public class ContainerResource implements CollectionResource, RootResource {
     }
 
     @Override
-    public void create(ResourceState state, Responder responder) {
+    public void create(RequestContext ctx, ResourceState state, Responder responder) {
         responder.createNotSupported( this );
     }
 
     @Override
-    public void readContent(Pagination pagination, ResourceSink sink) {
+    public void readContent(RequestContext ctx, ResourceSink sink) {
         sink.accept( this.propertiesResource );
         try {
             sink.close();
@@ -49,7 +49,7 @@ public class ContainerResource implements CollectionResource, RootResource {
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         if ( id.equals( this.propertiesResource.id() ) ) {
             responder.resourceRead( this.propertiesResource );
         } else {
@@ -58,7 +58,7 @@ public class ContainerResource implements CollectionResource, RootResource {
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         responder.deleteNotSupported( this );
     }
 

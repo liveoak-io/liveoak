@@ -5,7 +5,6 @@ import org.bson.types.ObjectId;
 import org.projectodd.restafari.spi.*;
 import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.Resource;
-import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
 import org.projectodd.restafari.spi.resource.async.Responder;
 import org.projectodd.restafari.spi.state.CollectionResourceState;
@@ -15,8 +14,6 @@ import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * @author Bob McWhirter
@@ -44,7 +41,7 @@ class MongoCollectionResource extends MongoDBResource implements BlockingResourc
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         DBObject dbObject = this.parent.getDB().getCollection(this.collectionName).findOne(new BasicDBObject("_id", new ObjectId(id)));
         if (dbObject == null) {
             responder.noSuchResource(id);
@@ -55,7 +52,7 @@ class MongoCollectionResource extends MongoDBResource implements BlockingResourc
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         if (getDB().collectionExists(id())) {
             getDB().getCollection(id()).drop();
             responder.resourceDeleted(this);
@@ -69,7 +66,7 @@ class MongoCollectionResource extends MongoDBResource implements BlockingResourc
     }
 
     @Override
-    public void readContent(Pagination pagination, ResourceSink sink) {
+    public void readContent(RequestContext ctx, ResourceSink sink) {
         DBCollection c = this.parent.getDB().getCollection(this.collectionName);
         DBCursor cursor = c.find();
 
@@ -85,7 +82,7 @@ class MongoCollectionResource extends MongoDBResource implements BlockingResourc
     }
 
     @Override
-    public void create(ResourceState state, Responder responder) {
+    public void create(RequestContext ctx, ResourceState state, Responder responder) {
         DBCollection dbCollection = this.parent.getDB().getCollection(this.collectionName);
 
         BasicDBObject basicDBObject = null;

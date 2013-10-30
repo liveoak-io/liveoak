@@ -2,6 +2,7 @@ package org.projectodd.restafari.filesystem.aggregating;
 
 import org.projectodd.restafari.filesystem.FileResource;
 import org.projectodd.restafari.spi.MediaType;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.BinaryContentSink;
 import org.projectodd.restafari.spi.resource.async.BinaryResource;
@@ -9,7 +10,6 @@ import org.projectodd.restafari.spi.resource.async.Responder;
 import org.vertx.java.core.buffer.Buffer;
 
 import java.io.*;
-import java.util.StringTokenizer;
 
 /**
  * @author Bob McWhirter
@@ -30,7 +30,7 @@ public class AggregatingResource implements BinaryResource {
     }
 
     @Override
-    public void readContent(BinaryContentSink sink) {
+    public void readContent(RequestContext ctx, BinaryContentSink sink) {
         File file = this.manifest.file();
         try {
             BufferedReader reader = new BufferedReader( new FileReader( file ) );
@@ -69,12 +69,12 @@ public class AggregatingResource implements BinaryResource {
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         responder.noSuchResource( id );
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         responder.deleteNotSupported( this );
     }
 

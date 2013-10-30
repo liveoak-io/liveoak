@@ -34,7 +34,7 @@ public class ResourceCodecManager {
             ;
             if (match != null) {
                 CompletableFuture<ByteBuf> future = new CompletableFuture<>();
-                ((BinaryResource) resource).readContent(new MyBinaryContentSink(future));
+                ((BinaryResource) resource).readContent(ctx, new MyBinaryContentSink(future));
                 return new EncodingResult(match, future.get());
             } else {
                 throw new IncompatibleMediaTypeException(mediaTypeMatcher.mediaTypes(), (BinaryResource) resource);

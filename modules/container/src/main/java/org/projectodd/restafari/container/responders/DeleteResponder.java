@@ -17,7 +17,7 @@ public class DeleteResponder extends TraversingResponder {
 
     @Override
     public void perform(Resource resource) {
-        resource.delete( createBaseResponder() );
+        resource.delete( inReplyTo().requestContext(), createBaseResponder() );
     }
 
 }

@@ -1,21 +1,11 @@
 package org.projectodd.restafari.filesystem;
 
-import org.projectodd.restafari.container.DirectConnector;
 import org.projectodd.restafari.spi.InitializationException;
-import org.projectodd.restafari.spi.Pagination;
 import org.projectodd.restafari.spi.ResourceContext;
-import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.RootResource;
-import org.projectodd.restafari.spi.resource.async.CollectionResource;
-import org.projectodd.restafari.spi.resource.async.ResourceSink;
-import org.projectodd.restafari.spi.resource.async.Responder;
-import org.projectodd.restafari.spi.state.ResourceState;
 import org.vertx.java.core.Vertx;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Bob McWhirter

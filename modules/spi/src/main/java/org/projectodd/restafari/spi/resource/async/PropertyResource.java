@@ -1,8 +1,8 @@
 package org.projectodd.restafari.spi.resource.async;
 
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 
-import javax.swing.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -28,14 +28,14 @@ public interface PropertyResource extends Resource {
      *
      * @return The value.
      */
-    default Object get() throws ExecutionException, InterruptedException {
+    default Object get(RequestContext ctx) throws ExecutionException, InterruptedException {
         CompletableFuture<Object> future = new CompletableFuture<>();
-        readContent((val) -> {
+        readContent(ctx, (val) -> {
             future.complete(val);
         });
 
         return future.get();
     }
 
-    void readContent(PropertyContentSink sink);
+    void readContent(RequestContext ctx, PropertyContentSink sink);
 }

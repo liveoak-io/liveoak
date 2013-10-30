@@ -1,5 +1,7 @@
 package org.projectodd.restafari.container.codec;
 
+import org.projectodd.restafari.spi.RequestContext;
+
 /**
  * @author Bob McWhirter
  */
@@ -15,4 +17,5 @@ public interface EncodingContext<T> {
 
     boolean shouldEncodeContent();
     void encodeContent(Runnable contentCompletionHandler);
+    RequestContext requestContext();
 }
