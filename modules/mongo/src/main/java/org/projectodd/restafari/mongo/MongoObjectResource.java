@@ -1,9 +1,6 @@
 package org.projectodd.restafari.mongo;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import com.mongodb.*;
 import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.Resource;
@@ -13,12 +10,14 @@ import org.projectodd.restafari.spi.resource.async.Responder;
 import org.projectodd.restafari.spi.resource.async.SimplePropertyResource;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
 
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Bob McWhirter
  */
-public class MongoObjectResource extends MongoResource implements ObjectResource, BlockingResource {
+public class MongoObjectResource extends MongoResource implements ObjectResource {
 
     public MongoObjectResource(MongoResource parent, DBObject dbObject) {
         super(parent, dbObject);
@@ -66,9 +65,9 @@ public class MongoObjectResource extends MongoResource implements ObjectResource
     public void read(RequestContext ctx, String childId, Responder responder) {
         Object value = this.dbObject.get(childId);
         if (value != null) {
-            responder.resourceRead(new SimplePropertyResource(this, id, value));
+            responder.resourceRead(new MongoPropertyResource(this, childId));
         } else {
-            responder.noSuchResource(id);
+            responder.noSuchResource(childId);
         }
     }
 

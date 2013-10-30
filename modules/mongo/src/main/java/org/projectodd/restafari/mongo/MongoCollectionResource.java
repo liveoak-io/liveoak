@@ -12,6 +12,7 @@ import org.projectodd.restafari.spi.state.ObjectResourceState;
 import org.projectodd.restafari.spi.state.PropertyResourceState;
 import org.projectodd.restafari.spi.state.ResourceState;
 
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,16 +54,12 @@ class MongoCollectionResource extends MongoResource implements CollectionResourc
 
     @Override
     public void delete(RequestContext ctx, Responder responder) {
-        if (getDB().collectionExists(id())) {
-            getDB().getCollection(id()).drop();
+        if (getDB().collectionExists(this.collectionName)) {
+            getDB().getCollection(this.collectionName).drop();
             responder.resourceDeleted(this);
         } else {
-            responder.noSuchResource(id());
+            responder.noSuchResource(this.collectionName);
         }
-    }
-
-    DB getDB() {
-        return this.parent.getDB();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.projectodd.restafari.mongo;
 
 import com.mongodb.*;
+import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.Resource;
 
 /**
@@ -8,7 +9,7 @@ import org.projectodd.restafari.spi.resource.Resource;
  */
 //public class MongoResource implements CollectionResource, RootResource {
 //public class MongoResource implements RootResource {
-public abstract class MongoResource implements Resource {
+public abstract class MongoResource implements Resource, BlockingResource {
 
     protected MongoResource parent;
     protected String id;

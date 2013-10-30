@@ -17,9 +17,8 @@ import java.util.stream.Stream;
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class RootMongoResource extends MongoResource implements CollectionResource, RootResource, BlockingResource {
+public class RootMongoResource extends MongoResource implements CollectionResource, RootResource {
 
-    private String id;
     private MongoClient mongo;
     private DB db;
 
@@ -75,7 +74,7 @@ public class RootMongoResource extends MongoResource implements CollectionResour
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         if (db.collectionExists(id)) {
             responder.resourceRead(new MongoCollectionResource(this, id));
         } else {

@@ -1,10 +1,14 @@
 package org.projectodd.restafari.mongo;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.async.PropertyContentSink;
 import org.projectodd.restafari.spi.resource.async.PropertyResource;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.Responder;
+
+import java.util.ArrayList;
 
 /**
  * @author Bob McWhirter
@@ -36,17 +40,7 @@ public class MongoPropertyResource extends MongoResource implements PropertyReso
 
     @Override
     public void readContent(RequestContext ctx, PropertyContentSink sink) {
-        sink.accept(get());
-    }
-
-    @Override
-    public Resource parent() {
-        return this.parent;
-    }
-
-    @Override
-    public String id() {
-        return this.name;
+        sink.accept(get(ctx));
     }
 
     @Override
