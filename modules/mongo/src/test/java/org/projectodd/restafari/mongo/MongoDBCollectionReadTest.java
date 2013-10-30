@@ -33,7 +33,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 //    public void testRootFound() throws Exception {
 //        Resource result = connector.read("/storage");
 //        assertThat(result).isNotNull();
-//        assertThat(result).isInstanceOf(MongoDBResource.class);
+//        assertThat(result).isInstanceOf(MongoResource.class);
 //    }
 //
 //    @Test

@@ -145,6 +145,7 @@ public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
             ((ByteBuf) value).readBytes(bytes);
             generator.writeBinary(bytes);
         } else {
+            generator.writeString("ERROR");
             System.err.println("UNKNOWN VALUE TYPE: " + value + " // " + ((value == null) ? null : value.getClass()));
         }
 
@@ -169,6 +170,9 @@ public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
                 generator.writeString("object");
             } else if (resource instanceof BinaryResource) {
                 generator.writeString("binary");
+            } else {
+                generator.writeString("Unknown");
+                System.err.println("Unknown resource type: " + resource.getClass());
             }
             generator.writeEndObject();
         }

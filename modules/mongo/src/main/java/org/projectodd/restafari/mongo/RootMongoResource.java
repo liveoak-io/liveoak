@@ -2,7 +2,6 @@ package org.projectodd.restafari.mongo;
 
 import com.mongodb.*;
 import org.projectodd.restafari.spi.*;
-import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.RootResource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
@@ -16,19 +15,15 @@ import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
+ * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class MongoDBResource implements CollectionResource, RootResource, BlockingResource {
+public class RootMongoResource extends MongoResource implements CollectionResource, RootResource {
 
-    private String id;
     private MongoClient mongo;
     private DB db;
 
-    public MongoDBResource(String id) {
-        this.id = id;
-    }
-
-    public MongoDBResource() {
-
+    public RootMongoResource(String id) {
+        super(null, id);
     }
 
     @Override
@@ -36,6 +31,7 @@ public class MongoDBResource implements CollectionResource, RootResource, Blocki
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
     public String id() {
         return this.id;
     }
@@ -66,7 +62,7 @@ public class MongoDBResource implements CollectionResource, RootResource, Blocki
         }
     }
 
-    DB getDB() {
+    protected DB getDB() {
         return this.db;
     }
 
@@ -89,7 +85,7 @@ public class MongoDBResource implements CollectionResource, RootResource, Blocki
 
     @Override
     public void delete(RequestContext ctx, Responder responder) {
-        //TODO: add delete support
+        //TODO: figure out how to handle deleting a mongodb root resource (eg /storage or /data).
         responder.deleteNotSupported(this);
     }
 

@@ -1,9 +1,6 @@
 package org.projectodd.restafari.mongo;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import com.mongodb.*;
 import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.Resource;
@@ -13,30 +10,17 @@ import org.projectodd.restafari.spi.resource.async.Responder;
 import org.projectodd.restafari.spi.resource.async.SimplePropertyResource;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
 
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Bob McWhirter
  */
-public class MongoObjectResource implements ObjectResource, BlockingResource {
+public class MongoObjectResource extends MongoResource implements ObjectResource {
 
-    private static final String ID_FIELD = "_id";
-
-	//TODO: fix the issues with mongo resources and parent objects
-    //private MongoCollectionResource parent;
-    private MongoDBResource parent;
-    private final DBObject dbObject;
-
-    public MongoObjectResource(MongoDBResource parent, DBObject dbObject) {
-        this.parent = parent;
-        this.dbObject = dbObject;
-        if ( dbObject == null ) {
-            new Exception().printStackTrace();
-        }
-    }
-
-    DBObject dbObject() {
-        return this.dbObject;
+    public MongoObjectResource(MongoResource parent, DBObject dbObject) {
+        super(parent, dbObject);
     }
 
     @Override
@@ -44,31 +28,59 @@ public class MongoObjectResource implements ObjectResource, BlockingResource {
         return this.parent;
     }
 
+//    @Override
+//    public String id() {
+//        Object candidateId = this.dbObject.get(MONGO_ID_FIELD);
+//        if (candidateId == null) {
+//            Resource parent = this.parent();
+//            String id = "/";
+//            while (parent.parent() != null) {
+//                id = "/" + parent.parent().id()  + id;
+//                parent = parent.parent();
+//            }
+//            return id;
+//            //return this.parent().id();
+//        }  else {
+//            return candidateId.toString();
+//        }
+//
+//    }
+
+    @Override
     public String id() {
-        Object candidateId = this.dbObject.get(ID_FIELD);
+        if (this.dbObject instanceof BasicDBObject) {
+        Object candidateId = this.dbObject.get(MONGO_ID_FIELD);
         if ( candidateId == null ) {
-            return null;
+            return this.parent().id();
         }
         return candidateId.toString();
+        } else if (this.dbObject instanceof BasicDBList) {
+            return null;
+        } else {
+            return null;
+        }
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
-        Object value = this.dbObject.get(id);
+    public void read(RequestContext ctx, String childId, Responder responder) {
+        Object value = this.dbObject.get(childId);
         if (value != null) {
-            responder.resourceRead(new SimplePropertyResource(this, id, value));
+            responder.resourceRead(new MongoPropertyResource(this, childId));
         } else {
-            responder.noSuchResource(id);
+            responder.noSuchResource(childId);
         }
     }
 
     @Override
     public void update(RequestContext ctx, ObjectResourceState state, Responder responder) {
         state.members().forEach((p) -> {
-            this.dbObject.put(p.id(), p.value());
+            if (!p.id().equals(MONGO_ID_FIELD) && !p.id().equals(MBAAS_ID_FIELD))
+            {
+                this.dbObject.put(p.id(), p.value());
+            }
         });
 
-        this.parent.getDB().getCollection(parent.id()).update(new BasicDBObject().append("_id", this.dbObject.get("_id")), this.dbObject);
+        this.parent.getDB().getCollection(parent.id()).update(new BasicDBObject().append(MONGO_ID_FIELD, this.dbObject.get(MONGO_ID_FIELD)), this.dbObject);
 
         responder.resourceUpdated(this);
     }
@@ -93,26 +105,46 @@ public class MongoObjectResource implements ObjectResource, BlockingResource {
     @Override
     public void readContent(RequestContext ctx, ResourceSink sink) {
         this.dbObject.keySet().stream().forEach((name) -> {
-            // the _id field is handled in the special case in id()
-            if (!name.equals(ID_FIELD)) {
+            // the mongo internal id should never be returned to the user
+            // the mbaas gets the id separately though getId when creating the object and should not be returned either
+            if (!name.equals(MONGO_ID_FIELD) && !name.equals(MBAAS_ID_FIELD)) {
                 Object object = this.dbObject.get(name);
-                if (object instanceof String || object instanceof Integer || object instanceof Double){
-                    sink.accept(new MongoPropertyResource(this, name) );
-                } else if (object instanceof DBObject) {
-                    sink.accept(new MongoPropertyResource(this, name));
-                }  else if (object instanceof ArrayList) {
-                   //TODO: add support for arrays/collections
-                }
+                sink.accept(new MongoPropertyResource(this, name));
             }
         });
         try {
             sink.close();
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace(); //TODO: properly handle errors
         }
     }
 
     public String toString() {
         return "[MongoObject: obj=" + this.dbObject() + "]";
+    }
+
+    @Override
+    public java.net.URI uri() {
+        List<String> segments = new ArrayList<>();
+        Resource current = this;
+
+        if (parent instanceof MongoPropertyResource)
+        {
+            current = current.parent();
+        }
+
+        while (current != null) {
+            segments.add(0, current.id());
+            current = current.parent();
+        }
+
+        StringBuilder buf = new StringBuilder();
+
+        segments.forEach((s) -> {
+            buf.append( "/" );
+            buf.append( s );
+        });
+
+        return URI.create(buf.toString());
     }
 }

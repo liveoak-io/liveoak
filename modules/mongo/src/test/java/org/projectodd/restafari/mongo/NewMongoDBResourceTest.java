@@ -25,7 +25,7 @@ public class NewMongoDBResourceTest extends AbstractResourceTestCase {
 
     @Override
     public RootResource createRootResource() {
-        return new MongoDBResource("storage");
+        return new RootMongoResource("storage");
     }
 
     @Override
@@ -46,7 +46,7 @@ public class NewMongoDBResourceTest extends AbstractResourceTestCase {
     public void testRootFound() throws Exception {
         Resource result = connector.read("/storage");
         assertThat(result).isNotNull();
-        assertThat(result).isInstanceOf(MongoDBResource.class);
+        assertThat(result).isInstanceOf(MongoResource.class);
     }
 
     @Test

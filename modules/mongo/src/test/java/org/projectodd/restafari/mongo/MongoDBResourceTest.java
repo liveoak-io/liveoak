@@ -50,7 +50,7 @@ public class MongoDBResourceTest {
         config.put("host", host);
 
         DefaultContainer container = new DefaultContainer();
-        container.registerResource(new MongoDBResource(TYPE), config);
+        container.registerResource(new RootMongoResource(TYPE), config);
 
         server = new UnsecureServer(container, "localhost", 8080);
         server.start();

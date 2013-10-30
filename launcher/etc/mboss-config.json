@@ -30,7 +30,7 @@
     storage: {
       type: 'jboss-module',
       module-id: 'org.projectodd.restafari.mongo',
-      class-name: 'org.projectodd.restafari.mongo.MongoDBResource',
+      class-name: 'org.projectodd.restafari.mongo.RootMongoResource',
       config: {
         db: 'mboss'
       }
