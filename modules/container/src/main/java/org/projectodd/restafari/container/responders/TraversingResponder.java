@@ -7,8 +7,6 @@ import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.Resource;
 
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * @author Bob McWhirter
@@ -42,14 +40,14 @@ public abstract class TraversingResponder extends BaseResponder {
         if (resource instanceof BlockingResource) {
             this.executor.execute(() -> {
                 try {
-                    resource.read(next, this);
+                    resource.read(TraversingResponder.this.inReplyTo().requestContext(), next, this);
                 } catch (RuntimeException e) {
                     noSuchResource(next);
                 }
             });
         } else {
             try {
-                resource.read(next, this);
+                resource.read(TraversingResponder.this.inReplyTo().requestContext(), next, this);
             } catch (RuntimeException e) {
                 noSuchResource( next );
             }

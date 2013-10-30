@@ -1,10 +1,9 @@
 package org.projectodd.restafari.vertx.resource;
 
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.Responder;
-import org.projectodd.restafari.spi.state.ResourceState;
 import org.vertx.java.core.Vertx;
-import org.vertx.java.core.json.JsonObject;
 
 /**
  * @author Bob McWhirter
@@ -40,7 +39,7 @@ public abstract class AbstractVertxResource implements Resource {
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

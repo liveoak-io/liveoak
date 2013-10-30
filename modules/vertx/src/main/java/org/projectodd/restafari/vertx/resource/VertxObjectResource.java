@@ -1,5 +1,6 @@
 package org.projectodd.restafari.vertx.resource;
 
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.ObjectResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
@@ -20,17 +21,17 @@ public class VertxObjectResource extends AbstractVertxResource implements Object
     }
 
     @Override
-    public void update(ObjectResourceState state, Responder responder) {
+    public void update(RequestContext ctx, ObjectResourceState state, Responder responder) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void readContent(ResourceSink sink) {
+    public void readContent(RequestContext ctx, ResourceSink sink) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         Object value = this.state.getValue( id );
         if ( value == null ) {
             responder.noSuchResource( id );

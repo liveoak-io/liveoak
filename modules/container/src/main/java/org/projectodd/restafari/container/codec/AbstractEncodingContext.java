@@ -2,7 +2,7 @@ package org.projectodd.restafari.container.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.projectodd.restafari.spi.Pagination;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.*;
 
@@ -13,10 +13,15 @@ import java.util.LinkedList;
  */
 public class AbstractEncodingContext<T> implements EncodingContext<T> {
 
-    public AbstractEncodingContext(AbstractEncodingContext<T> parent, Object object, Runnable completionHandler) {
+    public AbstractEncodingContext(AbstractEncodingContext<T> parent, RequestContext ctx, Object object, Runnable completionHandler) {
         this.parent = parent;
+        this.ctx = ctx;
         this.object = object;
         this.completionHandler = completionHandler;
+    }
+
+    public RequestContext requestContext() {
+        return ctx;
     }
 
     public int depth() {
@@ -78,13 +83,13 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
             this.endContentHandler = endContentHandler;
 
             if (this.object instanceof CollectionResource) {
-                ((CollectionResource) this.object).readContent(Pagination.NONE, new MyCollectionContentSink());
+                ((CollectionResource) this.object).readContent(ctx, new MyCollectionContentSink());
             } else if (this.object instanceof ObjectResource) {
-                ((ObjectResource) this.object).readContent(new MyObjectContentSink());
+                ((ObjectResource) this.object).readContent(ctx, new MyObjectContentSink());
             } else if (this.object instanceof PropertyResource) {
-                ((PropertyResource) this.object).readContent(new MyPropertyContentSink());
+                ((PropertyResource) this.object).readContent(ctx, new MyPropertyContentSink());
             } else if (this.object instanceof BinaryResource) {
-                ((BinaryResource) this.object).readContent(new MyBinaryContentSink());
+                ((BinaryResource) this.object).readContent(ctx, new MyBinaryContentSink());
             }
         } else {
             endContentHandler.run();
@@ -105,6 +110,7 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
     }
 
     private AbstractEncodingContext<T> parent;
+    private final RequestContext ctx;
     private Object object;
     private Runnable endContentHandler;
     private Runnable completionHandler;
@@ -114,7 +120,7 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
 
         @Override
         public void accept(Resource resource) {
-            ChildEncodingContext child = new ChildEncodingContext(AbstractEncodingContext.this, resource);
+            ChildEncodingContext child = new ChildEncodingContext(ctx, AbstractEncodingContext.this, resource);
             children.add(child);
         }
 
@@ -128,7 +134,7 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
     private class MyObjectContentSink implements ResourceSink {
         @Override
         public void accept(Resource resource) {
-            ChildEncodingContext child = new ChildEncodingContext(AbstractEncodingContext.this, resource);
+            ChildEncodingContext child = new ChildEncodingContext(ctx, AbstractEncodingContext.this, resource);
             children.add(child);
         }
 
@@ -142,7 +148,7 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
 
         @Override
         public void accept(Object o) {
-            ChildEncodingContext child = new ChildEncodingContext(AbstractEncodingContext.this, o);
+            ChildEncodingContext child = new ChildEncodingContext(ctx, AbstractEncodingContext.this, o);
             children.add(child);
             encodeNextContent();
         }
@@ -159,7 +165,7 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
 
         @Override
         public void close() {
-            ChildEncodingContext child = new ChildEncodingContext(AbstractEncodingContext.this, buffer);
+            ChildEncodingContext child = new ChildEncodingContext(ctx, AbstractEncodingContext.this, buffer);
             children.add( child );
             encodeNextContent();
         }

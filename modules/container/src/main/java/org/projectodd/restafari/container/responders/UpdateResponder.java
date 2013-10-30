@@ -24,7 +24,7 @@ public class UpdateResponder extends TraversingResponder {
     @Override
     public void perform(Resource resource) {
         if (resource instanceof ObjectResource) {
-            ((ObjectResource) resource).update((ObjectResourceState) inReplyTo().state(), createBaseResponder());
+            ((ObjectResource) resource).update(inReplyTo().requestContext(), (ObjectResourceState) inReplyTo().state(), createBaseResponder());
         } else {
             updateNotSupported(resource);
         }
@@ -36,7 +36,7 @@ public class UpdateResponder extends TraversingResponder {
             // Turn it into a Create on its parent, for upsert semantics
             ResourceState state = inReplyTo().state();
             state.id( id );
-            ((CollectionResource) currentResource() ).create(inReplyTo().state(), createBaseResponder());
+            ((CollectionResource) currentResource() ).create(inReplyTo().requestContext(), inReplyTo().state(), createBaseResponder());
         } else {
             super.noSuchResource(id);
         }

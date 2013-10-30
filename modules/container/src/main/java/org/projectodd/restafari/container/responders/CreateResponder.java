@@ -19,7 +19,7 @@ public class CreateResponder extends TraversingResponder {
     @Override
     public void perform(Resource resource) {
         if ( resource instanceof CollectionResource ) {
-            ((CollectionResource) resource).create( inReplyTo().state(), createBaseResponder() );
+            ((CollectionResource) resource).create( inReplyTo().requestContext(), inReplyTo().state(), createBaseResponder() );
         } else {
             this.createNotSupported( resource );
         }

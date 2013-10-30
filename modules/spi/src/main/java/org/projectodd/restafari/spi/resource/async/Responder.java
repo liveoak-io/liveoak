@@ -72,5 +72,4 @@ public interface Responder {
      * @param message
      */
     void internalError(String message);
-
 }

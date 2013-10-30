@@ -11,7 +11,6 @@ import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,7 +66,7 @@ public class VertxResourceTest extends AbstractResourceTestCase {
 
         assertThat(result).isInstanceOf(PropertyResource.class);
 
-        assertThat(((PropertyResource) result).get()).isEqualTo("Bob McWhirter");
+        assertThat(((PropertyResource) result).get(null)).isEqualTo("Bob McWhirter");
 
 
     }

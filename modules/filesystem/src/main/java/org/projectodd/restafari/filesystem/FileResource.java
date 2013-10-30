@@ -1,6 +1,7 @@
 package org.projectodd.restafari.filesystem;
 
 import org.projectodd.restafari.spi.MediaType;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.BinaryContentSink;
 import org.projectodd.restafari.spi.resource.async.BinaryResource;
@@ -55,12 +56,12 @@ public class FileResource implements FSResource, BinaryResource {
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         responder.readNotSupported(this);
     }
 
     @Override
-    public void readContent(BinaryContentSink sink) {
+    public void readContent(RequestContext ctx, BinaryContentSink sink) {
         vertx().fileSystem().open(file.getPath(), (result) -> {
             if (result.succeeded()) {
                 AsyncFile asyncFile = result.result();
@@ -78,7 +79,7 @@ public class FileResource implements FSResource, BinaryResource {
 
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         responder.deleteNotSupported(this);
     }
 

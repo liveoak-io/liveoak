@@ -69,7 +69,7 @@ public class DefaultContainer implements Container, CollectionResource {
     // ----------------------------------------
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         try {
             if ( id == null ) {
                 responder.resourceRead( this );
@@ -89,17 +89,17 @@ public class DefaultContainer implements Container, CollectionResource {
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         responder.deleteNotSupported(this);
     }
 
     @Override
-    public void create(ResourceState state, Responder responder) {
+    public void create(RequestContext ctx, ResourceState state, Responder responder) {
         responder.createNotSupported(this);
     }
 
     @Override
-    public void readContent(Pagination pagination, ResourceSink sink) {
+    public void readContent(RequestContext ctx, ResourceSink sink) {
         this.resources.values().forEach((e) -> {
             sink.accept( e );
         });

@@ -1,5 +1,6 @@
 package org.projectodd.restafari.spi.resource;
 
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.async.Responder;
 
 import java.net.URI;
@@ -67,11 +68,11 @@ public interface Resource {
      * @param id The child ID to read.
      * @param responder To respond to the action.
      */
-    void read(String id, Responder responder);
+    void read(RequestContext ctx, String id, Responder responder);
 
     /** Delete this resource.
      *
      * @param responder To respond to the action.
      */
-    void delete(Responder responder);
+    void delete(RequestContext ctx, Responder responder);
 }

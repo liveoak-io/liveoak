@@ -2,6 +2,7 @@ package org.projectodd.restafari.container.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.state.ResourceState;
 
@@ -17,9 +18,9 @@ public class ResourceCodec {
         this.decoder = decoder;
     }
 
-    public ByteBuf encode(Resource resource) throws Exception {
+    public ByteBuf encode(RequestContext ctx, Resource resource) throws Exception {
         CompletableFuture<ByteBuf> future = new CompletableFuture<>();
-        newEncodingContext(resource, future).encode();
+        newEncodingContext(ctx, resource, future).encode();
         ByteBuf result = future.get();
         return result;
     }
@@ -28,10 +29,10 @@ public class ResourceCodec {
         return this.decoder.decode(resource);
     }
 
-    protected EncodingContext newEncodingContext(Resource resource, CompletableFuture<ByteBuf> future) throws Exception {
+    protected EncodingContext newEncodingContext(RequestContext ctx, Resource resource, CompletableFuture<ByteBuf> future) throws Exception {
         ByteBuf buffer = Unpooled.buffer();
         Object attachment = this.encoder.createAttachment(buffer);
-        EncodingContext driver = new RootEncodingContext(this.encoder, attachment, resource, () -> {
+        EncodingContext driver = new RootEncodingContext(ctx, this.encoder, attachment, resource, () -> {
             future.complete( buffer );
         });
         return driver;

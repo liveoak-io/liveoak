@@ -1,5 +1,6 @@
 package org.projectodd.restafari.container;
 
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.ObjectResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
@@ -31,7 +32,7 @@ public class InMemoryObjectResource implements ObjectResource {
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         boolean found = false;
 
         List<PropertyResourceState> result = state.members().collect(Collectors.toList());
@@ -47,19 +48,19 @@ public class InMemoryObjectResource implements ObjectResource {
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         this.parent.delete(this.id);
         responder.resourceDeleted(this);
     }
 
     @Override
-    public void update(ObjectResourceState state, Responder responder) {
+    public void update(RequestContext ctx, ObjectResourceState state, Responder responder) {
         this.state = state;
         responder.resourceUpdated(this);
     }
 
     @Override
-    public void readContent(ResourceSink sink) {
+    public void readContent(RequestContext ctx, ResourceSink sink) {
         this.state.members().forEach((prop) -> {
             sink.accept( new SimplePropertyResource(this, prop.id(), prop.value() ) );
         });

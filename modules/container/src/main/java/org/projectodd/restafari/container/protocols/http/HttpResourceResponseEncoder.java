@@ -11,6 +11,7 @@ import org.projectodd.restafari.container.codec.IncompatibleMediaTypeException;
 import org.projectodd.restafari.container.codec.MediaTypeMatcher;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
 import org.projectodd.restafari.spi.MediaType;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 
 import java.util.List;
@@ -99,7 +100,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
         if (shouldEncodeState) {
             MediaTypeMatcher matcher = msg.inReplyTo().mediaTypeMatcher();
             try {
-                encodingResult = encodeState(matcher, msg.resource());
+                encodingResult = encodeState(msg.inReplyTo().requestContext(), matcher, msg.resource());
             } catch (IncompatibleMediaTypeException e) {
                 e.printStackTrace();
                 responseStatus = new HttpResponseStatus(HttpResponseStatus.NOT_ACCEPTABLE.code(), e.getMessage() );
@@ -133,8 +134,8 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
         out.add(response);
     }
 
-    protected EncodingResult encodeState(MediaTypeMatcher mediaTypeMatcher, Resource resource) throws Exception {
-        return this.codecManager.encode(mediaTypeMatcher, resource);
+    protected EncodingResult encodeState(RequestContext ctx, MediaTypeMatcher mediaTypeMatcher, Resource resource) throws Exception {
+        return this.codecManager.encode(ctx, mediaTypeMatcher, resource);
     }
 
     private ResourceCodecManager codecManager;

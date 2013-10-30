@@ -4,6 +4,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import org.projectodd.restafari.spi.RequestContext;
+import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.ObjectResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
@@ -16,7 +18,7 @@ import java.util.ArrayList;
 /**
  * @author Bob McWhirter
  */
-public class MongoObjectResource implements ObjectResource {
+public class MongoObjectResource implements ObjectResource, BlockingResource {
 
     private static final String ID_FIELD = "_id";
 
@@ -51,7 +53,7 @@ public class MongoObjectResource implements ObjectResource {
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         Object value = this.dbObject.get(id);
         if (value != null) {
             responder.resourceRead(new SimplePropertyResource(this, id, value));
@@ -61,7 +63,7 @@ public class MongoObjectResource implements ObjectResource {
     }
 
     @Override
-    public void update(ObjectResourceState state, Responder responder) {
+    public void update(RequestContext ctx, ObjectResourceState state, Responder responder) {
         state.members().forEach((p) -> {
             this.dbObject.put(p.id(), p.value());
         });
@@ -72,7 +74,7 @@ public class MongoObjectResource implements ObjectResource {
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         DB db = parent.getDB();
         if (db.collectionExists(parent.id()))
         {
@@ -89,7 +91,7 @@ public class MongoObjectResource implements ObjectResource {
     }
 
     @Override
-    public void readContent(ResourceSink sink) {
+    public void readContent(RequestContext ctx, ResourceSink sink) {
         this.dbObject.keySet().stream().forEach((name) -> {
             // the _id field is handled in the special case in id()
             if (!name.equals(ID_FIELD)) {

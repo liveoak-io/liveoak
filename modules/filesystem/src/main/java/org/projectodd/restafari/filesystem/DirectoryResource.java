@@ -1,6 +1,6 @@
 package org.projectodd.restafari.filesystem;
 
-import org.projectodd.restafari.spi.Pagination;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
@@ -31,12 +31,12 @@ public class DirectoryResource implements FSResource, CollectionResource {
     }
 
     @Override
-    public void create(ResourceState state, Responder responder) {
+    public void create(RequestContext ctx, ResourceState state, Responder responder) {
         responder.createNotSupported(this);
     }
 
     @Override
-    public void readContent(Pagination pagination, ResourceSink sink) {
+    public void readContent(RequestContext ctx, ResourceSink sink) {
         vertx().fileSystem().readDir(this.file.getPath(), (result) -> {
             if (result.failed()) {
                 sink.close();
@@ -92,7 +92,7 @@ public class DirectoryResource implements FSResource, CollectionResource {
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         File path = new File(this.file, id);
         vertx().fileSystem().exists(path.getPath(), (existResult) -> {
             if (existResult.succeeded() && existResult.result()) {
@@ -108,7 +108,7 @@ public class DirectoryResource implements FSResource, CollectionResource {
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         responder.deleteNotSupported(this);
     }
 

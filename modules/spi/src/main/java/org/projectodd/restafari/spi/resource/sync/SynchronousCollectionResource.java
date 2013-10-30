@@ -1,6 +1,7 @@
 package org.projectodd.restafari.spi.resource.sync;
 
 import org.projectodd.restafari.spi.CreateNotSupportedException;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.ResourceException;
 import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
@@ -22,7 +23,7 @@ public interface SynchronousCollectionResource extends SynchronousResource, Coll
     Resource create(ResourceState state) throws ResourceException;
 
     @Override
-    default void create(ResourceState state, Responder responder) {
+    default void create(RequestContext ctx, ResourceState state, Responder responder) {
         try {
             Resource result = create(state);
             responder.resourceCreated(result);
@@ -35,7 +36,8 @@ public interface SynchronousCollectionResource extends SynchronousResource, Coll
     }
 
     @Override
-    default void readContent(Pagination pagination, ResourceSink sink) {
+    default void readContent(RequestContext ctx, ResourceSink sink) {
+        Pagination pagination = ctx.getPagination();
         Stream<Resource> stream = members().substream( pagination.getOffset() );
 
         if ( pagination.getLimit() > 0 ) {

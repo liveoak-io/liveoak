@@ -33,7 +33,7 @@ public class InMemoryCollectionResource implements CollectionResource {
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         if (this.collection.containsKey(id)) {
             responder.resourceRead(this.collection.get(id));
         } else {
@@ -43,7 +43,7 @@ public class InMemoryCollectionResource implements CollectionResource {
     }
 
     @Override
-    public void create(ResourceState state, Responder responder) {
+    public void create(RequestContext ctx, ResourceState state, Responder responder) {
         String id = state.id();
         if (id == null) {
             id = UUID.randomUUID().toString();
@@ -61,8 +61,8 @@ public class InMemoryCollectionResource implements CollectionResource {
     }
 
     @Override
-    public void readContent(Pagination pagination, ResourceSink sink) {
-        Stream<Resource> stream = applyPagination(pagination, this.collection.values());
+    public void readContent(RequestContext ctx, ResourceSink sink) {
+        Stream<Resource> stream = applyPagination(ctx.getPagination(), this.collection.values());
         stream.forEach((m) -> {
             sink.accept(m);
         });
@@ -85,7 +85,7 @@ public class InMemoryCollectionResource implements CollectionResource {
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         parent.delete(this.id);
         responder.resourceDeleted(this);
     }

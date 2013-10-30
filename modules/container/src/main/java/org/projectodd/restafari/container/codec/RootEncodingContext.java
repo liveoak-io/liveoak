@@ -1,5 +1,6 @@
 package org.projectodd.restafari.container.codec;
 
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 
 import java.util.concurrent.Executor;
@@ -9,8 +10,8 @@ import java.util.concurrent.Executor;
  */
 public class RootEncodingContext<T> extends AbstractEncodingContext<T>  {
 
-    public RootEncodingContext(ResourceEncoder<T> encoder, T attachment, Resource resource, Runnable completionHandler) {
-        super( null, resource, completionHandler );
+    public RootEncodingContext(RequestContext ctx, ResourceEncoder<T> encoder, T attachment, Resource resource, Runnable completionHandler) {
+        super( null, ctx, resource, completionHandler );
         this.attachment = attachment;
         this.encoder = encoder;
     }

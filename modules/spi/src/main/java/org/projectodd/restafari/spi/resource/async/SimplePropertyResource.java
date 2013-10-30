@@ -1,5 +1,6 @@
 package org.projectodd.restafari.spi.resource.async;
 
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 
 /**
@@ -19,12 +20,12 @@ public class SimplePropertyResource implements PropertyResource {
     }
 
     @Override
-    public Object get() {
+    public Object get(RequestContext ctx) {
         return value;
     }
 
     @Override
-    public void readContent(PropertyContentSink sink) {
+    public void readContent(RequestContext ctx, PropertyContentSink sink) {
         sink.accept( this.value );
     }
 
@@ -39,12 +40,12 @@ public class SimplePropertyResource implements PropertyResource {
     }
 
     @Override
-    public void read(String id, Responder responder) {
+    public void read(RequestContext ctx, String id, Responder responder) {
         responder.readNotSupported( this );
     }
 
     @Override
-    public void delete(Responder responder) {
+    public void delete(RequestContext ctx, Responder responder) {
         responder.deleteNotSupported( this );
     }
 

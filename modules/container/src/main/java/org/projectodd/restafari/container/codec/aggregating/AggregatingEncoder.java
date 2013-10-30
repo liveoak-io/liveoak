@@ -35,7 +35,7 @@ public class AggregatingEncoder implements ExpansionControllingEncoder<ByteBuf> 
 
         if (object instanceof BinaryResource) {
             if (((BinaryResource) object).mediaType().isCompatible(this.mediaType)) {
-                ((BinaryResource) object).readContent(new MyBinaryContentSink(context));
+                ((BinaryResource) object).readContent(context.requestContext(), new MyBinaryContentSink(context));
             } else {
                 context.end();
             }
