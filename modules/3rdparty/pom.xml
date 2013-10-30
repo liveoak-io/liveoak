@@ -36,17 +36,8 @@
             <executions>
               <execution>
                 <id>assemble-module</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
                 <configuration>
-                  <descriptorRefs>
-                    <descriptorRef>module</descriptorRef>
-                  </descriptorRefs>
                   <outputDirectory>../../target/modules/${module.resourcePath}</outputDirectory>
-                  <finalName>main</finalName>
-                  <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
               </execution>
             </executions>
