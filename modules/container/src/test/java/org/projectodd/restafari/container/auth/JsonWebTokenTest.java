@@ -5,8 +5,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.jgroups.util.Util.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>

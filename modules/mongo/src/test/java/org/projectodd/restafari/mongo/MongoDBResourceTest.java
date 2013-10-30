@@ -21,7 +21,7 @@ import org.projectodd.restafari.container.UnsecureServer;
 import java.util.UUID;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.jgroups.util.Util.assertFalse;
+import static org.junit.Assert.*;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>

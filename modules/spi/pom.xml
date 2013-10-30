@@ -24,24 +24,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.jboss.msc</groupId>
-            <artifactId>jboss-msc</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
             <version>${vertx.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jgroups</groupId>
-            <artifactId>jgroups</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.modules</groupId>
-            <artifactId>jboss-modules</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

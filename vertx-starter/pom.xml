@@ -64,13 +64,15 @@
 
         <dependency>
             <groupId>org.projectodd.restafari</groupId>
+            <artifactId>restafari-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectodd.restafari</groupId>
             <artifactId>restafari-mongo</artifactId>
-            <version>${version.org.projectodd.restafari}</version>
         </dependency>
         <dependency>
             <groupId>org.projectodd.restafari</groupId>
             <artifactId>restafari-container</artifactId>
-            <version>${version.org.projectodd.restafari}</version>
         </dependency>
         <dependency>
             <groupId>org.projectodd.restafari</groupId>

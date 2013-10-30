@@ -48,6 +48,12 @@
         <dependency>
             <groupId>org.projectodd.restafari</groupId>
             <artifactId>restafari-spi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.projectodd.restafari</groupId>
