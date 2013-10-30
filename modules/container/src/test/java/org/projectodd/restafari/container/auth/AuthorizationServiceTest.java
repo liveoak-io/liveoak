@@ -4,8 +4,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.container.ResourceRequest;
-import org.projectodd.restafari.container.auth.service.AuthorizationRequestContext;
-import org.projectodd.restafari.container.auth.service.DemoAuthorizationService;
+import org.projectodd.restafari.container.auth.impl.AuthServicesHolder;
+import org.projectodd.restafari.container.auth.impl.PolicyBasedAuthorizationService;
+import org.projectodd.restafari.container.auth.impl.uri.DemoAuthorizationPolicy;
+import org.projectodd.restafari.container.auth.spi.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +19,7 @@ public class AuthorizationServiceTest {
 
     @Test
     public void testDemoAuthorizationService() {
-        DemoAuthorizationService service = new DemoAuthorizationService();
+        AuthorizationService service = AuthServicesHolder.getInstance().getAuthorizationService();
 
         AuthorizationRequestContext req1 = createAuthRequestContext("/something", ResourceRequest.RequestType.READ,
                 new String[] {}, new String[] {});

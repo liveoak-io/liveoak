@@ -1,8 +1,9 @@
-package org.projectodd.restafari.container.auth.service;
+package org.projectodd.restafari.container.auth.spi;
 
 /**
+ *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public enum AuthorizationDecision {
-    ALLOW, DENY, NOT_SURE
+    ACCEPT, REJECT, IGNORE
 }

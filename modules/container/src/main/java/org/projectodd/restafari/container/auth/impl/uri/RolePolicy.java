@@ -1,4 +1,6 @@
-package org.projectodd.restafari.container.auth.service;
+package org.projectodd.restafari.container.auth.impl.uri;
+
+import org.projectodd.restafari.container.auth.spi.AuthorizationDecision;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -28,52 +30,52 @@ public class RolePolicy {
 
     public AuthorizationDecision isRealmRoleAllowed(String roleName) {
         if (deniedRealmRoles != null && deniedRealmRoles.contains(roleName)) {
-            return AuthorizationDecision.DENY;
-        } else if (allowedRealmRoles != null && (allowedRealmRoles.contains(roleName) || allowedRealmRoles.contains(RoleBasedAuthorizationService.WILDCARD))) {
-            return AuthorizationDecision.ALLOW;
+            return AuthorizationDecision.REJECT;
+        } else if (allowedRealmRoles != null && (allowedRealmRoles.contains(roleName) || allowedRealmRoles.contains(URIAuthorizationPolicy.WILDCARD))) {
+            return AuthorizationDecision.ACCEPT;
         }
 
-        return AuthorizationDecision.NOT_SURE;
+        return AuthorizationDecision.IGNORE;
     }
 
     public AuthorizationDecision isApplicationRoleAllowed(String roleName) {
         if (deniedApplicationRoles != null && deniedApplicationRoles.contains(roleName)) {
-            return AuthorizationDecision.DENY;
-        } else if (allowedApplicationRoles != null && (allowedApplicationRoles.contains(roleName) || allowedApplicationRoles.contains(RoleBasedAuthorizationService.WILDCARD))) {
-            return AuthorizationDecision.ALLOW;
+            return AuthorizationDecision.REJECT;
+        } else if (allowedApplicationRoles != null && (allowedApplicationRoles.contains(roleName) || allowedApplicationRoles.contains(URIAuthorizationPolicy.WILDCARD))) {
+            return AuthorizationDecision.ACCEPT;
         }
 
-        return AuthorizationDecision.NOT_SURE;
+        return AuthorizationDecision.IGNORE;
     }
 
     public AuthorizationDecision isRealmRolesAllowed(Set<String> roles) {
         boolean anyAllowed = false;
         for (String role : roles) {
             AuthorizationDecision authDecision = isRealmRoleAllowed(role);
-            if (authDecision == AuthorizationDecision.DENY) {
-                // DENY always wins
-                return AuthorizationDecision.DENY;
-            } else if (authDecision == AuthorizationDecision.ALLOW) {
+            if (authDecision == AuthorizationDecision.REJECT) {
+                // REJECT always wins
+                return AuthorizationDecision.REJECT;
+            } else if (authDecision == AuthorizationDecision.ACCEPT) {
                 anyAllowed = true;
             }
         }
 
-        return anyAllowed ? AuthorizationDecision.ALLOW : AuthorizationDecision.NOT_SURE;
+        return anyAllowed ? AuthorizationDecision.ACCEPT : AuthorizationDecision.IGNORE;
     }
 
     public AuthorizationDecision isApplicationRolesAllowed(Set<String> roles) {
         boolean anyAllowed = false;
         for (String role : roles) {
             AuthorizationDecision authDecision = isApplicationRoleAllowed(role);
-            if (authDecision == AuthorizationDecision.DENY) {
-                // DENY always wins
-                return AuthorizationDecision.DENY;
-            } else if (authDecision == AuthorizationDecision.ALLOW) {
+            if (authDecision == AuthorizationDecision.REJECT) {
+                // REJECT always wins
+                return AuthorizationDecision.REJECT;
+            } else if (authDecision == AuthorizationDecision.ACCEPT) {
                 anyAllowed = true;
             }
         }
 
-        return anyAllowed ? AuthorizationDecision.ALLOW : AuthorizationDecision.NOT_SURE;
+        return anyAllowed ? AuthorizationDecision.ACCEPT : AuthorizationDecision.IGNORE;
     }
 
     public Set<String> getAllowedRealmRoles() {

@@ -1,4 +1,4 @@
-package org.projectodd.restafari.container.auth;
+package org.projectodd.restafari.container.auth.spi;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.*;
 
 /**
+ * TODO: Maybe introduce another (simpler) object into SPI instead of this one
+ *
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
 public class JsonWebToken {
@@ -39,7 +41,7 @@ public class JsonWebToken {
     }
 
     // Just for unit tests
-    JsonWebToken(String[] realmRoles, Map<String, String[]> appRoles) {
+    public JsonWebToken(String[] realmRoles, Map<String, String[]> appRoles) {
         claims = new JsonWebToken.Claims();
         claims.realmAccess = new Access();
         claims.realmAccess.roles = new HashSet();

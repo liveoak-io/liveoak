@@ -1,9 +1,12 @@
-package org.projectodd.restafari.container.auth.service;
+package org.projectodd.restafari.container.auth.utils;
+
+import org.projectodd.restafari.container.auth.impl.uri.URIAuthorizationPolicy;
+import org.projectodd.restafari.container.auth.impl.uri.RolePolicy;
 
 import java.util.*;
 
 /**
- * Utility to save authorization rules and then find best {@link RolePolicy} for given request
+ * Utility to save authorization rules and then find best {@link org.projectodd.restafari.container.auth.impl.uri.RolePolicy} for given request
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
@@ -34,7 +37,7 @@ public class RecursiveHashMap extends HashMap<String, Object> {
     }
 
     protected RolePolicy recursiveGet(Deque<String> keys, Collection<RecursiveHashMap> processedAncestors) {
-        String topKey = keys.isEmpty() ? RoleBasedAuthorizationService.WILDCARD : keys.peek();
+        String topKey = keys.isEmpty() ? URIAuthorizationPolicy.WILDCARD : keys.peek();
 
         // Try to find policy exactly for the key
         if (this.containsKey(topKey)) {
@@ -42,9 +45,9 @@ public class RecursiveHashMap extends HashMap<String, Object> {
         }
 
         // Try to find policy for * if policy for the key not available
-        if (topKey != RoleBasedAuthorizationService.WILDCARD) {
-            if (this.containsKey(RoleBasedAuthorizationService.WILDCARD)) {
-                return safeGet(RoleBasedAuthorizationService.WILDCARD, keys, processedAncestors);
+        if (topKey != URIAuthorizationPolicy.WILDCARD) {
+            if (this.containsKey(URIAuthorizationPolicy.WILDCARD)) {
+                return safeGet(URIAuthorizationPolicy.WILDCARD, keys, processedAncestors);
             }
         }
 
@@ -62,7 +65,7 @@ public class RecursiveHashMap extends HashMap<String, Object> {
         int size = keys.size() + ancestorDepth;
         for (int i=0 ; i<size ; i++) {
             // Add all path segments with wildcard
-            newKeys.add(RoleBasedAuthorizationService.WILDCARD);
+            newKeys.add(URIAuthorizationPolicy.WILDCARD);
         }
         // Add action to the last position without wildcard
         newKeys.add(keys.getLast());

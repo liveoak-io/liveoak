@@ -1,7 +1,6 @@
-package org.projectodd.restafari.container.auth.service;
+package org.projectodd.restafari.container.auth.spi;
 
 import org.projectodd.restafari.container.ResourceRequest;
-import org.projectodd.restafari.container.auth.JsonWebToken;
 
 /**
  * Encapsulates all data needed for authorization decision

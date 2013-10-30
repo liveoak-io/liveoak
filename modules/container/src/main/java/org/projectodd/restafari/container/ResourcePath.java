@@ -71,6 +71,21 @@ public class ResourcePath {
         return builder.toString();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(this.getClass().equals(obj.getClass()))) {
+            return false;
+        }
+
+        ResourcePath that = (ResourcePath)obj;
+        return segments.equals(that.segments);
+    }
+
+    @Override
+    public int hashCode() {
+        return segments.hashCode();
+    }
+
     private List<String> segments;
 
 }
