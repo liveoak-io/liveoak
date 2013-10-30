@@ -38,6 +38,9 @@
           <execution>
             <id>assemble-module</id>
           </execution>
+          <execution>
+            <id>assemble-m2-repo</id>
+          </execution>
         </executions>
       </plugin>
     </plugins>

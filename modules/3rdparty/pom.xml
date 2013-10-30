@@ -31,6 +31,12 @@
                 <outputDirectory>../../target/modules/${module.resourcePath}</outputDirectory>
               </configuration>
             </execution>
+            <execution>
+              <id>assemble-m2-repo</id>
+              <configuration>
+                <outputDirectory>../../target</outputDirectory>
+              </configuration>
+            </execution>
           </executions>
         </plugin>
       </plugins>

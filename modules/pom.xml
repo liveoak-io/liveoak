@@ -43,6 +43,21 @@
                 <appendAssemblyId>false</appendAssemblyId>
               </configuration>
             </execution>
+            <execution>
+              <id>assemble-m2-repo</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+              <configuration>
+                <descriptorRefs>
+                  <descriptorRef>m2-repo</descriptorRef>
+                </descriptorRefs>
+                <outputDirectory>../target</outputDirectory>
+                <finalName>m2-repo</finalName>
+                <appendAssemblyId>false</appendAssemblyId>
+              </configuration>
+            </execution>
           </executions>
         </plugin>
       </plugins>

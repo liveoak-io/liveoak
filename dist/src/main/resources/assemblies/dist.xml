@@ -9,6 +9,10 @@
       <directory>../modules/target/modules</directory>
       <outputDirectory>/modules</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>../modules/target/m2-repo</directory>
+      <outputDirectory>/m2-repo</outputDirectory>
+    </fileSet>
     <fileSet> 
       <directory>../clients/javascript/src/main/javascript</directory>
       <outputDirectory>/javascript</outputDirectory>

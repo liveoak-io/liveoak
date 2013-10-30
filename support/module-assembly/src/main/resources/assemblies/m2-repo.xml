@@ -7,17 +7,6 @@
   <repositories>
     <repository>
       <outputDirectory>/</outputDirectory>
-      <includes>
-        <include>org.projectodd.restafari:*:*</include>
-      </includes>
     </repository>
   </repositories>
-<!--
-  <dependencySets>
-    <dependencySet>
-      <useProjectArtifact>true</useProjectArtifact>
-      <unpack>false</unpack>
-    </dependencySet>
-  </dependencySets>
--->
 </assembly>
