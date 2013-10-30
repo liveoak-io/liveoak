@@ -5,7 +5,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.*;
-import org.projectodd.restafari.container.ResourceParams;
+import org.projectodd.restafari.container.DefaultRequestContext;
+import org.projectodd.restafari.container.DefaultResourceParams;
 import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.container.ResourceRequest;
 import org.projectodd.restafari.container.ReturnFieldsImpl;
@@ -14,6 +15,7 @@ import org.projectodd.restafari.container.codec.ResourceCodecManager;
 import org.projectodd.restafari.container.codec.UnsupportedMediaTypeException;
 import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.spi.Pagination;
+import org.projectodd.restafari.spi.ResourceParams;
 import org.projectodd.restafari.spi.ReturnFields;
 import org.projectodd.restafari.spi.state.ResourceState;
 
@@ -65,7 +67,10 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
 
         String authToken = getAuthorizationToken(msg);
 
-        ResourceParams params = ResourceParams.instance(decoder.parameters());
+        ResourceParams params = DefaultResourceParams.instance(decoder.parameters());
+
+        DefaultRequestContext requestCtx = new DefaultRequestContext(null, decodePagination(params), decodeReturnFields(params), params);
+        DefaultRequestContext.associate(requestCtx);
 
         if (msg.getMethod().equals(HttpMethod.POST)) {
             String contentTypeHeader = msg.headers().get( HttpHeaders.Names.CONTENT_TYPE );
@@ -81,8 +86,8 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .authorizationToken(authToken)
-                    .pagination(decodePagination(params))
-                    .returnFields(decodeReturnFields(params))
+                    .pagination(requestCtx.getPagination())
+                    .returnFields(requestCtx.getReturnFields())
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.PUT)) {
             String contentTypeHeader = msg.headers().get( HttpHeaders.Names.CONTENT_TYPE );
@@ -117,8 +122,8 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
     }
 
     protected Pagination decodePagination(ResourceParams params) {
-        int offset = limit(params.getIntValue("offset", 0), 0, Integer.MAX_VALUE);
-        int limit = limit(params.getIntValue("limit", Pagination.DEFAULT_LIMIT), 0, Pagination.MAX_LIMIT);
+        int offset = limit(params.intValue("offset", 0), 0, Integer.MAX_VALUE);
+        int limit = limit(params.intValue("limit", Pagination.DEFAULT_LIMIT), 0, Pagination.MAX_LIMIT);
 
         return new Pagination() {
             public int getOffset() {

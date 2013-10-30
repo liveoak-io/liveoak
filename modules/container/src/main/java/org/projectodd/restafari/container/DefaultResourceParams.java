@@ -1,5 +1,7 @@
 package org.projectodd.restafari.container;
 
+import org.projectodd.restafari.spi.ResourceParams;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -8,25 +10,22 @@ import java.util.Map;
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class ResourceParams {
-
-    public static final ResourceParams NONE = new ResourceParams();
-
+public class DefaultResourceParams implements ResourceParams {
 
     public static ResourceParams instance(Map<String, List<String>> params) {
         if (params == null || params.size() == 0) {
             return NONE;
         }
-        return new ResourceParams(params);
+        return new DefaultResourceParams(params);
     }
 
     private final Map<String, List<String>> params;
 
-    private ResourceParams() {
+    private DefaultResourceParams() {
         params = Collections.emptyMap();
     }
 
-    private ResourceParams(Map<String, List<String>> params) {
+    private DefaultResourceParams(Map<String, List<String>> params) {
         this.params = params;
     }
 
@@ -50,7 +49,7 @@ public class ResourceParams {
         return Collections.unmodifiableList(params.get(name));
     }
 
-    public int getIntValue(String name, int def) {
+    public int intValue(String name, int def) {
         String val = value(name);
         if (val == null) {
             return def;

@@ -86,6 +86,7 @@ public class PipelineConfigurator {
         pipeline.addLast("auth-handler", new AuthorizationHandler());
         //pipeline.addLast( new DebugHandler( "server-2" ) );
         pipeline.addLast("subscription-watcher", new SubscriptionWatcher(this.container.getSubscriptionManager()));
+        pipeline.addLast("request-context-handler", new RequestContextHandler());
         pipeline.addLast("object-handler", new ResourceHandler(this.container));
         pipeline.addLast("error-handler", new ErrorHandler() );
     }

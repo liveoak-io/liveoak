@@ -1,8 +1,8 @@
 package org.projectodd.restafari.container;
 
 import org.projectodd.restafari.container.codec.MediaTypeMatcher;
-import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.spi.Pagination;
+import org.projectodd.restafari.spi.ResourceParams;
 import org.projectodd.restafari.spi.ReturnFields;
 import org.projectodd.restafari.spi.state.ResourceState;
 

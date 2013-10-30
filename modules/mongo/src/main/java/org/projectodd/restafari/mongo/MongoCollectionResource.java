@@ -3,6 +3,7 @@ package org.projectodd.restafari.mongo;
 import com.mongodb.*;
 import org.bson.types.ObjectId;
 import org.projectodd.restafari.spi.*;
+import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
@@ -22,7 +23,7 @@ import java.util.stream.StreamSupport;
  */
 //TODO: fix the situations with all the mongo resources to have a proper hierarchy with parents
 //class MongoCollectionResource implements CollectionResource {
-class MongoCollectionResource extends MongoDBResource {
+class MongoCollectionResource extends MongoDBResource implements BlockingResource {
     private MongoDBResource parent;
     private String collectionName;
 

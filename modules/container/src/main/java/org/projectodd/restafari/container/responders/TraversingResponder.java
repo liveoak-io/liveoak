@@ -1,14 +1,14 @@
 package org.projectodd.restafari.container.responders;
 
 import io.netty.channel.ChannelHandlerContext;
+import org.projectodd.restafari.container.DefaultRequestContext;
 import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.container.ResourceRequest;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.Resource;
 
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * @author Bob McWhirter
@@ -40,11 +40,17 @@ public abstract class TraversingResponder extends BaseResponder {
 
     protected void doRead(String next, Resource resource) {
         if (resource instanceof BlockingResource) {
+            // propagate RequestContext to another thread via associate()
+            RequestContext ctx = RequestContext.instance();
+            //DefaultRequestContext.dissociate();
             this.executor.execute(() -> {
                 try {
+                    DefaultRequestContext.associate(ctx);
                     resource.read(next, this);
                 } catch (RuntimeException e) {
                     noSuchResource(next);
+                } finally {
+                    DefaultRequestContext.dissociate();
                 }
             });
         } else {
@@ -52,17 +58,30 @@ public abstract class TraversingResponder extends BaseResponder {
                 resource.read(next, this);
             } catch (RuntimeException e) {
                 noSuchResource( next );
+            } finally {
+                //DefaultRequestContext.dissociate();
             }
         }
     }
 
     protected void doPerform(Resource resource) {
         if (resource instanceof BlockingResource) {
+            RequestContext ctx = RequestContext.instance();
+            //DefaultRequestContext.dissociate();
             this.executor.execute(() -> {
-                perform(resource);
+                try {
+                    DefaultRequestContext.associate(ctx);
+                    perform(resource);
+                } finally {
+                    DefaultRequestContext.dissociate();
+                }
             });
         } else {
-            perform(resource);
+            try {
+                perform(resource);
+            } finally {
+                //DefaultRequestContext.dissociate();
+            }
         }
     }
 

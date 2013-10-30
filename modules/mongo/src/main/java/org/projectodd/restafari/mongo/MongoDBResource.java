@@ -2,6 +2,7 @@ package org.projectodd.restafari.mongo;
 
 import com.mongodb.*;
 import org.projectodd.restafari.spi.*;
+import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.RootResource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
@@ -16,7 +17,7 @@ import java.util.stream.Stream;
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  */
-public class MongoDBResource implements CollectionResource, RootResource {
+public class MongoDBResource implements CollectionResource, RootResource, BlockingResource {
 
     private String id;
     private MongoClient mongo;

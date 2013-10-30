@@ -4,6 +4,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.ObjectResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 /**
  * @author Bob McWhirter
  */
-public class MongoObjectResource implements ObjectResource {
+public class MongoObjectResource implements ObjectResource, BlockingResource {
 
     private static final String ID_FIELD = "_id";
 

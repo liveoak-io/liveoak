@@ -2,7 +2,7 @@ package org.projectodd.restafari.container.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.projectodd.restafari.spi.Pagination;
+import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.*;
 
@@ -78,7 +78,7 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
             this.endContentHandler = endContentHandler;
 
             if (this.object instanceof CollectionResource) {
-                ((CollectionResource) this.object).readContent(Pagination.NONE, new MyCollectionContentSink());
+                ((CollectionResource) this.object).readContent(RequestContext.instance().getPagination(), new MyCollectionContentSink());
             } else if (this.object instanceof ObjectResource) {
                 ((ObjectResource) this.object).readContent(new MyObjectContentSink());
             } else if (this.object instanceof PropertyResource) {
