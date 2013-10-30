@@ -4,7 +4,7 @@
 
   <resources>
     <resource-root path="${project.artifactId}.jar"/>
-    <resource-root path="commons-codec.jar"/>
+    <artifact name="commons-codec:commons-codec:${commons-codec.version}"/>
   </resources>
 
   <dependencies>

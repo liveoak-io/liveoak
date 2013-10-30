@@ -1,0 +1,23 @@
+<assembly>
+  <id>m2-repo</id>
+  <formats>
+    <format>dir</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <repositories>
+    <repository>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>org.projectodd.restafari:*:*</include>
+      </includes>
+    </repository>
+  </repositories>
+<!--
+  <dependencySets>
+    <dependencySet>
+      <useProjectArtifact>true</useProjectArtifact>
+      <unpack>false</unpack>
+    </dependencySet>
+  </dependencySets>
+-->
+</assembly>

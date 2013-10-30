@@ -3,11 +3,11 @@
 <module xmlns="urn:jboss:module:1.0" name="${module-name}">
 
   <resources>
-    <resource-root path="vertx-core.jar"/>
-    <resource-root path="vertx-platform.jar"/>
-    <resource-root path="hazelcast.jar"/>
-    <resource-root path="slf4j-api.jar"/>
-    <resource-root path="log4j.jar"/>
+    <artifact name="io.vertx:vertx-core:${vertx.version}"/>
+    <artifact name="io.vertx:vertx-platform:${vertx.version}"/>
+    <artifact name="org.slf4j:slf4j-api:1.6.2"/>
+    <artifact name="com.hazelcast:hazelcast:2.6"/>
+    <artifact name="log4j:log4j:1.2.16"/>
   </resources>
 
   <dependencies>

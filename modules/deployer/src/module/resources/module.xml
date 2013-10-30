@@ -3,11 +3,8 @@
 <module xmlns="urn:jboss:module:1.0" name="${module-name}">
 
   <resources>
-    <artifact name="io.netty:netty-all:${netty.version}"/>
+    <resource-root path="${project.artifactId}.jar"/>
   </resources>
-
-  <dependencies>
-  </dependencies>
 
 </module>
 

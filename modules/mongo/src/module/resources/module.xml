@@ -4,7 +4,7 @@
 
   <resources>
     <resource-root path="${project.artifactId}.jar"/>
-    <resource-root path="mongo-java-driver.jar"/>
+    <artifact name="org.mongodb:mongo-java-driver:${mongo.version}"/>
   </resources>
 
   <dependencies>

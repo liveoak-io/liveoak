@@ -36,6 +36,7 @@
         <junit.version>4.11</junit.version>
         <mockito.version>1.8.5</mockito.version>
         <fest.version>1.4</fest.version>
+        <commons-codec.version>1.8</commons-codec.version>
     </properties>
 
     <modules>
@@ -123,6 +124,11 @@
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongo-java-driver</artifactId>
                 <version>${mongo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons-codec.version}</version>
             </dependency>
 
             <dependency>
