@@ -28,7 +28,7 @@
             <execution>
               <id>assemble-module</id>
               <configuration>
-                <outputDirectory>../../target/modules/${module.resourcePath}</outputDirectory>
+                <outputDirectory>../../target/modules/${module.path}</outputDirectory>
               </configuration>
             </execution>
             <execution>

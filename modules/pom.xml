@@ -38,7 +38,7 @@
                 <descriptorRefs>
                   <descriptorRef>module</descriptorRef>
                 </descriptorRefs>
-                <outputDirectory>../target/modules/${module.resourcePath}</outputDirectory>
+                <outputDirectory>../target/modules/${module.path}</outputDirectory>
                 <finalName>main</finalName>
                 <appendAssemblyId>false</appendAssemblyId>
               </configuration>
@@ -74,7 +74,7 @@
               <goal>regex-property</goal>
             </goals>
             <configuration>
-              <name>module.resourcePath</name>
+              <name>module.path</name>
               <regex>\.</regex>
               <value>${module-name}</value>
               <replacement>/</replacement>
