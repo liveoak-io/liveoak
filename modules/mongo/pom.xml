@@ -46,16 +46,6 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.projectodd.restafari</groupId>
-      <artifactId>restafari-container</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>com.github.joelittlejohn.embedmongo</groupId>
       <artifactId>embedmongo-maven-plugin</artifactId>
       <version>0.1.9</version>
@@ -73,6 +63,9 @@
         <executions>
           <execution>
             <id>assemble-module</id>
+          </execution>
+          <execution>
+            <id>assemble-m2-repo</id>
           </execution>
         </executions>
       </plugin>

@@ -11,7 +11,7 @@
   <name>restafari-modules</name>
   <packaging>pom</packaging>
   <properties>
-    <module-name/>
+    <module-name>ignored.but.this.has.to.be.here</module-name>
   </properties>
   <dependencies>
     </dependencies>
@@ -45,7 +45,7 @@
             </execution>
             <execution>
               <id>assemble-m2-repo</id>
-              <phase>package</phase>
+              <phase>install</phase>
               <goals>
                 <goal>single</goal>
               </goals>
@@ -64,23 +64,20 @@
     </pluginManagement>
     <plugins>
       <plugin>
-        <groupId>com.github.goldin</groupId>
-        <artifactId>properties-maven-plugin</artifactId>
-        <version>0.2.5</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
         <executions>
           <execution>
             <id>set-properties</id>
             <phase>validate</phase>
             <goals>
-              <goal>set-properties</goal>
+              <goal>regex-property</goal>
             </goals>
             <configuration>
-              <properties>
-                <property>
-                  <name>module.resourcePath</name>
-                  <value>{{ moduleName.replaceAll( '\\.', '/' ) }}</value>
-                </property>
-              </properties>
+              <name>module.resourcePath</name>
+              <regex>\.</regex>
+              <value>${module-name}</value>
+              <replacement>/</replacement>
             </configuration>
           </execution>
         </executions>
