@@ -35,7 +35,7 @@ public class InMemoryCollectionResource implements CollectionResource {
     @Override
     public void read(RequestContext ctx, String id, Responder responder) {
         if (this.collection.containsKey(id)) {
-            responder.resourceRead(this.collection.get(id));
+            responder.resourceRead(applyReturnFields(ctx.getReturnFields(), this.collection.get(id)));
         } else {
             System.err.println( "no-such: " + id + " to " + responder);
             responder.noSuchResource( id );
@@ -71,6 +71,14 @@ public class InMemoryCollectionResource implements CollectionResource {
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+    }
+
+    private Resource applyReturnFields(ReturnFields fields, Resource obj) {
+        if (fields != null && obj instanceof InMemoryObjectResource) {
+            return new InMemoryObjectResource((InMemoryCollectionResource) obj.parent(), obj.id(),
+                    new FilteredObjectResourceState(((InMemoryObjectResource) obj).state(), fields));
+        }
+        return obj;
     }
 
     private Stream<Resource> applyPagination(Pagination pagination, Collection<Resource> values) {

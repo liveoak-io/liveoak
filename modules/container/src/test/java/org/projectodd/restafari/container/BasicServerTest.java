@@ -6,10 +6,8 @@ import io.netty.buffer.Unpooled;
 
 import java.net.InetAddress;
 import java.nio.charset.Charset;
-import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -32,14 +30,10 @@ import static org.fest.assertions.Assertions.*;
 
 public class BasicServerTest {
 
-    static class ObjectHolder {
-        public Object object;
-    }
-
     private DefaultContainer container;
     private UnsecureServer server;
 
-    private CloseableHttpClient httpClient;
+    protected CloseableHttpClient httpClient;
 
     @Before
     public void setUpServer() throws Exception {
@@ -67,7 +61,7 @@ public class BasicServerTest {
         System.err.flush();
     }
 
-    private ResourceState decode(HttpResponse response) throws Exception {
+    protected ResourceState decode(HttpResponse response) throws Exception {
         ByteBuf buffer = Unpooled.buffer();
         ByteBufOutputStream out = new ByteBufOutputStream(buffer);
         response.getEntity().writeTo(out);
@@ -79,7 +73,7 @@ public class BasicServerTest {
         return this.container.getCodecManager().decode(MediaType.JSON, buffer);
     }
 
-    private ResourceState decode(ByteBuf buffer) throws Exception {
+    protected ResourceState decode(ByteBuf buffer) throws Exception {
         System.err.println("===================");
         System.err.println(buffer.toString(Charset.defaultCharset()));
         System.err.println("===================");
@@ -239,94 +233,6 @@ public class BasicServerTest {
 
         assertThat( ((ObjectResourceState)state).getProperty( "id" ) ).isEqualTo( bobObjState.getProperty( "id" ) );
 
-        response.close();
-
-        System.err.println("TEST #7");
-        // test pagination
-
-        postRequest = new HttpPost( "http://localhost:8080/memory/people");
-        postRequest.setEntity( new StringEntity("{ \"name\": \"krusty\" }" ) );
-        postRequest.setHeader( "Content-Type", "application/json" );
-        response = httpClient.execute( postRequest );
-        ObjectResourceState crustyState = (ObjectResourceState) decode(response);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
-        response.close();
-
-        // now that we have two people we can do paging requests
-
-        // Retrieve first people resource, ensuring only the first one is returned
-        // Assumption: unsorted GET on collection returns items in the order they were added to collection
-        getRequest = new HttpGet("http://localhost:8080/memory/people?limit=1");
-        getRequest.addHeader(header);
-        response = httpClient.execute(getRequest);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
-
-        state = decode(response);
-        assertThat(state).isNotNull();
-        assertThat(state).isInstanceOf(CollectionResourceState.class);
-        Stream<? extends ResourceState> members = ((CollectionResourceState) state).members();
-        // TODO: uncomment once Pagination propagation is fixed
-        //assertThat(members.count()).isEqualTo(1);
-
-        ResourceState memberState = members.findFirst().get();
-        assertThat(memberState).isInstanceOf(ObjectResourceState.class);
-
-        ObjectResourceState member = (ObjectResourceState) memberState;
-        assertThat(member.id()).isEqualTo(bobObjState.id());
-
-        response.close();
-
-        // Retrieve second people resource, ensuring only the second one is returned
-        // Assumption: unsorted GET on collection returns items in the order they were added to collection
-        getRequest = new HttpGet("http://localhost:8080/memory/people?offset=1&limit=1");
-        getRequest.addHeader(header);
-        response = httpClient.execute(getRequest);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
-
-        state = decode(response);
-        assertThat(state).isNotNull();
-        assertThat(state).isInstanceOf(CollectionResourceState.class);
-
-        /* TODO: uncomment once Pagination propagation is fixed
-        members = ((CollectionResourceState) state).members();
-        assertThat(members.count()).isEqualTo(1);
-
-        memberState = members.findFirst().get();
-        assertThat(memberState).isInstanceOf(ObjectResourceState.class);
-
-        member = (ObjectResourceState) memberState;
-        assertThat(member.id()).isEqualTo(crustyState.id());
-        */
-        response.close();
-
-        System.err.println("TEST #8");
-        // test specifying fields to return
-
-        getRequest = new HttpGet("http://localhost:8080/memory/people/" + crustyState.getProperty("id") + "?fields=id");
-        getRequest.addHeader(header);
-        response = httpClient.execute(getRequest);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
-
-        state = decode(response);
-        assertThat(state).isNotNull();
-        assertThat(state).isInstanceOf(ObjectResourceState.class);
-
-        HashSet fields = new HashSet();
-        ((ObjectResourceState) state).members().forEach((f) -> {
-            fields.add(f.id());
-        });
-        // TODO uncomment once ReturnFields propagation is fixed
-        //assertThat(fields.size()).isEqualTo(1);
-        assertThat(fields.contains("id")).isTrue();
-        //assertThat(fields.contains("name")).isTrue();
         response.close();
     }
 
