@@ -31,6 +31,10 @@ public class InMemoryObjectResource implements ObjectResource {
         return this.id;
     }
 
+    public ObjectResourceState state() {
+        return state;
+    }
+
     @Override
     public void read(RequestContext ctx, String id, Responder responder) {
         boolean found = false;
