@@ -12,9 +12,6 @@ import org.projectodd.restafari.container.auth.spi.*;
  */
 public class AuthServicesHolder {
 
-    // TODO: Drop this
-    private static final String DEFAULT_PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCrVrCuTtArbgaZzL1hvh0xtL5mc7o0NqPVnYXkLvgcwiC3BjLGw1tGEGoJaXDuSaRllobm53JBhjx33UNv+5z/UMG4kytBWxheNVKnL6GgqlNabMaFfPLPCF8kAgKnsi79NMo+n6KnSY8YeUmec/p2vjO2NjsSAVcWEQMVhJ31LwIDAQAB";
-
     private static AuthServicesHolder INSTANCE = new AuthServicesHolder();
 
     private final AuthorizationService authorizationService;
@@ -28,7 +25,7 @@ public class AuthServicesHolder {
         this.authorizationService = new PolicyBasedAuthorizationService();
         this.authPersister = new InMemoryAuthPersister();
         this.tokenManager = new TokenManagerImpl();
-        this.applicationIdResolver = (resourceReq) -> ApplicationIdResolver.DEFAULT_APP_ID;
+        this.applicationIdResolver = (resourceReq) -> AuthConstants.DEFAULT_APP_ID;
 
         // Register default metadata and URIPolicy for default application
         registerDefaultAppConfig();
@@ -60,8 +57,8 @@ public class AuthServicesHolder {
     }
 
     private void registerDefaultAppConfig() {
-        ApplicationMetadata appMetadata = new ApplicationMetadata(ApplicationIdResolver.DEFAULT_APP_ID, "authTest",
-                "authTest", DEFAULT_PUBLIC_KEY);
+        ApplicationMetadata appMetadata = new ApplicationMetadata(AuthConstants.DEFAULT_APP_ID, AuthConstants.DEFAULT_REALM_NAME,
+                AuthConstants.DEFAULT_APPLICATION_NAME, AuthConstants.DEFAULT_PUBLIC_KEY);
         authPersister.registerApplicationMetadata(appMetadata);
     }
 
@@ -69,6 +66,6 @@ public class AuthServicesHolder {
         AuthorizationPolicy policy = new DemoAuthorizationPolicy();
         AuthorizationPolicyEntry policyEntry = new AuthorizationPolicyEntry("someId", policy);
         policyEntry.addIncludedResourcePrefix(new ResourcePath());
-        authPersister.registerPolicy(ApplicationIdResolver.DEFAULT_APP_ID, policyEntry);
+        authPersister.registerPolicy(AuthConstants.DEFAULT_APP_ID, policyEntry);
     }
 }

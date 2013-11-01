@@ -94,17 +94,28 @@ public class URIAuthorizationPolicy implements AuthorizationPolicy {
         return mergeDecisions(realmRolesAuthDecision, appRolesDecision);
     }
 
+    private Set<String> getRealmRoles(AuthorizationRequestContext authRequestContext) {
+        Set<String> realmRoles = null;
+        if (authRequestContext.isRequestAuthenticated()) {
+            realmRoles = authRequestContext.getAccessToken().getClaims().getRealmAccess().getRoles();
+        }
+
+        return realmRoles!=null ? realmRoles : Collections.emptySet();
+    }
+
     private Set<String> getAppRoles(AuthorizationRequestContext authRequestContext, String appName) {
         if (!authRequestContext.isRequestAuthenticated()) {
             return Collections.emptySet();
         }
 
         Map<String, JsonWebToken.Access> appAccess = authRequestContext.getAccessToken().getClaims().getResourceAccess();
+        Set<String> appRoles = null;
         if (appAccess != null && appAccess.containsKey(appName)) {
-            return appAccess.get(appName).getRoles();
-        } else {
-            return Collections.emptySet();
+            appRoles = appAccess.get(appName).getRoles();
         }
+
+        return appRoles!=null ? appRoles : Collections.emptySet();
+
     }
 
     protected AuthorizationDecision mergeDecisions(AuthorizationDecision authDec1, AuthorizationDecision authDec2) {

@@ -13,18 +13,18 @@ public class DemoAuthorizationPolicy extends URIAuthorizationPolicy {
 
         // Collection protected1 is available for READ for role "users"
         addRolePolicy("authTest", "protected1", "*", ResourceRequest.RequestType.READ.name(),
-                new RolePolicy.RolePolicyBuilder().addAllowedApplicationRole("users").build());
+                new RolePolicy.RolePolicyBuilder().addAllowedApplicationRole("user").build());
 
         // Collection protected1 is available for other actions than READ for role "admins" (READ specified by previous rule)
         addRolePolicy("authTest", "protected1", "*", "*",
-                new RolePolicy.RolePolicyBuilder().addAllowedApplicationRole("admins").build());
+                new RolePolicy.RolePolicyBuilder().addAllowedApplicationRole("admin").build());
 
         // Resource "12345" in collection "protected1" is available for "users" and "powerUsers" for all requestTypes (readMember+write)
         addRolePolicy("authTest", "protected1", "12345", "*",
-                new RolePolicy.RolePolicyBuilder().addAllowedApplicationRole("users").addAllowedApplicationRole("powerUsers").build());
+                new RolePolicy.RolePolicyBuilder().addAllowedApplicationRole("user").addAllowedApplicationRole("powerUser").build());
 
         // Collection protected2 is available for CREATE for realm role "users"
         addRolePolicy("authTest", "protected2", "*", ResourceRequest.RequestType.CREATE.name(),
-                new RolePolicy.RolePolicyBuilder().addAllowedRealmRole("users").build());
+                new RolePolicy.RolePolicyBuilder().addAllowedRealmRole("user").build());
     }
 }

@@ -10,7 +10,5 @@ import org.projectodd.restafari.container.ResourceRequest;
 @FunctionalInterface
 public interface ApplicationIdResolver {
 
-    static final String DEFAULT_APP_ID = "DEFAULT_APP_ID";
-
     String resolveAppId(ResourceRequest req);
 }

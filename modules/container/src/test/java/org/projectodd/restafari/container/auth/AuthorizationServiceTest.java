@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.container.ResourceRequest;
+import org.projectodd.restafari.container.auth.impl.AuthConstants;
 import org.projectodd.restafari.container.auth.impl.AuthServicesHolder;
 import org.projectodd.restafari.container.auth.impl.PolicyBasedAuthorizationService;
 import org.projectodd.restafari.container.auth.impl.uri.DemoAuthorizationPolicy;
@@ -30,31 +31,31 @@ public class AuthorizationServiceTest {
         Assert.assertTrue(service.isAuthorized(req2));
 
         AuthorizationRequestContext req3 = createAuthRequestContext("/authTest/protected1/12345", ResourceRequest.RequestType.READ,
-                new String[] {}, new String[] {"powerUsers"});
+                new String[] {}, new String[] {"powerUser"});
         Assert.assertTrue(service.isAuthorized(req3));
 
         AuthorizationRequestContext req4 = createAuthRequestContext("/authTest/protected1/6789", ResourceRequest.RequestType.READ,
-                new String[] {}, new String[] {"powerUsers"});
+                new String[] {}, new String[] {"powerUser"});
         Assert.assertFalse(service.isAuthorized(req4));
 
         AuthorizationRequestContext req5 = createAuthRequestContext("/authTest/protected1/6789", ResourceRequest.RequestType.READ,
-                new String[] {}, new String[] {"users", "powerUsers"});
+                new String[] {}, new String[] {"user", "powerUser"});
         Assert.assertTrue(service.isAuthorized(req5));
 
         AuthorizationRequestContext req6 = createAuthRequestContext("/authTest/protected1/6789", ResourceRequest.RequestType.CREATE,
-                new String[] {}, new String[] {"users", "powerUsers"});
+                new String[] {}, new String[] {"user", "powerUser"});
         Assert.assertFalse(service.isAuthorized(req6));
 
         AuthorizationRequestContext req7 = createAuthRequestContext("/authTest/protected1/6789", ResourceRequest.RequestType.CREATE,
-                new String[] {}, new String[] {"users", "admins"});
+                new String[] {}, new String[] {"user", "admin"});
         Assert.assertTrue(service.isAuthorized(req7));
 
         AuthorizationRequestContext req8 = createAuthRequestContext("/authTest/protected2", ResourceRequest.RequestType.CREATE,
-                new String[] {}, new String[] {"users", "admins"});
+                new String[] {}, new String[] {"user", "admin"});
         Assert.assertFalse(service.isAuthorized(req8));
 
         AuthorizationRequestContext req9 = createAuthRequestContext("/authTest/protected2", ResourceRequest.RequestType.CREATE,
-                new String[] {"users"}, new String[] {});
+                new String[] {"user"}, new String[] {});
         Assert.assertTrue(service.isAuthorized(req9));
 
         AuthorizationRequestContext req10 = createAuthRequestContext("/authTest/protected2", ResourceRequest.RequestType.READ,
@@ -71,7 +72,7 @@ public class AuthorizationServiceTest {
         ResourceRequest req = new ResourceRequest.Builder(reqType, resPath).build();
 
         Map<String, String[]> appRolesMap = new HashMap<>();
-        appRolesMap.put("authTest", appRoles);
+        appRolesMap.put(AuthConstants.DEFAULT_APPLICATION_NAME, appRoles);
         JsonWebToken accessToken = new JsonWebToken(realmRoles, appRolesMap);
 
         return new AuthorizationRequestContext(accessToken, req);
