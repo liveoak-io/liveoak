@@ -1,13 +1,13 @@
-package org.projectodd.restafari.container.auth.service;
+package org.projectodd.restafari.container.auth.impl.uri;
 
 import org.projectodd.restafari.container.ResourceRequest;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class DemoAuthorizationService extends RoleBasedAuthorizationService {
+public class DemoAuthorizationPolicy extends URIAuthorizationPolicy {
 
-    public DemoAuthorizationService() {
+    public DemoAuthorizationPolicy() {
         // Everything is allowed, unless specially configured
         addRolePolicy("*", "*", "*", "*", ALLOW_ALL_ROLE_POLICY);
 

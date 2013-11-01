@@ -1,4 +1,4 @@
-package org.projectodd.restafari.container.auth.service;
+package org.projectodd.restafari.container.auth.spi;
 
 /**
  * Service providing authorization

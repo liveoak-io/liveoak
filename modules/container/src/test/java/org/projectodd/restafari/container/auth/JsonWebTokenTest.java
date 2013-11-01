@@ -1,7 +1,7 @@
 package org.projectodd.restafari.container.auth;
 
-import org.junit.Assert;
 import org.junit.Test;
+import org.projectodd.restafari.container.auth.spi.JsonWebToken;
 
 import java.io.IOException;
 

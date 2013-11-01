@@ -1,4 +1,4 @@
-package org.projectodd.restafari.container;
+package org.projectodd.restafari.container.auth;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.*;
@@ -8,6 +8,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
+import org.projectodd.restafari.container.DefaultContainer;
+import org.projectodd.restafari.container.InMemoryDBResource;
+import org.projectodd.restafari.container.SimpleConfig;
+import org.projectodd.restafari.container.UnsecureServer;
 
 import java.io.IOException;
 import java.net.InetAddress;
