@@ -1,6 +1,7 @@
 package org.projectodd.restafari.mongo;
 
 import com.mongodb.*;
+import com.mongodb.util.JSON;
 import org.bson.types.ObjectId;
 import org.projectodd.restafari.spi.*;
 import org.projectodd.restafari.spi.resource.Resource;
@@ -65,8 +66,14 @@ class MongoCollectionResource extends MongoResource implements CollectionResourc
     @Override
     public void readContent(RequestContext ctx, ResourceSink sink) {
         DBCollection c = this.parent.getDB().getCollection(this.collectionName);
-        DBCursor cursor = c.find();
-
+        ResourceParams params = ctx.getResourceParams();
+        DBCursor cursor;
+        if (params != null && params.contains("q")) {
+            String q = params.value("q");
+            cursor = c.find((DBObject) JSON.parse(q));
+        } else {
+            cursor = c.find();
+        }
         cursor.forEach((e) -> {
             sink.accept(new MongoObjectResource(this, e));
         });
