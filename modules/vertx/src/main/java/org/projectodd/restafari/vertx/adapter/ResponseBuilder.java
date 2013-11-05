@@ -11,7 +11,7 @@ public class ResponseBuilder {
     public static JsonObject newCreatedResponse(JsonObject state) {
         JsonObject message = newBaseResponse( 200, "Resource created" );
         message.putString( "id", state.getString( "id" ) );
-        message.putObject( "state", state );
+        message.putObject( "content", state );
         return message;
     }
 
@@ -19,28 +19,34 @@ public class ResponseBuilder {
         JsonObject message = newBaseResponse( 200, "OK" );
         message.putString( "id", state.getString( "id" ) );
         message.putString( "type", "object" );
-        message.putObject( "state", state );
+        message.putObject( "content", state );
         return message;
     }
 
-    public static JsonObject newReadResponse(String collectionId, JsonObject[] state) {
+    public static JsonObject newReadResponse(JsonObject[] state) {
         JsonObject message = newBaseResponse( 200, "OK" );
-        message.putString( "id", collectionId );
-        message.putArray( "resources", new JsonArray( state ) );
+        message.putString( "type", "collection" );
+        message.putArray( "content", new JsonArray( state ) );
+        return message;
+    }
+    public static JsonObject newReadResponse(JsonArray state) {
+        JsonObject message = newBaseResponse( 200, "OK" );
+        message.putString( "type", "collection" );
+        message.putArray( "content", state );
         return message;
     }
 
     public static JsonObject newUpdatedResponse(JsonObject state) {
         JsonObject message = newBaseResponse( 200, "Resource updated" );
         message.putString( "id", state.getString( "id" ) );
-        message.putObject( "state", state );
+        message.putObject( "content", state );
         return message;
     }
 
     public static JsonObject newDeletedResponse(JsonObject state) {
         JsonObject message = newBaseResponse( 200, "Resource deleted" );
         message.putString( "id", state.getString( "id" ) );
-        message.putObject( "state", state );
+        message.putObject( "content", state );
         return message;
     }
 

@@ -32,6 +32,8 @@ public class VertxObjectResource extends AbstractVertxResource implements Object
 
     @Override
     public void read(RequestContext ctx, String id, Responder responder) {
+        System.err.println( "read: " + id );
+        System.err.println( "state: " + this.state );
         Object value = this.state.getValue( id );
         if ( value == null ) {
             responder.noSuchResource( id );

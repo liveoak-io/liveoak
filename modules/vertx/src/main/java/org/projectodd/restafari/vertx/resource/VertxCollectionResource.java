@@ -46,14 +46,14 @@ public class VertxCollectionResource extends AbstractVertxResource implements Co
         vertx().eventBus().send(address(), request, (Message<JsonObject> response) -> {
             JsonObject payload = response.body();
             System.err.println( "payload: " + payload );
-            int status = payload.getInteger("status");
+            int status = payload.getInteger("status-code");
             if (status == 200) {
                 String type = payload.getString("type");
                 if (type.equals("collection")) {
                     String resourceAddress = payload.getString("address");
                     responder.resourceRead(new VertxCollectionResource(this, id, vertx(), resourceAddress));
                 } else if (type.equals("object")) {
-                    responder.resourceRead(new VertxObjectResource(this, id, vertx(), payload.getObject( "state" ) ) );
+                    responder.resourceRead(new VertxObjectResource(this, id, vertx(), payload.getObject( "content" ) ) );
                 }
             } else if (status == 404) {
                 responder.noSuchResource(id);

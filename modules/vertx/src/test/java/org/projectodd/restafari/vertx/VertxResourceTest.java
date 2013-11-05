@@ -6,6 +6,7 @@ import org.projectodd.restafari.spi.resource.RootResource;
 import org.projectodd.restafari.spi.resource.async.PropertyResource;
 import org.projectodd.restafari.testtools.AbstractResourceTestCase;
 import org.projectodd.restafari.vertx.adapter.CollectionResourceAdapter;
+import org.projectodd.restafari.vertx.adapter.ResponseBuilder;
 import org.projectodd.restafari.vertx.resource.RootVertxCollectionResource;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
@@ -38,22 +39,20 @@ public class VertxResourceTest extends AbstractResourceTestCase {
         JsonObject ben = new JsonObject().putString("id", "ben").putString("name", "Ben Browning");
         objects.put("ben", ben);
 
-        adapter.readMemberHandler((Message<JsonObject> message) -> {
-            JsonObject body = message.body();
-            String id = body.getString("id");
-
+        adapter.readMemberHandler( (id, responder) -> {
+            System.err.println( "**** READ: " + id + " , " + responder );
             JsonObject object = objects.get(id);
+
             if (object != null) {
-                JsonObject reply = new JsonObject();
-                reply.putNumber("status", 200);
-                reply.putString("type", "object");
-                reply.putObject("state", object);
-                message.reply(reply);
+                responder.resourceRead( object );
+            } else {
+                responder.noSuchResource( id );
             }
         });
 
-        adapter.readMembersHandler((message) -> {
-            message.reply(new JsonObject().putArray("content", new JsonArray(objects.values().toArray())));
+        adapter.readMembersHandler((responder) -> {
+            JsonArray resources = new JsonArray( objects.values().toArray() );
+            responder.resourcesRead( resources );
         });
 
         adapter.start();

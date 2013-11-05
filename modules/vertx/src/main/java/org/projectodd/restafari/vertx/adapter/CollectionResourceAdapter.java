@@ -19,11 +19,11 @@ public class CollectionResourceAdapter implements Handler<Message<JsonObject>> {
         this.createHandler = createHandler;
     }
 
-    public void readMembersHandler(Handler<Message<JsonObject>> readMembersHandler) {
+    public void readMembersHandler(CollectionResponseHandler readMembersHandler) {
         this.readMembersHandler = readMembersHandler;
     }
 
-    public void readMemberHandler(Handler<Message<JsonObject>> readMemberHandler) {
+    public void readMemberHandler(ObjectResponseHandler readMemberHandler) {
         this.readMemberHandler = readMemberHandler;
     }
 
@@ -53,13 +53,15 @@ public class CollectionResourceAdapter implements Handler<Message<JsonObject>> {
                     if ( this.readMemberHandler == null ) {
                         message.reply( new JsonObject().putNumber( "status", 404 ));
                     } else {
-                        this.readMemberHandler.handle( message );
+                        VertxResponder responder = new VertxResponder( message );
+                        this.readMemberHandler.handle(id, responder);
                     }
                 } else {
                     if ( this.readMembersHandler == null ) {
-                        message.reply( new JsonObject().putNumber( "status", 404 ) );
+                        message.reply( ResponseBuilder.newReadNotSupportedResponse( "ummm?" ) );
                     } else {
-                        this.readMembersHandler.handle( message );
+                        VertxResponder responder = new VertxResponder( message );
+                        this.readMembersHandler.handle( responder );
                     }
                 }
                 break;
@@ -75,8 +77,8 @@ public class CollectionResourceAdapter implements Handler<Message<JsonObject>> {
     private String address;
 
     private Handler<Message<JsonObject>> createHandler;
-    private Handler<Message<JsonObject>> readMembersHandler;
-    private Handler<Message<JsonObject>> readMemberHandler;
+    private CollectionResponseHandler readMembersHandler;
+    private ObjectResponseHandler readMemberHandler;
     private Handler<Message<JsonObject>> deleteHandler;
 
 }
