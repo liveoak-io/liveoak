@@ -22,6 +22,10 @@ public class RootMongoResource extends MongoResource implements CollectionResour
     private MongoClient mongo;
     private DB db;
 
+    public RootMongoResource() {
+        super(null, (String) null);
+    }
+
     public RootMongoResource(String id) {
         super(null, id);
     }
