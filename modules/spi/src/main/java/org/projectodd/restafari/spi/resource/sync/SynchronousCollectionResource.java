@@ -38,7 +38,7 @@ public interface SynchronousCollectionResource extends SynchronousResource, Coll
     @Override
     default void readContent(RequestContext ctx, ResourceSink sink) {
         Pagination pagination = ctx.getPagination();
-        Stream<Resource> stream = members().substream( pagination.getOffset() );
+        Stream<Resource> stream = members().skip( pagination.getOffset() );
 
         if ( pagination.getLimit() > 0 ) {
             stream = stream.limit( pagination.getLimit() );
