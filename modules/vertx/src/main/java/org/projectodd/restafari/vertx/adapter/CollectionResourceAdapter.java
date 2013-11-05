@@ -19,7 +19,7 @@ public class CollectionResourceAdapter implements Handler<Message<JsonObject>> {
         this.createHandler = createHandler;
     }
 
-    public void readMembersHandler(Handler<Message<JsonObject>> readContentHandler) {
+    public void readMembersHandler(Handler<Message<JsonObject>> readMembersHandler) {
         this.readMembersHandler = readMembersHandler;
     }
 
@@ -41,7 +41,7 @@ public class CollectionResourceAdapter implements Handler<Message<JsonObject>> {
 
     @Override
     public void handle(Message<JsonObject> message) {
-        JsonObject body = (JsonObject) message.body();
+        JsonObject body = message.body();
         String action = body.getString( "action" );
 
         switch ( action ) {
@@ -63,6 +63,7 @@ public class CollectionResourceAdapter implements Handler<Message<JsonObject>> {
                     }
                 }
                 break;
+            case "update":
             case "delete":
                 break;
         }
