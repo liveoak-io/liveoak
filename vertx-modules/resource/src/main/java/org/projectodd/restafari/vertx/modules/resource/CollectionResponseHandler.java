@@ -1,4 +1,4 @@
-package org.projectodd.restafari.vertx.adapter;
+package org.projectodd.restafari.vertx.modules.resource;
 
 /**
  * @author Bob McWhirter

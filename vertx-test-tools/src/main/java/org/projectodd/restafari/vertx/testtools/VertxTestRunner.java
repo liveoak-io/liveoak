@@ -1,4 +1,4 @@
-package org.projectodd.restafari.vertx.modules.server.integration;
+package org.projectodd.restafari.vertx.testtools;
 
 import org.junit.Ignore;
 import org.junit.runner.Description;
@@ -135,7 +135,6 @@ public class VertxTestRunner extends BlockJUnit4ClassRunner {
                         //Ignore
                     }
                     modsDir = new File( pom.getParent(), "target/mods" ).getAbsolutePath();
-                    modsDir = "tacos";
                 }
             }
         }

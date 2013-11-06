@@ -17,8 +17,12 @@
  */
 package org.projectodd.restafari.vertx.modules.server;
 
+import org.projectodd.restafari.container.SimpleConfig;
 import org.projectodd.restafari.container.UnsecureServer;
+import org.projectodd.restafari.spi.InitializationException;
+import org.projectodd.restafari.vertx.resource.RootVertxCollectionResource;
 import org.vertx.java.core.Future;
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
 
@@ -30,6 +34,7 @@ This is a simple Java verticle which starts the server
 public class ServerVerticle extends Verticle {
 
     private UnsecureServer server;
+    private ResourceDeployer deployer;
 
     @Override
     public void start(Future<Void> startResult) {
@@ -50,6 +55,10 @@ public class ServerVerticle extends Verticle {
         } catch (InterruptedException e) {
             startResult.setFailure(e);
         }
+
+        String address = config.getString("address", "server.resource.registration");
+
+        this.deployer = new ResourceDeployer( this.server.container(), address );
 
         startResult.setResult(null);
     }

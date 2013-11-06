@@ -1,4 +1,4 @@
-package org.projectodd.restafari.vertx.adapter;
+package org.projectodd.restafari.vertx.modules.resource;
 
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;

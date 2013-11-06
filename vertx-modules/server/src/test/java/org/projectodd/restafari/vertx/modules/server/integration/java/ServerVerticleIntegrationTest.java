@@ -17,9 +17,7 @@ package org.projectodd.restafari.vertx.modules.server.integration.java;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.projectodd.restafari.vertx.modules.server.integration.VertxTestRunner;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
+import org.projectodd.restafari.vertx.testtools.VertxTestRunner;
 import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;

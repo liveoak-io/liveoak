@@ -39,6 +39,10 @@ public abstract class AbstractServer {
         return this.pipelineConfigurator;
     }
 
+    public DefaultContainer container() {
+        return this.container;
+    }
+
     protected abstract ChannelHandler createChildHandler();
 
     private DefaultContainer container;

@@ -1,18 +1,21 @@
-package org.projectodd.restafari.vertx.adapter;
+package org.projectodd.restafari.vertx.modules.resource;
 
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
 
+import java.util.UUID;
+
 /**
  * @author Bob McWhirter
  */
 public class CollectionResourceAdapter implements Handler<Message<JsonObject>> {
 
-    public CollectionResourceAdapter(Vertx vertx, String address) {
+    public CollectionResourceAdapter(Vertx vertx, String id, String registrationAddress) {
         this.vertx = vertx;
-        this.address = address;
+        this.id = id;
+        this.registrationAddress = registrationAddress;
     }
 
     public void createHandler(Handler<Message<JsonObject>> createHandler) {
@@ -32,36 +35,48 @@ public class CollectionResourceAdapter implements Handler<Message<JsonObject>> {
     }
 
     public void start() {
-        this.vertx.eventBus().registerHandler(this.address, this );
+        this.address = "resource." + UUID.randomUUID().toString();
+
+        this.vertx.eventBus().registerHandler(this.address, this);
+        this.vertx.eventBus().send(registrationAddress,
+                new JsonObject()
+                        .putString("action", "register")
+                        .putString("address", this.address)
+                        .putString("id", this.id));
     }
 
     public void stop() {
-        this.vertx.eventBus().unregisterHandler( this.address, this );
+        this.vertx.eventBus().send(this.registrationAddress,
+                new JsonObject()
+                        .putString("action", "unregister")
+                        .putString("id", this.id) );
+
+        this.vertx.eventBus().unregisterHandler(this.address, this);
     }
 
     @Override
     public void handle(Message<JsonObject> message) {
         JsonObject body = message.body();
-        String action = body.getString( "action" );
+        String action = body.getString("action");
 
-        switch ( action ) {
+        switch (action) {
             case "create":
                 break;
             case "read":
-                String id = body.getString( "id" );
-                if ( id != null ) {
-                    if ( this.readMemberHandler == null ) {
-                        message.reply( new JsonObject().putNumber( "status", 404 ));
+                String id = body.getString("id");
+                if (id != null) {
+                    if (this.readMemberHandler == null) {
+                        message.reply(new JsonObject().putNumber("status", 404));
                     } else {
-                        VertxResponder responder = new VertxResponder( message );
+                        VertxResponder responder = new VertxResponder(message);
                         this.readMemberHandler.handle(id, responder);
                     }
                 } else {
-                    if ( this.readMembersHandler == null ) {
-                        message.reply( ResponseBuilder.newReadNotSupportedResponse( "ummm?" ) );
+                    if (this.readMembersHandler == null) {
+                        message.reply(ResponseBuilder.newReadNotSupportedResponse("ummm?"));
                     } else {
-                        VertxResponder responder = new VertxResponder( message );
-                        this.readMembersHandler.handle( responder );
+                        VertxResponder responder = new VertxResponder(message);
+                        this.readMembersHandler.handle(responder);
                     }
                 }
                 break;
@@ -72,9 +87,11 @@ public class CollectionResourceAdapter implements Handler<Message<JsonObject>> {
     }
 
 
-
     private Vertx vertx;
+    private String id;
     private String address;
+
+    private String registrationAddress;
 
     private Handler<Message<JsonObject>> createHandler;
     private CollectionResponseHandler readMembersHandler;
