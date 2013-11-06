@@ -60,15 +60,15 @@ public class ResponseBuilder {
     }
 
     public static JsonObject newReadNotSupportedResponse(String id) {
-        return newNotSupportedResponse( "Create", id );
+        return newNotSupportedResponse( "Read", id );
     }
 
     public static JsonObject newUpdateNotSupportedResponse(String id) {
-        return newNotSupportedResponse( "Create", id );
+        return newNotSupportedResponse( "Update", id );
     }
 
     public static JsonObject newDeleteNotSupportedResponse(String id) {
-        return newNotSupportedResponse( "Create", id );
+        return newNotSupportedResponse( "Delete", id );
     }
 
     protected static JsonObject newNotSupportedResponse(String action, String id) {
@@ -78,7 +78,7 @@ public class ResponseBuilder {
     protected static JsonObject newBaseResponse(int statusCode, String statusMessage) {
         JsonObject message = new JsonObject();
         message.putNumber( "status-code", statusCode );
-        message.putString("status-message", statusMessage);
+        message.putString( "status-message", statusMessage);
         return message;
     }
 }

@@ -8,15 +8,18 @@ import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.RootResource;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.async.PropertyResource;
+import org.projectodd.restafari.spi.resource.async.ResourceSink;
 import org.projectodd.restafari.testtools.AbstractResourceTestCase;
 import org.projectodd.restafari.vertx.adapter.CollectionResourceAdapter;
 import org.projectodd.restafari.vertx.resource.RootVertxCollectionResource;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletableFuture;
 
 import static junit.framework.Assert.fail;
 import static org.fest.assertions.Assertions.assertThat;
@@ -27,8 +30,8 @@ import static org.fest.assertions.Assertions.assertThat;
  */
 public class VertxResourceTest extends AbstractResourceTestCase {
 
-    CollectionResourceAdapter adapter;
-    Map<String, JsonObject> objects = new HashMap<>();
+    private CollectionResourceAdapter adapter;
+    private Map<String, JsonObject> objects = new HashMap<>();
 
     @Override
     public RootResource createRootResource() {
@@ -37,9 +40,13 @@ public class VertxResourceTest extends AbstractResourceTestCase {
 
     @Before
     public void setUp() {
-        adapter = new CollectionResourceAdapter(vertx, "test.vertx");
+        // resources for our collection
         objects.put("bob", new JsonObject().putString("id", "bob").putString("name", "Bob McWhirter"));
         objects.put("ben", new JsonObject().putString("id", "ben").putString("name", "Ben Browning"));
+
+        adapter = new CollectionResourceAdapter(vertx, "test.vertx");
+
+        // read a single item from the collection
         adapter.readMemberHandler((id, responder) -> {
             JsonObject object = objects.get(id);
 
@@ -48,6 +55,12 @@ public class VertxResourceTest extends AbstractResourceTestCase {
             } else {
                 responder.noSuchResource(id);
             }
+        });
+
+        // read the collection
+        adapter.readMembersHandler((responder) -> {
+            JsonArray resources = new JsonArray(objects.values().toArray());
+            responder.resourcesRead(resources);
         });
         adapter.start();
     }
@@ -87,13 +100,24 @@ public class VertxResourceTest extends AbstractResourceTestCase {
 
     @Test
     public void testReadMembers() throws Exception {
+        List<Resource> resources = new ArrayList<>();
+        CompletableFuture<List<Resource>> future = new CompletableFuture<>();
+        ResourceSink sink = new ResourceSink() {
+            @Override
+            public void close() {
+                future.complete(resources);
+            }
 
-        adapter.readMembersHandler((responder) -> {
-            JsonArray resources = new JsonArray(objects.values().toArray());
-            responder.resourcesRead(resources);
-        });
-
+            @Override
+            public void accept(Resource resource) {
+                resources.add(resource);
+            }
+        };
         CollectionResource resource = (CollectionResource) connector.read("/vertx");
+        assertThat(resource).isNotNull();
+        resource.readContent(null, sink);
+        List<Resource> result = future.get();
+        assertThat(result.size()).isEqualTo(2);
     }
 
 }

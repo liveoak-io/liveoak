@@ -21,7 +21,6 @@ public abstract class AbstractVertxResource implements Resource {
     }
 
     public Vertx vertx() {
-        System.err.println( "something asked for vertx: " + this.vertx );
         return this.vertx;
     }
 
