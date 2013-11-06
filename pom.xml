@@ -30,8 +30,8 @@
     <module>support/module-assembly</module>
     <module>launcher</module>
     <module>test-tools</module>
-    <module>vertx-starter</module>
     <module>modules</module>
+    <module>vertx-modules</module>
     <module>dist</module>
   </modules>
   <developers>

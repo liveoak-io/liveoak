@@ -27,12 +27,14 @@ import org.vertx.java.platform.PlatformManager;
 public class DefaultContainer implements Container, CollectionResource {
 
     public DefaultContainer() {
+        this( PlatformLocator.factory.createPlatformManager().vertx() );
+    }
+
+    public DefaultContainer(Vertx vertx) {
         this.codecManager.registerResourceCodec("application/json", new ResourceCodec( new JSONEncoder(), new JSONDecoder() ) );
         this.codecManager.registerResourceCodec("text/html", new ResourceCodec( new HTMLEncoder( this ), null ) );
-        //this.codecManager.registerResourceCodec("application/javascript" , new ResourceCodec( new AggregatingEncoder( MediaType.JAVASCRIPT), null ) );
 
-        PlatformManager platformManager = PlatformLocator.factory.createPlatformManager();
-        this.vertx = platformManager.vertx();
+        this.vertx = vertx;
 
         this.subscriptionManager = new SubscriptionManager();
         this.workerPool = Executors.newCachedThreadPool();

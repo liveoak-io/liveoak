@@ -12,6 +12,7 @@
     <module name="org.projectodd.restafari.spi" services="import"/>
     <module name="org.projectodd.restafari.container"/>
     <module name="com.fasterxml.jackson.core"/>
+    <module name="io.vertx"/>
     <system>
       <paths> 
         <path name="org/jboss/modules"/>

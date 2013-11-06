@@ -6,11 +6,16 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.projectodd.restafari.container.protocols.ProtocolDetector;
+import org.vertx.java.core.Vertx;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class UnsecureServer extends AbstractServer {
+
+    public UnsecureServer(Vertx vertx, String host, int port) throws UnknownHostException {
+        super(new DefaultContainer(vertx), InetAddress.getByName(host), port, new NioEventLoopGroup());
+    }
 
     public UnsecureServer(DefaultContainer container, String host, int port) throws UnknownHostException {
         super(container, InetAddress.getByName(host), port, new NioEventLoopGroup());

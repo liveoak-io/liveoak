@@ -1,8 +1,0 @@
-{
-  "storage": {
-    "db": "test"
-  },
-  "deployer": {
-    "dir": "./deploy-dir"
-  }
-}

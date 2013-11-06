@@ -13,14 +13,8 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.projectodd.restafari.mongo.unit;
+package org.projectodd.restafari.vertx.modules.server.integration.unit;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.junit.Assert;
-import org.projectodd.restafari.mongo.ServerStarterVerticle;
 import org.junit.Test;
 
 
@@ -29,7 +23,7 @@ public class ExampleUnitTest {
     @Test
     public void testVerticle() throws Exception {
         /*
-        ServerStarterVerticle vert = new ServerStarterVerticle();
+        ServerVerticle vert = new ServerVerticle();
         vert.start();
 
         try {

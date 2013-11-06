@@ -1,10 +1,10 @@
 {
     // Java verticle
-    "main": "org.projectodd.restafari.mongo.ServerStarterVerticle",
+    "main": "org.projectodd.restafari.vertx.modules.server.ServerVerticle",
 
     // If your module is going to be registered in the Vert.x module registry you will also need the following
     // mandatory fields
-    "description": "Server starter",
+    "description": "Server",
     "licenses": ["The Apache Software License Version 2.0"],
     "author": "author"
 
