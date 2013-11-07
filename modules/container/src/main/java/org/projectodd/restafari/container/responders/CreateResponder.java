@@ -2,6 +2,7 @@ package org.projectodd.restafari.container.responders;
 
 import io.netty.channel.ChannelHandlerContext;
 import org.projectodd.restafari.container.ResourceRequest;
+import org.projectodd.restafari.container.aspects.ResourceAspectManager;
 import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.Resource;
 
@@ -12,8 +13,8 @@ import java.util.concurrent.Executor;
  */
 public class CreateResponder extends TraversingResponder {
 
-    public CreateResponder(Executor executor, Resource root, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
-        super( executor, root, inReplyTo, ctx );
+    public CreateResponder(ResourceAspectManager aspectManager, Executor executor, Resource root, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
+        super( aspectManager, executor, root, inReplyTo, ctx );
     }
 
     @Override

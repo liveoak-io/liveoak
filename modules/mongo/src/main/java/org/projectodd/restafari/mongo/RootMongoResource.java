@@ -96,9 +96,9 @@ public class RootMongoResource extends MongoResource implements CollectionResour
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
         Pagination pagination = ctx.getPagination();
-        Stream<String> members = this.db.getCollectionNames().stream().skip(pagination.getOffset());
-        if (pagination.getLimit() > 0) {
-            members = members.limit(pagination.getLimit());
+        Stream<String> members = this.db.getCollectionNames().stream().skip(pagination.offset());
+        if (pagination.limit() > 0) {
+            members = members.limit(pagination.limit());
         }
 
         members.forEach((name) -> {

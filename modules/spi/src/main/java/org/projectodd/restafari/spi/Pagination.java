@@ -12,10 +12,10 @@ public interface Pagination {
     static final int MAX_LIMIT = 10000;
 
     static final Pagination NONE = new Pagination() {
-        public int getOffset() {
+        public int offset() {
             return 0;
         }
-        public int getLimit() {
+        public int limit() {
             return DEFAULT_LIMIT;
         }
     };
@@ -28,7 +28,7 @@ public interface Pagination {
      * 
      * @return The offset.
      */
-    int getOffset();
+    int offset();
     
     /** Get the number of items to return.
      * 
@@ -38,6 +38,6 @@ public interface Pagination {
      * 
      * @return The limit.
      */
-    int getLimit();
+    int limit();
 
 }

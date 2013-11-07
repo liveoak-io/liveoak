@@ -42,7 +42,7 @@ public class SubscriptionManager {
         });
     }
 
-    protected Stream<Subscription> getSubscriptions(Resource resource) {
+    public Stream<Subscription> getSubscriptions(Resource resource) {
         ResourcePath resourcePath = resourcePathOf( resource);
         return this.subscriptions.stream().filter((subscription) -> {
             ResourcePath subscriptionPath = subscription.resourcePath();

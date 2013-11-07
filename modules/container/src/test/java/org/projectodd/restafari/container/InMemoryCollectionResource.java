@@ -84,12 +84,12 @@ public class InMemoryCollectionResource implements CollectionResource {
     private Stream<Resource> applyPagination(Pagination pagination, Collection<Resource> values) {
         boolean skipPagination = pagination == null
                 || pagination == Pagination.NONE
-                || (pagination.getOffset() == 0 && pagination.getLimit() >= values.size());
+                || (pagination.offset() == 0 && pagination.limit() >= values.size());
 
         if (skipPagination) {
             return values.stream();
         }
-        return values.stream().skip(pagination.getOffset()).limit(pagination.getLimit());
+        return values.stream().skip(pagination.offset()).limit(pagination.limit());
     }
 
     @Override

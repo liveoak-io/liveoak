@@ -3,6 +3,7 @@ package org.projectodd.restafari.container.responders;
 import io.netty.channel.ChannelHandlerContext;
 import org.projectodd.restafari.container.ResourcePath;
 import org.projectodd.restafari.container.ResourceRequest;
+import org.projectodd.restafari.container.aspects.ResourceAspectManager;
 import org.projectodd.restafari.spi.resource.BlockingResource;
 import org.projectodd.restafari.spi.resource.Resource;
 
@@ -13,8 +14,9 @@ import java.util.concurrent.Executor;
  */
 public abstract class TraversingResponder extends BaseResponder {
 
-    public TraversingResponder(Executor executor, Resource root, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
+    public TraversingResponder(ResourceAspectManager aspectManager, Executor executor, Resource root, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
         super(inReplyTo, ctx);
+        this.aspectManager = aspectManager;
         this.executor = executor;
         this.currentResource = root;
         this.remainingPath = inReplyTo.resourcePath().subPath();
@@ -37,6 +39,11 @@ public abstract class TraversingResponder extends BaseResponder {
     }
 
     protected void doRead(String next, Resource resource) {
+        if ( this.aspectManager.contains( next ) ) {
+            resourceRead( this.aspectManager.get( next ).forResource( resource ) );
+            return;
+        }
+
         if (resource instanceof BlockingResource) {
             this.executor.execute(() -> {
                 try {
@@ -85,6 +92,8 @@ public abstract class TraversingResponder extends BaseResponder {
     }
 
     protected abstract void perform(Resource resource);
+
+    private ResourceAspectManager aspectManager;
 
     private ResourcePath remainingPath;
     private Executor executor;

@@ -9,6 +9,8 @@ import org.projectodd.restafari.stomp.StompMessage;
 import org.projectodd.restafari.stomp.common.DefaultStompMessage;
 import org.projectodd.restafari.stomp.server.StompConnection;
 
+import java.util.UUID;
+
 /**
  * @author Bob McWhirter
  */
@@ -21,6 +23,10 @@ public class StompSubscription implements Subscription {
         this.mediaType = mediaType;
         this.codec = codec;
         this.resourcePath = new ResourcePath(destination);
+    }
+
+    public String id() {
+        return this.connection.getConnectionId() + "." + subscriptionId;
     }
 
     public ResourcePath resourcePath() {

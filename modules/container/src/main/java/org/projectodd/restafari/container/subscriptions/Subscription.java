@@ -8,6 +8,8 @@ import org.projectodd.restafari.spi.resource.Resource;
  */
 public interface Subscription {
 
+    String id();
+
     ResourcePath resourcePath();
 
     void resourceCreated(Resource resource) throws Exception;

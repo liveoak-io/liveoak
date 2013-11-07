@@ -23,8 +23,8 @@ public class RequestBuilder {
     public static JsonObject newReadRequest(String id, Pagination pagination) {
         JsonObject message = newBaseRequest("readMember");
         message.putString( "id", id );
-        message.putNumber("offset", pagination.getOffset());
-        message.putNumber( "limit", pagination.getLimit() );
+        message.putNumber("offset", pagination.offset());
+        message.putNumber( "limit", pagination.limit() );
         return message;
     }
 

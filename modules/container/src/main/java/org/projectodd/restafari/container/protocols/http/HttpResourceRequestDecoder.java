@@ -123,10 +123,10 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         int limit = limit(params.intValue("limit", Pagination.DEFAULT_LIMIT), 0, Pagination.MAX_LIMIT);
 
         return new Pagination() {
-            public int getOffset() {
+            public int offset() {
                 return offset;
             }
-            public int getLimit() {
+            public int limit() {
                 return limit;
             }
         };

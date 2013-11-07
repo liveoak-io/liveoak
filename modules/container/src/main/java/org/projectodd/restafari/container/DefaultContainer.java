@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import org.projectodd.restafari.container.aspects.ResourceAspectManager;
 import org.projectodd.restafari.container.codec.ResourceCodec;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
 import org.projectodd.restafari.container.codec.aggregating.AggregatingEncoder;
@@ -12,6 +13,7 @@ import org.projectodd.restafari.container.codec.html.HTMLEncoder;
 import org.projectodd.restafari.container.codec.json.JSONDecoder;
 import org.projectodd.restafari.container.codec.json.JSONEncoder;
 import org.projectodd.restafari.container.subscriptions.SubscriptionManager;
+import org.projectodd.restafari.container.subscriptions.resource.SubscriptionsResourceAspect;
 import org.projectodd.restafari.spi.*;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.RootResource;
@@ -35,9 +37,9 @@ public class DefaultContainer implements Container, CollectionResource {
         this.codecManager.registerResourceCodec("text/html", new ResourceCodec( new HTMLEncoder( this ), null ) );
 
         this.vertx = vertx;
-
-        this.subscriptionManager = new SubscriptionManager();
         this.workerPool = Executors.newCachedThreadPool();
+
+        this.aspectManager.put( "_subscriptions", new SubscriptionsResourceAspect( this.subscriptionManager ) );
     }
 
     public void registerResource(RootResource resource, Config config) throws InitializationException {
@@ -60,6 +62,10 @@ public class DefaultContainer implements Container, CollectionResource {
 
     Executor workerPool() {
         return this.workerPool;
+    }
+
+    ResourceAspectManager resourceAspectManager() {
+        return this.aspectManager;
     }
 
     public DirectConnector directConnector() {
@@ -122,11 +128,12 @@ public class DefaultContainer implements Container, CollectionResource {
         return this.prefix;
     }
 
+    private ResourceAspectManager aspectManager = new ResourceAspectManager();
     private String prefix = "";
     private Map<String, Resource> resources = new HashMap<>();
     private ResourceCodecManager codecManager = new ResourceCodecManager();
     private Vertx vertx;
-    private final SubscriptionManager subscriptionManager;
+    private final SubscriptionManager subscriptionManager = new SubscriptionManager();
     private Executor workerPool;
 
 }
