@@ -36,7 +36,7 @@ public class InMemoryObjectResource implements ObjectResource {
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         boolean found = false;
 
         List<PropertyResourceState> result = state.members().collect(Collectors.toList());
@@ -64,7 +64,7 @@ public class InMemoryObjectResource implements ObjectResource {
     }
 
     @Override
-    public void readContent(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
         this.state.members().forEach((prop) -> {
             sink.accept( new SimplePropertyResource(this, prop.id(), prop.value() ) );
         });

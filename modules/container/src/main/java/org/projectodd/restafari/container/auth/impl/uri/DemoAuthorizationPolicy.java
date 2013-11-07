@@ -19,7 +19,7 @@ public class DemoAuthorizationPolicy extends URIAuthorizationPolicy {
         addRolePolicy("authTest", "protected1", "*", "*",
                 new RolePolicy.RolePolicyBuilder().addAllowedApplicationRole("admins").build());
 
-        // Resource "12345" in collection "protected1" is available for "users" and "powerUsers" for all requestTypes (read+write)
+        // Resource "12345" in collection "protected1" is available for "users" and "powerUsers" for all requestTypes (readMember+write)
         addRolePolicy("authTest", "protected1", "12345", "*",
                 new RolePolicy.RolePolicyBuilder().addAllowedApplicationRole("users").addAllowedApplicationRole("powerUsers").build());
 

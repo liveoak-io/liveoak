@@ -44,7 +44,7 @@ public class MongoPropertyResource extends MongoResource implements PropertyReso
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         responder.noSuchResource( id );
     }
 

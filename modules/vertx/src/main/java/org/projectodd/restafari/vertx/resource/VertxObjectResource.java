@@ -26,13 +26,13 @@ public class VertxObjectResource extends AbstractVertxResource implements Object
     }
 
     @Override
-    public void readContent(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
-        System.err.println( "read: " + id );
+    public void readMember(RequestContext ctx, String id, Responder responder) {
+        System.err.println( "readMember: " + id );
         System.err.println( "state: " + this.state );
         Object value = this.state.getValue( id );
         if ( value == null ) {

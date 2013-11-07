@@ -65,10 +65,10 @@ public interface Resource {
      *
      * <p>Semantics are left to the author of the resource.</p>
      *
-     * @param id The child ID to read.
+     * @param id The child ID to readMember.
      * @param responder To respond to the action.
      */
-    void read(RequestContext ctx, String id, Responder responder);
+    void readMember(RequestContext ctx, String id, Responder responder);
 
     /** Delete this resource.
      *

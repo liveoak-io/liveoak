@@ -56,7 +56,7 @@ public class FileResource implements FSResource, BinaryResource {
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         responder.readNotSupported(this);
     }
 

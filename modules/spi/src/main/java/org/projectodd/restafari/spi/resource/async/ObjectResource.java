@@ -26,6 +26,6 @@ public interface ObjectResource extends Resource {
      *
      * @param sink The sink to stream members to.
      */
-    void readContent(RequestContext ctx, ResourceSink sink);
+    void readMembers(RequestContext ctx, ResourceSink sink);
 
 }

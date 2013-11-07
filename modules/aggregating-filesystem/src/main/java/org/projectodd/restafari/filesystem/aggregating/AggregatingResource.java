@@ -69,7 +69,7 @@ public class AggregatingResource implements BinaryResource {
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         responder.noSuchResource( id );
     }
 

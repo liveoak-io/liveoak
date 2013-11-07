@@ -31,7 +31,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
 //    @Test
 //    public void testRootFound() throws Exception {
-//        Resource result = connector.read("/storage");
+//        Resource result = connector.readMember("/storage");
 //        assertThat(result).isNotNull();
 //        assertThat(result).isInstanceOf(MongoResource.class);
 //    }
@@ -39,7 +39,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 //    @Test
 //    public void testUncreatedCollectionNotFound() throws Exception {
 //        try {
-//            connector.read("/storage/movies");
+//            connector.readMember("/storage/movies");
 //            fail( "shouldn't get here" );
 //        } catch (ResourceNotFoundException e) {
 //            assertThat( e.path() ).isEqualTo( "/storage/movies" );
@@ -48,7 +48,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 //
 //    @Test
 //    public void testEmpty() throws Exception {
-//        CollectionResource result = (CollectionResource)connector.read("/storage");
+//        CollectionResource result = (CollectionResource)connector.readMember("/storage");
 //
 //        assertThat(result.id()).isEqualTo("storage");
 //
@@ -73,7 +73,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 //        // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
 //        assertEquals(4, db.getCollectionNames().size());
 //
-//        CollectionResource result = (CollectionResource)connector.read("/storage");
+//        CollectionResource result = (CollectionResource)connector.readMember("/storage");
 //        assertThat(result.id()).isEqualTo("storage");
 //
 //

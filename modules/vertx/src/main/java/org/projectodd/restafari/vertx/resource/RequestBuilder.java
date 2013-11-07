@@ -15,15 +15,15 @@ public class RequestBuilder {
     }
 
     public static JsonObject newReadRequest(String id) {
-        JsonObject message = newBaseRequest("read");
+        JsonObject message = newBaseRequest("readMember");
         message.putString( "id", id );
         return message;
     }
 
     public static JsonObject newReadRequest(String id, Pagination pagination) {
-        JsonObject message = newBaseRequest("read");
+        JsonObject message = newBaseRequest("readMember");
         message.putString( "id", id );
-        message.putNumber( "offset", pagination.getOffset() );
+        message.putNumber("offset", pagination.getOffset());
         message.putNumber( "limit", pagination.getLimit() );
         return message;
     }

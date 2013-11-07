@@ -33,7 +33,7 @@ public class InMemoryCollectionResource implements CollectionResource {
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         if (this.collection.containsKey(id)) {
             responder.resourceRead(applyReturnFields(ctx.getReturnFields(), this.collection.get(id)));
         } else {
@@ -61,7 +61,7 @@ public class InMemoryCollectionResource implements CollectionResource {
     }
 
     @Override
-    public void readContent(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
         Stream<Resource> stream = applyPagination(ctx.getPagination(), this.collection.values());
         stream.forEach((m) -> {
             sink.accept(m);

@@ -46,7 +46,7 @@ public class DeployerResource implements RootResource, CollectionResource {
     }
 
     @Override
-    public void readContent(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -61,7 +61,7 @@ public class DeployerResource implements RootResource, CollectionResource {
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

@@ -102,7 +102,7 @@ public class AuthTest {
         httpMethod = createHttpMethod("POST", "http://localhost:8080/authTest/protected2");
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_FORBIDDEN);
 
-        // Authorization ok. Collection 'protected2' is available for read without token
+        // Authorization ok. Collection 'protected2' is available for readMember without token
         httpMethod = createHttpMethod("GET", "http://localhost:8080/authTest/protected2");
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_NOT_FOUND);
     }
@@ -142,17 +142,17 @@ public class AuthTest {
         httpMethod = createHttpMethod("GET", "http://localhost:8080/authTest/public/12345");
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_NOT_FOUND);
 
-        // Authorization ok. 'powerUsers' are able to read 12345
+        // Authorization ok. 'powerUsers' are able to readMember 12345
         httpMethod = createHttpMethod("GET", "http://localhost:8080/authTest/protected1/12345");
         httpMethod.addHeader(new BasicHeader("Authorization", "Bearer " + APP_POWERUSERS_TOKEN));
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_NOT_FOUND);
 
-        // Authorization no-ok. 'powerUsers' are not able to read other resources than 12345 in collection protected1
+        // Authorization no-ok. 'powerUsers' are not able to readMember other resources than 12345 in collection protected1
         httpMethod = createHttpMethod("GET", "http://localhost:8080/authTest/protected1/6789");
         httpMethod.addHeader(new BasicHeader("Authorization", "Bearer " + APP_POWERUSERS_TOKEN));
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_FORBIDDEN);
 
-        // Authorization ok. 'users' are able to read all resources of protected1
+        // Authorization ok. 'users' are able to readMember all resources of protected1
         httpMethod = createHttpMethod("GET", "http://localhost:8080/authTest/protected1/6789");
         httpMethod.addHeader(new BasicHeader("Authorization", "Bearer " + APP_USERS_POWERUSERS_TOKEN));
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_NOT_FOUND);

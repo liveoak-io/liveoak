@@ -78,7 +78,7 @@ public class RootMongoResource extends MongoResource implements CollectionResour
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         if (db.collectionExists(id)) {
             responder.resourceRead(new MongoCollectionResource(this, id));
         } else {
@@ -94,7 +94,7 @@ public class RootMongoResource extends MongoResource implements CollectionResour
     }
 
     @Override
-    public void readContent(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
         Pagination pagination = ctx.getPagination();
         Stream<String> members = this.db.getCollectionNames().stream().skip(pagination.getOffset());
         if (pagination.getLimit() > 0) {

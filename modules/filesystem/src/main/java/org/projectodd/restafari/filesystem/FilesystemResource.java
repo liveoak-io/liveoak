@@ -47,7 +47,7 @@ public class FilesystemResource extends DirectoryResource implements RootResourc
         this.file = new File(rootStr);
 
         if (!this.file.canRead()) {
-            throw new InitializationException("unable to read filesystem at: " + this.file.getAbsolutePath());
+            throw new InitializationException("unable to readMember filesystem at: " + this.file.getAbsolutePath());
         }
 
         this.vertx = context.vertx();

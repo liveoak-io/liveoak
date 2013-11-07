@@ -25,7 +25,7 @@ public class PropertiesResource implements ObjectResource {
     }
 
     @Override
-    public void readContent(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
         Properties allProps = System.getProperties();
         for ( String key : allProps.stringPropertyNames() ) {
             sink.accept( new SimplePropertyResource( this, key, allProps.getProperty( key ) ));
@@ -50,7 +50,7 @@ public class PropertiesResource implements ObjectResource {
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         String value = System.getProperty( id );
         if ( value != null ) {
             responder.resourceRead( new SimplePropertyResource( this, id, value ));

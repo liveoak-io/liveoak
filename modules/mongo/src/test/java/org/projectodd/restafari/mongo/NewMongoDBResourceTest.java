@@ -72,7 +72,7 @@ public class NewMongoDBResourceTest extends AbstractResourceTestCase {
         assertThat(createdResource.id()).isEqualTo("movies");
 
         // TODO: why doesn't this work?
-        //Resource movies = connector.read("/storage/movies");
+        //Resource movies = connector.readMember("/storage/movies");
 
         //assertThat( movies ).isNotNull();
         //assertThat( movies ).isInstanceOf( MongoCollectionResource.class );

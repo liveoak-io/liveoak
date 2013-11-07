@@ -62,7 +62,7 @@ public class CollectionResourceAdapter implements Handler<Message<JsonObject>> {
         switch (action) {
             case "create":
                 break;
-            case "read":
+            case "readMember":
                 String id = body.getString("id");
                 if (id != null) {
                     if (this.readMemberHandler == null) {

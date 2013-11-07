@@ -34,7 +34,7 @@ public class ContainerResource implements CollectionResource, RootResource {
     }
 
     @Override
-    public void readContent(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
         sink.accept( this.propertiesResource );
         try {
             sink.close();
@@ -49,7 +49,7 @@ public class ContainerResource implements CollectionResource, RootResource {
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         if ( id.equals( this.propertiesResource.id() ) ) {
             responder.resourceRead( this.propertiesResource );
         } else {

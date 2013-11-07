@@ -83,9 +83,9 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
             this.endContentHandler = endContentHandler;
 
             if (this.object instanceof CollectionResource) {
-                ((CollectionResource) this.object).readContent(ctx, new MyCollectionContentSink());
+                ((CollectionResource) this.object).readMembers(ctx, new MyCollectionContentSink());
             } else if (this.object instanceof ObjectResource) {
-                ((ObjectResource) this.object).readContent(ctx, new MyObjectContentSink());
+                ((ObjectResource) this.object).readMembers(ctx, new MyObjectContentSink());
             } else if (this.object instanceof PropertyResource) {
                 ((PropertyResource) this.object).readContent(ctx, new MyPropertyContentSink());
             } else if (this.object instanceof BinaryResource) {

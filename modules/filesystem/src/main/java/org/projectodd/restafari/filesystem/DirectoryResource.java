@@ -36,7 +36,7 @@ public class DirectoryResource implements FSResource, CollectionResource {
     }
 
     @Override
-    public void readContent(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
         vertx().fileSystem().readDir(this.file.getPath(), (result) -> {
             if (result.failed()) {
                 sink.close();
@@ -92,7 +92,7 @@ public class DirectoryResource implements FSResource, CollectionResource {
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         File path = new File(this.file, id);
         vertx().fileSystem().exists(path.getPath(), (existResult) -> {
             if (existResult.succeeded() && existResult.result()) {

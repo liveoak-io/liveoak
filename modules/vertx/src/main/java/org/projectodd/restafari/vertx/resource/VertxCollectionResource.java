@@ -37,9 +37,9 @@ public class VertxCollectionResource extends AbstractVertxResource implements Co
     }
 
     @Override
-    public void readContent(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
         JsonObject request = new JsonObject();
-        request.putString("action", "read");
+        request.putString("action", "readMember");
         // TODO: Allow filtering, paging and depth
         vertx().eventBus().send(address(), request, (Message<JsonObject> response) -> {
             JsonObject payload = response.body();
@@ -63,7 +63,7 @@ public class VertxCollectionResource extends AbstractVertxResource implements Co
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         JsonObject request = RequestBuilder.newReadRequest(id);
         vertx().eventBus().send(address(), request, (Message<JsonObject> response) -> {
             JsonObject payload = response.body();

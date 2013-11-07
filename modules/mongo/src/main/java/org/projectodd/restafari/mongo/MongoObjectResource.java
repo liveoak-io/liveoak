@@ -62,7 +62,7 @@ public class MongoObjectResource extends MongoResource implements ObjectResource
     }
 
     @Override
-    public void read(RequestContext ctx, String childId, Responder responder) {
+    public void readMember(RequestContext ctx, String childId, Responder responder) {
         Object value = this.dbObject.get(childId);
         if (value != null) {
             responder.resourceRead(new MongoPropertyResource(this, childId));
@@ -103,7 +103,7 @@ public class MongoObjectResource extends MongoResource implements ObjectResource
     }
 
     @Override
-    public void readContent(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
         this.dbObject.keySet().stream().forEach((name) -> {
             // the mongo internal id should never be returned to the user
             // the mbaas gets the id separately though getId when creating the object and should not be returned either

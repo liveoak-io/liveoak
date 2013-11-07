@@ -8,7 +8,7 @@ import org.projectodd.restafari.spi.resource.Resource;
  */
 public interface Responder {
 
-    /** Report a resource that has been read in response to a read request.
+    /** Report a resource that has been readMember in response to a readMember request.
      *
      * @param resource The resource that has been fetched for reading.
      */
@@ -42,7 +42,7 @@ public interface Responder {
      */
     void createNotSupported(Resource resource);
 
-    /** Indicate that a resource does not support read requests.
+    /** Indicate that a resource does not support readMember requests.
      *
      * @param resource The resource that does not support reading requests.
      */

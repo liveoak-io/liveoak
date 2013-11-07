@@ -40,7 +40,7 @@ public class SimplePropertyResource implements PropertyResource {
     }
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         responder.readNotSupported( this );
     }
 

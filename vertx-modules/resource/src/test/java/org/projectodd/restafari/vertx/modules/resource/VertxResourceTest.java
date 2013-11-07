@@ -1,7 +1,6 @@
 package org.projectodd.restafari.vertx.modules.resource;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectodd.restafari.container.DefaultContainer;
 import org.projectodd.restafari.container.DirectConnector;
@@ -119,7 +118,7 @@ public class VertxResourceTest  {
 
         CollectionResource resource = (CollectionResource) connector.read("/people");
         assertThat(resource).isNotNull();
-        resource.readContent(null, sink);
+        resource.readMembers(null, sink);
         List<Resource> result = future.get();
         assertThat(result.size()).isEqualTo(2);
 

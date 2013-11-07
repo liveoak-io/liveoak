@@ -39,7 +39,7 @@ public class MongoDBCollectionCreateTest extends BaseMongoDBTest{
 //        assertEquals(0, db.getCollection("movies").getCount());
 //
 ////        TODO: remove this, testing reads should be done separately from creates
-////        Resource movies = connector.read("/storage/movies");
+////        Resource movies = connector.readMember("/storage/movies");
 ////        assertThat( movies ).isNotNull();
 ////        assertThat( movies ).isInstanceOf( MongoCollectionResource.class );
 ////        assertThat( movies.id() ).isEqualTo( "movies" );

@@ -40,14 +40,14 @@ public abstract class TraversingResponder extends BaseResponder {
         if (resource instanceof BlockingResource) {
             this.executor.execute(() -> {
                 try {
-                    resource.read(TraversingResponder.this.inReplyTo().requestContext(), next, this);
+                    resource.readMember(TraversingResponder.this.inReplyTo().requestContext(), next, this);
                 } catch (RuntimeException e) {
                     noSuchResource(next);
                 }
             });
         } else {
             try {
-                resource.read(TraversingResponder.this.inReplyTo().requestContext(), next, this);
+                resource.readMember(TraversingResponder.this.inReplyTo().requestContext(), next, this);
             } catch (RuntimeException e) {
                 noSuchResource( next );
             }

@@ -16,7 +16,7 @@ public interface SynchronousResource extends Resource, BlockingResource {
     void delete(RequestContext ctx) throws ResourceException;
 
     @Override
-    default void read(RequestContext ctx, String id, Responder responder) {
+    default void readMember(RequestContext ctx, String id, Responder responder) {
         try {
             Resource result = read(ctx, id);
             responder.resourceRead(result);

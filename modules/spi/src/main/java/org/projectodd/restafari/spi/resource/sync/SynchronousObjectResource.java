@@ -33,7 +33,7 @@ public interface SynchronousObjectResource extends SynchronousResource, ObjectRe
     }
 
     @Override
-    default void readContent(RequestContext ctx, ResourceSink sink) {
+    default void readMembers(RequestContext ctx, ResourceSink sink) {
         members().forEach((m) -> {
             sink.accept( m );
         });

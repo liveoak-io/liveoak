@@ -71,7 +71,7 @@ public class DefaultContainer implements Container, CollectionResource {
     // ----------------------------------------
 
     @Override
-    public void read(RequestContext ctx, String id, Responder responder) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         try {
             if ( id == null ) {
                 responder.resourceRead( this );
@@ -101,7 +101,7 @@ public class DefaultContainer implements Container, CollectionResource {
     }
 
     @Override
-    public void readContent(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
         this.resources.values().forEach((e) -> {
             sink.accept( e );
         });
