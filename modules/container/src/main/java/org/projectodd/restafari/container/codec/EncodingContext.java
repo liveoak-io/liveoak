@@ -18,4 +18,6 @@ public interface EncodingContext<T> {
     boolean shouldEncodeContent();
     void encodeContent(Runnable contentCompletionHandler);
     RequestContext requestContext();
+
+    void encodeAspects(Runnable aspectCompletionHandler);
 }

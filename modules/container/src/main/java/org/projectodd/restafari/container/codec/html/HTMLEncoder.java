@@ -150,6 +150,27 @@ public class HTMLEncoder implements ExpansionControllingEncoder<HTMLEncoder.Enco
 
         writer.add(factory.createEndElement("", "", "div"));
 
+        writer.add(factory.createStartElement("", "", "table"));
+        writer.add(factory.createStartElement("", "", "tr"));
+
+        writer.add(factory.createStartElement("", "", "th"));
+        writer.add(factory.createCharacters("key"));
+        writer.add(factory.createEndElement("", "", "th"));
+
+        writer.add(factory.createStartElement("", "", "th"));
+        writer.add(factory.createCharacters("value"));
+        writer.add(factory.createEndElement("", "", "th"));
+
+        writer.add(factory.createEndElement("", "", "tr"));
+
+        context.encodeAspects(()->{
+            try {
+                writer.add( factory.createEndElement( "", "", "table" ));
+            } catch (XMLStreamException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        });
+
         if (context.shouldEncodeContent()) {
             writer.add(factory.createStartElement("", "", "div"));
             writer.add(factory.createAttribute("class", "content"));
@@ -184,6 +205,8 @@ public class HTMLEncoder implements ExpansionControllingEncoder<HTMLEncoder.Enco
         writer.add(factory.createEndElement("", "", "div"));
 
         // ----------------------------------------
+        //context.encodeAspects(()->{});
+
 
         if (context.shouldEncodeContent()) {
             writer.add(factory.createStartElement("", "", "table"));
@@ -198,6 +221,19 @@ public class HTMLEncoder implements ExpansionControllingEncoder<HTMLEncoder.Enco
             writer.add(factory.createEndElement("", "", "th"));
 
             writer.add(factory.createEndElement("", "", "tr"));
+
+            context.encodeAspects(() -> {
+                try {
+                    writer.add( factory.createStartElement("", "", "tr") );
+                    writer.add( factory.createStartElement("", "", "td") );
+                    writer.add( factory.createAttribute( "span", "2" ) );
+                    writer.add( factory.createCharacters( "-" ) );
+                    writer.add( factory.createEndElement("", "", "td") );
+                    writer.add( factory.createEndElement("", "", "tr") );
+                } catch (XMLStreamException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            });
 
             context.encodeContent(() -> {
                 try {

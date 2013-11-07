@@ -2,6 +2,7 @@ package org.projectodd.restafari.container.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import org.projectodd.restafari.container.aspects.ResourceAspectManager;
 import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.*;
@@ -25,7 +26,7 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
     }
 
     public int depth() {
-        if ( this.parent == null ) {
+        if (this.parent == null) {
             return 0;
         }
         return this.parent.depth() + 1;
@@ -34,6 +35,13 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
     public T attachment() {
         if (this.parent != null) {
             return this.parent.attachment();
+        }
+        return null;
+    }
+
+    public ResourceAspectManager aspectManager() {
+        if (this.parent != null) {
+            return this.parent.aspectManager();
         }
         return null;
     }
@@ -62,16 +70,16 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
     }
 
     public boolean shouldEncodeContent() {
-        if ( encoder() instanceof ExpansionControllingEncoder ) {
-            return ((ExpansionControllingEncoder) encoder()).shouldEncodeContent( this );
+        if (encoder() instanceof ExpansionControllingEncoder) {
+            return ((ExpansionControllingEncoder) encoder()).shouldEncodeContent(this);
         }
 
 
-        if ( this.object instanceof PropertyResource ) {
+        if (this.object instanceof PropertyResource) {
             return true;
         }
 
-        if ( this.parent != null && this.parent.object instanceof CollectionResource ) {
+        if (this.parent != null && this.parent.object instanceof CollectionResource) {
             return depth() < 2;
         }
 
@@ -93,6 +101,21 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
             }
         } else {
             endContentHandler.run();
+        }
+    }
+
+    @Override
+    public void encodeAspects(Runnable endContentHandler) {
+        this.endContentHandler = endContentHandler;
+        if (this.object instanceof Resource) {
+            MyObjectContentSink sink = new MyObjectContentSink();
+            aspectManager().stream().forEach((aspect) -> {
+                Resource resource = aspect.forResource((Resource) this.object);
+                if (resource != null) {
+                    sink.accept(new SimplePropertyResource((Resource) this.object, resource.id(), resource));
+                }
+            });
+            sink.close();
         }
     }
 
@@ -160,13 +183,13 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
 
         @Override
         public void accept(ByteBuf byteBuf) {
-            buffer.writeBytes( byteBuf );
+            buffer.writeBytes(byteBuf);
         }
 
         @Override
         public void close() {
             ChildEncodingContext child = new ChildEncodingContext(ctx, AbstractEncodingContext.this, buffer);
-            children.add( child );
+            children.add(child);
             encodeNextContent();
         }
 

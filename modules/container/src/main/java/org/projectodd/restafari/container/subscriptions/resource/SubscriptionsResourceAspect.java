@@ -15,6 +15,14 @@ public class SubscriptionsResourceAspect implements ResourceAspect {
 
     @Override
     public Resource forResource(Resource resource) {
+        if ( resource instanceof SubscriptionsCollectionResource ) {
+            return null;
+        }
+
+        if ( resource instanceof SubscriptionResource ) {
+            return null;
+        }
+
         return new SubscriptionsCollectionResource( resource, this.subscriptionManager );
     }
 

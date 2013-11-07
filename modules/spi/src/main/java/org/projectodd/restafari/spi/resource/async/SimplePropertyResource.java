@@ -8,7 +8,7 @@ import org.projectodd.restafari.spi.resource.Resource;
  */
 public class SimplePropertyResource implements PropertyResource {
 
-    public SimplePropertyResource(ObjectResource parent, String name, Object value) {
+    public SimplePropertyResource(Resource parent, String name, Object value) {
         this.parent = parent;
         this.name = name;
         this.value = value;
@@ -49,7 +49,7 @@ public class SimplePropertyResource implements PropertyResource {
         responder.deleteNotSupported( this );
     }
 
-    private ObjectResource parent;
+    private Resource parent;
     private String name;
     private Object value;
 }

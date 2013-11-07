@@ -2,6 +2,7 @@ package org.projectodd.restafari.container.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import org.projectodd.restafari.container.DefaultContainer;
 import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.state.ResourceState;
@@ -13,7 +14,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public class ResourceCodec {
 
-    public ResourceCodec(ResourceEncoder encoder, ResourceDecoder decoder) {
+    public ResourceCodec(DefaultContainer container, ResourceEncoder encoder, ResourceDecoder decoder) {
+        this.container = container;
         this.encoder = encoder;
         this.decoder = decoder;
     }
@@ -32,13 +34,14 @@ public class ResourceCodec {
     protected EncodingContext newEncodingContext(RequestContext ctx, Resource resource, CompletableFuture<ByteBuf> future) throws Exception {
         ByteBuf buffer = Unpooled.buffer();
         Object attachment = this.encoder.createAttachment(buffer);
-        EncodingContext driver = new RootEncodingContext(ctx, this.encoder, attachment, resource, () -> {
+        EncodingContext driver = new RootEncodingContext(ctx, this.encoder, attachment, resource, container.resourceAspectManager(), () -> {
             future.complete( buffer );
         });
         return driver;
     }
 
 
+    private final DefaultContainer container;
     private final ResourceEncoder encoder;
     private final ResourceDecoder decoder;
 

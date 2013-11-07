@@ -61,6 +61,8 @@ public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
         generator.writeStartObject();
         encodeProlog(context);
 
+        context.encodeAspects(()->{});
+
         if (context.shouldEncodeContent()) {
             generator.writeFieldName("content");
             generator.writeStartArray();
@@ -83,6 +85,7 @@ public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
         JsonGenerator generator = context.attachment();
         generator.writeStartObject();
         encodeProlog(context);
+        context.encodeAspects(()->{});
         context.encodeContent(() -> {
             try {
                 generator.writeEndObject();

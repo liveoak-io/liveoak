@@ -27,7 +27,7 @@ public class HttpResourceRequestDecoderTest {
     @Before
     public void setUp() {
         this.codecManager = new ResourceCodecManager();
-        this.codecManager.registerResourceCodec("application/json", new ResourceCodec(new JSONEncoder(), new JSONDecoder()));
+        this.codecManager.registerResourceCodec("application/json", new ResourceCodec(null, new JSONEncoder(), new JSONDecoder()));
         this.channel = new EmbeddedChannel(new HttpResourceRequestDecoder(this.codecManager));
     }
 

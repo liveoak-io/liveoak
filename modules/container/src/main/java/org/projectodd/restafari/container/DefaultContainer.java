@@ -33,8 +33,8 @@ public class DefaultContainer implements Container, CollectionResource {
     }
 
     public DefaultContainer(Vertx vertx) {
-        this.codecManager.registerResourceCodec("application/json", new ResourceCodec( new JSONEncoder(), new JSONDecoder() ) );
-        this.codecManager.registerResourceCodec("text/html", new ResourceCodec( new HTMLEncoder( this ), null ) );
+        this.codecManager.registerResourceCodec("application/json", new ResourceCodec( this, new JSONEncoder(), new JSONDecoder() ) );
+        this.codecManager.registerResourceCodec("text/html", new ResourceCodec( this, new HTMLEncoder( this ), null ) );
 
         this.vertx = vertx;
         this.workerPool = Executors.newCachedThreadPool();
@@ -64,7 +64,7 @@ public class DefaultContainer implements Container, CollectionResource {
         return this.workerPool;
     }
 
-    ResourceAspectManager resourceAspectManager() {
+    public ResourceAspectManager resourceAspectManager() {
         return this.aspectManager;
     }
 
