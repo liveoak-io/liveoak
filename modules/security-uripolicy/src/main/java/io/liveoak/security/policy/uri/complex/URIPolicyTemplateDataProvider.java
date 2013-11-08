@@ -17,13 +17,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class URIPolicyTemplateDataProvider implements DataProvider {
 
-    private final URIPolicyEntry uriPolicyEntry;
+    private final URIPolicyRule uriPolicyRule;
     private boolean processed = false;
 
     private static AtomicInteger counter = new AtomicInteger(0);
 
-    public URIPolicyTemplateDataProvider(URIPolicyEntry uriPolicyEntry) {
-        this.uriPolicyEntry = uriPolicyEntry;
+    public URIPolicyTemplateDataProvider(URIPolicyRule uriPolicyRule) {
+        this.uriPolicyRule = uriPolicyRule;
     }
 
     @Override
@@ -37,17 +37,15 @@ public class URIPolicyTemplateDataProvider implements DataProvider {
 
         return new String[]{
                 String.valueOf(counter.incrementAndGet()),
-                String.valueOf(uriPolicyEntry.getPriority()),
-                String.valueOf(uriPolicyEntry.getPriority() - 1),
-                uriPolicyEntry.getUriPattern(),
-                uriPolicyEntry.getQueryParamsCondition(),
-                uriPolicyEntry.getRequestType(),
-                uriPolicyEntry.getAllowedRealmRoles(),
-                uriPolicyEntry.getDeniedRealmRoles(),
-                uriPolicyEntry.getAllowedApplicationRoles(),
-                uriPolicyEntry.getDeniedApplicationRoles(),
-                uriPolicyEntry.getAllowedUsers(),
-                uriPolicyEntry.getDeniedUsers()
+                String.valueOf(uriPolicyRule.getPriority()),
+                String.valueOf(uriPolicyRule.getPriority() - 1),
+                uriPolicyRule.getUriPattern(),
+                uriPolicyRule.getQueryParamsCondition(),
+                uriPolicyRule.getRequestType(),
+                uriPolicyRule.getAllowedRoles(),
+                uriPolicyRule.getDeniedRoles(),
+                uriPolicyRule.getAllowedUsers(),
+                uriPolicyRule.getDeniedUsers()
         };
     }
 }

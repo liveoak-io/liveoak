@@ -104,6 +104,7 @@
         <module>git</module>
         <module>vertx</module>
         <module>3rdparty</module>
+        <module>keycloak</module>
         <module>security</module>
         <module>security-uripolicy</module>
     </modules>

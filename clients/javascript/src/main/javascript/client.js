@@ -12,36 +12,31 @@ var LiveOak = function( options ) {
     options = options || {};
 
     // Allow instantiation without using new
-    if(!this instanceof LiveOak) {
-        return LiveOak( options );
+    if(!(this instanceof LiveOak)) {
+        return new LiveOak( options );
     }
+
+    // Use address of liveoak.js if server address not specified
+    if (!options.host) {
+        var server = parseScriptUrl();
+        options.host = server.host;
+        options.port = server.port;
+        options.secure = server.secure;
+    }
+
+    var http = new Http(options);
+
     var stomp_client = new Stomp.Client( options.host, options.port, options.secure );
 
     this.connect = function( callback ) {
         stomp_client.connect( callback );
     };
 
-    this.create = function( path, data, options ) {
-        options = options || {};
-        $.ajax( path, {
-            type: 'POST',
-            data: JSON.stringify( data ),
-            contentType: 'application/json',
-            dataType: 'json',
-            successs: options.success,
-            error: options.error
-        });
-    };
-
-    this.read = function( path, options ) {
-        options = options || {};
-        $.ajax( path, {
-            type: 'GET',
-            dataType: 'json',
-            success: options.success,
-            error: options.error
-        });
-    };
+    this.read = http.read;
+    this.readMembers = http.readMembers;
+    this.save = http.save;
+    this.update = http.update;
+    this.remove = http.remove;
 
     this.subscribe = function( path, callback ) {
         stomp_client.subscribe( path, function(msg) {
@@ -49,4 +44,38 @@ var LiveOak = function( options ) {
             callback( data );
         });
     };
+
+    if (options.auth) {
+        if (!options.auth.host) {
+            options.auth.host = options.host;
+        }
+        if (!options.auth.port) {
+            options.auth.port = options.port ? options.port + 1 : 8081;
+        }
+        if (!options.auth.secure) {
+            options.auth.secure = options.secure;
+        }
+
+        this.auth = new Keycloak(options.auth);
+    }
+
+    function parseScriptUrl() {
+        var scripts = document.getElementsByTagName('script');
+        for (var i = 0; i < scripts.length; i++)  {
+            if (scripts[i].src.match(/.*liveoak\.js/)) {
+                var parts = scripts[i].src.split('/');
+                var server = {};
+                if (parts[2].indexOf(':') == -1) {
+                    server.host = parts[2];
+                } else {
+                    server.host = parts[2].substring(0, parts[2].indexOf(':'));
+                    server.port = parseInt(parts[2].substring(parts[2].indexOf(':') + 1));
+                }
+                if (parts[0] == 'https') {
+                    server.secure = true;
+                }
+                return server;
+            }
+        }
+    }
 };

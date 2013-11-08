@@ -12,6 +12,7 @@ public interface Container extends Resource {
 
     void registerResource(RootResource resource);
     void unregisterResource(RootResource resource);
+    boolean hasResource(String id);
 
     void start();
     void shutdown();

@@ -5,8 +5,8 @@
  */
 package io.liveoak.security.policy.uri.complex;
 
-import io.liveoak.security.impl.SimpleLogger;
-import io.liveoak.security.spi.AuthorizationDecision;
+import io.liveoak.container.auth.SimpleLogger;
+import io.liveoak.security.spi.AuthzDecision;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,18 +21,23 @@ public class RulesProcessingResult {
 
     private static final SimpleLogger log = new SimpleLogger(RulesProcessingResult.class);
 
-    private AuthorizationDecision current = AuthorizationDecision.IGNORE;
+    private AuthzDecision current = null;
     private Set<String> processedRules = new HashSet<String>();
     private int lastProcessedPriority;
 
-    public void mergeDecision(AuthorizationDecision newDecision) {
-        //if (log.isTraceEnabled()) {
-        log.trace("Merging decision: old=" + current + ", new=" + newDecision);
-        //}
-        current = current.mergeDecision(newDecision);
+    public void mergeDecision(AuthzDecision newDecision) {
+        if (log.isTraceEnabled()) {
+            log.trace("Merging decision: old=" + current + ", new=" + newDecision);
+        }
+
+        if (current == null) {
+            current = newDecision;
+        } else {
+            current = current.mergeDecision(newDecision);
+        }
     }
 
-    public AuthorizationDecision getDecision() {
+    public AuthzDecision getDecision() {
         return current;
     }
 

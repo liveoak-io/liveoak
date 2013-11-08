@@ -40,13 +40,13 @@
             <artifactId>liveoak-stomp</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
+       <!-- <dependency>
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-security</artifactId>
             <scope>provided</scope>
-        </dependency>
+        </dependency>-->
         <!-- TODO: Possibly remove policy implementations and drools later from this and from module.xml -->
-        <dependency>
+        <!--<dependency>
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-security-uripolicy</artifactId>
             <scope>provided</scope>
@@ -65,7 +65,7 @@
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
             <scope>provided</scope>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>io.netty</groupId>

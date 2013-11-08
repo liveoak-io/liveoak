@@ -5,10 +5,8 @@ CHECK_PRIORITY
 URI_PATTERN
 QUERY_PARAMS_CONDITIONS
 REQUEST_TYPE
-ALLOWED_REALM_ROLES
-DENIED_REALM_ROLES
-ALLOWED_APPLICATION_ROLES
-DENIED_APPLICATION_ROLES
+ALLOWED_ROLES
+DENIED_ROLES
 ALLOWED_USERS
 DENIED_USERS
 
@@ -20,15 +18,18 @@ import io.liveoak.security.policy.uri.complex.URIMatcher;
 import io.liveoak.security.policy.uri.complex.URIMatcherCache;
 import io.liveoak.security.policy.uri.complex.RequestContextDecorator;
 import io.liveoak.security.policy.uri.RolesContainer
-import io.liveoak.security.spi.AuthorizationDecision;
-import io.liveoak.security.spi.AuthToken;
+import io.liveoak.security.spi.AuthzDecision;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.SecurityContext;
+import io.liveoak.container.auth.SimpleLogger;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+
+import static io.liveoak.security.policy.uri.complex.LoggerHelper.logger;
 
 dialect "mvel"
 
@@ -38,7 +39,7 @@ salience @{PRIORITY}
 when
   $rulesProcessingResult: RulesProcessingResult( isAlreadyProcessedRule("URIPolicyRule_@{POLICY_COUNTER}") == false )
   $endSemaphore: EndSemaphore( finished == false )
-  $token: AuthToken()
+  $securityContext: SecurityContext()
   URIMatcherCache($uriMatcher: getURIMatcher("URIPolicyRule_@{POLICY_COUNTER}"));
   $request: RequestContextDecorator(
                             uriMatches("URIPolicyRule_@{POLICY_COUNTER}", @{URI_PATTERN}, resourcePath, $uriMatcher) &&
@@ -46,17 +47,17 @@ when
                             requestTypeMatches("URIPolicyRule_@{POLICY_COUNTER}", requestType, "@{REQUEST_TYPE}")
                           )
 then
-  System.out.println("Triggered rule: URIPolicyRule_@{POLICY_COUNTER} . All conditions matched");
+  if (logger().isTraceEnabled()) {
+    logger().trace("Triggered rule: URIPolicyRule_@{POLICY_COUNTER} . All conditions matched");
+  }
 
   RolesContainer container = new RolesContainer();
-  container.addAllAllowedRealmRoles( Arrays.asList(new String[] { @{ALLOWED_REALM_ROLES} }) );
-  container.addAllDeniedRealmRoles( Arrays.asList(new String[] { @{DENIED_REALM_ROLES} }) );
-  container.addAllAllowedApplicationRoles( Arrays.asList(new String[] { @{ALLOWED_APPLICATION_ROLES} }) );
-  container.addAllDeniedApplicationRoles( Arrays.asList(new String[] { @{DENIED_APPLICATION_ROLES} }) );
+  container.addAllAllowedRoles( Arrays.asList(new String[] { @{ALLOWED_ROLES} }) );
+  container.addAllDeniedRoles( Arrays.asList(new String[] { @{DENIED_ROLES} }) );
   container.addAllAllowedUsers( Arrays.asList(new String[] { @{ALLOWED_USERS} }) );
   container.addAllDeniedUsers( Arrays.asList(new String[] { @{DENIED_USERS} }) );
 
-  AuthorizationDecision decision = container.isTokenAllowed($token);
+  AuthzDecision decision = container.isRequestAllowed($request);
 
   modify ($rulesProcessingResult) {
     mergeDecision(decision);
@@ -74,10 +75,12 @@ template "Check finished"
 rule "CheckFinished_@{POLICY_COUNTER}"
 salience @{CHECK_PRIORITY}
 when
-  RulesProcessingResult(decision == AuthorizationDecision.ACCEPT || == AuthorizationDecision.REJECT, lastProcessedPriority > @{CHECK_PRIORITY})
+  RulesProcessingResult(decision == AuthzDecision.ACCEPT || == AuthzDecision.REJECT, lastProcessedPriority > @{CHECK_PRIORITY})
   $endSemaphore: EndSemaphore( finished == false )
 then
-  System.out.println("Triggered rule: CheckFinished_@{POLICY_COUNTER}, priority: " + @{CHECK_PRIORITY} + " . Going to stop processing other URI rules");
+  if (logger().isTraceEnabled()) {
+    logger().trace("Triggered rule: CheckFinished_@{POLICY_COUNTER}, priority: " + @{CHECK_PRIORITY} + " . Going to stop processing other URI rules");
+  }
   modify ($endSemaphore) {
     finished = true;
   }
