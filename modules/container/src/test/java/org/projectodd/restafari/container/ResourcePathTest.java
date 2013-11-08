@@ -1,6 +1,7 @@
 package org.projectodd.restafari.container;
 
 import org.junit.Test;
+import org.projectodd.restafari.spi.ResourcePath;
 
 import static org.fest.assertions.Assertions.*;
 

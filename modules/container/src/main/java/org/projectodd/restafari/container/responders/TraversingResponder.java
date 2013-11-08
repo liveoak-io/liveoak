@@ -1,7 +1,7 @@
 package org.projectodd.restafari.container.responders;
 
 import io.netty.channel.ChannelHandlerContext;
-import org.projectodd.restafari.container.ResourcePath;
+import org.projectodd.restafari.spi.ResourcePath;
 import org.projectodd.restafari.container.ResourceRequest;
 import org.projectodd.restafari.container.aspects.ResourceAspectManager;
 import org.projectodd.restafari.spi.resource.BlockingResource;

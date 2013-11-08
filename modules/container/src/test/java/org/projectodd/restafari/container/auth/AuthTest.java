@@ -98,7 +98,7 @@ public class AuthTest {
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_NOT_FOUND);
 
         // Authorization should fail because of invalid token signature
-        // TODO: Uncomment this
+        // TODO: Uncomment this. Signature verification should be revisited (Maybe needs to be done with BouncyCastle...)
         /*httpMethod = createHttpMethod("GET", "http://localhost:8080/authTest/public");
         httpMethod.addHeader(new BasicHeader("Authorization", "Bearer " + TestAuthConstants.INVALID_SIGNATURE_TOKEN));
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_FORBIDDEN);*/

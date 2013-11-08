@@ -5,9 +5,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.*;
-import org.projectodd.restafari.container.DefaultRequestContext;
 import org.projectodd.restafari.container.DefaultResourceParams;
-import org.projectodd.restafari.container.ResourcePath;
+import org.projectodd.restafari.security.impl.AuthConstants;
+import org.projectodd.restafari.spi.RequestType;
+import org.projectodd.restafari.spi.ResourcePath;
 import org.projectodd.restafari.container.ResourceRequest;
 import org.projectodd.restafari.container.ReturnFieldsImpl;
 import org.projectodd.restafari.container.codec.MediaTypeMatcher;
@@ -72,34 +73,34 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         if (msg.getMethod().equals(HttpMethod.POST)) {
             String contentTypeHeader = msg.headers().get( HttpHeaders.Names.CONTENT_TYPE );
             MediaType contentType = new MediaType( contentTypeHeader );
-            out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.CREATE, new ResourcePath(decoder.path()))
+            out.add(new ResourceRequest.Builder(RequestType.CREATE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
-                    .authorizationToken(authToken)
+                    .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
                     .resourceState(decodeState(contentType, msg.content()))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.GET)) {
-            out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.READ, new ResourcePath(decoder.path()))
+            out.add(new ResourceRequest.Builder(RequestType.READ, new ResourcePath(decoder.path()))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
-                    .authorizationToken(authToken)
+                    .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
                     .pagination(decodePagination(params))
                     .returnFields(decodeReturnFields(params))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.PUT)) {
             String contentTypeHeader = msg.headers().get( HttpHeaders.Names.CONTENT_TYPE );
             MediaType contentType = new MediaType( contentTypeHeader );
-            out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.UPDATE, new ResourcePath(decoder.path()))
+            out.add(new ResourceRequest.Builder(RequestType.UPDATE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
-                    .authorizationToken(authToken)
+                    .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
                     .resourceState(decodeState(contentType, msg.content()))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.DELETE)) {
-            out.add(new ResourceRequest.Builder(ResourceRequest.RequestType.DELETE, new ResourcePath(decoder.path()))
+            out.add(new ResourceRequest.Builder(RequestType.DELETE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
-                    .authorizationToken(authToken)
+                    .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
                     .build());
         }
 

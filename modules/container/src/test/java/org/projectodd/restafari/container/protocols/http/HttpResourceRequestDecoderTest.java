@@ -12,6 +12,7 @@ import org.projectodd.restafari.container.codec.json.JSONDecoder;
 import org.projectodd.restafari.container.codec.json.JSONEncoder;
 import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.spi.Pagination;
+import org.projectodd.restafari.spi.RequestType;
 import org.projectodd.restafari.spi.state.ObjectResourceState;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -35,7 +36,7 @@ public class HttpResourceRequestDecoderTest {
     public void testDecodeGet() throws Exception {
         ResourceRequest decoded = decode(HttpMethod.GET, "/memory/people/bob");
 
-        assertThat(decoded.requestType()).isEqualTo(ResourceRequest.RequestType.READ);
+        assertThat(decoded.requestType()).isEqualTo(RequestType.READ);
 
         assertThat(decoded.resourcePath().segments()).hasSize(3);
         assertThat(decoded.resourcePath().segments().get(0)).isEqualTo("memory");
@@ -55,7 +56,7 @@ public class HttpResourceRequestDecoderTest {
     public void testDecodeDelete() throws Exception {
         ResourceRequest decoded = decode(HttpMethod.DELETE, "/memory/people/bob");
 
-        assertThat(decoded.requestType()).isEqualTo(ResourceRequest.RequestType.DELETE);
+        assertThat(decoded.requestType()).isEqualTo(RequestType.DELETE);
 
         assertThat(decoded.resourcePath().segments()).hasSize(3);
         assertThat(decoded.resourcePath().segments().get(0)).isEqualTo("memory");
@@ -74,7 +75,7 @@ public class HttpResourceRequestDecoderTest {
     public void testDecodePost() throws Exception {
         ResourceRequest decoded = decode(HttpMethod.POST, "/memory/people/bob", "{ name: 'bob' }");
 
-        assertThat(decoded.requestType()).isEqualTo(ResourceRequest.RequestType.CREATE);
+        assertThat(decoded.requestType()).isEqualTo(RequestType.CREATE);
 
         assertThat(decoded.resourcePath().segments()).hasSize(3);
         assertThat(decoded.resourcePath().segments().get(0)).isEqualTo("memory");
@@ -98,7 +99,7 @@ public class HttpResourceRequestDecoderTest {
     public void testDecodePut() throws Exception {
         ResourceRequest decoded = decode(HttpMethod.PUT, "/memory/people/bob", "{ name: 'bob' }");
 
-        assertThat(decoded.requestType()).isEqualTo(ResourceRequest.RequestType.UPDATE);
+        assertThat(decoded.requestType()).isEqualTo(RequestType.UPDATE);
 
         assertThat(decoded.resourcePath().segments()).hasSize(3);
         assertThat(decoded.resourcePath().segments().get(0)).isEqualTo("memory");

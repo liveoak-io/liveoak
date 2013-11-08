@@ -1,13 +1,15 @@
 package org.projectodd.restafari.spi;
 
-import java.security.Principal;
 
 public interface RequestContext {
 
     Application getApplication();
-    Principal getPrinicpal();
+    SecurityContext getSecurityContext();
     Pagination getPagination();
+    ResourcePath getResourcePath();
     ResourceParams getResourceParams();
+    RequestAttributes getRequestAttributes();
+    RequestType getRequestType();
     ReturnFields getReturnFields();
 
     public static class Builder implements RequestContext {

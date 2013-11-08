@@ -41,7 +41,7 @@ public class DirectConnector {
     }
 
     public void create(String path, ResourceState state, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest.Builder(ResourceRequest.RequestType.CREATE, new ResourcePath(path))
+        ResourceRequest request = new ResourceRequest.Builder(RequestType.CREATE, new ResourcePath(path))
                 .resourceState(state)
                 .build();
         this.handlers.put(request, handler);
@@ -65,7 +65,7 @@ public class DirectConnector {
     }
 
     public void read(String path, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest.Builder(ResourceRequest.RequestType.READ, new ResourcePath(path))
+        ResourceRequest request = new ResourceRequest.Builder(RequestType.READ, new ResourcePath(path))
                 .build();
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
@@ -95,7 +95,7 @@ public class DirectConnector {
     }
 
     public void update(String path, ResourceState state, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest.Builder(ResourceRequest.RequestType.UPDATE, new ResourcePath(path))
+        ResourceRequest request = new ResourceRequest.Builder(RequestType.UPDATE, new ResourcePath(path))
                 .resourceState(state)
                 .build();
         this.handlers.put(request, handler);
@@ -119,7 +119,7 @@ public class DirectConnector {
     }
 
     public void delete(String path, Consumer<ResourceResponse> handler) {
-        ResourceRequest request = new ResourceRequest.Builder(ResourceRequest.RequestType.DELETE, new ResourcePath(path))
+        ResourceRequest request = new ResourceRequest.Builder(RequestType.DELETE, new ResourcePath(path))
                 .build();
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
