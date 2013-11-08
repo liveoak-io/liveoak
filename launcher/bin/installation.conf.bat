@@ -31,5 +31,5 @@ REM default to the user's local m2-repo.
 REM in development, we rely on a user's own .m2 repo
 
 REM pushd %BINDIR%..\..
-REM set "M2_REPO_DIR=%CD%modules\target\m2-repo"
+REM set "M2_REPO_DIR=%CD%\modules\target\m2-repo"
 REM popd
