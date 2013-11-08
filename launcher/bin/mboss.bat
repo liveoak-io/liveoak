@@ -1,4 +1,4 @@
-REM @echo off
+@echo off
 
 @if not "%ECHO%" == ""  echo %ECHO%
 @if "%OS%" == "Windows_NT" setlocal
