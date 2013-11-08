@@ -102,6 +102,10 @@ public class InMemoryCollectionResource implements CollectionResource {
         this.collection.remove(id);
     }
 
+    public void addMember(Resource member) {
+        this.collection.put( member.id(), member );
+    }
+
     private InMemoryCollectionResource parent;
     private String id;
     private Map<String, Resource> collection = new LinkedHashMap<>();
