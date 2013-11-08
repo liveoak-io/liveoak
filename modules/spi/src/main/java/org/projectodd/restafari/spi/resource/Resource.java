@@ -7,7 +7,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Basic server-side representation of a resource.
+/**
+ * Basic server-side representation of a resource.
  *
  * <p>The basic function of a resource is that it may (optionally) contain
  * children, in the form of members-of-a-collection, or properties-of-an-object.</p>
@@ -23,7 +24,8 @@ import java.util.List;
  */
 public interface Resource {
 
-    /** Retrieve the URI associated with this resource.
+    /**
+     * Retrieve the URI associated with this resource.
      *
      * @return The URI
      */
@@ -38,39 +40,49 @@ public interface Resource {
 
         StringBuilder buf = new StringBuilder();
 
+        if ( segments.size() == 1 && segments.get(0).equals( "" ) ) {
+            return URI.create( "/" );
+        }
+
         segments.forEach((s) -> {
-            buf.append( "/" );
-            buf.append( s );
+            if (s != null && !"".equals(s)) {
+                buf.append("/");
+                buf.append(s);
+            }
         });
 
-        return URI.create( buf.toString() );
+        return URI.create(buf.toString());
     }
 
-    /** Retrieve the parent resource of this resource, if any.
+    /**
+     * Retrieve the parent resource of this resource, if any.
      *
      * @return The parent, or {@code null} if none.
      */
     Resource parent();
 
-    /** Retrieve the identifier of this resource, if any.
+    /**
+     * Retrieve the identifier of this resource, if any.
      *
      * @return The id, or {@code null} if none.
      */
     String id();
 
-    /** Locate a child resource.
+    /**
+     * Locate a child resource.
      *
      * <p>Depending on the modelling of this resource, the child
      * may be a member-of-a-collection, or it might be a property-of-an-object.</p>
      *
      * <p>Semantics are left to the author of the resource.</p>
      *
-     * @param id The child ID to readMember.
+     * @param id        The child ID to readMember.
      * @param responder To respond to the action.
      */
     void readMember(RequestContext ctx, String id, Responder responder);
 
-    /** Delete this resource.
+    /**
+     * Delete this resource.
      *
      * @param responder To respond to the action.
      */

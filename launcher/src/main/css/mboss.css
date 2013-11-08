@@ -28,6 +28,7 @@
 .resource table {
   border: 1px solid #ccc;
   font-size: 90%;
+  margin-bottom: 1em;
 }
 
 .resource table tr {

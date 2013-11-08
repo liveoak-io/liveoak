@@ -56,7 +56,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
         JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
 
-        assertEquals(3, jsonNode.size()); // id, _self, bar
+        assertEquals(4, jsonNode.size()); // id, _self, bar
         assertEquals(id, jsonNode.get("id").asText());
         assertEquals("bar", jsonNode.get("foo").asText());
         assertNotNull(jsonNode.get("_self"));
@@ -101,7 +101,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
 
-        assertEquals(3, jsonNode.size()); // id, _self, members
+        assertEquals(4, jsonNode.size()); // id, _self, members, _subscriptions
         assertEquals(methodName, jsonNode.get("id").asText());
         assertEquals("{\"href\":\"/storage/testEmtpyCollection\",\"type\":\"collection\"}", jsonNode.get("_self").toString());
         assertEquals("[]", jsonNode.get("content").toString());

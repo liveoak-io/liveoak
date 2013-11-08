@@ -38,7 +38,7 @@ public abstract class TraversingResponder extends BaseResponder {
         return this.remainingPath.isEmpty();
     }
 
-    protected void doRead(String next, Resource resource) {
+    public void doRead(String next, Resource resource) {
         if ( this.aspectManager.contains( next ) ) {
             resourceRead( this.aspectManager.get( next ).forResource( resource ) );
             return;

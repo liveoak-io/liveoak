@@ -23,14 +23,14 @@ public class SubscriptionsCollectionResource implements CollectionResource {
 
     @Override
     public void create(RequestContext ctx, ResourceState state, Responder responder) {
-        responder.createNotSupported( this );
+        responder.createNotSupported(this);
     }
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
         Stream<Subscription> subscriptions = this.subscriptionManager.getSubscriptions(this.parent);
-        subscriptions.forEach( (each)->{
-            sink.accept( new SubscriptionResource( this, each ) );
+        subscriptions.forEach((each) -> {
+            sink.accept(new SubscriptionResource(this, each));
         });
         sink.close();
     }
@@ -47,7 +47,13 @@ public class SubscriptionsCollectionResource implements CollectionResource {
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
-        responder.noSuchResource( id );
+        Subscription subscription = this.subscriptionManager.getSubscription(this.parent, id);
+        if (subscription == null) {
+            responder.noSuchResource(id);
+            return;
+        }
+
+        responder.resourceRead(new SubscriptionResource(this, subscription));
     }
 
     @Override

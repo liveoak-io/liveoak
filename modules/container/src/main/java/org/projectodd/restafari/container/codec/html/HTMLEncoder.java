@@ -83,6 +83,7 @@ public class HTMLEncoder implements ExpansionControllingEncoder<HTMLEncoder.Enco
     @Override
     public void encode(EncodingContext<EncoderState> context) throws Exception {
         Object o = context.object();
+
         if (o instanceof CollectionResource) {
             encodeCollection(context);
         } else if (o instanceof ObjectResource) {
@@ -137,6 +138,7 @@ public class HTMLEncoder implements ExpansionControllingEncoder<HTMLEncoder.Enco
 
     protected void encodeCollection(EncodingContext<EncoderState> context) throws Exception {
         Resource resource = (Resource) context.object();
+
         XMLEventWriter writer = context.attachment().writer;
         XMLEventFactory factory = context.attachment().factory;
 
@@ -150,26 +152,7 @@ public class HTMLEncoder implements ExpansionControllingEncoder<HTMLEncoder.Enco
 
         writer.add(factory.createEndElement("", "", "div"));
 
-        writer.add(factory.createStartElement("", "", "table"));
-        writer.add(factory.createStartElement("", "", "tr"));
-
-        writer.add(factory.createStartElement("", "", "th"));
-        writer.add(factory.createCharacters("key"));
-        writer.add(factory.createEndElement("", "", "th"));
-
-        writer.add(factory.createStartElement("", "", "th"));
-        writer.add(factory.createCharacters("value"));
-        writer.add(factory.createEndElement("", "", "th"));
-
-        writer.add(factory.createEndElement("", "", "tr"));
-
-        context.encodeAspects(()->{
-            try {
-                writer.add( factory.createEndElement( "", "", "table" ));
-            } catch (XMLStreamException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        });
+        encodeAspects( context );
 
         if (context.shouldEncodeContent()) {
             writer.add(factory.createStartElement("", "", "div"));
@@ -204,9 +187,9 @@ public class HTMLEncoder implements ExpansionControllingEncoder<HTMLEncoder.Enco
 
         writer.add(factory.createEndElement("", "", "div"));
 
-        // ----------------------------------------
-        //context.encodeAspects(()->{});
+        encodeAspects( context );
 
+        // ----------------------------------------
 
         if (context.shouldEncodeContent()) {
             writer.add(factory.createStartElement("", "", "table"));
@@ -222,19 +205,6 @@ public class HTMLEncoder implements ExpansionControllingEncoder<HTMLEncoder.Enco
 
             writer.add(factory.createEndElement("", "", "tr"));
 
-            context.encodeAspects(() -> {
-                try {
-                    writer.add( factory.createStartElement("", "", "tr") );
-                    writer.add( factory.createStartElement("", "", "td") );
-                    writer.add( factory.createAttribute( "span", "2" ) );
-                    writer.add( factory.createCharacters( "-" ) );
-                    writer.add( factory.createEndElement("", "", "td") );
-                    writer.add( factory.createEndElement("", "", "tr") );
-                } catch (XMLStreamException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-            });
-
             context.encodeContent(() -> {
                 try {
                     writer.add(factory.createEndElement("", "", "table"));
@@ -248,6 +218,40 @@ public class HTMLEncoder implements ExpansionControllingEncoder<HTMLEncoder.Enco
             writer.add(factory.createEndElement("", "", "div"));
             context.end();
         }
+    }
+
+    protected void encodeAspects(EncodingContext<EncoderState> context) throws Exception {
+        if ( ! context.shouldEncodeContent() ) {
+            return;
+        }
+
+        Resource resource = (Resource) context.object();
+        final XMLEventWriter writer = context.attachment().writer;
+        final XMLEventFactory factory = context.attachment().factory;
+
+        if ( context.hasAspects() ) {
+            writer.add( factory.createStartElement( "", "", "table" ) );
+            writer.add( factory.createStartElement( "", "", "tr" ) );
+
+            writer.add( factory.createStartElement( "", "", "th" ) );
+            writer.add( factory.createCharacters( "Aspect" ) );
+            writer.add( factory.createEndElement( "", "", "th" ) );
+
+            writer.add( factory.createStartElement( "", "", "th" ) );
+            writer.add( factory.createCharacters("Link") );
+            writer.add( factory.createEndElement("", "", "th") );
+
+            writer.add( factory.createEndElement("", "", "tr") );
+
+            context.encodeAspects( ()->{
+                try {
+                    writer.add( factory.createEndElement("", "", "table") );
+                } catch (XMLStreamException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            });
+        }
+
     }
 
     protected void encodeProperty(EncodingContext<EncoderState> context) throws Exception {

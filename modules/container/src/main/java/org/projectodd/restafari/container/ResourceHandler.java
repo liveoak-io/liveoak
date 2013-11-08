@@ -19,16 +19,20 @@ public class ResourceHandler extends SimpleChannelInboundHandler<ResourceRequest
 
         switch (msg.requestType()) {
             case CREATE:
-                this.container.readMember(msg.requestContext(), firstSegment, new CreateResponder(container.resourceAspectManager(), container.workerPool(), container, msg, ctx));
+                //this.container.readMember(msg.requestContext(), firstSegment, new CreateResponder(container.resourceAspectManager(), container.workerPool(), container, msg, ctx));
+                new CreateResponder(container.resourceAspectManager(), container.workerPool(), container, msg, ctx).doRead( firstSegment, container );
                 break;
             case READ:
-                this.container.readMember(msg.requestContext(), firstSegment, new ReadResponder(container.resourceAspectManager(), container.workerPool(), container, msg, ctx));
+                //this.container.readMember(msg.requestContext(), firstSegment, new ReadResponder(container.resourceAspectManager(), container.workerPool(), container, msg, ctx));
+                new ReadResponder(container.resourceAspectManager(), container.workerPool(), container, msg, ctx).doRead( firstSegment, container );
                 break;
             case UPDATE:
-                this.container.readMember(msg.requestContext(), firstSegment, new UpdateResponder(container.resourceAspectManager(), container.workerPool(), container, msg, ctx));
+                //this.container.readMember(msg.requestContext(), firstSegment, new UpdateResponder(container.resourceAspectManager(), container.workerPool(), container, msg, ctx));
+                new UpdateResponder(container.resourceAspectManager(), container.workerPool(), container, msg, ctx).doRead( firstSegment, container );
                 break;
             case DELETE:
-                this.container.readMember(msg.requestContext(), firstSegment, new DeleteResponder(container.resourceAspectManager(), container.workerPool(), container, msg, ctx));
+                //this.container.readMember(msg.requestContext(), firstSegment, new DeleteResponder(container.resourceAspectManager(), container.workerPool(), container, msg, ctx));
+                new DeleteResponder(container.resourceAspectManager(), container.workerPool(), container, msg, ctx).doRead( firstSegment, container );
                 break;
         }
     }

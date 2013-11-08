@@ -7,7 +7,9 @@ import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.*;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Bob McWhirter
@@ -19,6 +21,7 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
         this.ctx = ctx;
         this.object = object;
         this.completionHandler = completionHandler;
+
     }
 
     public RequestContext requestContext() {
@@ -58,6 +61,15 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
     }
 
     public void encode() throws Exception {
+        if (this.object instanceof Resource) {
+            aspectManager().stream().forEach((aspect) -> {
+                Resource resource = aspect.forResource((Resource) this.object);
+                if (resource != null) {
+                    this.aspectResources.add(resource);
+                }
+            });
+        }
+
         encoder().encode(this);
     }
 
@@ -104,16 +116,18 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
         }
     }
 
+    public boolean hasAspects() {
+        return !this.aspectResources.isEmpty();
+    }
+
     @Override
     public void encodeAspects(Runnable endContentHandler) {
         this.endContentHandler = endContentHandler;
         if (this.object instanceof Resource) {
             MyObjectContentSink sink = new MyObjectContentSink();
-            aspectManager().stream().forEach((aspect) -> {
-                Resource resource = aspect.forResource((Resource) this.object);
-                if (resource != null) {
-                    sink.accept(new SimplePropertyResource((Resource) this.object, resource.id(), resource));
-                }
+            this.aspectResources.stream().forEach((aspectResource) -> {
+                Resource r =  new SimplePropertyResource((Resource) this.object, aspectResource.id(), aspectResource);
+                sink.accept( r );
             });
             sink.close();
         }
@@ -138,6 +152,7 @@ public class AbstractEncodingContext<T> implements EncodingContext<T> {
     private Runnable endContentHandler;
     private Runnable completionHandler;
     private LinkedList<EncodingContext> children = new LinkedList<>();
+    private List<Resource> aspectResources = new ArrayList<>();
 
     private class MyCollectionContentSink implements ResourceSink {
 
