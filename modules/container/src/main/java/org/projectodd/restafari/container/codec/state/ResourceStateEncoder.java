@@ -109,6 +109,7 @@ public class ResourceStateEncoder implements ResourceEncoder<ResourceStateEncode
         ResourceState top = state.peek();
         if (top instanceof ObjectResourceState) {
             ((ObjectResourceState) top).addProperty(resource.id(), resource.get(null));
+            context.end();
         } else if (top instanceof CollectionResourceState) {
             // TODO allow properties on Collections?
         }

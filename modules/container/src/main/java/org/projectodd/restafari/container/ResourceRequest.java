@@ -118,20 +118,25 @@ public class ResourceRequest {
             return this;
         }
 
+        public Builder requestContext(RequestContext requestContext) {
+            obj.requestContext = requestContext;
+            return this;
+        }
+
         public ResourceRequest build() {
             if (obj.mediaTypeMatcher == null) {
-                obj.mediaTypeMatcher = new MediaTypeMatcher("application/json" );
+                obj.mediaTypeMatcher = new MediaTypeMatcher("application/json");
             }
 
-            if (obj.pagination == null) {
-                obj.pagination = Pagination.NONE;
+            if (obj.requestContext == null) {
+                if (obj.pagination == null) {
+                    obj.pagination = Pagination.NONE;
+                }
+                if (obj.params == null) {
+                    obj.params = ResourceParams.NONE;
+                }
+                obj.requestContext = new DefaultRequestContext(null, obj.pagination, obj.returnFields, obj.params);
             }
-
-            if (obj.params == null) {
-                obj.params = ResourceParams.NONE;
-            }
-
-            obj.requestContext = new DefaultRequestContext(null, obj.pagination, obj.returnFields, obj.params);
             return obj;
         }
     }

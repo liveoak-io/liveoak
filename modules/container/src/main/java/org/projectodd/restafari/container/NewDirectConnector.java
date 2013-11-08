@@ -42,8 +42,38 @@ public class NewDirectConnector {
         this.channel.readInbound();
     }
 
+    public void create(RequestContext context, String path, ResourceState state, Consumer<ResourceResponse> handler) {
+        ResourceRequest request = new ResourceRequest.Builder(ResourceRequest.RequestType.CREATE, new ResourcePath(path))
+                .requestContext(context)
+                .resourceState(state)
+                .build();
+        this.handlers.put(request, handler);
+        this.channel.writeInbound(request);
+    }
+
+    public ResourceState create(RequestContext context, String path, ResourceState state) throws ExecutionException, InterruptedException {
+        CompletableFuture<ResourceState> future = new CompletableFuture<>();
+
+        create(context, path, state, (response) -> {
+            if (response.responseType() == ResourceResponse.ResponseType.CREATED) {
+                try {
+                    future.complete(encode(context, response.resource()));
+                } catch (Exception e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            } else if (response instanceof ResourceErrorResponse) {
+                handleError((ResourceErrorResponse) response, future);
+            } else {
+                future.complete(null);
+            }
+        });
+
+        return future.get();
+    }
+
     public void read(RequestContext context, String path, Consumer<ResourceResponse> handler) {
         ResourceRequest request = new ResourceRequest.Builder(ResourceRequest.RequestType.READ, new ResourcePath(path))
+                .requestContext(context)
                 .build();
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
@@ -76,6 +106,66 @@ public class NewDirectConnector {
         }
     }
 
+
+    public void update(RequestContext context, String path, ResourceState state, Consumer<ResourceResponse> handler) {
+        ResourceRequest request = new ResourceRequest.Builder(ResourceRequest.RequestType.UPDATE, new ResourcePath(path))
+                .requestContext(context)
+                .resourceState(state)
+                .build();
+        this.handlers.put(request, handler);
+        this.channel.writeInbound(request);
+    }
+
+    public ResourceState update(RequestContext context, String path, ResourceState state) throws ExecutionException, InterruptedException {
+        CompletableFuture<ResourceState> future = new CompletableFuture<>();
+
+        update(context, path, state, (response) -> {
+            if (response.responseType() == ResourceResponse.ResponseType.UPDATED) {
+                try {
+                    future.complete(encode(context, response.resource()));
+                } catch (Exception e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            } else if (response instanceof ResourceErrorResponse) {
+                handleError((ResourceErrorResponse) response, future);
+            } else {
+                future.complete(null);
+            }
+        });
+
+        return future.get();
+    }
+
+
+    public void delete(RequestContext context, String path, Consumer<ResourceResponse> handler) {
+        ResourceRequest request = new ResourceRequest.Builder(ResourceRequest.RequestType.DELETE, new ResourcePath(path))
+                .requestContext(context)
+                .build();
+        this.handlers.put(request, handler);
+        this.channel.writeInbound(request);
+    }
+
+    public ResourceState delete(RequestContext context, String path) throws ExecutionException, InterruptedException {
+        CompletableFuture<ResourceState> future = new CompletableFuture<>();
+
+        delete(context, path, (response) -> {
+            if (response.responseType() == ResourceResponse.ResponseType.UPDATED) {
+                try {
+                    future.complete(encode(context, response.resource()));
+                } catch (Exception e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            } else if (response instanceof ResourceErrorResponse) {
+                handleError((ResourceErrorResponse) response, future);
+            } else {
+                future.complete(null);
+            }
+        });
+
+        return future.get();
+    }
+
+
     protected ResourceState encode(RequestContext context, Resource resource) throws Exception {
         CompletableFuture<ResourceState> state = new CompletableFuture<>();
 
@@ -84,7 +174,7 @@ public class NewDirectConnector {
         RootEncodingContext<ResourceStateEncoder.EncoderState> encodingContext
                 = new RootEncodingContext<ResourceStateEncoder.EncoderState>(context, encoder, attachment, resource, this.container.resourceAspectManager(),
                 () -> {
-                    state.complete( attachment.root() );
+                    state.complete(attachment.root());
                 });
 
         encodingContext.encode();
