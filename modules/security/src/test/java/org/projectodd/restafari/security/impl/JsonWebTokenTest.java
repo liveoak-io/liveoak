@@ -2,7 +2,6 @@ package org.projectodd.restafari.security.impl;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.projectodd.restafari.security.spi.JsonWebToken;
 
 import java.io.IOException;
 

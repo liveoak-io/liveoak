@@ -1,6 +1,6 @@
 package org.projectodd.restafari.security.utils;
 
-import org.projectodd.restafari.security.spi.JsonWebToken;
+import org.projectodd.restafari.security.impl.JsonWebToken;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;

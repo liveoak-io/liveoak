@@ -2,16 +2,19 @@ package org.projectodd.restafari.container.auth;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.projectodd.restafari.container.DefaultRequestContext;
 import org.projectodd.restafari.container.ResourceErrorResponse;
 import org.projectodd.restafari.container.ResourceRequest;
 import org.projectodd.restafari.security.impl.AuthServicesHolder;
+import org.projectodd.restafari.security.impl.DefaultSecurityContext;
 import org.projectodd.restafari.security.impl.SimpleLogger;
+import org.projectodd.restafari.security.spi.AuthToken;
 import org.projectodd.restafari.security.spi.AuthorizationRequestContext;
 import org.projectodd.restafari.security.spi.AuthorizationService;
-import org.projectodd.restafari.security.spi.JsonWebToken;
 import org.projectodd.restafari.security.spi.TokenManager;
 import org.projectodd.restafari.security.spi.TokenValidationException;
 import org.projectodd.restafari.spi.RequestContext;
+import org.projectodd.restafari.spi.SecurityContext;
 
 /**
  * Handler for checking authorization of current request. It's independent of protocol. It delegates the work to {@link AuthorizationService}.
@@ -31,18 +34,13 @@ public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRe
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResourceRequest req) throws Exception {
-        JsonWebToken token;
+        AuthToken token;
         AuthorizationService authService = AuthServicesHolder.getInstance().getAuthorizationService();
         TokenManager tokenManager = AuthServicesHolder.getInstance().getTokenManager();
         RequestContext reqContext = req.requestContext();
 
         try {
-            token = tokenManager.getToken(reqContext);
-
-            // Validation is not done for null token. Null token is allowed in case of public requests
-            if (token != null) {
-                tokenManager.validateToken(reqContext, token);
-            }
+            token = tokenManager.getAndValidateToken(reqContext);
         } catch (TokenValidationException e) {
             String message = "Error when obtaining token: " + e.getMessage();
             log.warn(message);
@@ -55,7 +53,7 @@ public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRe
         }
 
         if (authService.isAuthorized(new AuthorizationRequestContext(token, reqContext))) {
-            // TODO: Attached current token and principal to requestContext
+            establishSecurityContext(token, reqContext);
             ctx.fireChannelRead(req);
         } else {
             sendAuthorizationError(ctx, req);
@@ -64,5 +62,15 @@ public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRe
 
     protected void sendAuthorizationError(ChannelHandlerContext ctx, ResourceRequest req) {
         ctx.writeAndFlush( new ResourceErrorResponse( req, ResourceErrorResponse.ErrorType.NOT_AUTHORIZED) );
+    }
+
+    protected void establishSecurityContext(AuthToken token, RequestContext reqContext) {
+        // Looks like a hack...
+        if (reqContext instanceof DefaultRequestContext) {
+            SecurityContext securityContext = DefaultSecurityContext.createFromAuthToken(token);
+            ((DefaultRequestContext)reqContext).setSecurityContext(securityContext);
+        } else {
+            log.warn("Can't establish securityContext to RequestContext " + reqContext);
+        }
     }
 }

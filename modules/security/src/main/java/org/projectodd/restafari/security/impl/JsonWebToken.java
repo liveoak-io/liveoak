@@ -1,4 +1,4 @@
-package org.projectodd.restafari.security.spi;
+package org.projectodd.restafari.security.impl;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -36,31 +36,6 @@ public class JsonWebToken {
 
         header = parseHeader();
         claims = parseClaims();
-    }
-
-    // Just for unit tests
-    public JsonWebToken(String[] realmRoles, Map<String, String[]> appRoles) {
-        claims = new JsonWebToken.Claims();
-        claims.realmAccess = new Access();
-        claims.realmAccess.roles = new HashSet();
-        claims.realmAccess.roles.addAll(Arrays.asList(realmRoles));
-
-        for (Map.Entry<String, String[]> entry : appRoles.entrySet()) {
-            String appName = entry.getKey();
-            String[] roles = entry.getValue();
-            Access acc = new Access();
-            acc.roles = new HashSet();
-            acc.roles.addAll(Arrays.asList(roles));
-            if (claims.resourceAccess == null) {
-                claims.resourceAccess = new HashMap<>();
-            }
-            claims.resourceAccess.put(appName, acc);
-        }
-
-        headerBytes = null;
-        claimsBytes = null;
-        signatureBytes = null;
-        header = null;
     }
 
     public Header getHeader() {

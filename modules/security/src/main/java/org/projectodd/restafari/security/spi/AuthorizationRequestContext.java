@@ -11,16 +11,16 @@ import org.projectodd.restafari.spi.RequestContext;
  */
 public class AuthorizationRequestContext {
 
-    private final JsonWebToken accessToken;
+    private final AuthToken authToken;
     private final RequestContext requestContext;
 
-    public AuthorizationRequestContext(JsonWebToken accessToken, RequestContext requestContext) {
+    public AuthorizationRequestContext(AuthToken authToken, RequestContext requestContext) {
         this.requestContext = requestContext;
-        this.accessToken = accessToken;
+        this.authToken = authToken;
     }
 
-    public JsonWebToken getAccessToken() {
-        return accessToken;
+    public AuthToken getAuthToken() {
+        return authToken;
     }
 
     public RequestContext getRequestContext() {
@@ -28,6 +28,6 @@ public class AuthorizationRequestContext {
     }
 
     public boolean isRequestAuthenticated() {
-        return getAccessToken() != null;
+        return !AuthToken.ANONYMOUS_TOKEN.equals(authToken);
     }
 }

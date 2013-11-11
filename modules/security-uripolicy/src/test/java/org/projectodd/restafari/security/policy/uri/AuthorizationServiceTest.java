@@ -1,15 +1,19 @@
 package org.projectodd.restafari.security.policy.uri;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.projectodd.restafari.security.impl.AuthConstants;
 import org.projectodd.restafari.security.impl.AuthServicesHolder;
+import org.projectodd.restafari.security.impl.AuthTokenImpl;
+import org.projectodd.restafari.security.spi.AuthToken;
 import org.projectodd.restafari.security.spi.AuthorizationRequestContext;
 import org.projectodd.restafari.security.spi.AuthorizationService;
-import org.projectodd.restafari.security.spi.JsonWebToken;
+import org.projectodd.restafari.security.impl.JsonWebToken;
 import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.RequestType;
 import org.projectodd.restafari.spi.ResourcePath;
@@ -74,10 +78,19 @@ public class AuthorizationServiceTest {
         ResourcePath resPath = new ResourcePath(uri);
         RequestContext reqContext = new AuthTestRequestContext(reqType, resPath);
 
-        Map<String, String[]> appRolesMap = new HashMap<>();
-        appRolesMap.put(AuthConstants.DEFAULT_APPLICATION_NAME, appRoles);
-        JsonWebToken accessToken = new JsonWebToken(realmRoles, appRolesMap);
+        Set<String> realmRolesSet = arrayToSet(realmRoles);
+        Map<String, Set<String>> appRolesMap = new HashMap<>();
+        appRolesMap.put(AuthConstants.DEFAULT_APPLICATION_NAME, arrayToSet(appRoles));
 
-        return new AuthorizationRequestContext(accessToken, reqContext);
+        AuthToken authToken = new AuthTokenImpl(null, null, null, 0, 0, 0, null, realmRolesSet, appRolesMap);
+        return new AuthorizationRequestContext(authToken, reqContext);
+    }
+
+    private Set<String> arrayToSet(String[] array) {
+        Set<String> set = new HashSet<>();
+        for (String item : array) {
+            set.add(item);
+        }
+        return set;
     }
 }

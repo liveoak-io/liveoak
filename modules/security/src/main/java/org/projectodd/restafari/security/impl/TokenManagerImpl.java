@@ -2,7 +2,7 @@ package org.projectodd.restafari.security.impl;
 
 import org.projectodd.restafari.security.spi.ApplicationMetadata;
 import org.projectodd.restafari.security.spi.AuthPersister;
-import org.projectodd.restafari.security.spi.JsonWebToken;
+import org.projectodd.restafari.security.spi.AuthToken;
 import org.projectodd.restafari.security.spi.TokenManager;
 import org.projectodd.restafari.security.spi.TokenValidationException;
 import org.projectodd.restafari.security.utils.RSAProvider;
@@ -14,7 +14,19 @@ import org.projectodd.restafari.spi.RequestContext;
 public class TokenManagerImpl implements TokenManager {
 
     @Override
-    public JsonWebToken getToken(RequestContext requestContext) {
+    public AuthToken getAndValidateToken(RequestContext reqContext) throws TokenValidationException {
+        JsonWebToken internalToken = getInternalToken(reqContext);
+
+        if (internalToken != null) {
+            validateToken(reqContext, internalToken);
+            return new AuthTokenImpl(internalToken);
+        } else {
+            return AuthToken.ANONYMOUS_TOKEN;
+        }
+    }
+
+
+    protected JsonWebToken getInternalToken(RequestContext requestContext) {
         String authorizationToken = requestContext.getRequestAttributes().getAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, String.class);
 
         // Use null token if Authorization header was not present
@@ -25,8 +37,7 @@ public class TokenManagerImpl implements TokenManager {
         return new JsonWebToken(authorizationToken);
     }
 
-    @Override
-    public void validateToken(RequestContext requestContext, JsonWebToken token) throws TokenValidationException {
+    protected void validateToken(RequestContext requestContext, JsonWebToken token) throws TokenValidationException {
         String targetApplicationId = AuthServicesHolder.getInstance().getApplicationIdResolver().resolveAppId(requestContext);
 
         AuthPersister authPersister = AuthServicesHolder.getInstance().getAuthPersister();
@@ -59,4 +70,6 @@ public class TokenManagerImpl implements TokenManager {
                     appMetadata.getRealmName() + ", applicationName from token: " + claims.getAudience());
         }
     }
+
+
 }

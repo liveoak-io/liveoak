@@ -8,6 +8,7 @@ import org.projectodd.restafari.spi.RequestType;
 import org.projectodd.restafari.spi.ResourceParams;
 import org.projectodd.restafari.spi.ResourcePath;
 import org.projectodd.restafari.spi.ReturnFields;
+import org.projectodd.restafari.spi.SecurityContext;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 /**
@@ -142,7 +143,7 @@ public class ResourceRequest {
                 if (obj.requestAttributes == null) {
                     obj.requestAttributes = new DefaultRequestAttributes();
                 }
-                obj.requestContext = new DefaultRequestContext(null, obj.pagination, obj.returnFields, obj.params, obj.resourcePath, obj.requestType, obj.requestAttributes);
+                obj.requestContext = new DefaultRequestContext(SecurityContext.ANONYMOUS, obj.pagination, obj.returnFields, obj.params, obj.resourcePath, obj.requestType, obj.requestAttributes);
             }
             return obj;
         }

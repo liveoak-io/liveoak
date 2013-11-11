@@ -12,7 +12,7 @@ import org.projectodd.restafari.security.impl.AuthServicesHolder;
 import org.projectodd.restafari.security.spi.AuthorizationDecision;
 import org.projectodd.restafari.security.spi.AuthorizationPolicy;
 import org.projectodd.restafari.security.spi.AuthorizationRequestContext;
-import org.projectodd.restafari.security.spi.JsonWebToken;
+import org.projectodd.restafari.security.impl.JsonWebToken;
 import org.projectodd.restafari.spi.RequestContext;
 
 /**
@@ -91,9 +91,8 @@ public class URIAuthorizationPolicy implements AuthorizationPolicy {
     }
 
     protected AuthorizationDecision checkPermissions(RolePolicy rolePolicy, AuthorizationRequestContext authRequestContext, String applicationName) {
-        JsonWebToken accessToken = authRequestContext.getAccessToken();
 
-        Set<String> realmRoles = authRequestContext.isRequestAuthenticated() ? accessToken.getClaims().getRealmAccess().getRoles() : Collections.emptySet();
+        Set<String> realmRoles = getRealmRoles(authRequestContext);
         Set<String> appRoles = getAppRoles(authRequestContext, applicationName);
 
         AuthorizationDecision realmRolesAuthDecision = rolePolicy.isRealmRolesAllowed(realmRoles);
@@ -103,12 +102,7 @@ public class URIAuthorizationPolicy implements AuthorizationPolicy {
     }
 
     private Set<String> getRealmRoles(AuthorizationRequestContext authRequestContext) {
-        Set<String> realmRoles = null;
-        if (authRequestContext.isRequestAuthenticated()) {
-            realmRoles = authRequestContext.getAccessToken().getClaims().getRealmAccess().getRoles();
-        }
-
-        return realmRoles!=null ? realmRoles : Collections.emptySet();
+        return authRequestContext.getAuthToken().getRealmRoles();
     }
 
     private Set<String> getAppRoles(AuthorizationRequestContext authRequestContext, String appName) {
@@ -116,14 +110,12 @@ public class URIAuthorizationPolicy implements AuthorizationPolicy {
             return Collections.emptySet();
         }
 
-        Map<String, JsonWebToken.Access> appAccess = authRequestContext.getAccessToken().getClaims().getResourceAccess();
-        Set<String> appRoles = null;
-        if (appAccess != null && appAccess.containsKey(appName)) {
-            appRoles = appAccess.get(appName).getRoles();
+        Map<String, Set<String>> appAccess = authRequestContext.getAuthToken().getApplicationRolesMap();
+        if (appAccess.containsKey(appName)) {
+            return appAccess.get(appName);
+        } else {
+            return Collections.EMPTY_SET;
         }
-
-        return appRoles!=null ? appRoles : Collections.emptySet();
-
     }
 
     protected AuthorizationDecision mergeDecisions(AuthorizationDecision authDec1, AuthorizationDecision authDec2) {

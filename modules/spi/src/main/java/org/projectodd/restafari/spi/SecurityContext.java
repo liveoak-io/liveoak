@@ -1,6 +1,7 @@
 package org.projectodd.restafari.spi;
 
 import java.security.Principal;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -25,11 +26,13 @@ public interface SecurityContext {
 
     /**
      * @return list of realm roles, which are assigned to current user (Realm role is something like global role of user for all applications)
+     * or empty set if not realm roles available. Never returns null
      */
     Set<String> getRealmRoles();
 
     /**
      * @return list of application roles for current application, which are assigned to current user
+     * or empty set if not application roles availablefor current application. Never returns null.
      */
     Set<String> getApplicationRoles();
 
@@ -48,4 +51,22 @@ public interface SecurityContext {
     default boolean isUserInApplicationRole(String roleName) {
         return getApplicationRoles().contains(roleName);
     }
+
+    public static final SecurityContext ANONYMOUS = new SecurityContext() {
+
+        @Override
+        public Principal getPrincipal() {
+            return null;
+        }
+
+        @Override
+        public Set<String> getRealmRoles() {
+            return Collections.EMPTY_SET;
+        }
+
+        @Override
+        public Set<String> getApplicationRoles() {
+            return Collections.EMPTY_SET;
+        }
+    };
 }
