@@ -1,6 +1,6 @@
 package org.projectodd.restafari.container.subscriptions;
 
-import org.projectodd.restafari.container.ResourcePath;
+import org.projectodd.restafari.spi.ResourcePath;
 import org.projectodd.restafari.spi.resource.Resource;
 
 import java.util.ArrayList;

@@ -95,5 +95,7 @@
     <module>aggregating-filesystem</module>
     <module>vertx</module>
     <module>3rdparty</module>
+    <module>security</module>
+    <module>security-uripolicy</module>
   </modules>
 </project>

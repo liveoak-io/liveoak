@@ -4,7 +4,6 @@
 
   <resources>
     <resource-root path="${project.artifactId}.jar"/>
-    <artifact name="commons-codec:commons-codec:${commons-codec.version}"/>
   </resources>
 
   <dependencies>
@@ -13,6 +12,8 @@
     <module name="com.fasterxml.jackson.core"/>
     <module name="org.projectodd.restafari.stomp"/>
     <module name="org.projectodd.restafari.spi"/>
+    <module name="org.projectodd.restafari.security"/>
+    <module name="org.projectodd.restafari.security.uripolicy"/>
     <system>
       <paths>
         <path name="javax/management"/>

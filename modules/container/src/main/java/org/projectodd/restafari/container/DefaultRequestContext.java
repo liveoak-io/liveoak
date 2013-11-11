@@ -2,9 +2,13 @@ package org.projectodd.restafari.container;
 
 import org.projectodd.restafari.spi.Application;
 import org.projectodd.restafari.spi.Pagination;
+import org.projectodd.restafari.spi.RequestAttributes;
 import org.projectodd.restafari.spi.RequestContext;
+import org.projectodd.restafari.spi.RequestType;
 import org.projectodd.restafari.spi.ResourceParams;
+import org.projectodd.restafari.spi.ResourcePath;
 import org.projectodd.restafari.spi.ReturnFields;
+import org.projectodd.restafari.spi.SecurityContext;
 
 import java.security.Principal;
 
@@ -15,16 +19,23 @@ public class DefaultRequestContext implements RequestContext {
 
 
     private Application app;
-    private Principal principal;
     private Pagination pagination;
     private ReturnFields returnFields;
     private ResourceParams resourceParams;
+    private SecurityContext securityContext;
+    private ResourcePath resourcePath;
+    private RequestType requestType;
+    private RequestAttributes requestAttributes;
 
-    public DefaultRequestContext(Principal principal, Pagination pagination, ReturnFields returnFields, ResourceParams resourceParams) {
-        this.principal = principal;
+    public DefaultRequestContext(SecurityContext securityContext, Pagination pagination, ReturnFields returnFields, ResourceParams resourceParams,
+                                 ResourcePath resourcePath, RequestType requestType, RequestAttributes requestAttributes) {
+        this.securityContext = securityContext;
         this.pagination = pagination;
         this.returnFields = returnFields;
         this.resourceParams = resourceParams;
+        this.resourcePath = resourcePath;
+        this.requestType = requestType;
+        this.requestAttributes = requestAttributes;
     }
 
     @Override
@@ -37,12 +48,12 @@ public class DefaultRequestContext implements RequestContext {
     }
 
     @Override
-    public Principal getPrinicpal() {
-        return principal;
+    public SecurityContext getSecurityContext() {
+        return securityContext;
     }
 
-    void setPrincipal(Principal principal) {
-        this.principal = principal;
+    public void setSecurityContext(SecurityContext securityContext) {
+        this.securityContext = securityContext;
     }
 
     @Override
@@ -70,5 +81,20 @@ public class DefaultRequestContext implements RequestContext {
 
     void setResourceParams(ResourceParams resourceParams) {
         this.resourceParams = resourceParams;
+    }
+
+    @Override
+    public ResourcePath getResourcePath() {
+        return resourcePath;
+    }
+
+    @Override
+    public RequestType getRequestType() {
+        return requestType;
+    }
+
+    @Override
+    public RequestAttributes getRequestAttributes() {
+        return requestAttributes;
     }
 }

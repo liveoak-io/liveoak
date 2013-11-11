@@ -2,22 +2,19 @@ package org.projectodd.restafari.container;
 
 import org.projectodd.restafari.container.codec.MediaTypeMatcher;
 import org.projectodd.restafari.spi.Pagination;
+import org.projectodd.restafari.spi.RequestAttributes;
 import org.projectodd.restafari.spi.RequestContext;
+import org.projectodd.restafari.spi.RequestType;
 import org.projectodd.restafari.spi.ResourceParams;
+import org.projectodd.restafari.spi.ResourcePath;
 import org.projectodd.restafari.spi.ReturnFields;
+import org.projectodd.restafari.spi.SecurityContext;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
  */
 public class ResourceRequest {
-
-    public enum RequestType {
-        CREATE,
-        READ,
-        UPDATE,
-        DELETE,
-    }
 
     private ResourceRequest(RequestType type, ResourcePath path) {
         if (type == null) {
@@ -54,8 +51,8 @@ public class ResourceRequest {
         return this.params;
     }
 
-    public String authorizationToken() {
-        return this.authorizationToken;
+    public RequestAttributes requestAttributes() {
+        return this.requestAttributes;
     }
 
     public ReturnFields returnFields() {
@@ -72,11 +69,11 @@ public class ResourceRequest {
 
     private RequestType requestType;
     private ResourcePath resourcePath;
+    private RequestAttributes requestAttributes;
     private ResourceParams params;
     private MediaTypeMatcher mediaTypeMatcher;
     private Pagination pagination;
     private ResourceState state;
-    private String authorizationToken;
     private ReturnFields returnFields;
     private RequestContext requestContext;
 
@@ -113,8 +110,16 @@ public class ResourceRequest {
             return this;
         }
 
-        public Builder authorizationToken(String authToken) {
-            obj.authorizationToken = authToken;
+        public Builder requestAttributes(RequestAttributes reqAttributes) {
+            obj.requestAttributes = reqAttributes;
+            return this;
+        }
+
+        public Builder requestAttribute(String attributeName, Object attributeValue) {
+            if (obj.requestAttributes == null) {
+                obj.requestAttributes = new DefaultRequestAttributes();
+            }
+            obj.requestAttributes.setAttribute(attributeName, attributeValue);
             return this;
         }
 
@@ -135,7 +140,10 @@ public class ResourceRequest {
                 if (obj.params == null) {
                     obj.params = ResourceParams.NONE;
                 }
-                obj.requestContext = new DefaultRequestContext(null, obj.pagination, obj.returnFields, obj.params);
+                if (obj.requestAttributes == null) {
+                    obj.requestAttributes = new DefaultRequestAttributes();
+                }
+                obj.requestContext = new DefaultRequestContext(SecurityContext.ANONYMOUS, obj.pagination, obj.returnFields, obj.params, obj.resourcePath, obj.requestType, obj.requestAttributes);
             }
             return obj;
         }

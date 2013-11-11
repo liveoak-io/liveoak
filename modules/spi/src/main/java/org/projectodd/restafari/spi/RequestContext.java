@@ -1,13 +1,15 @@
 package org.projectodd.restafari.spi;
 
-import java.security.Principal;
 
 public interface RequestContext {
 
     Application getApplication();
-    Principal getPrinicpal();
+    SecurityContext getSecurityContext();
     Pagination getPagination();
+    ResourcePath getResourcePath();
     ResourceParams getResourceParams();
+    RequestAttributes getRequestAttributes();
+    RequestType getRequestType();
     ReturnFields getReturnFields();
 
     public static class Builder implements RequestContext {
@@ -16,8 +18,8 @@ public interface RequestContext {
 
         }
 
-        public Builder principal(Principal principal) {
-            this.principal = principal;
+        public Builder securityContext(SecurityContext securityContext) {
+            this.securityContext = securityContext;
             return this;
         }
 
@@ -36,8 +38,8 @@ public interface RequestContext {
         }
 
         @Override
-        public Principal getPrinicpal() {
-            return this.principal;
+        public SecurityContext getSecurityContext() {
+            return this.securityContext;
         }
 
         @Override
@@ -55,7 +57,22 @@ public interface RequestContext {
             return null;
         }
 
-        private Principal principal;
+        @Override
+        public ResourcePath getResourcePath() {
+            return null;
+        }
+
+        @Override
+        public RequestAttributes getRequestAttributes() {
+            return null;
+        }
+
+        @Override
+        public RequestType getRequestType() {
+            return null;
+        }
+
+        private SecurityContext securityContext;
         private Pagination pagination = Pagination.NONE;
     }
 }
