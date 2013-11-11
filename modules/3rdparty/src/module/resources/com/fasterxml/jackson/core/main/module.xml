@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<module xmlns="urn:jboss:module:1.0" name="${module-name}">
+<module xmlns="urn:jboss:module:1.0" name="com.fasterxml.jackson.core">
 
   <resources>
     <artifact name="com.fasterxml.jackson.core:jackson-core:${jackson.version}"/>
