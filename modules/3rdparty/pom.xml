@@ -11,7 +11,62 @@
   <name>restafari-3rdparty-modules</name>
   <packaging>pom</packaging>
   <dependencies>
-    </dependencies>
+
+    <!-- com.fasterxml.jackson.core -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- io.netty -->
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-all</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- io.vertx -->
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-core</artifactId>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-all</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-annotations</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-platform</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+  </dependencies>
   <build>
     <pluginManagement>
       <plugins>
@@ -25,26 +80,34 @@
             </dependency>
           </dependencies>
           <executions>
-            <execution>
-              <id>assemble-module</id>
-              <configuration>
-                <outputDirectory>../../target/modules/${module.path}</outputDirectory>
-              </configuration>
-            </execution>
-            <execution>
-              <id>assemble-m2-repo</id>
-              <configuration>
-                <outputDirectory>../../target</outputDirectory>
-              </configuration>
-            </execution>
+              <execution>
+                  <id>assemble-module</id>
+                  <phase>package</phase>
+                  <goals>
+                      <goal>single</goal>
+                  </goals>
+                  <configuration>
+                      <descriptorRefs>
+                          <descriptorRef>module</descriptorRef>
+                      </descriptorRefs>
+                      <outputDirectory>../target</outputDirectory>
+                      <finalName>modules</finalName>
+                      <appendAssemblyId>false</appendAssemblyId>
+                  </configuration>
+              </execution>
           </executions>
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>assemble-module</id>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
-  <modules>
-    <module>netty</module>
-    <module>vertx</module>
-    <module>jackson</module>
-  </modules>
 </project>
