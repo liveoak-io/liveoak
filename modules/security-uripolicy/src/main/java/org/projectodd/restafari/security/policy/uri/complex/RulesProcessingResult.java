@@ -21,9 +21,9 @@ public class RulesProcessingResult {
     private int lastProcessedPriority;
 
     public void mergeDecision(AuthorizationDecision newDecision) {
-        if (log.isTraceEnabled()) {
+        //if (log.isTraceEnabled()) {
             log.trace("Merging decision: old=" + current + ", new=" + newDecision);
-        }
+        //}
         current = current.mergeDecision(newDecision);
     }
 

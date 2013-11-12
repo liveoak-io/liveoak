@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module xmlns="urn:jboss:module:1.0" name="org.slf4j">
+
+  <resources>
+    <artifact name="org.slf4j:slf4j-api:1.6.2"/>
+  </resources>
+
+  <dependencies>
+  </dependencies>
+
+</module>

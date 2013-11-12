@@ -5,7 +5,6 @@
   <resources>
     <artifact name="io.vertx:vertx-core:${vertx.version}"/>
     <artifact name="io.vertx:vertx-platform:${vertx.version}"/>
-    <artifact name="org.slf4j:slf4j-api:1.6.2"/>
     <artifact name="com.hazelcast:hazelcast:2.6"/>
     <artifact name="log4j:log4j:1.2.16"/>
   </resources>
@@ -13,6 +12,7 @@
   <dependencies>
     <module name="io.netty"/>
     <module name="com.fasterxml.jackson.core"/>
+    <module name="org.slf4j" />
     <system>
       <paths> 
         <path name="javax/management"/>

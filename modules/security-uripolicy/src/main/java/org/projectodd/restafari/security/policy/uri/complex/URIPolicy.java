@@ -9,6 +9,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import org.drools.RuleBase;
+import org.drools.RuleBaseConfiguration;
 import org.drools.RuleBaseFactory;
 import org.drools.WorkingMemory;
 import org.drools.compiler.DroolsError;
@@ -37,6 +38,7 @@ public class URIPolicy implements AuthorizationPolicy {
     private final Executor executor = Executors.newSingleThreadExecutor();
     private CountDownLatch latch = new CountDownLatch(1);
 
+    @Override
     public void init() {
         // Execute initialization asynchronously
         Runnable initTask = () -> {
@@ -52,12 +54,18 @@ public class URIPolicy implements AuthorizationPolicy {
     protected void doInit() {
         // Workaround for https://issues.jboss.org/browse/DROOLS-329 TODO: Remove when not needed or move to better place
         System.setProperty("drools.dialect.java.compiler", "JANINO");
-        ruleBase = RuleBaseFactory.newRuleBase();
+
+        RuleBaseConfiguration ruleBaseConfig = new RuleBaseConfiguration(URIPolicy.class.getClassLoader(), AuthorizationPolicy.class.getClassLoader());
+        ruleBase = RuleBaseFactory.newRuleBase(ruleBaseConfig);
+
+        // Add DRL with functions
+        InputStream functionsFileStream = URIPolicy.class.getClassLoader().getResourceAsStream("templates/URIPolicyFunctions.drl");
+        Reader functionsFileReader = new InputStreamReader(functionsFileStream);
+        addPackageToRuleBase(functionsFileReader);
     }
 
 
     public void addURIPolicyEntry(URIPolicyEntry uriPolicyEntry) {
-        // Create String containing rules for all uriPolicyEntries
         InputStream templateStream = URIPolicy.class.getClassLoader().getResourceAsStream("templates/URIPolicyTemplate.drl");
         URIPolicyTemplateDataProvider tdp = new URIPolicyTemplateDataProvider(uriPolicyEntry);
         DataProviderCompiler converter = new DataProviderCompiler();
@@ -129,14 +137,9 @@ public class URIPolicy implements AuthorizationPolicy {
 
 
     protected void addPackageToRuleBase(Reader packageReader) {
-        PackageBuilder packageBuilder = new PackageBuilder();
+        PackageBuilder packageBuilder = new PackageBuilder(ruleBase);
 
         try {
-            // Always add DRL with functions
-            InputStream functionsFileStream = URIPolicy.class.getClassLoader().getResourceAsStream("templates/URIPolicyFunctions.drl");
-            Reader functionsFileReader = new InputStreamReader(functionsFileStream);
-
-            packageBuilder.addPackageFromDrl(functionsFileReader);
             packageBuilder.addPackageFromDrl(packageReader);
         } catch (Exception e) {
             throw new RuntimeException(e);
