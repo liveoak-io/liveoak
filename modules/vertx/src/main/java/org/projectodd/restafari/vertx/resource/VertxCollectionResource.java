@@ -1,8 +1,7 @@
 package org.projectodd.restafari.vertx.resource;
 
 import org.projectodd.restafari.spi.RequestContext;
-import org.projectodd.restafari.spi.resource.Resource;
-import org.projectodd.restafari.spi.resource.async.CollectionResource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
 import org.projectodd.restafari.spi.resource.async.Responder;
 import org.projectodd.restafari.spi.state.ResourceState;
@@ -16,7 +15,7 @@ import java.util.Iterator;
 /**
  * @author Bob McWhirter
  */
-public class VertxCollectionResource extends AbstractVertxResource implements CollectionResource {
+public class VertxCollectionResource extends AbstractVertxResource implements Resource {
 
     public VertxCollectionResource(String id, String address) {
         this(null, id, null, address );
@@ -32,7 +31,7 @@ public class VertxCollectionResource extends AbstractVertxResource implements Co
     }
 
     @Override
-    public void create(RequestContext ctx, ResourceState state, Responder responder) {
+    public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

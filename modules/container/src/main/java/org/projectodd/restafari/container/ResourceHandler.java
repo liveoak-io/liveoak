@@ -16,6 +16,8 @@ public class ResourceHandler extends SimpleChannelInboundHandler<ResourceRequest
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResourceRequest msg) throws Exception {
         String firstSegment = msg.resourcePath().head();
+        System.err.println( "request: " + msg.requestType() );
+        System.err.println( " -> " + firstSegment );
 
         switch (msg.requestType()) {
             case CREATE:

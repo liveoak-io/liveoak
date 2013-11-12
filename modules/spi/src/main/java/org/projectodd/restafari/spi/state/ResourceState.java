@@ -1,5 +1,11 @@
 package org.projectodd.restafari.spi.state;
 
+import org.projectodd.restafari.spi.resource.async.Resource;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
 /** Opaque state of a resource.
  *
  * <p>State objects are used to instill new state into
@@ -20,5 +26,30 @@ public interface ResourceState {
      * @param id The ID of the resource.
      */
     void id(String id);
+
+    /** Add a property to the state.
+     *
+     * <p>Property values may be either simple scalar
+     * values, or complex {@link ResourceState} objects</p>
+     *
+     * @param name The name of the property.
+     * @param value The value of the property.
+     */
+    void putProperty(String name, Object value);
+
+    /** Retrieve a property value.
+     *
+     * @param name The property name.
+     * @return The value of the property, as either a simple scalar, or as a
+     * more complex {@link ResourceState}.
+     */
+    Object getProperty(String name);
+
+    Set<String> getPropertyNames();
+
+    void addMember(ResourceState member);
+
+    List<ResourceState> members();
+
 
 }

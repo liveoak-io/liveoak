@@ -1,133 +1,150 @@
 package org.projectodd.restafari.container.codec.state;
 
 import io.netty.buffer.ByteBuf;
-import org.projectodd.restafari.container.codec.DefaultCollectionResourceState;
-import org.projectodd.restafari.container.codec.DefaultObjectResourceState;
-import org.projectodd.restafari.container.codec.EncodingContext;
-import org.projectodd.restafari.container.codec.ResourceEncoder;
-import org.projectodd.restafari.spi.resource.Resource;
-import org.projectodd.restafari.spi.resource.async.BinaryResource;
-import org.projectodd.restafari.spi.resource.async.CollectionResource;
-import org.projectodd.restafari.spi.resource.async.ObjectResource;
-import org.projectodd.restafari.spi.resource.async.PropertyResource;
-import org.projectodd.restafari.spi.state.CollectionResourceState;
-import org.projectodd.restafari.spi.state.ObjectResourceState;
+import org.projectodd.restafari.container.codec.DefaultResourceState;
+import org.projectodd.restafari.container.codec.Encoder;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Date;
 import java.util.Stack;
 
 /**
  * @author Bob McWhirter
  */
-public class ResourceStateEncoder implements ResourceEncoder<ResourceStateEncoder.EncoderState> {
+public class ResourceStateEncoder implements Encoder {
 
-    public static class EncoderState {
-        private ResourceState root;
-        private Stack<ResourceState> stack = new Stack<>();
+    private Stack<Object> stack = new Stack<>();
+    private ResourceState root;
 
-        void push(ResourceState state) {
-            this.stack.push(state);
+    public ResourceStateEncoder() {
 
-            if (this.stack.size() == 1) {
-                this.root = state;
+    }
+
+    public ResourceState root() {
+        return this.root;
+    }
+
+    @Override
+    public void initialize(ByteBuf buffer) throws Exception {
+        // nothing
+    }
+
+    @Override
+    public void close() throws Exception {
+
+    }
+
+    @Override
+    public void startResource(Resource resource) throws Exception {
+        ResourceState state = new DefaultResourceState(resource.id());
+        this.stack.push( state );
+
+        if ( this.root == null ) {
+            root = state;
+        }
+    }
+
+    @Override
+    public void endResource(Resource resource) throws Exception {
+        Object completed = this.stack.pop();
+        if ( ! this.stack.isEmpty() ) {
+            Object top = this.stack.peek();
+            if ( top instanceof Collection ) {
+                ((Collection)top).add( completed );
+            } else if ( top instanceof ResourceState ) {
+                ((ResourceState)top).addMember((ResourceState) completed);
+            } else if ( top instanceof PropertyCatcher ) {
+                ((PropertyCatcher)top).value = completed;
             }
         }
+    }
 
-        ResourceState pop() {
-            ResourceState popped = this.stack.pop();
-            if (!this.stack.isEmpty()) {
-                ResourceState top = this.stack.peek();
-                if (top instanceof DefaultCollectionResourceState) {
-                    ((DefaultCollectionResourceState) top).addResource(popped);
-                }
+    @Override
+    public void startProperty(String propertyName) throws Exception {
+        this.stack.push( new PropertyCatcher() );
+    }
+
+    @Override
+    public void endProperty(String propertyName) throws Exception {
+        PropertyCatcher catcher = (PropertyCatcher) this.stack.pop();
+        ((ResourceState) this.stack.peek()).putProperty(propertyName, catcher.value);
+    }
+
+    @Override
+    public void startMembers() throws Exception {
+    }
+
+    @Override
+    public void endMembers() throws Exception {
+    }
+
+    @Override
+    public void startList() throws Exception {
+        this.stack.push( new ArrayList<Object>() );
+    }
+
+    @Override
+    public void endList() throws Exception {
+        ArrayList<Object> completed = (ArrayList<Object>) this.stack.pop();
+
+        if ( ! this.stack.isEmpty() ) {
+            Object top = this.stack.peek();
+            if ( top instanceof Collection ) {
+                ((Collection) top).add( completed );
+            } else if ( top instanceof PropertyCatcher ) {
+                ((PropertyCatcher) top).value = completed;
             }
-            return popped;
-        }
-
-        ResourceState peek() {
-            return this.stack.peek();
-        }
-
-        public ResourceState root() {
-            return this.root;
         }
     }
 
     @Override
-    public EncoderState createAttachment(ByteBuf output) throws Exception {
-        return new EncoderState();
-    }
+    public void writeValue(String value) throws Exception {
+        Object top = this.stack.peek();
 
-    @Override
-    public void encode(EncodingContext<EncoderState> context) throws Exception {
-        Object object = context.object();
-        System.err.println(context.depth() + " // " + object);
-
-        if (object instanceof CollectionResource) {
-            encodeCollection(context);
-        } else if (object instanceof ObjectResource) {
-            encodeObject(context);
-        } else if (object instanceof PropertyResource) {
-            encodeProperty(context);
-        } else if (object instanceof BinaryResource) {
-            encodeBinary(context);
-        } else {
-            encodeValue(context);
+        if ( top instanceof Collection ) {
+            ((Collection) top).add( value );
+        } else if ( top instanceof PropertyCatcher ) {
+            ((PropertyCatcher) top).value = value;
         }
     }
 
-    protected void encodeCollection(EncodingContext<EncoderState> context) throws Exception {
-        Resource resource = (Resource) context.object();
-        EncoderState state = context.attachment();
+    @Override
+    public void writeValue(Integer value) throws Exception {
+        Object top = this.stack.peek();
 
-        state.push(new DefaultCollectionResourceState(resource.id()));
-
-        context.encodeContent(() -> {
-            state.pop();
-            context.end();
-        });
-    }
-
-    protected void encodeObject(EncodingContext<EncoderState> context) throws Exception {
-        Resource resource = (Resource) context.object();
-        EncoderState state = context.attachment();
-
-        state.push(new DefaultObjectResourceState(resource.id()));
-
-        context.encodeContent(() -> {
-            state.pop();
-            context.end();
-        });
-    }
-
-    protected void encodeProperty(EncodingContext<EncoderState> context) throws Exception {
-        PropertyResource resource = (PropertyResource) context.object();
-        EncoderState state = context.attachment();
-
-        ResourceState top = state.peek();
-        if (top instanceof ObjectResourceState) {
-            ((ObjectResourceState) top).addProperty(resource.id(), resource.get(null));
-            context.end();
-        } else if (top instanceof CollectionResourceState) {
-            // TODO allow properties on Collections?
+        if ( top instanceof Collection ) {
+            ((Collection) top).add( value );
+        } else if ( top instanceof PropertyCatcher ) {
+            ((PropertyCatcher) top).value = value;
         }
-
-    }
-
-    protected void encodeBinary(EncodingContext<EncoderState> context) throws Exception {
-
-    }
-
-    protected void encodeValue(EncodingContext<EncoderState> context) throws Exception {
-
     }
 
     @Override
-    public void close(EncodingContext<EncoderState> context) throws Exception {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void writeValue(Double value) throws Exception {
+        Object top = this.stack.peek();
+
+        if ( top instanceof Collection ) {
+            ((Collection) top).add( value );
+        } else if ( top instanceof PropertyCatcher ) {
+            ((PropertyCatcher) top).value = value;
+        }
     }
 
+    @Override
+    public void writeValue(Date value) throws Exception {
+        Object top = this.stack.peek();
 
+        if ( top instanceof Collection ) {
+            ((Collection) top).add( value );
+        } else if ( top instanceof PropertyCatcher ) {
+            ((PropertyCatcher) top).value = value;
+        }
+    }
+
+    private static class PropertyCatcher {
+        public Object value;
+    }
 }

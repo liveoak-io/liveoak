@@ -5,31 +5,21 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
-import org.projectodd.restafari.container.codec.DefaultCollectionResourceState;
-import org.projectodd.restafari.container.codec.DefaultObjectResourceState;
-import org.projectodd.restafari.container.codec.DefaultPropertyResourceState;
+import org.projectodd.restafari.container.codec.DefaultResourceState;
 import org.projectodd.restafari.container.codec.ResourceDecoder;
-import org.projectodd.restafari.spi.state.CollectionResourceState;
-import org.projectodd.restafari.spi.state.ObjectResourceState;
-import org.projectodd.restafari.spi.state.PropertyResourceState;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Bob McWhirter
  */
 public class JSONDecoder implements ResourceDecoder {
-
-    private static final Set<String> SIMPLE_COLLECTION_PROPERTIES = new HashSet<String>() {{
-        add("id");
-        add("self");
-        add("content");
-    }};
 
     public JSONDecoder() {
     }
@@ -37,55 +27,24 @@ public class JSONDecoder implements ResourceDecoder {
     @Override
     public ResourceState decode(ByteBuf resource) throws IOException {
 
+        System.err.println("decode: " + resource.toString(Charset.defaultCharset()));
+
         JsonFactory factory = new JsonFactory();
-        factory.configure( JsonParser.Feature.ALLOW_SINGLE_QUOTES, true );
-        factory.configure( JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true );
+        factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+        factory.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         ByteBufInputStream in = new ByteBufInputStream(resource);
         JsonParser parser = factory.createParser(in);
         parser.nextToken();
 
         ResourceState result = decode(parser);
-        if (result instanceof ObjectResourceState) {
-            result = possiblyConvertToCollection((ObjectResourceState) result);
+
+        if (result == null) {
+            result = new DefaultResourceState();
         }
+
+        System.err.println("decoded: " + result);
 
         return result;
-    }
-
-    protected ResourceState possiblyConvertToCollection(ObjectResourceState state) {
-
-        List<PropertyResourceState> p = state.members().collect(Collectors.toList());
-
-        Object selfProp = state.getProperty("_self");
-        Object contentProp = null;
-
-        boolean isCollection = false;
-
-        if (selfProp != null && selfProp instanceof ObjectResourceState) {
-            Object typeProp = ((ObjectResourceState) selfProp).getProperty("type");
-            if (typeProp != null && "collection".equals(typeProp)) {
-                isCollection = true;
-            }
-        }
-
-        contentProp = state.getProperty("content");
-        if (contentProp != null && contentProp instanceof CollectionResourceState) {
-            isCollection = true;
-        } else {
-            contentProp = null;
-        }
-
-        if (isCollection) {
-            DefaultCollectionResourceState collection = new DefaultCollectionResourceState(state.id());
-            if (contentProp != null) {
-                ((CollectionResourceState) contentProp).members().forEach((m) -> {
-                    collection.addResource(m);
-                });
-            }
-            return collection;
-        }
-
-        return state;
     }
 
 
@@ -95,7 +54,7 @@ public class JSONDecoder implements ResourceDecoder {
             return (ResourceState) value;
         }
 
-        return new DefaultPropertyResourceState(null, value);
+        return null;
     }
 
     protected Object decodeValue(JsonParser parser) throws IOException {
@@ -141,20 +100,15 @@ public class JSONDecoder implements ResourceDecoder {
             return decodeArray(parser);
         }
 
-        if (token == JsonToken.FIELD_NAME) {
-            return decodeProperty(parser);
-        }
-
         return null;
     }
 
-    protected ObjectResourceState decodeObject(JsonParser parser) throws IOException {
+    protected ResourceState decodeObject(JsonParser parser) throws IOException {
         parser.nextToken();
-        DefaultObjectResourceState resource = new DefaultObjectResourceState();
+        DefaultResourceState resource = new DefaultResourceState();
 
         while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
-            PropertyResourceState property = decodeProperty(parser);
-            resource.addProperty(property);
+            decodeProperty(parser, resource);
         }
 
         parser.nextToken();
@@ -162,16 +116,14 @@ public class JSONDecoder implements ResourceDecoder {
         return resource;
     }
 
-    protected CollectionResourceState decodeArray(JsonParser parser) throws IOException {
+    protected ArrayList<Object> decodeArray(JsonParser parser) throws IOException {
 
         parser.nextToken();
-        DefaultCollectionResourceState array = new DefaultCollectionResourceState();
+        ArrayList<Object> array = new ArrayList<>();
 
         while (parser.getCurrentToken() != JsonToken.END_ARRAY) {
-            ResourceState o = decode(parser);
-            if (o != null) {
-                array.addResource(o);
-            }
+            Object value = decodeValue(parser);
+            array.add(value);
         }
 
         parser.nextToken();
@@ -179,11 +131,21 @@ public class JSONDecoder implements ResourceDecoder {
         return array;
     }
 
-    protected PropertyResourceState decodeProperty(JsonParser parser) throws IOException {
+    protected void decodeProperty(JsonParser parser, ResourceState state) throws IOException {
         String name = parser.getText();
         parser.nextToken();
         Object value = decodeValue(parser);
-        return new DefaultPropertyResourceState(name, value);
-    }
 
+        if (name.equals("_members") && value instanceof Collection) {
+            ((Collection) value).stream().forEach((e) -> {
+                state.addMember((ResourceState) e);
+            });
+        } else {
+            state.putProperty(name, value);
+        }
+
+        if (name.equals("id")) {
+            state.id(value.toString());
+        }
+    }
 }

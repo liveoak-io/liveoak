@@ -57,24 +57,30 @@ public class AuthTest {
     public void testMissingAuthorizationHeader() throws Exception {
         HttpRequestBase httpMethod;
 
+        System.err.println( "A" );
         // Authorization ok. Public collection with invalid type 'memory'
         httpMethod = createHttpMethod("GET", "http://localhost:8080/memory/public");
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_NOT_FOUND);
+        System.err.println( "B" );
 
         // Authorization ok. Public collection (should be accessible for R+W without token)
         httpMethod = createHttpMethod("PUT", "http://localhost:8080/authTest/public");
         ((HttpPut)httpMethod).setEntity(new StringEntity("{ \"members\": [] }"));
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_CREATED);
+        System.err.println( "C" );
 
         httpMethod = createHttpMethod("GET", "http://localhost:8080/authTest/public");
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_OK);
+        System.err.println( "D" );
 
         httpMethod = createHttpMethod("DELETE", "http://localhost:8080/authTest/public/456");
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_NOT_FOUND);
+        System.err.println( "E" );
 
         // Authorization no-ok. Protected collections 'protected1' and 'protected2' should be forbidden without token
         httpMethod = createHttpMethod("GET", "http://localhost:8080/authTest/protected1");
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_FORBIDDEN);
+        System.err.println( "F" );
 
         httpMethod = createHttpMethod("POST", "http://localhost:8080/authTest/protected1");
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_FORBIDDEN);

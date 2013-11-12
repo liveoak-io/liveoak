@@ -20,8 +20,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.projectodd.restafari.spi.MediaType;
-import org.projectodd.restafari.spi.state.CollectionResourceState;
-import org.projectodd.restafari.spi.state.ObjectResourceState;
 import org.projectodd.restafari.spi.state.ResourceState;
 import org.projectodd.restafari.stomp.StompMessage;
 import org.projectodd.restafari.stomp.client.StompClient;
@@ -126,8 +124,7 @@ public class BasicServerTest {
 
         ResourceState state = decode(response);
         assertThat(state).isNotNull();
-        assertThat(state).isInstanceOf(CollectionResourceState.class);
-        assertThat(((CollectionResourceState) state).members().count()).isEqualTo(0);
+        assertThat(state.members().size()).isEqualTo(0);
 
         response.close();
 
@@ -146,7 +143,7 @@ public class BasicServerTest {
         // create people collection with direct PUT
 
         putRequest = new HttpPut("http://localhost:8080/memory/people");
-        putRequest.setEntity(new StringEntity("{ \"content\": [] }"));
+        putRequest.setEntity(new StringEntity("{ \"type\": \"collection\" }"));
         putRequest.setHeader( "Content-Type", "application/json" );
         response = this.httpClient.execute(putRequest);
         System.err.println( "response: " + response );
@@ -196,13 +193,12 @@ public class BasicServerTest {
 
         state = decode(response);
         assertThat(state).isNotNull();
-        assertThat(state).isInstanceOf(CollectionResourceState.class);
-        assertThat(((CollectionResourceState) state).members().count()).isEqualTo(1);
+        assertThat(state.members().size()).isEqualTo(1);
 
-        ObjectResourceState memoryCollection = (ObjectResourceState) ((CollectionResourceState) state).members().findFirst().get();
+        ResourceState memoryCollection = state.members().get(0);
         assertThat(memoryCollection.getProperty("id")).isEqualTo("people");
 
-        ObjectResourceState selfObj = (ObjectResourceState) memoryCollection.getProperty("_self");
+        ResourceState selfObj = (ResourceState) memoryCollection.getProperty("self");
         assertThat(selfObj.getProperty("href")).isEqualTo("/memory/people");
 
         System.err.println("TEST #6");
@@ -218,20 +214,20 @@ public class BasicServerTest {
 
         state = decode(response);
         assertThat(state).isNotNull();
-        assertThat(state).isInstanceOf(ObjectResourceState.class);
+        assertThat(state).isInstanceOf(ResourceState.class);
 
-        assertThat( ((ObjectResourceState)state).getProperty( "id" ) ).isNotNull();
-        assertThat(((ObjectResourceState) state).getProperty("name")).isEqualTo( "bob" );
+        assertThat( state.getProperty( "id" ) ).isNotNull();
+        assertThat(state.getProperty("name")).isEqualTo( "bob" );
 
         // check STOMP
 
         StompMessage obj = bobCreationNotification.get(30000, TimeUnit.SECONDS);
         assertThat(obj).isNotNull();
 
-        ObjectResourceState bobObjState = (ObjectResourceState) decode( obj.content() );
+        ResourceState bobObjState = (ResourceState) decode( obj.content() );
         assertThat( bobObjState.getProperty( "name" ) ).isEqualTo( "bob" );
 
-        assertThat( ((ObjectResourceState)state).getProperty( "id" ) ).isEqualTo( bobObjState.getProperty( "id" ) );
+        assertThat( ((ResourceState)state).getProperty( "id" ) ).isEqualTo( bobObjState.getProperty( "id" ) );
 
         response.close();
     }

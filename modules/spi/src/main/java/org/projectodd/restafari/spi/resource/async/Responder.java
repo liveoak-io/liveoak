@@ -1,7 +1,5 @@
 package org.projectodd.restafari.spi.resource.async;
 
-import org.projectodd.restafari.spi.resource.Resource;
-
 /** Object to report on results of actions performed by Resources.
  *
  * @author Bob McWhirter

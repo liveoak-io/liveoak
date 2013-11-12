@@ -1,19 +1,7 @@
 package org.projectodd.restafari.container.codec.json;
 
-import io.netty.buffer.ByteBuf;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
-import org.projectodd.restafari.spi.state.ObjectResourceState;
-import org.projectodd.restafari.spi.state.ResourceState;
-
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Bob McWhirter

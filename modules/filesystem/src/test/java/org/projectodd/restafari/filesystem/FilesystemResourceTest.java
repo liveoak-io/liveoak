@@ -4,7 +4,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.projectodd.restafari.container.SimpleConfig;
 import org.projectodd.restafari.spi.Config;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.resource.RootResource;
 import org.projectodd.restafari.spi.resource.async.BinaryResource;
 import org.projectodd.restafari.testtools.AbstractResourceTestCase;

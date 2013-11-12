@@ -10,10 +10,9 @@ import org.projectodd.restafari.container.codec.ResourceCodec;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
 import org.projectodd.restafari.container.codec.json.JSONDecoder;
 import org.projectodd.restafari.container.codec.json.JSONEncoder;
-import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.spi.Pagination;
 import org.projectodd.restafari.spi.RequestType;
-import org.projectodd.restafari.spi.state.ObjectResourceState;
+import org.projectodd.restafari.spi.state.ResourceState;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -28,7 +27,7 @@ public class HttpResourceRequestDecoderTest {
     @Before
     public void setUp() {
         this.codecManager = new ResourceCodecManager();
-        this.codecManager.registerResourceCodec("application/json", new ResourceCodec(null, new JSONEncoder(), new JSONDecoder()));
+        this.codecManager.registerResourceCodec("application/json", new ResourceCodec(null, JSONEncoder.class, new JSONDecoder()));
         this.channel = new EmbeddedChannel(new HttpResourceRequestDecoder(this.codecManager));
     }
 
@@ -88,9 +87,9 @@ public class HttpResourceRequestDecoderTest {
         assertThat(decoded.pagination()).isEqualTo(Pagination.NONE);
 
         assertThat(decoded.state()).isNotNull();
-        assertThat(decoded.state()).isInstanceOf(ObjectResourceState.class);
+        assertThat(decoded.state()).isInstanceOf(ResourceState.class);
 
-        ObjectResourceState state = (ObjectResourceState) decoded.state();
+        ResourceState state = decoded.state();
 
         assertThat(state.getProperty("name")).isEqualTo("bob");
     }
@@ -112,9 +111,9 @@ public class HttpResourceRequestDecoderTest {
         assertThat(decoded.pagination()).isEqualTo(Pagination.NONE);
 
         assertThat(decoded.state()).isNotNull();
-        assertThat(decoded.state()).isInstanceOf(ObjectResourceState.class);
+        assertThat(decoded.state()).isInstanceOf(ResourceState.class);
 
-        ObjectResourceState state = (ObjectResourceState) decoded.state();
+        ResourceState state = decoded.state();
 
         assertThat(state.getProperty("name")).isEqualTo("bob");
     }

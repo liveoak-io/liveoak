@@ -3,7 +3,7 @@ package org.projectodd.restafari.filesystem.aggregating;
 import org.projectodd.restafari.filesystem.FileResource;
 import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.spi.RequestContext;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.resource.async.BinaryContentSink;
 import org.projectodd.restafari.spi.resource.async.BinaryResource;
 import org.projectodd.restafari.spi.resource.async.Responder;
@@ -66,11 +66,6 @@ public class AggregatingResource implements BinaryResource {
     @Override
     public String id() {
         return this.id;
-    }
-
-    @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
-        responder.noSuchResource( id );
     }
 
     @Override

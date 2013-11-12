@@ -8,8 +8,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.junit.Test;
-import org.projectodd.restafari.spi.state.CollectionResourceState;
-import org.projectodd.restafari.spi.state.ObjectResourceState;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.util.HashSet;
@@ -38,10 +36,10 @@ public class ParamsServerTest extends BasicServerTest {
         System.err.println("CREATE /people collection");
 
         putRequest = new HttpPut("http://localhost:8080/memory/people");
-        putRequest.setEntity(new StringEntity("{ \"content\": [] }"));
-        putRequest.setHeader( "Content-Type", "application/json" );
+        putRequest.setEntity(new StringEntity("{ \"type\": \"collection\" }"));
+        putRequest.setHeader("Content-Type", "application/json");
         response = this.httpClient.execute(putRequest);
-        System.err.println( "response: " + response );
+        System.err.println("response: " + response);
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
 
@@ -50,32 +48,34 @@ public class ParamsServerTest extends BasicServerTest {
         System.err.println("PREPARE 2 people ...");
         // Post a person
 
-        postRequest = new HttpPost( "http://localhost:8080/memory/people");
-        postRequest.setEntity( new StringEntity("{ \"name\": \"bob\" }" ) );
-        postRequest.setHeader( "Content-Type", "application/json" );
+        postRequest = new HttpPost("http://localhost:8080/memory/people");
+        postRequest.setEntity(new StringEntity("{ \"name\": \"bob\" }"));
+        postRequest.setHeader("Content-Type", "application/json");
 
-        response = httpClient.execute( postRequest );
+        response = httpClient.execute(postRequest);
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
 
-        ObjectResourceState bobState = (ObjectResourceState) decode(response);
+        ResourceState bobState = decode(response);
         assertThat(bobState).isNotNull();
 
+        assertThat(bobState.id()).isNotNull();
         assertThat(bobState.getProperty("id")).isNotNull();
+        assertThat(bobState.id()).isEqualTo((String) bobState.getProperty("id"));
         assertThat(bobState.getProperty("name")).isEqualTo("bob");
 
         response.close();
 
 
-        postRequest = new HttpPost( "http://localhost:8080/memory/people");
-        postRequest.setEntity( new StringEntity("{ \"name\": \"krusty\" }" ) );
-        postRequest.setHeader( "Content-Type", "application/json" );
+        postRequest = new HttpPost("http://localhost:8080/memory/people");
+        postRequest.setEntity(new StringEntity("{ \"name\": \"krusty\" }"));
+        postRequest.setHeader("Content-Type", "application/json");
 
-        response = httpClient.execute( postRequest );
+        response = httpClient.execute(postRequest);
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
 
-        ObjectResourceState krustyState = (ObjectResourceState) decode(response);
+        ResourceState krustyState = (ResourceState) decode(response);
         assertThat(krustyState).isNotNull();
 
         assertThat(krustyState.getProperty("id")).isNotNull();
@@ -100,15 +100,14 @@ public class ParamsServerTest extends BasicServerTest {
 
         ResourceState state = decode(response);
         assertThat(state).isNotNull();
-        assertThat(state).isInstanceOf(CollectionResourceState.class);
-        List<? extends ResourceState> members = ((CollectionResourceState) state).members().collect(Collectors.toList());
+        List<ResourceState> members = state.members();
 
         assertThat(members.size()).isEqualTo(1);
 
         ResourceState memberState = members.get(0);
-        assertThat(memberState).isInstanceOf(ObjectResourceState.class);
+        assertThat(memberState).isInstanceOf(ResourceState.class);
 
-        ObjectResourceState member = (ObjectResourceState) memberState;
+        ResourceState member = (ResourceState) memberState;
         assertThat(member.id()).isEqualTo(bobState.id());
 
         response.close();
@@ -124,19 +123,17 @@ public class ParamsServerTest extends BasicServerTest {
 
         state = decode(response);
         assertThat(state).isNotNull();
-        assertThat(state).isInstanceOf(CollectionResourceState.class);
 
-        members = ((CollectionResourceState) state).members().collect(Collectors.toList());
+        members = state.members();
         assertThat(members.size()).isEqualTo(1);
 
         memberState = members.get(0);
-        assertThat(memberState).isInstanceOf(ObjectResourceState.class);
+        assertThat(memberState).isInstanceOf(ResourceState.class);
 
-        member = (ObjectResourceState) memberState;
+        member = (ResourceState) memberState;
         assertThat(member.id()).isEqualTo(krustyState.id());
 
         response.close();
-
 
 
         System.err.println("TEST #2");
@@ -151,12 +148,14 @@ public class ParamsServerTest extends BasicServerTest {
 
         state = decode(response);
         assertThat(state).isNotNull();
-        assertThat(state).isInstanceOf(ObjectResourceState.class);
+        assertThat(state).isInstanceOf(ResourceState.class);
 
         HashSet fields = new HashSet();
-        ((ObjectResourceState) state).members().forEach((f) -> {
+        /*
+        ((CollectionResourceState) state).members().forEach((f) -> {
             fields.add(f.id());
         });
+        */
         // TODO: uncomment when _self, and id encoding takes ReturnFields into account
         //assertThat(fields.size()).isEqualTo(1);
         //assertThat(fields.contains("id")).isTrue();

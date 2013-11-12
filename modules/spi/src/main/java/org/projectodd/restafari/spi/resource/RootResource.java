@@ -2,6 +2,7 @@ package org.projectodd.restafari.spi.resource;
 
 import org.projectodd.restafari.spi.InitializationException;
 import org.projectodd.restafari.spi.ResourceContext;
+import org.projectodd.restafari.spi.resource.async.Resource;
 
 /** A root resource capable of being registered with a container.
  *

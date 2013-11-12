@@ -1,8 +1,7 @@
 package org.projectodd.restafari.container;
 
 import org.projectodd.restafari.container.codec.MediaTypeMatcher;
-import org.projectodd.restafari.spi.MediaType;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 
 /**
  * @author Bob McWhirter

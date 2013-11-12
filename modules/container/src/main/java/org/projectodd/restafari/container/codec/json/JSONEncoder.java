@@ -5,180 +5,113 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
-import org.projectodd.restafari.container.codec.ResourceEncoder;
-import org.projectodd.restafari.container.codec.EncodingContext;
-import org.projectodd.restafari.spi.resource.Resource;
-import org.projectodd.restafari.spi.resource.async.BinaryResource;
-import org.projectodd.restafari.spi.resource.async.CollectionResource;
-import org.projectodd.restafari.spi.resource.async.ObjectResource;
-import org.projectodd.restafari.spi.resource.async.PropertyResource;
+import org.projectodd.restafari.container.codec.Encoder;
+import org.projectodd.restafari.spi.resource.async.Resource;
 
-import java.nio.charset.Charset;
+import java.io.IOException;
+import java.util.Date;
 
 /**
  * @author Bob McWhirter
  */
-public class JSONEncoder implements ResourceEncoder<JsonGenerator> {
+public class JSONEncoder implements Encoder {
 
-    private static ByteBuf CURRENT = null;
-
-    public JsonGenerator createAttachment(ByteBuf buffer) throws Exception {
-        JsonFactory factory = new JsonFactory();
-        ByteBufOutputStream out = new ByteBufOutputStream(buffer);
-        JsonGenerator generator = factory.createGenerator(out);
-        generator.setPrettyPrinter(new DefaultPrettyPrinter("\\n"));
-        CURRENT = buffer;
-        return generator;
-    }
-
-    public void encode(EncodingContext<JsonGenerator> context) throws Exception {
-        Object o = context.object();
-        JsonGenerator generator = context.attachment();
-        if (o instanceof CollectionResource) {
-            encodeCollection(context);
-        } else if (o instanceof ObjectResource) {
-            encodeObject(context);
-        } else if (o instanceof PropertyResource) {
-            encodeProperty(context);
-        } else if (o instanceof BinaryResource) {
-            encodeBinary(context);
-        } else {
-            encodeValue(context);
-        }
-        generator.flush();
+    public JSONEncoder() {
     }
 
     @Override
-    public void close(EncodingContext<JsonGenerator> context) throws Exception {
-        JsonGenerator generator = context.attachment();
-        generator.flush();
-        generator.close();
+    public void initialize(ByteBuf buffer) throws Exception {
+        JsonFactory factory = new JsonFactory();
+        ByteBufOutputStream out = new ByteBufOutputStream(buffer);
+        this.generator = factory.createGenerator(out);
+        this.generator.setPrettyPrinter(new DefaultPrettyPrinter("\\n"));
     }
 
+    @Override
+    public void close() throws Exception {
+        this.generator.flush();
+        this.generator.close();
+    }
 
-    protected void encodeCollection(EncodingContext<JsonGenerator> context) throws Exception {
-        JsonGenerator generator = context.attachment();
-        generator.writeStartObject();
-        encodeProlog(context);
+    // ----------------------------------------
 
-        context.encodeAspects(()->{});
-
-        if (context.shouldEncodeContent()) {
-            generator.writeFieldName("content");
-            generator.writeStartArray();
-            context.encodeContent(() -> {
-                try {
-                    generator.writeEndArray();
-                    generator.writeEndObject();
-                    context.end();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-        } else {
-            generator.writeEndObject();
-            context.end();
+    @Override
+    public void startResource(Resource resource) throws Exception {
+        this.generator.writeStartObject();
+        if ( resource.id() != null ) {
+            this.generator.writeFieldName( "id" );
+            this.generator.writeString(resource.id());
+            this.generator.writeFieldName("self");
+            this.generator.writeStartObject();
+            this.generator.writeFieldName("href");
+            this.generator.writeString( resource.uri().toString() );
+            this.generator.writeEndObject();
         }
     }
 
-    protected void encodeObject(EncodingContext<JsonGenerator> context) throws Exception {
-        JsonGenerator generator = context.attachment();
-        generator.writeStartObject();
-        encodeProlog(context);
-        context.encodeAspects(()->{});
-        context.encodeContent(() -> {
-            try {
-                generator.writeEndObject();
-                context.end();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+    @Override
+    public void endResource(Resource resource) throws IOException {
+        this.generator.writeEndObject();
+    }
+
+    // ----------------------------------------
+
+    @Override
+    public void startProperty(String propertyName) throws Exception {
+        this.generator.writeFieldName( propertyName );
+    }
+
+    @Override
+    public void endProperty(String propertyName) throws Exception {
+        // not used in JSON
+    }
+
+    // ----------------------------------------
+
+    @Override
+    public void startList() throws Exception {
+        this.generator.writeStartArray();
+    }
+
+    @Override
+    public void endList() throws Exception {
+        this.generator.writeEndArray();
+    }
+
+    // ----------------------------------------
+
+    @Override
+    public void startMembers() throws Exception {
+        this.generator.writeFieldName( "_members" );
+        this.generator.writeStartArray();
+    }
+
+    @Override
+    public void endMembers() throws Exception {
+        this.generator.writeEndArray();
+    }
+
+    // ----------------------------------------
+
+    @Override
+    public void writeValue(String value) throws Exception {
+        this.generator.writeString( value );
+    }
+
+    @Override
+    public void writeValue(Integer value) throws Exception {
+        this.generator.writeNumber( value );
+    }
+
+    @Override
+    public void writeValue(Double value) throws Exception {
+        this.generator.writeNumber( value );
+    }
+
+    @Override
+    public void writeValue(Date value) throws Exception {
 
     }
 
-    protected void encodeProperty(EncodingContext<JsonGenerator> context) throws Exception {
-        Resource prop = (Resource) context.object();
-        JsonGenerator generator = context.attachment();
-
-        if (context.depth() > 0) {
-            generator.writeFieldName(prop.id());
-        }
-        context.encodeContent(() -> {
-            context.end();
-        });
-    }
-
-    protected void encodeBinary(EncodingContext<JsonGenerator> context) throws Exception {
-
-        JsonGenerator generator = context.attachment();
-        generator.writeStartObject();
-        encodeProlog(context);
-
-        generator.writeFieldName("content");
-        context.encodeContent(() -> {
-            try {
-                generator.writeEndObject();
-                context.end();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    protected void encodeValue(EncodingContext<JsonGenerator> context) throws Exception {
-
-        Object value = context.object();
-        JsonGenerator generator = context.attachment();
-
-        if (value instanceof String) {
-            generator.writeString(value.toString());
-        } else if (value instanceof Double) {
-            generator.writeNumber((Double) value);
-        } else if (value instanceof Float) {
-            generator.writeNumber((Float) value);
-        } else if (value instanceof Short) {
-            generator.writeNumber((Short) value);
-        } else if (value instanceof Integer) {
-            generator.writeNumber((Integer) value);
-        } else if (value instanceof Long) {
-            generator.writeNumber((Long) value);
-        } else if (value instanceof ByteBuf) {
-            byte[] bytes = new byte[((ByteBuf) value).readableBytes()];
-            ((ByteBuf) value).readBytes(bytes);
-            generator.writeBinary(bytes);
-        } else {
-            generator.writeString("ERROR");
-            System.err.println("UNKNOWN VALUE TYPE: " + value + " // " + ((value == null) ? null : value.getClass()));
-        }
-
-        context.end();
-    }
-
-    protected void encodeProlog(EncodingContext<JsonGenerator> context) throws Exception {
-        JsonGenerator generator = context.attachment();
-        Resource resource = (Resource) context.object();
-        String id = resource.id();
-        if (id != null) {
-            generator.writeFieldName("id");
-            generator.writeString(id);
-            generator.writeFieldName("_self");
-            generator.writeStartObject();
-            generator.writeFieldName("href");
-            generator.writeString(resource.uri().toString());
-            generator.writeFieldName("type");
-            if (resource instanceof CollectionResource) {
-                generator.writeString("collection");
-            } else if (resource instanceof ObjectResource) {
-                generator.writeString("object");
-            } else if (resource instanceof BinaryResource) {
-                generator.writeString("binary");
-            } else {
-                generator.writeString("Unknown");
-                System.err.println("Unknown resource type: " + resource.getClass());
-            }
-            generator.writeEndObject();
-        }
-    }
-
+    private JsonGenerator generator;
 }

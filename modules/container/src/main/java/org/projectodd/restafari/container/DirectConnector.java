@@ -5,7 +5,7 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 import org.projectodd.restafari.spi.*;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.util.HashMap;

@@ -1,7 +1,6 @@
 package org.projectodd.restafari.container.codec;
 
 import org.projectodd.restafari.spi.MediaType;
-import org.projectodd.restafari.spi.resource.Resource;
 import org.projectodd.restafari.spi.resource.async.BinaryResource;
 
 import java.util.List;

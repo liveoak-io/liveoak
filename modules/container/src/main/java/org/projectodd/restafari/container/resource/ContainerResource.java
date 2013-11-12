@@ -4,15 +4,13 @@ import org.projectodd.restafari.spi.InitializationException;
 import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.ResourceContext;
 import org.projectodd.restafari.spi.resource.RootResource;
-import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
 import org.projectodd.restafari.spi.resource.async.Responder;
-import org.projectodd.restafari.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
  */
-public class ContainerResource implements CollectionResource, RootResource {
+public class ContainerResource implements  RootResource {
 
 
     public ContainerResource(String id) {
@@ -26,11 +24,6 @@ public class ContainerResource implements CollectionResource, RootResource {
 
     @Override
     public void destroy() {
-    }
-
-    @Override
-    public void create(RequestContext ctx, ResourceState state, Responder responder) {
-        responder.createNotSupported( this );
     }
 
     @Override
@@ -55,11 +48,6 @@ public class ContainerResource implements CollectionResource, RootResource {
         } else {
             responder.noSuchResource( id );
         }
-    }
-
-    @Override
-    public void delete(RequestContext ctx, Responder responder) {
-        responder.deleteNotSupported( this );
     }
 
     private String id;

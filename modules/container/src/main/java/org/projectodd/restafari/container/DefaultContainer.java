@@ -8,33 +8,28 @@ import java.util.concurrent.Executors;
 import org.projectodd.restafari.container.aspects.ResourceAspectManager;
 import org.projectodd.restafari.container.codec.ResourceCodec;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
-import org.projectodd.restafari.container.codec.aggregating.AggregatingEncoder;
-import org.projectodd.restafari.container.codec.html.HTMLEncoder;
 import org.projectodd.restafari.container.codec.json.JSONDecoder;
 import org.projectodd.restafari.container.codec.json.JSONEncoder;
 import org.projectodd.restafari.container.subscriptions.SubscriptionManager;
 import org.projectodd.restafari.container.subscriptions.resource.SubscriptionsResourceAspect;
 import org.projectodd.restafari.spi.*;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.resource.RootResource;
-import org.projectodd.restafari.spi.resource.async.CollectionResource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
 import org.projectodd.restafari.spi.resource.async.Responder;
-import org.projectodd.restafari.spi.state.ResourceState;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.platform.PlatformLocator;
-import org.vertx.java.platform.PlatformManager;
 
 
-public class DefaultContainer implements Container, CollectionResource {
+public class DefaultContainer implements Container, Resource {
 
     public DefaultContainer() {
         this( PlatformLocator.factory.createPlatformManager().vertx() );
     }
 
     public DefaultContainer(Vertx vertx) {
-        this.codecManager.registerResourceCodec("application/json", new ResourceCodec( this, new JSONEncoder(), new JSONDecoder() ) );
-        this.codecManager.registerResourceCodec("text/html", new ResourceCodec( this, new HTMLEncoder( this ), null ) );
+        this.codecManager.registerResourceCodec("application/json", new ResourceCodec( this, JSONEncoder.class, new JSONDecoder() ) );
+        //this.codecManager.registerResourceCodec("text/html", new ResourceCodec( this, HTMLEncoder.class, null ) );
 
         this.vertx = vertx;
         this.workerPool = Executors.newCachedThreadPool();
@@ -78,6 +73,7 @@ public class DefaultContainer implements Container, CollectionResource {
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
+        System.err.println( "container read member: " + id );
         try {
             if ( id == null ) {
                 responder.resourceRead( this );
@@ -85,25 +81,17 @@ public class DefaultContainer implements Container, CollectionResource {
             }
 
             if (!this.resources.containsKey(id)) {
+                System.err.println( "container no such: " + id );
                 responder.noSuchResource(id);
                 return;
             }
 
+            System.err.println( "container found: " + this.resources.get(id));
             responder.resourceRead(this.resources.get(id));
 
         } catch (Throwable t) {
             responder.internalError(t.getMessage());
         }
-    }
-
-    @Override
-    public void delete(RequestContext ctx, Responder responder) {
-        responder.deleteNotSupported(this);
-    }
-
-    @Override
-    public void create(RequestContext ctx, ResourceState state, Responder responder) {
-        responder.createNotSupported(this);
     }
 
     @Override

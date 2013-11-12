@@ -39,42 +39,6 @@ public class BaseMongoDBTest {
     protected static String baseURL;
     protected static final String TYPE = "storage";
 
-/*    protected String mongoDatabaseName;
-    protected Integer mongoPort;
-    protected String mongoHost;
-
-    public BaseMongoDBTest() {
-        mongoDatabaseName = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
-        mongoPort = new Integer(System.getProperty("mongo.port", "27017"));
-        mongoHost = System.getProperty("mongo.host", "localhost");
-    }
-
-    @Override
-    public RootResource createRootResource() {
-        return new MongoResource(TYPE);
-    }
-
-    @Override
-    public Config createConfig() {
-        SimpleConfig config = new SimpleConfig();
-        config.put("db", this.mongoDatabaseName);
-        config.put("port", this.mongoPort);
-        config.put("host", this.mongoHost);
-        return config;
-    }
-
-    @Override
-    @Before
-    public void setUpContainer() throws Exception {
-       super.setUpContainer();
-
-        // configure a local mongo client to verify the data methods
-        mongoClient = new MongoClient(this.mongoHost, this.mongoPort);
-        db = mongoClient.getDB(this.mongoDatabaseName);
-    }
-
-*/
-
     @BeforeClass
     public static void init() throws Exception {
         String database = System.getProperty("mongo.db", "MongoResourceTest_" + UUID.randomUUID());

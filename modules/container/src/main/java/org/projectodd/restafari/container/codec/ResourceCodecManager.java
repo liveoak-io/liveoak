@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.spi.RequestContext;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.resource.async.BinaryContentSink;
 import org.projectodd.restafari.spi.resource.async.BinaryResource;
 import org.projectodd.restafari.spi.state.ResourceState;

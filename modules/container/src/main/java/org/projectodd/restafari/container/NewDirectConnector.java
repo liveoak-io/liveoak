@@ -4,10 +4,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
-import org.projectodd.restafari.container.codec.RootEncodingContext;
+import org.projectodd.restafari.container.codec.driver.RootEncodingDriver;
 import org.projectodd.restafari.container.codec.state.ResourceStateEncoder;
 import org.projectodd.restafari.spi.*;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.util.HashMap;
@@ -170,14 +170,11 @@ public class NewDirectConnector {
         CompletableFuture<ResourceState> state = new CompletableFuture<>();
 
         ResourceStateEncoder encoder = new ResourceStateEncoder();
-        ResourceStateEncoder.EncoderState attachment = encoder.createAttachment(null);
-        RootEncodingContext<ResourceStateEncoder.EncoderState> encodingContext
-                = new RootEncodingContext<ResourceStateEncoder.EncoderState>(context, encoder, attachment, resource, this.container.resourceAspectManager(),
-                () -> {
-                    state.complete(attachment.root());
+        RootEncodingDriver driver =  new RootEncodingDriver(context, encoder, resource, () -> {
+                    state.complete(encoder.root());
                 });
 
-        encodingContext.encode();
+        driver.encode();
 
         return state.get();
     }

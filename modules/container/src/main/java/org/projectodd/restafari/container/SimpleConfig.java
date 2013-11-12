@@ -38,7 +38,7 @@ public class SimpleConfig implements Config {
         }
     }
 
-    public void putAll(Map<String,Object> config) {
+    public void putAll(Map<String, Object> config) {
         config.putAll(this.fields);
     }
 

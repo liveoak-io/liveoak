@@ -3,7 +3,7 @@ package org.projectodd.restafari.filesystem.aggregating;
 import org.projectodd.restafari.filesystem.FileResource;
 import org.projectodd.restafari.filesystem.FilesystemResource;
 import org.projectodd.restafari.spi.RequestContext;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.resource.async.DelegatingResponder;
 import org.projectodd.restafari.spi.resource.async.Responder;
 

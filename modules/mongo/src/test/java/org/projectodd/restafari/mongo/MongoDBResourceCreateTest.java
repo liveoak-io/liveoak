@@ -27,6 +27,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import sun.nio.ch.IOUtil;
 
+import static org.fest.assertions.Assertions.*;
+
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
@@ -48,16 +50,17 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest{
         // verify response
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
-        assertEquals(4, jsonNode.size()); // id, _self, bar
-        assertNotNull(jsonNode.get("id").asText());
-        assertEquals("bar", jsonNode.get("foo").asText());
-        assertNotNull(jsonNode.get("_self"));
+
+        assertThat( jsonNode.get("id" ).asText() ).isNotNull();
+        assertThat( jsonNode.get( "foo" ).asText() ).isEqualTo( "bar" );
+        assertThat( jsonNode.get( "self" ) ).isNotNull();
 
         // verify what is stored in the mongo db
-        assertTrue(db.collectionExists(methodName));
-        assertEquals(1, db.getCollection(methodName).getCount());
+        assertThat( db.collectionExists( methodName ) ).isTrue();
+        assertThat( db.getCollection( methodName ).getCount()).isEqualTo( 1);
+
         DBObject dbObject = db.getCollection(methodName).findOne();
-        assertEquals("bar", dbObject.get("foo"));
+        assertThat( dbObject.get( "foo" ) ).isEqualTo( "bar" );
     }
 
     @Test
@@ -72,10 +75,9 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest{
         // verify response
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
-        assertEquals(4, jsonNode.size()); // id, _self, bar, _subscriptions
-        assertEquals("helloworld", jsonNode.get("id").asText());
-        assertEquals("bar", jsonNode.get("foo").asText());
-        assertNotNull(jsonNode.get("_self"));
+        assertThat( jsonNode.get( "id" ).asText() ).isEqualTo( "helloworld" );
+        assertThat( jsonNode.get( "foo" ).asText() ).isEqualTo( "bar" );
+        assertThat( jsonNode.get( "self" ) ).isNotNull();
 
         // verify what is stored in the mongo db
         assertTrue(db.collectionExists(methodName));
@@ -99,6 +101,8 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest{
                         "  \"obj\" : { \"foo2\" : \"bar2\", \"test2\": \"123\"}\n" +
                         "}\n");
         assertEquals(201, response.getStatusLine().getStatusCode());
+
+        System.err.println( "DONE" );
 
         // verify response
         ObjectMapper mapper = new ObjectMapper();

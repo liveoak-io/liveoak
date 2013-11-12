@@ -1,6 +1,6 @@
 package org.projectodd.restafari.container;
 
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 
 import java.net.URI;
 import java.util.ArrayList;

@@ -1,8 +1,5 @@
 package org.projectodd.restafari.container.aspects;
 
-import org.projectodd.restafari.spi.resource.Resource;
-
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;

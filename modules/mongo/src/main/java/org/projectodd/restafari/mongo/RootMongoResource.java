@@ -2,11 +2,8 @@ package org.projectodd.restafari.mongo;
 
 import com.mongodb.*;
 import org.projectodd.restafari.spi.*;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.*;
 import org.projectodd.restafari.spi.resource.RootResource;
-import org.projectodd.restafari.spi.resource.async.CollectionResource;
-import org.projectodd.restafari.spi.resource.async.ResourceSink;
-import org.projectodd.restafari.spi.resource.async.Responder;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.net.UnknownHostException;
@@ -17,7 +14,7 @@ import java.util.stream.Stream;
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class RootMongoResource extends MongoResource implements CollectionResource, RootResource {
+public class RootMongoResource extends MongoResource implements RootResource {
 
     private MongoClient mongo;
     private DB db;
@@ -88,12 +85,6 @@ public class RootMongoResource extends MongoResource implements CollectionResour
     }
 
     @Override
-    public void delete(RequestContext ctx, Responder responder) {
-        //TODO: figure out how to handle deleting a mongodb root resource (eg /storage or /data).
-        responder.deleteNotSupported(this);
-    }
-
-    @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
         Pagination pagination = ctx.getPagination();
         Stream<String> members = this.db.getCollectionNames().stream().skip(pagination.offset());
@@ -107,15 +98,11 @@ public class RootMongoResource extends MongoResource implements CollectionResour
             }
         });
 
-        try {
-            sink.close();
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+        sink.close();
     }
 
     @Override
-    public void create(RequestContext ctx, ResourceState state, Responder responder) {
+    public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
 
         String id = state.id();
         if (id == null) {
@@ -125,5 +112,9 @@ public class RootMongoResource extends MongoResource implements CollectionResour
         responder.resourceCreated(new MongoCollectionResource(this, id));
     }
 
-
+    @Override
+    public void readProperties(RequestContext ctx, PropertySink sink) {
+        sink.accept( "type", "collection" );
+        sink.close();
+    }
 }

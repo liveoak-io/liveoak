@@ -53,11 +53,10 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
 
-        assertEquals(4, jsonNode.size()); // id, _self, bar, _subscriptions
         assertEquals(id, jsonNode.get("id").asText());
         assertEquals("baz", jsonNode.get("foo").asText());
-        assertNotNull(jsonNode.get("_self"));
-        assertEquals("/storage/testSimpleDelete/" + id, jsonNode.get("_self").get("href").asText());
+        assertNotNull(jsonNode.get("self"));
+        assertEquals("/storage/testSimpleDelete/" + id, jsonNode.get("self").get("href").asText());
 
         // verify db content
         assertEquals(1, db.getCollection(methodName).getCount());

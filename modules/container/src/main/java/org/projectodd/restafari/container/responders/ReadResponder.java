@@ -3,7 +3,7 @@ package org.projectodd.restafari.container.responders;
 import io.netty.channel.ChannelHandlerContext;
 import org.projectodd.restafari.container.ResourceRequest;
 import org.projectodd.restafari.container.aspects.ResourceAspectManager;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 
 import java.util.concurrent.Executor;
 

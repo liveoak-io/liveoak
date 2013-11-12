@@ -4,25 +4,17 @@ import com.mongodb.*;
 import com.mongodb.util.JSON;
 import org.bson.types.ObjectId;
 import org.projectodd.restafari.spi.*;
-import org.projectodd.restafari.spi.resource.Resource;
-import org.projectodd.restafari.spi.resource.async.CollectionResource;
+import org.projectodd.restafari.spi.resource.async.PropertySink;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
 import org.projectodd.restafari.spi.resource.async.Responder;
-import org.projectodd.restafari.spi.state.CollectionResourceState;
-import org.projectodd.restafari.spi.state.ObjectResourceState;
-import org.projectodd.restafari.spi.state.PropertyResourceState;
 import org.projectodd.restafari.spi.state.ResourceState;
 
-import java.net.URI;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * @author Bob McWhirter
  */
-class MongoCollectionResource extends MongoResource implements CollectionResource {
+class MongoCollectionResource extends MongoResource {
 
     String collectionName;
 
@@ -86,7 +78,7 @@ class MongoCollectionResource extends MongoResource implements CollectionResourc
     }
 
     @Override
-    public void create(RequestContext ctx, ResourceState state, Responder responder) {
+    public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
         DBCollection dbCollection = this.parent.getDB().getCollection(this.id);
 
         BasicDBObject basicDBObject = null;
@@ -105,72 +97,32 @@ class MongoCollectionResource extends MongoResource implements CollectionResourc
     }
 
     protected Object createObject(ResourceState resourceState) {
-        if (resourceState instanceof PropertyResourceState) {
-            PropertyResourceState pRS = (PropertyResourceState) resourceState;
-            if (pRS.value() instanceof ResourceState) {
-                return createObject((ResourceState) pRS.value());
-            } else {
-                return pRS.value();
-            }
-        } else {
-            BasicDBObject basicDBObject = new BasicDBObject();
-            // if the state already has an id set, use it here. Otherwise one will be autocreated on insert
-            String rid = resourceState.id();
-            if (rid != null) {
-                basicDBObject.append(MONGO_ID_FIELD, rid);
-            }
-
-            if (resourceState instanceof CollectionResourceState) {
-                CollectionResourceState collectionResourceState = (CollectionResourceState) resourceState;
-                List<? extends ResourceState> resourceStates = collectionResourceState.members().collect(Collectors.toList());
-                ArrayList resourceList = new ArrayList();
-                for (ResourceState state : resourceStates) {
-                    if (state.id()== null || !state.id().equals(MBAAS_ID_FIELD)) { //don't append the ID field again
-                        resourceList.add(createObject(state));
-                    }
-                }
-
-                return resourceList;
-            } else if (resourceState instanceof ObjectResourceState) {
-                ObjectResourceState objectResourceState = (ObjectResourceState) resourceState;
-                List<? extends PropertyResourceState> resourceStates = objectResourceState.members().collect(Collectors.toList());
-                for (PropertyResourceState pRS : resourceStates) {
-                    if (pRS.id()== null || !pRS.id().equals(MBAAS_ID_FIELD)) { //don't append the ID field again
-                        basicDBObject.append(pRS.id(), createObject(pRS));
-                    }
-                }
-            } else {
-                System.out.println("UNKNOWN RESOURCESTATE TYPE : " + resourceState.getClass());
-            }
-            return basicDBObject;
+        BasicDBObject basicDBObject = new BasicDBObject();
+        // if the state already has an id set, use it here. Otherwise one will be autocreated on insert
+        String rid = resourceState.id();
+        if (rid != null) {
+            basicDBObject.append(MONGO_ID_FIELD, rid);
         }
+
+        Set<String> keys = resourceState.getPropertyNames();
+
+        for (String key : keys) {
+            if (!key.equals(MBAAS_ID_FIELD)) { //don't append the ID field again
+                Object value = resourceState.getProperty( key );
+                if ( value instanceof ResourceState ) {
+                    value = createObject((ResourceState) value);
+                }
+                basicDBObject.append(key, value);
+            }
+        }
+
+        return basicDBObject;
     }
 
     @Override
-    public java.net.URI uri() {
-        List<String> segments = new ArrayList<>();
-        Resource current = this;
-
-        //current = current.parent();
-
-        if (parent instanceof MongoPropertyResource)
-        {
-            current = current.parent();
-        }
-
-        while (current != null) {
-            segments.add(0, current.id());
-            current = current.parent();
-        }
-
-        StringBuilder buf = new StringBuilder();
-
-        segments.forEach((s) -> {
-            buf.append( "/" );
-            buf.append( s );
-        });
-
-        return URI.create(buf.toString());
+    public void readProperties(RequestContext ctx, PropertySink sink) {
+        sink.accept("type", "collection");
+        sink.close();
     }
 
 }

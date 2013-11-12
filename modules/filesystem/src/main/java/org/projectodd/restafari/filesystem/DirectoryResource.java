@@ -1,11 +1,9 @@
 package org.projectodd.restafari.filesystem;
 
 import org.projectodd.restafari.spi.RequestContext;
-import org.projectodd.restafari.spi.resource.Resource;
-import org.projectodd.restafari.spi.resource.async.CollectionResource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.resource.async.ResourceSink;
 import org.projectodd.restafari.spi.resource.async.Responder;
-import org.projectodd.restafari.spi.state.ResourceState;
 import org.vertx.java.core.Vertx;
 
 import java.io.File;
@@ -15,7 +13,7 @@ import java.util.List;
 /**
  * @author Bob McWhirter
  */
-public class DirectoryResource implements FSResource, CollectionResource {
+public class DirectoryResource implements FSResource {
 
     public DirectoryResource(FSResource parent, File file) {
         this.parent = parent;
@@ -28,11 +26,6 @@ public class DirectoryResource implements FSResource, CollectionResource {
 
     public File file() {
         return this.file;
-    }
-
-    @Override
-    public void create(RequestContext ctx, ResourceState state, Responder responder) {
-        responder.createNotSupported(this);
     }
 
     @Override
@@ -105,11 +98,6 @@ public class DirectoryResource implements FSResource, CollectionResource {
                 responder.noSuchResource(id);
             }
         });
-    }
-
-    @Override
-    public void delete(RequestContext ctx, Responder responder) {
-        responder.deleteNotSupported(this);
     }
 
     public String toString() {

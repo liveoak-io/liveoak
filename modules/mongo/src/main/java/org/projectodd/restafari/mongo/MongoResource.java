@@ -2,7 +2,7 @@ package org.projectodd.restafari.mongo;
 
 import com.mongodb.*;
 import org.projectodd.restafari.spi.resource.BlockingResource;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>

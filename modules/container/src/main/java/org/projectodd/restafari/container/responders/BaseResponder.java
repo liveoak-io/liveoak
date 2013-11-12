@@ -4,7 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import org.projectodd.restafari.container.ResourceErrorResponse;
 import org.projectodd.restafari.container.ResourceRequest;
 import org.projectodd.restafari.container.ResourceResponse;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.resource.async.Responder;
 
 /**

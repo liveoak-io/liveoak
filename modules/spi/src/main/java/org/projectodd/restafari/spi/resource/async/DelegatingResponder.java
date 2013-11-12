@@ -1,7 +1,5 @@
 package org.projectodd.restafari.spi.resource.async;
 
-import org.projectodd.restafari.spi.resource.Resource;
-
 /**
  * @author Bob McWhirter
  */

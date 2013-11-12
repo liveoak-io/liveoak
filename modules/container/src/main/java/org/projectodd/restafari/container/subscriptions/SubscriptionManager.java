@@ -1,11 +1,10 @@
 package org.projectodd.restafari.container.subscriptions;
 
 import org.projectodd.restafari.spi.ResourcePath;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 /**

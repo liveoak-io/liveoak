@@ -1,11 +1,13 @@
-package org.projectodd.restafari.spi.resource;
+package org.projectodd.restafari.spi.resource.async;
 
 import org.projectodd.restafari.spi.RequestContext;
-import org.projectodd.restafari.spi.resource.async.Responder;
+import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Basic server-side representation of a resource.
@@ -69,22 +71,50 @@ public interface Resource {
     String id();
 
     /**
-     * Locate a child resource.
+     * Read the properties of this resource.
      *
-     * <p>Depending on the modelling of this resource, the child
-     * may be a member-of-a-collection, or it might be a property-of-an-object.</p>
+     * @return The read-only properties.
+     */
+    default void readProperties(RequestContext ctx, PropertySink sink) {
+        sink.close();
+    }
+
+    /** Update this object's state.
      *
-     * <p>Semantics are left to the author of the resource.</p>
-     *
-     * @param id        The child ID to readMember.
+     * @param state The inbound representation of the state.
      * @param responder To respond to the action.
      */
-    void readMember(RequestContext ctx, String id, Responder responder);
+    default void updateProperties(RequestContext ctx, ResourceState state, Responder responder) {
+        responder.updateNotSupported( this );
+    }
+
+    /** Create a new child resource of this collection.
+     *
+     * @param state The state for the child, which may include an ID.
+     * @param responder To respond to the action.
+     */
+    default void createMember(RequestContext ctx, ResourceState state, Responder responder) {
+        responder.createNotSupported( this );
+    }
+
+    /** Write the members of this object to the provided sink.
+     *
+     * @param sink The sink to stream members to.
+     */
+    default void readMembers(RequestContext ctx, ResourceSink sink) {
+        sink.close();
+    }
+
+    default void readMember(RequestContext ctx, String id, Responder responder) {
+        responder.noSuchResource( id );
+    }
 
     /**
      * Delete this resource.
      *
      * @param responder To respond to the action.
      */
-    void delete(RequestContext ctx, Responder responder);
+    default void delete(RequestContext ctx, Responder responder) {
+        responder.deleteNotSupported( this );
+    }
 }

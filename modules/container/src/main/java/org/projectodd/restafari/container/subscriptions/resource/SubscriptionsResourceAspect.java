@@ -2,8 +2,7 @@ package org.projectodd.restafari.container.subscriptions.resource;
 
 import org.projectodd.restafari.container.aspects.ResourceAspect;
 import org.projectodd.restafari.container.subscriptions.SubscriptionManager;
-import org.projectodd.restafari.spi.resource.Resource;
-import org.projectodd.restafari.spi.resource.async.SimplePropertyResource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 
 /**
  * @author Bob McWhirter

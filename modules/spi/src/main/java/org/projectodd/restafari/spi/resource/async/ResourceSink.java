@@ -1,7 +1,5 @@
 package org.projectodd.restafari.spi.resource.async;
 
-import org.projectodd.restafari.spi.resource.Resource;
-
 import java.util.function.Consumer;
 
 /** A sink to accept children of a resource when reading.

@@ -1,7 +1,7 @@
 package org.projectodd.restafari.vertx.resource;
 
 import org.projectodd.restafari.spi.RequestContext;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.resource.async.Responder;
 import org.vertx.java.core.Vertx;
 

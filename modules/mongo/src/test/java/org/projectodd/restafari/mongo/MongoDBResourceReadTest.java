@@ -26,10 +26,9 @@ import org.bson.types.ObjectId;
 import org.junit.Test;
 
 import java.net.URLEncoder;
+import static org.fest.assertions.Assertions.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -56,11 +55,10 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
         JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
 
-        assertEquals(4, jsonNode.size()); // id, _self, bar
         assertEquals(id, jsonNode.get("id").asText());
         assertEquals("bar", jsonNode.get("foo").asText());
-        assertNotNull(jsonNode.get("_self"));
-        assertEquals("/storage/testSimpleGet/" + id, jsonNode.get("_self").get("href").asText());
+        assertNotNull(jsonNode.get("self"));
+        assertEquals("/storage/testSimpleGet/" + id, jsonNode.get("self").get("href").asText());
     }
 
     @Test
@@ -85,7 +83,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
     @Test
     public void testGetEmptyCollection() throws Exception {
-        String methodName = "testEmtpyCollection";
+        String methodName = "testEmptyCollection";
         // check that the collection really is empty
         assertFalse(db.collectionExists(methodName));
 
@@ -101,10 +99,10 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
 
-        assertEquals(4, jsonNode.size()); // id, _self, members, _subscriptions
+        //assertEquals(4, jsonNode.size()); // id, _self, members, _subscriptions
         assertEquals(methodName, jsonNode.get("id").asText());
-        assertEquals("{\"href\":\"/storage/testEmtpyCollection\",\"type\":\"collection\"}", jsonNode.get("_self").toString());
-        assertEquals("[]", jsonNode.get("content").toString());
+        assertThat( jsonNode.get( "self" ).get( "href" ).asText() ).isEqualTo( "/storage/testEmptyCollection" );
+        assertNull(jsonNode.get("_members" ) );
 
         // check that the collection is still empty
         assertEquals(0, db.getCollection(methodName).getCount());
@@ -130,7 +128,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         // verify response
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
-        JsonNode content = jsonNode.get("content");
+        JsonNode content = jsonNode.get("_members");
 
         assertEquals("20 collections limit check", 20, content.size());
         assertEquals("Check first collection is collection0000", "collection0000", content.get(0).get("id").asText());
@@ -144,7 +142,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         // verify response
         mapper = new ObjectMapper();
         jsonNode = mapper.readTree(response.getEntity().getContent());
-        content = jsonNode.get("content");
+        content = jsonNode.get("_members");
 
         assertEquals("Last 3 collections limit check", 3, content.size());
         assertEquals("Check first collection is collection1010", "collection1010", content.get(0).get("id").asText());
@@ -186,7 +184,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         // verify response
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
-        JsonNode content = jsonNode.get("content");
+        JsonNode content = jsonNode.get("_members");
 
         assertEquals("Number of items check", 2, content.size());
         assertEquals("Check first item is Hans", "Hans", content.get(0).get("name").asText());
@@ -202,7 +200,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         // verify response
         mapper = new ObjectMapper();
         jsonNode = mapper.readTree(response.getEntity().getContent());
-        content = jsonNode.get("content");
+        content = jsonNode.get("_members");
 
         assertEquals("Number of items check", 2, content.size());
         assertEquals("Check first item is John", "John", content.get(0).get("name").asText());

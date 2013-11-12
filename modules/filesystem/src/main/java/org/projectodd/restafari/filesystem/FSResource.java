@@ -1,6 +1,6 @@
 package org.projectodd.restafari.filesystem;
 
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.vertx.java.core.Vertx;
 
 import java.io.File;

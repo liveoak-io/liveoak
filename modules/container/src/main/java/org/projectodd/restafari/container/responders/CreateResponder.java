@@ -3,8 +3,7 @@ package org.projectodd.restafari.container.responders;
 import io.netty.channel.ChannelHandlerContext;
 import org.projectodd.restafari.container.ResourceRequest;
 import org.projectodd.restafari.container.aspects.ResourceAspectManager;
-import org.projectodd.restafari.spi.resource.async.CollectionResource;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 
 import java.util.concurrent.Executor;
 
@@ -19,11 +18,7 @@ public class CreateResponder extends TraversingResponder {
 
     @Override
     public void perform(Resource resource) {
-        if ( resource instanceof CollectionResource ) {
-            ((CollectionResource) resource).create( inReplyTo().requestContext(), inReplyTo().state(), createBaseResponder() );
-        } else {
-            this.createNotSupported( resource );
-        }
+            resource.createMember( inReplyTo().requestContext(), inReplyTo().state(), createBaseResponder() );
     }
 
 }

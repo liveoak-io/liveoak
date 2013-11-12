@@ -10,9 +10,8 @@ import org.projectodd.restafari.container.codec.EncodingResult;
 import org.projectodd.restafari.container.codec.IncompatibleMediaTypeException;
 import org.projectodd.restafari.container.codec.MediaTypeMatcher;
 import org.projectodd.restafari.container.codec.ResourceCodecManager;
-import org.projectodd.restafari.spi.MediaType;
 import org.projectodd.restafari.spi.RequestContext;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 
 import java.util.List;
 

@@ -1,23 +1,18 @@
 package org.projectodd.restafari.container;
 
 import org.projectodd.restafari.spi.RequestContext;
-import org.projectodd.restafari.spi.resource.Resource;
-import org.projectodd.restafari.spi.resource.async.ObjectResource;
-import org.projectodd.restafari.spi.resource.async.ResourceSink;
+import org.projectodd.restafari.spi.resource.BlockingResource;
+import org.projectodd.restafari.spi.resource.async.PropertySink;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.resource.async.Responder;
-import org.projectodd.restafari.spi.resource.async.SimplePropertyResource;
-import org.projectodd.restafari.spi.state.ObjectResourceState;
-import org.projectodd.restafari.spi.state.PropertyResourceState;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.projectodd.restafari.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
  */
-public class InMemoryObjectResource implements ObjectResource {
+public class InMemoryObjectResource implements Resource, BlockingResource {
 
-    public InMemoryObjectResource(InMemoryCollectionResource parent, String id, ObjectResourceState state) {
+    public InMemoryObjectResource(InMemoryCollectionResource parent, String id, ResourceState state) {
         this.parent = parent;
         this.id = id;
         this.state = state;
@@ -31,24 +26,8 @@ public class InMemoryObjectResource implements ObjectResource {
         return this.id;
     }
 
-    public ObjectResourceState state() {
+    public ResourceState state() {
         return state;
-    }
-
-    @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
-        boolean found = false;
-
-        List<PropertyResourceState> result = state.members().collect(Collectors.toList());
-
-        for ( PropertyResourceState each : result ) {
-            if ( each.id().equals( id ) ) {
-                responder.resourceRead( new SimplePropertyResource( this, each.id(), each.value() ) );
-                return;
-            }
-        }
-
-        responder.noSuchResource( id );
     }
 
     @Override
@@ -58,21 +37,17 @@ public class InMemoryObjectResource implements ObjectResource {
     }
 
     @Override
-    public void update(RequestContext ctx, ObjectResourceState state, Responder responder) {
-        this.state = state;
-        responder.resourceUpdated(this);
+    public void readProperties(RequestContext ctx, PropertySink sink) {
+        for ( String name : this.state.getPropertyNames() ) {
+            sink.accept( name, this.state.getProperty( name ) );
+        }
+        sink.close();
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
-        this.state.members().forEach((prop) -> {
-            sink.accept( new SimplePropertyResource(this, prop.id(), prop.value() ) );
-        });
-        try {
-            sink.close();
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) {
+        this.state = state;
+        responder.resourceUpdated(this);
     }
 
     public String toString() {
@@ -81,6 +56,6 @@ public class InMemoryObjectResource implements ObjectResource {
 
     private InMemoryCollectionResource parent;
     private String id;
-    private ObjectResourceState state;
+    private ResourceState state;
 
 }

@@ -1,28 +1,29 @@
 package org.projectodd.restafari.container;
 
-import org.projectodd.restafari.container.codec.DefaultPropertyResourceState;
 import org.projectodd.restafari.spi.ReturnFields;
-import org.projectodd.restafari.spi.state.ObjectResourceState;
-import org.projectodd.restafari.spi.state.PropertyResourceState;
+import org.projectodd.restafari.spi.state.ResourceState;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class FilteredObjectResourceState implements ObjectResourceState {
+public class FilteredObjectResourceState implements ResourceState {
 
-    private final ObjectResourceState delegate;
+    private final ResourceState delegate;
     private final ReturnFields filter;
 
-    public FilteredObjectResourceState(ObjectResourceState delegate, ReturnFields filter) {
+    public FilteredObjectResourceState(ResourceState delegate, ReturnFields filter) {
         this.delegate = delegate;
         this.filter = filter;
     }
 
     @Override
-    public void addProperty(String name, Object value) {
-        delegate.addProperty(name, value);
+    public void putProperty(String name, Object value) {
+        delegate.putProperty(name, value);
     }
 
     @Override
@@ -37,34 +38,38 @@ public class FilteredObjectResourceState implements ObjectResourceState {
         }
 
         ReturnFields childFilter = filter.child(name);
-        if (childFilter != null && val instanceof ObjectResourceState) {
-            val = new FilteredObjectResourceState((ObjectResourceState) val, childFilter);
+        if (childFilter != null && val instanceof ResourceState) {
+            val = new FilteredObjectResourceState((ResourceState) val, childFilter);
         }
         return val;
     }
 
     @Override
-    public Stream<? extends PropertyResourceState> members() {
-        Stream<? extends PropertyResourceState> stream = delegate.members();
-        stream = stream.flatMap((o) -> {
-            if (filter != null && !filter.included(o.id())) {
-                return null;
+    public Set<String> getPropertyNames() {
+        Set<String> filteredNames = new HashSet<>();
+
+        Set<String> names = delegate.getPropertyNames();
+        for( String name : names ) {
+            if ( filter == null ) {
+                filteredNames.add( name );
             }
 
-            Object val = o.value();
-            if (val == null) {
-                return Stream.of(o);
+            if ( filter.included( name ) ) {
+                filteredNames.add( name );
             }
+        }
 
-            ReturnFields childFilter = filter.child(o.id());
-            if (childFilter != null && val instanceof ObjectResourceState) {
-                val = new FilteredObjectResourceState((ObjectResourceState) val, childFilter);
-                return Stream.of(new DefaultPropertyResourceState(o.id(), val));
-            }
-            return Stream.of(o);
-        });
+        return filteredNames;
+    }
 
-        return stream;
+    @Override
+    public void addMember(ResourceState member) {
+        delegate.addMember( member );
+    }
+
+    @Override
+    public List<ResourceState> members() {
+        return delegate.members();
     }
 
     @Override

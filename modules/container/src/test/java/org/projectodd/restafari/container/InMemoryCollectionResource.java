@@ -1,10 +1,8 @@
 package org.projectodd.restafari.container;
 
 import org.projectodd.restafari.spi.*;
-import org.projectodd.restafari.spi.resource.Resource;
+import org.projectodd.restafari.spi.resource.async.Resource;
 import org.projectodd.restafari.spi.resource.async.*;
-import org.projectodd.restafari.spi.state.CollectionResourceState;
-import org.projectodd.restafari.spi.state.ObjectResourceState;
 import org.projectodd.restafari.spi.state.ResourceState;
 
 import java.util.Collection;
@@ -16,7 +14,7 @@ import java.util.stream.Stream;
 /**
  * @author Bob McWhirter
  */
-public class InMemoryCollectionResource implements CollectionResource {
+public class InMemoryCollectionResource implements Resource {
 
     public InMemoryCollectionResource(InMemoryCollectionResource parent, String id) {
         this.parent = parent;
@@ -43,19 +41,24 @@ public class InMemoryCollectionResource implements CollectionResource {
     }
 
     @Override
-    public void create(RequestContext ctx, ResourceState state, Responder responder) {
+    public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
         String id = state.id();
         if (id == null) {
             id = UUID.randomUUID().toString();
         }
 
-        if (state instanceof ObjectResourceState) {
-            ObjectResource r = new InMemoryObjectResource(this, id, (ObjectResourceState) state);
+        System.err.println( "create with id: " + id );
+        System.err.println( " state: " + state );
+
+        if ( state.getProperty( "type" ) != null && state.getProperty( "type" ).equals( "collection" ) ) {
+            Resource r = new InMemoryCollectionResource(this, id);
             this.collection.put(id, r);
+            System.err.println( "created collection" );
             responder.resourceCreated(r);
-        } else if (state instanceof CollectionResourceState) {
-            CollectionResource r = new InMemoryCollectionResource(this, id);
+        } else if (state instanceof ResourceState) {
+            Resource r = new InMemoryObjectResource(this, id, state);
             this.collection.put(id, r);
+            System.err.println( "created object" );
             responder.resourceCreated(r);
         }
     }
