@@ -11,7 +11,7 @@ import org.projectodd.restafari.spi.RequestContext;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class TokenManagerImpl implements TokenManager {
+public class DefaultTokenManager implements TokenManager {
 
     @Override
     public AuthToken getAndValidateToken(RequestContext reqContext) throws TokenValidationException {
@@ -19,7 +19,7 @@ public class TokenManagerImpl implements TokenManager {
 
         if (internalToken != null) {
             validateToken(reqContext, internalToken);
-            return new AuthTokenImpl(internalToken);
+            return new DefaultAuthToken(internalToken);
         } else {
             return AuthToken.ANONYMOUS_TOKEN;
         }

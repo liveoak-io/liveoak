@@ -9,11 +9,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.projectodd.restafari.security.impl.AuthConstants;
 import org.projectodd.restafari.security.impl.AuthServicesHolder;
-import org.projectodd.restafari.security.impl.AuthTokenImpl;
+import org.projectodd.restafari.security.impl.DefaultAuthToken;
 import org.projectodd.restafari.security.spi.AuthToken;
 import org.projectodd.restafari.security.spi.AuthorizationRequestContext;
 import org.projectodd.restafari.security.spi.AuthorizationService;
-import org.projectodd.restafari.security.impl.JsonWebToken;
 import org.projectodd.restafari.spi.RequestContext;
 import org.projectodd.restafari.spi.RequestType;
 import org.projectodd.restafari.spi.ResourcePath;
@@ -82,7 +81,7 @@ public class AuthorizationServiceTest {
         Map<String, Set<String>> appRolesMap = new HashMap<>();
         appRolesMap.put(AuthConstants.DEFAULT_APPLICATION_NAME, arrayToSet(appRoles));
 
-        AuthToken authToken = new AuthTokenImpl(null, null, null, 0, 0, 0, null, realmRolesSet, appRolesMap);
+        AuthToken authToken = new DefaultAuthToken(null, null, null, 0, 0, 0, null, realmRolesSet, appRolesMap);
         return new AuthorizationRequestContext(authToken, reqContext);
     }
 

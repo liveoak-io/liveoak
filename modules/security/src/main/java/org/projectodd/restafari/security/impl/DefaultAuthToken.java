@@ -10,7 +10,7 @@ import org.projectodd.restafari.security.spi.AuthToken;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class AuthTokenImpl implements AuthToken {
+public class DefaultAuthToken implements AuthToken {
 
     private final String username;
     private final String realmName;
@@ -22,8 +22,8 @@ public class AuthTokenImpl implements AuthToken {
     private final Set<String> realmRoles;
     private final Map<String, Set<String>> applicationRolesMap;
 
-    public AuthTokenImpl(String username, String realmName, String applicationName, long expiration, long notBefore, long issuedAt,
-                         String issuer, Set<String> realmRoles, Map<String, Set<String>> applicationRolesMap) {
+    public DefaultAuthToken(String username, String realmName, String applicationName, long expiration, long notBefore, long issuedAt,
+                            String issuer, Set<String> realmRoles, Map<String, Set<String>> applicationRolesMap) {
         this.username = username;
         this.realmName = realmName;
         this.applicationName = applicationName;
@@ -35,7 +35,7 @@ public class AuthTokenImpl implements AuthToken {
         this.applicationRolesMap = applicationRolesMap;
     }
 
-    public AuthTokenImpl(JsonWebToken internalToken) {
+    public DefaultAuthToken(JsonWebToken internalToken) {
         JsonWebToken.Claims claims = internalToken.getClaims();
         this.username = claims.getSubject();
         this.realmName = claims.getAudience();

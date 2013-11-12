@@ -1,8 +1,6 @@
 package org.projectodd.restafari.security.impl;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.projectodd.restafari.security.spi.ApplicationIdResolver;
@@ -41,7 +39,7 @@ public class AuthServicesHolder {
     private AuthServicesHolder() {
         this.authorizationService = new PolicyBasedAuthorizationService();
         this.authPersister = new InMemoryAuthPersister();
-        this.tokenManager = new TokenManagerImpl();
+        this.tokenManager = new DefaultTokenManager();
         this.applicationIdResolver = (resourceReq) -> AuthConstants.DEFAULT_APP_ID;
 
         // Register default loaders
@@ -88,7 +86,7 @@ public class AuthServicesHolder {
 
     public void registerDefaultPolicies() {
         // Register simple demo policy as default one
-        AuthorizationPolicy simplePolicy = loadPolicy("org.projectodd.restafari.security.policy.uri.DemoAuthorizationPolicy");
+        AuthorizationPolicy simplePolicy = loadPolicy("org.projectodd.restafari.security.policy.uri.simple.DemoSimpleURIPolicy");
         AuthorizationPolicyEntry policyEntry = new AuthorizationPolicyEntry("someId", simplePolicy);
         policyEntry.addIncludedResourcePrefix(new ResourcePath());
 
