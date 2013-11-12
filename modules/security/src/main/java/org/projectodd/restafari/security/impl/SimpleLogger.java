@@ -44,7 +44,7 @@ public class SimpleLogger {
         log("ERROR", message, System.err);
     }
 
-    public void error(String message, Exception e) {
+    public void error(String message, Throwable e) {
         log("ERROR", message, System.err);
         e.printStackTrace();
     }

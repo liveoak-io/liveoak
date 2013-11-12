@@ -17,10 +17,12 @@ public class AuthTestRequestContext implements RequestContext {
 
     private final RequestType reqType;
     private final ResourcePath resourcePath;
+    private final ResourceParams resourceParams;
 
-    public AuthTestRequestContext(RequestType reqType, ResourcePath resourcePath) {
+    public AuthTestRequestContext(RequestType reqType, ResourcePath resourcePath, ResourceParams resourceParams) {
         this.reqType = reqType;
         this.resourcePath = resourcePath;
+        this.resourceParams = resourceParams;
     }
 
     @Override
@@ -45,7 +47,7 @@ public class AuthTestRequestContext implements RequestContext {
 
     @Override
     public ResourceParams getResourceParams() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return resourceParams;
     }
 
     @Override

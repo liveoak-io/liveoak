@@ -105,4 +105,13 @@ public class DefaultAuthToken implements AuthToken {
     public Map<String, Set<String>> getApplicationRolesMap() {
         return applicationRolesMap;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("DefaultAuthToken [ username=").append(username)
+                .append(", realmRoles=").append(realmRoles)
+                .append(", applicationRoles=").append(applicationRolesMap)
+                .append(" ]")
+                .toString();
+    }
 }

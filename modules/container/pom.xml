@@ -29,12 +29,28 @@
       <artifactId>restafari-security</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!-- TODO: Possibly remove policy implementations later from this and from module.xml -->
+    <!-- TODO: Possibly remove policy implementations and drools later from this and from module.xml -->
     <dependency>
       <groupId>org.projectodd.restafari</groupId>
       <artifactId>restafari-security-uripolicy</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-compiler</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-templates</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.janino</groupId>
+      <artifactId>janino</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-all</artifactId>

@@ -26,7 +26,7 @@ public class RolesContainer {
 
     public RolesContainer addAllowedRealmRole(String roleName) {
         if (allowedRealmRoles == null) {
-            allowedRealmRoles = new HashSet<String>();
+            allowedRealmRoles = new HashSet<>();
         }
         allowedRealmRoles.add(roleName);
         return this;
@@ -34,7 +34,7 @@ public class RolesContainer {
 
     public RolesContainer addAllowedApplicationRole(String roleName) {
         if (allowedApplicationRoles == null) {
-            allowedApplicationRoles = new HashSet<String>();
+            allowedApplicationRoles = new HashSet<>();
         }
         allowedApplicationRoles.add(roleName);
         return this;
@@ -42,7 +42,7 @@ public class RolesContainer {
 
     public RolesContainer addDeniedRealmRole(String roleName) {
         if (deniedRealmRoles == null) {
-            deniedRealmRoles = new HashSet<String>();
+            deniedRealmRoles = new HashSet<>();
         }
         deniedRealmRoles.add(roleName);
         return this;
@@ -50,7 +50,7 @@ public class RolesContainer {
 
     public RolesContainer addDeniedApplicationRole(String roleName) {
         if (deniedApplicationRoles == null) {
-            deniedApplicationRoles = new HashSet<String>();
+            deniedApplicationRoles = new HashSet<>();
         }
         deniedApplicationRoles.add(roleName);
         return this;
@@ -58,7 +58,7 @@ public class RolesContainer {
 
     public RolesContainer addAllowedUser(String username) {
         if (allowedUsers == null) {
-            allowedUsers = new HashSet<String>();
+            allowedUsers = new HashSet<>();
         }
         allowedUsers.add(username);
         return this;
@@ -66,7 +66,7 @@ public class RolesContainer {
 
     public RolesContainer addDeniedUser(String username) {
         if (deniedUsers == null) {
-            deniedUsers = new HashSet<String>();
+            deniedUsers = new HashSet<>();
         }
         deniedUsers.add(username);
         return this;
@@ -74,7 +74,7 @@ public class RolesContainer {
 
     public RolesContainer addAllAllowedRealmRoles(Collection<String> coll) {
         if (allowedRealmRoles == null) {
-            allowedRealmRoles = new HashSet<String>();
+            allowedRealmRoles = new HashSet<>();
         }
         allowedRealmRoles.addAll(coll);
         return this;
@@ -82,7 +82,7 @@ public class RolesContainer {
 
     public RolesContainer addAllAllowedApplicationRoles(Collection<String> coll) {
         if (allowedApplicationRoles == null) {
-            allowedApplicationRoles = new HashSet<String>();
+            allowedApplicationRoles = new HashSet<>();
         }
         allowedApplicationRoles.addAll(coll);
         return this;
@@ -90,7 +90,7 @@ public class RolesContainer {
 
     public RolesContainer addAllDeniedRealmRoles(Collection<String> coll) {
         if (deniedRealmRoles == null) {
-            deniedRealmRoles = new HashSet<String>();
+            deniedRealmRoles = new HashSet<>();
         }
         deniedRealmRoles.addAll(coll);
         return this;
@@ -98,7 +98,7 @@ public class RolesContainer {
 
     public RolesContainer addAllDeniedApplicationRoles(Collection<String> coll) {
         if (deniedApplicationRoles == null) {
-            deniedApplicationRoles = new HashSet<String>();
+            deniedApplicationRoles = new HashSet<>();
         }
         deniedApplicationRoles.addAll(coll);
         return this;
@@ -106,7 +106,7 @@ public class RolesContainer {
 
     public RolesContainer addAllAllowedUsers(Collection<String> coll) {
         if (allowedUsers == null) {
-            allowedUsers = new HashSet<String>();
+            allowedUsers = new HashSet<>();
         }
         allowedUsers.addAll(coll);
         return this;
@@ -114,7 +114,7 @@ public class RolesContainer {
 
     public RolesContainer addAllDeniedUsers(Collection<String> coll) {
         if (deniedUsers == null) {
-            deniedUsers = new HashSet<String>();
+            deniedUsers = new HashSet<>();
         }
         deniedUsers.addAll(coll);
         return this;

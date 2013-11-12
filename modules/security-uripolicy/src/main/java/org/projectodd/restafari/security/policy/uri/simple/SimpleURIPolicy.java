@@ -50,6 +50,12 @@ public class SimpleURIPolicy implements AuthorizationPolicy {
 
     private RecursiveHashMap permissions = new RecursiveHashMap(null);
 
+
+    @Override
+    public void init() {
+        // Empty by default
+    }
+
     @Override
     public AuthorizationDecision isAuthorized(AuthorizationRequestContext authRequestContext) {
         RequestContext req = authRequestContext.getRequestContext();

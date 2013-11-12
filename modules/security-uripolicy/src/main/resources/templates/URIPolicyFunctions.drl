@@ -1,0 +1,73 @@
+package org.projectodd.restafari.security.policy.uri.complex;
+
+import org.projectodd.restafari.security.policy.uri.complex.RulesProcessingResult;
+import org.projectodd.restafari.security.policy.uri.complex.URIMatcher;
+import org.projectodd.restafari.security.policy.uri.complex.RequestContextDecorator;
+import org.projectodd.restafari.security.spi.AuthorizationDecision;
+import org.projectodd.restafari.security.spi.AuthToken;
+import org.projectodd.restafari.spi.RequestType;
+import org.projectodd.restafari.spi.ResourcePath;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+dialect "mvel"
+
+function boolean uriMatches(String ruleName, String regex, ResourcePath resourcePath, URIMatcher uriMatcher) {
+  if (uriMatcher.isProcessed()) {
+    return uriMatcher.isMatched();
+  }
+
+  String textToMatch = resourcePath.toString();
+  Pattern p = Pattern.compile(regex);
+  Matcher m = p.matcher(textToMatch);
+
+  if (m.find()) {
+    uriMatcher.setMatched(true);
+
+    for (int i=0 ; i<=m.groupCount() ; i++) {
+      uriMatcher.addGroup(m.group(i));
+    }
+  } else {
+    uriMatcher.setMatched(false);
+  }
+
+  uriMatcher.setProcessed(true);
+  System.out.println("Checking URI regex for rule " + ruleName + ". regex: " + regex + ", textToMatch: " + textToMatch
+      + ", result: " + uriMatcher);
+
+  return uriMatcher.isMatched();
+}
+
+
+function boolean requestConditionsMatches(String ruleName, boolean result) {
+  System.out.println("Checking params condition for rule: " + ruleName + ", result: " + result);
+  return result;
+}
+
+
+function boolean requestTypeMatches(String ruleName, RequestType reqType, String allowedTypes) {
+  boolean result = allowedTypes.contains(reqType.name());
+  System.out.println("Checking requestType for rule " + ruleName + ". Incoming requestType: " + reqType
+      + ", allowedTypes: " + allowedTypes + ", result: " + result);
+
+  return result;
+}
+
+
+function String any(Collection items) {
+  String rulesProcessingResult = "";
+  boolean first=true;
+  Iterator iterator = items.iterator();
+  while (iterator.hasNext()) {
+      String item = (String)(iterator.next());
+      if (first) {
+        rulesProcessingResult = item;
+        first = false;
+      } else {
+        rulesProcessingResult = rulesProcessingResult + "|" + item;
+      }
+  }
+  return rulesProcessingResult;
+}

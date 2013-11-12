@@ -23,40 +23,50 @@ import org.projectodd.restafari.spi.SecurityContext;
  */
 public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRequest> {
 
+    // TODO: replace with real logging
+    private static final SimpleLogger log = new SimpleLogger(AuthorizationHandler.class);
+
     // TODO: Should be removed...
     static {
-        AuthServicesHolder.getInstance().registerClassloader(AuthorizationHandler.class.getClassLoader());
-        AuthServicesHolder.getInstance().registerDefaultPolicies();
+        try {
+            AuthServicesHolder.getInstance().registerClassloader(AuthorizationHandler.class.getClassLoader());
+            AuthServicesHolder.getInstance().registerDefaultPolicies();
+        } catch (Throwable e) {
+            log.error("Error occured during initialization of AuthorizationService", e);
+            throw e;
+        }
     }
-
-    // TODO: replace with real logging
-    private final SimpleLogger log = new SimpleLogger(AuthorizationHandler.class);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResourceRequest req) throws Exception {
-        AuthToken token;
-        AuthorizationService authService = AuthServicesHolder.getInstance().getAuthorizationService();
-        TokenManager tokenManager = AuthServicesHolder.getInstance().getTokenManager();
-        RequestContext reqContext = req.requestContext();
-
         try {
-            token = tokenManager.getAndValidateToken(reqContext);
-        } catch (TokenValidationException e) {
-            String message = "Error when obtaining token: " + e.getMessage();
-            log.warn(message);
-            if (log.isTraceEnabled()) {
-                log.trace(message, e);
+            AuthToken token;
+            AuthorizationService authService = AuthServicesHolder.getInstance().getAuthorizationService();
+            TokenManager tokenManager = AuthServicesHolder.getInstance().getTokenManager();
+            RequestContext reqContext = req.requestContext();
+
+            try {
+                token = tokenManager.getAndValidateToken(reqContext);
+            } catch (TokenValidationException e) {
+                String message = "Error when obtaining token: " + e.getMessage();
+                log.warn(message);
+                if (log.isTraceEnabled()) {
+                    log.trace(message, e);
+                }
+
+                sendAuthorizationError(ctx, req);
+                return;
             }
 
-            sendAuthorizationError(ctx, req);
-            return;
-        }
-
-        if (authService.isAuthorized(new AuthorizationRequestContext(token, reqContext))) {
-            establishSecurityContext(token, reqContext);
-            ctx.fireChannelRead(req);
-        } else {
-            sendAuthorizationError(ctx, req);
+            if (authService.isAuthorized(new AuthorizationRequestContext(token, reqContext))) {
+                establishSecurityContext(token, reqContext);
+                ctx.fireChannelRead(req);
+            } else {
+                sendAuthorizationError(ctx, req);
+            }
+        } catch (Throwable e) {
+            log.error("Exception occured in AuthorizationService check", e);
+            throw e;
         }
     }
 
@@ -72,5 +82,11 @@ public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRe
         } else {
             log.warn("Can't establish securityContext to RequestContext " + reqContext);
         }
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        super.exceptionCaught(ctx, cause);
     }
 }

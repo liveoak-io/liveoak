@@ -25,6 +25,8 @@
     <junit.version>4.11</junit.version>
     <mockito.version>1.8.5</mockito.version>
     <fest.version>1.4</fest.version>
+    <drools.version>5.6.0.CR1</drools.version>
+    <janino.version>2.5.16</janino.version>
   </properties>
   <modules>
     <module>support/module-assembly</module>
@@ -116,6 +118,21 @@
         <groupId>org.quartz-scheduler</groupId>
         <artifactId>quartz</artifactId>
         <version>${quartz.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-compiler</artifactId>
+        <version>${drools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-templates</artifactId>
+        <version>${drools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.janino</groupId>
+        <artifactId>janino</artifactId>
+        <version>${janino.version}</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>

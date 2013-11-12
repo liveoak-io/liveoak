@@ -4,11 +4,14 @@ import org.projectodd.restafari.security.policy.uri.RolesContainer;
 import org.projectodd.restafari.spi.RequestType;
 
 /**
+ * Demo policy with pre-configured rules for testing purposes
+ *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public class DemoSimpleURIPolicy extends SimpleURIPolicy {
 
-    public DemoSimpleURIPolicy() {
+    @Override
+    public void init() {
         // Everything is allowed, unless specially configured
         addRolePolicy("*", "*", "*", "*", ALLOW_ALL_ROLES_CONTAINER);
 
