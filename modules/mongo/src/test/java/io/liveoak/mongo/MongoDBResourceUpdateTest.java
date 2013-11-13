@@ -16,26 +16,27 @@
 
 package io.liveoak.mongo;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import org.apache.http.client.methods.CloseableHttpResponse;
+import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceState;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
+public class MongoDBResourceUpdateTest extends NewBaseMongoDBTest {
 
     @Test
     public void testSimpleUpdate() throws Exception {
         String methodName = "testSimpleDelete";
-        assertEquals(0, db.getCollection(methodName).getCount());
+        assertThat(db.getCollection(methodName).getCount()).isEqualTo(0);
 
         // create the object using the mongo driver directly
         BasicDBObject object = new BasicDBObject();
@@ -44,21 +45,20 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         assertEquals(1, db.getCollection(methodName).getCount());
         String id = object.getObjectId("_id").toString();
 
-        // now update the object
-        CloseableHttpResponse response = testSimplePutMethod(baseURL + "/" + methodName + "/" + id, "{\"foo\":\"baz\"}");
-        assertEquals(200, response.getStatusLine().getStatusCode());
+        // update the resource using the connector.update method
+        ResourceState resourceState = new DefaultResourceState();
+        resourceState.putProperty("foo", "baz");
 
-        // verify response
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
+        ResourceState result = connector.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id, resourceState);
 
-        assertEquals(id, jsonNode.get("id").asText());
-        assertEquals("baz", jsonNode.get("foo").asText());
-        assertNotNull(jsonNode.get("self"));
-        assertEquals("/storage/testSimpleDelete/" + id, jsonNode.get("self").get("href").asText());
+        // verify the result
+        // NOTE: if the connector returned a resource state instead of a resource, it would be much easier to test here...
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo(id);
+        assertThat(result.getProperty("foo")).isEqualTo("baz");
 
         // verify db content
-        assertEquals(1, db.getCollection(methodName).getCount());
+        assertThat(db.getCollection(methodName).getCount()).isEqualTo(1);
         DBObject dbObject = db.getCollection(methodName).findOne();
         assertEquals("baz", dbObject.get("foo"));
         assertEquals(new ObjectId(id), dbObject.get("_id"));

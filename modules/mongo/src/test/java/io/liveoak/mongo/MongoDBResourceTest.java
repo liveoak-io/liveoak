@@ -2,6 +2,9 @@ package io.liveoak.mongo;
 
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
+import io.liveoak.container.DefaultContainer;
+import io.liveoak.container.SimpleConfig;
+import io.liveoak.container.UnsecureServer;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -14,14 +17,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import io.liveoak.container.DefaultContainer;
-import io.liveoak.container.SimpleConfig;
-import io.liveoak.container.UnsecureServer;
 
 import java.util.UUID;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>

@@ -2,6 +2,9 @@ package io.liveoak.mongo;
 
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
+import io.liveoak.container.DefaultContainer;
+import io.liveoak.container.SimpleConfig;
+import io.liveoak.container.UnsecureServer;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.ContentType;
@@ -10,14 +13,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import io.liveoak.container.DefaultContainer;
-import io.liveoak.container.SimpleConfig;
-import io.liveoak.container.UnsecureServer;
 
 import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created with IntelliJ IDEA.

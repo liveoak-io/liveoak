@@ -1,9 +1,9 @@
 package io.liveoak.mongo;
 
-import com.mongodb.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
-import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
@@ -14,27 +14,26 @@ import java.util.Set;
  */
 public class MongoObjectResource extends MongoResource {
 
-    public MongoObjectResource(MongoResource parent, DBObject dbObject) {
-        super(parent, dbObject);
+    private DBObject dbObject;
+    private String id;
+
+    public MongoObjectResource(MongoResource parent, DBObject dbObject, String id) {
+        super(parent);
+        this.dbObject = dbObject;
+        this.id = id;
     }
 
     @Override
-    public Resource parent() {
-        return this.parent;
-    }
-
-    @Override
-    public String id() {
-        if (this.dbObject instanceof BasicDBObject) {
-            Object candidateId = this.dbObject.get(MONGO_ID_FIELD);
-            if (candidateId == null) {
-                return this.parent().id();
+    public void readMember(RequestContext ctx, String id, Responder responder) {
+        Object object = this.dbObject.get(id);
+        if (object != null) {
+            if (object instanceof BasicDBObject) {
+               responder.resourceRead(new MongoObjectResource(this, (DBObject) object, id));
+            } else {
+                responder.internalError("ERROR: Object type (" + object.getClass() + ") not recognized");
             }
-            return candidateId.toString();
-        } else if (this.dbObject instanceof BasicDBList) {
-            return null;
         } else {
-            return null;
+            responder.noSuchResource(id);
         }
     }
 
@@ -45,7 +44,7 @@ public class MongoObjectResource extends MongoResource {
             if (!key.equals(MONGO_ID_FIELD) && !key.equals(MBAAS_ID_FIELD)) {
                 Object value = this.dbObject.get(key);
                 if (value instanceof BasicDBObject) {
-                    value = new MongoObjectResource(this, (DBObject) value);
+                    value = new MongoObjectResource(this, (DBObject) value, key);
                 }
                 sink.accept(key, value);
             }
@@ -61,27 +60,39 @@ public class MongoObjectResource extends MongoResource {
             }
         } );
 
-        this.parent.getDB().getCollection(parent.id()).update(new BasicDBObject().append(MONGO_ID_FIELD, this.dbObject.get(MONGO_ID_FIELD)), this.dbObject);
+        this.parent.updateChild(ctx, this.id(), this.dbObject);
 
         responder.resourceUpdated(this);
     }
 
     @Override
     public void delete(RequestContext ctx, Responder responder) {
-        DB db = parent.getDB();
-        if (db.collectionExists(parent.id())) {
-            DBCollection dbCollection = db.getCollection(parent.id());
-            DBObject dbObject = dbCollection.findOne(this.dbObject);
-            if (dbObject != null) {
-                dbCollection.remove(dbObject);
-                responder.resourceDeleted(this);
-            }
-        }
+        parent.deleteChild(ctx, id());
+        responder.resourceDeleted(this);
+    }
 
-        responder.noSuchResource(id());
+    @Override
+    protected Object updateChild(RequestContext ctx, String childId, Object child) {
+        this.dbObject.put(childId, child);
+        return parent.updateChild(ctx, this.id(), this.dbObject);
+    }
+
+    @Override
+    protected Object deleteChild(RequestContext ctx, String childId) {
+        dbObject.removeField(childId);
+        return parent.updateChild(ctx, this.id(), dbObject);
     }
 
     public String toString() {
-        return "[MongoObject: obj=" + this.dbObject() + "]";
+        return "[MongoObject: obj=" + this.dbObject + "]";
+    }
+
+    @Override
+    public String id() {
+        if (id != null) {
+            return id;
+        } else {
+            return this.dbObject.get(MONGO_ID_FIELD).toString();
+        }
     }
 }
