@@ -1,12 +1,14 @@
 package io.liveoak.container;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.state.ResourceState;
 
-import java.util.concurrent.CountDownLatch;
+import java.util.List;
 
-import static org.fest.assertions.Assertions.*;
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Bob McWhirter
@@ -14,7 +16,6 @@ import static org.fest.assertions.Assertions.*;
 public class DirectConnectorTest {
 
 
-    private AssertionHelper assertionHelper = new AssertionHelper();
     private DefaultContainer container;
     private DirectConnector connector;
 
@@ -22,39 +23,89 @@ public class DirectConnectorTest {
     @Before
     public void setUp() throws Exception {
         this.container = new DefaultContainer();
-        this.connector = this.container.directConnector();
-    }
+        this.connector = new DirectConnector(this.container);
 
-    @After
-    public void checkAssertions() throws Throwable {
-        this.assertionHelper.complete();
-    }
+        InMemoryDBResource db = new InMemoryDBResource("db");
+        db.addMember(new InMemoryCollectionResource(db, "people"));
+        db.addMember(new InMemoryCollectionResource(db, "dogs"));
 
-    protected void assertions(AssertionHelper.AssertionBlock b) {
-        this.assertionHelper.assertThat(b);
+        this.container.registerResource(db, new SimpleConfig());
     }
 
     @Test
-    public void testConnectorRead() throws Throwable {
+    public void testRead() throws Throwable {
 
-        CountDownLatch latch = new CountDownLatch(2);
+        RequestContext requestContext = new RequestContext.Builder().build();
+        ResourceState result = this.connector.read(requestContext, "/");
+        assertThat(result).isNotNull();
 
-        this.connector.read("/", (response) -> {
-            System.err.println("response to slash: " + response);
-            assertions(() -> {
-                assertThat(response.responseType()).isEqualTo(ResourceResponse.ResponseType.READ);
-            });
-            latch.countDown();
-        });
+        List<ResourceState> members = result.members();
 
-        this.connector.read("/tacos", (response) -> {
-            System.err.println("response to tacos: " + response);
-            assertions(() -> {
-                assertThat(response.responseType()).isEqualTo(ResourceResponse.ResponseType.ERROR);
-            });
-            latch.countDown();
-        });
+        assertThat(members).isNotEmpty();
 
-        latch.await();
+        ResourceState db = members.stream().filter((e) -> e.id().equals("db")).findFirst().get();
+        assertThat(db).isNotNull();
+
+        ResourceState people = db.members().stream().filter((e) -> e.id().equals("people")).findFirst().get();
+        assertThat(people).isNotNull();
+
+        ResourceState dogs = db.members().stream().filter((e) -> e.id().equals("dogs")).findFirst().get();
+        assertThat(dogs).isNotNull();
     }
+
+    @Test
+    public void testCreate() throws Throwable {
+
+        RequestContext requestContext = new RequestContext.Builder().build();
+        ResourceState bob = new DefaultResourceState( "bob" );
+        bob.putProperty("name", "Bob McWhirter");
+
+        ResourceState result = this.connector.create( requestContext, "/db/people", bob );
+
+        assertThat( result ).isNotNull();
+        assertThat( result.getProperty( "name" ) ).isEqualTo( "Bob McWhirter" );
+
+        ResourceState people = this.connector.read( requestContext, "/db/people" );
+
+        assertThat( people ).isNotNull();
+
+        ResourceState foundBob = people.members().stream().filter( (e)->e.id().equals("bob")).findFirst().get();
+        assertThat( foundBob ).isNotNull();
+        assertThat( foundBob.getProperty( "name" )).isEqualTo( "Bob McWhirter" );
+
+        foundBob = this.connector.read( requestContext, "/db/people/bob" );
+
+        assertThat( foundBob ).isNotNull();
+        assertThat( foundBob.getProperty( "name" )).isEqualTo("Bob McWhirter");
+    }
+
+    @Test
+    public void testUpdate() throws Throwable {
+        RequestContext requestContext = new RequestContext.Builder().build();
+        ResourceState bob = new DefaultResourceState( "bob" );
+        bob.putProperty( "name", "Bob McWhirter");
+
+        ResourceState result = this.connector.create( requestContext, "/db/people", bob );
+
+        assertThat( result ).isNotNull();
+        assertThat( result.getProperty( "name" ) ).isEqualTo( "Bob McWhirter" );
+
+        ResourceState foundBob = this.connector.read( requestContext, "/db/people/bob" );
+        assertThat( foundBob ).isNotNull();
+        assertThat( foundBob.getProperty( "name" )).isEqualTo( "Bob McWhirter" );
+
+        bob = new DefaultResourceState( "bob" );
+        bob.putProperty( "name", "Robert McWhirter");
+
+        result = this.connector.update( requestContext, "/db/people/bob", bob );
+        assertThat( result ).isNotNull();
+        assertThat( result.getProperty( "name" )).isEqualTo( "Robert McWhirter" );
+
+        foundBob = this.connector.read( requestContext, "/db/people/bob" );
+        assertThat( foundBob ).isNotNull();
+        assertThat( foundBob.getProperty( "name" )).isEqualTo( "Robert McWhirter" );
+
+
+    }
+
 }

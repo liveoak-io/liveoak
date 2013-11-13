@@ -4,6 +4,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.liveoak.container.codec.driver.RootEncodingDriver;
+import io.liveoak.container.codec.state.ResourceStateEncoder;
 import io.liveoak.spi.*;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
@@ -40,20 +42,25 @@ public class DirectConnector {
         this.channel.readInbound();
     }
 
-    public void create(String path, ResourceState state, Consumer<ResourceResponse> handler) {
+    public void create(RequestContext context, String path, ResourceState state, Consumer<ResourceResponse> handler) {
         ResourceRequest request = new ResourceRequest.Builder(RequestType.CREATE, new ResourcePath(path))
+                .requestContext(context)
                 .resourceState(state)
                 .build();
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
 
-    public Resource create(String path, ResourceState state) throws ExecutionException, InterruptedException {
-        CompletableFuture<Resource> future = new CompletableFuture<>();
+    public ResourceState create(RequestContext context, String path, ResourceState state) throws ExecutionException, InterruptedException {
+        CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
-        create(path, state, (response) -> {
+        create(context, path, state, (response) -> {
             if (response.responseType() == ResourceResponse.ResponseType.CREATED) {
-                future.complete(response.resource());
+                try {
+                    future.complete(encode(context, response.resource()));
+                } catch (Exception e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
             } else if (response instanceof ResourceErrorResponse) {
                 handleError((ResourceErrorResponse) response, future);
             } else {
@@ -64,19 +71,24 @@ public class DirectConnector {
         return future.get();
     }
 
-    public void read(String path, Consumer<ResourceResponse> handler) {
+    public void read(RequestContext context, String path, Consumer<ResourceResponse> handler) {
         ResourceRequest request = new ResourceRequest.Builder(RequestType.READ, new ResourcePath(path))
+                .requestContext(context)
                 .build();
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
 
-    public Resource read(String path) throws ResourceException, ExecutionException, InterruptedException {
-        CompletableFuture<Resource> future = new CompletableFuture<>();
+    public ResourceState read(RequestContext context, String path) throws ResourceException, ExecutionException, InterruptedException {
+        CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
-        read(path, (response) -> {
+        read(context, path, (response) -> {
             if (response.responseType() == ResourceResponse.ResponseType.READ) {
-                future.complete(response.resource());
+                try {
+                    future.complete(encode(context, response.resource()));
+                } catch (Exception e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
             } else if (response instanceof ResourceErrorResponse) {
                 handleError((ResourceErrorResponse) response, future);
             } else {
@@ -87,27 +99,33 @@ public class DirectConnector {
         try {
             return future.get();
         } catch (ExecutionException e) {
-            if ( e.getCause() instanceof ResourceException ) {
+            if (e.getCause() instanceof ResourceException) {
                 throw (ResourceException) e.getCause();
             }
             throw e;
         }
     }
 
-    public void update(String path, ResourceState state, Consumer<ResourceResponse> handler) {
+
+    public void update(RequestContext context, String path, ResourceState state, Consumer<ResourceResponse> handler) {
         ResourceRequest request = new ResourceRequest.Builder(RequestType.UPDATE, new ResourcePath(path))
+                .requestContext(context)
                 .resourceState(state)
                 .build();
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
 
-    public Resource update(String path, ResourceState state) throws ExecutionException, InterruptedException {
-        CompletableFuture<Resource> future = new CompletableFuture<>();
+    public ResourceState update(RequestContext context, String path, ResourceState state) throws ExecutionException, InterruptedException {
+        CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
-        update(path, state, (response) -> {
+        update(context, path, state, (response) -> {
             if (response.responseType() == ResourceResponse.ResponseType.UPDATED) {
-                future.complete(response.resource());
+                try {
+                    future.complete(encode(context, response.resource()));
+                } catch (Exception e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
             } else if (response instanceof ResourceErrorResponse) {
                 handleError((ResourceErrorResponse) response, future);
             } else {
@@ -118,19 +136,25 @@ public class DirectConnector {
         return future.get();
     }
 
-    public void delete(String path, Consumer<ResourceResponse> handler) {
+
+    public void delete(RequestContext context, String path, Consumer<ResourceResponse> handler) {
         ResourceRequest request = new ResourceRequest.Builder(RequestType.DELETE, new ResourcePath(path))
+                .requestContext(context)
                 .build();
         this.handlers.put(request, handler);
         this.channel.writeInbound(request);
     }
 
-    public Resource delete(String path) throws ExecutionException, InterruptedException {
-        CompletableFuture<Resource> future = new CompletableFuture<>();
+    public ResourceState delete(RequestContext context, String path) throws ExecutionException, InterruptedException {
+        CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
-        delete(path, (response) -> {
+        delete(context, path, (response) -> {
             if (response.responseType() == ResourceResponse.ResponseType.UPDATED) {
-                future.complete(response.resource());
+                try {
+                    future.complete(encode(context, response.resource()));
+                } catch (Exception e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
             } else if (response instanceof ResourceErrorResponse) {
                 handleError((ResourceErrorResponse) response, future);
             } else {
@@ -141,7 +165,21 @@ public class DirectConnector {
         return future.get();
     }
 
-    void handleError(ResourceErrorResponse response, CompletableFuture<Resource> future) {
+
+    protected ResourceState encode(RequestContext context, Resource resource) throws Exception {
+        CompletableFuture<ResourceState> state = new CompletableFuture<>();
+
+        ResourceStateEncoder encoder = new ResourceStateEncoder();
+        RootEncodingDriver driver =  new RootEncodingDriver(context, encoder, resource, () -> {
+                    state.complete(encoder.root());
+                });
+
+        driver.encode();
+
+        return state.get();
+    }
+
+    void handleError(ResourceErrorResponse response, CompletableFuture<?> future) {
         switch (((ResourceErrorResponse) response).errorType()) {
             case NOT_AUTHORIZED:
                 future.completeExceptionally(new NotAuthorizedException(response.inReplyTo().resourcePath().toString()));

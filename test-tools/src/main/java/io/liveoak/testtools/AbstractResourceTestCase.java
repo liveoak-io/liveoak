@@ -1,11 +1,11 @@
 package io.liveoak.testtools;
 
-import org.junit.Before;
 import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.DirectConnector;
 import io.liveoak.container.SimpleConfig;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.resource.RootResource;
+import org.junit.Before;
 import org.vertx.java.core.Vertx;
 
 

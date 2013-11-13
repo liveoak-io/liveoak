@@ -1,5 +1,7 @@
 package io.liveoak.filesystem;
 
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.state.ResourceState;
 import org.junit.Ignore;
 import org.junit.Test;
 import io.liveoak.container.SimpleConfig;
@@ -31,7 +33,7 @@ public class FilesystemResourceTest extends AbstractResourceTestCase {
     @Ignore
     @Test
     public void testRoot() throws Exception {
-        Resource result = connector.read("/files");
+        ResourceState result = connector.read( new RequestContext.Builder().build(), "/files");
 
         assertThat(result).isNotNull();
     }
@@ -39,10 +41,8 @@ public class FilesystemResourceTest extends AbstractResourceTestCase {
     @Ignore
     @Test
     public void testChild() throws Exception {
-        Resource result = connector.read("/files/pom.xml");
-
+        ResourceState result = connector.read( new RequestContext.Builder().build(), "/files/pom.xml");
         assertThat(result).isNotNull();
-        assertThat(result).isInstanceOf(BinaryResource.class);
     }
 
     /*

@@ -1,5 +1,7 @@
 package io.liveoak.mongo;
 
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
 import io.liveoak.container.SimpleConfig;
 import io.liveoak.spi.Config;
@@ -41,15 +43,14 @@ public class NewMongoDBResourceTest extends AbstractResourceTestCase {
 
     @Test
     public void testRootFound() throws Exception {
-        Resource result = connector.read("/storage");
+        ResourceState result = connector.read( new RequestContext.Builder().build(), "/storage");
         assertThat(result).isNotNull();
-        assertThat(result).isInstanceOf(MongoResource.class);
     }
 
     @Test
     public void testUncreatedCollectionNotFound() throws Exception {
         try {
-            connector.read("/storage/movies");
+            connector.read( new RequestContext.Builder().build(), "/storage/movies");
             fail( "shouldn't get here" );
         } catch (ResourceNotFoundException e) {
             assertThat( e.path() ).isEqualTo( "/storage/movies" );

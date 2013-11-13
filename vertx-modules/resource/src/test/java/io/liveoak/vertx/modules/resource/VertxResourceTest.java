@@ -1,9 +1,11 @@
 package io.liveoak.vertx.modules.resource;
 
+import io.liveoak.container.DirectConnector;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.state.ResourceState;
 import org.junit.Before;
 import org.junit.Test;
 import io.liveoak.container.DefaultContainer;
-import io.liveoak.container.DirectConnector;
 import io.liveoak.spi.ResourceException;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
@@ -70,11 +72,9 @@ public class VertxResourceTest  {
 
     @Test
     public void testReadMember() throws Exception {
-        Resource result = connector.read("/people/bob");
+        ResourceState result = connector.read(new RequestContext.Builder().build(),"/people/bob");
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("bob");
-        assertThat(result.uri().toString()).isEqualTo("/people/bob");
-        assertThat(result.parent().id()).isEqualTo("people");
     }
 
 
@@ -91,7 +91,7 @@ public class VertxResourceTest  {
     @Test
     public void testReadNonExistentResource() {
         try {
-            connector.read("/people/lance");
+            connector.read( new RequestContext.Builder().build(), "/people/lance");
         } catch (ResourceException e) {
             assertThat(e.path()).isEqualTo("/people/lance");
         } catch (Exception e) {
@@ -116,11 +116,9 @@ public class VertxResourceTest  {
             }
         };
 
-        Resource resource = connector.read("/people");
+        ResourceState resource = connector.read( new RequestContext.Builder().build(), "/people");
         assertThat(resource).isNotNull();
-        resource.readMembers(null, sink);
-        List<Resource> result = future.get();
-        assertThat(result.size()).isEqualTo(2);
+        assertThat( resource.members() ).hasSize( 2 );
 
     }
 
