@@ -8,7 +8,7 @@
   </resources>
 
   <dependencies>
-    <module name="org.projectodd.restafari.spi"/>
+    <module name="io.liveoak.spi"/>
     <system>
       <paths>
         <path name="javax/net"/>

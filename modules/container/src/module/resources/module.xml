@@ -10,10 +10,10 @@
     <module name="io.netty"/>
     <module name="io.vertx"/>
     <module name="com.fasterxml.jackson.core"/>
-    <module name="org.projectodd.restafari.stomp"/>
-    <module name="org.projectodd.restafari.spi"/>
-    <module name="org.projectodd.restafari.security"/>
-    <module name="org.projectodd.restafari.security.uripolicy"/>
+    <module name="io.liveoak.stomp"/>
+    <module name="io.liveoak.spi"/>
+    <module name="io.liveoak.security"/>
+    <module name="io.liveoak.security.uripolicy"/>
     <system>
       <paths>
         <path name="javax/management"/>

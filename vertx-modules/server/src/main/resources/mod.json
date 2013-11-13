@@ -1,6 +1,6 @@
 {
     // Java verticle
-    "main": "org.projectodd.restafari.vertx.modules.server.ServerVerticle",
+    "main": "io.liveoak.vertx.modules.server.ServerVerticle",
 
     // If your module is going to be registered in the Vert.x module registry you will also need the following
     // mandatory fields

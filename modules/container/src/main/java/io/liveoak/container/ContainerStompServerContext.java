@@ -1,0 +1,53 @@
+package io.liveoak.container;
+
+import io.liveoak.container.codec.ResourceCodec;
+import io.liveoak.spi.MediaType;
+import io.liveoak.container.subscriptions.StompSubscription;
+import io.liveoak.stomp.Headers;
+import io.liveoak.stomp.StompMessage;
+import io.liveoak.stomp.server.StompServerContext;
+import io.liveoak.stomp.server.StompConnection;
+
+/**
+ * @author Bob McWhirter
+ */
+public class ContainerStompServerContext implements StompServerContext {
+
+    public ContainerStompServerContext(DefaultContainer container) {
+        this.container = container;
+    }
+
+    @Override
+    public void handleConnect(StompConnection connection) {
+    }
+
+    @Override
+    public void handleDisconnect(StompConnection connection) {
+    }
+
+    @Override
+    public void handleSubscribe(StompConnection connection, String destination, String subscriptionId, Headers headers) {
+        String acceptMediaType = headers.get( "accept" );
+        if ( acceptMediaType == null ) {
+            acceptMediaType = "application/json";
+        }
+        MediaType mediaType = this.container.getCodecManager().determineMediaType( acceptMediaType, null );
+        if ( mediaType == null ) {
+            mediaType = MediaType.JSON;
+        }
+
+        ResourceCodec codec = this.container.getCodecManager().getResourceCodec(mediaType);
+        StompSubscription subscription = new StompSubscription(connection, destination, subscriptionId, mediaType, codec);
+        this.container.getSubscriptionManager().addSubscription( subscription );
+    }
+
+    @Override
+    public void handleUnsubscribe(StompConnection connection, String subscriptionId) {
+    }
+
+    @Override
+    public void handleSend(StompConnection connection, StompMessage message) {
+    }
+
+    private DefaultContainer container;
+}

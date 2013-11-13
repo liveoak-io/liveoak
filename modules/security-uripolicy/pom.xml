@@ -23,28 +23,28 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <groupId>org.projectodd.restafari</groupId>
-    <artifactId>restafari-modules</artifactId>
+    <groupId>io.liveoak</groupId>
+    <artifactId>liveoak-modules</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
-    <module-name>org.projectodd.restafari.security.uripolicy</module-name>
+    <module-name>io.liveoak.security.uripolicy</module-name>
   </properties>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>restafari-security-uripolicy</artifactId>
-  <name>restafari-security-uripolicy</name>
+  <artifactId>liveoak-security-uripolicy</artifactId>
+  <name>liveoak-security-uripolicy</name>
   <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
-      <groupId>org.projectodd.restafari</groupId>
-      <artifactId>restafari-spi</artifactId>
+      <groupId>io.liveoak</groupId>
+      <artifactId>liveoak-spi</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.projectodd.restafari</groupId>
-      <artifactId>restafari-security</artifactId>
+      <groupId>io.liveoak</groupId>
+      <artifactId>liveoak-security</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>

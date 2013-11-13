@@ -1,0 +1,12 @@
+package io.liveoak.spi.resource.async;
+
+import java.util.function.Consumer;
+
+/** A sink to accept children of a resource when reading.
+ *
+ * @author Bob McWhirter
+ */
+public interface ResourceSink extends Consumer<Resource>, AutoCloseable {
+
+    void close();
+}

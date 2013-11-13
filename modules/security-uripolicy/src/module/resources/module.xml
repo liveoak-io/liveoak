@@ -7,8 +7,8 @@
   </resources>
 
   <dependencies>
-    <module name="org.projectodd.restafari.spi"/>
-    <module name="org.projectodd.restafari.security"/>
+    <module name="io.liveoak.spi"/>
+    <module name="io.liveoak.security"/>
     <module name="com.fasterxml.jackson.core"/>
     <module name="org.drools"/>
   </dependencies>

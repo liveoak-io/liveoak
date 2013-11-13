@@ -7,8 +7,8 @@
   </resources>
 
   <dependencies>
-    <module name="org.projectodd.restafari.spi"/>
-    <module name="org.projectodd.restafari.filesystem"/>
+    <module name="io.liveoak.spi"/>
+    <module name="io.liveoak.filesystem"/>
   </dependencies>
 
 </module>

@@ -1,12 +1,12 @@
-package org.projectodd.restafari.security.policy.uri.complex;
+package io.liveoak.security.policy.uri.complex;
 
-import org.projectodd.restafari.security.policy.uri.complex.RulesProcessingResult;
-import org.projectodd.restafari.security.policy.uri.complex.URIMatcher;
-import org.projectodd.restafari.security.policy.uri.complex.RequestContextDecorator;
-import org.projectodd.restafari.security.spi.AuthorizationDecision;
-import org.projectodd.restafari.security.spi.AuthToken;
-import org.projectodd.restafari.spi.RequestType;
-import org.projectodd.restafari.spi.ResourcePath;
+import io.liveoak.security.policy.uri.complex.RulesProcessingResult;
+import io.liveoak.security.policy.uri.complex.URIMatcher;
+import io.liveoak.security.policy.uri.complex.RequestContextDecorator;
+import io.liveoak.security.spi.AuthorizationDecision;
+import io.liveoak.security.spi.AuthToken;
+import io.liveoak.spi.RequestType;
+import io.liveoak.spi.ResourcePath;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.regex.Pattern;

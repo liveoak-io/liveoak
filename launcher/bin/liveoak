@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+
+bindir=$(dirname $0)
+etcdir=$bindir/../etc
+
+. $bindir/installation.conf
+
+M2_REPO_CLAUSE=''
+
+if [ -n "$m2_repo_dir" ]; then
+  M2_REPO_CLAUSE=-Dlocal.maven.repo.path=$m2_repo_dir
+fi
+
+
+java $JAVA_OPTS \
+  -Djs.client.dir=$js_client_dir \
+  -Dcss.dir=$css_dir \
+  $M2_REPO_CLAUSE \
+  -jar $jboss_modules_jar \
+  -modulepath $modulepath \
+  io.liveoak.bootstrap:main $etcdir/liveoak-config.json $*

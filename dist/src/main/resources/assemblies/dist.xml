@@ -26,7 +26,8 @@
       <outputDirectory>/bin</outputDirectory>
       <fileMode>0555</fileMode>
       <includes>
-        <include>mboss</include>
+        <include>liveoak</include>
+        <include>liveoak.bat</include>
       </includes>
     </fileSet>
     <fileSet> 

@@ -8,6 +8,6 @@
 
   <dependencies>
     <module name="io.vertx"/>
-    <module name="org.projectodd.restafari.spi"/>
+    <module name="io.liveoak.spi"/>
 </module>
 

@@ -20,7 +20,7 @@
       <outputDirectory>/</outputDirectory>
       <useProjectArtifact>true</useProjectArtifact>
       <includes>
-        <include>org.projectodd.restafari:*</include>
+        <include>io.liveoak:*</include>
       </includes>
       <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
       <unpack>false</unpack>
