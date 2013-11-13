@@ -1,4 +1,4 @@
-package org.projectodd.restafari.security.policy.uri;
+package org.projectodd.restafari.security.policy.uri.simple;
 
 
 import java.util.Collection;
@@ -6,6 +6,8 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+
+import org.projectodd.restafari.security.policy.uri.RolesContainer;
 
 /**
  * Utility to save authorization rules and then find best RolesContainer for given request
@@ -20,7 +22,7 @@ public class RecursiveHashMap extends HashMap<String, Object> {
         this.parent = parent;
     }
 
-    public void recursivePut(Deque<String> keys, RolePolicy value) {
+    public void recursivePut(Deque<String> keys, RolesContainer value) {
         String topKey = keys.remove();
         if (keys.isEmpty()) {
             this.put(topKey, value);
@@ -34,12 +36,12 @@ public class RecursiveHashMap extends HashMap<String, Object> {
         }
     }
 
-    public RolePolicy recursiveGet(Deque<String> keys) {
+    public RolesContainer recursiveGet(Deque<String> keys) {
         return recursiveGet(keys, new HashSet<>());
     }
 
-    protected RolePolicy recursiveGet(Deque<String> keys, Collection<RecursiveHashMap> processedAncestors) {
-        String topKey = keys.isEmpty() ? URIAuthorizationPolicy.WILDCARD : keys.peek();
+    protected RolesContainer recursiveGet(Deque<String> keys, Collection<RecursiveHashMap> processedAncestors) {
+        String topKey = keys.isEmpty() ? SimpleURIPolicy.WILDCARD : keys.peek();
 
         // Try to find policy exactly for the key
         if (this.containsKey(topKey)) {
@@ -47,9 +49,9 @@ public class RecursiveHashMap extends HashMap<String, Object> {
         }
 
         // Try to find policy for * if policy for the key not available
-        if (topKey != URIAuthorizationPolicy.WILDCARD) {
-            if (this.containsKey(URIAuthorizationPolicy.WILDCARD)) {
-                return safeGet(URIAuthorizationPolicy.WILDCARD, keys, processedAncestors);
+        if (topKey != SimpleURIPolicy.WILDCARD) {
+            if (this.containsKey(SimpleURIPolicy.WILDCARD)) {
+                return safeGet(SimpleURIPolicy.WILDCARD, keys, processedAncestors);
             }
         }
 
@@ -67,7 +69,7 @@ public class RecursiveHashMap extends HashMap<String, Object> {
         int size = keys.size() + ancestorDepth;
         for (int i=0 ; i<size ; i++) {
             // Add all path segments with wildcard
-            newKeys.add(URIAuthorizationPolicy.WILDCARD);
+            newKeys.add(SimpleURIPolicy.WILDCARD);
         }
         // Add action to the last position without wildcard
         newKeys.add(keys.getLast());
@@ -76,10 +78,10 @@ public class RecursiveHashMap extends HashMap<String, Object> {
     }
 
     // It's safe in the sense that this.get(topKey) is not null (method should never be called if this condition is not true)
-    private RolePolicy safeGet(String topKey, Deque<String> keys, Collection<RecursiveHashMap> processedAncestors) {
+    private RolesContainer safeGet(String topKey, Deque<String> keys, Collection<RecursiveHashMap> processedAncestors) {
         Object o = this.get(topKey);
-        if (o instanceof RolePolicy) {
-            return (RolePolicy)o;
+        if (o instanceof RolesContainer) {
+            return (RolesContainer)o;
         } else {
             RecursiveHashMap childMap = (RecursiveHashMap)o;
             // Now remove key

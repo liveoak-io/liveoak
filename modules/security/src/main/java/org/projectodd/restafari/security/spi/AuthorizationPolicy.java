@@ -6,6 +6,11 @@ package org.projectodd.restafari.security.spi;
 public interface AuthorizationPolicy {
 
     /**
+     * Perform some needed initialization steps for this policy.
+     */
+    void init();
+
+    /**
      * Decide if request is authorized, not authorized or if we don't know
      *
      * @param authRequestContext encapsulates all info about current request, token etc

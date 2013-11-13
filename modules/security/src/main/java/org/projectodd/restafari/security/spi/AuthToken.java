@@ -35,6 +35,9 @@ public interface AuthToken {
      */
     Map<String, Set<String>> getApplicationRolesMap();
 
+    /**
+     * @return set with all granted roles for current application or empty set if no roles granted for current app. Never returns null
+     */
     default Set<String> getApplicationRoles() {
         String applicationName = getApplicationName();
         Set<String> appRoles = getApplicationRolesMap().get(applicationName);

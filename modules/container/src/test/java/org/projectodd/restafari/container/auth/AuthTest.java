@@ -175,6 +175,23 @@ public class AuthTest {
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_NOT_FOUND);
     }
 
+    @Test
+    public void testComplexPolicy() throws Exception {
+        HttpRequestBase httpMethod;
+
+        // Authorization ok. rule2 of DemoURIPolicy
+        httpMethod = createHttpMethod("GET", "http://localhost:8080/droolsTest/foo/bar?param1=foo&param2=10");
+        sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_NOT_FOUND);
+
+        // Authorization no-ok because of param1
+        httpMethod = createHttpMethod("GET", "http://localhost:8080/droolsTest/foo/bar?param1=noFoooooo&param2=10");
+        sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_FORBIDDEN);
+
+        // Authorization no-ok because of param2
+        httpMethod = createHttpMethod("GET", "http://localhost:8080/droolsTest/foo/bar?param1=foo&param2=9");
+        sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_FORBIDDEN);
+    }
+
     private HttpRequestBase createHttpMethod(String method, String uri) {
         HttpRequestBase httpMethod;
         switch (method) {

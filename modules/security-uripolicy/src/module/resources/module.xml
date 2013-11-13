@@ -8,7 +8,8 @@
 
   <dependencies>
     <module name="org.projectodd.restafari.spi"/>
-    <module name="com.fasterxml.jackson.core"/>
     <module name="org.projectodd.restafari.security"/>
+    <module name="com.fasterxml.jackson.core"/>
+    <module name="org.drools"/>
   </dependencies>
 </module>

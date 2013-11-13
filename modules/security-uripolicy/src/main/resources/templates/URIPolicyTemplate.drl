@@ -1,0 +1,85 @@
+template header
+POLICY_COUNTER
+PRIORITY
+CHECK_PRIORITY
+URI_PATTERN
+QUERY_PARAMS_CONDITIONS
+REQUEST_TYPE
+ALLOWED_REALM_ROLES
+DENIED_REALM_ROLES
+ALLOWED_APPLICATION_ROLES
+DENIED_APPLICATION_ROLES
+ALLOWED_USERS
+DENIED_USERS
+
+package org.projectodd.restafari.security.policy.uri.complex;
+
+import org.projectodd.restafari.security.policy.uri.complex.RulesProcessingResult;
+import org.projectodd.restafari.security.policy.uri.complex.EndSemaphore;
+import org.projectodd.restafari.security.policy.uri.complex.URIMatcher;
+import org.projectodd.restafari.security.policy.uri.complex.URIMatcherCache;
+import org.projectodd.restafari.security.policy.uri.complex.RequestContextDecorator;
+import org.projectodd.restafari.security.policy.uri.RolesContainer
+import org.projectodd.restafari.security.spi.AuthorizationDecision;
+import org.projectodd.restafari.security.spi.AuthToken;
+import org.projectodd.restafari.spi.RequestType;
+import org.projectodd.restafari.spi.ResourcePath;
+import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+dialect "mvel"
+
+template "URI Policy template"
+rule "URIPolicyRule_@{POLICY_COUNTER}"
+salience @{PRIORITY}
+when
+  $rulesProcessingResult: RulesProcessingResult( isAlreadyProcessedRule("URIPolicyRule_@{POLICY_COUNTER}") == false )
+  $endSemaphore: EndSemaphore( finished == false )
+  $token: AuthToken()
+  URIMatcherCache($uriMatcher: getURIMatcher("URIPolicyRule_@{POLICY_COUNTER}"));
+  $request: RequestContextDecorator(
+                            uriMatches("URIPolicyRule_@{POLICY_COUNTER}", @{URI_PATTERN}, resourcePath, $uriMatcher) &&
+                            requestConditionsMatches("URIPolicyRule_@{POLICY_COUNTER}", (@{QUERY_PARAMS_CONDITIONS}) ) &&
+                            requestTypeMatches("URIPolicyRule_@{POLICY_COUNTER}", requestType, "@{REQUEST_TYPE}")
+                          )
+then
+  System.out.println("Triggered rule: URIPolicyRule_@{POLICY_COUNTER} . All conditions matched");
+
+  RolesContainer container = new RolesContainer();
+  container.addAllAllowedRealmRoles( Arrays.asList(new String[] { @{ALLOWED_REALM_ROLES} }) );
+  container.addAllDeniedRealmRoles( Arrays.asList(new String[] { @{DENIED_REALM_ROLES} }) );
+  container.addAllAllowedApplicationRoles( Arrays.asList(new String[] { @{ALLOWED_APPLICATION_ROLES} }) );
+  container.addAllDeniedApplicationRoles( Arrays.asList(new String[] { @{DENIED_APPLICATION_ROLES} }) );
+  container.addAllAllowedUsers( Arrays.asList(new String[] { @{ALLOWED_USERS} }) );
+  container.addAllDeniedUsers( Arrays.asList(new String[] { @{DENIED_USERS} }) );
+
+  AuthorizationDecision decision = container.isTokenAllowed($token);
+
+  modify ($rulesProcessingResult) {
+    mergeDecision(decision);
+  }
+  modify ($rulesProcessingResult) {
+    addProcessedRule("URIPolicyRule_@{POLICY_COUNTER}");
+  }
+  modify ($rulesProcessingResult) {
+    lastProcessedPriority = @{PRIORITY}
+  }
+end
+end template
+
+template "Check finished"
+rule "CheckFinished_@{POLICY_COUNTER}"
+salience @{CHECK_PRIORITY}
+when
+  RulesProcessingResult(decision == AuthorizationDecision.ACCEPT || == AuthorizationDecision.REJECT, lastProcessedPriority > @{CHECK_PRIORITY})
+  $endSemaphore: EndSemaphore( finished == false )
+then
+  System.out.println("Triggered rule: CheckFinished_@{POLICY_COUNTER}, priority: " + @{CHECK_PRIORITY} + " . Going to stop processing other URI rules");
+  modify ($endSemaphore) {
+    finished = true;
+  }
+end
+end template

@@ -1,8 +1,6 @@
 package org.projectodd.restafari.security.impl;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.projectodd.restafari.security.spi.ApplicationIdResolver;
@@ -41,7 +39,7 @@ public class AuthServicesHolder {
     private AuthServicesHolder() {
         this.authorizationService = new PolicyBasedAuthorizationService();
         this.authPersister = new InMemoryAuthPersister();
-        this.tokenManager = new TokenManagerImpl();
+        this.tokenManager = new DefaultTokenManager();
         this.applicationIdResolver = (resourceReq) -> AuthConstants.DEFAULT_APP_ID;
 
         // Register default loaders
@@ -88,11 +86,21 @@ public class AuthServicesHolder {
 
     public void registerDefaultPolicies() {
         // Register simple demo policy as default one
-        AuthorizationPolicy simplePolicy = loadPolicy("org.projectodd.restafari.security.policy.uri.DemoAuthorizationPolicy");
-        AuthorizationPolicyEntry policyEntry = new AuthorizationPolicyEntry("someId", simplePolicy);
-        policyEntry.addIncludedResourcePrefix(new ResourcePath());
+        AuthorizationPolicy simplePolicy = loadPolicy("org.projectodd.restafari.security.policy.uri.simple.DemoSimpleURIPolicy");
+        simplePolicy.init();
+        AuthorizationPolicyEntry simplePolicyEntry = new AuthorizationPolicyEntry("someId", simplePolicy);
+        simplePolicyEntry.addIncludedResourcePrefix(new ResourcePath());
+        // Don't test URI under /droolsTest/foo/bar/* with simple policy
+        simplePolicyEntry.addExcludedResourcePrefix(new ResourcePath("/droolsTest/foo/bar"));
 
-        authPersister.registerPolicy(AuthConstants.DEFAULT_APP_ID, policyEntry);
+        // Register drools based URIPolicy for context /droolsTest
+        AuthorizationPolicy droolsPolicy = loadPolicy("org.projectodd.restafari.security.policy.uri.complex.DemoURIPolicy");
+        droolsPolicy.init();
+        AuthorizationPolicyEntry droolsPolicyEntry = new AuthorizationPolicyEntry("someId2", droolsPolicy);
+        droolsPolicyEntry.addIncludedResourcePrefix(new ResourcePath("droolsTest"));
+
+        authPersister.registerPolicy(AuthConstants.DEFAULT_APP_ID, simplePolicyEntry);
+        authPersister.registerPolicy(AuthConstants.DEFAULT_APP_ID, droolsPolicyEntry);
     }
 
     private AuthorizationPolicy loadPolicy(String policyClassname) {
