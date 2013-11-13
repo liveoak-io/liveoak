@@ -1,5 +1,7 @@
 package io.liveoak.container;
 
+import io.liveoak.container.responders.ReadResponder;
+import io.liveoak.spi.resource.async.Responder;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -40,6 +42,34 @@ public class DirectConnector {
         this.container = container;
         this.channel = new EmbeddedChannel(new DirectCallbackHandler(), new ResourceHandler(this.container));
         this.channel.readInbound();
+    }
+
+    public Resource fetch(String path) throws ResourceException, ExecutionException, InterruptedException {
+        CompletableFuture<Resource> future = new CompletableFuture<>();
+        RequestContext context = new RequestContext.Builder().build();
+
+        read(context, path, (response) -> {
+            if (response.responseType() == ResourceResponse.ResponseType.READ) {
+                try {
+                    future.complete(response.resource());
+                } catch (Exception e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            } else if (response instanceof ResourceErrorResponse) {
+                handleError((ResourceErrorResponse) response, future);
+            } else {
+                future.complete(null);
+            }
+        });
+
+        try {
+            return future.get();
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof ResourceException) {
+                throw (ResourceException) e.getCause();
+            }
+            throw e;
+        }
     }
 
     public void create(RequestContext context, String path, ResourceState state, Consumer<ResourceResponse> handler) {

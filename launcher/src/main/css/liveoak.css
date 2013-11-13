@@ -46,6 +46,11 @@
   border: 1px solid #666;
 }
 
+.resource .members {
+  padding: 1ex;
+  border: 1px solid #ccc;
+}
+
 .footer {
   border-top: 1px solid #ddd;
   padding-left: 1em;

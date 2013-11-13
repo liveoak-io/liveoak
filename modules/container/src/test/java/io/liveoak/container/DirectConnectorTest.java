@@ -1,5 +1,6 @@
 package io.liveoak.container;
 
+import io.liveoak.spi.resource.async.Resource;
 import org.junit.Before;
 import org.junit.Test;
 import io.liveoak.container.codec.DefaultResourceState;
@@ -105,6 +106,22 @@ public class DirectConnectorTest {
         assertThat( foundBob ).isNotNull();
         assertThat( foundBob.getProperty( "name" )).isEqualTo( "Robert McWhirter" );
 
+
+    }
+
+    @Test
+    public void testFetch() throws Throwable {
+
+        RequestContext requestContext = new RequestContext.Builder().build();
+        ResourceState bob = new DefaultResourceState( "bob" );
+        bob.putProperty( "name", "Bob McWhirter");
+
+        ResourceState result = this.connector.create( requestContext, "/db/people", bob );
+
+        Resource bobResource = this.connector.fetch( "/db/people/bob" );
+
+        assertThat( bobResource ).isNotNull();
+        assertThat( bobResource.id() ).isEqualTo( "bob" );
 
     }
 

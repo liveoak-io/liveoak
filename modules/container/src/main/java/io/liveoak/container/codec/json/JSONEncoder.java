@@ -54,6 +54,16 @@ public class JSONEncoder implements Encoder {
         this.generator.writeEndObject();
     }
 
+    @Override
+    public void startProperties() throws Exception {
+        // not needed
+    }
+
+    @Override
+    public void endProperties() throws Exception {
+        // not needed
+    }
+
     // ----------------------------------------
 
     @Override
