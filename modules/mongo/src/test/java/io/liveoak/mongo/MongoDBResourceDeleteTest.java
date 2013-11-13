@@ -21,9 +21,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>

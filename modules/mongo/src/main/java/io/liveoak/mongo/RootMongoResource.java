@@ -1,9 +1,15 @@
 package io.liveoak.mongo;
 
-import com.mongodb.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.MongoClient;
 import io.liveoak.spi.*;
-import io.liveoak.spi.resource.async.*;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.async.ResourceSink;
+import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
 import java.net.UnknownHostException;
@@ -17,19 +23,31 @@ import java.util.stream.Stream;
 public class RootMongoResource extends MongoResource implements RootResource {
 
     private MongoClient mongo;
-    private DB db;
-
-    public RootMongoResource() {
-        super(null, (String) null);
-    }
+    protected DB db;
+    private String id;
 
     public RootMongoResource(String id) {
-        super(null, id);
+        super(null);
+        this.id = id;
+    }
+
+    protected DB getDB() {
+        return this.db;
+    }
+
+    @Override
+    protected Object deleteChild(RequestContext ctx, String childId) {
+        return null;
+    }
+
+    @Override
+    protected Object updateChild(RequestContext ctx, String childId, Object child) {
+        return null;
     }
 
     @Override
     public Resource parent() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
@@ -63,10 +81,6 @@ public class RootMongoResource extends MongoResource implements RootResource {
         }
     }
 
-    protected DB getDB() {
-        return this.db;
-    }
-
     @Override
     public void destroy() {
         if (mongo != null) {
@@ -77,7 +91,7 @@ public class RootMongoResource extends MongoResource implements RootResource {
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
         if (db.collectionExists(id)) {
-            responder.resourceRead(new MongoCollectionResource(this, id));
+            responder.resourceRead(new MongoCollectionResource(this, db.getCollection(id)));
         } else {
             responder.noSuchResource(id);
         }
@@ -94,10 +108,11 @@ public class RootMongoResource extends MongoResource implements RootResource {
 
         members.forEach((name) -> {
             if (!name.equals("system.indexes")) {
-                sink.accept(new MongoCollectionResource(this, name));
+                sink.accept(new MongoCollectionResource(this, db.getCollection(name)));
             }
         });
 
+       
         sink.close();
     }
 
@@ -108,8 +123,8 @@ public class RootMongoResource extends MongoResource implements RootResource {
         if (id == null) {
             id = UUID.randomUUID().toString();
         }
-        db.createCollection(id, new BasicDBObject()); //send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
-        responder.resourceCreated(new MongoCollectionResource(this, id));
+        DBCollection collection = db.createCollection(id, new BasicDBObject()); //send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
+        responder.resourceCreated(new MongoCollectionResource(this, collection));
     }
 
     @Override

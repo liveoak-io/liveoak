@@ -24,10 +24,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.*;
-
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -95,11 +93,9 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest{
                         "  \"foo\" : \"bar\",\n" +
                         "  \"test\" : \"123\",\n" +
                         "  \"arr\" : [1, 1, 2, 3, 5, 8, 13, 21],\n" +
-                        "  \"obj\" : { \"foo2\" : \"bar2\", \"test2\": \"123\"}\n" +
+                        "  \"obj\" : { \"foo2\" : \"bar2\", \"test2\" : \"123\", \"subobject\":{\"abc\" : \"xyz\"}}\n" +
                         "}\n");
         assertEquals(201, response.getStatusLine().getStatusCode());
-
-        System.err.println( "DONE" );
 
         // verify response
         ObjectMapper mapper = new ObjectMapper();
@@ -108,8 +104,12 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest{
         //System.out.println("MONGO: " + db.getCollection(methodName).findOne());
 
         CloseableHttpResponse readResponse = testSimpleGetMethod(baseURL + "/" + methodName + "/helloworld/obj");
-        //System.out.println("READ: " + readResponse.getStatusLine().toString());
+        //System.out.println("READ OBJ: " + readResponse.getStatusLine().toString());
         //IOUtils.copy(readResponse.getEntity().getContent(), System.out);
+
+//        readResponse = testSimpleGetMethod(baseURL + "/" + methodName + "/helloworld/arr");
+//        System.out.println("READ ARR: " + readResponse.getStatusLine().toString());
+//        IOUtils.copy(readResponse.getEntity().getContent(), System.out);
 
 //        JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
 //        assertEquals(5, jsonNode.size()); // id, _self, bar

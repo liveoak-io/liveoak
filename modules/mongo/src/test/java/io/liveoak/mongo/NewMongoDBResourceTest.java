@@ -1,5 +1,6 @@
 package io.liveoak.mongo;
 
+import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
@@ -57,26 +58,18 @@ public class NewMongoDBResourceTest extends AbstractResourceTestCase {
         }
     }
 
-    /*
     @Test
     public void testCreateCollection() throws Exception {
-        ObjectResourceState state = new DefaultObjectResourceState();
-        state.id("movies");
-        state.addProperty("movies", new DefaultCollectionResourceState());
-
-        Resource createdResource = connector.create("/storage", state);
-
+        // check that we can create the resource
+        ResourceState state = new DefaultResourceState("movies");
+        ResourceState createdResource = connector.create(new RequestContext.Builder().build(), "/storage", state);
         assertThat(createdResource).isNotNull();
-        assertThat(createdResource).isInstanceOf(MongoCollectionResource.class);
         assertThat(createdResource.id()).isEqualTo("movies");
 
-        // TODO: why doesn't this work?
-        //Resource movies = connector.readMember("/storage/movies");
-
-        //assertThat( movies ).isNotNull();
-        //assertThat( movies ).isInstanceOf( MongoCollectionResource.class );
-        //assertThat( movies.id() ).isEqualTo( "movies" );
+        // test that we get this resource back on a read
+        ResourceState movies = connector.read(new RequestContext.Builder().build(), "/storage/movies");
+        assertThat( movies ).isNotNull();
+        assertThat( movies.id() ).isEqualTo("movies");
     }
-    */
 
 }
