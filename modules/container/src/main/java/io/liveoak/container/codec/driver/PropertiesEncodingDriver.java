@@ -18,13 +18,14 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
 
     @Override
     public void encode() throws Exception {
-        System.err.println( "properties::encode" );
-        resource().readProperties( requestContext(), new MyPropertySink() );
+        resource().readProperties(requestContext(), new MyPropertySink());
     }
 
     @Override
     public void close() throws Exception {
-        System.err.println( "properties::close" );
+        if (this.hasProperties) {
+            encoder().endProperties();
+        }
         parent().encodeNext();
     }
 
@@ -32,22 +33,32 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
 
         @Override
         public void accept(String name, Object value) {
-            PropertyEncodingDriver propDriver = new PropertyEncodingDriver( PropertiesEncodingDriver.this, name );
-            if ( value instanceof Resource ) {
-                propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value));
-            } else if ( value instanceof List || value instanceof Set) {
-                propDriver.addChildDriver( new ListEncodingDriver( propDriver, ((Collection)value).stream() ) );
-            } else {
-                propDriver.addChildDriver( new ValueEncodingDriver( propDriver, value ) );
+            if (!hasProperties) {
+                try {
+                    encoder().startProperties();
+                } catch (Exception e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+                hasProperties = true;
             }
-            addChildDriver( propDriver );
+            PropertyEncodingDriver propDriver = new PropertyEncodingDriver(PropertiesEncodingDriver.this, name);
+            if (value instanceof Resource) {
+                propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value));
+            } else if (value instanceof List || value instanceof Set) {
+                propDriver.addChildDriver(new ListEncodingDriver(propDriver, ((Collection) value).stream()));
+            } else {
+                propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value));
+            }
+            addChildDriver(propDriver);
         }
 
         @Override
         public void close() {
-            System.err.println( "prop sink close" );
+            System.err.println("prop sink close");
             encodeNext();
         }
     }
+
+    private boolean hasProperties;
 
 }

@@ -16,6 +16,9 @@ public interface Encoder extends AutoCloseable {
     void startResource(Resource resource) throws Exception;
     void endResource(Resource resource) throws Exception;
 
+    void startProperties() throws Exception;
+    void endProperties() throws Exception;
+
     void startProperty(String propertyName) throws  Exception;
     void endProperty(String propertyName) throws  Exception;
 

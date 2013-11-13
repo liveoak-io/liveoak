@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import io.liveoak.container.aspects.ResourceAspectManager;
 import io.liveoak.container.codec.ResourceCodec;
 import io.liveoak.container.codec.ResourceCodecManager;
+import io.liveoak.container.codec.html.HTMLEncoder;
 import io.liveoak.container.codec.json.JSONDecoder;
 import io.liveoak.container.codec.json.JSONEncoder;
 import io.liveoak.container.subscriptions.SubscriptionManager;
@@ -29,7 +30,7 @@ public class DefaultContainer implements Container, Resource {
 
     public DefaultContainer(Vertx vertx) {
         this.codecManager.registerResourceCodec("application/json", new ResourceCodec( this, JSONEncoder.class, new JSONDecoder() ) );
-        //this.codecManager.registerResourceCodec("text/html", new ResourceCodec( this, HTMLEncoder.class, null ) );
+        this.codecManager.registerResourceCodec("text/html", new ResourceCodec( this, HTMLEncoder.class, null ) );
 
         this.vertx = vertx;
         this.workerPool = Executors.newCachedThreadPool();

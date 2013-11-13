@@ -63,6 +63,16 @@ public class ResourceStateEncoder implements Encoder {
     }
 
     @Override
+    public void startProperties() throws Exception {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void endProperties() throws Exception {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public void startProperty(String propertyName) throws Exception {
         this.stack.push( new PropertyCatcher() );
     }
