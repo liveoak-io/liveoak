@@ -51,7 +51,7 @@ public class InMemoryObjectResource implements Resource, BlockingResource {
     }
 
     public String toString() {
-        return "[InMemoryObjectResource: id=" + this.id + "]";
+        return "[InMemoryObjectResource: id=" + this.id + "; state=" + this.state + "]";
     }
 
     private InMemoryCollectionResource parent;

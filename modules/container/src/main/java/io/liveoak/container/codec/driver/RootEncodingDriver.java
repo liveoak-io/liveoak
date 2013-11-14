@@ -10,7 +10,7 @@ import io.liveoak.spi.resource.async.Resource;
 public class RootEncodingDriver extends ResourceEncodingDriver {
 
     public RootEncodingDriver(RequestContext requestContext, Encoder encoder, Resource resource, Runnable completionHandler) {
-        super( resource );
+        super( resource, requestContext.getReturnFields() );
         this.requestContext = requestContext;
         this.encoder = encoder;
         this.completionHandler = completionHandler;

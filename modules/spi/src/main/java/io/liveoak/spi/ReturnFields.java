@@ -1,11 +1,78 @@
 package io.liveoak.spi;
 
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 public interface ReturnFields extends Iterable<String> {
+
+    public static ReturnFields ALL = new ReturnFields() {
+        @Override
+        public ReturnFields child(String field) {
+            return NONE;
+        }
+
+        @Override
+        public boolean included(String... pathSegments) {
+            return true;
+        }
+
+        @Override
+        public Iterator<String> iterator() {
+            return Collections.singletonList( "*" ).iterator();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        public boolean isAll() {
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return "[ReturnFields ALL]";
+        }
+    };
+
+    public static ReturnFields NONE = new ReturnFields() {
+        @Override
+        public ReturnFields child(String field) {
+            return this;
+        }
+
+        @Override
+        public boolean included(String... pathSegments) {
+            return false;
+        }
+
+        @Override
+        public Iterator<String> iterator() {
+            List<String> emptyList = Collections.emptyList();
+            return emptyList.iterator();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+
+        @Override
+        public boolean isAll() {
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return "[ReturnFields NONE]";
+        }
+    };
+
 
     /**
      * Get ReturnFields for a child field of JSONObject type.
@@ -33,4 +100,13 @@ public interface ReturnFields extends Iterable<String> {
      * @return iterator over child fields to be included in response.
      */
     Iterator<String> iterator();
+
+    /**
+     * Determine if zero fields should be returned.
+     *
+     * @return <code>true</code> if the list is empty, else, <code>false</code>
+     */
+    boolean isEmpty();
+
+    boolean isAll();
 }

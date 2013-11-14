@@ -32,11 +32,11 @@ class MongoCollectionResource extends MongoResource {
         }
 
         if (object == null) {
-             object = dbCollection.findOne(new BasicDBObject(MONGO_ID_FIELD, childId));
+            object = dbCollection.findOne(new BasicDBObject(MONGO_ID_FIELD, childId));
         }
 
         if (object == null) {
-             responder.noSuchResource(childId);
+            responder.noSuchResource(childId);
         } else {
             responder.resourceRead(new MongoObjectResource(this, object, null));
         }
@@ -69,7 +69,7 @@ class MongoCollectionResource extends MongoResource {
     @Override
     protected Object updateChild(RequestContext ctx, String childId, Object child) {
         if (child instanceof DBObject) {
-            DBObject childObject = (DBObject)child;
+            DBObject childObject = (DBObject) child;
             WriteResult wResult = dbCollection.update(new BasicDBObject(MONGO_ID_FIELD, childObject.get(MONGO_ID_FIELD)), childObject);
             return wResult;
         } else {
@@ -80,16 +80,15 @@ class MongoCollectionResource extends MongoResource {
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
         DBObject queryObject = new BasicDBObject();
-        if (ctx != null && ctx.getResourceParams()!= null && ctx.getResourceParams().contains("q")) {
-           String queryString = ctx.getResourceParams().value("q");
-           queryObject = (DBObject) JSON.parse(queryString);
+        if (ctx != null && ctx.getResourceParams() != null && ctx.getResourceParams().contains("q")) {
+            String queryString = ctx.getResourceParams().value("q");
+            queryObject = (DBObject) JSON.parse(queryString);
         }
 
         DBObject returnFields = new BasicDBObject();
-        if (ctx != null && ctx.getReturnFields() != null) {
-
+        if (ctx != null && ctx.getReturnFields() != null && ! ctx.getReturnFields().isAll() ) {
             ctx.getReturnFields().forEach((fieldName) -> {
-                  returnFields.put(fieldName, true);
+                returnFields.put(fieldName, true);
             });
         }
 
@@ -121,7 +120,7 @@ class MongoCollectionResource extends MongoResource {
             e.printStackTrace();
         }
 
-       responder.resourceCreated(new MongoObjectResource(this, basicDBObject, null));
+        responder.resourceCreated(new MongoObjectResource(this, basicDBObject, null));
     }
 
     public String toString() {
@@ -140,8 +139,8 @@ class MongoCollectionResource extends MongoResource {
 
         for (String key : keys) {
             if (!key.equals(MBAAS_ID_FIELD)) { //don't append the ID field again
-                Object value = resourceState.getProperty( key );
-                if ( value instanceof ResourceState ) {
+                Object value = resourceState.getProperty(key);
+                if (value instanceof ResourceState) {
                     value = createObject((ResourceState) value);
                 }
                 basicDBObject.append(key, value);
