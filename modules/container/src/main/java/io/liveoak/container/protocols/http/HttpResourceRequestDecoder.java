@@ -33,16 +33,16 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if ( cause instanceof DecoderException ) {
+        if (cause instanceof DecoderException) {
             Throwable rootCause = cause.getCause();
-            if ( rootCause instanceof UnsupportedMediaTypeException ) {
-                DefaultFullHttpResponse response = new DefaultFullHttpResponse( HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_ACCEPTABLE );
-                response.headers().add( HttpHeaders.Names.CONTENT_LENGTH, 0 );
-                ctx.writeAndFlush( response );
+            if (rootCause instanceof UnsupportedMediaTypeException) {
+                DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_ACCEPTABLE);
+                response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
+                ctx.writeAndFlush(response);
                 return;
             }
         }
-        super.exceptionCaught( ctx, cause );
+        super.exceptionCaught(ctx, cause);
     }
 
     @Override
@@ -52,27 +52,27 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
 
         String path = decoder.path();
 
-        int lastDotLoc = path.lastIndexOf( '.' );
+        int lastDotLoc = path.lastIndexOf('.');
 
         String extension = null;
 
-        if ( lastDotLoc > 0 ) {
-            extension = path.substring( lastDotLoc + 1 );
+        if (lastDotLoc > 0) {
+            extension = path.substring(lastDotLoc + 1);
         }
 
-        String acceptHeader = msg.headers().get(HttpHeaders.Names.ACCEPT );
-        if ( acceptHeader == null ) {
+        String acceptHeader = msg.headers().get(HttpHeaders.Names.ACCEPT);
+        if (acceptHeader == null) {
             acceptHeader = "application/json";
         }
-        MediaTypeMatcher mediaTypeMatcher = new MediaTypeMatcher( acceptHeader, extension );
+        MediaTypeMatcher mediaTypeMatcher = new MediaTypeMatcher(acceptHeader, extension);
 
         String authToken = getAuthorizationToken(msg);
 
         ResourceParams params = DefaultResourceParams.instance(decoder.parameters());
 
         if (msg.getMethod().equals(HttpMethod.POST)) {
-            String contentTypeHeader = msg.headers().get( HttpHeaders.Names.CONTENT_TYPE );
-            MediaType contentType = new MediaType( contentTypeHeader );
+            String contentTypeHeader = msg.headers().get(HttpHeaders.Names.CONTENT_TYPE);
+            MediaType contentType = new MediaType(contentTypeHeader);
             out.add(new ResourceRequest.Builder(RequestType.CREATE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
@@ -88,8 +88,8 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
                     .returnFields(decodeReturnFields(params))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.PUT)) {
-            String contentTypeHeader = msg.headers().get( HttpHeaders.Names.CONTENT_TYPE );
-            MediaType contentType = new MediaType( contentTypeHeader );
+            String contentTypeHeader = msg.headers().get(HttpHeaders.Names.CONTENT_TYPE);
+            MediaType contentType = new MediaType(contentTypeHeader);
             out.add(new ResourceRequest.Builder(RequestType.UPDATE, new ResourcePath(decoder.path()))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
@@ -107,17 +107,25 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
     }
 
     private ReturnFields decodeReturnFields(ResourceParams params) {
-        String value = params.value("fields");
-        ReturnFields returnFields = ReturnFields.ALL;
-        if (value != null &&  ! "".equals(value)) {
-            returnFields = new ReturnFieldsImpl(value);
+        String fieldsValue = params.value("fields");
+        ReturnFieldsImpl returnFields = null;
+        if (fieldsValue != null && !"".equals(fieldsValue)) {
+            returnFields = new ReturnFieldsImpl(fieldsValue);
+        } else {
+            returnFields = new ReturnFieldsImpl("*");
+        }
+
+        String expandValue = params.value("expand");
+
+        if (expandValue != null && !"".equals(expandValue)) {
+            returnFields = returnFields.withExpand( expandValue );
         }
 
         return returnFields;
     }
 
     protected ResourceState decodeState(MediaType mediaType, ByteBuf content) throws Exception {
-        return codecManager.decode( mediaType, content );
+        return codecManager.decode(mediaType, content);
     }
 
     protected Pagination decodePagination(ResourceParams params) {
@@ -128,6 +136,7 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
             public int offset() {
                 return offset;
             }
+
             public int limit() {
                 return limit;
             }

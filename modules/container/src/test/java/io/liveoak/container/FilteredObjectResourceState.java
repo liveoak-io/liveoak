@@ -3,6 +3,7 @@ package io.liveoak.container;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.state.ResourceState;
 
+import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +19,16 @@ public class FilteredObjectResourceState implements ResourceState {
     public FilteredObjectResourceState(ResourceState delegate, ReturnFields filter) {
         this.delegate = delegate;
         this.filter = filter;
+    }
+
+    @Override
+    public void uri(URI uri) {
+        this.delegate.uri( uri );
+    }
+
+    @Override
+    public URI uri() {
+        return this.delegate.uri();
     }
 
     @Override

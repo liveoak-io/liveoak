@@ -163,7 +163,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertEquals("Data set up", 6, collection.count());
 
         // This should return 2 items
-        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/testQueryCollection?fields=*,members(*)&q=" + URLEncoder.encode("{lastName:{$gt:'E', $lt:'R'}}", "utf-8"));
+        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/testQueryCollection?expand=members&q=" + URLEncoder.encode("{lastName:{$gt:'E', $lt:'R'}}", "utf-8"));
 
         assertEquals(200, response.getStatusLine().getStatusCode());
 
@@ -181,7 +181,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
 
         // This should return 2 items
-        response = testSimpleGetMethod(baseURL + "/testQueryCollection?fields=*,members(*)&q=" + URLEncoder.encode("{lastName:'Doe'}", "utf-8"));
+        response = testSimpleGetMethod(baseURL + "/testQueryCollection?expand=members&q=" + URLEncoder.encode("{lastName:'Doe'}", "utf-8"));
 
         assertEquals(200, response.getStatusLine().getStatusCode());
 

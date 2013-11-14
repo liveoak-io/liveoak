@@ -2,6 +2,7 @@ package io.liveoak.container.codec;
 
 import io.liveoak.spi.state.ResourceState;
 
+import java.net.URI;
 import java.util.*;
 
 /**
@@ -25,6 +26,16 @@ public class DefaultResourceState implements ResourceState {
     @Override
     public void id(String id) {
         this.id = id;
+    }
+
+    @Override
+    public void uri(URI uri) {
+        this.uri = uri;
+    }
+
+    @Override
+    public URI uri() {
+        return this.uri;
     }
 
     @Override
@@ -57,6 +68,7 @@ public class DefaultResourceState implements ResourceState {
     }
 
     private String id;
+    private URI uri;
     private Map<String, Object> properties = new HashMap<>();
     private List<ResourceState> members = new ArrayList<>();
 

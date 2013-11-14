@@ -1,5 +1,6 @@
 package io.liveoak.container;
 
+import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.Resource;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,9 +37,13 @@ public class DirectConnectorTest {
     @Test
     public void testRead() throws Throwable {
 
-        RequestContext requestContext = new RequestContext.Builder().build();
+        ReturnFields fields = new ReturnFieldsImpl( "*,members(*,members(*))");
+
+        RequestContext requestContext = new RequestContext.Builder().returnFields( fields ).build();
         ResourceState result = this.connector.read(requestContext, "/");
         assertThat(result).isNotNull();
+
+        System.err.println( "result: " + result );
 
         List<ResourceState> members = result.members();
 
@@ -57,7 +62,9 @@ public class DirectConnectorTest {
     @Test
     public void testCreate() throws Throwable {
 
-        RequestContext requestContext = new RequestContext.Builder().build();
+        ReturnFields fields = new ReturnFieldsImpl( "*" );
+
+        RequestContext requestContext = new RequestContext.Builder().returnFields( fields ).build();
         ResourceState bob = new DefaultResourceState( "bob" );
         bob.putProperty("name", "Bob McWhirter");
 
@@ -70,8 +77,10 @@ public class DirectConnectorTest {
 
         assertThat( people ).isNotNull();
 
+        System.err.println( people );
+
         ResourceState foundBob = people.members().stream().filter( (e)->e.id().equals("bob")).findFirst().get();
-        assertThat( foundBob ).isNotNull();
+        assertThat(foundBob).isNotNull();
         assertThat( foundBob.id() ).isEqualTo( "bob" );
         assertThat( foundBob.getPropertyNames() ).hasSize( 0 );
 

@@ -47,8 +47,19 @@ public abstract class AbstractEncodingDriver implements EncodingDriver {
         return this.object;
     }
 
-    EncodingDriver parent() {
+    @Override
+    public EncodingDriver parent() {
         return this.parent;
+    }
+
+    public int depth() {
+        int depth = 0;
+        EncodingDriver current = this;
+        while ( current != null ) {
+            ++depth;
+            current = current.parent();
+        }
+        return depth;
     }
 
     public void encodeNext() {

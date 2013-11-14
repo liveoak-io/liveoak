@@ -20,7 +20,7 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
 
     @Override
     public void close() throws Exception {
-        if ( hasMembers ) {
+        if (hasMembers) {
             encoder().endMembers();
         }
         parent().encodeNext();
@@ -30,7 +30,10 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
 
         @Override
         public void accept(Resource resource) {
-            if ( ! hasMembers ) {
+            if (!returnFields().included("members")) {
+                return;
+            }
+            if (!hasMembers) {
                 try {
                     encoder().startMembers();
                 } catch (Exception e) {
@@ -38,7 +41,11 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
                 }
                 hasMembers = true;
             }
-            addChildDriver( new ResourceEncodingDriver( MembersEncodingDriver.this, resource, returnFields().child( "members" ) ) );
+            if (returnFields().child("members").isEmpty()) {
+                addChildDriver(new ValueEncodingDriver(MembersEncodingDriver.this, resource));
+            } else {
+                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, returnFields().child("members")));
+            }
         }
 
         @Override

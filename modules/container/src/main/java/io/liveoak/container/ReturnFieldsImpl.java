@@ -2,18 +2,14 @@ package io.liveoak.container;
 
 import io.liveoak.spi.ReturnFields;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 public class ReturnFieldsImpl implements ReturnFields {
 
-
-    private HashMap<String, ReturnFields> fields = new LinkedHashMap<>();
+    private HashMap<String, ReturnFieldsImpl> fields = new LinkedHashMap<>();
 
     private static enum XpctState {
         xpctIdentCommaOpen,
@@ -41,7 +37,7 @@ public class ReturnFieldsImpl implements ReturnFields {
         StringBuilder token = new StringBuilder(buf.length);
 
         // stack for handling depth
-        LinkedList<HashMap<String, ReturnFields>> specs = new LinkedList<>();
+        LinkedList<HashMap<String, ReturnFieldsImpl>> specs = new LinkedList<>();
         specs.add(fields);
 
         // parser state
@@ -131,7 +127,7 @@ public class ReturnFieldsImpl implements ReturnFields {
             if (current == null) {
                 return false;
             }
-            if ( current.fields.containsKey("*" ) ) {
+            if (current.fields.containsKey("*")) {
                 return true;
             }
             if (!current.fields.containsKey(path)) {
@@ -154,11 +150,25 @@ public class ReturnFieldsImpl implements ReturnFields {
 
     @Override
     public boolean isAll() {
-        return this.fields.keySet().contains( "*" );
+        return this.fields.keySet().contains("*");
     }
 
     @Override
     public String toString() {
         return "[ReturnFieldsImpl: fields=" + this.fields + "]";
+    }
+
+    public ReturnFieldsImpl withExpand(String spec) {
+        StringTokenizer expandFields = new StringTokenizer(spec);
+
+        ReturnFieldsImpl merged = new ReturnFieldsImpl();
+        merged.fields.putAll(this.fields);
+
+        while (expandFields.hasMoreTokens()) {
+            String expandField = expandFields.nextToken();
+            merged.fields.put(expandField, new ReturnFieldsImpl("*"));
+        }
+
+        return merged;
     }
 }

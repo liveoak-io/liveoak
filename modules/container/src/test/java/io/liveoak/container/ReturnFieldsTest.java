@@ -52,10 +52,30 @@ public class ReturnFieldsTest {
         assertThat( spec.included( "tacos" ) ).isFalse();
 
         assertThat( spec.child( "dog" ) ).isNotNull();
-        assertThat( spec.child( "dog" ).included( "dogname" ) ).isTrue();
+        assertThat( spec.child( "dog" ).included("dogname") ).isTrue();
 
         assertThat( spec.child( "cat" ) ).isNotNull();
         assertThat( spec.child( "cat" ).included( "name") ).isFalse();
+    }
+
+    @Test
+    public void testMergeWithExpand() {
+        ReturnFieldsImpl fields = new ReturnFieldsImpl("*");
+        fields = fields.withExpand( "members" );
+
+        assertThat( fields.included( "name" ) ).isTrue();
+        assertThat( fields.included( "members" ) ).isTrue();
+        assertThat(fields.child("members").included("name")).isTrue();
+
+        fields = new ReturnFieldsImpl( "wife" ).withExpand( "dogs" );
+
+        assertThat( fields.included( "wife" ) ).isTrue();
+        assertThat( fields.included( "name" ) ).isFalse();
+
+        assertThat( fields.child( "dogs" ) ).isNotNull();
+        assertThat( fields.child( "dogs" ).included( "name" ) ).isTrue();
+        assertThat( fields.child( "dogs" ).included( "breed" ) ).isTrue();
+        assertThat( fields.child( "dogs" ).included( "breed" ) ).isTrue();
     }
 
 

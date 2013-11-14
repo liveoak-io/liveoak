@@ -19,7 +19,6 @@ import java.util.List;
  */
 public class HTMLEncoder implements Encoder {
 
-
     @Override
     public void initialize(ByteBuf buffer) throws Exception {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
@@ -80,11 +79,6 @@ public class HTMLEncoder implements Encoder {
 
     @Override
     public void startResource(Resource resource) throws Exception {
-        ++this.depth;
-
-        if ( depth > 2 ) {
-            return;
-        }
         startTag("div");
         attribute("class", "resource");
 
@@ -93,15 +87,6 @@ public class HTMLEncoder implements Encoder {
     }
 
     protected void resourceLink(Resource resource) throws XMLStreamException {
-        if (depth > 1) {
-            startTag("a");
-            attribute("href", resource.uri().toString());
-            text(resource.id());
-            endTag("a");
-            return;
-
-        }
-
         List<Resource> lineage = new ArrayList<>();
 
         Resource current = resource;
@@ -137,18 +122,11 @@ public class HTMLEncoder implements Encoder {
 
     @Override
     public void endResource(Resource resource) throws Exception {
-        --this.depth;
-        if ( depth > 1 ) {
-            return;
-        }
         endTag("div");
     }
 
     @Override
     public void startProperties() throws Exception {
-        if ( depth > 1 ) {
-            return;
-        }
         startTag("table");
         startTag("tr");
         startTag("th");
@@ -162,17 +140,11 @@ public class HTMLEncoder implements Encoder {
 
     @Override
     public void endProperties() throws Exception {
-        if ( depth > 1 ) {
-            return;
-        }
         endTag("table");
     }
 
     @Override
     public void startProperty(String propertyName) throws Exception {
-        if ( depth > 1 ) {
-            return;
-        }
         startTag("tr");
         startTag("td");
         text(propertyName);
@@ -182,27 +154,18 @@ public class HTMLEncoder implements Encoder {
 
     @Override
     public void endProperty(String propertyName) throws Exception {
-        if ( depth > 1 ) {
-            return;
-        }
         endTag("td");
         endTag("tr");
     }
 
     @Override
     public void startMembers() throws Exception {
-        if ( depth > 1 ) {
-            return;
-        }
         startTag("div");
         attribute("class", "members");
     }
 
     @Override
     public void endMembers() throws Exception {
-        if ( depth > 1 ) {
-            return;
-        }
         endTag("div");
     }
 
@@ -216,45 +179,35 @@ public class HTMLEncoder implements Encoder {
 
     @Override
     public void writeValue(String value) throws Exception {
-        if ( depth > 1 ) {
-            return;
-        }
         text(value);
     }
 
     @Override
     public void writeValue(Integer value) throws Exception {
-        if ( depth > 1 ) {
-            return;
-        }
         text(value.toString());
     }
 
     @Override
     public void writeValue(Double value) throws Exception {
-        if ( depth > 1 ) {
-            return;
-        }
         text(value.toString());
     }
 
     @Override
     public void writeValue(Date value) throws Exception {
-        if ( depth > 1 ) {
-            return;
-        }
         text(value.toString());
     }
 
     @Override
     public void writeLink(Resource resource) throws Exception {
+        startTag( "div" );
+        attribute( "class", "resource" );
         startTag( "a" );
         attribute( "href", resource.uri().toString() );
         text( resource.id() );
         endTag( "a" );
+        endTag( "div" );
     }
 
-    private int depth;
     private XMLEventWriter writer;
     private XMLEventFactory eventFactory;
 }
