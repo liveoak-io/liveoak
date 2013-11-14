@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
@@ -54,7 +55,7 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
         assertThat( db.getCollectionNames() ).hasSize( 4 );
 
 
-        ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH);
+        ResourceState result = connector.read(new RequestContext.Builder().returnFields( new ReturnFieldsImpl( "*" ).withExpand( "members" ) ).build(), BASEPATH);
 
         // verify response
         assertThat(result).isNotNull();
@@ -113,7 +114,7 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
         assertEquals(1014, db.getCollectionNames().size());
 
         // This should return 23 collections
-        RequestContext requestContext = new RequestContext.Builder().pagination(new SimplePagination(11, 23)).build();
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand( "members" )).pagination(new SimplePagination(11, 23)).build();
         ResourceState result = connector.read(requestContext, BASEPATH);
 
         //verify the result
@@ -131,7 +132,7 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
         }
 
         // This should return 3 collections as a total number of them is 1013
-        requestContext = new RequestContext.Builder().pagination(new SimplePagination(1010, 20)).build();
+        requestContext = new RequestContext.Builder().returnFields( new ReturnFieldsImpl("*").withExpand( "members" ) ).pagination(new SimplePagination(1010, 20)).build();
         result = connector.read(requestContext, BASEPATH);
 
         //verify the result
@@ -175,7 +176,7 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
         // This should return 2 items
         SimpleResourceParams resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
-        RequestContext requestContext = new RequestContext.Builder().resourceParams(resourceParams).build();
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand( "members" )).resourceParams(resourceParams).build();
         ResourceState result = connector.read(requestContext, BASEPATH + "/testQueryCollection");
 
         // verify response
@@ -191,7 +192,7 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
         //Try another query
         resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:'Doe'}");
-        requestContext = new RequestContext.Builder().resourceParams(resourceParams).build();
+        requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*" ).withExpand( "members" ) ).resourceParams(resourceParams).build();
         result = connector.read(requestContext, BASEPATH + "/testQueryCollection");
 
         assertThat(result).isNotNull();
@@ -213,6 +214,8 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
             obj.put("city", rec[3]);
 
             collection.insert(obj);
+
+            System.err.println( "INSERT: " + obj );
         }
     }
 

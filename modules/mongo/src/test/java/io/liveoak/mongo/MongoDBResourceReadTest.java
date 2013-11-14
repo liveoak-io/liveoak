@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
@@ -71,7 +72,9 @@ public class MongoDBResourceReadTest extends NewBaseMongoDBTest {
         assertEquals(1, db.getCollection(methodName).getCount());
         String id = object.getObjectId("_id").toString();
 
-        ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/child");
+        ResourceState result = connector.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl( "*,grandchild(*)")).build(), BASEPATH + "/" + methodName + "/" + id + "/child");
+
+        System.err.println( "result :: " + result );
 
         //verify response
         assertThat(result).isNotNull();

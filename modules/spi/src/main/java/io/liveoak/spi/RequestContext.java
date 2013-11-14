@@ -32,6 +32,10 @@ public interface RequestContext {
             this.resourceParams = resourceParams;
             return this;
         }
+        public Builder returnFields(ReturnFields returnFields) {
+            this.returnFields = returnFields;
+            return this;
+        }
 
         public RequestContext build() {
             return this;
@@ -59,7 +63,7 @@ public interface RequestContext {
 
         @Override
         public ReturnFields getReturnFields() {
-            return null;
+            return returnFields;
         }
 
         @Override
@@ -80,5 +84,6 @@ public interface RequestContext {
         private SecurityContext securityContext;
         private Pagination pagination = Pagination.NONE;
         private ResourceParams resourceParams = ResourceParams.NONE;
+        private ReturnFields returnFields = ReturnFields.ALL;
     }
 }

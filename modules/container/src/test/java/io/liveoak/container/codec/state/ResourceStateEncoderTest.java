@@ -11,6 +11,7 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -94,17 +95,12 @@ public class ResourceStateEncoderTest {
 
         assertThat( encoded.getPropertyNames() ).contains( "dog" );
         assertThat( encoded.getProperty("dog")).isNotNull();
-        assertThat( encoded.getProperty( "dog" )).isInstanceOf(ResourceState.class);
+        assertThat( encoded.getProperty( "dog" )).isInstanceOf(URI.class);
 
         assertThat( encoded.members() ).hasSize(0);
 
-        ResourceState encodedMoses = (ResourceState) encoded.getProperty( "dog" );
-        assertThat( encodedMoses.getPropertyNames() ).hasSize(2);
-        assertThat( encodedMoses.getPropertyNames() ).contains("name");
-        assertThat( encodedMoses.getProperty("name") ).isEqualTo("Moses");
-        assertThat( encodedMoses.getPropertyNames() ).contains("breed");
-        assertThat( encodedMoses.getProperty("breed") ).isEqualTo("German Shepherd");
-        assertThat( encodedMoses.members() ).hasSize( 0 );
+        URI encodedMoses = (URI) encoded.getProperty( "dog" );
+        assertThat( encodedMoses ).isEqualTo( mosesResourse.uri() );
     }
 
     @Test
@@ -146,11 +142,11 @@ public class ResourceStateEncoderTest {
 
         assertThat( encoded.members() ).hasSize(0);
 
-        List<ResourceState> encodedDogs = (List<ResourceState>) encoded.getProperty( "dogs" );
+        List<URI> encodedDogs = (List<URI>) encoded.getProperty( "dogs" );
 
         assertThat( encodedDogs ).hasSize( 2 );
 
-        assertThat( encodedDogs.get(0).getProperty("name")).isEqualTo( "Moses" );
-        assertThat( encodedDogs.get(1).getProperty("name")).isEqualTo( "Only" );
+        assertThat( encodedDogs.get(0)).isEqualTo( mosesResourse.uri() );
+        assertThat( encodedDogs.get(1)).isEqualTo(onlyResource.uri());
     }
 }

@@ -15,6 +15,8 @@ public interface EncodingDriver {
     void encode() throws Exception;
     void close() throws Exception;
 
+    EncodingDriver parent();
+
     void encodeNext();
 
 }

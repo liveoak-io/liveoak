@@ -26,6 +26,10 @@ public class RootMongoResource extends MongoResource implements RootResource {
     protected DB db;
     private String id;
 
+    public RootMongoResource() {
+        super( null );
+    }
+
     public RootMongoResource(String id) {
         super(null);
         this.id = id;

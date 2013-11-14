@@ -1,5 +1,6 @@
 package io.liveoak.container.subscriptions;
 
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.container.codec.ResourceCodec;
 import io.liveoak.spi.MediaType;
@@ -53,7 +54,8 @@ public class StompSubscription implements Subscription {
         message.headers().put("action", action);
         message.headers().put("status", "" + status);
         message.headers().put("location", resource.uri().toString() );
-        message.content(this.codec.encode(null, resource));
+        RequestContext requestContext = new RequestContext.Builder().build();
+        message.content(this.codec.encode(requestContext, resource));
         return message;
     }
 

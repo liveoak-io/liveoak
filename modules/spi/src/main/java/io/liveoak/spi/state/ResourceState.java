@@ -1,5 +1,6 @@
 package io.liveoak.spi.state;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,10 @@ public interface ResourceState {
      * @param id The ID of the resource.
      */
     void id(String id);
+
+    void uri(URI uri);
+
+    URI uri();
 
     /** Add a property to the state.
      *

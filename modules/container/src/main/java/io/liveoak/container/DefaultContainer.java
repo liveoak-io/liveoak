@@ -74,7 +74,6 @@ public class DefaultContainer implements Container, Resource {
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
-        System.err.println( "container read member: " + id );
         try {
             if ( id == null ) {
                 responder.resourceRead( this );
@@ -82,12 +81,10 @@ public class DefaultContainer implements Container, Resource {
             }
 
             if (!this.resources.containsKey(id)) {
-                System.err.println( "container no such: " + id );
                 responder.noSuchResource(id);
                 return;
             }
 
-            System.err.println( "container found: " + this.resources.get(id));
             responder.resourceRead(this.resources.get(id));
 
         } catch (Throwable t) {

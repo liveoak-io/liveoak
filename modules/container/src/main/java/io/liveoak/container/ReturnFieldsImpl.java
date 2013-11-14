@@ -2,18 +2,14 @@ package io.liveoak.container;
 
 import io.liveoak.spi.ReturnFields;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 public class ReturnFieldsImpl implements ReturnFields {
 
-    private HashMap<String, ReturnFields> fields = new LinkedHashMap<>();
-
+    private HashMap<String, ReturnFieldsImpl> fields = new LinkedHashMap<>();
 
     private static enum XpctState {
         xpctIdentCommaOpen,
@@ -37,11 +33,11 @@ public class ReturnFieldsImpl implements ReturnFields {
             throw new IllegalArgumentException("Fields spec is null or empty!");
         }
         // parse the spec, building up the tree for nested children
-        char [] buf = spec.toCharArray();
+        char[] buf = spec.toCharArray();
         StringBuilder token = new StringBuilder(buf.length);
 
         // stack for handling depth
-        LinkedList<HashMap<String, ReturnFields>> specs = new LinkedList<>();
+        LinkedList<HashMap<String, ReturnFieldsImpl>> specs = new LinkedList<>();
         specs.add(fields);
 
         // parser state
@@ -80,6 +76,7 @@ public class ReturnFieldsImpl implements ReturnFields {
                 if (fldState == FieldState.name) {
                     specs.getLast().put(token.toString(), null);
                     token.setLength(0);
+
                 }
                 specs.removeLast();
 
@@ -97,9 +94,10 @@ public class ReturnFieldsImpl implements ReturnFields {
         if (specs.size() > 1) {
             error(spec, i);
         }
+
         if (token.length() > 0) {
             specs.getLast().put(token.toString(), null);
-        } else if (state != XpctState.xpctAnything) {
+        } else if (!(state == XpctState.xpctAnything || state == XpctState.xpctComma)) {
             error(spec, i);
         }
     }
@@ -110,7 +108,14 @@ public class ReturnFieldsImpl implements ReturnFields {
 
     @Override
     public ReturnFields child(String field) {
-        return fields.get(field);
+        ReturnFields returnFields = fields.get(field);
+        if (returnFields == null) {
+            returnFields = fields.get("*");
+            if (returnFields == null) {
+                returnFields = ReturnFields.NONE;
+            }
+        }
+        return returnFields;
     }
 
     @Override
@@ -121,9 +126,12 @@ public class ReturnFieldsImpl implements ReturnFields {
         }
         ReturnFieldsImpl current = this;
 
-        for (String path: pathSegments) {
+        for (String path : pathSegments) {
             if (current == null) {
                 return false;
+            }
+            if (current.fields.containsKey("*")) {
+                return true;
             }
             if (!current.fields.containsKey(path)) {
                 return false;
@@ -136,5 +144,34 @@ public class ReturnFieldsImpl implements ReturnFields {
     @Override
     public Iterator<String> iterator() {
         return fields.keySet().iterator();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return this.fields.isEmpty();
+    }
+
+    @Override
+    public boolean isAll() {
+        return this.fields.keySet().contains("*");
+    }
+
+    @Override
+    public String toString() {
+        return "[ReturnFieldsImpl: fields=" + this.fields + "]";
+    }
+
+    public ReturnFieldsImpl withExpand(String spec) {
+        StringTokenizer expandFields = new StringTokenizer(spec);
+
+        ReturnFieldsImpl merged = new ReturnFieldsImpl();
+        merged.fields.putAll(this.fields);
+
+        while (expandFields.hasMoreTokens()) {
+            String expandField = expandFields.nextToken();
+            merged.fields.put(expandField, new ReturnFieldsImpl("*"));
+        }
+
+        return merged;
     }
 }

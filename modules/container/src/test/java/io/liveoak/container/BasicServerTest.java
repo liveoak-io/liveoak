@@ -169,7 +169,7 @@ public class BasicServerTest {
         // people collection should be enumerable from the root
 
 
-        getRequest = new HttpGet("http://localhost:8080/memory");
+        getRequest = new HttpGet("http://localhost:8080/memory?expand=members");
         getRequest.addHeader(header);
 
         response = this.httpClient.execute(getRequest);

@@ -18,6 +18,7 @@ package io.liveoak.mongo;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
@@ -96,7 +97,7 @@ public class MongoDBResourceDeleteTest extends NewBaseMongoDBTest{
         assertThat(db.getCollection(methodName).findOne(new BasicDBObject("_id", new ObjectId(id)))).isNotNull();
 
         // now delete the object
-        ResourceState result = connector.delete(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo");
+        ResourceState result = connector.delete(new RequestContext.Builder().returnFields( new ReturnFieldsImpl( "bar(ABC(*))")).build(), BASEPATH + "/" + methodName + "/" + id + "/foo");
 
         // verify we are getting back the object which was deleted
         assertThat(result).isNotNull();
@@ -151,7 +152,9 @@ public class MongoDBResourceDeleteTest extends NewBaseMongoDBTest{
         assertThat(db.getCollection(methodName).findOne(new BasicDBObject("_id", new ObjectId(id)))).isNotNull();
 
         // now delete the object
-        ResourceState result = connector.delete(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo");
+        ResourceState result = connector.delete(new RequestContext.Builder().returnFields( new ReturnFieldsImpl( "bar(ABC(*))")).build(), BASEPATH + "/" + methodName + "/" + id + "/foo");
+
+        System.err.println( "result: " + result );
 
         // verify we are getting back the object which was deleted
         assertThat(result).isNotNull();

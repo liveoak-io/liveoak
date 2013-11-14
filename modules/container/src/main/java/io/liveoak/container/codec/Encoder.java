@@ -3,6 +3,7 @@ package io.liveoak.container.codec;
 import io.netty.buffer.ByteBuf;
 import io.liveoak.spi.resource.async.Resource;
 
+import java.net.URI;
 import java.util.Date;
 
 /**
@@ -15,6 +16,8 @@ public interface Encoder extends AutoCloseable {
 
     void startResource(Resource resource) throws Exception;
     void endResource(Resource resource) throws Exception;
+
+    void writeLink(Resource link) throws Exception;
 
     void startProperties() throws Exception;
     void endProperties() throws Exception;
@@ -32,4 +35,5 @@ public interface Encoder extends AutoCloseable {
     void writeValue(Integer value) throws Exception;
     void writeValue(Double value) throws Exception;
     void writeValue(Date value) throws Exception;
+
 }
