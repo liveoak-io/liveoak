@@ -72,6 +72,11 @@ public class BaseResponder implements Responder {
     }
 
     @Override
+    public void resourceAlreadyExists(String id) {
+        this.ctx.writeAndFlush( new ResourceErrorResponse( this.inReplyTo, ResourceErrorResponse.ErrorType.RESOURCE_ALREADY_EXISTS) );
+    }
+
+    @Override
     public void internalError(String message) {
         this.ctx.writeAndFlush( new ResourceErrorResponse( this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR) );
     }

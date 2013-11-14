@@ -20,19 +20,26 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceNotFoundException;
+import io.liveoak.spi.state.ResourceState;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class MongoDBResourceReadTest extends BaseMongoDBTest {
+public class MongoDBResourceReadTest extends NewBaseMongoDBTest {
 
     @Test
-    public void testSimpleGet() throws Exception {
+    public void testGetSimple() throws Exception {
         String methodName = "testSimpleGet";
         assertFalse(db.collectionExists(methodName));
 
@@ -43,22 +50,16 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals(1, db.getCollection(methodName).getCount());
         String id = object.getObjectId("_id").toString();
 
-        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/" + methodName + "/" + id);
-        assertEquals(200, response.getStatusLine().getStatusCode());
+        ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
 
-        // verify response
-        ObjectMapper mapper = new ObjectMapper();
-
-        JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
-
-        assertEquals(id, jsonNode.get("id").asText());
-        assertEquals("bar", jsonNode.get("foo").asText());
-        assertNotNull(jsonNode.get("self"));
-        assertEquals("/storage/testSimpleGet/" + id, jsonNode.get("self").get("href").asText());
+        //verify response
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo(id);
+        assertThat(result.getProperty("foo")).isEqualTo("bar");
     }
 
     @Test
-    public void testComplexGet() throws Exception {
+    public void testGetChild() throws Exception {
         String methodName = "testComplexGet";
         assertFalse(db.collectionExists(methodName));
 
@@ -70,35 +71,20 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals(1, db.getCollection(methodName).getCount());
         String id = object.getObjectId("_id").toString();
 
-        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/" + methodName + "/" + id + "/child");
-        assertEquals(200, response.getStatusLine().getStatusCode());
+        ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/child");
 
-        // verify response
-        ObjectMapper mapper = new ObjectMapper();
+        //verify response
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo("child");
+        ResourceState grandChild = (ResourceState) result.getProperty("grandchild");
+        assertThat(grandChild).isNotNull();
+        assertThat(grandChild.id()).isEqualTo("grandchild");
+        assertThat(grandChild.getProperty("foo3")).isEqualTo("bar3");
 
-        ObjectWriter writer = mapper.writer().withDefaultPrettyPrinter();
-        JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
-
-        System.out.println(writer.writeValueAsString(jsonNode));
-
-        response = testSimpleGetMethod(baseURL + "/" + methodName + "/" + id + "/child/grandchild");
-        assertEquals(200, response.getStatusLine().getStatusCode());
-
-        // verify response
-         mapper = new ObjectMapper();
-
-        writer = mapper.writer().withDefaultPrettyPrinter();
-        jsonNode = mapper.readTree(response.getEntity().getContent());
-
-        //System.out.println(writer.writeValueAsString(jsonNode));
-
-
-//        assertEquals(3, jsonNode.size()); // id, _self, bar
-//        assertEquals(id, jsonNode.get("id").asText());
-//        assertEquals("bar", jsonNode.get("foo").asText());
-//        assertNotNull(jsonNode.get("_self"));
-//        assertEquals("/storage/testSimpleGet/" + id, jsonNode.get("_self").get("href").asText());
-
+        result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/child/grandchild");
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo("grandchild");
+        assertThat(result.getProperty("foo3")).isEqualTo("bar3");
     }
 
     @Test
@@ -106,8 +92,12 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         String methodName = "testGetInvalidId";
         assertFalse(db.collectionExists(methodName));
 
-        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/" + methodName + "/foobar123");
-        assertEquals(404, response.getStatusLine().getStatusCode());
+        try {
+            ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/foobar123");
+            fail( "shouldn't get here" );
+        } catch (ResourceNotFoundException rnfe) {
+            // expected
+        }
     }
 
     @Test
@@ -117,8 +107,12 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
         ObjectId id = new ObjectId();
 
-        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/" + methodName + "/" + id);
-        assertEquals(404, response.getStatusLine().getStatusCode());
+        try {
+            ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
+            fail( "shouldn't get here" );
+        } catch (ResourceNotFoundException rnfe) {
+            // expected
+        }
     }
 
 

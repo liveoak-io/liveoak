@@ -55,13 +55,12 @@ public class NewBaseMongoDBTest extends AbstractResourceTestCase {
         config.put("host", host);
 
         try {
-        mongoClient = new MongoClient(host, port);
-        db = mongoClient.getDB(database);
-        db.dropDatabase();
+            mongoClient = new MongoClient(host, port);
+            db = mongoClient.getDB(database);
+            db.dropDatabase();
         } catch (Exception e) {
-           e.printStackTrace();
+            e.printStackTrace();
         }
-
         return config;
     }
 }

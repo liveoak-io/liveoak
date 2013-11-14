@@ -120,11 +120,20 @@ public class RootMongoResource extends MongoResource implements RootResource {
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
 
         String id = state.id();
-        if (id == null) {
-            id = UUID.randomUUID().toString();
+
+        if (id == null || !db.collectionExists(id)) {
+
+            if (id == null) {
+                id = UUID.randomUUID().toString();
+            }
+
+            DBCollection collection = db.createCollection(id, new BasicDBObject()); //send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
+
+            responder.resourceCreated(new MongoCollectionResource(this, collection));
+        } else {
+            System.out.println("id : " + id);
+            responder.resourceAlreadyExists(id);
         }
-        DBCollection collection = db.createCollection(id, new BasicDBObject()); //send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
-        responder.resourceCreated(new MongoCollectionResource(this, collection));
     }
 
     @Override
