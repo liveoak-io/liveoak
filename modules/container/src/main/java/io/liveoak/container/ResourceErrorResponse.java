@@ -9,6 +9,7 @@ public class ResourceErrorResponse extends ResourceResponse {
         NOT_AUTHORIZED,
         NOT_ACCEPTABLE,
         NO_SUCH_RESOURCE,
+        RESOURCE_ALREADY_EXISTS,
         CREATE_NOT_SUPPORTED,
         READ_NOT_SUPPORTED,
         UPDATE_NOT_SUPPORTED,

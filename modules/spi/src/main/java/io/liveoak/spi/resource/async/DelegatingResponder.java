@@ -55,6 +55,11 @@ public class DelegatingResponder implements Responder {
     }
 
     @Override
+    public void resourceAlreadyExists(String id) {
+        delegate.resourceAlreadyExists( id );
+    }
+
+    @Override
     public void internalError(String message) {
         delegate.internalError( message );
     }

@@ -64,6 +64,12 @@ public interface Responder {
      */
     void noSuchResource(String id);
 
+    /** Indicate an attempt to create a new resource with an id that already exists.
+     *
+     * @param id The identifier used in the create.
+     */
+    void resourceAlreadyExists(String id);
+
     /** Indicate a temporary error condition that normally should not occur during
      * the processing of this request. Examples include DB unreachable, DB error ...
      *

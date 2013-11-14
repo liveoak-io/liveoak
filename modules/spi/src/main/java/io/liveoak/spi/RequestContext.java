@@ -28,6 +28,11 @@ public interface RequestContext {
             return this;
         }
 
+        public Builder resourceParams(ResourceParams resourceParams) {
+            this.resourceParams = resourceParams;
+            return this;
+        }
+
         public RequestContext build() {
             return this;
         }
@@ -49,7 +54,7 @@ public interface RequestContext {
 
         @Override
         public ResourceParams getResourceParams() {
-            return null;
+            return this.resourceParams;
         }
 
         @Override
@@ -74,5 +79,6 @@ public interface RequestContext {
 
         private SecurityContext securityContext;
         private Pagination pagination = Pagination.NONE;
+        private ResourceParams resourceParams = ResourceParams.NONE;
     }
 }

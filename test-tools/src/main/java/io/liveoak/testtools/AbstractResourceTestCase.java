@@ -5,6 +5,7 @@ import io.liveoak.container.DirectConnector;
 import io.liveoak.container.SimpleConfig;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.resource.RootResource;
+import org.junit.After;
 import org.junit.Before;
 import org.vertx.java.core.Vertx;
 
@@ -27,9 +28,16 @@ public abstract class AbstractResourceTestCase {
 
     @Before
     public void setUpContainer() throws Exception {
-        this.container = new DefaultContainer();
-        this.container.registerResource( createRootResource(), createConfig() );
-        this.connector = this.container.directConnector();
-        this.vertx = this.container.vertx();
+            this.container = new DefaultContainer();
+            this.container.registerResource( createRootResource(), createConfig() );
+            this.connector = this.container.directConnector();
+            this.vertx = this.container.vertx();
     }
+
+    @After
+    public void shutdownContainer() throws Exception {
+        this.vertx.stop();
+        this.container = null;
+    }
+
 }

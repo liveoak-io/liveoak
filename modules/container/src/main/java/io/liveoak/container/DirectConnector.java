@@ -81,7 +81,7 @@ public class DirectConnector {
         this.channel.writeInbound(request);
     }
 
-    public ResourceState create(RequestContext context, String path, ResourceState state) throws ExecutionException, InterruptedException {
+    public ResourceState create(RequestContext context, String path, ResourceState state) throws ResourceException, ExecutionException, InterruptedException {
         CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
         create(context, path, state, (response) -> {
@@ -98,7 +98,14 @@ public class DirectConnector {
             }
         });
 
-        return future.get();
+        try {
+            return future.get();
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof ResourceException) {
+                throw (ResourceException) e.getCause();
+            }
+            throw e;
+        }
     }
 
     public void read(RequestContext context, String path, Consumer<ResourceResponse> handler) {
@@ -175,11 +182,11 @@ public class DirectConnector {
         this.channel.writeInbound(request);
     }
 
-    public ResourceState delete(RequestContext context, String path) throws ExecutionException, InterruptedException {
+    public ResourceState delete(RequestContext context, String path) throws ResourceException, ExecutionException, InterruptedException {
         CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
         delete(context, path, (response) -> {
-            if (response.responseType() == ResourceResponse.ResponseType.UPDATED) {
+            if (response.responseType() == ResourceResponse.ResponseType.DELETED) {
                 try {
                     future.complete(encode(context, response.resource()));
                 } catch (Exception e) {
@@ -192,7 +199,14 @@ public class DirectConnector {
             }
         });
 
-        return future.get();
+        try {
+            return future.get();
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof ResourceException) {
+                throw (ResourceException) e.getCause();
+            }
+            throw e;
+        }
     }
 
 
@@ -218,6 +232,9 @@ public class DirectConnector {
                 break;
             case NO_SUCH_RESOURCE:
                 future.completeExceptionally(new ResourceNotFoundException(response.inReplyTo().resourcePath().toString()));
+                break;
+            case RESOURCE_ALREADY_EXISTS:
+                future.completeExceptionally(new ResourceAlreadyExistsException(response.inReplyTo().state().id()));
                 break;
             case CREATE_NOT_SUPPORTED:
                 future.completeExceptionally(new CreateNotSupportedException(response.inReplyTo().resourcePath().toString()));

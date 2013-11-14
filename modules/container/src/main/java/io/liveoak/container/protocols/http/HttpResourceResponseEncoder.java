@@ -67,6 +67,10 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
                             responseStatusCode = HttpResponseStatus.NOT_FOUND.code();
                             responseMessage = HttpResponseStatus.NOT_FOUND.reasonPhrase();
                             break;
+                        case RESOURCE_ALREADY_EXISTS:
+                            responseStatusCode = HttpResponseStatus.NOT_ACCEPTABLE.code();
+                            responseMessage = HttpResponseStatus.NOT_ACCEPTABLE.reasonPhrase();
+                            break;
                         case CREATE_NOT_SUPPORTED:
                             responseStatusCode = HttpResponseStatus.METHOD_NOT_ALLOWED.code();
                             responseMessage = "Create not supported";

@@ -4,10 +4,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+import io.liveoak.spi.Pagination;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceNotFoundException;
+import io.liveoak.spi.ResourceParams;
+import io.liveoak.spi.state.ResourceState;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.fest.assertions.Fail;
 import org.junit.Test;
 
 import java.net.URLEncoder;
+import java.util.*;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.*;
@@ -15,26 +22,23 @@ import static org.junit.Assert.*;
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class MongoDBCollectionReadTest extends BaseMongoDBTest {
+public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
 
     @Test
     public void testGetStorageEmpty() throws Exception {
         db.dropDatabase(); //TODO: create a new DB here instead of dropping the old one
         assertThat( db.getCollectionNames() ).hasSize( 0 );
 
-        CloseableHttpResponse response = testSimpleGetMethod(baseURL);
-        // This should return an empty list since there are no collections
-        assertThat( response.getStatusLine().getStatusCode() ).isEqualTo( 200 );
+        ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH);
 
         // verify response
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
-
-        assertThat( jsonNode.get( "id" ).asText() ).isEqualTo( "storage" );
-        assertThat( jsonNode.get("type").asText() ).isEqualTo("collection");
-        assertThat( jsonNode.get( "self" ).get( "href" ).asText() ).isEqualTo("/storage");
-        assertThat( jsonNode.get( "_members" ) ).isNull();
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo(BASEPATH);
+        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.members()).isEmpty();
     }
+
 
     @Test
     public void testGetStorageCollections() throws Exception {
@@ -49,23 +53,25 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
         assertThat( db.getCollectionNames() ).hasSize( 4 );
 
-        CloseableHttpResponse response = testSimpleGetMethod(baseURL);
-        // This should return an empty list since there are no collections
-        assertThat( response.getStatusLine().getStatusCode() ).isEqualTo(200);
+
+        ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH);
 
         // verify response
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo(BASEPATH);
+        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.members().size()).isEqualTo(3);
 
-        assertThat(jsonNode.get("id").asText()).isEqualTo( "storage" );
-        assertThat( jsonNode.get( "type" ).asText() ).isEqualTo( "collection" );
-        assertThat( jsonNode.get( "self" ).get( "href" ).asText() ).isEqualTo( "/storage" );
-        assertThat( jsonNode.get( "_members" ) ).isNotEmpty();
-
-        assertThat( jsonNode.get( "_members" ).get( 0 ).get( "id" ).asText() ).isEqualTo( "collection1" );
-        assertThat( jsonNode.get( "_members" ).get( 1 ).get( "id" ).asText() ).isEqualTo( "collection2" );
-        assertThat( jsonNode.get( "_members" ).get( 2 ).get( "id" ).asText() ).isEqualTo( "collection3" );
+        for (int i = 0; i < result.members().size(); i++) {
+            ResourceState member =  result.members().get(i);
+            assertThat(member.id()).isEqualTo("collection" + (i+1));
+            assertThat(member.getPropertyNames().size()).isEqualTo(1);
+            assertThat(member.getProperty("type")).isEqualTo("collection");
+            assertThat(member.members()).isEmpty();
+        }
     }
+
+
 
     @Test
     public void testGetEmptyCollection() throws Exception {
@@ -73,22 +79,22 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // check that the collection really is empty
         assertFalse(db.collectionExists(methodName));
 
-        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/" + methodName);
-        // collection does not exist yet, so should return 404
-        assertEquals(404, response.getStatusLine().getStatusCode());
+        try {
+            ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName);
+            Fail.fail();
+        } catch (ResourceNotFoundException e) {
+            //expected
+        }
 
         db.createCollection(methodName, new BasicDBObject());
-        response = testSimpleGetMethod(baseURL + "/" + methodName);
-        assertEquals(200, response.getStatusLine().getStatusCode());
 
-        // check that we get back an empty collection
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
+        ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName);
 
-        //assertEquals(4, jsonNode.size()); // id, _self, members, _subscriptions
-        assertEquals(methodName, jsonNode.get("id").asText());
-        assertThat( jsonNode.get( "self" ).get( "href" ).asText() ).isEqualTo("/storage/testEmptyCollection");
-        assertNull(jsonNode.get("_members"));
+        //verify the result
+        assertThat(result.id()).isEqualTo(methodName);
+        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.members()).isEmpty();
 
         // check that the collection is still empty
         assertEquals(0, db.getCollection(methodName).getCount());
@@ -106,37 +112,41 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
         assertEquals(1014, db.getCollectionNames().size());
 
-        // This should return 20 collections
-        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "?limit=20");
+        // This should return 23 collections
+        RequestContext requestContext = new RequestContext.Builder().pagination(new SimplePagination(11, 23)).build();
+        ResourceState result = connector.read(requestContext, BASEPATH);
 
-        assertEquals(200, response.getStatusLine().getStatusCode());
+        //verify the result
+        assertThat(result.id()).isEqualTo(BASEPATH);
+        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.members().size()).isEqualTo(23);
 
-        // verify response
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
-        JsonNode content = jsonNode.get("_members");
+        for (int i = 0; i < result.members().size(); i++) {
+            ResourceState member =  result.members().get(i);
+            assertThat(member.id()).isEqualTo(String.format("collection%1$04d", i + 11));
+            assertThat(member.getPropertyNames().size()).isEqualTo(1);
+            assertThat(member.getProperty("type")).isEqualTo("collection");
+            assertThat(member.members()).isEmpty();
+        }
 
-        assertEquals("20 collections limit check", 20, content.size());
-        assertEquals("Check first collection is collection0000", "collection0000", content.get(0).get("id").asText());
-        assertEquals("Check last collection is collection0019", "collection0019", content.get(19).get("id").asText());
-        response.close();
-
-        response = testSimpleGetMethod(baseURL + "?offset=1010&limit=20");
         // This should return 3 collections as a total number of them is 1013
-        assertEquals(200, response.getStatusLine().getStatusCode());
+        requestContext = new RequestContext.Builder().pagination(new SimplePagination(1010, 20)).build();
+        result = connector.read(requestContext, BASEPATH);
 
-        // verify response
-        mapper = new ObjectMapper();
-        jsonNode = mapper.readTree(response.getEntity().getContent());
-        content = jsonNode.get("_members");
+        //verify the result
+        assertThat(result.id()).isEqualTo(BASEPATH);
+        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.members().size()).isEqualTo(3);
 
-        assertEquals("Last 3 collections limit check", 3, content.size());
-        assertEquals("Check first collection is collection1010", "collection1010", content.get(0).get("id").asText());
-        assertEquals("Check last collection is collection1012", "collection1012", content.get(2).get("id").asText());
-
-        // String entity = getEntityAsString(response.getEntity());
-        // TODO: verify the entity that gets returned
-        // System.out.println("ENTITY : " + entity);
+        for (int i = 0; i < result.members().size(); i++) {
+            ResourceState member =  result.members().get(i);
+            assertThat(member.id()).isEqualTo(String.format("collection%1$04d", i + 1010));
+            assertThat(member.getPropertyNames().size()).isEqualTo(1);
+            assertThat(member.getProperty("type")).isEqualTo("collection");
+            assertThat(member.members()).isEmpty();
+        }
     }
 
 
@@ -160,39 +170,38 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         };
 
         addPeopleItems(collection, data);
-        assertEquals("Data set up", 6, collection.count());
+        assertThat(collection.count()).isEqualTo(6);
 
         // This should return 2 items
-        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/testQueryCollection?q=" + URLEncoder.encode("{lastName:{$gt:'E', $lt:'R'}}", "utf-8"));
-
-        assertEquals(200, response.getStatusLine().getStatusCode());
-
-        // verify response
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
-        JsonNode content = jsonNode.get("_members");
-
-        assertEquals("Number of items check", 2, content.size());
-        assertEquals("Check first item is Hans", "Hans", content.get(0).get("name").asText());
-        assertEquals("Check last item is Francois", "Francois", content.get(1).get("name").asText());
-        response.close();
-
-
-        // This should return 2 items
-        response = testSimpleGetMethod(baseURL + "/testQueryCollection?q=" + URLEncoder.encode("{lastName:'Doe'}", "utf-8"));
-
-        assertEquals(200, response.getStatusLine().getStatusCode());
+        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
+        RequestContext requestContext = new RequestContext.Builder().resourceParams(resourceParams).build();
+        ResourceState result = connector.read(requestContext, BASEPATH + "/testQueryCollection");
 
         // verify response
-        mapper = new ObjectMapper();
-        jsonNode = mapper.readTree(response.getEntity().getContent());
-        content = jsonNode.get("_members");
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo("testQueryCollection");
+        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.members().size()).isEqualTo(2);
 
-        assertEquals("Number of items check", 2, content.size());
-        assertEquals("Check first item is John", "John", content.get(0).get("name").asText());
-        assertEquals("Check last item is Jane", "Jane", content.get(1).get("name").asText());
-        response.close();
+        assertThat(result.members().get(0).getProperty("name")).isEqualTo("Hans");
+        assertThat(result.members().get(1).getProperty("name")).isEqualTo("Francois");
 
+        //Try another query
+        resourceParams = new SimpleResourceParams();
+        resourceParams.put("q", "{lastName:'Doe'}");
+        requestContext = new RequestContext.Builder().resourceParams(resourceParams).build();
+        result = connector.read(requestContext, BASEPATH + "/testQueryCollection");
+
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo("testQueryCollection");
+        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.members().size()).isEqualTo(2);
+
+        assertThat(result.members().get(0).getProperty("name")).isEqualTo("John");
+        assertThat(result.members().get(1).getProperty("name")).isEqualTo("Jane");
     }
 
     private void addPeopleItems(DBCollection collection, String[][] data) {
@@ -204,6 +213,63 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
             obj.put("city", rec[3]);
 
             collection.insert(obj);
+        }
+    }
+
+    private class SimplePagination implements Pagination {
+
+        int offset;
+        int limit;
+
+        public SimplePagination(int offset, int limit) {
+            this.offset = offset;
+            this.limit = limit;
+        }
+
+        @Override
+        public int offset() {
+            return offset;
+        }
+
+        @Override
+        public int limit() {
+            return limit;
+        }
+    }
+
+    private class SimpleResourceParams implements ResourceParams {
+
+        Map<String, String> map = new HashMap<String, String>();
+
+        public void put(String name, String value) {
+            map.put(name, value);
+        }
+
+        @Override
+        public Collection<String> names() {
+            return map.keySet();
+        }
+
+        @Override
+        public boolean contains(String name) {
+            return map.containsKey(name);
+        }
+
+        @Override
+        public String value(String name) {
+            return map.get(name);
+        }
+
+        @Override
+        public List<String> values(String name) {
+            List list = new ArrayList<String>();
+            list.add(map.get(name));
+            return list;
+        }
+
+        @Override
+        public int intValue(String name, int defaultValue) {
+            return defaultValue;
         }
     }
 }

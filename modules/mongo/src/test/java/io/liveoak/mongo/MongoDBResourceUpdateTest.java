@@ -35,7 +35,7 @@ public class MongoDBResourceUpdateTest extends NewBaseMongoDBTest {
 
     @Test
     public void testSimpleUpdate() throws Exception {
-        String methodName = "testSimpleDelete";
+        String methodName = "testSimpleUpdate";
         assertThat(db.getCollection(methodName).getCount()).isEqualTo(0);
 
         // create the object using the mongo driver directly
@@ -52,7 +52,6 @@ public class MongoDBResourceUpdateTest extends NewBaseMongoDBTest {
         ResourceState result = connector.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id, resourceState);
 
         // verify the result
-        // NOTE: if the connector returned a resource state instead of a resource, it would be much easier to test here...
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(id);
         assertThat(result.getProperty("foo")).isEqualTo("baz");
@@ -62,5 +61,67 @@ public class MongoDBResourceUpdateTest extends NewBaseMongoDBTest {
         DBObject dbObject = db.getCollection(methodName).findOne();
         assertEquals("baz", dbObject.get("foo"));
         assertEquals(new ObjectId(id), dbObject.get("_id"));
+    }
+
+    @Test
+    public void testChildUpdate() throws Exception {
+        String methodName = "testChildUpdate";
+        assertThat(db.getCollection(methodName).getCount()).isEqualTo(0);
+
+        // create the object using the mongo driver directly
+        BasicDBObject object = new BasicDBObject();
+        object.append("foo", new BasicDBObject("bar", "baz"));
+        db.getCollection(methodName).insert(object);
+        assertEquals(1, db.getCollection(methodName).getCount());
+        String id = object.getObjectId("_id").toString();
+
+        // update the resource using the connector.update method
+        ResourceState resourceState = new DefaultResourceState();
+        resourceState.putProperty("bar", 123);
+
+        ResourceState result = connector.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo", resourceState);
+
+        // verify the result
+        // NOTE: if the connector returned a resource state instead of a resource, it would be much easier to test here...
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo("foo");
+        assertThat(result.getProperty("bar")).isEqualTo(123);
+
+        // verify db content
+        assertThat(db.getCollection(methodName).getCount()).isEqualTo(1);
+        DBObject dbObject = db.getCollection(methodName).findOne();
+        assertEquals(123, ((DBObject)dbObject.get("foo")).get("bar"));
+    }
+
+    @Test
+    public void testGrandChildUpdate() throws Exception {
+        String methodName = "testSimpleDelete";
+        assertThat(db.getCollection(methodName).getCount()).isEqualTo(0);
+
+        // create the object using the mongo driver directly
+        BasicDBObject object = new BasicDBObject();
+        object.append("foo", new BasicDBObject("bar", new BasicDBObject("baz", "ABC")));
+        db.getCollection(methodName).insert(object);
+        assertEquals(1, db.getCollection(methodName).getCount());
+        String id = object.getObjectId("_id").toString();
+
+        // update the resource using the connector.update method
+        ResourceState resourceState = new DefaultResourceState();
+        resourceState.putProperty("baz", "XYZ");
+
+        ResourceState result = connector.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo/bar", resourceState);
+
+        // verify the result
+        // NOTE: if the connector returned a resource state instead of a resource, it would be much easier to test here...
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo("bar");
+        assertThat(result.getProperty("baz")).isEqualTo("XYZ");
+
+        // verify db content
+        assertThat(db.getCollection(methodName).getCount()).isEqualTo(1);
+        DBObject dbObject = db.getCollection(methodName).findOne();
+        DBObject child =  ((DBObject)dbObject.get("foo"));
+        DBObject grandChild = ((DBObject)child.get("bar"));
+        assertEquals("XYZ", grandChild.get("baz"));
     }
 }
