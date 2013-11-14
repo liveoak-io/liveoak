@@ -108,11 +108,12 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
 
     private ReturnFields decodeReturnFields(ResourceParams params) {
         String value = params.value("fields");
-        if (value == null || "".equals(value)) {
-            return null;
+        ReturnFields returnFields = ReturnFields.ALL;
+        if (value != null &&  ! "".equals(value)) {
+            returnFields = new ReturnFieldsImpl(value);
         }
 
-        return new ReturnFieldsImpl(value);
+        return returnFields;
     }
 
     protected ResourceState decodeState(MediaType mediaType, ByteBuf content) throws Exception {

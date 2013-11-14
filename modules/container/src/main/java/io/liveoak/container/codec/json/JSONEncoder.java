@@ -9,6 +9,7 @@ import io.liveoak.container.codec.Encoder;
 import io.liveoak.spi.resource.async.Resource;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Date;
 
 /**
@@ -120,6 +121,16 @@ public class JSONEncoder implements Encoder {
 
     @Override
     public void writeValue(Date value) throws Exception {
+
+    }
+
+    public void writeLink(Resource resource) throws Exception {
+        this.generator.writeStartObject();
+        this.generator.writeFieldName( "id" );
+        this.generator.writeString( resource.id() );
+        this.generator.writeFieldName( "href" );
+        this.generator.writeString( resource.uri().toString() );
+        this.generator.writeEndObject();
 
     }
 

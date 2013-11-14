@@ -24,9 +24,6 @@ public class JSONDecoder implements ResourceDecoder {
 
     @Override
     public ResourceState decode(ByteBuf resource) throws IOException {
-
-        System.err.println("decode: " + resource.toString(Charset.defaultCharset()));
-
         JsonFactory factory = new JsonFactory();
         factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
         factory.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -39,8 +36,6 @@ public class JSONDecoder implements ResourceDecoder {
         if (result == null) {
             result = new DefaultResourceState();
         }
-
-        System.err.println("decoded: " + result);
 
         return result;
     }

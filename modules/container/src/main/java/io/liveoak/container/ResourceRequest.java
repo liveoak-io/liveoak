@@ -143,6 +143,10 @@ public class ResourceRequest {
                 if (obj.requestAttributes == null) {
                     obj.requestAttributes = new DefaultRequestAttributes();
                 }
+                if ( obj.returnFields == null ) {
+                    obj.returnFields = ReturnFields.ALL;
+                }
+
                 obj.requestContext = new DefaultRequestContext(SecurityContext.ANONYMOUS, obj.pagination, obj.returnFields, obj.params, obj.resourcePath, obj.requestType, obj.requestAttributes);
             }
             return obj;

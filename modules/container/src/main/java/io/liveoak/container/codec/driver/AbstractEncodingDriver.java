@@ -2,6 +2,7 @@ package io.liveoak.container.codec.driver;
 
 import io.liveoak.container.codec.Encoder;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.Resource;
 
 import java.util.LinkedList;
@@ -11,13 +12,14 @@ import java.util.LinkedList;
  */
 public abstract class AbstractEncodingDriver implements EncodingDriver {
 
-    public AbstractEncodingDriver(Resource resource) {
-        this(null, resource);
+    public AbstractEncodingDriver(Object object, ReturnFields returnFields) {
+        this(null, object, returnFields);
     }
 
-    public AbstractEncodingDriver(EncodingDriver parent, Object object) {
+    public AbstractEncodingDriver(EncodingDriver parent, Object object, ReturnFields returnFields) {
         this.parent = parent;
         this.object = object;
+        this.returnFields = returnFields;
     }
 
     @Override
@@ -36,6 +38,10 @@ public abstract class AbstractEncodingDriver implements EncodingDriver {
         return null;
     }
 
+    protected ReturnFields returnFields() {
+        return this.returnFields;
+    }
+
     @Override
     public Object object() {
         return this.object;
@@ -48,14 +54,12 @@ public abstract class AbstractEncodingDriver implements EncodingDriver {
     public void encodeNext() {
         if (children.isEmpty()) {
             try {
-                System.err.println("encode next done, close: " + this);
                 close();
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         } else {
             EncodingDriver next = children.removeFirst();
-            System.err.println( "next; " + next );
             try {
                 next.encode();
             } catch (Exception e) {
@@ -70,6 +74,7 @@ public abstract class AbstractEncodingDriver implements EncodingDriver {
 
     private EncodingDriver parent;
     private Object object;
+    private ReturnFields returnFields;
 
     private LinkedList<EncodingDriver> children = new LinkedList<>();
 

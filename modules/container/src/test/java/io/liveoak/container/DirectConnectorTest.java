@@ -72,7 +72,8 @@ public class DirectConnectorTest {
 
         ResourceState foundBob = people.members().stream().filter( (e)->e.id().equals("bob")).findFirst().get();
         assertThat( foundBob ).isNotNull();
-        assertThat( foundBob.getProperty( "name" )).isEqualTo( "Bob McWhirter" );
+        assertThat( foundBob.id() ).isEqualTo( "bob" );
+        assertThat( foundBob.getPropertyNames() ).hasSize( 0 );
 
         foundBob = this.connector.read( requestContext, "/db/people/bob" );
 

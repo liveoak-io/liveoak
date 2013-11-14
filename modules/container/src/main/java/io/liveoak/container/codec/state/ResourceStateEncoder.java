@@ -154,6 +154,17 @@ public class ResourceStateEncoder implements Encoder {
         }
     }
 
+    @Override
+    public void writeLink(Resource resource) throws Exception {
+        Object top = this.stack.peek();
+
+        if ( top instanceof Collection ) {
+            ((Collection) top).add( resource.uri() );
+        } else if ( top instanceof PropertyCatcher ) {
+            ((PropertyCatcher) top).value = resource.uri();
+        }
+    }
+
     private static class PropertyCatcher {
         public Object value;
     }

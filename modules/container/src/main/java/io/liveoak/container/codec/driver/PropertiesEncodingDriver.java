@@ -1,5 +1,6 @@
 package io.liveoak.container.codec.driver;
 
+import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 
@@ -12,8 +13,8 @@ import java.util.Set;
  */
 public class PropertiesEncodingDriver extends ResourceEncodingDriver {
 
-    public PropertiesEncodingDriver(ResourceEncodingDriver parent, Resource resource) {
-        super(parent, resource);
+    public PropertiesEncodingDriver(ResourceEncodingDriver parent, Resource resource, ReturnFields returnFields) {
+        super(parent, resource, returnFields );
     }
 
     @Override
@@ -33,6 +34,9 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
 
         @Override
         public void accept(String name, Object value) {
+            if ( ! returnFields().included( name ) ) {
+                return;
+            }
             if (!hasProperties) {
                 try {
                     encoder().startProperties();
@@ -41,11 +45,15 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
                 }
                 hasProperties = true;
             }
-            PropertyEncodingDriver propDriver = new PropertyEncodingDriver(PropertiesEncodingDriver.this, name);
+            PropertyEncodingDriver propDriver = new PropertyEncodingDriver(PropertiesEncodingDriver.this, name, null);
             if (value instanceof Resource) {
-                propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value));
+                if ( ! returnFields().child( name ).isEmpty() ) {
+                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().child( name )));
+                } else {
+                    propDriver.addChildDriver( new ValueEncodingDriver( propDriver, value ) );
+                }
             } else if (value instanceof List || value instanceof Set) {
-                propDriver.addChildDriver(new ListEncodingDriver(propDriver, ((Collection) value).stream()));
+                propDriver.addChildDriver(new ListEncodingDriver(propDriver, ((Collection) value).stream(), returnFields().child( name )));
             } else {
                 propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value));
             }
@@ -54,7 +62,6 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
 
         @Override
         public void close() {
-            System.err.println("prop sink close");
             encodeNext();
         }
     }

@@ -4,6 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import io.liveoak.spi.ReturnFields;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
@@ -40,6 +42,20 @@ public class ReturnFieldsTest {
                 //e.printStackTrace();
             }
         }
+    }
+
+    @Test
+    public void testNestedWithGlob() {
+        ReturnFieldsImpl spec = new ReturnFieldsImpl( "name,dog(*)" );
+
+        assertThat( spec.included( "name" ) ).isTrue();
+        assertThat( spec.included( "tacos" ) ).isFalse();
+
+        assertThat( spec.child( "dog" ) ).isNotNull();
+        assertThat( spec.child( "dog" ).included( "dogname" ) ).isTrue();
+
+        assertThat( spec.child( "cat" ) ).isNotNull();
+        assertThat( spec.child( "cat" ).included( "name") ).isFalse();
     }
 
 
@@ -85,7 +101,7 @@ public class ReturnFieldsTest {
             buf.append(field);
 
             ReturnFields cspec = fspec.child(field);
-            if (cspec != null) {
+            if (cspec != null && cspec != ReturnFields.NONE) {
                 buf.append('(');
                 buf.append(traverse(cspec));
                 buf.append(')');

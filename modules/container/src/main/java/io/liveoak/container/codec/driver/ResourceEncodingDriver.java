@@ -1,5 +1,6 @@
 package io.liveoak.container.codec.driver;
 
+import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.Resource;
 
 /**
@@ -7,12 +8,12 @@ import io.liveoak.spi.resource.async.Resource;
  */
 public class ResourceEncodingDriver extends AbstractEncodingDriver {
 
-    public ResourceEncodingDriver(Resource resource) {
-        super(resource);
+    public ResourceEncodingDriver(Resource resource, ReturnFields returnFields) {
+        super(resource, returnFields);
     }
 
-    public ResourceEncodingDriver(EncodingDriver parent, Resource resource) {
-        super(parent, resource);
+    public ResourceEncodingDriver(EncodingDriver parent, Resource resource, ReturnFields returnFields) {
+        super(parent, resource, returnFields);
     }
 
     public Resource resource() {
@@ -21,15 +22,15 @@ public class ResourceEncodingDriver extends AbstractEncodingDriver {
 
     @Override
     public void encode() throws Exception {
-        encoder().startResource( resource() );
-        addChildDriver(new PropertiesEncodingDriver(this, resource()));
-        addChildDriver( new MembersEncodingDriver( this, resource() ));
+        encoder().startResource(resource());
+        addChildDriver(new PropertiesEncodingDriver(this, resource(), returnFields()));
+        addChildDriver(new MembersEncodingDriver(this, resource(), returnFields()));
         encodeNext();
     }
 
     @Override
     public void close() throws Exception {
-        encoder().endResource( resource() );
+        encoder().endResource(resource());
         parent().encodeNext();
     }
 }

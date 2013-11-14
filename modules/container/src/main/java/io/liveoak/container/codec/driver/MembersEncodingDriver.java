@@ -1,5 +1,6 @@
 package io.liveoak.container.codec.driver;
 
+import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 
@@ -8,23 +9,20 @@ import io.liveoak.spi.resource.async.ResourceSink;
  */
 public class MembersEncodingDriver extends ResourceEncodingDriver {
 
-    public MembersEncodingDriver(EncodingDriver parent, Resource resource) {
-        super(parent, resource);
+    public MembersEncodingDriver(EncodingDriver parent, Resource resource, ReturnFields returnFields) {
+        super(parent, resource, returnFields);
     }
 
     @Override
     public void encode() throws Exception {
-        System.err.println( "members::encode" );
         resource().readMembers(requestContext(), new MyResourceSink());
     }
 
     @Override
     public void close() throws Exception {
-        //encoder().endMembers();
         if ( hasMembers ) {
             encoder().endMembers();
         }
-        System.err.println( "members::close" );
         parent().encodeNext();
     }
 
@@ -40,12 +38,11 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
                 }
                 hasMembers = true;
             }
-            addChildDriver( new ResourceEncodingDriver( MembersEncodingDriver.this, resource ) );
+            addChildDriver( new ResourceEncodingDriver( MembersEncodingDriver.this, resource, returnFields().child( "members" ) ) );
         }
 
         @Override
         public void close() {
-            System.err.println( "member sink close" );
             encodeNext();
         }
     }

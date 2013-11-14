@@ -33,9 +33,8 @@ public class InMemoryCollectionResource implements Resource {
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
         if (this.collection.containsKey(id)) {
-            responder.resourceRead(applyReturnFields(ctx.getReturnFields(), this.collection.get(id)));
+            responder.resourceRead(this.collection.get(id));
         } else {
-            System.err.println( "no-such: " + id + " to " + responder);
             responder.noSuchResource( id );
         }
     }
@@ -47,18 +46,13 @@ public class InMemoryCollectionResource implements Resource {
             id = UUID.randomUUID().toString();
         }
 
-        System.err.println( "create with id: " + id );
-        System.err.println( " state: " + state );
-
         if ( state.getProperty( "type" ) != null && state.getProperty( "type" ).equals( "collection" ) ) {
             Resource r = new InMemoryCollectionResource(this, id);
             this.collection.put(id, r);
-            System.err.println( "created collection" );
             responder.resourceCreated(r);
         } else if (state instanceof ResourceState) {
             Resource r = new InMemoryObjectResource(this, id, state);
             this.collection.put(id, r);
-            System.err.println( "created object" );
             responder.resourceCreated(r);
         }
     }
@@ -74,14 +68,6 @@ public class InMemoryCollectionResource implements Resource {
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-    }
-
-    private Resource applyReturnFields(ReturnFields fields, Resource obj) {
-        if (fields != null && obj instanceof InMemoryObjectResource) {
-            return new InMemoryObjectResource((InMemoryCollectionResource) obj.parent(), obj.id(),
-                    new FilteredObjectResourceState(((InMemoryObjectResource) obj).state(), fields));
-        }
-        return obj;
     }
 
     private Stream<Resource> applyPagination(Pagination pagination, Collection<Resource> values) {

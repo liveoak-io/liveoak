@@ -9,6 +9,7 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -94,7 +95,7 @@ public class HTMLEncoder implements Encoder {
     protected void resourceLink(Resource resource) throws XMLStreamException {
         if (depth > 1) {
             startTag("a");
-            attribute("href", resource.uri().toString() );
+            attribute("href", resource.uri().toString());
             text(resource.id());
             endTag("a");
             return;
@@ -243,6 +244,14 @@ public class HTMLEncoder implements Encoder {
             return;
         }
         text(value.toString());
+    }
+
+    @Override
+    public void writeLink(Resource resource) throws Exception {
+        startTag( "a" );
+        attribute( "href", resource.uri().toString() );
+        text( resource.id() );
+        endTag( "a" );
     }
 
     private int depth;
