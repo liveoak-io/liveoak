@@ -92,14 +92,19 @@ public class ConfigDeployer {
                             this.container.registerResource(resource, resourceConfig);
                             System.err.println("registered resource: " + resource);
                         } catch (ModuleLoadException e) {
+                            e.printStackTrace();
                             System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
                         } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
                             System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
                         } catch (InstantiationException e) {
+                            e.printStackTrace();
                             System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
                         } catch (IllegalAccessException e) {
+                            e.printStackTrace();
                             System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
                         } catch (InitializationException e) {
+                            e.printStackTrace();
                             System.err.println("Unable to deploy '" + id + "': " + e.getMessage());
                         }
                     } else {

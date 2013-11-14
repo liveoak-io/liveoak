@@ -163,7 +163,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertEquals("Data set up", 6, collection.count());
 
         // This should return 2 items
-        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/testQueryCollection?q=" + URLEncoder.encode("{lastName:{$gt:'E', $lt:'R'}}", "utf-8"));
+        CloseableHttpResponse response = testSimpleGetMethod(baseURL + "/testQueryCollection?expand=members&q=" + URLEncoder.encode("{lastName:{$gt:'E', $lt:'R'}}", "utf-8"));
 
         assertEquals(200, response.getStatusLine().getStatusCode());
 
@@ -172,6 +172,8 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         JsonNode jsonNode = mapper.readTree(response.getEntity().getContent());
         JsonNode content = jsonNode.get("_members");
 
+        System.err.println( content );
+
         assertEquals("Number of items check", 2, content.size());
         assertEquals("Check first item is Hans", "Hans", content.get(0).get("name").asText());
         assertEquals("Check last item is Francois", "Francois", content.get(1).get("name").asText());
@@ -179,7 +181,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
 
         // This should return 2 items
-        response = testSimpleGetMethod(baseURL + "/testQueryCollection?q=" + URLEncoder.encode("{lastName:'Doe'}", "utf-8"));
+        response = testSimpleGetMethod(baseURL + "/testQueryCollection?expand=members&q=" + URLEncoder.encode("{lastName:'Doe'}", "utf-8"));
 
         assertEquals(200, response.getStatusLine().getStatusCode());
 
@@ -204,6 +206,8 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
             obj.put("city", rec[3]);
 
             collection.insert(obj);
+
+            System.err.println( "INSERT: " + obj );
         }
     }
 }

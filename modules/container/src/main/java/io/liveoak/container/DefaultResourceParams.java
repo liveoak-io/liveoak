@@ -56,4 +56,8 @@ public class DefaultResourceParams implements ResourceParams {
         }
         return Integer.parseInt(val);
     }
+
+    public String toString() {
+        return "[ResourceParams: params=" + this.params + "]";
+    }
 }
