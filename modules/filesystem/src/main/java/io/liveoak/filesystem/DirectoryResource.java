@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class DirectoryResource implements FSResource {
 
-    public DirectoryResource(FSResource parent, File file) {
+    public DirectoryResource(DirectoryResource parent, File file) {
         this.parent = parent;
         this.file = file;
     }
@@ -69,9 +69,9 @@ public class DirectoryResource implements FSResource {
 
                 for ( File each : sorted ) {
                     if ( each.isDirectory() ) {
-                        sink.accept( new DirectoryResource( this, each ));
+                        sink.accept( createDirectoryResource( this, each ));
                     } else {
-                        sink.accept( new FileResource( this, each ));
+                        sink.accept( createFileResource( this, each ));
                     }
                 }
                 sink.close();
@@ -95,9 +95,9 @@ public class DirectoryResource implements FSResource {
         vertx().fileSystem().exists(path.getPath(), (existResult) -> {
             if (existResult.succeeded() && existResult.result()) {
                 if (path.isDirectory()) {
-                    responder.resourceRead(new DirectoryResource(this, path));
+                    responder.resourceRead(createDirectoryResource(this, path));
                 } else {
-                    responder.resourceRead(new FileResource(this, path));
+                    responder.resourceRead(createFileResource(this, path));
                 }
             } else {
                 responder.noSuchResource(id);
@@ -105,10 +105,18 @@ public class DirectoryResource implements FSResource {
         });
     }
 
+    protected DirectoryResource createDirectoryResource(DirectoryResource parent, File path) {
+        return new DirectoryResource(parent, path);
+    }
+
+    protected FileResource createFileResource(DirectoryResource parent, File file) {
+        return new FileResource(parent, file);
+    }
+
     public String toString() {
         return "[DirectoryResource: file=" + this.file.getAbsolutePath() + "]";
     }
 
-    private FSResource parent;
+    private DirectoryResource parent;
     protected File file;
 }

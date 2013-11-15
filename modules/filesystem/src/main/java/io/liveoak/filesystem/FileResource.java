@@ -20,7 +20,7 @@ import java.io.File;
  */
 public class FileResource implements FSResource, BinaryResource {
 
-    public FileResource(FSResource parent, File file) {
+    public FileResource(DirectoryResource parent, File file) {
         this.parent = parent;
         this.file = file;
     }
@@ -80,6 +80,6 @@ public class FileResource implements FSResource, BinaryResource {
         return "[FileResource: file=" + this.file + "]";
     }
 
-    private FSResource parent;
+    private DirectoryResource parent;
     private File file;
 }
