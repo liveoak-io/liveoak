@@ -69,9 +69,9 @@ public class DirectoryResource implements FSResource {
 
                 for ( File each : sorted ) {
                     if ( each.isDirectory() ) {
-                        sink.accept( createDirectoryResource( this, each ));
+                        sink.accept( createDirectoryResource( each ));
                     } else {
-                        sink.accept( createFileResource( this, each ));
+                        sink.accept( createFileResource( each ));
                     }
                 }
                 sink.close();
@@ -95,9 +95,9 @@ public class DirectoryResource implements FSResource {
         vertx().fileSystem().exists(path.getPath(), (existResult) -> {
             if (existResult.succeeded() && existResult.result()) {
                 if (path.isDirectory()) {
-                    responder.resourceRead(createDirectoryResource(this, path));
+                    responder.resourceRead(createDirectoryResource(path));
                 } else {
-                    responder.resourceRead(createFileResource(this, path));
+                    responder.resourceRead(createFileResource(path));
                 }
             } else {
                 responder.noSuchResource(id);
@@ -105,12 +105,12 @@ public class DirectoryResource implements FSResource {
         });
     }
 
-    protected DirectoryResource createDirectoryResource(DirectoryResource parent, File path) {
-        return new DirectoryResource(parent, path);
+    protected DirectoryResource createDirectoryResource(File path) {
+        return new DirectoryResource(this, path);
     }
 
-    protected FileResource createFileResource(DirectoryResource parent, File file) {
-        return new FileResource(parent, file);
+    protected FileResource createFileResource(File file) {
+        return new FileResource(this, file);
     }
 
     public String toString() {
