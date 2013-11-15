@@ -97,6 +97,7 @@
     <module>mongo</module>
     <module>filesystem</module>
     <module>aggregating-filesystem</module>
+    <module>scheduler</module>
     <module>vertx</module>
     <module>3rdparty</module>
     <module>security</module>

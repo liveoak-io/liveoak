@@ -7,6 +7,8 @@ package io.liveoak.container.codec.driver;
 
 import io.liveoak.spi.resource.async.Resource;
 
+import java.util.Date;
+
 /**
  * @author Bob McWhirter
  */
@@ -26,6 +28,8 @@ public class ValueEncodingDriver extends AbstractEncodingDriver {
             encoder().writeValue((Integer) o);
         } else if ( o instanceof Double ) {
             encoder().writeValue((Double) o);
+        } else if ( o instanceof Date) {
+            encoder().writeValue((Date) o);
         } else if ( o instanceof Resource) {
             encoder().writeLink((Resource) o);
         } else {

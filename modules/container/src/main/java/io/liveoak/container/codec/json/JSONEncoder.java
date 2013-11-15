@@ -126,7 +126,7 @@ public class JSONEncoder implements Encoder {
 
     @Override
     public void writeValue(Date value) throws Exception {
-
+        this.generator.writeNumber( value.getTime() );
     }
 
     public void writeLink(Resource resource) throws Exception {
