@@ -32,6 +32,7 @@
     <fest.version>1.4</fest.version>
     <drools.version>5.6.0.CR1</drools.version>
     <janino.version>2.5.16</janino.version>
+    <jgit.version>3.1.0.201310021548-r</jgit.version>
   </properties>
   <modules>
     <module>support/module-assembly</module>
@@ -138,6 +139,11 @@
         <groupId>org.codehaus.janino</groupId>
         <artifactId>janino</artifactId>
         <version>${janino.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jgit</groupId>
+        <artifactId>org.eclipse.jgit</artifactId>
+        <version>${jgit.version}</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>

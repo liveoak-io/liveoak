@@ -27,6 +27,15 @@
       }
     },
 
+    git: {
+      type: 'jboss-module',
+      module-id:   'io.liveoak.git',
+      class-name:  'io.liveoak.git.GitResource',
+      config: {
+        repoPath: '${user.dir}'
+      }
+    },
+
     storage: {
       type: 'jboss-module',
       module-id:  'io.liveoak.mongo',
