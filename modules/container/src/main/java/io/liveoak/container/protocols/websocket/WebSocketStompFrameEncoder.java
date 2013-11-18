@@ -5,19 +5,20 @@
  */
 package io.liveoak.container.protocols.websocket;
 
+import io.liveoak.stomp.common.StompFrameEncoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.liveoak.stomp.common.StompFrameEncoder;
 
 import java.util.List;
 
-/** STOMP frame to WebSocket frame encoder
- *
+/**
+ * STOMP frame to WebSocket frame encoder
+ * <p/>
  * This encoder also adds the typical STOMP frame encoder upstream of itself,
  * providing for the pipeline of:
- *
+ * <p/>
  * STOMP frame to bytes to WebSocketFrame
  *
  * @author Bob McWhirter
@@ -25,12 +26,12 @@ import java.util.List;
 public class WebSocketStompFrameEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
-    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+    public void handlerAdded( ChannelHandlerContext ctx ) throws Exception {
         ctx.pipeline().addAfter( ctx.name(), "stomp-frame-encoder", new StompFrameEncoder() );
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
+    protected void encode( ChannelHandlerContext ctx, ByteBuf msg, List<Object> out ) throws Exception {
         out.add( new TextWebSocketFrame( msg.retain() ) );
     }
 

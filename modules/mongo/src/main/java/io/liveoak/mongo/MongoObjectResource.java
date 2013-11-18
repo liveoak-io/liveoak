@@ -22,70 +22,70 @@ public class MongoObjectResource extends MongoResource {
     private DBObject dbObject;
     private String id;
 
-    public MongoObjectResource(MongoResource parent, DBObject dbObject, String id) {
-        super(parent);
+    public MongoObjectResource( MongoResource parent, DBObject dbObject, String id ) {
+        super( parent );
         this.dbObject = dbObject;
         this.id = id;
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
-        Object object = this.dbObject.get(id);
-        if (object != null) {
-            if (object instanceof BasicDBObject) {
-               responder.resourceRead(new MongoObjectResource(this, (DBObject) object, id));
+    public void readMember( RequestContext ctx, String id, Responder responder ) {
+        Object object = this.dbObject.get( id );
+        if ( object != null ) {
+            if ( object instanceof BasicDBObject ) {
+                responder.resourceRead( new MongoObjectResource( this, ( DBObject ) object, id ) );
             } else {
-                responder.internalError("ERROR: Object type (" + object.getClass() + ") not recognized");
+                responder.internalError( "ERROR: Object type (" + object.getClass() + ") not recognized" );
             }
         } else {
-            responder.noSuchResource(id);
+            responder.noSuchResource( id );
         }
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties( RequestContext ctx, PropertySink sink ) {
         Set<String> keys = this.dbObject.keySet();
-        for (String key : keys) {
-            if (!key.equals(MONGO_ID_FIELD) && !key.equals(MBAAS_ID_FIELD)) {
-                Object value = this.dbObject.get(key);
-                if (value instanceof BasicDBObject) {
-                    value = new MongoObjectResource(this, (DBObject) value, key);
+        for ( String key : keys ) {
+            if ( !key.equals( MONGO_ID_FIELD ) && !key.equals( MBAAS_ID_FIELD ) ) {
+                Object value = this.dbObject.get( key );
+                if ( value instanceof BasicDBObject ) {
+                    value = new MongoObjectResource( this, ( DBObject ) value, key );
                 }
-                sink.accept(key, value);
+                sink.accept( key, value );
             }
         }
         sink.close();
     }
 
     @Override
-    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) {
-        state.getPropertyNames().stream().forEach((name) -> {
-            if ( ! name.equals( MONGO_ID_FIELD ) && ! name.equals(MBAAS_ID_FIELD ) ) {
+    public void updateProperties( RequestContext ctx, ResourceState state, Responder responder ) {
+        state.getPropertyNames().stream().forEach( ( name ) -> {
+            if ( !name.equals( MONGO_ID_FIELD ) && !name.equals( MBAAS_ID_FIELD ) ) {
                 this.dbObject.put( name, state.getProperty( name ) );
             }
         } );
 
-        this.parent.updateChild(ctx, this.id(), this.dbObject);
+        this.parent.updateChild( ctx, this.id(), this.dbObject );
 
-        responder.resourceUpdated(this);
+        responder.resourceUpdated( this );
     }
 
     @Override
-    public void delete(RequestContext ctx, Responder responder) {
-        parent.deleteChild(ctx, id());
-        responder.resourceDeleted(this);
+    public void delete( RequestContext ctx, Responder responder ) {
+        parent.deleteChild( ctx, id() );
+        responder.resourceDeleted( this );
     }
 
     @Override
-    protected Object updateChild(RequestContext ctx, String childId, Object child) {
-        this.dbObject.put(childId, child);
-        return parent.updateChild(ctx, this.id(), this.dbObject);
+    protected Object updateChild( RequestContext ctx, String childId, Object child ) {
+        this.dbObject.put( childId, child );
+        return parent.updateChild( ctx, this.id(), this.dbObject );
     }
 
     @Override
-    protected Object deleteChild(RequestContext ctx, String childId) {
-        dbObject.removeField(childId);
-        return parent.updateChild(ctx, this.id(), dbObject);
+    protected Object deleteChild( RequestContext ctx, String childId ) {
+        dbObject.removeField( childId );
+        return parent.updateChild( ctx, this.id(), dbObject );
     }
 
     public String toString() {
@@ -94,10 +94,10 @@ public class MongoObjectResource extends MongoResource {
 
     @Override
     public String id() {
-        if (id != null) {
+        if ( id != null ) {
             return id;
         } else {
-            return this.dbObject.get(MONGO_ID_FIELD).toString();
+            return this.dbObject.get( MONGO_ID_FIELD ).toString();
         }
     }
 }

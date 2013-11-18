@@ -8,7 +8,7 @@
 <module xmlns="urn:jboss:module:1.0" name="org.quartz-scheduler">
 
   <resources>
-    <artifact name="org.quartz-scheduler:quartz:${quartz.version}"/>
+    <artifact name="org.quartz-scheduler:quartz:${quartz.version}" />
   </resources>
 
   <dependencies>

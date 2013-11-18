@@ -5,11 +5,11 @@
  */
 package io.liveoak.security.policy.uri.complex;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import io.liveoak.security.impl.SimpleLogger;
 import io.liveoak.security.spi.AuthorizationDecision;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Object bound to Drools engine, which encapsulate info about authorization decision, all processed rules and rule
@@ -19,37 +19,37 @@ import io.liveoak.security.spi.AuthorizationDecision;
  */
 public class RulesProcessingResult {
 
-    private static final SimpleLogger log = new SimpleLogger(RulesProcessingResult.class);
+    private static final SimpleLogger log = new SimpleLogger( RulesProcessingResult.class );
 
     private AuthorizationDecision current = AuthorizationDecision.IGNORE;
     private Set<String> processedRules = new HashSet<String>();
     private int lastProcessedPriority;
 
-    public void mergeDecision(AuthorizationDecision newDecision) {
+    public void mergeDecision( AuthorizationDecision newDecision ) {
         //if (log.isTraceEnabled()) {
-            log.trace("Merging decision: old=" + current + ", new=" + newDecision);
+        log.trace( "Merging decision: old=" + current + ", new=" + newDecision );
         //}
-        current = current.mergeDecision(newDecision);
+        current = current.mergeDecision( newDecision );
     }
 
     public AuthorizationDecision getDecision() {
         return current;
     }
 
-    public String addProcessedRule(String rule) {
-        processedRules.add(rule);
+    public String addProcessedRule( String rule ) {
+        processedRules.add( rule );
         return rule;
     }
 
-    public boolean isAlreadyProcessedRule(String rule) {
-        return processedRules.contains(rule);
+    public boolean isAlreadyProcessedRule( String rule ) {
+        return processedRules.contains( rule );
     }
 
     public int getLastProcessedPriority() {
         return lastProcessedPriority;
     }
 
-    public void setLastProcessedPriority(int lastProcessedPriority) {
+    public void setLastProcessedPriority( int lastProcessedPriority ) {
         this.lastProcessedPriority = lastProcessedPriority;
     }
 }

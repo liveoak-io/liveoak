@@ -5,29 +5,29 @@
  */
 package io.liveoak.stomp.common;
 
+import io.liveoak.stomp.Stomp;
+import io.liveoak.stomp.server.StompServerException;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.ReferenceCountUtil;
-import io.liveoak.stomp.Stomp;
-import io.liveoak.stomp.server.StompServerException;
 
 /**
  * @author Bob McWhirter
  */
 public abstract class AbstractFrameHandler extends SimpleChannelInboundHandler<StompFrame> {
 
-    public AbstractFrameHandler(Stomp.Command command) {
+    public AbstractFrameHandler( Stomp.Command command ) {
         this.command = command;
     }
 
-    public void channelRead0(ChannelHandlerContext ctx, StompFrame msg) throws Exception {
-        if (this.command != null) {
-            if (((StompFrame) msg).command().equals(this.command)) {
-                handleFrame(ctx, (StompFrame) msg);
+    public void channelRead0( ChannelHandlerContext ctx, StompFrame msg ) throws Exception {
+        if ( this.command != null ) {
+            if ( ( ( StompFrame ) msg ).command().equals( this.command ) ) {
+                handleFrame( ctx, ( StompFrame ) msg );
                 return;
             }
         } else {
-            handleFrame(ctx, (StompFrame) msg);
+            handleFrame( ctx, ( StompFrame ) msg );
             return;
         }
 
@@ -35,7 +35,7 @@ public abstract class AbstractFrameHandler extends SimpleChannelInboundHandler<S
         ctx.fireChannelRead( msg );
     }
 
-    protected abstract void handleFrame(ChannelHandlerContext ctx, StompFrame frame) throws StompServerException;
+    protected abstract void handleFrame( ChannelHandlerContext ctx, StompFrame frame ) throws StompServerException;
 
     private Stomp.Command command;
 }

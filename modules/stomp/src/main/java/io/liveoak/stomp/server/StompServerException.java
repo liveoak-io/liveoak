@@ -12,15 +12,15 @@ import io.liveoak.stomp.StompException;
  */
 public class StompServerException extends StompException {
 
-    public StompServerException(String message) {
+    public StompServerException( String message ) {
         super( message );
     }
 
-    public StompServerException(Throwable cause) {
+    public StompServerException( Throwable cause ) {
         super( cause );
     }
 
-    public StompServerException withReceiptId(String receiptId) {
+    public StompServerException withReceiptId( String receiptId ) {
         this.receiptId = receiptId;
         return this;
     }

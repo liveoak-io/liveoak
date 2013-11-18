@@ -14,5 +14,6 @@ import io.liveoak.spi.RequestContext;
 public interface BinaryResource extends Resource {
 
     MediaType mediaType();
-    void readContent(RequestContext ctx, BinaryContentSink sink);
+
+    void readContent( RequestContext ctx, BinaryContentSink sink );
 }

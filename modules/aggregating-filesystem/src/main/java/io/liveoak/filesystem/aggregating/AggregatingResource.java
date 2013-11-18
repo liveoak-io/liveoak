@@ -8,20 +8,24 @@ package io.liveoak.filesystem.aggregating;
 import io.liveoak.filesystem.FileResource;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.BinaryContentSink;
 import io.liveoak.spi.resource.async.BinaryResource;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import org.vertx.java.core.buffer.Buffer;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * @author Bob McWhirter
  */
 public class AggregatingResource implements BinaryResource {
 
-    public AggregatingResource(Resource parent, String id, FileResource manifest) {
+    public AggregatingResource( Resource parent, String id, FileResource manifest ) {
         this.parent = parent;
         this.id = id;
         this.manifest = manifest;
@@ -35,7 +39,7 @@ public class AggregatingResource implements BinaryResource {
     }
 
     @Override
-    public void readContent(RequestContext ctx, BinaryContentSink sink) {
+    public void readContent( RequestContext ctx, BinaryContentSink sink ) {
         File file = this.manifest.file();
         try {
             BufferedReader reader = new BufferedReader( new FileReader( file ) );
@@ -51,12 +55,12 @@ public class AggregatingResource implements BinaryResource {
                     String rest = line.substring( "require".length() ).trim();
                     File sub = new File( file.getParent(), rest );
 
-                    Buffer buffer = manifest.vertx().fileSystem().readFileSync(sub.getPath());
+                    Buffer buffer = manifest.vertx().fileSystem().readFileSync( sub.getPath() );
                     sink.accept( buffer.getByteBuf() );
                 }
             }
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {
+        } catch ( FileNotFoundException e ) {
+        } catch ( IOException e ) {
         } finally {
             sink.close();
         }
@@ -74,7 +78,7 @@ public class AggregatingResource implements BinaryResource {
     }
 
     @Override
-    public void delete(RequestContext ctx, Responder responder) {
+    public void delete( RequestContext ctx, Responder responder ) {
         responder.deleteNotSupported( this );
     }
 

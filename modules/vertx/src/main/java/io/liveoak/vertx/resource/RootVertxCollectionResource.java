@@ -14,12 +14,12 @@ import io.liveoak.spi.resource.RootResource;
  */
 public class RootVertxCollectionResource extends VertxCollectionResource implements RootResource {
 
-    public RootVertxCollectionResource(String id, String address) {
+    public RootVertxCollectionResource( String id, String address ) {
         super( id, address );
     }
 
     @Override
-    public void initialize(ResourceContext context) throws InitializationException {
+    public void initialize( ResourceContext context ) throws InitializationException {
         vertx( context.vertx() );
     }
 

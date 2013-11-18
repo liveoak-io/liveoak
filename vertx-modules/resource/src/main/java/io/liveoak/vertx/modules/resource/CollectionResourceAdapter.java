@@ -17,71 +17,71 @@ import java.util.UUID;
  */
 public class CollectionResourceAdapter implements Handler<Message<JsonObject>> {
 
-    public CollectionResourceAdapter(Vertx vertx, String id, String registrationAddress) {
+    public CollectionResourceAdapter( Vertx vertx, String id, String registrationAddress ) {
         this.vertx = vertx;
         this.id = id;
         this.registrationAddress = registrationAddress;
     }
 
-    public void createHandler(Handler<Message<JsonObject>> createHandler) {
+    public void createHandler( Handler<Message<JsonObject>> createHandler ) {
         this.createHandler = createHandler;
     }
 
-    public void readMembersHandler(CollectionResponseHandler readMembersHandler) {
+    public void readMembersHandler( CollectionResponseHandler readMembersHandler ) {
         this.readMembersHandler = readMembersHandler;
     }
 
-    public void readMemberHandler(ObjectResponseHandler readMemberHandler) {
+    public void readMemberHandler( ObjectResponseHandler readMemberHandler ) {
         this.readMemberHandler = readMemberHandler;
     }
 
-    public void deleteHandler(Handler<Message<JsonObject>> deleteHandler) {
+    public void deleteHandler( Handler<Message<JsonObject>> deleteHandler ) {
         this.deleteHandler = deleteHandler;
     }
 
     public void start() {
         this.address = "resource." + UUID.randomUUID().toString();
 
-        this.vertx.eventBus().registerHandler(this.address, this);
-        this.vertx.eventBus().send(registrationAddress,
+        this.vertx.eventBus().registerHandler( this.address, this );
+        this.vertx.eventBus().send( registrationAddress,
                 new JsonObject()
-                        .putString("action", "register")
-                        .putString("address", this.address)
-                        .putString("id", this.id));
+                        .putString( "action", "register" )
+                        .putString( "address", this.address )
+                        .putString( "id", this.id ) );
     }
 
     public void stop() {
-        this.vertx.eventBus().send(this.registrationAddress,
+        this.vertx.eventBus().send( this.registrationAddress,
                 new JsonObject()
-                        .putString("action", "unregister")
-                        .putString("id", this.id) );
+                        .putString( "action", "unregister" )
+                        .putString( "id", this.id ) );
 
-        this.vertx.eventBus().unregisterHandler(this.address, this);
+        this.vertx.eventBus().unregisterHandler( this.address, this );
     }
 
     @Override
-    public void handle(Message<JsonObject> message) {
+    public void handle( Message<JsonObject> message ) {
         JsonObject body = message.body();
-        String action = body.getString("action");
+        String action = body.getString( "action" );
 
-        switch (action) {
+        switch ( action ) {
             case "create":
                 break;
             case "readMember":
-                String id = body.getString("id");
-                if (id != null) {
-                    if (this.readMemberHandler == null) {
-                        message.reply(new JsonObject().putNumber("status", 404));
+                String id = body.getString( "id" );
+                if ( id != null ) {
+                    if ( this.readMemberHandler == null ) {
+                        message.reply( new JsonObject().putNumber( "status", 404 ) );
                     } else {
-                        VertxResponder responder = new VertxResponder(message);
-                        this.readMemberHandler.handle(id, responder);
+                        VertxResponder responder = new VertxResponder( message );
+                        this.readMemberHandler.handle( id, responder );
                     }
                 } else {
-                    if (this.readMembersHandler == null) {
-                        message.reply(ResponseBuilder.newReadNotSupportedResponse("ummm?"));
+                    if ( this.readMembersHandler == null ) {
+                        message.reply( ResponseBuilder.newReadNotSupportedResponse( "ummm?" ) );
                     } else {
-                        VertxResponder responder = new VertxResponder(message);
-                        this.readMembersHandler.handle(responder);
+                        VertxResponder responder = new VertxResponder( message );
+                        this.readMembersHandler.handle( responder );
                     }
                 }
                 break;

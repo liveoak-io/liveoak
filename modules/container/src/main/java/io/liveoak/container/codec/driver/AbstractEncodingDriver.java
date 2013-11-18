@@ -8,7 +8,6 @@ package io.liveoak.container.codec.driver;
 import io.liveoak.container.codec.Encoder;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ReturnFields;
-import io.liveoak.spi.resource.async.Resource;
 
 import java.util.LinkedList;
 
@@ -17,11 +16,11 @@ import java.util.LinkedList;
  */
 public abstract class AbstractEncodingDriver implements EncodingDriver {
 
-    public AbstractEncodingDriver(Object object, ReturnFields returnFields) {
-        this(null, object, returnFields);
+    public AbstractEncodingDriver( Object object, ReturnFields returnFields ) {
+        this( null, object, returnFields );
     }
 
-    public AbstractEncodingDriver(EncodingDriver parent, Object object, ReturnFields returnFields) {
+    public AbstractEncodingDriver( EncodingDriver parent, Object object, ReturnFields returnFields ) {
         this.parent = parent;
         this.object = object;
         this.returnFields = returnFields;
@@ -29,7 +28,7 @@ public abstract class AbstractEncodingDriver implements EncodingDriver {
 
     @Override
     public Encoder encoder() {
-        if (this.parent != null) {
+        if ( this.parent != null ) {
             return this.parent.encoder();
         }
         return null;
@@ -37,7 +36,7 @@ public abstract class AbstractEncodingDriver implements EncodingDriver {
 
     @Override
     public RequestContext requestContext() {
-        if (this.parent != null) {
+        if ( this.parent != null ) {
             return this.parent.requestContext();
         }
         return null;
@@ -68,24 +67,24 @@ public abstract class AbstractEncodingDriver implements EncodingDriver {
     }
 
     public void encodeNext() {
-        if (children.isEmpty()) {
+        if ( children.isEmpty() ) {
             try {
                 close();
-            } catch (Exception e) {
+            } catch ( Exception e ) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         } else {
             EncodingDriver next = children.removeFirst();
             try {
                 next.encode();
-            } catch (Exception e) {
+            } catch ( Exception e ) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
     }
 
-    void addChildDriver(EncodingDriver child) {
-        this.children.add(child);
+    void addChildDriver( EncodingDriver child ) {
+        this.children.add( child );
     }
 
     private EncodingDriver parent;

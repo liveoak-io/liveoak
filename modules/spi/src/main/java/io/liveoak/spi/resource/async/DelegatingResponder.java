@@ -10,62 +10,62 @@ package io.liveoak.spi.resource.async;
  */
 public class DelegatingResponder implements Responder {
 
-    public DelegatingResponder(Responder delegate) {
+    public DelegatingResponder( Responder delegate ) {
         this.delegate = delegate;
     }
 
     @Override
-    public void resourceRead(Resource resource) {
+    public void resourceRead( Resource resource ) {
         delegate.resourceRead( resource );
     }
 
     @Override
-    public void resourceCreated(Resource resource) {
+    public void resourceCreated( Resource resource ) {
         delegate.resourceCreated( resource );
     }
 
     @Override
-    public void resourceDeleted(Resource resource) {
+    public void resourceDeleted( Resource resource ) {
         delegate.resourceDeleted( resource );
     }
 
     @Override
-    public void resourceUpdated(Resource resource) {
+    public void resourceUpdated( Resource resource ) {
         delegate.resourceUpdated( resource );
     }
 
     @Override
-    public void createNotSupported(Resource resource) {
+    public void createNotSupported( Resource resource ) {
         delegate.createNotSupported( resource );
     }
 
     @Override
-    public void readNotSupported(Resource resource) {
+    public void readNotSupported( Resource resource ) {
         delegate.readNotSupported( resource );
     }
 
     @Override
-    public void updateNotSupported(Resource resource) {
+    public void updateNotSupported( Resource resource ) {
         delegate.updateNotSupported( resource );
     }
 
     @Override
-    public void deleteNotSupported(Resource resource) {
+    public void deleteNotSupported( Resource resource ) {
         delegate.deleteNotSupported( resource );
     }
 
     @Override
-    public void noSuchResource(String id) {
+    public void noSuchResource( String id ) {
         delegate.noSuchResource( id );
     }
 
     @Override
-    public void resourceAlreadyExists(String id) {
+    public void resourceAlreadyExists( String id ) {
         delegate.resourceAlreadyExists( id );
     }
 
     @Override
-    public void internalError(String message) {
+    public void internalError( String message ) {
         delegate.internalError( message );
     }
 

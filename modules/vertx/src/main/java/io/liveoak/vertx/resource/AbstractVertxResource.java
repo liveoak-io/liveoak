@@ -15,11 +15,11 @@ import org.vertx.java.core.Vertx;
  */
 public abstract class AbstractVertxResource implements Resource {
 
-    public AbstractVertxResource(String id) {
-        this(null, id, null );
+    public AbstractVertxResource( String id ) {
+        this( null, id, null );
     }
 
-    public AbstractVertxResource(Resource parent, String id, Vertx vertx) {
+    public AbstractVertxResource( Resource parent, String id, Vertx vertx ) {
         this.parent = parent;
         this.vertx = vertx;
         this.id = id;
@@ -29,7 +29,7 @@ public abstract class AbstractVertxResource implements Resource {
         return this.vertx;
     }
 
-    public void vertx(Vertx vertx) {
+    public void vertx( Vertx vertx ) {
         this.vertx = vertx;
     }
 
@@ -44,7 +44,7 @@ public abstract class AbstractVertxResource implements Resource {
     }
 
     @Override
-    public void delete(RequestContext ctx, Responder responder) {
+    public void delete( RequestContext ctx, Responder responder ) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

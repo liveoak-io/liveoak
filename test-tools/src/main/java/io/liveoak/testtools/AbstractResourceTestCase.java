@@ -33,10 +33,10 @@ public abstract class AbstractResourceTestCase {
 
     @Before
     public void setUpContainer() throws Exception {
-            this.container = new DefaultContainer();
-            this.container.registerResource( createRootResource(), createConfig() );
-            this.connector = this.container.directConnector();
-            this.vertx = this.container.vertx();
+        this.container = new DefaultContainer();
+        this.container.registerResource( createRootResource(), createConfig() );
+        this.connector = this.container.directConnector();
+        this.vertx = this.container.vertx();
     }
 
     @After

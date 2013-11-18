@@ -12,13 +12,13 @@ public interface Headers {
 
     Set<String> getHeaderNames();
 
-    String get(String headerName);
+    String get( String headerName );
 
-    String put(String headerName, String headerValue);
+    String put( String headerName, String headerValue );
 
-    void putAll(Headers headers);
+    void putAll( Headers headers );
 
-    void remove(String headerName);
+    void remove( String headerName );
 
     Headers duplicate();
 

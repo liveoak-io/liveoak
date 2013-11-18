@@ -6,16 +6,13 @@ import io.liveoak.spi.resource.async.Resource;
 import org.quartz.CronTrigger;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
-import org.quartz.TriggerKey;
-
-import java.net.URI;
 
 /**
  * @author Bob McWhirter
  */
 public class TriggerResource implements Resource {
 
-    public TriggerResource(SchedulerResource parent, Trigger trigger) {
+    public TriggerResource( SchedulerResource parent, Trigger trigger ) {
         this.parent = parent;
         this.trigger = trigger;
     }
@@ -31,12 +28,12 @@ public class TriggerResource implements Resource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
-        sink.accept( "cron", ((CronTrigger)this.trigger).getCronExpression() );
+    public void readProperties( RequestContext ctx, PropertySink sink ) {
+        sink.accept( "cron", ( ( CronTrigger ) this.trigger ).getCronExpression() );
         try {
-            Trigger.TriggerState state = this.parent.scheduler().getTriggerState(this.trigger.getKey());
+            Trigger.TriggerState state = this.parent.scheduler().getTriggerState( this.trigger.getKey() );
             sink.accept( "state", state.toString().toLowerCase() );
-        } catch (SchedulerException e) {
+        } catch ( SchedulerException e ) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         sink.close();

@@ -10,7 +10,7 @@ package io.liveoak.spi;
  */
 public class ReadNotSupportedException extends ResourceException {
 
-    public ReadNotSupportedException(String path) {
-        super(path, "Read not supported for '" + path + "'" );
+    public ReadNotSupportedException( String path ) {
+        super( path, "Read not supported for '" + path + "'" );
     }
 }

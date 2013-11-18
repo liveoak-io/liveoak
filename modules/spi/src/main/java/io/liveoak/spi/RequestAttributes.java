@@ -17,25 +17,26 @@ public interface RequestAttributes {
 
     Collection<String> getAttributeNames();
 
-    Object getAttribute(String attributeName);
+    Object getAttribute( String attributeName );
 
-    default <T> T getAttribute(String attributeName, Class<T> expectedClass) {
-        Object o = getAttribute(attributeName);
-        if (o == null) {
+    default <T> T getAttribute( String attributeName, Class<T> expectedClass ) {
+        Object o = getAttribute( attributeName );
+        if ( o == null ) {
             return null;
-        } else if (expectedClass.isAssignableFrom(o.getClass())) {
-            return expectedClass.cast(o);
+        } else if ( expectedClass.isAssignableFrom( o.getClass() ) ) {
+            return expectedClass.cast( o );
         } else {
-            throw new IllegalArgumentException("Object " + o + " is not instance of expected class " + expectedClass);
+            throw new IllegalArgumentException( "Object " + o + " is not instance of expected class " + expectedClass );
         }
     }
 
-    void setAttribute(String attributeName, Object attributeValue);
+    void setAttribute( String attributeName, Object attributeValue );
 
     /**
      * Removes attribute and return it's value if it was present or null if it wasn't
+     *
      * @param attributeName
      * @return value of removed attribute or null if attribute wasn't present
      */
-    Object removeAttribute(String attributeName);
+    Object removeAttribute( String attributeName );
 }

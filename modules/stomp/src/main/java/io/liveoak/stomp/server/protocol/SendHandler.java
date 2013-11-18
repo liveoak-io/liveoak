@@ -5,11 +5,11 @@
  */
 package io.liveoak.stomp.server.protocol;
 
+import io.liveoak.stomp.StompMessage;
+import io.liveoak.stomp.server.StompConnection;
+import io.liveoak.stomp.server.StompServerContext;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.liveoak.stomp.StompMessage;
-import io.liveoak.stomp.server.StompServerContext;
-import io.liveoak.stomp.server.StompConnection;
 
 /**
  * @author Bob McWhirter
@@ -17,15 +17,15 @@ import io.liveoak.stomp.server.StompConnection;
 public class SendHandler extends SimpleChannelInboundHandler<StompMessage> {
 
 
-    public SendHandler(StompServerContext serverContext) {
+    public SendHandler( StompServerContext serverContext ) {
         this.serverContext = serverContext;
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, StompMessage msg) throws Exception {
-        StompMessage stompMessage = (StompMessage) msg;
-        StompConnection connection = ctx.channel().attr(ConnectHandler.CONNECTION).get();
-        this.serverContext.handleSend(connection, stompMessage);
+    protected void channelRead0( ChannelHandlerContext ctx, StompMessage msg ) throws Exception {
+        StompMessage stompMessage = ( StompMessage ) msg;
+        StompConnection connection = ctx.channel().attr( ConnectHandler.CONNECTION ).get();
+        this.serverContext.handleSend( connection, stompMessage );
 
         // end of the line, do NOT retain or send upstream.
     }

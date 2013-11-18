@@ -24,7 +24,7 @@ public class GitResource extends GitDirectoryResource implements RootResource {
         super( null, null );
     }
 
-    public GitResource(String id) {
+    public GitResource( String id ) {
         super( null, null );
         this.id = id;
     }
@@ -35,23 +35,23 @@ public class GitResource extends GitDirectoryResource implements RootResource {
     }
 
     @Override
-    public void initialize(ResourceContext context) throws InitializationException {
-        if (this.id == null) {
-            this.id = context.config().get("id", null);
-            if (this.id == null) {
-                throw new InitializationException("no id specified");
+    public void initialize( ResourceContext context ) throws InitializationException {
+        if ( this.id == null ) {
+            this.id = context.config().get( "id", null );
+            if ( this.id == null ) {
+                throw new InitializationException( "no id specified" );
             }
         }
 
-        String repoPathStr = context.config().get("repoPath", null);
-        if (repoPathStr == null) {
-            throw new InitializationException("no git repo path specified");
+        String repoPathStr = context.config().get( "repoPath", null );
+        if ( repoPathStr == null ) {
+            throw new InitializationException( "no git repo path specified" );
         }
 
-        this.file = new File(repoPathStr);
+        this.file = new File( repoPathStr );
 
-        if (!this.file.canRead()) {
-            throw new InitializationException("unable to readMember git repo at: " + this.file.getAbsolutePath());
+        if ( !this.file.canRead() ) {
+            throw new InitializationException( "unable to readMember git repo at: " + this.file.getAbsolutePath() );
         }
 
         this.vertx = context.vertx();

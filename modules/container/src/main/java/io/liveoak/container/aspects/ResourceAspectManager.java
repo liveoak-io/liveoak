@@ -18,15 +18,15 @@ public class ResourceAspectManager {
 
     }
 
-    public void put(String name, ResourceAspect aspect) {
+    public void put( String name, ResourceAspect aspect ) {
         this.aspects.put( name, aspect );
     }
 
-    public ResourceAspect get(String name) {
+    public ResourceAspect get( String name ) {
         return this.aspects.get( name );
     }
 
-    public boolean contains(String name) {
+    public boolean contains( String name ) {
         return this.aspects.containsKey( name );
     }
 

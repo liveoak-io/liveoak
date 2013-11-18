@@ -4,7 +4,8 @@
   ~
   ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0           http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0           http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>io.liveoak</groupId>
     <artifactId>liveoak</artifactId>
@@ -15,7 +16,7 @@
   <artifactId>liveoak-vertx-modules</artifactId>
   <name>liveoak-vertx-modules</name>
   <packaging>pom</packaging>
-  
+
   <properties>
     <vertx.pullInDeps>false</vertx.pullInDeps>
     <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>

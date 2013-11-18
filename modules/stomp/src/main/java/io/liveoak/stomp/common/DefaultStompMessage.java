@@ -5,12 +5,12 @@
  */
 package io.liveoak.stomp.common;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufHolder;
-import io.netty.buffer.Unpooled;
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.StompException;
 import io.liveoak.stomp.StompMessage;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufHolder;
+import io.netty.buffer.Unpooled;
 
 import java.nio.charset.Charset;
 
@@ -19,26 +19,26 @@ import java.nio.charset.Charset;
  */
 public class DefaultStompMessage implements StompMessage, ByteBufHolder {
 
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
+    private static final Charset UTF_8 = Charset.forName( "UTF-8" );
 
     public DefaultStompMessage() {
-        this(new HeadersImpl());
+        this( new HeadersImpl() );
     }
 
-    public DefaultStompMessage(Headers headers) {
-        this(headers, Unpooled.EMPTY_BUFFER, false);
+    public DefaultStompMessage( Headers headers ) {
+        this( headers, Unpooled.EMPTY_BUFFER, false );
     }
 
-    public DefaultStompMessage(Headers headers, ByteBuf content) {
-        this(headers, content, false);
+    public DefaultStompMessage( Headers headers, ByteBuf content ) {
+        this( headers, content, false );
 
     }
 
-    public DefaultStompMessage(boolean error) {
+    public DefaultStompMessage( boolean error ) {
         this( new HeadersImpl(), Unpooled.EMPTY_BUFFER, error );
     }
 
-    public DefaultStompMessage(Headers headers, ByteBuf content, boolean error) {
+    public DefaultStompMessage( Headers headers, ByteBuf content, boolean error ) {
         this.content = content;
         this.headers = headers;
         this.error = error;
@@ -46,7 +46,7 @@ public class DefaultStompMessage implements StompMessage, ByteBufHolder {
 
     @Override
     public String id() {
-        return this.headers.get(Headers.MESSAGE_ID);
+        return this.headers.get( Headers.MESSAGE_ID );
     }
 
     @Override
@@ -56,48 +56,48 @@ public class DefaultStompMessage implements StompMessage, ByteBufHolder {
 
     @Override
     public String destination() {
-        return this.headers.get(Headers.DESTINATION);
+        return this.headers.get( Headers.DESTINATION );
     }
 
     @Override
-    public void destination(String destination) {
-        this.headers.put(Headers.DESTINATION, destination);
+    public void destination( String destination ) {
+        this.headers.put( Headers.DESTINATION, destination );
     }
 
     @Override
     public String contentType() {
-        return this.headers.get(Headers.CONTENT_TYPE);
+        return this.headers.get( Headers.CONTENT_TYPE );
     }
 
     @Override
-    public void contentType(String contentType) {
-        this.headers.put(Headers.CONTENT_TYPE, contentType);
+    public void contentType( String contentType ) {
+        this.headers.put( Headers.CONTENT_TYPE, contentType );
     }
 
     @Override
-    public String content(Charset charset) {
-        return this.content.duplicate().retain().toString(charset);
+    public String content( Charset charset ) {
+        return this.content.duplicate().retain().toString( charset );
     }
 
     @Override
     public String utf8Content() {
-        return content(UTF_8);
+        return content( UTF_8 );
     }
 
     @Override
-    public void content(String content, Charset charset) {
-        if (this.content != null) {
+    public void content( String content, Charset charset ) {
+        if ( this.content != null ) {
             this.content().release();
         }
-        this.content = Unpooled.copiedBuffer(content.toCharArray(), charset).retain();
+        this.content = Unpooled.copiedBuffer( content.toCharArray(), charset ).retain();
     }
 
-    public void content(String content) {
-        content(content, UTF_8);
+    public void content( String content ) {
+        content( content, UTF_8 );
     }
 
     @Override
-    public void content(ByteBuf content) {
+    public void content( ByteBuf content ) {
         if ( this.content != null ) {
             this.content.release();
         }
@@ -123,20 +123,20 @@ public class DefaultStompMessage implements StompMessage, ByteBufHolder {
     }
 
     @Override
-    public void ack(String transactionId) throws StompException {
+    public void ack( String transactionId ) throws StompException {
     }
 
     @Override
-    public void nack(String transactionId) throws StompException {
+    public void nack( String transactionId ) throws StompException {
     }
 
     public StompMessage duplicate() {
-        return new DefaultStompMessage(this.headers.duplicate(), this.content.duplicate(), this.error);
+        return new DefaultStompMessage( this.headers.duplicate(), this.content.duplicate(), this.error );
     }
 
     @Override
     public ByteBufHolder copy() {
-        return new DefaultStompMessage(this.headers.duplicate(), this.content.copy(), this.error);
+        return new DefaultStompMessage( this.headers.duplicate(), this.content.copy(), this.error );
     }
 
     @Override
@@ -151,8 +151,8 @@ public class DefaultStompMessage implements StompMessage, ByteBufHolder {
     }
 
     @Override
-    public ByteBufHolder retain(int increment) {
-        this.content.retain(increment);
+    public ByteBufHolder retain( int increment ) {
+        this.content.retain( increment );
         return this;
     }
 
@@ -162,12 +162,12 @@ public class DefaultStompMessage implements StompMessage, ByteBufHolder {
     }
 
     @Override
-    public boolean release(int decrement) {
-        return this.content.release(decrement);
+    public boolean release( int decrement ) {
+        return this.content.release( decrement );
     }
 
     public String toString() {
-        return "[DefaultStompMessage: headers="+ this.headers + "; error=" + error + "; content=" + this.content + "," + this.content.refCnt() + "]";
+        return "[DefaultStompMessage: headers=" + this.headers + "; error=" + error + "; content=" + this.content + "," + this.content.refCnt() + "]";
     }
 
 

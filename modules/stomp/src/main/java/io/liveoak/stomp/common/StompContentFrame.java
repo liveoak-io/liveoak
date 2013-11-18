@@ -5,40 +5,40 @@
  */
 package io.liveoak.stomp.common;
 
+import io.liveoak.stomp.Headers;
+import io.liveoak.stomp.Stomp;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufHolder;
 import io.netty.buffer.Unpooled;
-import io.liveoak.stomp.Headers;
-import io.liveoak.stomp.Stomp;
 
 /**
  * @author Bob McWhirter
  */
 public class StompContentFrame extends StompFrame implements ByteBufHolder {
 
-    public StompContentFrame(Stomp.Command command) {
+    public StompContentFrame( Stomp.Command command ) {
         super( command );
     }
 
-    public StompContentFrame(Stomp.Command command, Headers headers) {
+    public StompContentFrame( Stomp.Command command, Headers headers ) {
         super( command, headers );
     }
 
-    public StompContentFrame(FrameHeader header) {
+    public StompContentFrame( FrameHeader header ) {
         super( header );
     }
 
-    public StompContentFrame(FrameHeader header, ByteBuf content) {
+    public StompContentFrame( FrameHeader header, ByteBuf content ) {
         super( header );
         this.content = content;
     }
 
-    public StompContentFrame(FrameHeader header, String content) {
-        super( header);
-        this.content = Unpooled.copiedBuffer(content.getBytes());
+    public StompContentFrame( FrameHeader header, String content ) {
+        super( header );
+        this.content = Unpooled.copiedBuffer( content.getBytes() );
     }
 
-    public void content(ByteBuf content) {
+    public void content( ByteBuf content ) {
         this.content = content;
     }
 
@@ -68,7 +68,7 @@ public class StompContentFrame extends StompFrame implements ByteBufHolder {
     }
 
     @Override
-    public StompContentFrame retain(int increment) {
+    public StompContentFrame retain( int increment ) {
         this.content.retain( increment );
         return this;
     }
@@ -79,7 +79,7 @@ public class StompContentFrame extends StompFrame implements ByteBufHolder {
     }
 
     @Override
-    public boolean release(int decrement) {
+    public boolean release( int decrement ) {
         return this.content.release( decrement );
     }
 

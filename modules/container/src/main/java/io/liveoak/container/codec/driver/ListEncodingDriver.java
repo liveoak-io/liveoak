@@ -18,26 +18,26 @@ import java.util.stream.Stream;
  */
 public class ListEncodingDriver extends AbstractEncodingDriver {
 
-    public ListEncodingDriver(EncodingDriver parent, Stream<Object> object, ReturnFields returnFields) {
-        super(parent, object, returnFields );
+    public ListEncodingDriver( EncodingDriver parent, Stream<Object> object, ReturnFields returnFields ) {
+        super( parent, object, returnFields );
     }
 
     @Override
     public void encode() throws Exception {
         encoder().startList();
-        ((Stream<Object>)object()).forEach( (e)->{
-            if ( e instanceof Resource) {
+        ( ( Stream<Object> ) object() ).forEach( ( e ) -> {
+            if ( e instanceof Resource ) {
                 if ( returnFields().isEmpty() ) {
                     addChildDriver( new ValueEncodingDriver( this, e ) );
                 } else {
-                    addChildDriver( new ResourceEncodingDriver( this, (Resource) e, returnFields() ) );
+                    addChildDriver( new ResourceEncodingDriver( this, ( Resource ) e, returnFields() ) );
                 }
-            } else if ( e instanceof List || e instanceof Set) {
-                addChildDriver( new ListEncodingDriver( this, ((Collection)e).stream(), returnFields() ) );
+            } else if ( e instanceof List || e instanceof Set ) {
+                addChildDriver( new ListEncodingDriver( this, ( ( Collection ) e ).stream(), returnFields() ) );
             } else {
                 addChildDriver( new ValueEncodingDriver( this, e ) );
             }
-        });
+        } );
         encodeNext();
     }
 

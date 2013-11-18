@@ -9,32 +9,34 @@ package io.liveoak.stomp;
  * @author Bob McWhirter
  */
 public class Stomp {
-    /** STOMP versions */
+    /**
+     * STOMP versions
+     */
     public enum Version {
 
-        VERSION_1_0("1.0", 1.0F),
-        VERSION_1_1("1.1", 1.1F),
-        VERSION_1_2("1.2", 1.1F);
+        VERSION_1_0( "1.0", 1.0F ),
+        VERSION_1_1( "1.1", 1.1F ),
+        VERSION_1_2( "1.2", 1.1F );
 
         private String versionString;
         private float versionValue;
 
-        Version(String versionString, float versionValue) {
+        Version( String versionString, float versionValue ) {
             this.versionString = versionString;
             this.versionValue = versionValue;
         }
 
-        public boolean isAfter(Version version) {
+        public boolean isAfter( Version version ) {
             return versionValue > version.versionValue;
         }
 
-        public boolean isBefore(Version version) {
+        public boolean isBefore( Version version ) {
             return versionValue < version.versionValue;
         }
 
-        public static Version forVersionString(String versionString) {
-            for (Version version : Version.values()) {
-                if (versionString.equals( version.versionString ))
+        public static Version forVersionString( String versionString ) {
+            for ( Version version : Version.values() ) {
+                if ( versionString.equals( version.versionString ) )
                     return version;
             }
             return null;
@@ -43,7 +45,7 @@ public class Stomp {
         public static String supportedVersions() {
             StringBuffer buf = new StringBuffer();
             Version[] versions = Version.values();
-            for (int i = 0; i < versions.length; i++) {
+            for ( int i = 0; i < versions.length; i++ ) {
                 if ( i > 0 ) {
                     buf.append( "," );
                 }
@@ -82,7 +84,7 @@ public class Stomp {
 
         private boolean hasContent;
 
-        Command(boolean hasContent) {
+        Command( boolean hasContent ) {
             this.hasContent = hasContent;
         }
 

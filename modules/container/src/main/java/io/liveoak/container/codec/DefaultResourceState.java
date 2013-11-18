@@ -8,7 +8,11 @@ package io.liveoak.container.codec;
 import io.liveoak.spi.state.ResourceState;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Bob McWhirter
@@ -19,7 +23,7 @@ public class DefaultResourceState implements ResourceState {
 
     }
 
-    public DefaultResourceState(String id) {
+    public DefaultResourceState( String id ) {
         this.id = id;
     }
 
@@ -29,12 +33,12 @@ public class DefaultResourceState implements ResourceState {
     }
 
     @Override
-    public void id(String id) {
+    public void id( String id ) {
         this.id = id;
     }
 
     @Override
-    public void uri(URI uri) {
+    public void uri( URI uri ) {
         this.uri = uri;
     }
 
@@ -44,12 +48,12 @@ public class DefaultResourceState implements ResourceState {
     }
 
     @Override
-    public void putProperty(String name, Object value) {
-        this.properties.put(name, value);
+    public void putProperty( String name, Object value ) {
+        this.properties.put( name, value );
     }
 
     @Override
-    public Object getProperty(String name) {
+    public Object getProperty( String name ) {
         return this.properties.get( name );
     }
 
@@ -59,7 +63,7 @@ public class DefaultResourceState implements ResourceState {
     }
 
     @Override
-    public void addMember(ResourceState member) {
+    public void addMember( ResourceState member ) {
         this.members.add( member );
     }
 

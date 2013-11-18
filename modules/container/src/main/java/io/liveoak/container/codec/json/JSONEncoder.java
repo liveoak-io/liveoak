@@ -8,13 +8,12 @@ package io.liveoak.container.codec.json;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufOutputStream;
 import io.liveoak.container.codec.Encoder;
 import io.liveoak.spi.resource.async.Resource;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufOutputStream;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Date;
 
 /**
@@ -26,11 +25,11 @@ public class JSONEncoder implements Encoder {
     }
 
     @Override
-    public void initialize(ByteBuf buffer) throws Exception {
+    public void initialize( ByteBuf buffer ) throws Exception {
         JsonFactory factory = new JsonFactory();
-        ByteBufOutputStream out = new ByteBufOutputStream(buffer);
-        this.generator = factory.createGenerator(out);
-        this.generator.setPrettyPrinter(new DefaultPrettyPrinter("\\n"));
+        ByteBufOutputStream out = new ByteBufOutputStream( buffer );
+        this.generator = factory.createGenerator( out );
+        this.generator.setPrettyPrinter( new DefaultPrettyPrinter( "\\n" ) );
     }
 
     @Override
@@ -42,21 +41,21 @@ public class JSONEncoder implements Encoder {
     // ----------------------------------------
 
     @Override
-    public void startResource(Resource resource) throws Exception {
+    public void startResource( Resource resource ) throws Exception {
         this.generator.writeStartObject();
         if ( resource.id() != null ) {
             this.generator.writeFieldName( "id" );
-            this.generator.writeString(resource.id());
-            this.generator.writeFieldName("self");
+            this.generator.writeString( resource.id() );
+            this.generator.writeFieldName( "self" );
             this.generator.writeStartObject();
-            this.generator.writeFieldName("href");
+            this.generator.writeFieldName( "href" );
             this.generator.writeString( resource.uri().toString() );
             this.generator.writeEndObject();
         }
     }
 
     @Override
-    public void endResource(Resource resource) throws IOException {
+    public void endResource( Resource resource ) throws IOException {
         this.generator.writeEndObject();
     }
 
@@ -73,12 +72,12 @@ public class JSONEncoder implements Encoder {
     // ----------------------------------------
 
     @Override
-    public void startProperty(String propertyName) throws Exception {
+    public void startProperty( String propertyName ) throws Exception {
         this.generator.writeFieldName( propertyName );
     }
 
     @Override
-    public void endProperty(String propertyName) throws Exception {
+    public void endProperty( String propertyName ) throws Exception {
         // not used in JSON
     }
 
@@ -110,26 +109,26 @@ public class JSONEncoder implements Encoder {
     // ----------------------------------------
 
     @Override
-    public void writeValue(String value) throws Exception {
+    public void writeValue( String value ) throws Exception {
         this.generator.writeString( value );
     }
 
     @Override
-    public void writeValue(Integer value) throws Exception {
+    public void writeValue( Integer value ) throws Exception {
         this.generator.writeNumber( value );
     }
 
     @Override
-    public void writeValue(Double value) throws Exception {
+    public void writeValue( Double value ) throws Exception {
         this.generator.writeNumber( value );
     }
 
     @Override
-    public void writeValue(Date value) throws Exception {
+    public void writeValue( Date value ) throws Exception {
         this.generator.writeNumber( value.getTime() );
     }
 
-    public void writeLink(Resource resource) throws Exception {
+    public void writeLink( Resource resource ) throws Exception {
         this.generator.writeStartObject();
         this.generator.writeFieldName( "id" );
         this.generator.writeString( resource.id() );

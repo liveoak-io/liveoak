@@ -19,17 +19,17 @@ import java.util.stream.Stream;
  */
 public class SubscriptionsCollectionResource implements Resource {
 
-    public SubscriptionsCollectionResource(Resource parent, SubscriptionManager subscriptionManager) {
+    public SubscriptionsCollectionResource( Resource parent, SubscriptionManager subscriptionManager ) {
         this.parent = parent;
         this.subscriptionManager = subscriptionManager;
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
-        Stream<Subscription> subscriptions = this.subscriptionManager.getSubscriptions(this.parent);
-        subscriptions.forEach((each) -> {
-            sink.accept(new SubscriptionResource(this, each));
-        });
+    public void readMembers( RequestContext ctx, ResourceSink sink ) {
+        Stream<Subscription> subscriptions = this.subscriptionManager.getSubscriptions( this.parent );
+        subscriptions.forEach( ( each ) -> {
+            sink.accept( new SubscriptionResource( this, each ) );
+        } );
         sink.close();
     }
 
@@ -44,14 +44,14 @@ public class SubscriptionsCollectionResource implements Resource {
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
-        Subscription subscription = this.subscriptionManager.getSubscription(this.parent, id);
-        if (subscription == null) {
-            responder.noSuchResource(id);
+    public void readMember( RequestContext ctx, String id, Responder responder ) {
+        Subscription subscription = this.subscriptionManager.getSubscription( this.parent, id );
+        if ( subscription == null ) {
+            responder.noSuchResource( id );
             return;
         }
 
-        responder.resourceRead(new SubscriptionResource(this, subscription));
+        responder.resourceRead( new SubscriptionResource( this, subscription ) );
     }
 
     private Resource parent;

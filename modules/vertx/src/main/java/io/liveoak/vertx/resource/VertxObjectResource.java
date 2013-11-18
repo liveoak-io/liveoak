@@ -16,13 +16,13 @@ import org.vertx.java.core.json.JsonObject;
  */
 public class VertxObjectResource extends AbstractVertxResource {
 
-    public VertxObjectResource(Resource parent, String id, Vertx vertx, JsonObject state) {
+    public VertxObjectResource( Resource parent, String id, Vertx vertx, JsonObject state ) {
         super( parent, id, vertx );
         this.state = state;
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties( RequestContext ctx, PropertySink sink ) {
         for ( String name : state.getFieldNames() ) {
             sink.accept( name, state.getField( name ) );
         }

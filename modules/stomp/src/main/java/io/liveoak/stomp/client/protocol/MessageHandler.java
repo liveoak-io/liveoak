@@ -5,10 +5,10 @@
  */
 package io.liveoak.stomp.client.protocol;
 
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.StompMessage;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
 
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
@@ -18,27 +18,27 @@ import java.util.function.Consumer;
  */
 public class MessageHandler extends ChannelDuplexHandler {
 
-    public MessageHandler(StompClientContext clientContext, Executor executor) {
+    public MessageHandler( StompClientContext clientContext, Executor executor ) {
         this.clientContext = clientContext;
         this.executor = executor;
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (msg instanceof StompMessage) {
-            StompMessage stompMessage = (StompMessage) msg;
-            if (stompMessage.isError()) {
+    public void channelRead( ChannelHandlerContext ctx, Object msg ) throws Exception {
+        if ( msg instanceof StompMessage ) {
+            StompMessage stompMessage = ( StompMessage ) msg;
+            if ( stompMessage.isError() ) {
 
             } else {
                 String subscriptionId = stompMessage.headers().get( Headers.SUBSCRIPTION );
-                this.clientContext.getSubscriptionHandler(subscriptionId);
-                Consumer<StompMessage> handler = this.clientContext.getSubscriptionHandler(subscriptionId);
-                this.executor.execute(() -> {
-                    handler.accept(stompMessage);
-                });
+                this.clientContext.getSubscriptionHandler( subscriptionId );
+                Consumer<StompMessage> handler = this.clientContext.getSubscriptionHandler( subscriptionId );
+                this.executor.execute( () -> {
+                    handler.accept( stompMessage );
+                } );
             }
         } else {
-            super.channelRead(ctx, msg);
+            super.channelRead( ctx, msg );
         }
     }
 

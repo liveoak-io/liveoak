@@ -8,9 +8,9 @@
 <module xmlns="urn:jboss:module:1.0" name="com.fasterxml.jackson.core">
 
   <resources>
-    <artifact name="com.fasterxml.jackson.core:jackson-core:${jackson.version}"/>
-    <artifact name="com.fasterxml.jackson.core:jackson-databind:${jackson.version}"/>
-    <artifact name="com.fasterxml.jackson.core:jackson-annotations:${jackson.version}"/>
+    <artifact name="com.fasterxml.jackson.core:jackson-core:${jackson.version}" />
+    <artifact name="com.fasterxml.jackson.core:jackson-databind:${jackson.version}" />
+    <artifact name="com.fasterxml.jackson.core:jackson-annotations:${jackson.version}" />
   </resources>
 
   <dependencies>

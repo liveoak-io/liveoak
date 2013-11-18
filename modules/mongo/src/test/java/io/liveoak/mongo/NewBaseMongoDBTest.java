@@ -11,11 +11,8 @@ import com.mongodb.MongoClient;
 import io.liveoak.container.SimpleConfig;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.testtools.AbstractResourceTestCase;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -30,25 +27,25 @@ public class NewBaseMongoDBTest extends AbstractResourceTestCase {
 
     @Override
     public RootResource createRootResource() {
-        return new RootMongoResource(BASEPATH);
+        return new RootMongoResource( BASEPATH );
     }
 
     @Override
     public Config createConfig() {
-        String database = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
-        Integer port = new Integer(System.getProperty("mongo.port", "27017"));
-        String host = System.getProperty("mongo.host", "localhost");
+        String database = System.getProperty( "mongo.db", "MongoControllerTest_" + UUID.randomUUID() );
+        Integer port = new Integer( System.getProperty( "mongo.port", "27017" ) );
+        String host = System.getProperty( "mongo.host", "localhost" );
 
         SimpleConfig config = new SimpleConfig();
-        config.put("db", database);
-        config.put("port", port);
-        config.put("host", host);
+        config.put( "db", database );
+        config.put( "port", port );
+        config.put( "host", host );
 
         try {
-            mongoClient = new MongoClient(host, port);
-            db = mongoClient.getDB(database);
+            mongoClient = new MongoClient( host, port );
+            db = mongoClient.getDB( database );
             db.dropDatabase();
-        } catch (Exception e) {
+        } catch ( Exception e ) {
             e.printStackTrace();
         }
         return config;

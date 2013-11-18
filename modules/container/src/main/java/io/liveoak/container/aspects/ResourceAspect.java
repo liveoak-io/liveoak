@@ -12,5 +12,5 @@ import io.liveoak.spi.resource.async.Resource;
  */
 public interface ResourceAspect {
 
-    Resource forResource(Resource resource);
+    Resource forResource( Resource resource );
 }

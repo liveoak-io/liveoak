@@ -14,10 +14,13 @@ import io.liveoak.spi.RequestContext;
 public interface EncodingDriver {
 
     Encoder encoder();
+
     Object object();
+
     RequestContext requestContext();
 
     void encode() throws Exception;
+
     void close() throws Exception;
 
     EncodingDriver parent();

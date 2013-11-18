@@ -13,15 +13,15 @@ import io.liveoak.stomp.Stomp;
  */
 public class StompControlFrame extends StompFrame {
 
-    public StompControlFrame(Stomp.Command command) {
+    public StompControlFrame( Stomp.Command command ) {
         super( command );
     }
 
-    public StompControlFrame(Stomp.Command command, Headers headers) {
+    public StompControlFrame( Stomp.Command command, Headers headers ) {
         super( command, headers );
     }
 
-    public StompControlFrame(FrameHeader header) {
+    public StompControlFrame( FrameHeader header ) {
         super( header );
     }
 

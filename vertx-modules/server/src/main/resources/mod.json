@@ -1,15 +1,15 @@
 {
-    // Java verticle
-    "main": "io.liveoak.vertx.modules.server.ServerVerticle",
+  // Java verticle
+  "main": "io.liveoak.vertx.modules.server.ServerVerticle",
 
-    // If your module is going to be registered in the Vert.x module registry you will also need the following
-    // mandatory fields
-    "description": "Server",
-    "licenses": ["The Apache Software License Version 2.0"],
-    "author": "author"
+  // If your module is going to be registered in the Vert.x module registry you will also need the following
+  // mandatory fields
+  "description": "Server",
+  "licenses": ["The Apache Software License Version 2.0"],
+  "author": "author"
 
-    // Optional fields
-    //"developers": ["", ""],
-    //"keywords": ["", ""],
-    //"homepage": "url to your project page"
+  // Optional fields
+  //"developers": ["", ""],
+  //"keywords": ["", ""],
+  //"homepage": "url to your project page"
 }

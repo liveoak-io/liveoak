@@ -14,18 +14,18 @@ import io.liveoak.spi.resource.async.ResourceSink;
  */
 public class MembersEncodingDriver extends ResourceEncodingDriver {
 
-    public MembersEncodingDriver(EncodingDriver parent, Resource resource, ReturnFields returnFields) {
-        super(parent, resource, returnFields);
+    public MembersEncodingDriver( EncodingDriver parent, Resource resource, ReturnFields returnFields ) {
+        super( parent, resource, returnFields );
     }
 
     @Override
     public void encode() throws Exception {
-        resource().readMembers(requestContext(), new MyResourceSink());
+        resource().readMembers( requestContext(), new MyResourceSink() );
     }
 
     @Override
     public void close() throws Exception {
-        if (hasMembers) {
+        if ( hasMembers ) {
             encoder().endMembers();
         }
         parent().encodeNext();
@@ -34,22 +34,22 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
     private class MyResourceSink implements ResourceSink {
 
         @Override
-        public void accept(Resource resource) {
-            if (!returnFields().included("members")) {
+        public void accept( Resource resource ) {
+            if ( !returnFields().included( "members" ) ) {
                 return;
             }
-            if (!hasMembers) {
+            if ( !hasMembers ) {
                 try {
                     encoder().startMembers();
-                } catch (Exception e) {
+                } catch ( Exception e ) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
                 hasMembers = true;
             }
-            if (returnFields().child("members").isEmpty()) {
-                addChildDriver(new ValueEncodingDriver(MembersEncodingDriver.this, resource));
+            if ( returnFields().child( "members" ).isEmpty() ) {
+                addChildDriver( new ValueEncodingDriver( MembersEncodingDriver.this, resource ) );
             } else {
-                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, returnFields().child("members")));
+                addChildDriver( new ResourceEncodingDriver( MembersEncodingDriver.this, resource, returnFields().child( "members" ) ) );
             }
         }
 

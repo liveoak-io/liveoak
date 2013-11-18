@@ -7,7 +7,8 @@ package io.liveoak.spi.resource.async;
 
 import java.util.function.Consumer;
 
-/** A sink to accept children of a resource when reading.
+/**
+ * A sink to accept children of a resource when reading.
  *
  * @author Bob McWhirter
  */

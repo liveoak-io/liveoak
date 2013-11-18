@@ -10,7 +10,7 @@ package io.liveoak.spi;
  */
 public class ResourceNotFoundException extends ResourceException {
 
-    public ResourceNotFoundException(String path) {
-        super(path, "Resource with id '" + path + "' not found" );
+    public ResourceNotFoundException( String path ) {
+        super( path, "Resource with id '" + path + "' not found" );
     }
 }

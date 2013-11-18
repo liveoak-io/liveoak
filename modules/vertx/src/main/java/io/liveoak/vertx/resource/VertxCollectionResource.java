@@ -22,12 +22,12 @@ import java.util.Iterator;
  */
 public class VertxCollectionResource extends AbstractVertxResource implements Resource {
 
-    public VertxCollectionResource(String id, String address) {
-        this(null, id, null, address );
+    public VertxCollectionResource( String id, String address ) {
+        this( null, id, null, address );
     }
 
-    public VertxCollectionResource(Resource parent, String id, Vertx vertx, String address) {
-        super(parent, id, vertx );
+    public VertxCollectionResource( Resource parent, String id, Vertx vertx, String address ) {
+        super( parent, id, vertx );
         this.address = address;
     }
 
@@ -36,56 +36,56 @@ public class VertxCollectionResource extends AbstractVertxResource implements Re
     }
 
     @Override
-    public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
+    public void createMember( RequestContext ctx, ResourceState state, Responder responder ) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
+    public void readMembers( RequestContext ctx, ResourceSink sink ) {
         JsonObject request = new JsonObject();
-        request.putString("action", "readMember");
+        request.putString( "action", "readMember" );
         // TODO: Allow filtering, paging and depth
-        vertx().eventBus().send(address(), request, (Message<JsonObject> response) -> {
+        vertx().eventBus().send( address(), request, ( Message<JsonObject> response ) -> {
             JsonObject payload = response.body();
-            int status = payload.getInteger("status-code");
-            if (status == 200) {
-                String type = payload.getString("type");
-                if (type.equals("collection")) {
-                    System.err.println("GOT: " + payload);
-                    JsonArray records = payload.getArray("content");
+            int status = payload.getInteger( "status-code" );
+            if ( status == 200 ) {
+                String type = payload.getString( "type" );
+                if ( type.equals( "collection" ) ) {
+                    System.err.println( "GOT: " + payload );
+                    JsonArray records = payload.getArray( "content" );
                     Iterator<Object> iterator = records.iterator();
-                    while(iterator.hasNext()) {
-                        JsonObject record = (JsonObject) iterator.next();
-                        sink.accept(new VertxObjectResource(this, record.getString("id"), vertx(), record));
+                    while ( iterator.hasNext() ) {
+                        JsonObject record = ( JsonObject ) iterator.next();
+                        sink.accept( new VertxObjectResource( this, record.getString( "id" ), vertx(), record ) );
                     }
                 } else {
                     // TODO: I don't think we ever get here
                 }
             }
             sink.close();
-        });
+        } );
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
-        JsonObject request = RequestBuilder.newReadRequest(id);
-        vertx().eventBus().send(address(), request, (Message<JsonObject> response) -> {
+    public void readMember( RequestContext ctx, String id, Responder responder ) {
+        JsonObject request = RequestBuilder.newReadRequest( id );
+        vertx().eventBus().send( address(), request, ( Message<JsonObject> response ) -> {
             JsonObject payload = response.body();
             System.err.println( "payload: " + payload );
-            int status = payload.getInteger("status-code");
-            if (status == 200) {
-                String type = payload.getString("type");
+            int status = payload.getInteger( "status-code" );
+            if ( status == 200 ) {
+                String type = payload.getString( "type" );
                 // TODO I don't think this ever evals true
-                if (type.equals("collection")) {
-                    String resourceAddress = payload.getString("address");
-                    responder.resourceRead(new VertxCollectionResource(this, id, vertx(), resourceAddress));
-                } else if (type.equals("object")) {
-                    responder.resourceRead(new VertxObjectResource(this, id, vertx(), payload.getObject( "content" ) ) );
+                if ( type.equals( "collection" ) ) {
+                    String resourceAddress = payload.getString( "address" );
+                    responder.resourceRead( new VertxCollectionResource( this, id, vertx(), resourceAddress ) );
+                } else if ( type.equals( "object" ) ) {
+                    responder.resourceRead( new VertxObjectResource( this, id, vertx(), payload.getObject( "content" ) ) );
                 }
-            } else if (status == 404) {
-                responder.noSuchResource(id);
+            } else if ( status == 404 ) {
+                responder.noSuchResource( id );
             }
-        });
+        } );
     }
 
     private String address;

@@ -12,8 +12,8 @@ import io.liveoak.spi.ReturnFields;
  */
 public class PropertyEncodingDriver extends AbstractEncodingDriver {
 
-    public PropertyEncodingDriver(EncodingDriver parent, String name, ReturnFields returnFields) {
-        super(parent, null, returnFields );
+    public PropertyEncodingDriver( EncodingDriver parent, String name, ReturnFields returnFields ) {
+        super( parent, null, returnFields );
         this.name = name;
     }
 

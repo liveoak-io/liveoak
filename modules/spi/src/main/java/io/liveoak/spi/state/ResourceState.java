@@ -9,8 +9,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
-/** Opaque state of a resource.
- *
+/**
+ * Opaque state of a resource.
+ * <p/>
  * <p>State objects are used to instill new state into
  * a server-side resource.</p>
  *
@@ -18,43 +19,47 @@ import java.util.Set;
  */
 public interface ResourceState {
 
-    /** Retrieve the ID of the resource.
+    /**
+     * Retrieve the ID of the resource.
      *
      * @return The ID of the resource.
      */
     String id();
 
-    /** Set the ID of the resource.
+    /**
+     * Set the ID of the resource.
      *
      * @param id The ID of the resource.
      */
-    void id(String id);
+    void id( String id );
 
-    void uri(URI uri);
+    void uri( URI uri );
 
     URI uri();
 
-    /** Add a property to the state.
-     *
+    /**
+     * Add a property to the state.
+     * <p/>
      * <p>Property values may be either simple scalar
      * values, or complex {@link ResourceState} objects</p>
      *
-     * @param name The name of the property.
+     * @param name  The name of the property.
      * @param value The value of the property.
      */
-    void putProperty(String name, Object value);
+    void putProperty( String name, Object value );
 
-    /** Retrieve a property value.
+    /**
+     * Retrieve a property value.
      *
      * @param name The property name.
      * @return The value of the property, as either a simple scalar, or as a
-     * more complex {@link ResourceState}.
+     *         more complex {@link ResourceState}.
      */
-    Object getProperty(String name);
+    Object getProperty( String name );
 
     Set<String> getPropertyNames();
 
-    void addMember(ResourceState member);
+    void addMember( ResourceState member );
 
     List<ResourceState> members();
 

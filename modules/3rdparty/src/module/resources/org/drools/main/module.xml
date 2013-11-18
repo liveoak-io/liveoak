@@ -8,21 +8,21 @@
 <module xmlns="urn:jboss:module:1.0" name="org.drools">
 
   <resources>
-    <artifact name="org.drools:drools-compiler:${drools.version}"/>
-    <artifact name="org.drools:drools-templates:${drools.version}"/>
-    <artifact name="org.drools:drools-core:${drools.version}"/>
-    <artifact name="org.drools:knowledge-api:${drools.version}"/>
-    <artifact name="org.drools:knowledge-internal-api:${drools.version}"/>
-    <artifact name="org.codehaus.janino:janino:${janino.version}"/>
-    <artifact name="org.mvel:mvel2:2.1.5.Final"/>
-    <artifact name="org.antlr:antlr-runtime:3.3"/>
+    <artifact name="org.drools:drools-compiler:${drools.version}" />
+    <artifact name="org.drools:drools-templates:${drools.version}" />
+    <artifact name="org.drools:drools-core:${drools.version}" />
+    <artifact name="org.drools:knowledge-api:${drools.version}" />
+    <artifact name="org.drools:knowledge-internal-api:${drools.version}" />
+    <artifact name="org.codehaus.janino:janino:${janino.version}" />
+    <artifact name="org.mvel:mvel2:2.1.5.Final" />
+    <artifact name="org.antlr:antlr-runtime:3.3" />
   </resources>
 
   <dependencies>
     <module name="org.slf4j" />
     <system>
       <paths>
-        <path name="org/xml/sax"/>
+        <path name="org/xml/sax" />
       </paths>
     </system>
   </dependencies>

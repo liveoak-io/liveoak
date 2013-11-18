@@ -20,10 +20,10 @@ public enum AuthorizationDecision {
      * @param newDecision decision to merge with this decision
      * @return result of merge
      */
-    public AuthorizationDecision mergeDecision(AuthorizationDecision newDecision) {
-        if (newDecision == AuthorizationDecision.REJECT || this == AuthorizationDecision.REJECT) {
+    public AuthorizationDecision mergeDecision( AuthorizationDecision newDecision ) {
+        if ( newDecision == AuthorizationDecision.REJECT || this == AuthorizationDecision.REJECT ) {
             return AuthorizationDecision.REJECT;
-        } else if (newDecision == AuthorizationDecision.ACCEPT || this == AuthorizationDecision.ACCEPT) {
+        } else if ( newDecision == AuthorizationDecision.ACCEPT || this == AuthorizationDecision.ACCEPT ) {
             return AuthorizationDecision.ACCEPT;
         } else {
             return AuthorizationDecision.IGNORE;

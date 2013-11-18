@@ -5,8 +5,6 @@
  */
 package io.liveoak.mongo;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import io.liveoak.container.ReturnFieldsImpl;
@@ -15,15 +13,18 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.state.ResourceState;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.fest.assertions.Fail;
 import org.junit.Test;
 
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -35,123 +36,122 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
         db.dropDatabase(); //TODO: create a new DB here instead of dropping the old one
         assertThat( db.getCollectionNames() ).hasSize( 0 );
 
-        ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH);
+        ResourceState result = connector.read( new RequestContext.Builder().build(), BASEPATH );
 
         // verify response
-        assertThat(result).isNotNull();
-        assertThat(result.id()).isEqualTo(BASEPATH);
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
-        assertThat(result.getProperty("type")).isEqualTo("collection");
-        assertThat(result.members()).isEmpty();
+        assertThat( result ).isNotNull();
+        assertThat( result.id() ).isEqualTo( BASEPATH );
+        assertThat( result.getPropertyNames().size() ).isEqualTo( 1 );
+        assertThat( result.getProperty( "type" ) ).isEqualTo( "collection" );
+        assertThat( result.members() ).isEmpty();
     }
 
 
     @Test
     public void testGetStorageCollections() throws Exception {
         db.dropDatabase(); //TODO: create a new DB here instead of dropping the old one
-        assertThat( db.getCollectionNames() ).hasSize(0);
+        assertThat( db.getCollectionNames() ).hasSize( 0 );
 
         // create a couple of collections
-        db.createCollection("collection1", new BasicDBObject());
-        db.createCollection("collection2", new BasicDBObject());
-        db.createCollection("collection3", new BasicDBObject());
+        db.createCollection( "collection1", new BasicDBObject() );
+        db.createCollection( "collection2", new BasicDBObject() );
+        db.createCollection( "collection3", new BasicDBObject() );
 
         // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
         assertThat( db.getCollectionNames() ).hasSize( 4 );
 
 
-        ResourceState result = connector.read(new RequestContext.Builder().returnFields( new ReturnFieldsImpl( "*" ).withExpand( "members" ) ).build(), BASEPATH);
+        ResourceState result = connector.read( new RequestContext.Builder().returnFields( new ReturnFieldsImpl( "*" ).withExpand( "members" ) ).build(), BASEPATH );
 
         // verify response
-        assertThat(result).isNotNull();
-        assertThat(result.id()).isEqualTo(BASEPATH);
-        assertThat(result.getProperty("type")).isEqualTo("collection");
-        assertThat(result.members().size()).isEqualTo(3);
+        assertThat( result ).isNotNull();
+        assertThat( result.id() ).isEqualTo( BASEPATH );
+        assertThat( result.getProperty( "type" ) ).isEqualTo( "collection" );
+        assertThat( result.members().size() ).isEqualTo( 3 );
 
-        for (int i = 0; i < result.members().size(); i++) {
-            ResourceState member =  result.members().get(i);
-            assertThat(member.id()).isEqualTo("collection" + (i+1));
-            assertThat(member.getPropertyNames().size()).isEqualTo(1);
-            assertThat(member.getProperty("type")).isEqualTo("collection");
-            assertThat(member.members()).isEmpty();
+        for ( int i = 0; i < result.members().size(); i++ ) {
+            ResourceState member = result.members().get( i );
+            assertThat( member.id() ).isEqualTo( "collection" + ( i + 1 ) );
+            assertThat( member.getPropertyNames().size() ).isEqualTo( 1 );
+            assertThat( member.getProperty( "type" ) ).isEqualTo( "collection" );
+            assertThat( member.members() ).isEmpty();
         }
     }
-
 
 
     @Test
     public void testGetEmptyCollection() throws Exception {
         String methodName = "testEmptyCollection";
         // check that the collection really is empty
-        assertFalse(db.collectionExists(methodName));
+        assertFalse( db.collectionExists( methodName ) );
 
         try {
-            ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName);
+            ResourceState result = connector.read( new RequestContext.Builder().build(), BASEPATH + "/" + methodName );
             Fail.fail();
-        } catch (ResourceNotFoundException e) {
+        } catch ( ResourceNotFoundException e ) {
             //expected
         }
 
-        db.createCollection(methodName, new BasicDBObject());
+        db.createCollection( methodName, new BasicDBObject() );
 
-        ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName);
+        ResourceState result = connector.read( new RequestContext.Builder().build(), BASEPATH + "/" + methodName );
 
         //verify the result
-        assertThat(result.id()).isEqualTo(methodName);
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
-        assertThat(result.getProperty("type")).isEqualTo("collection");
-        assertThat(result.members()).isEmpty();
+        assertThat( result.id() ).isEqualTo( methodName );
+        assertThat( result.getPropertyNames().size() ).isEqualTo( 1 );
+        assertThat( result.getProperty( "type" ) ).isEqualTo( "collection" );
+        assertThat( result.members() ).isEmpty();
 
         // check that the collection is still empty
-        assertEquals(0, db.getCollection(methodName).getCount());
+        assertEquals( 0, db.getCollection( methodName ).getCount() );
     }
 
     @Test
     public void testGetStorageCollectionsPagination() throws Exception {
         // DB db = mongoClient.getDB("testGetStorageCollectionsPagination");
         db.dropDatabase();
-        assertEquals(0, db.getCollectionNames().size());
+        assertEquals( 0, db.getCollectionNames().size() );
         // create a bunch of collections
-        for (int i = 0; i < 1013; i++) {
-            db.createCollection(String.format("collection%1$04d", i), new BasicDBObject("count", i));
+        for ( int i = 0; i < 1013; i++ ) {
+            db.createCollection( String.format( "collection%1$04d", i ), new BasicDBObject( "count", i ) );
         }
         // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
-        assertEquals(1014, db.getCollectionNames().size());
+        assertEquals( 1014, db.getCollectionNames().size() );
 
         // This should return 23 collections
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand( "members" )).pagination(new SimplePagination(11, 23)).build();
-        ResourceState result = connector.read(requestContext, BASEPATH);
+        RequestContext requestContext = new RequestContext.Builder().returnFields( new ReturnFieldsImpl( "*" ).withExpand( "members" ) ).pagination( new SimplePagination( 11, 23 ) ).build();
+        ResourceState result = connector.read( requestContext, BASEPATH );
 
         //verify the result
-        assertThat(result.id()).isEqualTo(BASEPATH);
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
-        assertThat(result.getProperty("type")).isEqualTo("collection");
-        assertThat(result.members().size()).isEqualTo(23);
+        assertThat( result.id() ).isEqualTo( BASEPATH );
+        assertThat( result.getPropertyNames().size() ).isEqualTo( 1 );
+        assertThat( result.getProperty( "type" ) ).isEqualTo( "collection" );
+        assertThat( result.members().size() ).isEqualTo( 23 );
 
-        for (int i = 0; i < result.members().size(); i++) {
-            ResourceState member =  result.members().get(i);
-            assertThat(member.id()).isEqualTo(String.format("collection%1$04d", i + 11));
-            assertThat(member.getPropertyNames().size()).isEqualTo(1);
-            assertThat(member.getProperty("type")).isEqualTo("collection");
-            assertThat(member.members()).isEmpty();
+        for ( int i = 0; i < result.members().size(); i++ ) {
+            ResourceState member = result.members().get( i );
+            assertThat( member.id() ).isEqualTo( String.format( "collection%1$04d", i + 11 ) );
+            assertThat( member.getPropertyNames().size() ).isEqualTo( 1 );
+            assertThat( member.getProperty( "type" ) ).isEqualTo( "collection" );
+            assertThat( member.members() ).isEmpty();
         }
 
         // This should return 3 collections as a total number of them is 1013
-        requestContext = new RequestContext.Builder().returnFields( new ReturnFieldsImpl("*").withExpand( "members" ) ).pagination(new SimplePagination(1010, 20)).build();
-        result = connector.read(requestContext, BASEPATH);
+        requestContext = new RequestContext.Builder().returnFields( new ReturnFieldsImpl( "*" ).withExpand( "members" ) ).pagination( new SimplePagination( 1010, 20 ) ).build();
+        result = connector.read( requestContext, BASEPATH );
 
         //verify the result
-        assertThat(result.id()).isEqualTo(BASEPATH);
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
-        assertThat(result.getProperty("type")).isEqualTo("collection");
-        assertThat(result.members().size()).isEqualTo(3);
+        assertThat( result.id() ).isEqualTo( BASEPATH );
+        assertThat( result.getPropertyNames().size() ).isEqualTo( 1 );
+        assertThat( result.getProperty( "type" ) ).isEqualTo( "collection" );
+        assertThat( result.members().size() ).isEqualTo( 3 );
 
-        for (int i = 0; i < result.members().size(); i++) {
-            ResourceState member =  result.members().get(i);
-            assertThat(member.id()).isEqualTo(String.format("collection%1$04d", i + 1010));
-            assertThat(member.getPropertyNames().size()).isEqualTo(1);
-            assertThat(member.getProperty("type")).isEqualTo("collection");
-            assertThat(member.members()).isEmpty();
+        for ( int i = 0; i < result.members().size(); i++ ) {
+            ResourceState member = result.members().get( i );
+            assertThat( member.id() ).isEqualTo( String.format( "collection%1$04d", i + 1010 ) );
+            assertThat( member.getPropertyNames().size() ).isEqualTo( 1 );
+            assertThat( member.getProperty( "type" ) ).isEqualTo( "collection" );
+            assertThat( member.members() ).isEmpty();
         }
     }
 
@@ -159,66 +159,66 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
     @Test
     public void testGetStorageCollectionsQuery() throws Exception {
 
-        DBCollection collection = db.getCollection("testQueryCollection");
-        if (collection != null) {
+        DBCollection collection = db.getCollection( "testQueryCollection" );
+        if ( collection != null ) {
             collection.drop();
         }
-        collection = db.createCollection("testQueryCollection", new BasicDBObject("count", 0));
+        collection = db.createCollection( "testQueryCollection", new BasicDBObject( "count", 0 ) );
 
         // add a few people
-        String [][] data = {
-                {"John", "Doe", "US", "San Francisco"},
-                {"Jane", "Doe", "US", "New York"},
-                {"Hans", "Gruber", "DE", "Berlin"},
-                {"Helga", "Schmidt", "DE", "Munich"},
-                {"Francois", "Popo", "FR", "Marseille"},
-                {"Jacqueline", "Coco", "FR", "Paris"}
+        String[][] data = {
+                { "John", "Doe", "US", "San Francisco" },
+                { "Jane", "Doe", "US", "New York" },
+                { "Hans", "Gruber", "DE", "Berlin" },
+                { "Helga", "Schmidt", "DE", "Munich" },
+                { "Francois", "Popo", "FR", "Marseille" },
+                { "Jacqueline", "Coco", "FR", "Paris" }
         };
 
-        addPeopleItems(collection, data);
-        assertThat(collection.count()).isEqualTo(6);
+        addPeopleItems( collection, data );
+        assertThat( collection.count() ).isEqualTo( 6 );
 
         // This should return 2 items
         SimpleResourceParams resourceParams = new SimpleResourceParams();
-        resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand( "members" )).resourceParams(resourceParams).build();
-        ResourceState result = connector.read(requestContext, BASEPATH + "/testQueryCollection");
+        resourceParams.put( "q", "{lastName:{$gt:'E', $lt:'R'}}" );
+        RequestContext requestContext = new RequestContext.Builder().returnFields( new ReturnFieldsImpl( "*" ).withExpand( "members" ) ).resourceParams( resourceParams ).build();
+        ResourceState result = connector.read( requestContext, BASEPATH + "/testQueryCollection" );
 
         // verify response
-        assertThat(result).isNotNull();
-        assertThat(result.id()).isEqualTo("testQueryCollection");
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
-        assertThat(result.getProperty("type")).isEqualTo("collection");
-        assertThat(result.members().size()).isEqualTo(2);
+        assertThat( result ).isNotNull();
+        assertThat( result.id() ).isEqualTo( "testQueryCollection" );
+        assertThat( result.getPropertyNames().size() ).isEqualTo( 1 );
+        assertThat( result.getProperty( "type" ) ).isEqualTo( "collection" );
+        assertThat( result.members().size() ).isEqualTo( 2 );
 
-        assertThat(result.members().get(0).getProperty("name")).isEqualTo("Hans");
-        assertThat(result.members().get(1).getProperty("name")).isEqualTo("Francois");
+        assertThat( result.members().get( 0 ).getProperty( "name" ) ).isEqualTo( "Hans" );
+        assertThat( result.members().get( 1 ).getProperty( "name" ) ).isEqualTo( "Francois" );
 
         //Try another query
         resourceParams = new SimpleResourceParams();
-        resourceParams.put("q", "{lastName:'Doe'}");
-        requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*" ).withExpand( "members" ) ).resourceParams(resourceParams).build();
-        result = connector.read(requestContext, BASEPATH + "/testQueryCollection");
+        resourceParams.put( "q", "{lastName:'Doe'}" );
+        requestContext = new RequestContext.Builder().returnFields( new ReturnFieldsImpl( "*" ).withExpand( "members" ) ).resourceParams( resourceParams ).build();
+        result = connector.read( requestContext, BASEPATH + "/testQueryCollection" );
 
-        assertThat(result).isNotNull();
-        assertThat(result.id()).isEqualTo("testQueryCollection");
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
-        assertThat(result.getProperty("type")).isEqualTo("collection");
-        assertThat(result.members().size()).isEqualTo(2);
+        assertThat( result ).isNotNull();
+        assertThat( result.id() ).isEqualTo( "testQueryCollection" );
+        assertThat( result.getPropertyNames().size() ).isEqualTo( 1 );
+        assertThat( result.getProperty( "type" ) ).isEqualTo( "collection" );
+        assertThat( result.members().size() ).isEqualTo( 2 );
 
-        assertThat(result.members().get(0).getProperty("name")).isEqualTo("John");
-        assertThat(result.members().get(1).getProperty("name")).isEqualTo("Jane");
+        assertThat( result.members().get( 0 ).getProperty( "name" ) ).isEqualTo( "John" );
+        assertThat( result.members().get( 1 ).getProperty( "name" ) ).isEqualTo( "Jane" );
     }
 
-    private void addPeopleItems(DBCollection collection, String[][] data) {
-        for (String[] rec: data) {
+    private void addPeopleItems( DBCollection collection, String[][] data ) {
+        for ( String[] rec : data ) {
             BasicDBObject obj = new BasicDBObject();
-            obj.put("name", rec[0]);
-            obj.put("lastName", rec[1]);
-            obj.put("country", rec[2]);
-            obj.put("city", rec[3]);
+            obj.put( "name", rec[0] );
+            obj.put( "lastName", rec[1] );
+            obj.put( "country", rec[2] );
+            obj.put( "city", rec[3] );
 
-            collection.insert(obj);
+            collection.insert( obj );
 
             System.err.println( "INSERT: " + obj );
         }
@@ -229,7 +229,7 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
         int offset;
         int limit;
 
-        public SimplePagination(int offset, int limit) {
+        public SimplePagination( int offset, int limit ) {
             this.offset = offset;
             this.limit = limit;
         }
@@ -249,8 +249,8 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
 
         Map<String, String> map = new HashMap<String, String>();
 
-        public void put(String name, String value) {
-            map.put(name, value);
+        public void put( String name, String value ) {
+            map.put( name, value );
         }
 
         @Override
@@ -259,24 +259,24 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
         }
 
         @Override
-        public boolean contains(String name) {
-            return map.containsKey(name);
+        public boolean contains( String name ) {
+            return map.containsKey( name );
         }
 
         @Override
-        public String value(String name) {
-            return map.get(name);
+        public String value( String name ) {
+            return map.get( name );
         }
 
         @Override
-        public List<String> values(String name) {
+        public List<String> values( String name ) {
             List list = new ArrayList<String>();
-            list.add(map.get(name));
+            list.add( map.get( name ) );
             return list;
         }
 
         @Override
-        public int intValue(String name, int defaultValue) {
+        public int intValue( String name, int defaultValue ) {
             return defaultValue;
         }
     }

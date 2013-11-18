@@ -5,11 +5,6 @@
  */
 package io.liveoak.container;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
 import io.liveoak.container.aspects.ResourceAspectManager;
 import io.liveoak.container.codec.ResourceCodec;
 import io.liveoak.container.codec.ResourceCodecManager;
@@ -18,13 +13,21 @@ import io.liveoak.container.codec.json.JSONDecoder;
 import io.liveoak.container.codec.json.JSONEncoder;
 import io.liveoak.container.subscriptions.SubscriptionManager;
 import io.liveoak.container.subscriptions.resource.SubscriptionsResourceAspect;
-import io.liveoak.spi.*;
-import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.Config;
+import io.liveoak.spi.Container;
+import io.liveoak.spi.InitializationException;
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.platform.PlatformLocator;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 
 public class DefaultContainer implements Container, Resource {
@@ -33,9 +36,9 @@ public class DefaultContainer implements Container, Resource {
         this( PlatformLocator.factory.createPlatformManager().vertx() );
     }
 
-    public DefaultContainer(Vertx vertx) {
-        this.codecManager.registerResourceCodec("application/json", new ResourceCodec( this, JSONEncoder.class, new JSONDecoder() ) );
-        this.codecManager.registerResourceCodec("text/html", new ResourceCodec( this, HTMLEncoder.class, null ) );
+    public DefaultContainer( Vertx vertx ) {
+        this.codecManager.registerResourceCodec( "application/json", new ResourceCodec( this, JSONEncoder.class, new JSONDecoder() ) );
+        this.codecManager.registerResourceCodec( "text/html", new ResourceCodec( this, HTMLEncoder.class, null ) );
 
         this.vertx = vertx;
         this.workerPool = Executors.newCachedThreadPool();
@@ -43,10 +46,10 @@ public class DefaultContainer implements Container, Resource {
         this.aspectManager.put( "_subscriptions", new SubscriptionsResourceAspect( this.subscriptionManager ) );
     }
 
-    public void registerResource(RootResource resource, Config config) throws InitializationException {
+    public void registerResource( RootResource resource, Config config ) throws InitializationException {
         //TODO: Lazy initialization in holder class when resourceRead controller is first accessed
-        resource.initialize(new SimpleResourceContext(this.vertx, null, config));
-        this.resources.put(resource.id(), resource);
+        resource.initialize( new SimpleResourceContext( this.vertx, null, config ) );
+        this.resources.put( resource.id(), resource );
     }
 
     public ResourceCodecManager getCodecManager() {
@@ -78,33 +81,33 @@ public class DefaultContainer implements Container, Resource {
     // ----------------------------------------
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
+    public void readMember( RequestContext ctx, String id, Responder responder ) {
         try {
             if ( id == null ) {
                 responder.resourceRead( this );
                 return;
             }
 
-            if (!this.resources.containsKey(id)) {
-                responder.noSuchResource(id);
+            if ( !this.resources.containsKey( id ) ) {
+                responder.noSuchResource( id );
                 return;
             }
 
-            responder.resourceRead(this.resources.get(id));
+            responder.resourceRead( this.resources.get( id ) );
 
-        } catch (Throwable t) {
-            responder.internalError(t.getMessage());
+        } catch ( Throwable t ) {
+            responder.internalError( t.getMessage() );
         }
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
-        this.resources.values().forEach((e) -> {
+    public void readMembers( RequestContext ctx, ResourceSink sink ) {
+        this.resources.values().forEach( ( e ) -> {
             sink.accept( e );
-        });
+        } );
         try {
             sink.close();
-        } catch (Exception e) {
+        } catch ( Exception e ) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }

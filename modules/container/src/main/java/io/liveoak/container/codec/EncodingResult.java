@@ -5,15 +5,15 @@
  */
 package io.liveoak.container.codec;
 
-import io.netty.buffer.ByteBuf;
 import io.liveoak.spi.MediaType;
+import io.netty.buffer.ByteBuf;
 
 /**
  * @author Bob McWhirter
  */
 public class EncodingResult {
 
-    public EncodingResult(MediaType mediaType, ByteBuf encoded) {
+    public EncodingResult( MediaType mediaType, ByteBuf encoded ) {
         this.mediaType = mediaType;
         this.encoded = encoded;
     }

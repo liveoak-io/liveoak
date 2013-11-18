@@ -24,7 +24,7 @@ public class FilesystemResource extends DirectoryResource implements RootResourc
         super( null, null );
     }
 
-    public FilesystemResource(String id) {
+    public FilesystemResource( String id ) {
         super( null, null );
         this.id = id;
     }
@@ -35,24 +35,24 @@ public class FilesystemResource extends DirectoryResource implements RootResourc
     }
 
     @Override
-    public void initialize(ResourceContext context) throws InitializationException {
+    public void initialize( ResourceContext context ) throws InitializationException {
 
-        if (this.id == null) {
-            this.id = context.config().get("id", null);
-            if (this.id == null) {
-                throw new InitializationException("no id specified");
+        if ( this.id == null ) {
+            this.id = context.config().get( "id", null );
+            if ( this.id == null ) {
+                throw new InitializationException( "no id specified" );
             }
         }
 
-        String rootStr = context.config().get("root", null);
-        if (rootStr == null) {
-            throw new InitializationException("no filesystem root specified");
+        String rootStr = context.config().get( "root", null );
+        if ( rootStr == null ) {
+            throw new InitializationException( "no filesystem root specified" );
         }
 
-        this.file = new File(rootStr);
+        this.file = new File( rootStr );
 
-        if (!this.file.canRead()) {
-            throw new InitializationException("unable to readMember filesystem at: " + this.file.getAbsolutePath());
+        if ( !this.file.canRead() ) {
+            throw new InitializationException( "unable to readMember filesystem at: " + this.file.getAbsolutePath() );
         }
 
         this.vertx = context.vertx();

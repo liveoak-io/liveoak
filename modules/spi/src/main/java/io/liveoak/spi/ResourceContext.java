@@ -7,26 +7,30 @@ package io.liveoak.spi;
 
 import org.vertx.java.core.Vertx;
 
-/** Resource initialization context.
- * 
+/**
+ * Resource initialization context.
+ *
  * @author Bob McWhirter
  */
 public interface ResourceContext {
-    
-    /** Retrieve the Vertx.
-     * 
+
+    /**
+     * Retrieve the Vertx.
+     *
      * @return The Vertx.
      */
     Vertx vertx();
-    
-    /** Retrieve the container.
-     * 
+
+    /**
+     * Retrieve the container.
+     *
      * @return The container.
      */
     Container container();
-    
-    /** Retrieve the controller config.
-     * 
+
+    /**
+     * Retrieve the controller config.
+     *
      * @return The controller config.
      */
     Config config();

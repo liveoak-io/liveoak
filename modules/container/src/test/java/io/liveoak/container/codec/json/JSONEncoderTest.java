@@ -7,154 +7,152 @@ package io.liveoak.container.codec.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import org.junit.Test;
 import io.liveoak.container.InMemoryObjectResource;
 import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.container.codec.driver.EncodingDriver;
 import io.liveoak.container.codec.driver.RootEncodingDriver;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import org.junit.Test;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import static org.fest.assertions.Assertions.*;
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Bob McWhirter
  */
 public class JSONEncoderTest {
 
-    protected EncodingDriver createDriver(Resource resource, CompletableFuture<ByteBuf> future) throws Exception {
+    protected EncodingDriver createDriver( Resource resource, CompletableFuture<ByteBuf> future ) throws Exception {
         JSONEncoder encoder = new JSONEncoder();
         ByteBuf buffer = Unpooled.buffer();
-        encoder.initialize(buffer);
-        RootEncodingDriver driver = new RootEncodingDriver(new RequestContext.Builder().build(), encoder, resource, () -> {
-            future.complete(buffer);
-        });
+        encoder.initialize( buffer );
+        RootEncodingDriver driver = new RootEncodingDriver( new RequestContext.Builder().build(), encoder, resource, () -> {
+            future.complete( buffer );
+        } );
         return driver;
     }
 
     @Test
     public void testEmptyObject() throws Exception {
         DefaultResourceState state = new DefaultResourceState();
-        InMemoryObjectResource resource = new InMemoryObjectResource(null, "bob", state);
+        InMemoryObjectResource resource = new InMemoryObjectResource( null, "bob", state );
 
         CompletableFuture<ByteBuf> future = new CompletableFuture<>();
-        EncodingDriver driver = createDriver(resource, future);
+        EncodingDriver driver = createDriver( resource, future );
         driver.encode();
         ByteBuf buffer = future.get();
 
-        String encoded = buffer.toString(Charset.defaultCharset());
+        String encoded = buffer.toString( Charset.defaultCharset() );
 
-        System.err.println(encoded);
+        System.err.println( encoded );
 
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> root = mapper.readValue(encoded, Map.class);
+        Map<String, Object> root = mapper.readValue( encoded, Map.class );
 
-        assertThat(root.get("id")).isEqualTo("bob");
-        assertThat(root.get("self")).isNotNull();
-        assertThat(((Map) root.get("self")).get("href")).isEqualTo("/bob");
+        assertThat( root.get( "id" ) ).isEqualTo( "bob" );
+        assertThat( root.get( "self" ) ).isNotNull();
+        assertThat( ( ( Map ) root.get( "self" ) ).get( "href" ) ).isEqualTo( "/bob" );
     }
 
     @Test
     public void testObjectWithProperties() throws Exception {
         DefaultResourceState state = new DefaultResourceState();
-        state.putProperty("name", "Bob McWhirter");
-        InMemoryObjectResource resource = new InMemoryObjectResource(null, "bob", state);
+        state.putProperty( "name", "Bob McWhirter" );
+        InMemoryObjectResource resource = new InMemoryObjectResource( null, "bob", state );
 
         CompletableFuture<ByteBuf> future = new CompletableFuture<>();
-        EncodingDriver driver = createDriver(resource, future);
+        EncodingDriver driver = createDriver( resource, future );
         driver.encode();
         ByteBuf buffer = future.get();
 
-        String encoded = buffer.toString(Charset.defaultCharset());
+        String encoded = buffer.toString( Charset.defaultCharset() );
 
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> root = mapper.readValue(encoded, Map.class);
+        Map<String, Object> root = mapper.readValue( encoded, Map.class );
 
-        assertThat(root.get("id")).isEqualTo("bob");
-        assertThat(root.get("self")).isNotNull();
-        assertThat(((Map) root.get("self")).get("href")).isEqualTo("/bob");
-        assertThat(root.get("name")).isEqualTo("Bob McWhirter");
+        assertThat( root.get( "id" ) ).isEqualTo( "bob" );
+        assertThat( root.get( "self" ) ).isNotNull();
+        assertThat( ( ( Map ) root.get( "self" ) ).get( "href" ) ).isEqualTo( "/bob" );
+        assertThat( root.get( "name" ) ).isEqualTo( "Bob McWhirter" );
     }
 
     @Test
     public void testObjectWithResourceProperty() throws Exception {
         DefaultResourceState mosesState = new DefaultResourceState();
-        mosesState.putProperty("name", "Moses");
-        mosesState.putProperty("breed", "German Shepherd");
-        InMemoryObjectResource mosesResourse = new InMemoryObjectResource(null, "moses", mosesState);
+        mosesState.putProperty( "name", "Moses" );
+        mosesState.putProperty( "breed", "German Shepherd" );
+        InMemoryObjectResource mosesResourse = new InMemoryObjectResource( null, "moses", mosesState );
 
 
         DefaultResourceState bobState = new DefaultResourceState();
-        bobState.putProperty("name", "Bob McWhirter");
-        bobState.putProperty("dog", mosesResourse);
-        InMemoryObjectResource bobResource = new InMemoryObjectResource(null, "bob", bobState);
+        bobState.putProperty( "name", "Bob McWhirter" );
+        bobState.putProperty( "dog", mosesResourse );
+        InMemoryObjectResource bobResource = new InMemoryObjectResource( null, "bob", bobState );
 
         CompletableFuture<ByteBuf> future = new CompletableFuture<>();
-        EncodingDriver driver = createDriver(bobResource, future);
+        EncodingDriver driver = createDriver( bobResource, future );
         driver.encode();
         ByteBuf buffer = future.get();
 
-        String encoded = buffer.toString(Charset.defaultCharset());
+        String encoded = buffer.toString( Charset.defaultCharset() );
 
-        System.err.println(encoded);
+        System.err.println( encoded );
 
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = mapper.readTree(encoded);
+        JsonNode root = mapper.readTree( encoded );
 
-        assertThat(root.get("id").asText()).isEqualTo("bob");
-        assertThat(root.get("self")).isNotNull();
-        assertThat(root.get("self").get("href").asText()).isEqualTo("/bob");
-        assertThat(root.get("name").asText()).isEqualTo("Bob McWhirter");
+        assertThat( root.get( "id" ).asText() ).isEqualTo( "bob" );
+        assertThat( root.get( "self" ) ).isNotNull();
+        assertThat( root.get( "self" ).get( "href" ).asText() ).isEqualTo( "/bob" );
+        assertThat( root.get( "name" ).asText() ).isEqualTo( "Bob McWhirter" );
 
-        assertThat(root.get("dog") ).isNotNull();
-        assertThat(root.get("dog").get( "href" ).asText() ).isEqualTo( "/moses" );
+        assertThat( root.get( "dog" ) ).isNotNull();
+        assertThat( root.get( "dog" ).get( "href" ).asText() ).isEqualTo( "/moses" );
     }
 
     @Test
     public void testObjectWithResourceArrayProperty() throws Exception {
         DefaultResourceState mosesState = new DefaultResourceState();
-        mosesState.putProperty("name", "Moses");
-        mosesState.putProperty("breed", "German Shepherd");
-        InMemoryObjectResource mosesResourse = new InMemoryObjectResource(null, "moses", mosesState);
+        mosesState.putProperty( "name", "Moses" );
+        mosesState.putProperty( "breed", "German Shepherd" );
+        InMemoryObjectResource mosesResourse = new InMemoryObjectResource( null, "moses", mosesState );
 
         DefaultResourceState onlyState = new DefaultResourceState();
-        onlyState.putProperty("name", "Only");
-        onlyState.putProperty("breed", "Lab/Huskie Mix");
-        InMemoryObjectResource onlyResource = new InMemoryObjectResource(null, "only", onlyState);
+        onlyState.putProperty( "name", "Only" );
+        onlyState.putProperty( "breed", "Lab/Huskie Mix" );
+        InMemoryObjectResource onlyResource = new InMemoryObjectResource( null, "only", onlyState );
 
         DefaultResourceState bobState = new DefaultResourceState();
-        bobState.putProperty("name", "Bob McWhirter");
+        bobState.putProperty( "name", "Bob McWhirter" );
         ArrayList<Resource> dogs = new ArrayList<>();
-        dogs.add(mosesResourse);
-        dogs.add(onlyResource);
-        bobState.putProperty("dogs", dogs);
-        InMemoryObjectResource bobResource = new InMemoryObjectResource(null, "bob", bobState);
+        dogs.add( mosesResourse );
+        dogs.add( onlyResource );
+        bobState.putProperty( "dogs", dogs );
+        InMemoryObjectResource bobResource = new InMemoryObjectResource( null, "bob", bobState );
 
         CompletableFuture<ByteBuf> future = new CompletableFuture<>();
-        EncodingDriver driver = createDriver(bobResource, future);
+        EncodingDriver driver = createDriver( bobResource, future );
         driver.encode();
         ByteBuf buffer = future.get();
 
-        String encoded = buffer.toString(Charset.defaultCharset());
+        String encoded = buffer.toString( Charset.defaultCharset() );
 
         ObjectMapper mapper = new ObjectMapper();
         System.err.println( encoded );
         JsonNode root = mapper.readTree( encoded );
 
 
-        assertThat(root.get("id").asText()).isEqualTo("bob");
-        assertThat(root.get("self")).isNotNull();
-        assertThat( root.get("self").get("href").asText()).isEqualTo("/bob");
-        assertThat(root.get("name").asText()).isEqualTo("Bob McWhirter");
+        assertThat( root.get( "id" ).asText() ).isEqualTo( "bob" );
+        assertThat( root.get( "self" ) ).isNotNull();
+        assertThat( root.get( "self" ).get( "href" ).asText() ).isEqualTo( "/bob" );
+        assertThat( root.get( "name" ).asText() ).isEqualTo( "Bob McWhirter" );
 
         //assertThat(root.get("dogs")).isInstanceOf(ArrayNode.class);
         assertThat( root.get( "dogs" ) ).isNotNull();

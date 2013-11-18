@@ -5,11 +5,11 @@
  */
 package io.liveoak.container.codec.state;
 
-import io.netty.buffer.ByteBuf;
 import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.container.codec.Encoder;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
+import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +33,7 @@ public class ResourceStateEncoder implements Encoder {
     }
 
     @Override
-    public void initialize(ByteBuf buffer) throws Exception {
+    public void initialize( ByteBuf buffer ) throws Exception {
         // nothing
     }
 
@@ -43,26 +43,26 @@ public class ResourceStateEncoder implements Encoder {
     }
 
     @Override
-    public void startResource(Resource resource) throws Exception {
-        ResourceState state = new DefaultResourceState(resource.id());
-        this.stack.push(state);
+    public void startResource( Resource resource ) throws Exception {
+        ResourceState state = new DefaultResourceState( resource.id() );
+        this.stack.push( state );
 
-        if (this.root == null) {
+        if ( this.root == null ) {
             root = state;
         }
     }
 
     @Override
-    public void endResource(Resource resource) throws Exception {
+    public void endResource( Resource resource ) throws Exception {
         Object completed = this.stack.pop();
-        if (!this.stack.isEmpty()) {
+        if ( !this.stack.isEmpty() ) {
             Object top = this.stack.peek();
-            if (top instanceof Collection) {
-                ((Collection) top).add(completed);
-            } else if (top instanceof ResourceState) {
-                ((ResourceState) top).addMember((ResourceState) completed);
-            } else if (top instanceof PropertyCatcher) {
-                ((PropertyCatcher) top).value = completed;
+            if ( top instanceof Collection ) {
+                ( ( Collection ) top ).add( completed );
+            } else if ( top instanceof ResourceState ) {
+                ( ( ResourceState ) top ).addMember( ( ResourceState ) completed );
+            } else if ( top instanceof PropertyCatcher ) {
+                ( ( PropertyCatcher ) top ).value = completed;
             }
         }
     }
@@ -78,14 +78,14 @@ public class ResourceStateEncoder implements Encoder {
     }
 
     @Override
-    public void startProperty(String propertyName) throws Exception {
-        this.stack.push(new PropertyCatcher());
+    public void startProperty( String propertyName ) throws Exception {
+        this.stack.push( new PropertyCatcher() );
     }
 
     @Override
-    public void endProperty(String propertyName) throws Exception {
-        PropertyCatcher catcher = (PropertyCatcher) this.stack.pop();
-        ((ResourceState) this.stack.peek()).putProperty(propertyName, catcher.value);
+    public void endProperty( String propertyName ) throws Exception {
+        PropertyCatcher catcher = ( PropertyCatcher ) this.stack.pop();
+        ( ( ResourceState ) this.stack.peek() ).putProperty( propertyName, catcher.value );
     }
 
     @Override
@@ -98,80 +98,80 @@ public class ResourceStateEncoder implements Encoder {
 
     @Override
     public void startList() throws Exception {
-        this.stack.push(new ArrayList<Object>());
+        this.stack.push( new ArrayList<Object>() );
     }
 
     @Override
     public void endList() throws Exception {
-        ArrayList<Object> completed = (ArrayList<Object>) this.stack.pop();
+        ArrayList<Object> completed = ( ArrayList<Object> ) this.stack.pop();
 
-        if (!this.stack.isEmpty()) {
+        if ( !this.stack.isEmpty() ) {
             Object top = this.stack.peek();
-            if (top instanceof Collection) {
-                ((Collection) top).add(completed);
-            } else if (top instanceof PropertyCatcher) {
-                ((PropertyCatcher) top).value = completed;
+            if ( top instanceof Collection ) {
+                ( ( Collection ) top ).add( completed );
+            } else if ( top instanceof PropertyCatcher ) {
+                ( ( PropertyCatcher ) top ).value = completed;
             }
         }
     }
 
     @Override
-    public void writeValue(String value) throws Exception {
+    public void writeValue( String value ) throws Exception {
         Object top = this.stack.peek();
 
-        if (top instanceof Collection) {
-            ((Collection) top).add(value);
-        } else if (top instanceof PropertyCatcher) {
-            ((PropertyCatcher) top).value = value;
+        if ( top instanceof Collection ) {
+            ( ( Collection ) top ).add( value );
+        } else if ( top instanceof PropertyCatcher ) {
+            ( ( PropertyCatcher ) top ).value = value;
         }
     }
 
     @Override
-    public void writeValue(Integer value) throws Exception {
+    public void writeValue( Integer value ) throws Exception {
         Object top = this.stack.peek();
 
-        if (top instanceof Collection) {
-            ((Collection) top).add(value);
-        } else if (top instanceof PropertyCatcher) {
-            ((PropertyCatcher) top).value = value;
+        if ( top instanceof Collection ) {
+            ( ( Collection ) top ).add( value );
+        } else if ( top instanceof PropertyCatcher ) {
+            ( ( PropertyCatcher ) top ).value = value;
         }
     }
 
     @Override
-    public void writeValue(Double value) throws Exception {
+    public void writeValue( Double value ) throws Exception {
         Object top = this.stack.peek();
 
-        if (top instanceof Collection) {
-            ((Collection) top).add(value);
-        } else if (top instanceof PropertyCatcher) {
-            ((PropertyCatcher) top).value = value;
+        if ( top instanceof Collection ) {
+            ( ( Collection ) top ).add( value );
+        } else if ( top instanceof PropertyCatcher ) {
+            ( ( PropertyCatcher ) top ).value = value;
         }
     }
 
     @Override
-    public void writeValue(Date value) throws Exception {
+    public void writeValue( Date value ) throws Exception {
         Object top = this.stack.peek();
 
-        if (top instanceof Collection) {
-            ((Collection) top).add(value);
-        } else if (top instanceof PropertyCatcher) {
-            ((PropertyCatcher) top).value = value;
+        if ( top instanceof Collection ) {
+            ( ( Collection ) top ).add( value );
+        } else if ( top instanceof PropertyCatcher ) {
+            ( ( PropertyCatcher ) top ).value = value;
         }
     }
 
     @Override
-    public void writeLink(Resource resource) throws Exception {
+    public void writeLink( Resource resource ) throws Exception {
         Object top = this.stack.peek();
 
-        if (top instanceof Collection) {
-            ((Collection) top).add(resource.uri());
+        if ( top instanceof Collection ) {
+            ( ( Collection ) top ).add( resource.uri() );
         } else if ( top instanceof ResourceState ) {
             DefaultResourceState state = new DefaultResourceState();
-            state.id(resource.id());
-            state.uri(resource.uri());
-            ((ResourceState)top).addMember( state );
-        } else if (top instanceof PropertyCatcher) {
-            ((PropertyCatcher) top).value = resource.uri();
+            state.id( resource.id() );
+            state.uri( resource.uri() );
+            ( ( ResourceState ) top ).addMember( state );
+        } else if ( top instanceof PropertyCatcher ) {
+            ( ( PropertyCatcher ) top ).value = resource.uri();
         }
     }
 

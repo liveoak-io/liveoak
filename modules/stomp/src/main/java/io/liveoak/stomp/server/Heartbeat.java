@@ -10,8 +10,8 @@ package io.liveoak.stomp.server;
  */
 public class Heartbeat {
 
-    public int calculateDuration(int senderDuration, int receiverDuration) {
-        return Math.max(senderDuration, receiverDuration);
+    public int calculateDuration( int senderDuration, int receiverDuration ) {
+        return Math.max( senderDuration, receiverDuration );
     }
 
     public int getClientReceive() {
@@ -34,19 +34,19 @@ public class Heartbeat {
         return serverSend;
     }
 
-    public void setClientReceive(int clientReceive) {
+    public void setClientReceive( int clientReceive ) {
         this.clientReceive = clientReceive;
     }
 
-    public void setClientSend(int clientSend) {
+    public void setClientSend( int clientSend ) {
         this.clientSend = clientSend;
     }
 
-    public void setServerReceive(int serverReceive) {
+    public void setServerReceive( int serverReceive ) {
         this.serverReceive = serverReceive;
     }
 
-    public void setServerSend(int serverSend) {
+    public void setServerSend( int serverSend ) {
         this.serverSend = serverSend;
     }
 

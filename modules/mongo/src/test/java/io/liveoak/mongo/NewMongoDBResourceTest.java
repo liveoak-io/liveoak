@@ -5,16 +5,15 @@
  */
 package io.liveoak.mongo;
 
-import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.state.ResourceState;
-import org.junit.Test;
 import io.liveoak.container.SimpleConfig;
+import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.spi.Config;
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
-import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
+import org.junit.Test;
 
 import java.util.UUID;
 
@@ -30,35 +29,35 @@ public class NewMongoDBResourceTest extends AbstractResourceTestCase {
 
     @Override
     public RootResource createRootResource() {
-        return new RootMongoResource("storage");
+        return new RootMongoResource( "storage" );
     }
 
     @Override
     public Config createConfig() {
-        String database = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
-        Integer port = new Integer(System.getProperty("mongo.port", "27017"));
-        String host = System.getProperty("mongo.host", "localhost");
+        String database = System.getProperty( "mongo.db", "MongoControllerTest_" + UUID.randomUUID() );
+        Integer port = new Integer( System.getProperty( "mongo.port", "27017" ) );
+        String host = System.getProperty( "mongo.host", "localhost" );
 
         SimpleConfig config = new SimpleConfig();
-        config.put("db", database);
-        config.put("port", port);
-        config.put("host", host);
+        config.put( "db", database );
+        config.put( "port", port );
+        config.put( "host", host );
 
         return config;
     }
 
     @Test
     public void testRootFound() throws Exception {
-        ResourceState result = connector.read( new RequestContext.Builder().build(), "/storage");
-        assertThat(result).isNotNull();
+        ResourceState result = connector.read( new RequestContext.Builder().build(), "/storage" );
+        assertThat( result ).isNotNull();
     }
 
     @Test
     public void testUncreatedCollectionNotFound() throws Exception {
         try {
-            connector.read( new RequestContext.Builder().build(), "/storage/movies");
+            connector.read( new RequestContext.Builder().build(), "/storage/movies" );
             fail( "shouldn't get here" );
-        } catch (ResourceNotFoundException e) {
+        } catch ( ResourceNotFoundException e ) {
             assertThat( e.path() ).isEqualTo( "/storage/movies" );
         }
     }
@@ -66,15 +65,15 @@ public class NewMongoDBResourceTest extends AbstractResourceTestCase {
     @Test
     public void testCreateCollection() throws Exception {
         // check that we can create the resource
-        ResourceState state = new DefaultResourceState("movies");
-        ResourceState createdResource = connector.create(new RequestContext.Builder().build(), "/storage", state);
-        assertThat(createdResource).isNotNull();
-        assertThat(createdResource.id()).isEqualTo("movies");
+        ResourceState state = new DefaultResourceState( "movies" );
+        ResourceState createdResource = connector.create( new RequestContext.Builder().build(), "/storage", state );
+        assertThat( createdResource ).isNotNull();
+        assertThat( createdResource.id() ).isEqualTo( "movies" );
 
         // test that we get this resource back on a read
-        ResourceState movies = connector.read(new RequestContext.Builder().build(), "/storage/movies");
+        ResourceState movies = connector.read( new RequestContext.Builder().build(), "/storage/movies" );
         assertThat( movies ).isNotNull();
-        assertThat( movies.id() ).isEqualTo("movies");
+        assertThat( movies.id() ).isEqualTo( "movies" );
     }
 
 }

@@ -6,8 +6,9 @@
 package io.liveoak.spi;
 
 
-/** Pagination information for retrieving a subset of a collection.
- * 
+/**
+ * Pagination information for retrieving a subset of a collection.
+ *
  * @author Bob McWhirter
  */
 public interface Pagination {
@@ -20,27 +21,30 @@ public interface Pagination {
         public int offset() {
             return 0;
         }
+
         public int limit() {
             return DEFAULT_LIMIT;
         }
     };
 
-    /** Get the offset.
-     * 
+    /**
+     * Get the offset.
+     * <p/>
      * <p>
      * Offsets are zero-indexed.
      * </p>
-     * 
+     *
      * @return The offset.
      */
     int offset();
-    
-    /** Get the number of items to return.
-     * 
+
+    /**
+     * Get the number of items to return.
+     * <p/>
      * <p>
      * A limit of less-than-zero indicates no limit.
      * </p>
-     * 
+     *
      * @return The limit.
      */
     int limit();

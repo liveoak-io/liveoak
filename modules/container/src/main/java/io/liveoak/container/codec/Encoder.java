@@ -5,10 +5,9 @@
  */
 package io.liveoak.container.codec;
 
-import io.netty.buffer.ByteBuf;
 import io.liveoak.spi.resource.async.Resource;
+import io.netty.buffer.ByteBuf;
 
-import java.net.URI;
 import java.util.Date;
 
 /**
@@ -16,29 +15,38 @@ import java.util.Date;
  */
 public interface Encoder extends AutoCloseable {
 
-    void initialize(ByteBuf buffer) throws Exception;
+    void initialize( ByteBuf buffer ) throws Exception;
+
     void close() throws Exception;
 
-    void startResource(Resource resource) throws Exception;
-    void endResource(Resource resource) throws Exception;
+    void startResource( Resource resource ) throws Exception;
 
-    void writeLink(Resource link) throws Exception;
+    void endResource( Resource resource ) throws Exception;
+
+    void writeLink( Resource link ) throws Exception;
 
     void startProperties() throws Exception;
+
     void endProperties() throws Exception;
 
-    void startProperty(String propertyName) throws  Exception;
-    void endProperty(String propertyName) throws  Exception;
+    void startProperty( String propertyName ) throws Exception;
 
-    void startMembers() throws  Exception;
-    void endMembers() throws  Exception;
+    void endProperty( String propertyName ) throws Exception;
+
+    void startMembers() throws Exception;
+
+    void endMembers() throws Exception;
 
     void startList() throws Exception;
+
     void endList() throws Exception;
 
-    void writeValue(String value) throws Exception;
-    void writeValue(Integer value) throws Exception;
-    void writeValue(Double value) throws Exception;
-    void writeValue(Date value) throws Exception;
+    void writeValue( String value ) throws Exception;
+
+    void writeValue( Integer value ) throws Exception;
+
+    void writeValue( Double value ) throws Exception;
+
+    void writeValue( Date value ) throws Exception;
 
 }

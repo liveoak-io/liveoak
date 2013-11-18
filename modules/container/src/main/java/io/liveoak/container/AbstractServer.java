@@ -16,7 +16,7 @@ import java.net.InetAddress;
 
 public abstract class AbstractServer {
 
-    public AbstractServer(DefaultContainer container, InetAddress host, int port, EventLoopGroup group) {
+    public AbstractServer( DefaultContainer container, InetAddress host, int port, EventLoopGroup group ) {
         this.container = container;
         this.host = host;
         this.port = port;
@@ -27,10 +27,10 @@ public abstract class AbstractServer {
     public void start() throws InterruptedException {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         serverBootstrap
-                .channel(NioServerSocketChannel.class)
-                .group(this.group)
-                .localAddress(this.host, this.port)
-                .childHandler(createChildHandler());
+                .channel( NioServerSocketChannel.class )
+                .group( this.group )
+                .localAddress( this.host, this.port )
+                .childHandler( createChildHandler() );
         ChannelFuture future = serverBootstrap.bind();
         future.sync();
     }

@@ -5,8 +5,9 @@
  */
 package io.liveoak.container;
 
-import io.liveoak.spi.*;
+import io.liveoak.spi.Config;
 import io.liveoak.spi.Container;
+import io.liveoak.spi.ResourceContext;
 import org.vertx.java.core.Vertx;
 
 /**
@@ -18,7 +19,7 @@ public class SimpleResourceContext implements ResourceContext {
     private final Container container;
     private final Config config;
 
-    public SimpleResourceContext(Vertx vertx, Container container, Config config) {
+    public SimpleResourceContext( Vertx vertx, Container container, Config config ) {
         this.vertx = vertx;
         this.container = container;
         this.config = config;

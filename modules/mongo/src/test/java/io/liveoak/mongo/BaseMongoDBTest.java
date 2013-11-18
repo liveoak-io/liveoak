@@ -11,7 +11,11 @@ import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.SimpleConfig;
 import io.liveoak.container.UnsecureServer;
 import io.netty.handler.codec.http.HttpHeaders;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -39,99 +43,99 @@ public class BaseMongoDBTest {
 
     @BeforeClass
     public static void init() throws Exception {
-        String database = System.getProperty("mongo.db", "MongoResourceTest_" + UUID.randomUUID());
-        Integer port = new Integer(System.getProperty("mongo.port", "27017"));
-        String host = System.getProperty("mongo.host", "localhost");
+        String database = System.getProperty( "mongo.db", "MongoResourceTest_" + UUID.randomUUID() );
+        Integer port = new Integer( System.getProperty( "mongo.port", "27017" ) );
+        String host = System.getProperty( "mongo.host", "localhost" );
 
         // configure the mongo controller
         SimpleConfig config = new SimpleConfig();
-        config.put("db", database);
-        config.put("port", port);
-        config.put("host", host);
+        config.put( "db", database );
+        config.put( "port", port );
+        config.put( "host", host );
 
         DefaultContainer container = new DefaultContainer();
-        container.registerResource(new RootMongoResource(TYPE), config);
+        container.registerResource( new RootMongoResource( TYPE ), config );
 
         //TODO: pass these params in instead of hardcoding them
-        server = new UnsecureServer(container, "localhost", 8080);
+        server = new UnsecureServer( container, "localhost", 8080 );
         server.start();
 
         baseURL = "http://localhost:8080/" + TYPE;
 
         // configure a local mongo client to verify the data methods
-        mongoClient = new MongoClient(host, port);
-        db = mongoClient.getDB(database);
+        mongoClient = new MongoClient( host, port );
+        db = mongoClient.getDB( database );
         db.dropDatabase();
     }
 
     @AfterClass
     public static void dispose() {
         mongoClient.close();
-        if (server == null)
+        if ( server == null )
             return;
 
         try {
             server.stop();
-        } catch (InterruptedException ignored) {
+        } catch ( InterruptedException ignored ) {
         }
     }
 
-    protected CloseableHttpResponse testSimpleGetMethod(String url) throws Exception {
-        return testSimpleGetMethod(url, "application/json", "application/json");
+    protected CloseableHttpResponse testSimpleGetMethod( String url ) throws Exception {
+        return testSimpleGetMethod( url, "application/json", "application/json" );
     }
 
-    protected CloseableHttpResponse testSimpleGetMethod(String url, String contentType_header, String accept_header) throws Exception {
-        HttpGet get = new HttpGet(url);
-        get.setHeader(HttpHeaders.Names.CONTENT_TYPE, contentType_header);
-        get.setHeader(HttpHeaders.Names.ACCEPT, accept_header);
+    protected CloseableHttpResponse testSimpleGetMethod( String url, String contentType_header, String accept_header ) throws Exception {
+        HttpGet get = new HttpGet( url );
+        get.setHeader( HttpHeaders.Names.CONTENT_TYPE, contentType_header );
+        get.setHeader( HttpHeaders.Names.ACCEPT, accept_header );
 
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        return httpClient.execute(get);
+        return httpClient.execute( get );
     }
 
-    protected CloseableHttpResponse testSimplePostMethod(String url, String content) throws Exception {
-        return testSimplePostMethod(url, content, "application/json", "application/json");
+    protected CloseableHttpResponse testSimplePostMethod( String url, String content ) throws Exception {
+        return testSimplePostMethod( url, content, "application/json", "application/json" );
     }
 
-    protected CloseableHttpResponse testSimplePostMethod(String url, String content, String contentType_header, String accept_header) throws Exception {
-        HttpPost post = new HttpPost(url);
-        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, contentType_header);
-        post.setHeader(HttpHeaders.Names.ACCEPT, accept_header);
+    protected CloseableHttpResponse testSimplePostMethod( String url, String content, String contentType_header, String accept_header ) throws Exception {
+        HttpPost post = new HttpPost( url );
+        post.setHeader( HttpHeaders.Names.CONTENT_TYPE, contentType_header );
+        post.setHeader( HttpHeaders.Names.ACCEPT, accept_header );
 
-        StringEntity entity = new StringEntity(content, ContentType.create("text/plain", "UTF-8"));
-        post.setEntity(entity);
+        StringEntity entity = new StringEntity( content, ContentType.create( "text/plain", "UTF-8" ) );
+        post.setEntity( entity );
 
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        return httpClient.execute(post);
+        return httpClient.execute( post );
     }
 
-    protected CloseableHttpResponse testSimpleDeleteMethod(String url) throws Exception {
-        return testSimpleDeleteMethod(url, "application/json", "application/json");
+    protected CloseableHttpResponse testSimpleDeleteMethod( String url ) throws Exception {
+        return testSimpleDeleteMethod( url, "application/json", "application/json" );
     }
 
-    protected CloseableHttpResponse testSimpleDeleteMethod(String url, String contentType_header, String accept_header) throws Exception {
-        HttpDelete delete = new HttpDelete(url);
-        delete.setHeader(HttpHeaders.Names.CONTENT_TYPE, contentType_header);
-        delete.setHeader(HttpHeaders.Names.ACCEPT, accept_header);
+    protected CloseableHttpResponse testSimpleDeleteMethod( String url, String contentType_header, String accept_header ) throws Exception {
+        HttpDelete delete = new HttpDelete( url );
+        delete.setHeader( HttpHeaders.Names.CONTENT_TYPE, contentType_header );
+        delete.setHeader( HttpHeaders.Names.ACCEPT, accept_header );
 
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        return httpClient.execute(delete);
+        return httpClient.execute( delete );
     }
 
-    protected CloseableHttpResponse testSimplePutMethod(String url, String content) throws Exception {
-        return testSimplePutMethod(url, content, "application/json", "application/json");
+    protected CloseableHttpResponse testSimplePutMethod( String url, String content ) throws Exception {
+        return testSimplePutMethod( url, content, "application/json", "application/json" );
     }
 
-    protected CloseableHttpResponse testSimplePutMethod(String url, String content, String contentType_header, String accept_header) throws Exception {
-        HttpPut put = new HttpPut(url);
-        put.setHeader(HttpHeaders.Names.CONTENT_TYPE, contentType_header);
-        put.setHeader(HttpHeaders.Names.ACCEPT, accept_header);
+    protected CloseableHttpResponse testSimplePutMethod( String url, String content, String contentType_header, String accept_header ) throws Exception {
+        HttpPut put = new HttpPut( url );
+        put.setHeader( HttpHeaders.Names.CONTENT_TYPE, contentType_header );
+        put.setHeader( HttpHeaders.Names.ACCEPT, accept_header );
 
-        StringEntity entity = new StringEntity(content, ContentType.create("text/plain", "UTF-8"));
-        put.setEntity(entity);
+        StringEntity entity = new StringEntity( content, ContentType.create( "text/plain", "UTF-8" ) );
+        put.setEntity( entity );
 
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        return httpClient.execute(put);
+        return httpClient.execute( put );
     }
 
 /*

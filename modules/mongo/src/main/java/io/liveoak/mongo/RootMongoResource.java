@@ -9,7 +9,11 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
-import io.liveoak.spi.*;
+import io.liveoak.spi.Config;
+import io.liveoak.spi.InitializationException;
+import io.liveoak.spi.Pagination;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
@@ -35,8 +39,8 @@ public class RootMongoResource extends MongoResource implements RootResource {
         super( null );
     }
 
-    public RootMongoResource(String id) {
-        super(null);
+    public RootMongoResource( String id ) {
+        super( null );
         this.id = id;
     }
 
@@ -45,12 +49,12 @@ public class RootMongoResource extends MongoResource implements RootResource {
     }
 
     @Override
-    protected Object deleteChild(RequestContext ctx, String childId) {
+    protected Object deleteChild( RequestContext ctx, String childId ) {
         return null;
     }
 
     @Override
-    protected Object updateChild(RequestContext ctx, String childId, Object child) {
+    protected Object updateChild( RequestContext ctx, String childId, Object child ) {
         return null;
     }
 
@@ -65,88 +69,88 @@ public class RootMongoResource extends MongoResource implements RootResource {
     }
 
     @Override
-    public void initialize(ResourceContext context) throws InitializationException {
+    public void initialize( ResourceContext context ) throws InitializationException {
 
-        if (this.id == null) {
-            this.id = context.config().get("id", null);
-            if (this.id == null) {
-                throw new InitializationException("no id specified");
+        if ( this.id == null ) {
+            this.id = context.config().get( "id", null );
+            if ( this.id == null ) {
+                throw new InitializationException( "no id specified" );
             }
         }
 
         Config config = context.config();
-        String host = config.get("host", "localhost");
-        int port = config.get("port", 27017);
-        String dbName = config.getRequired("db");
+        String host = config.get( "host", "localhost" );
+        int port = config.get( "port", 27017 );
+        String dbName = config.getRequired( "db" );
 
         try {
-            mongo = new MongoClient(host, port);
-            db = mongo.getDB(dbName);
-            if (db == null) {
-                throw new InitializationException("Unknown database " + dbName);
+            mongo = new MongoClient( host, port );
+            db = mongo.getDB( dbName );
+            if ( db == null ) {
+                throw new InitializationException( "Unknown database " + dbName );
             }
-        } catch (UnknownHostException e) {
-            throw new InitializationException("Could not handleConnect to " + host + " on port " + port);
+        } catch ( UnknownHostException e ) {
+            throw new InitializationException( "Could not handleConnect to " + host + " on port " + port );
         }
     }
 
     @Override
     public void destroy() {
-        if (mongo != null) {
+        if ( mongo != null ) {
             mongo.close();
         }
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
-        if (db.collectionExists(id)) {
-            responder.resourceRead(new MongoCollectionResource(this, db.getCollection(id)));
+    public void readMember( RequestContext ctx, String id, Responder responder ) {
+        if ( db.collectionExists( id ) ) {
+            responder.resourceRead( new MongoCollectionResource( this, db.getCollection( id ) ) );
         } else {
-            responder.noSuchResource(id);
+            responder.noSuchResource( id );
         }
 
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
+    public void readMembers( RequestContext ctx, ResourceSink sink ) {
         Pagination pagination = ctx.getPagination();
-        Stream<String> members = this.db.getCollectionNames().stream().skip(pagination.offset());
-        if (pagination.limit() > 0) {
-            members = members.limit(pagination.limit());
+        Stream<String> members = this.db.getCollectionNames().stream().skip( pagination.offset() );
+        if ( pagination.limit() > 0 ) {
+            members = members.limit( pagination.limit() );
         }
 
-        members.forEach((name) -> {
-            if (!name.equals("system.indexes")) {
-                sink.accept(new MongoCollectionResource(this, db.getCollection(name)));
+        members.forEach( ( name ) -> {
+            if ( !name.equals( "system.indexes" ) ) {
+                sink.accept( new MongoCollectionResource( this, db.getCollection( name ) ) );
             }
-        });
+        } );
 
-       
+
         sink.close();
     }
 
     @Override
-    public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
+    public void createMember( RequestContext ctx, ResourceState state, Responder responder ) {
 
         String id = state.id();
 
-        if (id == null || !db.collectionExists(id)) {
+        if ( id == null || !db.collectionExists( id ) ) {
 
-            if (id == null) {
+            if ( id == null ) {
                 id = UUID.randomUUID().toString();
             }
 
-            DBCollection collection = db.createCollection(id, new BasicDBObject()); //send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
+            DBCollection collection = db.createCollection( id, new BasicDBObject() ); //send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
 
-            responder.resourceCreated(new MongoCollectionResource(this, collection));
+            responder.resourceCreated( new MongoCollectionResource( this, collection ) );
         } else {
-            System.out.println("id : " + id);
-            responder.resourceAlreadyExists(id);
+            System.out.println( "id : " + id );
+            responder.resourceAlreadyExists( id );
         }
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties( RequestContext ctx, PropertySink sink ) {
         sink.accept( "type", "collection" );
         sink.close();
     }

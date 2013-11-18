@@ -5,11 +5,11 @@
  */
 package io.liveoak.stomp.server.protocol;
 
+import io.liveoak.stomp.Headers;
+import io.liveoak.stomp.common.StompFrame;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.ReferenceCountUtil;
-import io.liveoak.stomp.Headers;
-import io.liveoak.stomp.common.StompFrame;
 
 /**
  * @author Bob McWhirter
@@ -20,10 +20,10 @@ public class ReceiptHandler extends SimpleChannelInboundHandler<StompFrame> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, StompFrame msg) throws Exception {
+    protected void channelRead0( ChannelHandlerContext ctx, StompFrame msg ) throws Exception {
         String receiptId = msg.headers().get( Headers.RECEIPT );
         if ( receiptId != null ) {
-            ctx.writeAndFlush(StompFrame.newReceiptFrame(receiptId));
+            ctx.writeAndFlush( StompFrame.newReceiptFrame( receiptId ) );
         }
 
         // retain and keep it moving upstream

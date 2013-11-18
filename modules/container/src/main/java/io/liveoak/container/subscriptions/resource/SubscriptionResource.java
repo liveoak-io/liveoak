@@ -13,7 +13,7 @@ import io.liveoak.spi.resource.async.Resource;
  */
 public class SubscriptionResource implements Resource {
 
-    public SubscriptionResource(Resource parent, Subscription subscription) {
+    public SubscriptionResource( Resource parent, Subscription subscription ) {
         this.parent = parent;
         this.subscription = subscription;
     }

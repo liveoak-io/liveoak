@@ -16,14 +16,14 @@ import io.liveoak.container.resource.ContainerResource;
  */
 public class Bootstrap {
 
-    public static void main(String... args) throws Exception {
+    public static void main( String... args ) throws Exception {
 
-        System.err.println("Booting up the mBaaS");
+        System.err.println( "Booting up the mBaaS" );
 
         DefaultContainer container = new DefaultContainer();
-        UnsecureServer server = new UnsecureServer(container, "localhost", 8080);
+        UnsecureServer server = new UnsecureServer( container, "localhost", 8080 );
 
-        container.registerResource(new ContainerResource("_container"), new SimpleConfig());
+        container.registerResource( new ContainerResource( "_container" ), new SimpleConfig() );
 
         if ( args.length > 0 ) {
             ConfigDeployer deployer = new ConfigDeployer( container );

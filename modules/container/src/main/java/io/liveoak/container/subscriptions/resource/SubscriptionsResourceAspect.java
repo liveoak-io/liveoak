@@ -14,12 +14,12 @@ import io.liveoak.spi.resource.async.Resource;
  */
 public class SubscriptionsResourceAspect implements ResourceAspect {
 
-    public SubscriptionsResourceAspect(SubscriptionManager subscriptionManager) {
+    public SubscriptionsResourceAspect( SubscriptionManager subscriptionManager ) {
         this.subscriptionManager = subscriptionManager;
     }
 
     @Override
-    public Resource forResource(Resource resource) {
+    public Resource forResource( Resource resource ) {
         if ( resource instanceof SubscriptionsCollectionResource ) {
             return null;
         }

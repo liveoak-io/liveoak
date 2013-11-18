@@ -5,11 +5,11 @@
  */
 package io.liveoak.container.codec;
 
-import io.netty.buffer.ByteBuf;
 import io.liveoak.spi.state.ResourceState;
+import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;
 
 public interface ResourceDecoder {
-    ResourceState decode(ByteBuf resource) throws IOException;
+    ResourceState decode( ByteBuf resource ) throws IOException;
 }

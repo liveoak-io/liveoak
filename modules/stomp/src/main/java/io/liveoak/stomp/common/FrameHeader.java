@@ -12,7 +12,8 @@ import io.liveoak.stomp.Stomp;
 
 import java.util.Set;
 
-/** A Frame-header encompasses the STOMP command keyword, along with
+/**
+ * A Frame-header encompasses the STOMP command keyword, along with
  * message headers.
  *
  * @author Bob McWhirter
@@ -23,11 +24,11 @@ public class FrameHeader {
 
     }
 
-    public FrameHeader(Stomp.Command command) {
+    public FrameHeader( Stomp.Command command ) {
         this.command = command;
     }
 
-    public FrameHeader(Stomp.Command command, Headers headers) {
+    public FrameHeader( Stomp.Command command, Headers headers ) {
         this.command = command;
         this.headers.putAll( headers );
     }
@@ -36,7 +37,7 @@ public class FrameHeader {
         return this.command.hasContent();
     }
 
-    public void setCommand(Stomp.Command command) {
+    public void setCommand( Stomp.Command command ) {
         this.command = command;
     }
 
@@ -44,11 +45,11 @@ public class FrameHeader {
         return this.command;
     }
 
-    public void set(String name, String value) {
+    public void set( String name, String value ) {
         this.headers.put( name, value );
     }
 
-    public String get(String name) {
+    public String get( String name ) {
         return this.headers.get( name );
     }
 
@@ -61,8 +62,8 @@ public class FrameHeader {
     }
 
     public int getContentLength() {
-        String value = get(Headers.CONTENT_LENGTH.toString());
-        if (value == null) {
+        String value = get( Headers.CONTENT_LENGTH.toString() );
+        if ( value == null ) {
             return -1;
         }
 

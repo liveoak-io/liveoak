@@ -14,7 +14,7 @@ import java.io.File;
  */
 public class GitFileResource extends FileResource {
 
-    public GitFileResource(GitDirectoryResource parent, File file) {
-        super(parent, file);
+    public GitFileResource( GitDirectoryResource parent, File file ) {
+        super( parent, file );
     }
 }

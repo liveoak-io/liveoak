@@ -26,8 +26,8 @@ public class URIPolicyEntry {
     private final String allowedUsers;
     private final String deniedUsers;
 
-    private URIPolicyEntry(int priority, String uriPattern, String queryParamsCondition, String requestType, String allowedRealmRoles, String deniedRealmRoles,
-                           String allowedApplicationRoles, String deniedApplicationRoles, String allowedUsers, String deniedUsers) {
+    private URIPolicyEntry( int priority, String uriPattern, String queryParamsCondition, String requestType, String allowedRealmRoles, String deniedRealmRoles,
+                            String allowedApplicationRoles, String deniedApplicationRoles, String allowedUsers, String deniedUsers ) {
         this.priority = priority;
         this.uriPattern = uriPattern;
         this.queryParamsCondition = queryParamsCondition;
@@ -41,15 +41,15 @@ public class URIPolicyEntry {
         this.deniedUsers = deniedUsers;
     }
 
-    public static URIPolicyEntry createEntry(int priority, String uriPattern, String queryParamsCondition, String requestType,
-                                             String allowedRealmRoles, String deniedRealmRoles,
-                                             String allowedApplicationRoles, String deniedApplicationRoles, String allowedUsers, String deniedUsers) {
+    public static URIPolicyEntry createEntry( int priority, String uriPattern, String queryParamsCondition, String requestType,
+                                              String allowedRealmRoles, String deniedRealmRoles,
+                                              String allowedApplicationRoles, String deniedApplicationRoles, String allowedUsers, String deniedUsers ) {
 
         // From uriPattern from "user-friendly" form to "drools-friendly" form
-        String formattedPattern = DroolsFormattingUtils.formatStringToDrools(uriPattern);
+        String formattedPattern = DroolsFormattingUtils.formatStringToDrools( uriPattern );
 
         // Add placeholder for queryParamsCondition if it's empty
-        if (queryParamsCondition == null || queryParamsCondition.isEmpty()) {
+        if ( queryParamsCondition == null || queryParamsCondition.isEmpty() ) {
             queryParamsCondition = "1 == 1";
         }
 
@@ -57,10 +57,10 @@ public class URIPolicyEntry {
         priority = priority * 2;
 
         // RequestType must be wildcard or some of RequestType enums
-        requestType = validateAndFormatRequestType(requestType);
+        requestType = validateAndFormatRequestType( requestType );
 
-        return new URIPolicyEntry(priority, formattedPattern, queryParamsCondition, requestType,
-                allowedRealmRoles, deniedRealmRoles, allowedApplicationRoles, deniedApplicationRoles, allowedUsers, deniedUsers);
+        return new URIPolicyEntry( priority, formattedPattern, queryParamsCondition, requestType,
+                allowedRealmRoles, deniedRealmRoles, allowedApplicationRoles, deniedApplicationRoles, allowedUsers, deniedUsers );
     }
 
     public int getPriority() {
@@ -106,26 +106,27 @@ public class URIPolicyEntry {
     /**
      * requestType must be either "*" or set of requestTypes divided by comma (for example: "CREATE, READ, DELETE" or "DELETE")
      * Method throws IllegalArgumentException if requestType is not formatted
+     *
      * @param requestType
      * @return formatted requestType without spaces and with wildcard expanded to all request types (like "CREATE,READ,UPDATE,DELETE")
      */
-    private static String validateAndFormatRequestType(String requestType) {
-        if (requestType == null) {
-            throw new IllegalArgumentException("requestType can't be null");
-        } else if (requestType.equals("*")) {
+    private static String validateAndFormatRequestType( String requestType ) {
+        if ( requestType == null ) {
+            throw new IllegalArgumentException( "requestType can't be null" );
+        } else if ( requestType.equals( "*" ) ) {
             requestType = "CREATE,READ,UPDATE,DELETE";
         }
-        String[] spl = requestType.split(",");
+        String[] spl = requestType.split( "," );
         StringBuilder requestTypeBuilder = new StringBuilder();
-        for (int i=0 ; i<spl.length ; i++) {
+        for ( int i = 0; i < spl.length; i++ ) {
             String oneReqType = spl[i].trim();
             // Just to check if it throws IllegalArgumentException
-            Enum.valueOf(RequestType.class, oneReqType);
+            Enum.valueOf( RequestType.class, oneReqType );
 
-            if (i != 0) {
-                requestTypeBuilder.append(",");
+            if ( i != 0 ) {
+                requestTypeBuilder.append( "," );
             }
-            requestTypeBuilder.append(oneReqType);
+            requestTypeBuilder.append( oneReqType );
         }
         return requestTypeBuilder.toString();
     }

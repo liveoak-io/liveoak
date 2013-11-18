@@ -5,16 +5,16 @@
  */
 package io.liveoak.testtools;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.junit.After;
-import org.junit.Before;
 import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.SimpleConfig;
 import io.liveoak.container.UnsecureServer;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.resource.RootResource;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.junit.After;
+import org.junit.Before;
 
 
 /**
@@ -34,8 +34,8 @@ public abstract class AbstractHTTPResourceTestCase {
 
     @Before
     public void setUpClient() throws Exception {
-        RequestConfig cconfig = RequestConfig.custom().setSocketTimeout(500000).build();
-        this.httpClient = HttpClients.custom().setDefaultRequestConfig(cconfig).build();
+        RequestConfig cconfig = RequestConfig.custom().setSocketTimeout( 500000 ).build();
+        this.httpClient = HttpClients.custom().setDefaultRequestConfig( cconfig ).build();
     }
 
     @After

@@ -18,11 +18,11 @@
       <directory>../modules/target/m2-repo</directory>
       <outputDirectory>/m2-repo</outputDirectory>
     </fileSet>
-    <fileSet> 
+    <fileSet>
       <directory>../clients/javascript/src/main/javascript</directory>
       <outputDirectory>/javascript</outputDirectory>
-    </fileSet> 
-    <fileSet> 
+    </fileSet>
+    <fileSet>
       <directory>../launcher/src/main/css</directory>
       <outputDirectory>/css</outputDirectory>
     </fileSet>
@@ -35,10 +35,10 @@
         <include>liveoak.bat</include>
       </includes>
     </fileSet>
-    <fileSet> 
+    <fileSet>
       <directory>src/main/resources/bin</directory>
       <outputDirectory>/bin</outputDirectory>
-    </fileSet> 
+    </fileSet>
     <fileSet>
       <directory>../launcher/etc</directory>
       <outputDirectory>/etc</outputDirectory>
@@ -48,14 +48,14 @@
       <outputDirectory>/lib</outputDirectory>
     </fileSet>
   </fileSets>
-<!--
-  <dependencySets>
-    <dependencySet>
-      <outputDirectory>/</outputDirectory>
-      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
-      <unpack>false</unpack>
-      <scope>runtime</scope>
-    </dependencySet>
-  </dependencySets>
--->
+  <!--
+    <dependencySets>
+      <dependencySet>
+        <outputDirectory>/</outputDirectory>
+        <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+        <unpack>false</unpack>
+        <scope>runtime</scope>
+      </dependencySet>
+    </dependencySets>
+  -->
 </assembly>

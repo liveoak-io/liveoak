@@ -19,13 +19,13 @@ public abstract class MongoResource implements Resource, BlockingResource {
     protected static final String MONGO_ID_FIELD = "_id";
     protected static final String MBAAS_ID_FIELD = "id";
 
-    public MongoResource(MongoResource parent) {
+    public MongoResource( MongoResource parent ) {
         this.parent = parent;
     }
 
-    abstract protected Object deleteChild(RequestContext ctx, String childId);
+    abstract protected Object deleteChild( RequestContext ctx, String childId );
 
-    abstract protected Object updateChild(RequestContext ctx, String childId, Object child);
+    abstract protected Object updateChild( RequestContext ctx, String childId, Object child );
 
     @Override
     public Resource parent() {

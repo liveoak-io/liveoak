@@ -17,7 +17,7 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class InMemoryObjectResource implements Resource, BlockingResource {
 
-    public InMemoryObjectResource(InMemoryCollectionResource parent, String id, ResourceState state) {
+    public InMemoryObjectResource( InMemoryCollectionResource parent, String id, ResourceState state ) {
         this.parent = parent;
         this.id = id;
         this.state = state;
@@ -36,13 +36,13 @@ public class InMemoryObjectResource implements Resource, BlockingResource {
     }
 
     @Override
-    public void delete(RequestContext ctx, Responder responder) {
-        this.parent.delete(this.id);
-        responder.resourceDeleted(this);
+    public void delete( RequestContext ctx, Responder responder ) {
+        this.parent.delete( this.id );
+        responder.resourceDeleted( this );
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties( RequestContext ctx, PropertySink sink ) {
         for ( String name : this.state.getPropertyNames() ) {
             sink.accept( name, this.state.getProperty( name ) );
         }
@@ -50,9 +50,9 @@ public class InMemoryObjectResource implements Resource, BlockingResource {
     }
 
     @Override
-    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) {
+    public void updateProperties( RequestContext ctx, ResourceState state, Responder responder ) {
         this.state = state;
-        responder.resourceUpdated(this);
+        responder.resourceUpdated( this );
     }
 
     public String toString() {

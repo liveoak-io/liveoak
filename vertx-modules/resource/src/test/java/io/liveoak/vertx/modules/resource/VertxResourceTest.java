@@ -5,16 +5,16 @@
  */
 package io.liveoak.vertx.modules.resource;
 
+import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.DirectConnector;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.state.ResourceState;
-import org.junit.Before;
-import org.junit.Test;
-import io.liveoak.container.DefaultContainer;
 import io.liveoak.spi.ResourceException;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
+import io.liveoak.spi.state.ResourceState;
 import io.liveoak.vertx.modules.server.ResourceDeployer;
+import org.junit.Before;
+import org.junit.Test;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
@@ -24,15 +24,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import static org.fest.assertions.Assertions.assertThat;
 import static junit.framework.Assert.fail;
+import static org.fest.assertions.Assertions.assertThat;
 
 
 /**
  * @author Bob McWhirter
  * @author Lance Ball
  */
-public class VertxResourceTest  {
+public class VertxResourceTest {
 
     private DefaultContainer container;
     private ResourceDeployer deployer;
@@ -50,26 +50,26 @@ public class VertxResourceTest  {
 
     @Before
     public void setUpResource() throws Exception {
-        this.adapter = new CollectionResourceAdapter(container.vertx(), "people", "test.register");
+        this.adapter = new CollectionResourceAdapter( container.vertx(), "people", "test.register" );
 
-        this.objects.put("bob", new JsonObject().putString("id", "bob").putString("name", "Bob McWhirter"));
-        this.objects.put("ben", new JsonObject().putString("id", "ben").putString("name", "Ben Browning"));
-        this.adapter.readMemberHandler((id, responder) -> {
+        this.objects.put( "bob", new JsonObject().putString( "id", "bob" ).putString( "name", "Bob McWhirter" ) );
+        this.objects.put( "ben", new JsonObject().putString( "id", "ben" ).putString( "name", "Ben Browning" ) );
+        this.adapter.readMemberHandler( ( id, responder ) -> {
 
             System.err.println( "asked for: " + id );
-            JsonObject object = objects.get(id);
+            JsonObject object = objects.get( id );
 
-            if (object != null) {
-                responder.resourceRead(object);
+            if ( object != null ) {
+                responder.resourceRead( object );
             } else {
-                responder.noSuchResource(id);
+                responder.noSuchResource( id );
             }
-        });
+        } );
 
-        this.adapter.readMembersHandler((responder) -> {
-            JsonArray resources = new JsonArray(objects.values().toArray());
-            responder.resourcesRead(resources);
-        });
+        this.adapter.readMembersHandler( ( responder ) -> {
+            JsonArray resources = new JsonArray( objects.values().toArray() );
+            responder.resourcesRead( resources );
+        } );
 
         this.adapter.start();
         Thread.sleep( 500 );
@@ -77,9 +77,9 @@ public class VertxResourceTest  {
 
     @Test
     public void testReadMember() throws Exception {
-        ResourceState result = connector.read(new RequestContext.Builder().build(),"/people/bob");
-        assertThat(result).isNotNull();
-        assertThat(result.id()).isEqualTo("bob");
+        ResourceState result = connector.read( new RequestContext.Builder().build(), "/people/bob" );
+        assertThat( result ).isNotNull();
+        assertThat( result.id() ).isEqualTo( "bob" );
     }
 
 
@@ -96,11 +96,11 @@ public class VertxResourceTest  {
     @Test
     public void testReadNonExistentResource() {
         try {
-            connector.read( new RequestContext.Builder().build(), "/people/lance");
-        } catch (ResourceException e) {
-            assertThat(e.path()).isEqualTo("/people/lance");
-        } catch (Exception e) {
-            fail("Unexpected exception: " + e);
+            connector.read( new RequestContext.Builder().build(), "/people/lance" );
+        } catch ( ResourceException e ) {
+            assertThat( e.path() ).isEqualTo( "/people/lance" );
+        } catch ( Exception e ) {
+            fail( "Unexpected exception: " + e );
         }
     }
 
@@ -112,17 +112,17 @@ public class VertxResourceTest  {
         ResourceSink sink = new ResourceSink() {
             @Override
             public void close() {
-                future.complete(resources);
+                future.complete( resources );
             }
 
             @Override
-            public void accept(Resource resource) {
-                resources.add(resource);
+            public void accept( Resource resource ) {
+                resources.add( resource );
             }
         };
 
-        ResourceState resource = connector.read( new RequestContext.Builder().build(), "/people");
-        assertThat(resource).isNotNull();
+        ResourceState resource = connector.read( new RequestContext.Builder().build(), "/people" );
+        assertThat( resource ).isNotNull();
         assertThat( resource.members() ).hasSize( 2 );
 
     }

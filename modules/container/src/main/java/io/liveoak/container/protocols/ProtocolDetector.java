@@ -5,10 +5,10 @@
  */
 package io.liveoak.container.protocols;
 
+import io.liveoak.container.PipelineConfigurator;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
-import io.liveoak.container.PipelineConfigurator;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -20,18 +20,18 @@ public class ProtocolDetector extends ReplayingDecoder<Void> {
 
     private static final Charset UTF_8 = Charset.forName( "UTF-8" );
 
-    public ProtocolDetector(PipelineConfigurator configurator) {
+    public ProtocolDetector( PipelineConfigurator configurator ) {
         this.configurator = configurator;
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    protected void decode( ChannelHandlerContext ctx, ByteBuf in, List<Object> out ) throws Exception {
 
-        int nonNewlineBytes = in.bytesBefore( (byte) '\n' );
+        int nonNewlineBytes = in.bytesBefore( ( byte ) '\n' );
 
         in.markReaderIndex();
 
-        if (nonNewlineBytes > 0) {
+        if ( nonNewlineBytes > 0 ) {
             ByteBuf lineBuffer = in.readBytes( nonNewlineBytes );
             String line = lineBuffer.toString( UTF_8 );
 
@@ -40,7 +40,7 @@ public class ProtocolDetector extends ReplayingDecoder<Void> {
             in.resetReaderIndex();
             ByteBuf fullBuffer = in.readBytes( super.actualReadableBytes() );
 
-            if (line.startsWith( "CONNECT" ) || line.startsWith( "STOMP" )) {
+            if ( line.startsWith( "CONNECT" ) || line.startsWith( "STOMP" ) ) {
                 this.configurator.switchToPureStomp( ctx.pipeline() );
             } else {
                 this.configurator.switchToHttpWebSockets( ctx.pipeline() );

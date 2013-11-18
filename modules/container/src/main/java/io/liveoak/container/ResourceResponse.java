@@ -21,12 +21,12 @@ public class ResourceResponse {
         ERROR,
     }
 
-    public ResourceResponse(ResourceRequest inReplyTo, ResponseType responseType) {
+    public ResourceResponse( ResourceRequest inReplyTo, ResponseType responseType ) {
         this.inReplyTo = inReplyTo;
         this.responseType = responseType;
     }
 
-    public ResourceResponse(ResourceRequest inReplyTo, ResponseType responseType, Resource resource) {
+    public ResourceResponse( ResourceRequest inReplyTo, ResponseType responseType, Resource resource ) {
         this.inReplyTo = inReplyTo;
         this.responseType = responseType;
         this.resource = resource;

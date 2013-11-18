@@ -5,13 +5,14 @@
  */
 package io.liveoak.vertx.modules.server.integration.java;
 
+import io.liveoak.vertx.testtools.VertxTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import io.liveoak.vertx.testtools.VertxTestRunner;
 import org.vertx.testtools.TestVerticle;
 
-import static org.vertx.testtools.VertxAssert.*;
-import static org.vertx.testtools.VertxAssert.assertEquals;
+import static org.vertx.testtools.VertxAssert.assertNotNull;
+import static org.vertx.testtools.VertxAssert.assertTrue;
+import static org.vertx.testtools.VertxAssert.testComplete;
 
 /**
  * Example Java integration test that deploys the module that this project builds.
@@ -33,11 +34,11 @@ public class ServerVerticleIntegrationTest extends TestVerticle {
     public void start() {
         initialize();
 
-        container.deployModule(System.getProperty("vertx.modulename"), (result) -> {
-            assertTrue(result.succeeded());
-            assertNotNull("deploymentID should not be null", result.result());
+        container.deployModule( System.getProperty( "vertx.modulename" ), ( result ) -> {
+            assertTrue( result.succeeded() );
+            assertNotNull( "deploymentID should not be null", result.result() );
             startTests();
-        });
+        } );
     }
 
 }

@@ -5,9 +5,9 @@
  */
 package io.liveoak.container.mime;
 
-import org.junit.Test;
 import io.liveoak.container.codec.MediaTypeMatcher;
 import io.liveoak.spi.MediaType;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +24,9 @@ public class MediaTypeMatcherTest {
         MediaTypeMatcher matcher = new MediaTypeMatcher( "application/json" );
 
         assertThat( matcher.mediaTypes() ).hasSize( 1 );
-        assertThat( matcher.mediaTypes().get(0).type() ).isEqualTo("application");
-        assertThat( matcher.mediaTypes().get(0).subtype() ).isEqualTo("json");
-        assertThat( matcher.mediaTypes().get(0).suffix() ).isNull();
+        assertThat( matcher.mediaTypes().get( 0 ).type() ).isEqualTo( "application" );
+        assertThat( matcher.mediaTypes().get( 0 ).subtype() ).isEqualTo( "json" );
+        assertThat( matcher.mediaTypes().get( 0 ).suffix() ).isNull();
     }
 
     @Test
@@ -34,17 +34,17 @@ public class MediaTypeMatcherTest {
         MediaTypeMatcher matcher = new MediaTypeMatcher( "application/json, text/xml, */*" );
 
         assertThat( matcher.mediaTypes() ).hasSize( 3 );
-        assertThat( matcher.mediaTypes().get(0).type() ).isEqualTo("application");
-        assertThat( matcher.mediaTypes().get(0).subtype() ).isEqualTo( "json" );
-        assertThat( matcher.mediaTypes().get(0).suffix() ).isNull();
+        assertThat( matcher.mediaTypes().get( 0 ).type() ).isEqualTo( "application" );
+        assertThat( matcher.mediaTypes().get( 0 ).subtype() ).isEqualTo( "json" );
+        assertThat( matcher.mediaTypes().get( 0 ).suffix() ).isNull();
 
-        assertThat( matcher.mediaTypes().get(1).type() ).isEqualTo( "text" );
-        assertThat( matcher.mediaTypes().get(1).subtype() ).isEqualTo( "xml" );
-        assertThat( matcher.mediaTypes().get(1).suffix() ).isNull();
+        assertThat( matcher.mediaTypes().get( 1 ).type() ).isEqualTo( "text" );
+        assertThat( matcher.mediaTypes().get( 1 ).subtype() ).isEqualTo( "xml" );
+        assertThat( matcher.mediaTypes().get( 1 ).suffix() ).isNull();
 
-        assertThat( matcher.mediaTypes().get(2).type() ).isEqualTo( "*" );
-        assertThat( matcher.mediaTypes().get(2).subtype() ).isEqualTo( "*" );
-        assertThat( matcher.mediaTypes().get(2).suffix() ).isNull();
+        assertThat( matcher.mediaTypes().get( 2 ).type() ).isEqualTo( "*" );
+        assertThat( matcher.mediaTypes().get( 2 ).subtype() ).isEqualTo( "*" );
+        assertThat( matcher.mediaTypes().get( 2 ).suffix() ).isNull();
     }
 
     @Test
@@ -53,17 +53,17 @@ public class MediaTypeMatcherTest {
 
         assertThat( matcher.mediaTypes() ).hasSize( 3 );
 
-        assertThat( matcher.mediaTypes().get(0).type() ).isEqualTo( "text" );
-        assertThat( matcher.mediaTypes().get(0).subtype() ).isEqualTo( "xml" );
-        assertThat( matcher.mediaTypes().get(0).suffix() ).isNull();
+        assertThat( matcher.mediaTypes().get( 0 ).type() ).isEqualTo( "text" );
+        assertThat( matcher.mediaTypes().get( 0 ).subtype() ).isEqualTo( "xml" );
+        assertThat( matcher.mediaTypes().get( 0 ).suffix() ).isNull();
 
-        assertThat( matcher.mediaTypes().get(1).type() ).isEqualTo( "application" );
-        assertThat( matcher.mediaTypes().get(1).subtype() ).isEqualTo( "json" );
-        assertThat( matcher.mediaTypes().get(1).suffix() ).isNull();
+        assertThat( matcher.mediaTypes().get( 1 ).type() ).isEqualTo( "application" );
+        assertThat( matcher.mediaTypes().get( 1 ).subtype() ).isEqualTo( "json" );
+        assertThat( matcher.mediaTypes().get( 1 ).suffix() ).isNull();
 
-        assertThat( matcher.mediaTypes().get(2).type() ).isEqualTo( "*" );
-        assertThat( matcher.mediaTypes().get(2).subtype() ).isEqualTo( "*" );
-        assertThat( matcher.mediaTypes().get(2).suffix() ).isNull();
+        assertThat( matcher.mediaTypes().get( 2 ).type() ).isEqualTo( "*" );
+        assertThat( matcher.mediaTypes().get( 2 ).subtype() ).isEqualTo( "*" );
+        assertThat( matcher.mediaTypes().get( 2 ).suffix() ).isNull();
     }
 
     @Test
@@ -76,11 +76,11 @@ public class MediaTypeMatcherTest {
         candidates.add( new MediaType( "text/xml" ) );
         candidates.add( new MediaType( "text/html" ) );
 
-        MediaType match = matcher.findBestMatch(candidates);
+        MediaType match = matcher.findBestMatch( candidates );
 
         assertThat( match ).isNotNull();
-        assertThat( match.type() ).isEqualTo("text");
-        assertThat( match.subtype() ).isEqualTo("xml");
+        assertThat( match.type() ).isEqualTo( "text" );
+        assertThat( match.subtype() ).isEqualTo( "xml" );
     }
 
     @Test
@@ -93,7 +93,7 @@ public class MediaTypeMatcherTest {
         candidates.add( new MediaType( "text/xml" ) );
         candidates.add( new MediaType( "text/html" ) );
 
-        MediaType match = matcher.findBestMatch(candidates);
+        MediaType match = matcher.findBestMatch( candidates );
 
         assertThat( match ).isNotNull();
         assertThat( match.type() ).isEqualTo( "text" );

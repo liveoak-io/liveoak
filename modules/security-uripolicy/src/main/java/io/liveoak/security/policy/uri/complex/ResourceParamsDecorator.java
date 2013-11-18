@@ -5,10 +5,10 @@
  */
 package io.liveoak.security.policy.uri.complex;
 
+import io.liveoak.spi.ResourceParams;
+
 import java.util.Collection;
 import java.util.List;
-
-import io.liveoak.spi.ResourceParams;
 
 /**
  * Decorator of {@link ResourceParams} with some added methods to allow safe processing of request parameters by drools engine
@@ -19,7 +19,7 @@ public class ResourceParamsDecorator implements ResourceParams {
 
     private final ResourceParams delegate;
 
-    public ResourceParamsDecorator(ResourceParams delegate) {
+    public ResourceParamsDecorator( ResourceParams delegate ) {
         this.delegate = delegate;
     }
 
@@ -29,38 +29,39 @@ public class ResourceParamsDecorator implements ResourceParams {
     }
 
     @Override
-    public boolean contains(String name) {
-        return delegate.contains(name);
+    public boolean contains( String name ) {
+        return delegate.contains( name );
     }
 
     @Override
-    public String value(String name) {
-        return delegate.value(name);
+    public String value( String name ) {
+        return delegate.value( name );
     }
 
     @Override
-    public List<String> values(String name) {
-        return delegate.values(name);
+    public List<String> values( String name ) {
+        return delegate.values( name );
     }
 
     @Override
-    public int intValue(String name, int defaultValue) {
-        return delegate.intValue(name, defaultValue);
+    public int intValue( String name, int defaultValue ) {
+        return delegate.intValue( name, defaultValue );
     }
 
     /**
      * Return intValue if param exists and if param could be converted to int. Otherwise returns null. Never throws NumberFormatException
+     *
      * @param name
      * @return intValue
      */
-    public Integer intValue(String name) {
-        String val = value(name);
-        if (val == null) {
+    public Integer intValue( String name ) {
+        String val = value( name );
+        if ( val == null ) {
             return null;
         } else {
             try {
-                return Integer.parseInt(val);
-            } catch (NumberFormatException nfe) {
+                return Integer.parseInt( val );
+            } catch ( NumberFormatException nfe ) {
                 return null;
             }
         }
@@ -68,11 +69,12 @@ public class ResourceParamsDecorator implements ResourceParams {
 
     /**
      * Return true only if params exists and it's value is "true" (with equals-ignore-case semantics)
+     *
      * @param name
      * @return booleanValue. Never returns null
      */
-    public Boolean booleanValue(String name) {
-        String val = value(name);
-        return Boolean.parseBoolean(val);
+    public Boolean booleanValue( String name ) {
+        String val = value( name );
+        return Boolean.parseBoolean( val );
     }
 }

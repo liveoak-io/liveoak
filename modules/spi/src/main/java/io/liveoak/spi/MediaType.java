@@ -34,15 +34,15 @@ public class MediaType {
     public static final MediaType ZIP = new MediaType( "application/zip" );
     public static final MediaType GZIP = new MediaType( "application/gzip" );
 
-    private static Map<String,MediaType> EXTENSIONS = new HashMap<>();
+    private static Map<String, MediaType> EXTENSIONS = new HashMap<>();
 
-    public static void registerExtensions(MediaType mediaType, String...extensions) {
+    public static void registerExtensions( MediaType mediaType, String... extensions ) {
         for ( String ext : extensions ) {
             EXTENSIONS.put( ext, mediaType );
         }
     }
 
-    public static MediaType lookup(String extension) {
+    public static MediaType lookup( String extension ) {
         return EXTENSIONS.get( extension );
     }
 
@@ -67,71 +67,70 @@ public class MediaType {
     }
 
 
-
-    public MediaType(String type) {
+    public MediaType( String type ) {
         if ( type == null ) {
             type = "application/json";
         }
-        int slashLoc = type.indexOf("/");
-        if (slashLoc < 0) {
-            throw new IllegalArgumentException("media-type must be in the form of 'type/subtype'");
+        int slashLoc = type.indexOf( "/" );
+        if ( slashLoc < 0 ) {
+            throw new IllegalArgumentException( "media-type must be in the form of 'type/subtype'" );
         }
 
-        this.type = type.substring(0, slashLoc);
+        this.type = type.substring( 0, slashLoc );
 
-        int plusLoc = type.indexOf("+", slashLoc);
-        int semiLoc = type.indexOf(";", slashLoc);
+        int plusLoc = type.indexOf( "+", slashLoc );
+        int semiLoc = type.indexOf( ";", slashLoc );
 
-        if (semiLoc > 0) {
+        if ( semiLoc > 0 ) {
             this.parameters = new HashMap<>();
-            if (plusLoc > 0) {
-                this.subtype = type.substring(slashLoc + 1, plusLoc);
-                this.suffix = type.substring(plusLoc + 1, semiLoc );
+            if ( plusLoc > 0 ) {
+                this.subtype = type.substring( slashLoc + 1, plusLoc );
+                this.suffix = type.substring( plusLoc + 1, semiLoc );
             } else {
-                this.subtype = type.substring(slashLoc + 1, semiLoc);
+                this.subtype = type.substring( slashLoc + 1, semiLoc );
             }
 
-            int end = type.indexOf( ";", semiLoc + 1);
+            int end = type.indexOf( ";", semiLoc + 1 );
             if ( end < 0 ) {
                 end = type.length();
             }
 
             while ( semiLoc > 0 ) {
-                String param = type.substring( semiLoc+1, end );
+                String param = type.substring( semiLoc + 1, end );
 
                 int equalLoc = param.indexOf( "=" );
                 if ( equalLoc < 0 ) {
                     break;
                 }
-                String key = param.substring(0, equalLoc).trim();
+                String key = param.substring( 0, equalLoc ).trim();
                 String value = param.substring( equalLoc + 1 ).trim();
 
                 this.parameters.put( key, value );
 
-                semiLoc = type.indexOf( ";", semiLoc + 1  );
+                semiLoc = type.indexOf( ";", semiLoc + 1 );
 
-                end = type.indexOf( ";", semiLoc+1 );
+                end = type.indexOf( ";", semiLoc + 1 );
                 if ( end < 0 ) {
                     end = type.length();
                 }
             }
 
         } else {
-            if (plusLoc > 0) {
-                this.subtype = type.substring(slashLoc + 1, plusLoc);
-                this.suffix = type.substring(plusLoc + 1);
+            if ( plusLoc > 0 ) {
+                this.subtype = type.substring( slashLoc + 1, plusLoc );
+                this.suffix = type.substring( plusLoc + 1 );
             } else {
-                this.subtype = type.substring(slashLoc + 1);
+                this.subtype = type.substring( slashLoc + 1 );
             }
 
         }
     }
 
-    public MediaType(String type, String subtype) {
-        this(type, subtype, null);
+    public MediaType( String type, String subtype ) {
+        this( type, subtype, null );
     }
 
-    public MediaType(String type, String subtype, String suffix) {
+    public MediaType( String type, String subtype, String suffix ) {
         this.type = type;
         this.subtype = subtype;
         this.suffix = suffix;
@@ -149,21 +148,21 @@ public class MediaType {
         return this.suffix;
     }
 
-    public boolean isCompatible(MediaType other) {
-        if (!this.type.equals(other.type)) {
-            if ( ! this.type.equals( "*" ) && ! other.type.equals("*" ) ) {
+    public boolean isCompatible( MediaType other ) {
+        if ( !this.type.equals( other.type ) ) {
+            if ( !this.type.equals( "*" ) && !other.type.equals( "*" ) ) {
                 return false;
             }
         }
 
-        if (this.subtype.equals(other.subtype)) {
-            if (this.suffix == null && other.suffix == null) {
+        if ( this.subtype.equals( other.subtype ) ) {
+            if ( this.suffix == null && other.suffix == null ) {
                 return true;
             }
-            if (this.suffix == null || other.suffix == null) {
+            if ( this.suffix == null || other.suffix == null ) {
                 return true;
             }
-            if (this.suffix.equals(other.suffix)) {
+            if ( this.suffix.equals( other.suffix ) ) {
                 return true;
             }
             return false;
@@ -172,11 +171,11 @@ public class MediaType {
         }
 
 
-        if (this.suffix != null && this.suffix.equals(other.subtype)) {
+        if ( this.suffix != null && this.suffix.equals( other.subtype ) ) {
             return true;
         }
 
-        if (other.suffix != null && other.suffix.equals(this.subtype)) {
+        if ( other.suffix != null && other.suffix.equals( this.subtype ) ) {
             return true;
         }
 
@@ -184,9 +183,9 @@ public class MediaType {
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals( Object other ) {
         if ( other instanceof MediaType ) {
-            MediaType that = (MediaType) other;
+            MediaType that = ( MediaType ) other;
 
             if ( this.type.equals( that.type ) ) {
                 if ( this.subtype.equals( that.subtype ) ) {
@@ -211,18 +210,18 @@ public class MediaType {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(this.type);
-        builder.append("/");
-        builder.append(this.subtype);
-        if (this.suffix != null) {
-            builder.append("+");
-            builder.append(this.suffix);
+        builder.append( this.type );
+        builder.append( "/" );
+        builder.append( this.subtype );
+        if ( this.suffix != null ) {
+            builder.append( "+" );
+            builder.append( this.suffix );
         }
         return builder.toString();
     }
 
     public Map<String, String> parameters() {
-        if (this.parameters == null) {
+        if ( this.parameters == null ) {
             return Collections.emptyMap();
         }
         return this.parameters;

@@ -5,23 +5,23 @@
  */
 package io.liveoak.stomp.common;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.ReferenceCountUtil;
 import io.liveoak.stomp.Stomp;
 import io.liveoak.stomp.server.StompServerException;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.ReferenceCountUtil;
 
 /**
  * @author Bob McWhirter
  */
 public abstract class AbstractControlFrameHandler extends AbstractFrameHandler {
 
-    public AbstractControlFrameHandler(Stomp.Command command) {
-        super(command);
+    public AbstractControlFrameHandler( Stomp.Command command ) {
+        super( command );
     }
 
-    public void handleFrame(ChannelHandlerContext ctx, StompFrame msg) throws StompServerException {
-        if (msg instanceof StompControlFrame) {
-            handleControlFrame(ctx, (StompControlFrame) msg);
+    public void handleFrame( ChannelHandlerContext ctx, StompFrame msg ) throws StompServerException {
+        if ( msg instanceof StompControlFrame ) {
+            handleControlFrame( ctx, ( StompControlFrame ) msg );
             return;
         }
 
@@ -29,5 +29,5 @@ public abstract class AbstractControlFrameHandler extends AbstractFrameHandler {
         ctx.fireChannelRead( msg );
     }
 
-    protected abstract void handleControlFrame(ChannelHandlerContext ctx, StompControlFrame frame) throws StompServerException;
+    protected abstract void handleControlFrame( ChannelHandlerContext ctx, StompControlFrame frame ) throws StompServerException;
 }

@@ -10,7 +10,8 @@ package io.liveoak.spi.resource.async;
  */
 public interface PropertySink {
 
-    void accept(String name, Object value);
+    void accept( String name, Object value );
+
     void close();
 
 }

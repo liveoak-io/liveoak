@@ -21,13 +21,13 @@ public class FilteredObjectResourceState implements ResourceState {
     private final ResourceState delegate;
     private final ReturnFields filter;
 
-    public FilteredObjectResourceState(ResourceState delegate, ReturnFields filter) {
+    public FilteredObjectResourceState( ResourceState delegate, ReturnFields filter ) {
         this.delegate = delegate;
         this.filter = filter;
     }
 
     @Override
-    public void uri(URI uri) {
+    public void uri( URI uri ) {
         this.delegate.uri( uri );
     }
 
@@ -37,24 +37,24 @@ public class FilteredObjectResourceState implements ResourceState {
     }
 
     @Override
-    public void putProperty(String name, Object value) {
-        delegate.putProperty(name, value);
+    public void putProperty( String name, Object value ) {
+        delegate.putProperty( name, value );
     }
 
     @Override
-    public Object getProperty(String name) {
-        if (filter != null && !filter.included(name)) {
+    public Object getProperty( String name ) {
+        if ( filter != null && !filter.included( name ) ) {
             return null;
         }
 
-        Object val = delegate.getProperty(name);
-        if (val == null) {
+        Object val = delegate.getProperty( name );
+        if ( val == null ) {
             return null;
         }
 
-        ReturnFields childFilter = filter.child(name);
-        if (childFilter != null && val instanceof ResourceState) {
-            val = new FilteredObjectResourceState((ResourceState) val, childFilter);
+        ReturnFields childFilter = filter.child( name );
+        if ( childFilter != null && val instanceof ResourceState ) {
+            val = new FilteredObjectResourceState( ( ResourceState ) val, childFilter );
         }
         return val;
     }
@@ -64,7 +64,7 @@ public class FilteredObjectResourceState implements ResourceState {
         Set<String> filteredNames = new HashSet<>();
 
         Set<String> names = delegate.getPropertyNames();
-        for( String name : names ) {
+        for ( String name : names ) {
             if ( filter == null ) {
                 filteredNames.add( name );
             }
@@ -78,7 +78,7 @@ public class FilteredObjectResourceState implements ResourceState {
     }
 
     @Override
-    public void addMember(ResourceState member) {
+    public void addMember( ResourceState member ) {
         delegate.addMember( member );
     }
 
@@ -93,7 +93,7 @@ public class FilteredObjectResourceState implements ResourceState {
     }
 
     @Override
-    public void id(String id) {
-        delegate.id(id);
+    public void id( String id ) {
+        delegate.id( id );
     }
 }

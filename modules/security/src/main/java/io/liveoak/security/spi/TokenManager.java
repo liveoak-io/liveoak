@@ -14,5 +14,5 @@ import io.liveoak.spi.RequestContext;
  */
 public interface TokenManager {
 
-    AuthToken getAndValidateToken(RequestContext requestContext) throws TokenValidationException;
+    AuthToken getAndValidateToken( RequestContext requestContext ) throws TokenValidationException;
 }

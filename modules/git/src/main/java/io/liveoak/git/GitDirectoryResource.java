@@ -15,17 +15,17 @@ import java.io.File;
  */
 public class GitDirectoryResource extends DirectoryResource {
 
-    public GitDirectoryResource(GitDirectoryResource parent, File file) {
-        super(parent, file);
+    public GitDirectoryResource( GitDirectoryResource parent, File file ) {
+        super( parent, file );
     }
 
     @Override
-    protected DirectoryResource createDirectoryResource(File path) {
-        return new GitDirectoryResource(this, path);
+    protected DirectoryResource createDirectoryResource( File path ) {
+        return new GitDirectoryResource( this, path );
     }
 
     @Override
-    protected FileResource createFileResource(File file) {
-        return new GitFileResource(this, file);
+    protected FileResource createFileResource( File file ) {
+        return new GitFileResource( this, file );
     }
 }

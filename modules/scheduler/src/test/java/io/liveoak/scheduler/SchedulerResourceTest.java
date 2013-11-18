@@ -23,7 +23,7 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
         RequestContext requestContext = new RequestContext.Builder().build();
 
         ResourceState triggerState = new DefaultResourceState();
-        triggerState.putProperty( "cron", "* * * * * ?");
+        triggerState.putProperty( "cron", "* * * * * ?" );
         ResourceState returnedState = connector.create( requestContext, "/scheduler", triggerState );
 
         String id = returnedState.id();
@@ -33,7 +33,7 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
         ResourceState fromCollection = connector.read( requestContext, "/scheduler/" + id );
 
         assertThat( fromCollection ).isNotNull();
-        assertThat( fromCollection.getPropertyNames()).hasSize( 2 );
+        assertThat( fromCollection.getPropertyNames() ).hasSize( 2 );
         assertThat( fromCollection.getProperty( "cron" ) ).isEqualTo( "* * * * * ?" );
         assertThat( fromCollection.getProperty( "state" ) ).isEqualTo( "normal" );
     }

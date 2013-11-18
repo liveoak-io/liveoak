@@ -17,25 +17,25 @@ public class AssertionHelper {
         public void doAssertions() throws Throwable;
     }
 
-    public void assertThat(AssertionBlock b) {
+    public void assertThat( AssertionBlock b ) {
         try {
             b.doAssertions();
-        } catch (Throwable e) {
+        } catch ( Throwable e ) {
             System.err.println( "caught: " + e );
-            errors.add(e);
+            errors.add( e );
         }
     }
 
     public void complete() throws Throwable {
-        if (errors.isEmpty()) {
+        if ( errors.isEmpty() ) {
             return;
         }
 
-        if (errors.get(0) instanceof AssertionError) {
-            throw errors.get(0);
+        if ( errors.get( 0 ) instanceof AssertionError ) {
+            throw errors.get( 0 );
         }
 
-        throw new AssertionError(errors.get(0));
+        throw new AssertionError( errors.get( 0 ) );
 
     }
 
