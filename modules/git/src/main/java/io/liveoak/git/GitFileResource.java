@@ -6,15 +6,24 @@
 package io.liveoak.git;
 
 import io.liveoak.filesystem.FileResource;
+import org.eclipse.jgit.api.Git;
 
 import java.io.File;
 
 /**
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
-public class GitFileResource extends FileResource {
+public class GitFileResource extends FileResource implements GitResource {
+
+    private GitDirectoryResource parent;
 
     public GitFileResource( GitDirectoryResource parent, File file ) {
         super( parent, file );
+        this.parent = parent;
+    }
+
+    @Override
+    public Git git() {
+        return this.parent.git();
     }
 }
