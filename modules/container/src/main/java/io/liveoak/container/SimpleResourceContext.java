@@ -8,6 +8,7 @@ package io.liveoak.container;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.ResourceContext;
+import io.liveoak.spi.resource.async.Notifier;
 import org.vertx.java.core.Vertx;
 
 /**
@@ -18,11 +19,13 @@ public class SimpleResourceContext implements ResourceContext {
     private final Vertx vertx;
     private final Container container;
     private final Config config;
+    private final Notifier notifier;
 
-    public SimpleResourceContext( Vertx vertx, Container container, Config config ) {
+    public SimpleResourceContext( Vertx vertx, DefaultContainer container, Config config ) {
         this.vertx = vertx;
         this.container = container;
         this.config = config;
+        this.notifier = new NotifierImpl( container.getSubscriptionManager() );
     }
 
     @Override
@@ -39,4 +42,10 @@ public class SimpleResourceContext implements ResourceContext {
     public Config config() {
         return config;
     }
+
+    public Notifier notifier() {
+        return notifier;
+    }
+
+
 }

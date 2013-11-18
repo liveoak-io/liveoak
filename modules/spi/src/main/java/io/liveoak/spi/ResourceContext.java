@@ -5,6 +5,7 @@
  */
 package io.liveoak.spi;
 
+import io.liveoak.spi.resource.async.Notifier;
 import org.vertx.java.core.Vertx;
 
 /**
@@ -34,5 +35,7 @@ public interface ResourceContext {
      * @return The controller config.
      */
     Config config();
+
+    Notifier notifier();
 
 }

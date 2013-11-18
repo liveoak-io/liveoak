@@ -48,7 +48,7 @@ public class DefaultContainer implements Container, Resource {
 
     public void registerResource( RootResource resource, Config config ) throws InitializationException {
         //TODO: Lazy initialization in holder class when resourceRead controller is first accessed
-        resource.initialize( new SimpleResourceContext( this.vertx, null, config ) );
+        resource.initialize( new SimpleResourceContext( this.vertx, this, config ) );
         this.resources.put( resource.id(), resource );
     }
 

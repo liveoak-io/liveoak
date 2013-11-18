@@ -52,8 +52,11 @@ public class TriggerResource implements Resource {
     }
 
     public void createFire(JobExecutionContext context) {
-        this.fires.add(new FireResource(this, context));
+        FireResource fireResource = new FireResource(this, context);
+        this.fires.add( fireResource );
+        this.parent.notifier().resourceCreated( fireResource );
     }
+
 
     private SchedulerResource parent;
     private Trigger trigger;

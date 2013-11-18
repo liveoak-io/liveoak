@@ -4,6 +4,7 @@ import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Notifier;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
@@ -53,6 +54,8 @@ public class SchedulerResource implements RootResource {
         } catch (SchedulerException e) {
             throw new InitializationException(e);
         }
+
+        this.notifier = context.notifier();
     }
 
     @Override
@@ -138,7 +141,12 @@ public class SchedulerResource implements RootResource {
         sink.close();
     }
 
+    Notifier notifier() {
+        return this.notifier;
+    }
+
     private String id;
     private Scheduler scheduler;
     private Map<String, TriggerResource> children = new HashMap<>();
+    private Notifier notifier;
 }
