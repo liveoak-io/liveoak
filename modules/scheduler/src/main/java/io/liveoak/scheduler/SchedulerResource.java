@@ -24,6 +24,9 @@ import java.util.UUID;
  */
 public class SchedulerResource implements RootResource {
 
+    public SchedulerResource() {
+    }
+
     public SchedulerResource(String id) {
         this.id = id;
     }
