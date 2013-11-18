@@ -11,7 +11,6 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -29,11 +28,10 @@ public class FilesystemResourceTest extends AbstractResourceTestCase {
     @Override
     public Config createConfig() {
         SimpleConfig config = new SimpleConfig();
-        config.put( "root", "./tmp" );
+        config.put( "root", this.projectRoot.getAbsolutePath() );
         return config;
     }
 
-    @Ignore
     @Test
     public void testRoot() throws Exception {
         ResourceState result = connector.read( new RequestContext.Builder().build(), "/files" );
@@ -41,7 +39,6 @@ public class FilesystemResourceTest extends AbstractResourceTestCase {
         assertThat( result ).isNotNull();
     }
 
-    @Ignore
     @Test
     public void testChild() throws Exception {
         ResourceState result = connector.read( new RequestContext.Builder().build(), "/files/pom.xml" );

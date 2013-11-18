@@ -18,7 +18,7 @@ import org.vertx.java.core.Vertx;
 /**
  * @author Bob McWhirter
  */
-public abstract class AbstractResourceTestCase {
+public abstract class AbstractResourceTestCase extends AbstractTestCase {
 
     private DefaultContainer container;
     protected DirectConnector connector;

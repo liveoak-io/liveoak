@@ -12,8 +12,9 @@ import io.liveoak.testtools.AbstractHTTPResourceTestCase;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.File;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -29,15 +30,18 @@ public class HTTPFilesystemResourceTest extends AbstractHTTPResourceTestCase {
 
     @Override
     public Config createConfig() {
+        File dataDir = new File(this.projectRoot, "/target/test-data/one");
+        if (!dataDir.exists()) {
+            dataDir.mkdirs();
+        }
+
         SimpleConfig config = new SimpleConfig();
-        //config.put( "root", "./test-data/one" );
-        config.put( "root", "./test-data/one" );
+        config.put( "root", dataDir.getAbsolutePath() );
         return config;
     }
 
 
     @Test
-    @Ignore
     public void testEnumerateRoot() throws Exception {
 
         HttpGet get = new HttpGet( "http://localhost:8080/files" );

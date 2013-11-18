@@ -20,7 +20,7 @@ import org.junit.Before;
 /**
  * @author Bob McWhirter
  */
-public abstract class AbstractHTTPResourceTestCase {
+public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
 
     private UnsecureServer server;
     private DefaultContainer container;
