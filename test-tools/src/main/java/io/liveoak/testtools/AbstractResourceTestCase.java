@@ -22,6 +22,7 @@ public abstract class AbstractResourceTestCase {
 
     private DefaultContainer container;
     protected DirectConnector connector;
+    protected RootResource resource;
     protected Vertx vertx;
 
 
@@ -34,7 +35,8 @@ public abstract class AbstractResourceTestCase {
     @Before
     public void setUpContainer() throws Exception {
         this.container = new DefaultContainer();
-        this.container.registerResource( createRootResource(), createConfig() );
+        this.resource = createRootResource();
+        this.container.registerResource( this.resource, createConfig() );
         this.connector = this.container.directConnector();
         this.vertx = this.container.vertx();
     }
