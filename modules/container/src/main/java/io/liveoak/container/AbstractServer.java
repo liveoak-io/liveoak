@@ -38,6 +38,7 @@ public abstract class AbstractServer {
     public void stop() throws InterruptedException {
         Future<?> future = this.group.shutdownGracefully();
         future.sync();
+        this.container.shutdown();
     }
 
     protected PipelineConfigurator getPipelineConfigurator() {

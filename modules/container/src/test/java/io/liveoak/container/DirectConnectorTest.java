@@ -10,6 +10,7 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,6 +38,11 @@ public class DirectConnectorTest {
         db.addMember( new InMemoryCollectionResource( db, "dogs" ) );
 
         this.container.registerResource( db, new SimpleConfig() );
+    }
+
+    @After
+    public void shutdown() throws Exception {
+        this.container.shutdown();
     }
 
     @Test

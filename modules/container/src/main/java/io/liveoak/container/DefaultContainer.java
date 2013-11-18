@@ -46,6 +46,15 @@ public class DefaultContainer implements Container, Resource {
         this.aspectManager.put( "_subscriptions", new SubscriptionsResourceAspect( this.subscriptionManager ) );
     }
 
+    @Override
+    public void shutdown() {
+        this.resources.values().forEach( ( res ) -> {
+            res.destroy();
+        } );
+
+        this.resources.clear();
+    }
+
     public void registerResource( RootResource resource, Config config ) throws InitializationException {
         //TODO: Lazy initialization in holder class when resourceRead controller is first accessed
         resource.initialize( new SimpleResourceContext( this.vertx, this, config ) );
@@ -124,12 +133,11 @@ public class DefaultContainer implements Container, Resource {
 
     private ResourceAspectManager aspectManager = new ResourceAspectManager();
     private String prefix = "";
-    private Map<String, Resource> resources = new HashMap<>();
+    private Map<String, RootResource> resources = new HashMap<>();
     private ResourceCodecManager codecManager = new ResourceCodecManager();
     private Vertx vertx;
     private final SubscriptionManager subscriptionManager = new SubscriptionManager();
     private Executor workerPool;
-
 }
 
 

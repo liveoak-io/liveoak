@@ -44,7 +44,7 @@ public abstract class AbstractResourceTestCase {
     @After
     public void shutdownContainer() throws Exception {
         this.vertx.stop();
-        this.container = null;
+        this.container.shutdown();
     }
 
 }

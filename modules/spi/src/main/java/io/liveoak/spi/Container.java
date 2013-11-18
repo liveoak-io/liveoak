@@ -7,5 +7,5 @@ package io.liveoak.spi;
 
 public interface Container {
 
-
+    void shutdown();
 }
