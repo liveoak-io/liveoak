@@ -9,6 +9,7 @@ import io.liveoak.container.codec.ResourceCodec;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.StompMessage;
@@ -20,18 +21,40 @@ import io.liveoak.stomp.server.StompConnection;
  */
 public class StompSubscription implements Subscription {
 
-    public StompSubscription( StompConnection connection, String destination, String subscriptionId, MediaType mediaType, ResourceCodec codec ) {
+    public StompSubscription(SubscriptionManager subscriptionManager, StompConnection connection, String destination, String subscriptionId, MediaType mediaType, ResourceCodec codec ) {
+        this.subscriptionManager = subscriptionManager;
         this.connection = connection;
         this.destination = destination;
         this.subscriptionId = subscriptionId;
         this.mediaType = mediaType;
         this.codec = codec;
-        this.resourcePath = new ResourcePath( destination );
+        this.resourcePath = new ResourcePath(destination);
+    }
+
+    @Override
+    public Resource parent() {
+        return this.subscriptionManager;
     }
 
     public String id() {
-        return this.connection.getConnectionId() + "." + subscriptionId;
+        return this.connection.getConnectionId() + "-" + subscriptionId;
     }
+
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+
+    @Override
+    public void readProperties(RequestContext ctx, PropertySink sink) {
+        sink.accept( "type", "stomp" );
+        sink.accept( "path", this.resourcePath.toString() );
+        sink.accept( "subscription-id", this.subscriptionId );
+        sink.accept( "media-type", this.mediaType.toString() );
+        sink.close();
+    }
+
+
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
 
     public ResourcePath resourcePath() {
         return this.resourcePath;
@@ -64,6 +87,7 @@ public class StompSubscription implements Subscription {
         return message;
     }
 
+    private SubscriptionManager subscriptionManager;
     private StompConnection connection;
     private String destination;
     private String subscriptionId;

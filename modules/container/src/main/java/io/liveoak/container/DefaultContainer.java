@@ -12,7 +12,6 @@ import io.liveoak.container.codec.html.HTMLEncoder;
 import io.liveoak.container.codec.json.JSONDecoder;
 import io.liveoak.container.codec.json.JSONEncoder;
 import io.liveoak.container.subscriptions.SubscriptionManager;
-import io.liveoak.container.subscriptions.resource.SubscriptionsResourceAspect;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.InitializationException;
@@ -43,7 +42,14 @@ public class DefaultContainer implements Container, Resource {
         this.vertx = vertx;
         this.workerPool = Executors.newCachedThreadPool();
 
-        this.aspectManager.put( "_subscriptions", new SubscriptionsResourceAspect( this.subscriptionManager ) );
+        this.subscriptionManager = new SubscriptionManager( "subscriptions", this.codecManager );
+        try {
+            registerResource( this.subscriptionManager, new SimpleConfig() );
+        } catch (InitializationException e) {
+            // ignore
+        }
+
+        //this.aspectManager.put( "_subscriptions", new SubscriptionsResourceAspect( this.subscriptionManager ) );
     }
 
     @Override
@@ -136,7 +142,7 @@ public class DefaultContainer implements Container, Resource {
     private Map<String, RootResource> resources = new HashMap<>();
     private ResourceCodecManager codecManager = new ResourceCodecManager();
     private Vertx vertx;
-    private final SubscriptionManager subscriptionManager = new SubscriptionManager();
+    private SubscriptionManager subscriptionManager;
     private Executor workerPool;
 }
 

@@ -42,7 +42,7 @@ public class ContainerStompServerContext implements StompServerContext {
         }
 
         ResourceCodec codec = this.container.getCodecManager().getResourceCodec( mediaType );
-        StompSubscription subscription = new StompSubscription( connection, destination, subscriptionId, mediaType, codec );
+        StompSubscription subscription = new StompSubscription( this.container.getSubscriptionManager(), connection, destination, subscriptionId, mediaType, codec );
         this.container.getSubscriptionManager().addSubscription( subscription );
     }
 

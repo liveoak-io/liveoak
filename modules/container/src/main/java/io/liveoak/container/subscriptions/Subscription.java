@@ -11,16 +11,16 @@ import io.liveoak.spi.resource.async.Resource;
 /**
  * @author Bob McWhirter
  */
-public interface Subscription {
+public interface Subscription extends Resource {
 
     String id();
 
     ResourcePath resourcePath();
 
-    void resourceCreated( Resource resource ) throws Exception;
+    void resourceCreated(Resource resource) throws Exception;
 
-    void resourceUpdated( Resource resource ) throws Exception;
+    void resourceUpdated(Resource resource) throws Exception;
 
-    void resourceDeleted( Resource resource ) throws Exception;
+    void resourceDeleted(Resource resource) throws Exception;
 
 }

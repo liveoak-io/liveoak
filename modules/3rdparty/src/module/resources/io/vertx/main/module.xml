@@ -21,6 +21,7 @@
     <system>
       <paths>
         <path name="javax/management" />
+        <path name="javax/net/ssl" />
       </paths>
     </system>
   </dependencies>
