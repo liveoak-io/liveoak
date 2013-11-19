@@ -7,6 +7,7 @@ package io.liveoak.container;
 
 import io.liveoak.container.codec.driver.RootEncodingDriver;
 import io.liveoak.container.codec.state.ResourceStateEncoder;
+import io.liveoak.container.subscriptions.SubscriptionWatcher;
 import io.liveoak.spi.CreateNotSupportedException;
 import io.liveoak.spi.DeleteNotSupportedException;
 import io.liveoak.spi.NotAuthorizedException;
@@ -53,7 +54,11 @@ public class DirectConnector {
 
     public DirectConnector( DefaultContainer container ) {
         this.container = container;
-        this.channel = new EmbeddedChannel( new DirectCallbackHandler(), new ResourceHandler( this.container ) );
+        this.channel = new EmbeddedChannel(
+                new DirectCallbackHandler(),
+                new SubscriptionWatcher( this.container.getSubscriptionManager() ),
+                new ResourceHandler( this.container )
+        );
         this.channel.readInbound();
     }
 
@@ -100,7 +105,7 @@ public class DirectConnector {
         create( context, path, state, ( response ) -> {
             if ( response.responseType() == ResourceResponse.ResponseType.CREATED ) {
                 try {
-                    future.complete( encode( context, response.resource() ) );
+                    future.complete(encode(context, response.resource()));
                 } catch ( Exception e ) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }

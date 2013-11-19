@@ -60,6 +60,11 @@ public class FilteredObjectResourceState implements ResourceState {
     }
 
     @Override
+    public Object removeProperty(String name) {
+        return this.delegate.removeProperty( name );
+    }
+
+    @Override
     public Set<String> getPropertyNames() {
         Set<String> filteredNames = new HashSet<>();
 

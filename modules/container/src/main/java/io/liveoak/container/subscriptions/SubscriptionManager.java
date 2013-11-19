@@ -35,12 +35,11 @@ public class SubscriptionManager implements RootResource {
 
     @Override
     public void initialize(ResourceContext context) throws InitializationException {
-        this.httpClient = context.vertx().createHttpClient();
+        this.vertx = context.vertx();
     }
 
     @Override
     public void destroy() {
-        this.httpClient.close();
     }
 
     @Override
@@ -96,12 +95,18 @@ public class SubscriptionManager implements RootResource {
             return;
         }
 
+
         try {
-            HttpSubscription sub = new HttpSubscription( this, this.httpClient, path, new URI( destination ), codec );
-            addSubscription( sub );
+            URI destinationUri = new URI( destination );
+            HttpClient httpClient = this.vertx.createHttpClient();
+            httpClient.setHost( destinationUri.getHost() );
+            httpClient.setPort( destinationUri.getPort() );
+
+            HttpSubscription sub = new HttpSubscription( this, httpClient, path, destinationUri, codec );
+            addSubscription(sub);
             responder.resourceCreated( sub );
         } catch (URISyntaxException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            responder.internalError( e.getMessage() );
         }
     }
 
@@ -211,7 +216,7 @@ public class SubscriptionManager implements RootResource {
 
     private String id;
     private ResourceCodecManager codecManager;
-    private HttpClient httpClient;
+    private Vertx vertx;
     private List<Subscription> subscriptions = new ArrayList<>();
 
 

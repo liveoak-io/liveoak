@@ -46,12 +46,13 @@ public class HttpSubscription implements Subscription {
         sink.accept("type", "http");
         sink.accept("path", this.resourcePath.toString());
         sink.accept("destination", this.destination.toString());
+        sink.close();
     }
 
     @Override
     public void delete(RequestContext ctx, Responder responder) {
-        this.subscriptionManager.removeSubscription( this );
-        responder.resourceDeleted( this );
+        this.subscriptionManager.removeSubscription(this);
+        responder.resourceDeleted(this);
     }
 
     // ----------------------------------------------------------------------
@@ -69,8 +70,11 @@ public class HttpSubscription implements Subscription {
 
     @Override
     public void resourceUpdated(Resource resource) throws Exception {
-        HttpClientRequest request = this.httpClient.put(destinationUri(resource).toString(), (response) -> {
+        URI uri = destinationUri(resource);
+        HttpClientRequest request = this.httpClient.put(uri.getPath(), (response) -> {
         });
+
+        request.setChunked(true);
 
         RequestContext requestContext = new RequestContext.Builder().build();
         ByteBuf encoded = codec.encode(requestContext, resource);
@@ -80,8 +84,11 @@ public class HttpSubscription implements Subscription {
 
     @Override
     public void resourceDeleted(Resource resource) throws Exception {
-        HttpClientRequest request = this.httpClient.delete(destinationUri(resource).toString(), (response) -> {
+        URI uri = destinationUri(resource);
+        HttpClientRequest request = this.httpClient.delete(uri.getPath(), (response) -> {
         });
+
+        request.setChunked(true);
 
         RequestContext requestContext = new RequestContext.Builder().build();
         ByteBuf encoded = codec.encode(requestContext, resource);
@@ -90,7 +97,8 @@ public class HttpSubscription implements Subscription {
     }
 
     protected URI destinationUri(Resource resource) {
-        return this.destination.resolve(resource.id());
+        URI uri = this.destination.resolve(resource.id());
+        return uri;
     }
 
     private SubscriptionManager subscriptionManager;

@@ -39,6 +39,7 @@ public class InMemoryCollectionResource implements Resource {
 
     @Override
     public void readMember( RequestContext ctx, String id, Responder responder ) {
+
         if ( this.collection.containsKey( id ) ) {
             responder.resourceRead( this.collection.get( id ) );
         } else {
@@ -58,10 +59,16 @@ public class InMemoryCollectionResource implements Resource {
             this.collection.put( id, r );
             responder.resourceCreated( r );
         } else if ( state instanceof ResourceState ) {
-            Resource r = new InMemoryObjectResource( this, id, state );
+            Resource r = new InMemoryObjectResource( this, id, cleanse( state ) );
             this.collection.put( id, r );
             responder.resourceCreated( r );
         }
+    }
+
+    protected ResourceState cleanse(ResourceState state) {
+        state.removeProperty( "id" );
+        state.removeProperty( "self" );
+        return state;
     }
 
     @Override

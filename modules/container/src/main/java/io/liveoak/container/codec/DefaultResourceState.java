@@ -58,6 +58,11 @@ public class DefaultResourceState implements ResourceState {
     }
 
     @Override
+    public Object removeProperty(String name) {
+        return this.properties.remove( name );
+    }
+
+    @Override
     public Set<String> getPropertyNames() {
         return this.properties.keySet();
     }

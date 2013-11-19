@@ -57,6 +57,8 @@ public interface ResourceState {
      */
     Object getProperty( String name );
 
+    Object removeProperty(String name);
+
     Set<String> getPropertyNames();
 
     void addMember( ResourceState member );
