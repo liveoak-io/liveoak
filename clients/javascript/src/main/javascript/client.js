@@ -3,7 +3,7 @@
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-var mBoss = function(host, port, secure, callback) {
+var LiveOak = function(host, port, secure, callback) {
   this._host = host;
   this._port = port;
   this._secure = secure;
@@ -11,7 +11,7 @@ var mBoss = function(host, port, secure, callback) {
 
 }
 
-mBoss.prototype = {
+LiveOak.prototype = {
 
   connect: function(callback) {
     this.stomp_client.connect( callback );
