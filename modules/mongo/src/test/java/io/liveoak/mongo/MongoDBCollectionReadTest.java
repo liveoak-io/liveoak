@@ -12,6 +12,7 @@ import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.ResourceParams;
+import io.liveoak.spi.Sorting;
 import io.liveoak.spi.state.ResourceState;
 import org.fest.assertions.Fail;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -155,7 +157,6 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
         }
     }
 
-
     @Test
     public void testGetStorageCollectionsQuery() throws Exception {
 
@@ -165,17 +166,8 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
         }
         collection = db.createCollection( "testQueryCollection", new BasicDBObject( "count", 0 ) );
 
-        // add a few people
-        String[][] data = {
-                { "John", "Doe", "US", "San Francisco" },
-                { "Jane", "Doe", "US", "New York" },
-                { "Hans", "Gruber", "DE", "Berlin" },
-                { "Helga", "Schmidt", "DE", "Munich" },
-                { "Francois", "Popo", "FR", "Marseille" },
-                { "Jacqueline", "Coco", "FR", "Paris" }
-        };
-
-        addPeopleItems( collection, data );
+        // insert data records for the test
+        setupPeopleData( collection );
         assertThat( collection.count() ).isEqualTo( 6 );
 
         // This should return 2 items
@@ -208,6 +200,85 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
 
         assertThat( result.members().get( 0 ).getProperty( "name" ) ).isEqualTo( "John" );
         assertThat( result.members().get( 1 ).getProperty( "name" ) ).isEqualTo( "Jane" );
+    }
+
+    @Test
+    public void testGetStorageCollectionsSort() throws Exception {
+
+        DBCollection collection = db.getCollection( "testSortCollection" );
+        if ( collection != null ) {
+            collection.drop();
+        }
+        collection = db.createCollection( "testSortCollection", new BasicDBObject( "count", 0 ) );
+
+        // insert data records for the test
+        setupPeopleData( collection );
+        assertThat( collection.count() ).isEqualTo( 6 );
+
+        // going through DirectConnector will bypass phase where container sets up Pagination, Sorting, ReturnFields
+        // so resourceParams are only relevant for 'q' parameter
+        SimpleResourceParams resourceParams = new SimpleResourceParams();
+
+        // This should return 6 items ordered by lastName ascending, and name descending
+        RequestContext requestContext = new RequestContext.Builder()
+                .returnFields( new ReturnFieldsImpl( "*" ).withExpand( "members" ) )
+                .sorting( new Sorting( "lastName,-name" ) )
+                .resourceParams( resourceParams ).build();
+        ResourceState result = connector.read( requestContext, BASEPATH + "/testSortCollection" );
+
+        String[] expected = { "Jacqueline", "John", "Jane", "Hans", "Francois", "Helga" };
+        assertThat( expected ).isEqualTo( getNames( result ) );
+    }
+
+    @Test
+    public void testGetStorageCollectionsQueryAndSort() throws Exception {
+
+        DBCollection collection = db.getCollection( "testQuerySortCollection" );
+        if ( collection != null ) {
+            collection.drop();
+        }
+        collection = db.createCollection( "testQuerySortCollection", new BasicDBObject( "count", 0 ) );
+
+        // insert data records for the test
+        setupPeopleData( collection );
+        assertThat( collection.count() ).isEqualTo( 6 );
+
+        // going through DirectConnector will bypass phase where container sets up Pagination, Sorting, ReturnFields
+        // so resourceParams are only relevant for 'q' parameter
+        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams.put( "q", "{country:{$ne:'FR'}}" );
+
+        // This should return 4 items ordered by lastName descending and name ascending
+        RequestContext requestContext = new RequestContext.Builder()
+                .returnFields( new ReturnFieldsImpl( "*" ).withExpand( "members" ) )
+                .sorting( new Sorting( "-lastName,name" ) )
+                .resourceParams( resourceParams ).build();
+        ResourceState result = connector.read( requestContext, BASEPATH + "/testQuerySortCollection" );
+
+        String[] expected = { "Helga", "Hans", "Jane", "John" };
+        assertThat( expected ).isEqualTo( getNames( result ) );
+    }
+
+    private String[] getNames( ResourceState result ) {
+        List<String> ret = new LinkedList<>();
+        for ( ResourceState item : result.members() ) {
+            ret.add( ( String ) item.getProperty( "name" ) );
+        }
+        return ret.toArray( new String[ret.size()] );
+    }
+
+    private void setupPeopleData( DBCollection collection ) {
+        // add a few people
+        String[][] data = {
+                { "John", "Doe", "US", "San Francisco" },
+                { "Jane", "Doe", "US", "New York" },
+                { "Hans", "Gruber", "DE", "Berlin" },
+                { "Helga", "Schmidt", "DE", "Munich" },
+                { "Francois", "Popo", "FR", "Marseille" },
+                { "Jacqueline", "Coco", "FR", "Paris" }
+        };
+
+        addPeopleItems( collection, data );
     }
 
     private void addPeopleItems( DBCollection collection, String[][] data ) {

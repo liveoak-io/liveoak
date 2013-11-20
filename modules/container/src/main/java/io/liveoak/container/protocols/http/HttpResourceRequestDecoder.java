@@ -18,6 +18,7 @@ import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ReturnFields;
+import io.liveoak.spi.Sorting;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -97,6 +98,7 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
                     .requestAttribute( AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken )
                     .pagination( decodePagination( params ) )
                     .returnFields( decodeReturnFields( params ) )
+                    .sorting( decodeSorting( params ) )
                     .build() );
         } else if ( msg.getMethod().equals( HttpMethod.PUT ) ) {
             String contentTypeHeader = msg.headers().get( HttpHeaders.Names.CONTENT_TYPE );
@@ -152,6 +154,14 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
                 return limit;
             }
         };
+    }
+
+    protected Sorting decodeSorting( ResourceParams params ) {
+        String spec = params.value( "sort" );
+        if ( spec != null ) {
+            return new Sorting( spec );
+        }
+        return null;
     }
 
     protected String getAuthorizationToken( FullHttpRequest req ) {

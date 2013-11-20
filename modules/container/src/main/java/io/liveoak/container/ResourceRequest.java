@@ -14,6 +14,7 @@ import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.Sorting;
 import io.liveoak.spi.state.ResourceState;
 
 /**
@@ -68,6 +69,10 @@ public class ResourceRequest {
         return this.requestContext;
     }
 
+    public Sorting sorting() {
+        return this.sorting;
+    }
+
     public String toString() {
         return "[ResourceRequest: type=" + this.requestType() + "; path=" + this.resourcePath + "]";
     }
@@ -81,6 +86,7 @@ public class ResourceRequest {
     private ResourceState state;
     private ReturnFields returnFields;
     private RequestContext requestContext;
+    private Sorting sorting;
 
     public static class Builder {
 
@@ -133,6 +139,11 @@ public class ResourceRequest {
             return this;
         }
 
+        public Builder sorting( Sorting sorting ) {
+            obj.sorting = sorting;
+            return this;
+        }
+
         public ResourceRequest build() {
             if ( obj.mediaTypeMatcher == null ) {
                 obj.mediaTypeMatcher = new MediaTypeMatcher( "application/json" );
@@ -152,7 +163,7 @@ public class ResourceRequest {
                     obj.returnFields = ReturnFields.ALL;
                 }
 
-                obj.requestContext = new DefaultRequestContext( SecurityContext.ANONYMOUS, obj.pagination, obj.returnFields, obj.params, obj.resourcePath, obj.requestType, obj.requestAttributes );
+                obj.requestContext = new DefaultRequestContext( SecurityContext.ANONYMOUS, obj.pagination, obj.returnFields, obj.params, obj.resourcePath, obj.requestType, obj.requestAttributes, obj.sorting );
             }
             return obj;
         }

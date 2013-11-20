@@ -24,6 +24,8 @@ public interface RequestContext {
 
     ReturnFields getReturnFields();
 
+    Sorting getSorting();
+
     public static class Builder implements RequestContext {
 
         public Builder() {
@@ -47,6 +49,11 @@ public interface RequestContext {
 
         public Builder returnFields( ReturnFields returnFields ) {
             this.returnFields = returnFields;
+            return this;
+        }
+
+        public Builder sorting( Sorting sorting ) {
+            this.sorting = sorting;
             return this;
         }
 
@@ -94,6 +101,12 @@ public interface RequestContext {
             return null;
         }
 
+        @Override
+        public Sorting getSorting() {
+            return sorting;
+        }
+
+        private Sorting sorting;
         private SecurityContext securityContext;
         private Pagination pagination = Pagination.NONE;
         private ResourceParams resourceParams = ResourceParams.NONE;

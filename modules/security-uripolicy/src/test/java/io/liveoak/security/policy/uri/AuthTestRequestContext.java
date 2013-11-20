@@ -14,6 +14,7 @@ import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.Sorting;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -67,6 +68,11 @@ public class AuthTestRequestContext implements RequestContext {
 
     @Override
     public ReturnFields getReturnFields() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Sorting getSorting() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }
