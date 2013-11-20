@@ -14,6 +14,7 @@ import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.Sorting;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -29,9 +30,10 @@ public class DefaultRequestContext implements RequestContext {
     private ResourcePath resourcePath;
     private RequestType requestType;
     private RequestAttributes requestAttributes;
+    private Sorting sorting;
 
     public DefaultRequestContext( SecurityContext securityContext, Pagination pagination, ReturnFields returnFields, ResourceParams resourceParams,
-                                  ResourcePath resourcePath, RequestType requestType, RequestAttributes requestAttributes ) {
+                                  ResourcePath resourcePath, RequestType requestType, RequestAttributes requestAttributes, Sorting sorting ) {
         this.securityContext = securityContext;
         this.pagination = pagination;
         this.returnFields = returnFields;
@@ -39,6 +41,7 @@ public class DefaultRequestContext implements RequestContext {
         this.resourcePath = resourcePath;
         this.requestType = requestType;
         this.requestAttributes = requestAttributes;
+        this.sorting = sorting;
     }
 
     @Override
@@ -99,5 +102,10 @@ public class DefaultRequestContext implements RequestContext {
     @Override
     public RequestAttributes getRequestAttributes() {
         return requestAttributes;
+    }
+
+    @Override
+    public Sorting getSorting() {
+        return sorting;
     }
 }

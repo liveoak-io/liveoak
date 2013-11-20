@@ -13,6 +13,7 @@ import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.Sorting;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -63,5 +64,10 @@ public class RequestContextDecorator implements RequestContext {
     @Override
     public ReturnFields getReturnFields() {
         return delegate.getReturnFields();
+    }
+
+    @Override
+    public Sorting getSorting() {
+        return delegate.getSorting();
     }
 }

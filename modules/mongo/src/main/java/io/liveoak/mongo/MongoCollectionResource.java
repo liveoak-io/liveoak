@@ -12,6 +12,7 @@ import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.Sorting;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
@@ -89,13 +90,13 @@ class MongoCollectionResource extends MongoResource {
     @Override
     public void readMembers( RequestContext ctx, ResourceSink sink ) {
         DBObject queryObject = new BasicDBObject();
-        if ( ctx != null && ctx.getResourceParams() != null && ctx.getResourceParams().contains( "q" ) ) {
+        if ( ctx.getResourceParams() != null && ctx.getResourceParams().contains( "q" ) ) {
             String queryString = ctx.getResourceParams().value( "q" );
             queryObject = ( DBObject ) JSON.parse( queryString );
         }
 
         DBObject returnFields = new BasicDBObject();
-        if ( ctx != null && ctx.getReturnFields() != null && !ctx.getReturnFields().isAll() ) {
+        if ( ctx.getReturnFields() != null && !ctx.getReturnFields().isAll() ) {
             ctx.getReturnFields().forEach( ( fieldName ) -> {
                 returnFields.put( fieldName, true );
             } );
@@ -103,7 +104,16 @@ class MongoCollectionResource extends MongoResource {
 
         DBCursor dbCursor = dbCollection.find( queryObject, returnFields );
 
-        if ( ctx != null && ctx.getPagination() != null ) {
+        Sorting sorting = ctx.getSorting();
+        if ( sorting != null ) {
+            BasicDBObject sortingObject = new BasicDBObject();
+            for ( Sorting.Spec spec : sorting ) {
+                sortingObject.append( spec.name(), spec.ascending() ? 1 : -1 );
+            }
+            dbCursor = dbCursor.sort( sortingObject );
+        }
+
+        if ( ctx.getPagination() != null ) {
             dbCursor.limit( ctx.getPagination().limit() );
             dbCursor.skip( ctx.getPagination().offset() );
         }
