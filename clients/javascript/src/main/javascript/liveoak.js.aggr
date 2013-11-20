@@ -1,0 +1,4 @@
+
+require stomp/client.js
+require stomp/transport/websocket.js
+require client.js
