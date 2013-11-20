@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+/**
+ * @author Bob McWhirter
+ * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
+ */
 public class ResourceCodecManager {
 
     public void registerResourceCodec( String mediaType, ResourceCodec codec ) {
@@ -28,7 +32,7 @@ public class ResourceCodecManager {
 
     public ResourceState decode( MediaType mediaType, ByteBuf buf ) throws Exception {
         ResourceCodec codec = getResourceCodec( mediaType );
-        if ( codec == null ) {
+        if (codec == null || !codec.hasDecoder()) {
             throw new UnsupportedMediaTypeException( Collections.singletonList( mediaType ) );
         }
         return codec.decode( buf );
@@ -61,6 +65,10 @@ public class ResourceCodecManager {
         if ( codec == null ) {
             codec = getResourceCodec( MediaType.JSON );
             bestMatch = MediaType.JSON;
+        }
+
+        if (!codec.hasEncoder()) {
+            throw new UnsupportedMediaTypeException(mediaTypeMatcher.mediaTypes());
         }
 
         return new EncodingResult( bestMatch, codec.encode( ctx, resource ) );

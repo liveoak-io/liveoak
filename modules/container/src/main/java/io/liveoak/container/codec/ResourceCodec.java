@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Bob McWhirter
+ * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
 public class ResourceCodec {
 
@@ -25,6 +26,14 @@ public class ResourceCodec {
         this.container = container;
         this.encoderClass = encoderClass;
         this.decoder = decoder;
+    }
+
+    public boolean hasEncoder() {
+        return this.encoderClass != null;
+    }
+
+    public boolean hasDecoder() {
+        return this.decoder != null;
     }
 
     public ByteBuf encode( RequestContext ctx, Resource resource ) throws Exception {
