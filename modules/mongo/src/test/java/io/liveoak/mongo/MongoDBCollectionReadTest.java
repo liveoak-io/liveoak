@@ -27,11 +27,28 @@ import java.util.Map;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 /**
- * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
- */
-public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
+* @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+*/
+public class MongoDBCollectionReadTest extends BaseMongoDBTest {
+
+    @Test
+    public void testRootFound() throws Exception {
+        ResourceState result = connector.read( new RequestContext.Builder().build(), "/storage" );
+        assertThat( result ).isNotNull();
+    }
+
+    @Test
+    public void testUncreatedCollectionNotFound() throws Exception {
+        try {
+            connector.read( new RequestContext.Builder().build(), "/storage/movies" );
+            fail( "shouldn't get here" );
+        } catch ( ResourceNotFoundException e ) {
+            assertThat( e.path() ).isEqualTo( "/storage/movies" );
+        }
+    }
 
     @Test
     public void testGetStorageEmpty() throws Exception {
@@ -291,7 +308,6 @@ public class MongoDBCollectionReadTest extends NewBaseMongoDBTest {
 
             collection.insert( obj );
 
-            System.err.println( "INSERT: " + obj );
         }
     }
 

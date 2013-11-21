@@ -16,12 +16,26 @@ import org.junit.Test;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
- * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
- */
-public class MongoDBCollectionCreateTest extends NewBaseMongoDBTest {
+* @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+*/
+public class MongoDBCollectionCreateTest extends BaseMongoDBTest {
 
     @Test
     public void testCreateCollection() throws Exception {
+        // check that we can create the resource
+        ResourceState state = new DefaultResourceState( "movies" );
+        ResourceState createdResource = connector.create( new RequestContext.Builder().build(), "/storage", state );
+        assertThat( createdResource ).isNotNull();
+        assertThat( createdResource.id() ).isEqualTo( "movies" );
+
+        // test that we get this resource back on a read
+        ResourceState movies = connector.read( new RequestContext.Builder().build(), "/storage/movies" );
+        assertThat( movies ).isNotNull();
+        assertThat( movies.id() ).isEqualTo( "movies" );
+    }
+
+    @Test
+    public void testCreateEmptyCollection() throws Exception {
         //DB db = mongoClient.getDB("testGetStorageEmpty");
         db.dropDatabase(); //TODO: create a new DB here instead of dropping the old one ?
 

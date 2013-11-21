@@ -52,7 +52,10 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
             }
             PropertyEncodingDriver propDriver = new PropertyEncodingDriver( PropertiesEncodingDriver.this, name, null );
             if ( value instanceof Resource ) {
-                if ( !returnFields().child( name ).isEmpty() ) {
+                // embedded resource's don't have id's and should always be displayed unless the return field is set
+                if (((Resource)value).id() == null && returnFields().child(name).isEmpty()) {
+                    propDriver.addChildDriver( new ResourceEncodingDriver( propDriver, ( Resource ) value, returnFields().ALL ) );
+                } else if (!returnFields().child( name ).isEmpty())  {
                     propDriver.addChildDriver( new ResourceEncodingDriver( propDriver, ( Resource ) value, returnFields().child( name ) ) );
                 } else {
                     propDriver.addChildDriver( new ValueEncodingDriver( propDriver, value ) );
