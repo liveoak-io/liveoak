@@ -1,4 +1,0 @@
-Intellij Code Style
-
-  Open Intellij and open File -> Import Settings. Locate 'intellij-settings.jar' under support/ of the project, select 'Ok'.
-  Then select 'Ok' again on the 'Select Components to Import' dialog.
