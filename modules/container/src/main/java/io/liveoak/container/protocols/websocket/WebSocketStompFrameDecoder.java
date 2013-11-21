@@ -16,27 +16,29 @@ import java.util.List;
 
 /**
  * WebSocket to STOMP frame decoder.
- * <p/>
- * This decoder also adds the normal "native" STOMP frame decoder upstream from itself,
- * providing for the pipeline of:
- * <p/>
+ *
+ * <p>This decoder also adds the normal "native" STOMP frame decoder upstream from itself,
+ * providing for the pipeline of:</p>
+ *
+ * <p>
  * WebSocket Frame to bytes to STOMP frame
+ * </p>
  *
  * @author Bob McWhirter
  */
 public class WebSocketStompFrameDecoder extends MessageToMessageDecoder<WebSocketFrame> {
 
     @Override
-    public void handlerAdded( ChannelHandlerContext ctx ) throws Exception {
-        ctx.pipeline().addAfter( ctx.name(), "stomp-frame-decoder", new StompFrameDecoder() );
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        ctx.pipeline().addAfter(ctx.name(), "stomp-frame-decoder", new StompFrameDecoder());
     }
 
     @Override
-    protected void decode( ChannelHandlerContext ctx, WebSocketFrame msg, List<Object> out ) throws Exception {
-        if ( msg instanceof TextWebSocketFrame || msg instanceof BinaryWebSocketFrame ) {
-            out.add( msg.content().retain() );
+    protected void decode(ChannelHandlerContext ctx, WebSocketFrame msg, List<Object> out) throws Exception {
+        if (msg instanceof TextWebSocketFrame || msg instanceof BinaryWebSocketFrame) {
+            out.add(msg.content().retain());
         } else {
-            out.add( msg.retain() );
+            out.add(msg.retain());
         }
     }
 

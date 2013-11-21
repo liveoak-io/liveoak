@@ -46,9 +46,9 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * This class intercepts the running of the JUnit test and instead deploys the TestVerticle inside the Vert.x container
  * and runs the test on that instance.
- * <p/>
- * Any failures are propagated from the container back to this test runner using the Vert.x event bus where they
- * are rethrown to appear to have occurred locally.
+ *
+ * <p>Any failures are propagated from the container back to this test runner using the Vert.x event bus where they
+ * are rethrown to appear to have occurred locally.</p>
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  * @author Bob McWhirter

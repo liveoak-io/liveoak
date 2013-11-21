@@ -51,7 +51,7 @@ import java.util.stream.StreamSupport;
  * of <code>id</code>.</p>
  *
  * <p>When instantiating the resource from a class, it first attempts to use
- * a one-argument constructor which should take a single <code>String></code>
+ * a one-argument constructor which should take a single <code>String</code>
  * parameter, in which the resource's ID will be passed</p>.
  *
  * <p>If the resource lacks a one-arg constructor, a no-arg constructor will

@@ -15,11 +15,10 @@ import java.util.List;
 
 /**
  * STOMP frame to WebSocket frame encoder
- * <p/>
- * This encoder also adds the typical STOMP frame encoder upstream of itself,
- * providing for the pipeline of:
- * <p/>
- * STOMP frame to bytes to WebSocketFrame
+ * <p>This encoder also adds the typical STOMP frame encoder upstream of itself,
+ * providing for the pipeline of:</p>
+ *
+ * <p>STOMP frame to bytes to WebSocketFrame</p>
  *
  * @author Bob McWhirter
  */

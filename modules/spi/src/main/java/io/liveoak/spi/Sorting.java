@@ -12,15 +12,15 @@ import java.util.List;
 
 /**
  * This class represents a sorting specification for results.
- * <p/>
- * Sorting specification is usually passed as a query parameter 'sort' with fields in dot notation separated by commas.
- * A descending order can be specified for a field by pre-pending the field name with minus sign '-'.
- * <p/>
- * Example:
+ *
+ * <p>Sorting specification is usually passed as a query parameter 'sort' with fields in dot notation separated by commas.
+ * A descending order can be specified for a field by pre-pending the field name with minus sign '-'.</p>
+ *
+ * <p>Example:</p>
  * <pre>-score,date</pre>
- * <p/>
- * That expresses that items of the collection should be order by score from higher score to lower score, and if many have
- * the same score, those would be further ordered by date with earlier date returned first.
+ *
+ * <p>That expresses that items of the collection should be order by score from higher score to lower score, and if many have
+ * the same score, those would be further ordered by date with earlier date returned first.</p>
  *
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */

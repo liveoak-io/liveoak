@@ -11,9 +11,8 @@ import java.util.Set;
 
 /**
  * Opaque state of a resource.
- * <p/>
- * <p>State objects are used to instill new state into
- * a server-side resource.</p>
+ *
+ * <p>State objects are used to instill new state into a server-side resource.</p>
  *
  * @author Bob McWhirter
  */
@@ -39,7 +38,7 @@ public interface ResourceState {
 
     /**
      * Add a property to the state.
-     * <p/>
+     *
      * <p>Property values may be either simple scalar
      * values, or complex {@link ResourceState} objects</p>
      *

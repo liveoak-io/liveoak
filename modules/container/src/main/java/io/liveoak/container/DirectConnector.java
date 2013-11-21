@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 
 /**
  * Connector to the resoure-container that works in-VM, avoiding network traffic.
- * <p/>
+ *
  * <p>Inputs and outputs through the connector avoid all serialization to bytes
  * and work only in terms of {@link ResourceState} instances.</p>
  *
@@ -218,7 +218,7 @@ public class DirectConnector {
 
     /**
      * Perform an asynchronous UPDATE action.
-     * <p/>
+     *
      * <p>UPDATE has UPSERT semantics, in that if an attempt to
      * update a non-existant resource fails, an attempt is made
      * to create a resource at that location in the implied parent

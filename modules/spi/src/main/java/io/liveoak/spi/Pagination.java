@@ -29,7 +29,7 @@ public interface Pagination {
 
     /**
      * Get the offset.
-     * <p/>
+     *
      * <p>
      * Offsets are zero-indexed.
      * </p>
@@ -40,7 +40,7 @@ public interface Pagination {
 
     /**
      * Get the number of items to return.
-     * <p/>
+     *
      * <p>
      * A limit of less-than-zero indicates no limit.
      * </p>

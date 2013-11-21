@@ -46,7 +46,7 @@ public class URIMatcher {
 
     /**
      * group(0) is whole URI.
-     * group(X) for X>=0 are matcher groups from particular regex.
+     * group(X) for X greater than 0 are matcher groups from particular regex.
      *
      * @param groupIndex
      * @return group from regex or null if groupIndex is bigger than number of groups (Method never throws ArrayIndexOutOfBoundsException)

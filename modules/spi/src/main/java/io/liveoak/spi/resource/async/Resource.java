@@ -14,14 +14,14 @@ import java.util.List;
 
 /**
  * Basic server-side representation of a resource.
- * <p/>
+ *
  * <p>The basic function of a resource is that it may (optionally) contain
  * children, in the form of members-of-a-collection, or properties-of-an-object.</p>
- * <p/>
+ *
  * <p>Additionally, it may optionally be deleted.</p>
- * <p/>
+ *
  * <p>All resources optionally have an ID, if they are to be directly addressable.</p>
- * <p/>
+ *
  * <p>Each resource, if it is a child of another resource, should include a non-null
  * reference to its parent</p>
  *
@@ -38,25 +38,25 @@ public interface Resource {
         List<String> segments = new ArrayList<>();
         Resource current = this;
 
-        while ( current != null ) {
-            segments.add( 0, current.id() );
+        while (current != null) {
+            segments.add(0, current.id());
             current = current.parent();
         }
 
         StringBuilder buf = new StringBuilder();
 
-        if ( segments.size() == 1 && segments.get( 0 ).equals( "" ) ) {
-            return URI.create( "/" );
+        if (segments.size() == 1 && segments.get(0).equals("")) {
+            return URI.create("/");
         }
 
-        segments.forEach( ( s ) -> {
-            if ( s != null && !"".equals( s ) ) {
-                buf.append( "/" );
-                buf.append( s );
+        segments.forEach((s) -> {
+            if (s != null && !"".equals(s)) {
+                buf.append("/");
+                buf.append(s);
             }
-        } );
+        });
 
-        return URI.create( buf.toString() );
+        return URI.create(buf.toString());
     }
 
     /**
@@ -76,9 +76,10 @@ public interface Resource {
     /**
      * Read the properties of this resource.
      *
-     * @return The read-only properties.
+     * @param ctx  The request context.
+     * @param sink The sink to capture the properties.
      */
-    default void readProperties( RequestContext ctx, PropertySink sink ) {
+    default void readProperties(RequestContext ctx, PropertySink sink) {
         sink.close();
     }
 
@@ -88,8 +89,8 @@ public interface Resource {
      * @param state     The inbound representation of the state.
      * @param responder To respond to the action.
      */
-    default void updateProperties( RequestContext ctx, ResourceState state, Responder responder ) {
-        responder.updateNotSupported( this );
+    default void updateProperties(RequestContext ctx, ResourceState state, Responder responder) {
+        responder.updateNotSupported(this);
     }
 
     /**
@@ -98,8 +99,8 @@ public interface Resource {
      * @param state     The state for the child, which may include an ID.
      * @param responder To respond to the action.
      */
-    default void createMember( RequestContext ctx, ResourceState state, Responder responder ) {
-        responder.createNotSupported( this );
+    default void createMember(RequestContext ctx, ResourceState state, Responder responder) {
+        responder.createNotSupported(this);
     }
 
     /**
@@ -107,12 +108,12 @@ public interface Resource {
      *
      * @param sink The sink to stream members to.
      */
-    default void readMembers( RequestContext ctx, ResourceSink sink ) {
+    default void readMembers(RequestContext ctx, ResourceSink sink) {
         sink.close();
     }
 
-    default void readMember( RequestContext ctx, String id, Responder responder ) {
-        responder.noSuchResource( id );
+    default void readMember(RequestContext ctx, String id, Responder responder) {
+        responder.noSuchResource(id);
     }
 
     /**
@@ -120,7 +121,7 @@ public interface Resource {
      *
      * @param responder To respond to the action.
      */
-    default void delete( RequestContext ctx, Responder responder ) {
-        responder.deleteNotSupported( this );
+    default void delete(RequestContext ctx, Responder responder) {
+        responder.deleteNotSupported(this);
     }
 }

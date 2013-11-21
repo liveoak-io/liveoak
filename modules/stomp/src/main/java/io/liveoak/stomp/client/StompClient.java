@@ -39,7 +39,7 @@ import java.util.function.Consumer;
 
 /**
  * STOMP client.
- * <p/>
+ *
  * <p>This client may be used in synchronous or asynchronous environments</p>
  *
  * @author Bob McWhirter
@@ -151,7 +151,7 @@ public class StompClient {
 
     /**
      * Send a message to the server.
-     * <p/>
+     *
      * <p>The message should be fully-formed, including a destination
      * header indicating where the message should be sent.</p>
      *
@@ -229,7 +229,7 @@ public class StompClient {
 
     /**
      * Subscribe to a destination.
-     * <p/>
+     *
      * <p>Additional headers may be included to support complex subscriptions.
      * The {@code destination} paramter will be added to the headers on
      * your behalf.</p>
