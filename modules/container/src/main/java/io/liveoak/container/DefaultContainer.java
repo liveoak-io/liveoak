@@ -5,7 +5,6 @@
  */
 package io.liveoak.container;
 
-import io.liveoak.container.aspects.ResourceAspectManager;
 import io.liveoak.container.codec.ResourceCodec;
 import io.liveoak.container.codec.ResourceCodecManager;
 import io.liveoak.container.codec.html.HTMLEncoder;
@@ -29,42 +28,56 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 
+/**
+ * Default resource-container implementation.
+ *
+ * @author Bob McWhirter
+ */
 public class DefaultContainer implements Container, Resource {
 
+    /**
+     * Construct a self-contained container.
+     *
+     * The container will instantiate its own Vertx platform.
+     */
     public DefaultContainer() {
-        this( PlatformLocator.factory.createPlatformManager().vertx() );
+        this(PlatformLocator.factory.createPlatformManager().vertx());
     }
 
-    public DefaultContainer( Vertx vertx ) {
-        this.codecManager.registerResourceCodec( "application/json", new ResourceCodec( this, JSONEncoder.class, new JSONDecoder() ) );
-        this.codecManager.registerResourceCodec( "text/html", new ResourceCodec( this, HTMLEncoder.class, null ) );
+
+    /**
+     * Construct a container around an existing vertx.
+     *
+     * @param vertx
+     */
+    public DefaultContainer(Vertx vertx) {
+        this.codecManager.registerResourceCodec("application/json", new ResourceCodec(this, JSONEncoder.class, new JSONDecoder()));
+        this.codecManager.registerResourceCodec("text/html", new ResourceCodec(this, HTMLEncoder.class, null));
 
         this.vertx = vertx;
         this.workerPool = Executors.newCachedThreadPool();
 
-        this.subscriptionManager = new SubscriptionManager( "subscriptions", this.codecManager );
+        this.subscriptionManager = new SubscriptionManager("subscriptions", this.codecManager);
         try {
-            registerResource( this.subscriptionManager, new SimpleConfig() );
+            registerResource(this.subscriptionManager, new SimpleConfig());
         } catch (InitializationException e) {
             // ignore
         }
-
-        //this.aspectManager.put( "_subscriptions", new SubscriptionsResourceAspect( this.subscriptionManager ) );
     }
 
     @Override
     public void shutdown() {
-        this.resources.values().forEach( ( res ) -> {
+        this.resources.values().forEach((res) -> {
             res.destroy();
-        } );
+        });
 
         this.resources.clear();
     }
 
-    public void registerResource( RootResource resource, Config config ) throws InitializationException {
+    public void registerResource(RootResource resource, Config config) throws InitializationException {
         //TODO: Lazy initialization in holder class when resourceRead controller is first accessed
-        resource.initialize( new SimpleResourceContext( this.vertx, this, config ) );
-        this.resources.put( resource.id(), resource );
+        resource.initialize(new SimpleResourceContext(this.vertx, this, config));
+        this.resources.put(resource.id(), resource);
     }
 
     public ResourceCodecManager getCodecManager() {
@@ -83,12 +96,8 @@ public class DefaultContainer implements Container, Resource {
         return this.workerPool;
     }
 
-    public ResourceAspectManager resourceAspectManager() {
-        return this.aspectManager;
-    }
-
     public DirectConnector directConnector() {
-        return new DirectConnector( this );
+        return new DirectConnector(this);
     }
 
     // ----------------------------------------
@@ -96,33 +105,33 @@ public class DefaultContainer implements Container, Resource {
     // ----------------------------------------
 
     @Override
-    public void readMember( RequestContext ctx, String id, Responder responder ) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
         try {
-            if ( id == null ) {
-                responder.resourceRead( this );
+            if (id == null) {
+                responder.resourceRead(this);
                 return;
             }
 
-            if ( !this.resources.containsKey( id ) ) {
-                responder.noSuchResource( id );
+            if (!this.resources.containsKey(id)) {
+                responder.noSuchResource(id);
                 return;
             }
 
-            responder.resourceRead( this.resources.get( id ) );
+            responder.resourceRead(this.resources.get(id));
 
-        } catch ( Throwable t ) {
-            responder.internalError( t.getMessage() );
+        } catch (Throwable t) {
+            responder.internalError(t.getMessage());
         }
     }
 
     @Override
-    public void readMembers( RequestContext ctx, ResourceSink sink ) {
-        this.resources.values().forEach( ( e ) -> {
-            sink.accept( e );
-        } );
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
+        this.resources.values().forEach((e) -> {
+            sink.accept(e);
+        });
         try {
             sink.close();
-        } catch ( Exception e ) {
+        } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
@@ -137,7 +146,6 @@ public class DefaultContainer implements Container, Resource {
         return this.prefix;
     }
 
-    private ResourceAspectManager aspectManager = new ResourceAspectManager();
     private String prefix = "";
     private Map<String, RootResource> resources = new HashMap<>();
     private ResourceCodecManager codecManager = new ResourceCodecManager();

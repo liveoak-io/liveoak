@@ -11,7 +11,8 @@ import io.liveoak.container.SimpleConfig;
 import io.liveoak.container.UnsecureServer;
 import io.liveoak.container.resource.ContainerResource;
 
-/**
+/** Bootstrapping <code>main()</code> method.
+ *
  * @author Bob McWhirter
  */
 public class Bootstrap {
