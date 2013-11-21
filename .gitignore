@@ -13,3 +13,4 @@ mods/
 *.swp
 epom
 log
+.DS_Store
