@@ -5,10 +5,26 @@
  */
 package io.liveoak.spi.state;
 
-import io.liveoak.spi.state.ResourceState;
+import io.netty.buffer.ByteBuf;
 
+/**
+ * @author Bob McWhirter
+ * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
+ */
 public interface BinaryResourceState extends ResourceState {
 
+    /**
+     * Retrieve the Mime Type of the binary resource.
+     *
+     * @return The Mime Type of the binary resource.
+     */
     String getMimeType();
+
+    /**
+     * Retrieve the buffer containing the binary resource content.
+     *
+     * @return The {@link ByteBuf} containing the binary resource content.
+     */
+    ByteBuf getBuffer();
 
 }

@@ -5,6 +5,7 @@
  */
 package io.liveoak.container.codec;
 
+import io.liveoak.container.codec.binary.DefaultBinaryResourceState;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.BinaryContentSink;
@@ -30,7 +31,11 @@ public class ResourceCodecManager {
         this.codecs.add( new CodecRegistration( new MediaType( mediaType ), codec ) );
     }
 
-    public ResourceState decode( MediaType mediaType, ByteBuf buf ) throws Exception {
+    public ResourceState decode(MediaType mediaType, ByteBuf buf) throws Exception {
+        if (MediaType.OCTET_STREAM.equals(mediaType)) {
+            return new DefaultBinaryResourceState(buf.retain());
+        }
+
         ResourceCodec codec = getResourceCodec( mediaType );
         if (codec == null || !codec.hasDecoder()) {
             throw new UnsupportedMediaTypeException( Collections.singletonList( mediaType ) );
