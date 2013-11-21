@@ -49,16 +49,6 @@ public class RootMongoResource extends MongoResource implements RootResource {
     }
 
     @Override
-    protected Object deleteChild( RequestContext ctx, String childId ) {
-        return null;
-    }
-
-    @Override
-    protected Object updateChild( RequestContext ctx, String childId, Object child ) {
-        return null;
-    }
-
-    @Override
     public Resource parent() {
         return null;
     }
@@ -144,7 +134,6 @@ public class RootMongoResource extends MongoResource implements RootResource {
 
             responder.resourceCreated( new MongoCollectionResource( this, collection ) );
         } else {
-            System.out.println( "id : " + id );
             responder.resourceAlreadyExists( id );
         }
     }

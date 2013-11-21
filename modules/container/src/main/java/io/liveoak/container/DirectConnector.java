@@ -171,7 +171,7 @@ public class DirectConnector {
         this.channel.writeInbound( request );
     }
 
-    public ResourceState update( RequestContext context, String path, ResourceState state ) throws ExecutionException, InterruptedException {
+    public ResourceState update( RequestContext context, String path, ResourceState state ) throws ResourceException, ExecutionException, InterruptedException {
         CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
         update( context, path, state, ( response ) -> {
@@ -188,7 +188,14 @@ public class DirectConnector {
             }
         } );
 
-        return future.get();
+        try {
+            return future.get();
+        } catch ( ExecutionException e ) {
+            if ( e.getCause() instanceof ResourceException ) {
+                throw ( ResourceException ) e.getCause();
+            }
+            throw e;
+        }
     }
 
 

@@ -1,26 +1,29 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
- *
- * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
- */
+* Copyright 2013 Red Hat, Inc. and/or its affiliates.
+*
+* Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+*/
 
 package io.liveoak.mongo;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.spi.CreateNotSupportedException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
 import org.bson.types.ObjectId;
+import org.fest.assertions.Fail;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
- */
-public class MongoDBResourceUpdateTest extends NewBaseMongoDBTest {
+* @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+*/
+public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
 
     @Test
     public void testSimpleUpdate() throws Exception {
@@ -53,8 +56,8 @@ public class MongoDBResourceUpdateTest extends NewBaseMongoDBTest {
     }
 
     @Test
-    public void testChildUpdate() throws Exception {
-        String methodName = "testChildUpdate";
+    public void testChildDirectUpdate() throws Exception {
+        String methodName = "testChildDirectUpdate";
         assertThat( db.getCollection( methodName ).getCount() ).isEqualTo( 0 );
 
         // create the object using the mongo driver directly
@@ -68,23 +71,20 @@ public class MongoDBResourceUpdateTest extends NewBaseMongoDBTest {
         ResourceState resourceState = new DefaultResourceState();
         resourceState.putProperty( "bar", 123 );
 
-        ResourceState result = connector.update( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo", resourceState );
+        // should not be able to directly update a child object
+        try {
+            ResourceState result = connector.update( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo", resourceState );
+            Fail.fail();
+        } catch (CreateNotSupportedException e) {
+            //expected
+        }
 
-        // verify the result
-        // NOTE: if the connector returned a resource state instead of a resource, it would be much easier to test here...
-        assertThat( result ).isNotNull();
-        assertThat( result.id() ).isEqualTo( "foo" );
-        assertThat( result.getProperty( "bar" ) ).isEqualTo( 123 );
-
-        // verify db content
-        assertThat( db.getCollection( methodName ).getCount() ).isEqualTo( 1 );
-        DBObject dbObject = db.getCollection( methodName ).findOne();
-        assertEquals( 123, ( ( DBObject ) dbObject.get( "foo" ) ).get( "bar" ) );
+        assertThat((DBObject)object).isEqualTo(db.getCollection(methodName).findOne());
     }
 
     @Test
-    public void testGrandChildUpdate() throws Exception {
-        String methodName = "testSimpleDelete";
+    public void testGrandChildDirectUpdate() throws Exception {
+        String methodName = "testGrandChildDirectUpdate";
         assertThat( db.getCollection( methodName ).getCount() ).isEqualTo( 0 );
 
         // create the object using the mongo driver directly
@@ -98,19 +98,13 @@ public class MongoDBResourceUpdateTest extends NewBaseMongoDBTest {
         ResourceState resourceState = new DefaultResourceState();
         resourceState.putProperty( "baz", "XYZ" );
 
-        ResourceState result = connector.update( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo/bar", resourceState );
+        try {
+            ResourceState result = connector.update( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo/bar", resourceState );
+            Fail.fail();
+        } catch (ResourceNotFoundException e) {
+            // expected
+        }
 
-        // verify the result
-        // NOTE: if the connector returned a resource state instead of a resource, it would be much easier to test here...
-        assertThat( result ).isNotNull();
-        assertThat( result.id() ).isEqualTo( "bar" );
-        assertThat( result.getProperty( "baz" ) ).isEqualTo( "XYZ" );
-
-        // verify db content
-        assertThat( db.getCollection( methodName ).getCount() ).isEqualTo( 1 );
-        DBObject dbObject = db.getCollection( methodName ).findOne();
-        DBObject child = ( ( DBObject ) dbObject.get( "foo" ) );
-        DBObject grandChild = ( ( DBObject ) child.get( "bar" ) );
-        assertEquals( "XYZ", grandChild.get( "baz" ) );
+        assertThat((DBObject)object).isEqualTo(db.getCollection(methodName).findOne());
     }
 }

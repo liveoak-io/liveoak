@@ -5,7 +5,6 @@
  */
 package io.liveoak.mongo;
 
-import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.resource.async.Resource;
 
@@ -22,10 +21,6 @@ public abstract class MongoResource implements Resource, BlockingResource {
     public MongoResource( MongoResource parent ) {
         this.parent = parent;
     }
-
-    abstract protected Object deleteChild( RequestContext ctx, String childId );
-
-    abstract protected Object updateChild( RequestContext ctx, String childId, Object child );
 
     @Override
     public Resource parent() {

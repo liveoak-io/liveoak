@@ -27,7 +27,11 @@ public class ListEncodingDriver extends AbstractEncodingDriver {
         encoder().startList();
         ( ( Stream<Object> ) object() ).forEach( ( e ) -> {
             if ( e instanceof Resource ) {
-                if ( returnFields().isEmpty() ) {
+                Resource r = (Resource)e;
+                // embedded resource's don't have id's and should always be displayed unless the return field is set
+                if (r.id() == null && returnFields().isEmpty()) {
+                    addChildDriver( new ResourceEncodingDriver( this, ( Resource ) e, ReturnFields.ALL));
+                } else if ( returnFields().isEmpty() ) {
                     addChildDriver( new ValueEncodingDriver( this, e ) );
                 } else {
                     addChildDriver( new ResourceEncodingDriver( this, ( Resource ) e, returnFields() ) );

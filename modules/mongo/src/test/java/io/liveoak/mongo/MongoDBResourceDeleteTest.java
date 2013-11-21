@@ -19,9 +19,9 @@ import org.junit.Test;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
- * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
- */
-public class MongoDBResourceDeleteTest extends NewBaseMongoDBTest {
+* @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+*/
+public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
 
     @Test
     public void testSimpleDelete() throws Exception {
@@ -48,8 +48,8 @@ public class MongoDBResourceDeleteTest extends NewBaseMongoDBTest {
     }
 
     @Test
-    public void testDeleteChildProperty() throws Exception {
-        String methodName = "testDeleteChildProperty";
+    public void testDirectDeleteProperty() throws Exception {
+        String methodName = "testDirectDeleteProperty";
         assertThat( db.getCollectionNames().contains( methodName ) ).isFalse();
 
         // create the object using the mongo driver directly
@@ -59,18 +59,15 @@ public class MongoDBResourceDeleteTest extends NewBaseMongoDBTest {
         String id = object.getObjectId( "_id" ).toString();
         assertThat( db.getCollection( methodName ).findOne( new BasicDBObject( "_id", new ObjectId( id ) ) ) ).isNotNull();
 
-        // now delete the object
-        ResourceState result = connector.delete( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo" );
+        // we should not be able to directly delete a child property
+        try {
+            ResourceState result = connector.delete( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo" );
+            Fail.fail("We should not be able to directly delete a property");
+        } catch (ResourceNotFoundException e) {
+            // expected
+        }
 
-        // verify we are getting back the object which was deleted
-        assertThat( result ).isNotNull();
-        assertThat( result.id() ).isEqualTo( "foo" );
-        assertThat( result.getProperty( "bar" ) ).isEqualTo( "123" );
-
-        // check that it got deleted in the db
-        DBObject dbObject = db.getCollection( methodName ).findOne( new BasicDBObject( "_id", new ObjectId( id ) ) );
-        assertThat( dbObject ).isNotNull();
-        assertThat( dbObject.get( "foo" ) ).isNull();
+        assertThat((DBObject)object).isEqualTo(db.getCollection(methodName).findOne());
     }
 
     @Test
@@ -85,24 +82,20 @@ public class MongoDBResourceDeleteTest extends NewBaseMongoDBTest {
         String id = object.getObjectId( "_id" ).toString();
         assertThat( db.getCollection( methodName ).findOne( new BasicDBObject( "_id", new ObjectId( id ) ) ) ).isNotNull();
 
-        // now delete the object
-        ResourceState result = connector.delete( new RequestContext.Builder().returnFields( new ReturnFieldsImpl( "bar(ABC(*))" ) ).build(), BASEPATH + "/" + methodName + "/" + id + "/foo" );
+        // we should not be able to directly delete a child object
+        try {
+            ResourceState result = connector.delete( new RequestContext.Builder().returnFields( new ReturnFieldsImpl( "bar(ABC(*))" ) ).build(), BASEPATH + "/" + methodName + "/" + id + "/foo" );
+            Fail.fail("We should not be able to directly delete a child object");
+        } catch (ResourceNotFoundException e) {
+            //expected
+        }
 
-        // verify we are getting back the object which was deleted
-        assertThat( result ).isNotNull();
-        assertThat( result.id() ).isEqualTo( "foo" );
-        ResourceState childResourceState = ( ResourceState ) result.getProperty( "bar" );
-        assertThat( childResourceState.getProperty( "ABC" ) ).isEqualTo( 123 );
-
-        // check that it got deleted in the db
-        DBObject dbObject = db.getCollection( methodName ).findOne( new BasicDBObject( "_id", new ObjectId( id ) ) );
-        assertThat( dbObject ).isNotNull();
-        assertThat( dbObject.get( "foo" ) ).isNull();
+        assertThat((DBObject)object).isEqualTo(db.getCollection(methodName).findOne());
     }
 
     @Test
-    public void testDeleteGrandchildProperty() throws Exception {
-        String methodName = "testDeleteGrandchildProperty";
+    public void testDeleteChildProperty() throws Exception {
+        String methodName = "testDeleteChildProperty";
         assertThat( db.getCollectionNames().contains( methodName ) ).isFalse();
 
         // create the object using the mongo driver directly
@@ -112,20 +105,15 @@ public class MongoDBResourceDeleteTest extends NewBaseMongoDBTest {
         String id = object.getObjectId( "_id" ).toString();
         assertThat( db.getCollection( methodName ).findOne( new BasicDBObject( "_id", new ObjectId( id ) ) ) ).isNotNull();
 
-        // now delete the object
-        ResourceState result = connector.delete( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo/bar" );
+        // we should not be able to directly delete a child property
+        try {
+            ResourceState result = connector.delete( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo/bar" );
+            Fail.fail("We should not be able to directly delete a property on a child object");
+        } catch (ResourceNotFoundException e) {
+            //expected
+        }
 
-        // verify we are getting back the object which was deleted
-        assertThat( result ).isNotNull();
-        assertThat( result.id() ).isEqualTo( "bar" );
-        assertThat( result.getProperty( "ABC" ) ).isEqualTo( 123 );
-
-        // check that it got deleted in the db
-        DBObject dbObject = db.getCollection( methodName ).findOne( new BasicDBObject( "_id", new ObjectId( id ) ) );
-        assertThat( dbObject ).isNotNull();
-        DBObject childDBObject = ( DBObject ) dbObject.get( "foo" );
-        assertThat( childDBObject ).isNotNull();
-        assertThat( childDBObject.get( "bar" ) ).isNull();
+        assertThat((DBObject)object).isEqualTo(db.getCollection(methodName).findOne());
     }
 
     @Test
@@ -140,23 +128,15 @@ public class MongoDBResourceDeleteTest extends NewBaseMongoDBTest {
         String id = object.getObjectId( "_id" ).toString();
         assertThat( db.getCollection( methodName ).findOne( new BasicDBObject( "_id", new ObjectId( id ) ) ) ).isNotNull();
 
-        // now delete the object
-        ResourceState result = connector.delete( new RequestContext.Builder().returnFields( new ReturnFieldsImpl( "bar(ABC(*))" ) ).build(), BASEPATH + "/" + methodName + "/" + id + "/foo" );
+        // we should not be able to directly delete a child object
+        try {
+            ResourceState result = connector.delete( new RequestContext.Builder().returnFields( new ReturnFieldsImpl( "bar(ABC(*))" ) ).build(), BASEPATH + "/" + methodName + "/" + id + "/foo" );
+            Fail.fail();
+        } catch (ResourceNotFoundException e) {
+            //expected
+        }
 
-        System.err.println( "result: " + result );
-
-        // verify we are getting back the object which was deleted
-        assertThat( result ).isNotNull();
-        assertThat( result.id() ).isEqualTo( "foo" );
-        ResourceState childResourceState = ( ResourceState ) result.getProperty( "bar" );
-        assertThat( childResourceState.getProperty( "ABC" ) ).isNotNull();
-        ResourceState grandchildResourceState = ( ResourceState ) childResourceState.getProperty( "ABC" );
-        assertThat( grandchildResourceState.getProperty( "123" ) ).isEqualTo( "XYZ" );
-
-        // check that it got deleted in the db
-        DBObject dbObject = db.getCollection( methodName ).findOne( new BasicDBObject( "_id", new ObjectId( id ) ) );
-        assertThat( dbObject ).isNotNull();
-        assertThat( dbObject.get( "foo" ) ).isNull();
+        assertThat((DBObject)object).isEqualTo(db.getCollection( methodName ).findOne());
     }
 
     @Test
@@ -182,8 +162,6 @@ public class MongoDBResourceDeleteTest extends NewBaseMongoDBTest {
         assertThat( db.getCollectionNames().contains( methodName ) ).isTrue();
 
         ResourceState result = connector.delete( new RequestContext.Builder().build(), BASEPATH + "/" + methodName );
-
-        System.out.println( "RESULT : " + result );
 
         // check that it was actually deleted
         assertThat( db.getCollectionNames().contains( methodName ) ).isFalse();
