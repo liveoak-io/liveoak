@@ -14,6 +14,10 @@ import io.netty.util.concurrent.Future;
 
 import java.net.InetAddress;
 
+/** Base server capable of connecting a container to a network ports.
+ *
+ * @author Bob McWhirter
+ */
 public abstract class AbstractServer {
 
     public AbstractServer( DefaultContainer container, InetAddress host, int port, EventLoopGroup group ) {
@@ -24,6 +28,10 @@ public abstract class AbstractServer {
         this.pipelineConfigurator = new PipelineConfigurator( this.container );
     }
 
+    /** Synchronously start the network listener.
+     *
+     * @throws InterruptedException If interrupted before completely starting.
+     */
     public void start() throws InterruptedException {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         serverBootstrap
@@ -35,6 +43,10 @@ public abstract class AbstractServer {
         future.sync();
     }
 
+    /** Synchronously stop the network listener.
+     *
+     * @throws InterruptedException If interrupted before completely stopping.
+     */
     public void stop() throws InterruptedException {
         Future<?> future = this.group.shutdownGracefully();
         future.sync();
@@ -49,6 +61,13 @@ public abstract class AbstractServer {
         return this.container;
     }
 
+    /** Create a server-specific port-handler.
+     *
+     * <p>This is implemented by concrete subclasses to provide
+     * SSL or bare networking handling.</p>
+     *
+     * @return The channel-handler for the netowrk listener.
+     */
     protected abstract ChannelHandler createChildHandler();
 
     private DefaultContainer container;
