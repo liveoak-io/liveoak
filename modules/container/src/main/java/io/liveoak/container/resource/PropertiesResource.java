@@ -16,15 +16,15 @@ import java.util.Properties;
  */
 public class PropertiesResource implements Resource {
 
-    public PropertiesResource( ContainerResource parent ) {
+    public PropertiesResource(ContainerResource parent) {
         this.parent = parent;
     }
 
     @Override
-    public void readProperties( RequestContext ctx, PropertySink sink ) {
+    public void readProperties(RequestContext ctx, PropertySink sink) {
         Properties allProps = System.getProperties();
-        for ( String key : allProps.stringPropertyNames() ) {
-            sink.accept( key, allProps.getProperty( key ) );
+        for (String key : allProps.stringPropertyNames()) {
+            sink.accept(key, allProps.getProperty(key));
         }
 
         sink.close();

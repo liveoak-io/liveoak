@@ -22,8 +22,8 @@ public class ResourceErrorResponse extends ResourceResponse {
         INTERNAL_ERROR
     }
 
-    public ResourceErrorResponse( ResourceRequest inReplyTo, ErrorType errorType ) {
-        super( inReplyTo, ResponseType.ERROR );
+    public ResourceErrorResponse(ResourceRequest inReplyTo, ErrorType errorType) {
+        super(inReplyTo, ResponseType.ERROR);
         this.errorType = errorType;
     }
 

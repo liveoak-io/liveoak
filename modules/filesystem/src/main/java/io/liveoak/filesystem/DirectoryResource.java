@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class DirectoryResource implements FSResource {
 
-    public DirectoryResource( DirectoryResource parent, File file ) {
+    public DirectoryResource(DirectoryResource parent, File file) {
         this.parent = parent;
         this.file = file;
     }
@@ -34,49 +34,49 @@ public class DirectoryResource implements FSResource {
     }
 
     @Override
-    public void readMembers( RequestContext ctx, ResourceSink sink ) {
-        vertx().fileSystem().readDir( this.file.getPath(), ( result ) -> {
-            if ( result.failed() ) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
+        vertx().fileSystem().readDir(this.file.getPath(), (result) -> {
+            if (result.failed()) {
                 sink.close();
             } else {
                 List<File> sorted = new ArrayList<>();
 
-                for ( String filename : result.result() ) {
-                    File child = new File( filename );
-                    sorted.add( child );
+                for (String filename : result.result()) {
+                    File child = new File(filename);
+                    sorted.add(child);
                 }
 
-                sorted.sort( ( left, right ) -> {
-                    if ( left.isDirectory() && right.isDirectory() ) {
+                sorted.sort((left, right) -> {
+                    if (left.isDirectory() && right.isDirectory()) {
                         return 0;
                     }
 
-                    if ( left.isFile() && right.isFile() ) {
+                    if (left.isFile() && right.isFile()) {
                         return 0;
                     }
 
-                    if ( left.isDirectory() ) {
+                    if (left.isDirectory()) {
                         return -1;
                     }
 
-                    if ( left.isFile() ) {
+                    if (left.isFile()) {
                         return 1;
                     }
 
                     return 0;
 
-                } );
+                });
 
-                for ( File each : sorted ) {
-                    if ( each.isDirectory() ) {
-                        sink.accept( createDirectoryResource( each ) );
+                for (File each : sorted) {
+                    if (each.isDirectory()) {
+                        sink.accept(createDirectoryResource(each));
                     } else {
-                        sink.accept( createFileResource( each ) );
+                        sink.accept(createFileResource(each));
                     }
                 }
                 sink.close();
             }
-        } );
+        });
     }
 
     @Override
@@ -90,27 +90,27 @@ public class DirectoryResource implements FSResource {
     }
 
     @Override
-    public void readMember( RequestContext ctx, String id, Responder responder ) {
-        File path = new File( this.file, id );
-        vertx().fileSystem().exists( path.getPath(), ( existResult ) -> {
-            if ( existResult.succeeded() && existResult.result() ) {
-                if ( path.isDirectory() ) {
-                    responder.resourceRead( createDirectoryResource( path ) );
+    public void readMember(RequestContext ctx, String id, Responder responder) {
+        File path = new File(this.file, id);
+        vertx().fileSystem().exists(path.getPath(), (existResult) -> {
+            if (existResult.succeeded() && existResult.result()) {
+                if (path.isDirectory()) {
+                    responder.resourceRead(createDirectoryResource(path));
                 } else {
-                    responder.resourceRead( createFileResource( path ) );
+                    responder.resourceRead(createFileResource(path));
                 }
             } else {
-                responder.noSuchResource( id );
+                responder.noSuchResource(id);
             }
-        } );
+        });
     }
 
-    protected DirectoryResource createDirectoryResource( File path ) {
-        return new DirectoryResource( this, path );
+    protected DirectoryResource createDirectoryResource(File path) {
+        return new DirectoryResource(this, path);
     }
 
-    protected FileResource createFileResource( File file ) {
-        return new FileResource( this, file );
+    protected FileResource createFileResource(File file) {
+        return new FileResource(this, file);
     }
 
     public String toString() {

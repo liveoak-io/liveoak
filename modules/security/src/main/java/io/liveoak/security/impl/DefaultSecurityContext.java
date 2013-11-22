@@ -20,18 +20,18 @@ public class DefaultSecurityContext implements SecurityContext {
     private Set<String> realmRoles;
     private Set<String> applicationRoles;
 
-    private DefaultSecurityContext( Principal principal, Set<String> realmRoles, Set<String> appRoles ) {
+    private DefaultSecurityContext(Principal principal, Set<String> realmRoles, Set<String> appRoles) {
         this.principal = principal;
         this.realmRoles = realmRoles;
         this.applicationRoles = appRoles;
     }
 
-    public static SecurityContext createFromAuthToken( final AuthToken authToken ) {
-        if ( authToken.isAnonymous() ) {
+    public static SecurityContext createFromAuthToken(final AuthToken authToken) {
+        if (authToken.isAnonymous()) {
             return SecurityContext.ANONYMOUS;
         } else {
             Principal principal = () -> authToken.getUsername();
-            return new DefaultSecurityContext( principal, authToken.getRealmRoles(), authToken.getApplicationRoles() );
+            return new DefaultSecurityContext(principal, authToken.getRealmRoles(), authToken.getApplicationRoles());
         }
     }
 

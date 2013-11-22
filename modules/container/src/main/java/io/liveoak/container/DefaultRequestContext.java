@@ -32,8 +32,8 @@ public class DefaultRequestContext implements RequestContext {
     private RequestAttributes requestAttributes;
     private Sorting sorting;
 
-    public DefaultRequestContext( SecurityContext securityContext, Pagination pagination, ReturnFields returnFields, ResourceParams resourceParams,
-                                  ResourcePath resourcePath, RequestType requestType, RequestAttributes requestAttributes, Sorting sorting ) {
+    public DefaultRequestContext(SecurityContext securityContext, Pagination pagination, ReturnFields returnFields, ResourceParams resourceParams,
+                                 ResourcePath resourcePath, RequestType requestType, RequestAttributes requestAttributes, Sorting sorting) {
         this.securityContext = securityContext;
         this.pagination = pagination;
         this.returnFields = returnFields;
@@ -49,7 +49,7 @@ public class DefaultRequestContext implements RequestContext {
         return app;
     }
 
-    void setApplication( Application app ) {
+    void setApplication(Application app) {
         this.app = app;
     }
 
@@ -58,7 +58,7 @@ public class DefaultRequestContext implements RequestContext {
         return securityContext;
     }
 
-    public void setSecurityContext( SecurityContext securityContext ) {
+    public void setSecurityContext(SecurityContext securityContext) {
         this.securityContext = securityContext;
     }
 
@@ -67,7 +67,7 @@ public class DefaultRequestContext implements RequestContext {
         return pagination;
     }
 
-    void setPagination( Pagination pagination ) {
+    void setPagination(Pagination pagination) {
         this.pagination = pagination;
     }
 
@@ -76,7 +76,7 @@ public class DefaultRequestContext implements RequestContext {
         return returnFields;
     }
 
-    void setReturnFields( ReturnFields returnFields ) {
+    void setReturnFields(ReturnFields returnFields) {
         this.returnFields = returnFields;
     }
 
@@ -85,7 +85,7 @@ public class DefaultRequestContext implements RequestContext {
         return resourceParams;
     }
 
-    void setResourceParams( ResourceParams resourceParams ) {
+    void setResourceParams(ResourceParams resourceParams) {
         this.resourceParams = resourceParams;
     }
 

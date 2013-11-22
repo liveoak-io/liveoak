@@ -18,8 +18,8 @@ public class GitDirectoryResource extends DirectoryResource implements GitResour
 
     private GitDirectoryResource parent;
 
-    public GitDirectoryResource( GitDirectoryResource parent, File file ) {
-        super( parent, file );
+    public GitDirectoryResource(GitDirectoryResource parent, File file) {
+        super(parent, file);
         this.parent = parent;
     }
 
@@ -29,12 +29,12 @@ public class GitDirectoryResource extends DirectoryResource implements GitResour
     }
 
     @Override
-    protected DirectoryResource createDirectoryResource( File path ) {
-        return new GitDirectoryResource( this, path );
+    protected DirectoryResource createDirectoryResource(File path) {
+        return new GitDirectoryResource(this, path);
     }
 
     @Override
-    protected FileResource createFileResource( File file ) {
-        return new GitFileResource( this, file );
+    protected FileResource createFileResource(File file) {
+        return new GitFileResource(this, file);
     }
 }

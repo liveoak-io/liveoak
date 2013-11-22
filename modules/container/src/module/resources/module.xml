@@ -7,25 +7,25 @@
   -->
 <module xmlns="urn:jboss:module:1.0" name="${module-name}">
 
-  <resources>
-    <resource-root path="${project.artifactId}.jar" />
-  </resources>
+    <resources>
+        <resource-root path="${project.artifactId}.jar"/>
+    </resources>
 
-  <dependencies>
-    <module name="io.netty" />
-    <module name="io.vertx" />
-    <module name="com.fasterxml.jackson.core" />
-    <module name="io.liveoak.stomp" />
-    <module name="io.liveoak.spi" />
-    <module name="io.liveoak.security" />
-    <module name="io.liveoak.security.uripolicy" />
-    <system>
-      <paths>
-        <path name="javax/management" />
-        <path name="javax/xml/stream" />
-        <path name="javax/xml/stream/events" />
-      </paths>
-    </system>
-  </dependencies>
+    <dependencies>
+        <module name="io.netty"/>
+        <module name="io.vertx"/>
+        <module name="com.fasterxml.jackson.core"/>
+        <module name="io.liveoak.stomp"/>
+        <module name="io.liveoak.spi"/>
+        <module name="io.liveoak.security"/>
+        <module name="io.liveoak.security.uripolicy"/>
+        <system>
+            <paths>
+                <path name="javax/management"/>
+                <path name="javax/xml/stream"/>
+                <path name="javax/xml/stream/events"/>
+            </paths>
+        </system>
+    </dependencies>
 </module>
 

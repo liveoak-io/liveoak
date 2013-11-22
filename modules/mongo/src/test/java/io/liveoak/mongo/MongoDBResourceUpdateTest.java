@@ -21,90 +21,90 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 /**
-* @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
-*/
+ * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+ */
 public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
 
     @Test
     public void testSimpleUpdate() throws Exception {
         String methodName = "testSimpleUpdate";
-        assertThat( db.getCollection( methodName ).getCount() ).isEqualTo( 0 );
+        assertThat(db.getCollection(methodName).getCount()).isEqualTo(0);
 
         // create the object using the mongo driver directly
         BasicDBObject object = new BasicDBObject();
-        object.append( "foo", "bar" );
-        db.getCollection( methodName ).insert( object );
-        assertEquals( 1, db.getCollection( methodName ).getCount() );
-        String id = object.getObjectId( "_id" ).toString();
+        object.append("foo", "bar");
+        db.getCollection(methodName).insert(object);
+        assertEquals(1, db.getCollection(methodName).getCount());
+        String id = object.getObjectId("_id").toString();
 
         // update the resource using the connector.update method
         ResourceState resourceState = new DefaultResourceState();
-        resourceState.putProperty( "foo", "baz" );
+        resourceState.putProperty("foo", "baz");
 
-        ResourceState result = connector.update( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id, resourceState );
+        ResourceState result = connector.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id, resourceState);
 
         // verify the result
-        assertThat( result ).isNotNull();
-        assertThat( result.id() ).isEqualTo( id );
-        assertThat( result.getProperty( "foo" ) ).isEqualTo( "baz" );
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo(id);
+        assertThat(result.getProperty("foo")).isEqualTo("baz");
 
         // verify db content
-        assertThat( db.getCollection( methodName ).getCount() ).isEqualTo( 1 );
-        DBObject dbObject = db.getCollection( methodName ).findOne();
-        assertEquals( "baz", dbObject.get( "foo" ) );
-        assertEquals( new ObjectId( id ), dbObject.get( "_id" ) );
+        assertThat(db.getCollection(methodName).getCount()).isEqualTo(1);
+        DBObject dbObject = db.getCollection(methodName).findOne();
+        assertEquals("baz", dbObject.get("foo"));
+        assertEquals(new ObjectId(id), dbObject.get("_id"));
     }
 
     @Test
     public void testChildDirectUpdate() throws Exception {
         String methodName = "testChildDirectUpdate";
-        assertThat( db.getCollection( methodName ).getCount() ).isEqualTo( 0 );
+        assertThat(db.getCollection(methodName).getCount()).isEqualTo(0);
 
         // create the object using the mongo driver directly
         BasicDBObject object = new BasicDBObject();
-        object.append( "foo", new BasicDBObject( "bar", "baz" ) );
-        db.getCollection( methodName ).insert( object );
-        assertEquals( 1, db.getCollection( methodName ).getCount() );
-        String id = object.getObjectId( "_id" ).toString();
+        object.append("foo", new BasicDBObject("bar", "baz"));
+        db.getCollection(methodName).insert(object);
+        assertEquals(1, db.getCollection(methodName).getCount());
+        String id = object.getObjectId("_id").toString();
 
         // update the resource using the connector.update method
         ResourceState resourceState = new DefaultResourceState();
-        resourceState.putProperty( "bar", 123 );
+        resourceState.putProperty("bar", 123);
 
         // should not be able to directly update a child object
         try {
-            ResourceState result = connector.update( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo", resourceState );
+            ResourceState result = connector.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo", resourceState);
             Fail.fail();
         } catch (CreateNotSupportedException e) {
             //expected
         }
 
-        assertThat((DBObject)object).isEqualTo(db.getCollection(methodName).findOne());
+        assertThat((DBObject) object).isEqualTo(db.getCollection(methodName).findOne());
     }
 
     @Test
     public void testGrandChildDirectUpdate() throws Exception {
         String methodName = "testGrandChildDirectUpdate";
-        assertThat( db.getCollection( methodName ).getCount() ).isEqualTo( 0 );
+        assertThat(db.getCollection(methodName).getCount()).isEqualTo(0);
 
         // create the object using the mongo driver directly
         BasicDBObject object = new BasicDBObject();
-        object.append( "foo", new BasicDBObject( "bar", new BasicDBObject( "baz", "ABC" ) ) );
-        db.getCollection( methodName ).insert( object );
-        assertEquals( 1, db.getCollection( methodName ).getCount() );
-        String id = object.getObjectId( "_id" ).toString();
+        object.append("foo", new BasicDBObject("bar", new BasicDBObject("baz", "ABC")));
+        db.getCollection(methodName).insert(object);
+        assertEquals(1, db.getCollection(methodName).getCount());
+        String id = object.getObjectId("_id").toString();
 
         // update the resource using the connector.update method
         ResourceState resourceState = new DefaultResourceState();
-        resourceState.putProperty( "baz", "XYZ" );
+        resourceState.putProperty("baz", "XYZ");
 
         try {
-            ResourceState result = connector.update( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo/bar", resourceState );
+            ResourceState result = connector.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo/bar", resourceState);
             Fail.fail();
         } catch (ResourceNotFoundException e) {
             // expected
         }
 
-        assertThat((DBObject)object).isEqualTo(db.getCollection(methodName).findOne());
+        assertThat((DBObject) object).isEqualTo(db.getCollection(methodName).findOne());
     }
 }

@@ -17,40 +17,40 @@ import java.util.List;
 public class MockStompServerContext implements StompServerContext {
 
     @Override
-    public void handleConnect( StompConnection connection ) {
+    public void handleConnect(StompConnection connection) {
     }
 
     @Override
-    public void handleDisconnect( StompConnection connection ) {
-        this.subscriptions.removeIf( ( e ) -> {
-            return ( e.connection.equals( connection ) );
-        } );
+    public void handleDisconnect(StompConnection connection) {
+        this.subscriptions.removeIf((e) -> {
+            return (e.connection.equals(connection));
+        });
     }
 
     @Override
-    public void handleSubscribe( StompConnection connection, String destination, String subscriptionId, Headers header ) {
-        this.subscriptions.add( new Subscription( connection, destination, subscriptionId ) );
+    public void handleSubscribe(StompConnection connection, String destination, String subscriptionId, Headers header) {
+        this.subscriptions.add(new Subscription(connection, destination, subscriptionId));
     }
 
     @Override
-    public void handleUnsubscribe( StompConnection connection, String subscriptionId ) {
-        this.subscriptions.removeIf( ( e ) -> {
-            return ( e.connection.equals( connection ) && e.subscriptionId.equals( subscriptionId ) );
-        } );
+    public void handleUnsubscribe(StompConnection connection, String subscriptionId) {
+        this.subscriptions.removeIf((e) -> {
+            return (e.connection.equals(connection) && e.subscriptionId.equals(subscriptionId));
+        });
     }
 
     @Override
-    public void handleSend( StompConnection connection, StompMessage message ) {
+    public void handleSend(StompConnection connection, StompMessage message) {
         StompMessage retainedDupe = message.duplicate().retain();
-        this.sentMessages.add( retainedDupe );
-        String destination = message.headers().get( Headers.DESTINATION );
-        this.subscriptions.forEach( ( e ) -> {
-            if ( e.destination.equals( destination ) ) {
+        this.sentMessages.add(retainedDupe);
+        String destination = message.headers().get(Headers.DESTINATION);
+        this.subscriptions.forEach((e) -> {
+            if (e.destination.equals(destination)) {
                 StompMessage dupe = message.duplicate().retain();
-                dupe.headers().put( Headers.SUBSCRIPTION, e.subscriptionId );
-                e.connection.send( dupe );
+                dupe.headers().put(Headers.SUBSCRIPTION, e.subscriptionId);
+                e.connection.send(dupe);
             }
-        } );
+        });
     }
 
     public List<StompMessage> getSentMessages() {
@@ -62,7 +62,7 @@ public class MockStompServerContext implements StompServerContext {
         public String destination;
         public String subscriptionId;
 
-        public Subscription( StompConnection connection, String destination, String subscriptionId ) {
+        public Subscription(StompConnection connection, String destination, String subscriptionId) {
             this.connection = connection;
             this.destination = destination;
             this.subscriptionId = subscriptionId;

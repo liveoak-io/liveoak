@@ -10,5 +10,5 @@ package io.liveoak.vertx.modules.resource;
  */
 public interface CollectionResponseHandler {
 
-    public void handle( VertxResponder responder );
+    public void handle(VertxResponder responder);
 }

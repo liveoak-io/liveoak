@@ -45,41 +45,41 @@ public class VertxResourceTest {
     public void setUpContainer() throws Exception {
         this.container = new DefaultContainer();
         this.connector = this.container.directConnector();
-        this.deployer = new ResourceDeployer( this.container, "test.register" );
+        this.deployer = new ResourceDeployer(this.container, "test.register");
     }
 
     @Before
     public void setUpResource() throws Exception {
-        this.adapter = new CollectionResourceAdapter( container.vertx(), "people", "test.register" );
+        this.adapter = new CollectionResourceAdapter(container.vertx(), "people", "test.register");
 
-        this.objects.put( "bob", new JsonObject().putString( "id", "bob" ).putString( "name", "Bob McWhirter" ) );
-        this.objects.put( "ben", new JsonObject().putString( "id", "ben" ).putString( "name", "Ben Browning" ) );
-        this.adapter.readMemberHandler( ( id, responder ) -> {
+        this.objects.put("bob", new JsonObject().putString("id", "bob").putString("name", "Bob McWhirter"));
+        this.objects.put("ben", new JsonObject().putString("id", "ben").putString("name", "Ben Browning"));
+        this.adapter.readMemberHandler((id, responder) -> {
 
-            System.err.println( "asked for: " + id );
-            JsonObject object = objects.get( id );
+            System.err.println("asked for: " + id);
+            JsonObject object = objects.get(id);
 
-            if ( object != null ) {
-                responder.resourceRead( object );
+            if (object != null) {
+                responder.resourceRead(object);
             } else {
-                responder.noSuchResource( id );
+                responder.noSuchResource(id);
             }
-        } );
+        });
 
-        this.adapter.readMembersHandler( ( responder ) -> {
-            JsonArray resources = new JsonArray( objects.values().toArray() );
-            responder.resourcesRead( resources );
-        } );
+        this.adapter.readMembersHandler((responder) -> {
+            JsonArray resources = new JsonArray(objects.values().toArray());
+            responder.resourcesRead(resources);
+        });
 
         this.adapter.start();
-        Thread.sleep( 500 );
+        Thread.sleep(500);
     }
 
     @Test
     public void testReadMember() throws Exception {
-        ResourceState result = connector.read( new RequestContext.Builder().build(), "/people/bob" );
-        assertThat( result ).isNotNull();
-        assertThat( result.id() ).isEqualTo( "bob" );
+        ResourceState result = connector.read(new RequestContext.Builder().build(), "/people/bob");
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo("bob");
     }
 
 
@@ -96,11 +96,11 @@ public class VertxResourceTest {
     @Test
     public void testReadNonExistentResource() {
         try {
-            connector.read( new RequestContext.Builder().build(), "/people/lance" );
-        } catch ( ResourceException e ) {
-            assertThat( e.path() ).isEqualTo( "/people/lance" );
-        } catch ( Exception e ) {
-            fail( "Unexpected exception: " + e );
+            connector.read(new RequestContext.Builder().build(), "/people/lance");
+        } catch (ResourceException e) {
+            assertThat(e.path()).isEqualTo("/people/lance");
+        } catch (Exception e) {
+            fail("Unexpected exception: " + e);
         }
     }
 
@@ -112,18 +112,18 @@ public class VertxResourceTest {
         ResourceSink sink = new ResourceSink() {
             @Override
             public void close() {
-                future.complete( resources );
+                future.complete(resources);
             }
 
             @Override
-            public void accept( Resource resource ) {
-                resources.add( resource );
+            public void accept(Resource resource) {
+                resources.add(resource);
             }
         };
 
-        ResourceState resource = connector.read( new RequestContext.Builder().build(), "/people" );
-        assertThat( resource ).isNotNull();
-        assertThat( resource.members() ).hasSize( 2 );
+        ResourceState resource = connector.read(new RequestContext.Builder().build(), "/people");
+        assertThat(resource).isNotNull();
+        assertThat(resource.members()).hasSize(2);
 
     }
 

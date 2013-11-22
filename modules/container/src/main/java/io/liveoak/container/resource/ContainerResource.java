@@ -18,13 +18,13 @@ import io.liveoak.spi.resource.async.Responder;
 public class ContainerResource implements RootResource {
 
 
-    public ContainerResource( String id ) {
+    public ContainerResource(String id) {
         this.id = id;
-        this.propertiesResource = new PropertiesResource( this );
+        this.propertiesResource = new PropertiesResource(this);
     }
 
     @Override
-    public void initialize( ResourceContext context ) throws InitializationException {
+    public void initialize(ResourceContext context) throws InitializationException {
     }
 
     @Override
@@ -32,11 +32,11 @@ public class ContainerResource implements RootResource {
     }
 
     @Override
-    public void readMembers( RequestContext ctx, ResourceSink sink ) {
-        sink.accept( this.propertiesResource );
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
+        sink.accept(this.propertiesResource);
         try {
             sink.close();
-        } catch ( Exception e ) {
+        } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
@@ -47,11 +47,11 @@ public class ContainerResource implements RootResource {
     }
 
     @Override
-    public void readMember( RequestContext ctx, String id, Responder responder ) {
-        if ( id.equals( this.propertiesResource.id() ) ) {
-            responder.resourceRead( this.propertiesResource );
+    public void readMember(RequestContext ctx, String id, Responder responder) {
+        if (id.equals(this.propertiesResource.id())) {
+            responder.resourceRead(this.propertiesResource);
         } else {
-            responder.noSuchResource( id );
+            responder.noSuchResource(id);
         }
     }
 

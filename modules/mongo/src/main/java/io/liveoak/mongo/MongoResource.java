@@ -18,7 +18,7 @@ public abstract class MongoResource implements Resource, BlockingResource {
     protected static final String MONGO_ID_FIELD = "_id";
     protected static final String MBAAS_ID_FIELD = "id";
 
-    public MongoResource( MongoResource parent ) {
+    public MongoResource(MongoResource parent) {
         this.parent = parent;
     }
 

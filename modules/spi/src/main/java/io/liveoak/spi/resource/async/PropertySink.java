@@ -5,22 +5,25 @@
  */
 package io.liveoak.spi.resource.async;
 
-/** A sink to asynchronously capture a resource's properties.
+/**
+ * A sink to asynchronously capture a resource's properties.
  *
  * @author Bob McWhirter
  */
 public interface PropertySink {
 
-    /** Accept a name/value pair representing a single
+    /**
+     * Accept a name/value pair representing a single
      * property of the resource.
      *
-     * @param name The name of the property.
+     * @param name  The name of the property.
      * @param value The value of the property.
      */
-    void accept( String name, Object value );
+    void accept(String name, Object value);
 
 
-    /** Close the sink, indicating all properties have been sunk.
+    /**
+     * Close the sink, indicating all properties have been sunk.
      */
     void close();
 

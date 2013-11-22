@@ -17,15 +17,15 @@ import io.netty.channel.SimpleChannelInboundHandler;
 public class SendHandler extends SimpleChannelInboundHandler<StompMessage> {
 
 
-    public SendHandler( StompServerContext serverContext ) {
+    public SendHandler(StompServerContext serverContext) {
         this.serverContext = serverContext;
     }
 
     @Override
-    protected void channelRead0( ChannelHandlerContext ctx, StompMessage msg ) throws Exception {
-        StompMessage stompMessage = ( StompMessage ) msg;
-        StompConnection connection = ctx.channel().attr( ConnectHandler.CONNECTION ).get();
-        this.serverContext.handleSend( connection, stompMessage );
+    protected void channelRead0(ChannelHandlerContext ctx, StompMessage msg) throws Exception {
+        StompMessage stompMessage = (StompMessage) msg;
+        StompConnection connection = ctx.channel().attr(ConnectHandler.CONNECTION).get();
+        this.serverContext.handleSend(connection, stompMessage);
 
         // end of the line, do NOT retain or send upstream.
     }

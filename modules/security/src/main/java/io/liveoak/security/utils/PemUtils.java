@@ -20,16 +20,16 @@ import java.util.Base64;
  */
 public class PemUtils {
 
-    public static X509Certificate decodeCertificate( InputStream is ) throws Exception {
-        byte[] der = pemToDer( is );
-        ByteArrayInputStream bis = new ByteArrayInputStream( der );
-        return DerUtils.decodeCertificate( bis );
+    public static X509Certificate decodeCertificate(InputStream is) throws Exception {
+        byte[] der = pemToDer(is);
+        ByteArrayInputStream bis = new ByteArrayInputStream(der);
+        return DerUtils.decodeCertificate(bis);
     }
 
-    public static X509Certificate decodeCertificate( String cert ) throws Exception {
-        byte[] der = pemToDer( cert );
-        ByteArrayInputStream bis = new ByteArrayInputStream( der );
-        return DerUtils.decodeCertificate( bis );
+    public static X509Certificate decodeCertificate(String cert) throws Exception {
+        byte[] der = pemToDer(cert);
+        ByteArrayInputStream bis = new ByteArrayInputStream(der);
+        return DerUtils.decodeCertificate(bis);
     }
 
 
@@ -40,9 +40,9 @@ public class PemUtils {
      * @return PublicKey instance
      * @throws Exception if error occurs during decoding
      */
-    public static PublicKey decodePublicKey( String pem ) throws Exception {
-        byte[] der = pemToDer( pem );
-        return DerUtils.decodePublicKey( der );
+    public static PublicKey decodePublicKey(String pem) throws Exception {
+        byte[] der = pemToDer(pem);
+        return DerUtils.decodePublicKey(der);
     }
 
     /**
@@ -52,14 +52,14 @@ public class PemUtils {
      * @return PrivateKey instance
      * @throws Exception if error occurs during decoding
      */
-    public static PrivateKey decodePrivateKey( String pem ) throws Exception {
-        byte[] der = pemToDer( pem );
-        return DerUtils.decodePrivateKey( der );
+    public static PrivateKey decodePrivateKey(String pem) throws Exception {
+        byte[] der = pemToDer(pem);
+        return DerUtils.decodePrivateKey(der);
     }
 
-    public static PrivateKey decodePrivateKey( InputStream is ) throws Exception {
-        String pem = pemFromStream( is );
-        return decodePrivateKey( pem );
+    public static PrivateKey decodePrivateKey(InputStream is) throws Exception {
+        String pem = pemFromStream(is);
+        return decodePrivateKey(pem);
     }
 
     /**
@@ -69,9 +69,9 @@ public class PemUtils {
      * @return byte[]
      * @throws java.io.IOException if error occurs during decoding
      */
-    public static byte[] pemToDer( InputStream is ) throws IOException {
-        String pem = pemFromStream( is );
-        byte[] der = pemToDer( pem );
+    public static byte[] pemToDer(InputStream is) throws IOException {
+        String pem = pemFromStream(is);
+        byte[] der = pemToDer(pem);
         return der;
     }
 
@@ -82,25 +82,25 @@ public class PemUtils {
      * @return byte[]
      * @throws java.io.IOException if error occurs during decoding
      */
-    public static byte[] pemToDer( String pem ) throws IOException {
-        pem = removeBeginEnd( pem );
-        return Base64.getDecoder().decode( pem );
+    public static byte[] pemToDer(String pem) throws IOException {
+        pem = removeBeginEnd(pem);
+        return Base64.getDecoder().decode(pem);
     }
 
-    public static String removeBeginEnd( String pem ) {
-        pem = pem.replaceAll( "-----BEGIN (.*)-----", "" );
-        pem = pem.replaceAll( "-----END (.*)----", "" );
-        pem = pem.replaceAll( "\r\n", "" );
-        pem = pem.replaceAll( "\n", "" );
+    public static String removeBeginEnd(String pem) {
+        pem = pem.replaceAll("-----BEGIN (.*)-----", "");
+        pem = pem.replaceAll("-----END (.*)----", "");
+        pem = pem.replaceAll("\r\n", "");
+        pem = pem.replaceAll("\n", "");
         return pem.trim();
     }
 
 
-    public static String pemFromStream( InputStream is ) throws IOException {
-        DataInputStream dis = new DataInputStream( is );
+    public static String pemFromStream(InputStream is) throws IOException {
+        DataInputStream dis = new DataInputStream(is);
         byte[] keyBytes = new byte[dis.available()];
-        dis.readFully( keyBytes );
+        dis.readFully(keyBytes);
         dis.close();
-        return new String( keyBytes, "utf-8" );
+        return new String(keyBytes, "utf-8");
     }
 }

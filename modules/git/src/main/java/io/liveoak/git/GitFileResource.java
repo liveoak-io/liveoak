@@ -17,8 +17,8 @@ public class GitFileResource extends FileResource implements GitResource {
 
     private GitDirectoryResource parent;
 
-    public GitFileResource( GitDirectoryResource parent, File file ) {
-        super( parent, file );
+    public GitFileResource(GitDirectoryResource parent, File file) {
+        super(parent, file);
         this.parent = parent;
     }
 

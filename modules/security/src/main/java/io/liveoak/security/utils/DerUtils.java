@@ -27,38 +27,38 @@ import java.security.spec.X509EncodedKeySpec;
  */
 public class DerUtils {
 
-    public static PrivateKey decodePrivateKey( InputStream is )
+    public static PrivateKey decodePrivateKey(InputStream is)
             throws Exception {
 
-        DataInputStream dis = new DataInputStream( is );
+        DataInputStream dis = new DataInputStream(is);
         byte[] keyBytes = new byte[dis.available()];
-        dis.readFully( keyBytes );
+        dis.readFully(keyBytes);
         dis.close();
 
         PKCS8EncodedKeySpec spec =
-                new PKCS8EncodedKeySpec( keyBytes );
-        KeyFactory kf = KeyFactory.getInstance( "RSA" );
-        return kf.generatePrivate( spec );
+                new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePrivate(spec);
     }
 
-    public static PublicKey decodePublicKey( byte[] der ) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
+    public static PublicKey decodePublicKey(byte[] der) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
         X509EncodedKeySpec spec =
-                new X509EncodedKeySpec( der );
-        KeyFactory kf = KeyFactory.getInstance( "RSA" );
-        return kf.generatePublic( spec );
+                new X509EncodedKeySpec(der);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePublic(spec);
     }
 
-    public static X509Certificate decodeCertificate( InputStream is ) throws Exception {
-        CertificateFactory cf = CertificateFactory.getInstance( "X.509" );
-        X509Certificate cert = ( X509Certificate ) cf.generateCertificate( is );
+    public static X509Certificate decodeCertificate(InputStream is) throws Exception {
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        X509Certificate cert = (X509Certificate) cf.generateCertificate(is);
         is.close();
         return cert;
     }
 
-    public static PrivateKey decodePrivateKey( byte[] der ) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
+    public static PrivateKey decodePrivateKey(byte[] der) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
         PKCS8EncodedKeySpec spec =
-                new PKCS8EncodedKeySpec( der );
-        KeyFactory kf = KeyFactory.getInstance( "RSA" );
-        return kf.generatePrivate( spec );
+                new PKCS8EncodedKeySpec(der);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePrivate(spec);
     }
 }

@@ -25,11 +25,11 @@ public class JSONEncoder implements Encoder {
     }
 
     @Override
-    public void initialize( ByteBuf buffer ) throws Exception {
+    public void initialize(ByteBuf buffer) throws Exception {
         JsonFactory factory = new JsonFactory();
-        ByteBufOutputStream out = new ByteBufOutputStream( buffer );
-        this.generator = factory.createGenerator( out );
-        this.generator.setPrettyPrinter( new DefaultPrettyPrinter( "\\n" ) );
+        ByteBufOutputStream out = new ByteBufOutputStream(buffer);
+        this.generator = factory.createGenerator(out);
+        this.generator.setPrettyPrinter(new DefaultPrettyPrinter("\\n"));
     }
 
     @Override
@@ -41,21 +41,21 @@ public class JSONEncoder implements Encoder {
     // ----------------------------------------
 
     @Override
-    public void startResource( Resource resource ) throws Exception {
+    public void startResource(Resource resource) throws Exception {
         this.generator.writeStartObject();
-        if ( resource.id() != null ) {
-            this.generator.writeFieldName( "id" );
-            this.generator.writeString( resource.id() );
-            this.generator.writeFieldName( "self" );
+        if (resource.id() != null) {
+            this.generator.writeFieldName("id");
+            this.generator.writeString(resource.id());
+            this.generator.writeFieldName("self");
             this.generator.writeStartObject();
-            this.generator.writeFieldName( "href" );
-            this.generator.writeString( resource.uri().toString() );
+            this.generator.writeFieldName("href");
+            this.generator.writeString(resource.uri().toString());
             this.generator.writeEndObject();
         }
     }
 
     @Override
-    public void endResource( Resource resource ) throws IOException {
+    public void endResource(Resource resource) throws IOException {
         this.generator.writeEndObject();
     }
 
@@ -72,12 +72,12 @@ public class JSONEncoder implements Encoder {
     // ----------------------------------------
 
     @Override
-    public void startProperty( String propertyName ) throws Exception {
-        this.generator.writeFieldName( propertyName );
+    public void startProperty(String propertyName) throws Exception {
+        this.generator.writeFieldName(propertyName);
     }
 
     @Override
-    public void endProperty( String propertyName ) throws Exception {
+    public void endProperty(String propertyName) throws Exception {
         // not used in JSON
     }
 
@@ -97,7 +97,7 @@ public class JSONEncoder implements Encoder {
 
     @Override
     public void startMembers() throws Exception {
-        this.generator.writeFieldName( "_members" );
+        this.generator.writeFieldName("_members");
         this.generator.writeStartArray();
     }
 
@@ -109,31 +109,31 @@ public class JSONEncoder implements Encoder {
     // ----------------------------------------
 
     @Override
-    public void writeValue( String value ) throws Exception {
-        this.generator.writeString( value );
+    public void writeValue(String value) throws Exception {
+        this.generator.writeString(value);
     }
 
     @Override
-    public void writeValue( Integer value ) throws Exception {
-        this.generator.writeNumber( value );
+    public void writeValue(Integer value) throws Exception {
+        this.generator.writeNumber(value);
     }
 
     @Override
-    public void writeValue( Double value ) throws Exception {
-        this.generator.writeNumber( value );
+    public void writeValue(Double value) throws Exception {
+        this.generator.writeNumber(value);
     }
 
     @Override
-    public void writeValue( Date value ) throws Exception {
-        this.generator.writeNumber( value.getTime() );
+    public void writeValue(Date value) throws Exception {
+        this.generator.writeNumber(value.getTime());
     }
 
-    public void writeLink( Resource resource ) throws Exception {
+    public void writeLink(Resource resource) throws Exception {
         this.generator.writeStartObject();
-        this.generator.writeFieldName( "id" );
-        this.generator.writeString( resource.id() );
-        this.generator.writeFieldName( "href" );
-        this.generator.writeString( resource.uri().toString() );
+        this.generator.writeFieldName("id");
+        this.generator.writeString(resource.id());
+        this.generator.writeFieldName("href");
+        this.generator.writeString(resource.uri().toString());
         this.generator.writeEndObject();
 
     }

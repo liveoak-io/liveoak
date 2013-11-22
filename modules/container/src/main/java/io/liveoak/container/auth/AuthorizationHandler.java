@@ -29,21 +29,21 @@ import io.netty.channel.SimpleChannelInboundHandler;
 public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRequest> {
 
     // TODO: replace with real logging
-    private static final SimpleLogger log = new SimpleLogger( AuthorizationHandler.class );
+    private static final SimpleLogger log = new SimpleLogger(AuthorizationHandler.class);
 
     // TODO: Should be removed...
     static {
         try {
-            AuthServicesHolder.getInstance().registerClassloader( AuthorizationHandler.class.getClassLoader() );
+            AuthServicesHolder.getInstance().registerClassloader(AuthorizationHandler.class.getClassLoader());
             AuthServicesHolder.getInstance().registerDefaultPolicies();
-        } catch ( Throwable e ) {
-            log.error( "Error occured during initialization of AuthorizationService", e );
+        } catch (Throwable e) {
+            log.error("Error occured during initialization of AuthorizationService", e);
             throw e;
         }
     }
 
     @Override
-    protected void channelRead0( ChannelHandlerContext ctx, ResourceRequest req ) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, ResourceRequest req) throws Exception {
         try {
             AuthToken token;
             AuthorizationService authService = AuthServicesHolder.getInstance().getAuthorizationService();
@@ -51,47 +51,47 @@ public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRe
             RequestContext reqContext = req.requestContext();
 
             try {
-                token = tokenManager.getAndValidateToken( reqContext );
-            } catch ( TokenValidationException e ) {
+                token = tokenManager.getAndValidateToken(reqContext);
+            } catch (TokenValidationException e) {
                 String message = "Error when obtaining token: " + e.getMessage();
-                log.warn( message );
-                if ( log.isTraceEnabled() ) {
-                    log.trace( message, e );
+                log.warn(message);
+                if (log.isTraceEnabled()) {
+                    log.trace(message, e);
                 }
 
-                sendAuthorizationError( ctx, req );
+                sendAuthorizationError(ctx, req);
                 return;
             }
 
-            if ( authService.isAuthorized( new AuthorizationRequestContext( token, reqContext ) ) ) {
-                establishSecurityContext( token, reqContext );
-                ctx.fireChannelRead( req );
+            if (authService.isAuthorized(new AuthorizationRequestContext(token, reqContext))) {
+                establishSecurityContext(token, reqContext);
+                ctx.fireChannelRead(req);
             } else {
-                sendAuthorizationError( ctx, req );
+                sendAuthorizationError(ctx, req);
             }
-        } catch ( Throwable e ) {
-            log.error( "Exception occured in AuthorizationService check", e );
+        } catch (Throwable e) {
+            log.error("Exception occured in AuthorizationService check", e);
             throw e;
         }
     }
 
-    protected void sendAuthorizationError( ChannelHandlerContext ctx, ResourceRequest req ) {
-        ctx.writeAndFlush( new ResourceErrorResponse( req, ResourceErrorResponse.ErrorType.NOT_AUTHORIZED ) );
+    protected void sendAuthorizationError(ChannelHandlerContext ctx, ResourceRequest req) {
+        ctx.writeAndFlush(new ResourceErrorResponse(req, ResourceErrorResponse.ErrorType.NOT_AUTHORIZED));
     }
 
-    protected void establishSecurityContext( AuthToken token, RequestContext reqContext ) {
+    protected void establishSecurityContext(AuthToken token, RequestContext reqContext) {
         // Looks like a hack...
-        if ( reqContext instanceof DefaultRequestContext ) {
-            SecurityContext securityContext = DefaultSecurityContext.createFromAuthToken( token );
-            ( ( DefaultRequestContext ) reqContext ).setSecurityContext( securityContext );
+        if (reqContext instanceof DefaultRequestContext) {
+            SecurityContext securityContext = DefaultSecurityContext.createFromAuthToken(token);
+            ((DefaultRequestContext) reqContext).setSecurityContext(securityContext);
         } else {
-            log.warn( "Can't establish securityContext to RequestContext " + reqContext );
+            log.warn("Can't establish securityContext to RequestContext " + reqContext);
         }
     }
 
     @Override
-    public void exceptionCaught( ChannelHandlerContext ctx, Throwable cause ) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
-        super.exceptionCaught( ctx, cause );
+        super.exceptionCaught(ctx, cause);
     }
 }

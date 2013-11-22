@@ -34,11 +34,11 @@ public class ServerVerticleIntegrationTest extends TestVerticle {
     public void start() {
         initialize();
 
-        container.deployModule( System.getProperty( "vertx.modulename" ), ( result ) -> {
-            assertTrue( result.succeeded() );
-            assertNotNull( "deploymentID should not be null", result.result() );
+        container.deployModule(System.getProperty("vertx.modulename"), (result) -> {
+            assertTrue(result.succeeded());
+            assertNotNull("deploymentID should not be null", result.result());
             startTests();
-        } );
+        });
     }
 
 }

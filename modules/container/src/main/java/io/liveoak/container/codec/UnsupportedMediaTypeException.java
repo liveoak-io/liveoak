@@ -14,8 +14,8 @@ import java.util.List;
  */
 public class UnsupportedMediaTypeException extends Exception {
 
-    public UnsupportedMediaTypeException( List<MediaType> mediaTypes ) {
-        super( "Unsupported media-types: " + mediaTypes );
+    public UnsupportedMediaTypeException(List<MediaType> mediaTypes) {
+        super("Unsupported media-types: " + mediaTypes);
         this.mediaTypes = mediaTypes;
     }
 

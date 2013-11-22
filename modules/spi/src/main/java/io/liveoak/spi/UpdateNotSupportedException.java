@@ -10,7 +10,7 @@ package io.liveoak.spi;
  */
 public class UpdateNotSupportedException extends ResourceException {
 
-    public UpdateNotSupportedException( String path ) {
-        super( path, "Update not supported for '" + path + "'" );
+    public UpdateNotSupportedException(String path) {
+        super(path, "Update not supported for '" + path + "'");
     }
 }

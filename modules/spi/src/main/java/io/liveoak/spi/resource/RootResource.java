@@ -23,7 +23,7 @@ public interface RootResource extends Resource {
      * @throws io.liveoak.spi.InitializationException
      *          If an error occurs.
      */
-    void initialize( ResourceContext context ) throws InitializationException;
+    void initialize(ResourceContext context) throws InitializationException;
 
     /**
      * Free resources used by the resource and shutdown.

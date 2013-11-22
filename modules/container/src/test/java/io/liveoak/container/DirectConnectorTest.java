@@ -31,13 +31,13 @@ public class DirectConnectorTest {
     @Before
     public void setUp() throws Exception {
         this.container = new DefaultContainer();
-        this.connector = new DirectConnector( this.container );
+        this.connector = new DirectConnector(this.container);
 
-        InMemoryDBResource db = new InMemoryDBResource( "db" );
-        db.addMember( new InMemoryCollectionResource( db, "people" ) );
-        db.addMember( new InMemoryCollectionResource( db, "dogs" ) );
+        InMemoryDBResource db = new InMemoryDBResource("db");
+        db.addMember(new InMemoryCollectionResource(db, "people"));
+        db.addMember(new InMemoryCollectionResource(db, "dogs"));
 
-        this.container.registerResource( db, new SimpleConfig() );
+        this.container.registerResource(db, new SimpleConfig());
     }
 
     @After
@@ -48,84 +48,84 @@ public class DirectConnectorTest {
     @Test
     public void testRead() throws Throwable {
 
-        ReturnFields fields = new ReturnFieldsImpl( "*,members(*,members(*))" );
+        ReturnFields fields = new ReturnFieldsImpl("*,members(*,members(*))");
 
-        RequestContext requestContext = new RequestContext.Builder().returnFields( fields ).build();
-        ResourceState result = this.connector.read( requestContext, "/" );
-        assertThat( result ).isNotNull();
+        RequestContext requestContext = new RequestContext.Builder().returnFields(fields).build();
+        ResourceState result = this.connector.read(requestContext, "/");
+        assertThat(result).isNotNull();
 
-        System.err.println( "result: " + result );
+        System.err.println("result: " + result);
 
         List<ResourceState> members = result.members();
 
-        assertThat( members ).isNotEmpty();
+        assertThat(members).isNotEmpty();
 
-        ResourceState db = members.stream().filter( ( e ) -> e.id().equals( "db" ) ).findFirst().get();
-        assertThat( db ).isNotNull();
+        ResourceState db = members.stream().filter((e) -> e.id().equals("db")).findFirst().get();
+        assertThat(db).isNotNull();
 
-        ResourceState people = db.members().stream().filter( ( e ) -> e.id().equals( "people" ) ).findFirst().get();
-        assertThat( people ).isNotNull();
+        ResourceState people = db.members().stream().filter((e) -> e.id().equals("people")).findFirst().get();
+        assertThat(people).isNotNull();
 
-        ResourceState dogs = db.members().stream().filter( ( e ) -> e.id().equals( "dogs" ) ).findFirst().get();
-        assertThat( dogs ).isNotNull();
+        ResourceState dogs = db.members().stream().filter((e) -> e.id().equals("dogs")).findFirst().get();
+        assertThat(dogs).isNotNull();
     }
 
     @Test
     public void testCreate() throws Throwable {
 
-        ReturnFields fields = new ReturnFieldsImpl( "*" );
+        ReturnFields fields = new ReturnFieldsImpl("*");
 
-        RequestContext requestContext = new RequestContext.Builder().returnFields( fields ).build();
-        ResourceState bob = new DefaultResourceState( "bob" );
-        bob.putProperty( "name", "Bob McWhirter" );
+        RequestContext requestContext = new RequestContext.Builder().returnFields(fields).build();
+        ResourceState bob = new DefaultResourceState("bob");
+        bob.putProperty("name", "Bob McWhirter");
 
-        ResourceState result = this.connector.create( requestContext, "/db/people", bob );
+        ResourceState result = this.connector.create(requestContext, "/db/people", bob);
 
-        assertThat( result ).isNotNull();
-        assertThat( result.getProperty( "name" ) ).isEqualTo( "Bob McWhirter" );
+        assertThat(result).isNotNull();
+        assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");
 
-        ResourceState people = this.connector.read( requestContext, "/db/people" );
+        ResourceState people = this.connector.read(requestContext, "/db/people");
 
-        assertThat( people ).isNotNull();
+        assertThat(people).isNotNull();
 
-        System.err.println( people );
+        System.err.println(people);
 
-        ResourceState foundBob = people.members().stream().filter( ( e ) -> e.id().equals( "bob" ) ).findFirst().get();
-        assertThat( foundBob ).isNotNull();
-        assertThat( foundBob.id() ).isEqualTo( "bob" );
-        assertThat( foundBob.getPropertyNames() ).hasSize( 0 );
+        ResourceState foundBob = people.members().stream().filter((e) -> e.id().equals("bob")).findFirst().get();
+        assertThat(foundBob).isNotNull();
+        assertThat(foundBob.id()).isEqualTo("bob");
+        assertThat(foundBob.getPropertyNames()).hasSize(0);
 
-        foundBob = this.connector.read( requestContext, "/db/people/bob" );
+        foundBob = this.connector.read(requestContext, "/db/people/bob");
 
-        assertThat( foundBob ).isNotNull();
-        assertThat( foundBob.getProperty( "name" ) ).isEqualTo( "Bob McWhirter" );
+        assertThat(foundBob).isNotNull();
+        assertThat(foundBob.getProperty("name")).isEqualTo("Bob McWhirter");
     }
 
     @Test
     public void testUpdate() throws Throwable {
         RequestContext requestContext = new RequestContext.Builder().build();
-        ResourceState bob = new DefaultResourceState( "bob" );
-        bob.putProperty( "name", "Bob McWhirter" );
+        ResourceState bob = new DefaultResourceState("bob");
+        bob.putProperty("name", "Bob McWhirter");
 
-        ResourceState result = this.connector.create( requestContext, "/db/people", bob );
+        ResourceState result = this.connector.create(requestContext, "/db/people", bob);
 
-        assertThat( result ).isNotNull();
-        assertThat( result.getProperty( "name" ) ).isEqualTo( "Bob McWhirter" );
+        assertThat(result).isNotNull();
+        assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");
 
-        ResourceState foundBob = this.connector.read( requestContext, "/db/people/bob" );
-        assertThat( foundBob ).isNotNull();
-        assertThat( foundBob.getProperty( "name" ) ).isEqualTo( "Bob McWhirter" );
+        ResourceState foundBob = this.connector.read(requestContext, "/db/people/bob");
+        assertThat(foundBob).isNotNull();
+        assertThat(foundBob.getProperty("name")).isEqualTo("Bob McWhirter");
 
-        bob = new DefaultResourceState( "bob" );
-        bob.putProperty( "name", "Robert McWhirter" );
+        bob = new DefaultResourceState("bob");
+        bob.putProperty("name", "Robert McWhirter");
 
-        result = this.connector.update( requestContext, "/db/people/bob", bob );
-        assertThat( result ).isNotNull();
-        assertThat( result.getProperty( "name" ) ).isEqualTo( "Robert McWhirter" );
+        result = this.connector.update(requestContext, "/db/people/bob", bob);
+        assertThat(result).isNotNull();
+        assertThat(result.getProperty("name")).isEqualTo("Robert McWhirter");
 
-        foundBob = this.connector.read( requestContext, "/db/people/bob" );
-        assertThat( foundBob ).isNotNull();
-        assertThat( foundBob.getProperty( "name" ) ).isEqualTo( "Robert McWhirter" );
+        foundBob = this.connector.read(requestContext, "/db/people/bob");
+        assertThat(foundBob).isNotNull();
+        assertThat(foundBob.getProperty("name")).isEqualTo("Robert McWhirter");
 
 
     }
@@ -134,15 +134,15 @@ public class DirectConnectorTest {
     public void testFetch() throws Throwable {
 
         RequestContext requestContext = new RequestContext.Builder().build();
-        ResourceState bob = new DefaultResourceState( "bob" );
-        bob.putProperty( "name", "Bob McWhirter" );
+        ResourceState bob = new DefaultResourceState("bob");
+        bob.putProperty("name", "Bob McWhirter");
 
-        ResourceState result = this.connector.create( requestContext, "/db/people", bob );
+        ResourceState result = this.connector.create(requestContext, "/db/people", bob);
 
-        Resource bobResource = this.connector.fetch( "/db/people/bob" );
+        Resource bobResource = this.connector.fetch("/db/people/bob");
 
-        assertThat( bobResource ).isNotNull();
-        assertThat( bobResource.id() ).isEqualTo( "bob" );
+        assertThat(bobResource).isNotNull();
+        assertThat(bobResource.id()).isEqualTo("bob");
 
     }
 

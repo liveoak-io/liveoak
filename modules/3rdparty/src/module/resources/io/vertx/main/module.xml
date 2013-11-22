@@ -7,24 +7,24 @@
   -->
 <module xmlns="urn:jboss:module:1.0" name="io.vertx">
 
-  <resources>
-    <artifact name="io.vertx:vertx-core:${vertx.version}" />
-    <artifact name="io.vertx:vertx-platform:${vertx.version}" />
-    <artifact name="com.hazelcast:hazelcast:2.6" />
-    <artifact name="log4j:log4j:1.2.16" />
-  </resources>
+    <resources>
+        <artifact name="io.vertx:vertx-core:${vertx.version}"/>
+        <artifact name="io.vertx:vertx-platform:${vertx.version}"/>
+        <artifact name="com.hazelcast:hazelcast:2.6"/>
+        <artifact name="log4j:log4j:1.2.16"/>
+    </resources>
 
-  <dependencies>
-    <module name="io.netty" />
-    <module name="com.fasterxml.jackson.core" />
-    <module name="org.slf4j" />
-    <system>
-      <paths>
-        <path name="javax/management" />
-        <path name="javax/net/ssl" />
-      </paths>
-    </system>
-  </dependencies>
+    <dependencies>
+        <module name="io.netty"/>
+        <module name="com.fasterxml.jackson.core"/>
+        <module name="org.slf4j"/>
+        <system>
+            <paths>
+                <path name="javax/management"/>
+                <path name="javax/net/ssl"/>
+            </paths>
+        </system>
+    </dependencies>
 
 </module>
 

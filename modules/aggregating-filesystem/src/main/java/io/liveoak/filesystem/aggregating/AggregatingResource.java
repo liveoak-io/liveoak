@@ -25,7 +25,7 @@ import java.io.IOException;
  */
 public class AggregatingResource implements BinaryResource {
 
-    public AggregatingResource( Resource parent, String id, FileResource manifest ) {
+    public AggregatingResource(Resource parent, String id, FileResource manifest) {
         this.parent = parent;
         this.id = id;
         this.manifest = manifest;
@@ -33,34 +33,34 @@ public class AggregatingResource implements BinaryResource {
 
     @Override
     public MediaType mediaType() {
-        int dotLoc = this.id.lastIndexOf( '.' );
-        String extension = this.id.substring( dotLoc + 1 );
-        return MediaType.lookup( extension );
+        int dotLoc = this.id.lastIndexOf('.');
+        String extension = this.id.substring(dotLoc + 1);
+        return MediaType.lookup(extension);
     }
 
     @Override
-    public void readContent( RequestContext ctx, BinaryContentSink sink ) {
+    public void readContent(RequestContext ctx, BinaryContentSink sink) {
         File file = this.manifest.file();
         try {
-            BufferedReader reader = new BufferedReader( new FileReader( file ) );
+            BufferedReader reader = new BufferedReader(new FileReader(file));
 
             String line = null;
 
-            while ( ( line = reader.readLine() ) != null ) {
+            while ((line = reader.readLine()) != null) {
                 line = line.trim();
-                if ( line.equals( "" ) || line.startsWith( "//" ) ) {
+                if (line.equals("") || line.startsWith("//")) {
                     continue;
                 }
-                if ( line.startsWith( "require" ) ) {
-                    String rest = line.substring( "require".length() ).trim();
-                    File sub = new File( file.getParent(), rest );
+                if (line.startsWith("require")) {
+                    String rest = line.substring("require".length()).trim();
+                    File sub = new File(file.getParent(), rest);
 
-                    Buffer buffer = manifest.vertx().fileSystem().readFileSync( sub.getPath() );
-                    sink.accept( buffer.getByteBuf() );
+                    Buffer buffer = manifest.vertx().fileSystem().readFileSync(sub.getPath());
+                    sink.accept(buffer.getByteBuf());
                 }
             }
-        } catch ( FileNotFoundException e ) {
-        } catch ( IOException e ) {
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
         } finally {
             sink.close();
         }
@@ -78,8 +78,8 @@ public class AggregatingResource implements BinaryResource {
     }
 
     @Override
-    public void delete( RequestContext ctx, Responder responder ) {
-        responder.deleteNotSupported( this );
+    public void delete(RequestContext ctx, Responder responder) {
+        responder.deleteNotSupported(this);
     }
 
     private Resource parent;

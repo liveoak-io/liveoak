@@ -29,7 +29,7 @@ public class MongoEmbeddedObjectResource extends MongoObjectResource {
     }
 
     @Override
-    public  URI uri() {
+    public URI uri() {
         return null;
     }
 

@@ -36,7 +36,7 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
     public void setUpContainer() throws Exception {
         this.container = new DefaultContainer();
         this.resource = createRootResource();
-        this.container.registerResource( this.resource, createConfig() );
+        this.container.registerResource(this.resource, createConfig());
         this.connector = this.container.directConnector();
         this.vertx = this.container.vertx();
     }

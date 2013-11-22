@@ -20,7 +20,7 @@ import java.io.File;
  */
 public class FileResource implements FSResource, BinaryResource {
 
-    public FileResource( DirectoryResource parent, File file ) {
+    public FileResource(DirectoryResource parent, File file) {
         this.parent = parent;
         this.file = file;
     }
@@ -42,13 +42,13 @@ public class FileResource implements FSResource, BinaryResource {
     @Override
     public MediaType mediaType() {
         String name = this.file.getName();
-        int lastDotLoc = name.lastIndexOf( '.' );
+        int lastDotLoc = name.lastIndexOf('.');
         MediaType mediaType = null;
-        if ( lastDotLoc > 0 ) {
-            mediaType = MediaType.lookup( name.substring( lastDotLoc + 1 ) );
+        if (lastDotLoc > 0) {
+            mediaType = MediaType.lookup(name.substring(lastDotLoc + 1));
         }
 
-        if ( mediaType == null ) {
+        if (mediaType == null) {
             mediaType = MediaType.OCTET_STREAM;
         }
         return mediaType;
@@ -60,20 +60,20 @@ public class FileResource implements FSResource, BinaryResource {
     }
 
     @Override
-    public void readContent( RequestContext ctx, BinaryContentSink sink ) {
-        vertx().fileSystem().open( file.getPath(), ( result ) -> {
-            if ( result.succeeded() ) {
+    public void readContent(RequestContext ctx, BinaryContentSink sink) {
+        vertx().fileSystem().open(file.getPath(), (result) -> {
+            if (result.succeeded()) {
                 AsyncFile asyncFile = result.result();
-                asyncFile.dataHandler( ( buffer ) -> {
-                    sink.accept( buffer.getByteBuf() );
-                } );
-                asyncFile.endHandler( ( end ) -> {
+                asyncFile.dataHandler((buffer) -> {
+                    sink.accept(buffer.getByteBuf());
+                });
+                asyncFile.endHandler((end) -> {
                     sink.close();
-                } );
+                });
             } else {
                 sink.close();
             }
-        } );
+        });
     }
 
     public String toString() {

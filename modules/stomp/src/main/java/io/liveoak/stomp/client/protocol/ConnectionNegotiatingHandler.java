@@ -20,39 +20,39 @@ import java.util.function.Consumer;
  */
 public class ConnectionNegotiatingHandler extends AbstractControlFrameHandler {
 
-    public ConnectionNegotiatingHandler( StompClientContext clientContext, Consumer<StompClient> callback ) {
-        super( Stomp.Command.CONNECTED );
+    public ConnectionNegotiatingHandler(StompClientContext clientContext, Consumer<StompClient> callback) {
+        super(Stomp.Command.CONNECTED);
         this.clientContext = clientContext;
         this.callback = callback;
     }
 
     @Override
-    public void channelRegistered( ChannelHandlerContext ctx ) throws Exception {
-        this.clientContext.setConnectionState( StompClient.ConnectionState.CONNECTING );
-        super.channelRegistered( ctx );
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        this.clientContext.setConnectionState(StompClient.ConnectionState.CONNECTING);
+        super.channelRegistered(ctx);
     }
 
     @Override
-    public void channelActive( ChannelHandlerContext ctx ) throws Exception {
-        StompControlFrame connectFrame = new StompControlFrame( Stomp.Command.CONNECT );
-        connectFrame.headers().put( Headers.HOST, this.clientContext.getHost() );
-        connectFrame.headers().put( Headers.ACCEPT_VERSION, Stomp.Version.supportedVersions() );
-        ctx.writeAndFlush( connectFrame );
-        super.channelActive( ctx );
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        StompControlFrame connectFrame = new StompControlFrame(Stomp.Command.CONNECT);
+        connectFrame.headers().put(Headers.HOST, this.clientContext.getHost());
+        connectFrame.headers().put(Headers.ACCEPT_VERSION, Stomp.Version.supportedVersions());
+        ctx.writeAndFlush(connectFrame);
+        super.channelActive(ctx);
     }
 
     @Override
-    protected void handleControlFrame( ChannelHandlerContext ctx, StompControlFrame frame ) throws StompServerException {
-        String version = frame.headers().get( Headers.VERSION );
-        if ( version != null ) {
-            this.clientContext.setVersion( Stomp.Version.forVersionString( version ) );
+    protected void handleControlFrame(ChannelHandlerContext ctx, StompControlFrame frame) throws StompServerException {
+        String version = frame.headers().get(Headers.VERSION);
+        if (version != null) {
+            this.clientContext.setVersion(Stomp.Version.forVersionString(version));
         }
 
-        ctx.pipeline().replace( this, "stomp-disconnection-negotiator", new DisconnectionNegotiatingHandler( this.clientContext ) );
-        this.clientContext.setConnectionState( StompClient.ConnectionState.CONNECTED );
-        this.clientContext.setChannel( ctx.channel() );
-        if ( this.callback != null ) {
-            this.callback.accept( clientContext.getClient() );
+        ctx.pipeline().replace(this, "stomp-disconnection-negotiator", new DisconnectionNegotiatingHandler(this.clientContext));
+        this.clientContext.setConnectionState(StompClient.ConnectionState.CONNECTED);
+        this.clientContext.setChannel(ctx.channel());
+        if (this.callback != null) {
+            this.callback.accept(clientContext.getClient());
         }
     }
 

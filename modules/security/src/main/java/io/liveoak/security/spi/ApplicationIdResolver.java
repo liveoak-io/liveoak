@@ -15,5 +15,5 @@ import io.liveoak.spi.RequestContext;
 @FunctionalInterface
 public interface ApplicationIdResolver {
 
-    String resolveAppId( RequestContext req );
+    String resolveAppId(RequestContext req);
 }

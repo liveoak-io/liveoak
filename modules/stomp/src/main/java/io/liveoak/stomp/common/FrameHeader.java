@@ -24,20 +24,20 @@ public class FrameHeader {
 
     }
 
-    public FrameHeader( Stomp.Command command ) {
+    public FrameHeader(Stomp.Command command) {
         this.command = command;
     }
 
-    public FrameHeader( Stomp.Command command, Headers headers ) {
+    public FrameHeader(Stomp.Command command, Headers headers) {
         this.command = command;
-        this.headers.putAll( headers );
+        this.headers.putAll(headers);
     }
 
     public boolean isContentFrame() {
         return this.command.hasContent();
     }
 
-    public void setCommand( Stomp.Command command ) {
+    public void setCommand(Stomp.Command command) {
         this.command = command;
     }
 
@@ -45,12 +45,12 @@ public class FrameHeader {
         return this.command;
     }
 
-    public void set( String name, String value ) {
-        this.headers.put( name, value );
+    public void set(String name, String value) {
+        this.headers.put(name, value);
     }
 
-    public String get( String name ) {
-        return this.headers.get( name );
+    public String get(String name) {
+        return this.headers.get(name);
     }
 
     public Set<String> getNames() {
@@ -62,12 +62,12 @@ public class FrameHeader {
     }
 
     public int getContentLength() {
-        String value = get( Headers.CONTENT_LENGTH.toString() );
-        if ( value == null ) {
+        String value = get(Headers.CONTENT_LENGTH.toString());
+        if (value == null) {
             return -1;
         }
 
-        return Integer.parseInt( value );
+        return Integer.parseInt(value);
     }
 
     public String toString() {

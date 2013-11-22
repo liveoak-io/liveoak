@@ -28,34 +28,34 @@ public class Sorting implements Iterable<Sorting.Spec> {
 
     private List<Spec> specs = new LinkedList<>();
 
-    public Sorting( String sortingSpec ) {
-        String[] spec = sortingSpec.split( "," );
+    public Sorting(String sortingSpec) {
+        String[] spec = sortingSpec.split(",");
 
-        for ( String s : spec ) {
+        for (String s : spec) {
             boolean asc = true;
             s = s.trim();
 
-            if ( s.startsWith( "-" ) ) {
-                s = s.substring( 1 );
+            if (s.startsWith("-")) {
+                s = s.substring(1);
                 asc = false;
             }
 
-            if ( s.equals( "" ) ) {
-                throw new IllegalArgumentException( "Invalid sorting specification: " + sortingSpec );
+            if (s.equals("")) {
+                throw new IllegalArgumentException("Invalid sorting specification: " + sortingSpec);
             }
-            specs.add( new Spec( s, asc ) );
+            specs.add(new Spec(s, asc));
         }
     }
 
     public Iterator<Spec> iterator() {
-        return Collections.unmodifiableList( specs ).iterator();
+        return Collections.unmodifiableList(specs).iterator();
     }
 
     public static class Spec {
         private String name;
         private boolean ascending;
 
-        private Spec( String name, boolean ascending ) {
+        private Spec(String name, boolean ascending) {
             this.name = name;
             this.ascending = ascending;
         }

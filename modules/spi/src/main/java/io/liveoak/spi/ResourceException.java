@@ -10,17 +10,17 @@ package io.liveoak.spi;
  */
 public class ResourceException extends Exception {
 
-    protected ResourceException( String path ) {
+    protected ResourceException(String path) {
         this.path = path;
     }
 
-    public ResourceException( String path, String message ) {
-        super( message );
+    public ResourceException(String path, String message) {
+        super(message);
         this.path = path;
     }
 
-    public ResourceException( String path, Throwable cause ) {
-        super( cause );
+    public ResourceException(String path, Throwable cause) {
+        super(cause);
         this.path = path;
     }
 

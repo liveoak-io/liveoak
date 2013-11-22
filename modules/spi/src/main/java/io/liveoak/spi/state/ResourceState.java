@@ -30,9 +30,9 @@ public interface ResourceState {
      *
      * @param id The ID of the resource.
      */
-    void id( String id );
+    void id(String id);
 
-    void uri( URI uri );
+    void uri(URI uri);
 
     URI uri();
 
@@ -45,7 +45,7 @@ public interface ResourceState {
      * @param name  The name of the property.
      * @param value The value of the property.
      */
-    void putProperty( String name, Object value );
+    void putProperty(String name, Object value);
 
     /**
      * Retrieve a property value.
@@ -54,13 +54,13 @@ public interface ResourceState {
      * @return The value of the property, as either a simple scalar, or as a
      *         more complex {@link ResourceState}.
      */
-    Object getProperty( String name );
+    Object getProperty(String name);
 
     Object removeProperty(String name);
 
     Set<String> getPropertyNames();
 
-    void addMember( ResourceState member );
+    void addMember(ResourceState member);
 
     List<ResourceState> members();
 

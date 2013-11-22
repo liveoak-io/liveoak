@@ -21,39 +21,39 @@ public class ServerVerticle extends Verticle {
     private ResourceDeployer deployer;
 
     @Override
-    public void start( Future<Void> startResult ) {
+    public void start(Future<Void> startResult) {
         JsonObject config = this.container.config();
 
-        String host = config.getString( "host", "localhost" );
-        int port = config.getInteger( "port", 8080 );
+        String host = config.getString("host", "localhost");
+        int port = config.getInteger("port", 8080);
 
         try {
-            server = new UnsecureServer( this.vertx, host, port );
-        } catch ( UnknownHostException e ) {
-            startResult.setFailure( e );
+            server = new UnsecureServer(this.vertx, host, port);
+        } catch (UnknownHostException e) {
+            startResult.setFailure(e);
             return;
         }
 
         try {
             server.start();
-        } catch ( InterruptedException e ) {
-            startResult.setFailure( e );
+        } catch (InterruptedException e) {
+            startResult.setFailure(e);
         }
 
-        String address = config.getString( "address", "server.resource.registration" );
+        String address = config.getString("address", "server.resource.registration");
 
-        this.deployer = new ResourceDeployer( this.server.container(), address );
+        this.deployer = new ResourceDeployer(this.server.container(), address);
 
-        startResult.setResult( null );
+        startResult.setResult(null);
     }
 
     @Override
     public void stop() {
-        if ( server == null )
+        if (server == null)
             return;
         try {
             server.stop();
-        } catch ( InterruptedException ignored ) {
+        } catch (InterruptedException ignored) {
         }
     }
 }

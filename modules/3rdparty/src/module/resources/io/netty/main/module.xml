@@ -7,12 +7,12 @@
   -->
 <module xmlns="urn:jboss:module:1.0" name="io.netty">
 
-  <resources>
-    <artifact name="io.netty:netty-all:${netty.version}" />
-  </resources>
+    <resources>
+        <artifact name="io.netty:netty-all:${netty.version}"/>
+    </resources>
 
-  <dependencies>
-  </dependencies>
+    <dependencies>
+    </dependencies>
 
 </module>
 

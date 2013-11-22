@@ -34,8 +34,8 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
 
     @Before
     public void setUpClient() throws Exception {
-        RequestConfig cconfig = RequestConfig.custom().setSocketTimeout( 500000 ).build();
-        this.httpClient = HttpClients.custom().setDefaultRequestConfig( cconfig ).build();
+        RequestConfig cconfig = RequestConfig.custom().setSocketTimeout(500000).build();
+        this.httpClient = HttpClients.custom().setDefaultRequestConfig(cconfig).build();
     }
 
     @After
@@ -46,8 +46,8 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
     @Before
     public void setUpServer() throws Exception {
         this.container = new DefaultContainer();
-        this.container.registerResource( createRootResource(), createConfig() );
-        this.server = new UnsecureServer( this.container, "localhost", 8080 );
+        this.container.registerResource(createRootResource(), createConfig());
+        this.server = new UnsecureServer(this.container, "localhost", 8080);
         this.server.start();
     }
 

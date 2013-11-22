@@ -21,7 +21,7 @@ import io.liveoak.stomp.server.StompConnection;
  */
 public class StompSubscription implements Subscription {
 
-    public StompSubscription(SubscriptionManager subscriptionManager, StompConnection connection, String destination, String subscriptionId, MediaType mediaType, ResourceCodec codec ) {
+    public StompSubscription(SubscriptionManager subscriptionManager, StompConnection connection, String destination, String subscriptionId, MediaType mediaType, ResourceCodec codec) {
         this.subscriptionManager = subscriptionManager;
         this.connection = connection;
         this.destination = destination;
@@ -45,10 +45,10 @@ public class StompSubscription implements Subscription {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) {
-        sink.accept( "type", "stomp" );
-        sink.accept( "path", this.resourcePath.toString() );
-        sink.accept( "subscription-id", this.subscriptionId );
-        sink.accept( "media-type", this.mediaType.toString() );
+        sink.accept("type", "stomp");
+        sink.accept("path", this.resourcePath.toString());
+        sink.accept("subscription-id", this.subscriptionId);
+        sink.accept("media-type", this.mediaType.toString());
         sink.close();
     }
 
@@ -61,29 +61,29 @@ public class StompSubscription implements Subscription {
     }
 
     @Override
-    public void resourceCreated( Resource resource ) throws Exception {
-        this.connection.send( createMessage( "create", 200, resource ) );
+    public void resourceCreated(Resource resource) throws Exception {
+        this.connection.send(createMessage("create", 200, resource));
     }
 
     @Override
-    public void resourceUpdated( Resource resource ) throws Exception {
-        this.connection.send( createMessage( "update", 200, resource ) );
+    public void resourceUpdated(Resource resource) throws Exception {
+        this.connection.send(createMessage("update", 200, resource));
     }
 
     @Override
-    public void resourceDeleted( Resource resource ) throws Exception {
-        this.connection.send( createMessage( "delete", 200, resource ) );
+    public void resourceDeleted(Resource resource) throws Exception {
+        this.connection.send(createMessage("delete", 200, resource));
     }
 
-    protected StompMessage createMessage( String action, int status, Resource resource ) throws Exception {
+    protected StompMessage createMessage(String action, int status, Resource resource) throws Exception {
         StompMessage message = new DefaultStompMessage();
-        message.headers().put( Headers.SUBSCRIPTION, this.subscriptionId );
-        message.headers().put( Headers.CONTENT_TYPE, this.mediaType.toString() );
-        message.headers().put( "action", action );
-        message.headers().put( "status", "" + status );
-        message.headers().put( "location", resource.uri().toString() );
+        message.headers().put(Headers.SUBSCRIPTION, this.subscriptionId);
+        message.headers().put(Headers.CONTENT_TYPE, this.mediaType.toString());
+        message.headers().put("action", action);
+        message.headers().put("status", "" + status);
+        message.headers().put("location", resource.uri().toString());
         RequestContext requestContext = new RequestContext.Builder().build();
-        message.content( this.codec.encode( requestContext, resource ) );
+        message.content(this.codec.encode(requestContext, resource));
         return message;
     }
 

@@ -10,11 +10,11 @@ package io.liveoak.stomp;
  */
 public class StompException extends Exception {
 
-    public StompException( String message ) {
-        super( message );
+    public StompException(String message) {
+        super(message);
     }
 
-    public StompException( Throwable cause ) {
-        super( cause );
+    public StompException(Throwable cause) {
+        super(cause);
     }
 }

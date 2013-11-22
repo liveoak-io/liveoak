@@ -23,7 +23,7 @@ public class GitResourceTest extends AbstractResourceTestCase {
 
     @Override
     public RootResource createRootResource() {
-        return new GitRepoResource( "git" );
+        return new GitRepoResource("git");
     }
 
     @Override

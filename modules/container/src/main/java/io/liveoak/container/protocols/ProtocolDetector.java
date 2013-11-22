@@ -18,35 +18,35 @@ import java.util.List;
  */
 public class ProtocolDetector extends ReplayingDecoder<Void> {
 
-    private static final Charset UTF_8 = Charset.forName( "UTF-8" );
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
-    public ProtocolDetector( PipelineConfigurator configurator ) {
+    public ProtocolDetector(PipelineConfigurator configurator) {
         this.configurator = configurator;
     }
 
     @Override
-    protected void decode( ChannelHandlerContext ctx, ByteBuf in, List<Object> out ) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
 
-        int nonNewlineBytes = in.bytesBefore( ( byte ) '\n' );
+        int nonNewlineBytes = in.bytesBefore((byte) '\n');
 
         in.markReaderIndex();
 
-        if ( nonNewlineBytes > 0 ) {
-            ByteBuf lineBuffer = in.readBytes( nonNewlineBytes );
-            String line = lineBuffer.toString( UTF_8 );
+        if (nonNewlineBytes > 0) {
+            ByteBuf lineBuffer = in.readBytes(nonNewlineBytes);
+            String line = lineBuffer.toString(UTF_8);
 
             //SslHandler sslHandler = context.getPipeline().writeState( SslHandler.class );
 
             in.resetReaderIndex();
-            ByteBuf fullBuffer = in.readBytes( super.actualReadableBytes() );
+            ByteBuf fullBuffer = in.readBytes(super.actualReadableBytes());
 
-            if ( line.startsWith( "CONNECT" ) || line.startsWith( "STOMP" ) ) {
-                this.configurator.switchToPureStomp( ctx.pipeline() );
+            if (line.startsWith("CONNECT") || line.startsWith("STOMP")) {
+                this.configurator.switchToPureStomp(ctx.pipeline());
             } else {
-                this.configurator.switchToHttpWebSockets( ctx.pipeline() );
+                this.configurator.switchToHttpWebSockets(ctx.pipeline());
             }
 
-            ctx.pipeline().fireChannelRead( fullBuffer );
+            ctx.pipeline().fireChannelRead(fullBuffer);
         }
     }
 

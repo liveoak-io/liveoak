@@ -15,17 +15,17 @@ public class NotifierImpl implements Notifier {
 
     @Override
     public void resourceCreated(Resource resource) {
-        this.subscriptionManager.resourceCreated( resource );
+        this.subscriptionManager.resourceCreated(resource);
     }
 
     @Override
     public void resourceDeleted(Resource resource) {
-        this.subscriptionManager.resourceDeleted( resource );
+        this.subscriptionManager.resourceDeleted(resource);
     }
 
     @Override
     public void resourceUpdated(Resource resource) {
-        this.subscriptionManager.resourceUpdated( resource );
+        this.subscriptionManager.resourceUpdated(resource);
     }
 
     private SubscriptionManager subscriptionManager;

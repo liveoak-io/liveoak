@@ -116,12 +116,12 @@ public class SchedulerResource implements RootResource {
             TriggerResource resource = new TriggerResource(this, trigger);
 
             JobDataMap dataMap = new JobDataMap();
-            dataMap.put( "resource", resource );
+            dataMap.put("resource", resource);
 
             JobBuilder jobBuilder = JobBuilder.newJob();
             jobBuilder.withIdentity(id);
             jobBuilder.ofType(LiveOakJob.class);
-            jobBuilder.setJobData( dataMap );
+            jobBuilder.setJobData(dataMap);
 
             JobDetail jobDetail = jobBuilder.build();
 
@@ -131,7 +131,7 @@ public class SchedulerResource implements RootResource {
             responder.resourceCreated(resource);
 
         } catch (SchedulerException e) {
-            responder.internalError( e.getMessage() );
+            responder.internalError(e.getMessage());
             e.printStackTrace();
         }
     }
@@ -139,7 +139,7 @@ public class SchedulerResource implements RootResource {
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
         this.children.values().stream().forEach((e) -> {
-            sink.accept( e );
+            sink.accept(e);
         });
         sink.close();
     }

@@ -16,32 +16,32 @@ import io.netty.channel.ChannelPromise;
  */
 public class SubscriptionWatcher extends ChannelOutboundHandlerAdapter {
 
-    public SubscriptionWatcher( SubscriptionManager subscriptionManager ) {
+    public SubscriptionWatcher(SubscriptionManager subscriptionManager) {
         this.subscriptionManager = subscriptionManager;
     }
 
     @Override
-    public void write( ChannelHandlerContext ctx, Object msg, ChannelPromise promise ) throws Exception {
-        if ( msg instanceof ResourceResponse ) {
-            ResourceResponse response = ( ResourceResponse ) msg;
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        if (msg instanceof ResourceResponse) {
+            ResourceResponse response = (ResourceResponse) msg;
 
-            switch ( response.responseType() ) {
+            switch (response.responseType()) {
                 case CREATED:
-                    this.subscriptionManager.resourceCreated( response.resource() );
+                    this.subscriptionManager.resourceCreated(response.resource());
                     break;
                 case READ:
                     // no notification
                     break;
                 case UPDATED:
-                    this.subscriptionManager.resourceUpdated( response.resource() );
+                    this.subscriptionManager.resourceUpdated(response.resource());
                     break;
                 case DELETED:
-                    this.subscriptionManager.resourceDeleted( response.resource() );
+                    this.subscriptionManager.resourceDeleted(response.resource());
                     break;
             }
         }
 
-        super.write( ctx, msg, promise );
+        super.write(ctx, msg, promise);
     }
 
     private SubscriptionManager subscriptionManager;

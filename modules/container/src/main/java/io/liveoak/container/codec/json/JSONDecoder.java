@@ -27,17 +27,17 @@ public class JSONDecoder implements ResourceDecoder {
     }
 
     @Override
-    public ResourceState decode( ByteBuf resource ) throws IOException {
+    public ResourceState decode(ByteBuf resource) throws IOException {
         JsonFactory factory = new JsonFactory();
-        factory.configure( JsonParser.Feature.ALLOW_SINGLE_QUOTES, true );
-        factory.configure( JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true );
-        ByteBufInputStream in = new ByteBufInputStream( resource );
-        JsonParser parser = factory.createParser( in );
+        factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+        factory.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        ByteBufInputStream in = new ByteBufInputStream(resource);
+        JsonParser parser = factory.createParser(in);
         parser.nextToken();
 
-        ResourceState result = decode( parser );
+        ResourceState result = decode(parser);
 
-        if ( result == null ) {
+        if (result == null) {
             result = new DefaultResourceState();
         }
 
@@ -45,67 +45,67 @@ public class JSONDecoder implements ResourceDecoder {
     }
 
 
-    protected ResourceState decode( JsonParser parser ) throws IOException {
-        Object value = decodeValue( parser );
-        if ( value instanceof ResourceState ) {
-            return ( ResourceState ) value;
+    protected ResourceState decode(JsonParser parser) throws IOException {
+        Object value = decodeValue(parser);
+        if (value instanceof ResourceState) {
+            return (ResourceState) value;
         }
 
         return null;
     }
 
-    protected Object decodeValue( JsonParser parser ) throws IOException {
+    protected Object decodeValue(JsonParser parser) throws IOException {
         JsonToken token = parser.getCurrentToken();
 
         Object value = null;
 
-        if ( token == JsonToken.VALUE_STRING ) {
+        if (token == JsonToken.VALUE_STRING) {
             value = parser.getValueAsString();
             parser.nextToken();
             return value;
         }
 
-        if ( token == JsonToken.VALUE_NUMBER_INT ) {
+        if (token == JsonToken.VALUE_NUMBER_INT) {
             value = parser.getValueAsInt();
             parser.nextToken();
             return value;
         }
 
-        if ( token == JsonToken.VALUE_NUMBER_FLOAT ) {
+        if (token == JsonToken.VALUE_NUMBER_FLOAT) {
             value = parser.getValueAsDouble();
             parser.nextToken();
             return value;
         }
 
-        if ( token == JsonToken.VALUE_FALSE ) {
+        if (token == JsonToken.VALUE_FALSE) {
             value = Boolean.FALSE;
             parser.nextToken();
             return value;
         }
 
-        if ( token == JsonToken.VALUE_TRUE ) {
-            value = ( Boolean.TRUE );
+        if (token == JsonToken.VALUE_TRUE) {
+            value = (Boolean.TRUE);
             parser.nextToken();
             return value;
         }
 
-        if ( token == JsonToken.START_OBJECT ) {
-            return decodeObject( parser );
+        if (token == JsonToken.START_OBJECT) {
+            return decodeObject(parser);
         }
 
-        if ( token == JsonToken.START_ARRAY ) {
-            return decodeArray( parser );
+        if (token == JsonToken.START_ARRAY) {
+            return decodeArray(parser);
         }
 
         return null;
     }
 
-    protected ResourceState decodeObject( JsonParser parser ) throws IOException {
+    protected ResourceState decodeObject(JsonParser parser) throws IOException {
         parser.nextToken();
         DefaultResourceState resource = new DefaultResourceState();
 
-        while ( parser.getCurrentToken() == JsonToken.FIELD_NAME ) {
-            decodeProperty( parser, resource );
+        while (parser.getCurrentToken() == JsonToken.FIELD_NAME) {
+            decodeProperty(parser, resource);
         }
 
         parser.nextToken();
@@ -113,14 +113,14 @@ public class JSONDecoder implements ResourceDecoder {
         return resource;
     }
 
-    protected ArrayList<Object> decodeArray( JsonParser parser ) throws IOException {
+    protected ArrayList<Object> decodeArray(JsonParser parser) throws IOException {
 
         parser.nextToken();
         ArrayList<Object> array = new ArrayList<>();
 
-        while ( parser.getCurrentToken() != JsonToken.END_ARRAY ) {
-            Object value = decodeValue( parser );
-            array.add( value );
+        while (parser.getCurrentToken() != JsonToken.END_ARRAY) {
+            Object value = decodeValue(parser);
+            array.add(value);
         }
 
         parser.nextToken();
@@ -128,21 +128,21 @@ public class JSONDecoder implements ResourceDecoder {
         return array;
     }
 
-    protected void decodeProperty( JsonParser parser, ResourceState state ) throws IOException {
+    protected void decodeProperty(JsonParser parser, ResourceState state) throws IOException {
         String name = parser.getText();
         parser.nextToken();
-        Object value = decodeValue( parser );
+        Object value = decodeValue(parser);
 
-        if ( name.equals( "_members" ) && value instanceof Collection ) {
-            ( ( Collection ) value ).stream().forEach( ( e ) -> {
-                state.addMember( ( ResourceState ) e );
-            } );
+        if (name.equals("_members") && value instanceof Collection) {
+            ((Collection) value).stream().forEach((e) -> {
+                state.addMember((ResourceState) e);
+            });
         } else {
-            state.putProperty( name, value );
+            state.putProperty(name, value);
         }
 
-        if ( name.equals( "id" ) ) {
-            state.id( value.toString() );
+        if (name.equals("id")) {
+            state.id(value.toString());
         }
     }
 }

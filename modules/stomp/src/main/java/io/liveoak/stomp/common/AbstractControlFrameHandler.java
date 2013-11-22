@@ -15,19 +15,19 @@ import io.netty.util.ReferenceCountUtil;
  */
 public abstract class AbstractControlFrameHandler extends AbstractFrameHandler {
 
-    public AbstractControlFrameHandler( Stomp.Command command ) {
-        super( command );
+    public AbstractControlFrameHandler(Stomp.Command command) {
+        super(command);
     }
 
-    public void handleFrame( ChannelHandlerContext ctx, StompFrame msg ) throws StompServerException {
-        if ( msg instanceof StompControlFrame ) {
-            handleControlFrame( ctx, ( StompControlFrame ) msg );
+    public void handleFrame(ChannelHandlerContext ctx, StompFrame msg) throws StompServerException {
+        if (msg instanceof StompControlFrame) {
+            handleControlFrame(ctx, (StompControlFrame) msg);
             return;
         }
 
-        ReferenceCountUtil.retain( msg );
-        ctx.fireChannelRead( msg );
+        ReferenceCountUtil.retain(msg);
+        ctx.fireChannelRead(msg);
     }
 
-    protected abstract void handleControlFrame( ChannelHandlerContext ctx, StompControlFrame frame ) throws StompServerException;
+    protected abstract void handleControlFrame(ChannelHandlerContext ctx, StompControlFrame frame) throws StompServerException;
 }

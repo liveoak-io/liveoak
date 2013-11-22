@@ -11,5 +11,5 @@ import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 
 public interface ResourceDecoder {
-    ResourceState decode( ByteBuf resource ) throws IOException;
+    ResourceState decode(ByteBuf resource) throws IOException;
 }

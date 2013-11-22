@@ -21,11 +21,11 @@ public class SimpleResourceContext implements ResourceContext {
     private final Config config;
     private final Notifier notifier;
 
-    public SimpleResourceContext( Vertx vertx, DefaultContainer container, Config config ) {
+    public SimpleResourceContext(Vertx vertx, DefaultContainer container, Config config) {
         this.vertx = vertx;
         this.container = container;
         this.config = config;
-        this.notifier = new NotifierImpl( container.getSubscriptionManager() );
+        this.notifier = new NotifierImpl(container.getSubscriptionManager());
     }
 
     @Override

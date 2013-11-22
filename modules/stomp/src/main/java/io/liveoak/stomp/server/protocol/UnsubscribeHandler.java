@@ -20,21 +20,21 @@ import io.netty.util.ReferenceCountUtil;
  */
 public class UnsubscribeHandler extends AbstractControlFrameHandler {
 
-    public UnsubscribeHandler( StompServerContext serverContext ) {
-        super( Stomp.Command.UNSUBSCRIBE );
+    public UnsubscribeHandler(StompServerContext serverContext) {
+        super(Stomp.Command.UNSUBSCRIBE);
         this.serverContext = serverContext;
 
     }
 
     @Override
-    public void handleControlFrame( ChannelHandlerContext ctx, StompControlFrame msg ) throws StompServerException {
-        String subscriptionId = msg.headers().get( Headers.ID );
-        StompConnection stompConnection = ctx.channel().attr( ConnectHandler.CONNECTION ).get();
-        this.serverContext.handleUnsubscribe( stompConnection, subscriptionId );
+    public void handleControlFrame(ChannelHandlerContext ctx, StompControlFrame msg) throws StompServerException {
+        String subscriptionId = msg.headers().get(Headers.ID);
+        StompConnection stompConnection = ctx.channel().attr(ConnectHandler.CONNECTION).get();
+        this.serverContext.handleUnsubscribe(stompConnection, subscriptionId);
 
         // retain and send upstream for RECEIPT
-        ReferenceCountUtil.retain( msg );
-        ctx.fireChannelRead( msg );
+        ReferenceCountUtil.retain(msg);
+        ctx.fireChannelRead(msg);
     }
 
     private StompServerContext serverContext;

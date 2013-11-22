@@ -23,22 +23,22 @@ public class MongoObjectResource extends MongoResource {
 
     protected DBObject dbObject;
 
-    public MongoObjectResource( MongoResource parent, DBObject dbObject) {
-        super( parent );
+    public MongoObjectResource(MongoResource parent, DBObject dbObject) {
+        super(parent);
         this.dbObject = dbObject;
     }
 
     @Override
-    public void readMember( RequestContext ctx, String id, Responder responder ) {
-        Object object = this.dbObject.get( id );
-        if ( object != null ) {
-            if ( object instanceof BasicDBObject || object instanceof BasicDBList ) {
+    public void readMember(RequestContext ctx, String id, Responder responder) {
+        Object object = this.dbObject.get(id);
+        if (object != null) {
+            if (object instanceof BasicDBObject || object instanceof BasicDBList) {
                 responder.noSuchResource(null);
             } else if (object instanceof DBRef) {
                 //TODO: add in support here for references to other objects
                 responder.internalError("Referenced resources not yet supported");
             } else {
-                responder.internalError( "ERROR: Object type (" + object.getClass() + ") not recognized" );
+                responder.internalError("ERROR: Object type (" + object.getClass() + ") not recognized");
             }
         } else {
             responder.noSuchResource(id);
@@ -64,15 +64,15 @@ public class MongoObjectResource extends MongoResource {
 
     protected Object getResourceCollection(Object object) {
         if (object instanceof BasicDBObject) {
-            return new MongoEmbeddedObjectResource(this, (DBObject)object);
+            return new MongoEmbeddedObjectResource(this, (DBObject) object);
         } else if (object instanceof BasicDBList) {
-             BasicDBList dbList = ((BasicDBList)object);
-             ArrayList list = new ArrayList();
-             for (int i = 0; i< dbList.size(); i++) {
+            BasicDBList dbList = ((BasicDBList) object);
+            ArrayList list = new ArrayList();
+            for (int i = 0; i < dbList.size(); i++) {
                 Object child = dbList.get(i);
                 list.add(getResourceCollection(child));
-             }
-             return list;
+            }
+            return list;
         } else {
             return object;
         }
@@ -84,6 +84,6 @@ public class MongoObjectResource extends MongoResource {
 
     @Override
     public String id() {
-            return this.dbObject.get( MONGO_ID_FIELD ).toString();
+        return this.dbObject.get(MONGO_ID_FIELD).toString();
     }
 }

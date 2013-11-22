@@ -84,7 +84,7 @@ public class HttpSubscriptionTest {
 
         // Delete a subscribed thing
 
-        ResourceState deletedBob = this.connector.delete( requestContext, createdBob.uri().toString() );
+        ResourceState deletedBob = this.connector.delete(requestContext, createdBob.uri().toString());
 
         // Give it time to propagate
 
@@ -93,8 +93,8 @@ public class HttpSubscriptionTest {
         // ensure delete was notified to subscriber
 
         try {
-            this.connector.read( requestContext, notifiedBob.uri().toString() );
-            fail( "Should have thrown ResourceNotFoundException" );
+            this.connector.read(requestContext, notifiedBob.uri().toString());
+            fail("Should have thrown ResourceNotFoundException");
         } catch (ResourceNotFoundException e) {
             // expected and correct
         }
@@ -117,7 +117,7 @@ public class HttpSubscriptionTest {
 
         try {
             this.connector.read(requestContext, "/memory/notifications/" + kenId);
-            fail( "should have thrown ResourceNotFoundException" );
+            fail("should have thrown ResourceNotFoundException");
         } catch (ResourceNotFoundException e) {
             // expected and corret
         }

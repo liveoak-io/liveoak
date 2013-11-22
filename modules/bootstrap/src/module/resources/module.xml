@@ -7,23 +7,23 @@
   -->
 <module xmlns="urn:jboss:module:1.0" name="${module-name}">
 
-  <main-class name="io.liveoak.bootstrap.Bootstrap" />
+    <main-class name="io.liveoak.bootstrap.Bootstrap"/>
 
-  <resources>
-    <resource-root path="${project.artifactId}.jar" />
-  </resources>
+    <resources>
+        <resource-root path="${project.artifactId}.jar"/>
+    </resources>
 
-  <dependencies>
-    <module name="io.liveoak.spi" services="import" />
-    <module name="io.liveoak.container" />
-    <module name="com.fasterxml.jackson.core" />
-    <module name="io.vertx" />
-    <system>
-      <paths>
-        <path name="org/jboss/modules" />
-      </paths>
-    </system>
-  </dependencies>
+    <dependencies>
+        <module name="io.liveoak.spi" services="import"/>
+        <module name="io.liveoak.container"/>
+        <module name="com.fasterxml.jackson.core"/>
+        <module name="io.vertx"/>
+        <system>
+            <paths>
+                <path name="org/jboss/modules"/>
+            </paths>
+        </system>
+    </dependencies>
 
 </module>
 

@@ -14,36 +14,39 @@ import io.netty.util.concurrent.Future;
 
 import java.net.InetAddress;
 
-/** Base server capable of connecting a container to a network ports.
+/**
+ * Base server capable of connecting a container to a network ports.
  *
  * @author Bob McWhirter
  */
 public abstract class AbstractServer {
 
-    public AbstractServer( DefaultContainer container, InetAddress host, int port, EventLoopGroup group ) {
+    public AbstractServer(DefaultContainer container, InetAddress host, int port, EventLoopGroup group) {
         this.container = container;
         this.host = host;
         this.port = port;
         this.group = group;
-        this.pipelineConfigurator = new PipelineConfigurator( this.container );
+        this.pipelineConfigurator = new PipelineConfigurator(this.container);
     }
 
-    /** Synchronously start the network listener.
+    /**
+     * Synchronously start the network listener.
      *
      * @throws InterruptedException If interrupted before completely starting.
      */
     public void start() throws InterruptedException {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         serverBootstrap
-                .channel( NioServerSocketChannel.class )
-                .group( this.group )
-                .localAddress( this.host, this.port )
-                .childHandler( createChildHandler() );
+                .channel(NioServerSocketChannel.class)
+                .group(this.group)
+                .localAddress(this.host, this.port)
+                .childHandler(createChildHandler());
         ChannelFuture future = serverBootstrap.bind();
         future.sync();
     }
 
-    /** Synchronously stop the network listener.
+    /**
+     * Synchronously stop the network listener.
      *
      * @throws InterruptedException If interrupted before completely stopping.
      */
@@ -61,7 +64,8 @@ public abstract class AbstractServer {
         return this.container;
     }
 
-    /** Create a server-specific port-handler.
+    /**
+     * Create a server-specific port-handler.
      *
      * <p>This is implemented by concrete subclasses to provide
      * SSL or bare networking handling.</p>

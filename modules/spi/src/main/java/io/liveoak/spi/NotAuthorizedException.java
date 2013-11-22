@@ -10,11 +10,11 @@ package io.liveoak.spi;
  */
 public class NotAuthorizedException extends ResourceException {
 
-    public NotAuthorizedException( String path ) {
-        super( path, "Not authorized for '" + path + "'" );
+    public NotAuthorizedException(String path) {
+        super(path, "Not authorized for '" + path + "'");
     }
 
-    public NotAuthorizedException( String path, String message ) {
-        super( path, message );
+    public NotAuthorizedException(String path, String message) {
+        super(path, message);
     }
 }

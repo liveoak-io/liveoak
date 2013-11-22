@@ -4,14 +4,14 @@
   ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
   -->
 <assembly>
-  <id>m2-repo</id>
-  <formats>
-    <format>dir</format>
-  </formats>
-  <includeBaseDirectory>false</includeBaseDirectory>
-  <repositories>
-    <repository>
-      <outputDirectory>/</outputDirectory>
-    </repository>
-  </repositories>
+    <id>m2-repo</id>
+    <formats>
+        <format>dir</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <repositories>
+        <repository>
+            <outputDirectory>/</outputDirectory>
+        </repository>
+    </repositories>
 </assembly>

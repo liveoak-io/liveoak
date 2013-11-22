@@ -16,29 +16,29 @@ import io.netty.buffer.Unpooled;
  */
 public class StompContentFrame extends StompFrame implements ByteBufHolder {
 
-    public StompContentFrame( Stomp.Command command ) {
-        super( command );
+    public StompContentFrame(Stomp.Command command) {
+        super(command);
     }
 
-    public StompContentFrame( Stomp.Command command, Headers headers ) {
-        super( command, headers );
+    public StompContentFrame(Stomp.Command command, Headers headers) {
+        super(command, headers);
     }
 
-    public StompContentFrame( FrameHeader header ) {
-        super( header );
+    public StompContentFrame(FrameHeader header) {
+        super(header);
     }
 
-    public StompContentFrame( FrameHeader header, ByteBuf content ) {
-        super( header );
+    public StompContentFrame(FrameHeader header, ByteBuf content) {
+        super(header);
         this.content = content;
     }
 
-    public StompContentFrame( FrameHeader header, String content ) {
-        super( header );
-        this.content = Unpooled.copiedBuffer( content.getBytes() );
+    public StompContentFrame(FrameHeader header, String content) {
+        super(header);
+        this.content = Unpooled.copiedBuffer(content.getBytes());
     }
 
-    public void content( ByteBuf content ) {
+    public void content(ByteBuf content) {
         this.content = content;
     }
 
@@ -48,12 +48,12 @@ public class StompContentFrame extends StompFrame implements ByteBufHolder {
 
     @Override
     public StompContentFrame copy() {
-        return new StompContentFrame( frameHeader(), this.content.copy() );
+        return new StompContentFrame(frameHeader(), this.content.copy());
     }
 
     @Override
     public StompContentFrame duplicate() {
-        return new StompContentFrame( frameHeader(), this.content.duplicate() );
+        return new StompContentFrame(frameHeader(), this.content.duplicate());
     }
 
     @Override
@@ -68,8 +68,8 @@ public class StompContentFrame extends StompFrame implements ByteBufHolder {
     }
 
     @Override
-    public StompContentFrame retain( int increment ) {
-        this.content.retain( increment );
+    public StompContentFrame retain(int increment) {
+        this.content.retain(increment);
         return this;
     }
 
@@ -79,8 +79,8 @@ public class StompContentFrame extends StompFrame implements ByteBufHolder {
     }
 
     @Override
-    public boolean release( int decrement ) {
-        return this.content.release( decrement );
+    public boolean release(int decrement) {
+        return this.content.release(decrement);
     }
 
     public String toString() {

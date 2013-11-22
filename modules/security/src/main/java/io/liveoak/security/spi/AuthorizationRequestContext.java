@@ -18,7 +18,7 @@ public class AuthorizationRequestContext {
     private final AuthToken authToken;
     private final RequestContext requestContext;
 
-    public AuthorizationRequestContext( AuthToken authToken, RequestContext requestContext ) {
+    public AuthorizationRequestContext(AuthToken authToken, RequestContext requestContext) {
         this.requestContext = requestContext;
         this.authToken = authToken;
     }
@@ -32,6 +32,6 @@ public class AuthorizationRequestContext {
     }
 
     public boolean isRequestAuthenticated() {
-        return !AuthToken.ANONYMOUS_TOKEN.equals( authToken );
+        return !AuthToken.ANONYMOUS_TOKEN.equals(authToken);
     }
 }

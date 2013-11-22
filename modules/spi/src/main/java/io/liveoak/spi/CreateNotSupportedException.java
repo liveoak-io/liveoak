@@ -10,8 +10,8 @@ package io.liveoak.spi;
  */
 public class CreateNotSupportedException extends ResourceException {
 
-    public CreateNotSupportedException( String path ) {
-        super( path, "Create not supported for '" + path + "'" );
+    public CreateNotSupportedException(String path) {
+        super(path, "Create not supported for '" + path + "'");
     }
 
 }

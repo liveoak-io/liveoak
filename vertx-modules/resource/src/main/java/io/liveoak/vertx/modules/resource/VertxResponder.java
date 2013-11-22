@@ -14,13 +14,13 @@ import org.vertx.java.core.json.JsonObject;
  */
 public class VertxResponder {
 
-    public VertxResponder( Message<JsonObject> request ) {
+    public VertxResponder(Message<JsonObject> request) {
         this.request = request;
     }
 
-    public void resourceRead( JsonObject resource ) {
-        JsonObject response = ResponseBuilder.newReadResponse( resource );
-        this.request.reply( response );
+    public void resourceRead(JsonObject resource) {
+        JsonObject response = ResponseBuilder.newReadResponse(resource);
+        this.request.reply(response);
     }
 
     // TODO Really, this should probably be more link ResourceSink instead
@@ -31,14 +31,14 @@ public class VertxResponder {
     // I don't think a vertx message can have N replies, though, so we
     // probably need to setup some temporary address and communicate that
     // through the envelope.
-    public void resourcesRead( JsonArray resources ) {
-        JsonObject response = ResponseBuilder.newReadResponse( resources );
-        this.request.reply( response );
+    public void resourcesRead(JsonArray resources) {
+        JsonObject response = ResponseBuilder.newReadResponse(resources);
+        this.request.reply(response);
     }
 
-    public void noSuchResource( String id ) {
-        JsonObject response = ResponseBuilder.newNoSuchResourceResponse( id );
-        this.request.reply( response );
+    public void noSuchResource(String id) {
+        JsonObject response = ResponseBuilder.newNoSuchResourceResponse(id);
+        this.request.reply(response);
     }
 
     private Message<JsonObject> request;

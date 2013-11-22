@@ -46,15 +46,15 @@ public class TriggerResource implements Resource {
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
         this.fires.stream().forEach((e) -> {
-            sink.accept( e );
+            sink.accept(e);
         });
         sink.close();
     }
 
     public void createFire(JobExecutionContext context) {
         FireResource fireResource = new FireResource(this, context);
-        this.fires.add( fireResource );
-        this.parent.notifier().resourceCreated( fireResource );
+        this.fires.add(fireResource);
+        this.parent.notifier().resourceCreated(fireResource);
     }
 
 

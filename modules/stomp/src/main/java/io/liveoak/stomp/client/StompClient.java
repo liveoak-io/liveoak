@@ -60,28 +60,28 @@ public class StompClient {
 
     }
 
-    private Bootstrap createBootstrap( String host, Consumer<StompClient> callback ) {
+    private Bootstrap createBootstrap(String host, Consumer<StompClient> callback) {
         Executor executor = Executors.newCachedThreadPool();
         NioEventLoopGroup group = new NioEventLoopGroup();
 
         StompClientContext clientContext = new ContextImplStomp();
 
         Bootstrap bootstrap = new Bootstrap();
-        bootstrap.channel( NioSocketChannel.class );
-        bootstrap.group( group );
-        bootstrap.handler( new ChannelInitializer<NioSocketChannel>() {
+        bootstrap.channel(NioSocketChannel.class);
+        bootstrap.group(group);
+        bootstrap.handler(new ChannelInitializer<NioSocketChannel>() {
             @Override
-            protected void initChannel( NioSocketChannel ch ) throws Exception {
+            protected void initChannel(NioSocketChannel ch) throws Exception {
                 //ch.pipeline().addLast( new DebugHandler( "client-head" ) );
-                ch.pipeline().addLast( new StompFrameEncoder() );
-                ch.pipeline().addLast( new StompFrameDecoder() );
+                ch.pipeline().addLast(new StompFrameEncoder());
+                ch.pipeline().addLast(new StompFrameDecoder());
                 //ch.pipeline().addLast( new DebugHandler( "client-frames" ) );
-                ch.pipeline().addLast( new ConnectionNegotiatingHandler( clientContext, callback ) );
-                ch.pipeline().addLast( new StompMessageEncoder( false ) );
-                ch.pipeline().addLast( new StompMessageDecoder() );
-                ch.pipeline().addLast( new MessageHandler( clientContext, executor ) );
+                ch.pipeline().addLast(new ConnectionNegotiatingHandler(clientContext, callback));
+                ch.pipeline().addLast(new StompMessageEncoder(false));
+                ch.pipeline().addLast(new StompMessageDecoder());
+                ch.pipeline().addLast(new MessageHandler(clientContext, executor));
             }
-        } );
+        });
 
         return bootstrap;
     }
@@ -104,12 +104,12 @@ public class StompClient {
      * @throws InterruptedException If the connection times out.
      * @throws StompException       If an error occurs during connection.
      */
-    public void connectSync( String host, int port ) throws InterruptedException, StompException {
-        CountDownLatch latch = new CountDownLatch( 1 );
-        connect( host, port, ( client ) -> {
+    public void connectSync(String host, int port) throws InterruptedException, StompException {
+        CountDownLatch latch = new CountDownLatch(1);
+        connect(host, port, (client) -> {
             latch.countDown();
-        } );
-        latch.await( 30, TimeUnit.SECONDS );
+        });
+        latch.await(30, TimeUnit.SECONDS);
     }
 
     /**
@@ -119,10 +119,10 @@ public class StompClient {
      * @param port     Port to connect to.
      * @param callback Callback to fire after successfully connecting.
      */
-    public void connect( String host, int port, Consumer<StompClient> callback ) {
+    public void connect(String host, int port, Consumer<StompClient> callback) {
         this.host = host;
-        Bootstrap bootstrap = createBootstrap( host, callback );
-        bootstrap.connect( host, port );
+        Bootstrap bootstrap = createBootstrap(host, callback);
+        bootstrap.connect(host, port);
     }
 
     /**
@@ -132,11 +132,11 @@ public class StompClient {
      * @throws StompException       If an error occurs during disconnection.
      */
     public void disconnectSync() throws StompException, InterruptedException {
-        CountDownLatch latch = new CountDownLatch( 1 );
-        disconnect( () -> {
+        CountDownLatch latch = new CountDownLatch(1);
+        disconnect(() -> {
             latch.countDown();
-        } );
-        latch.await( 30, TimeUnit.SECONDS );
+        });
+        latch.await(30, TimeUnit.SECONDS);
     }
 
     /**
@@ -144,9 +144,9 @@ public class StompClient {
      *
      * @param callback Callback to fire after successfully disconnecting.
      */
-    public void disconnect( Runnable callback ) {
-        this.channel.pipeline().get( DisconnectionNegotiatingHandler.class ).setCallback( callback );
-        this.channel.writeAndFlush( StompFrame.newDisconnectFrame() );
+    public void disconnect(Runnable callback) {
+        this.channel.pipeline().get(DisconnectionNegotiatingHandler.class).setCallback(callback);
+        this.channel.writeAndFlush(StompFrame.newDisconnectFrame());
     }
 
     /**
@@ -157,8 +157,8 @@ public class StompClient {
      *
      * @param message The message to send.
      */
-    public void send( StompMessage message ) {
-        this.channel.writeAndFlush( message );
+    public void send(StompMessage message) {
+        this.channel.writeAndFlush(message);
     }
 
     /**
@@ -167,11 +167,11 @@ public class StompClient {
      * @param destination The destination.
      * @param content     The content bytes.
      */
-    public void send( String destination, ByteBuf content ) {
+    public void send(String destination, ByteBuf content) {
         StompMessage message = new DefaultStompMessage();
-        message.destination( destination );
-        message.content( content.duplicate().retain() );
-        send( message );
+        message.destination(destination);
+        message.content(content.duplicate().retain());
+        send(message);
     }
 
     /**
@@ -180,11 +180,11 @@ public class StompClient {
      * @param destination The destination.
      * @param content     The content, as a UTF-8 string.
      */
-    public void send( String destination, String content ) {
+    public void send(String destination, String content) {
         StompMessage message = new DefaultStompMessage();
-        message.destination( destination );
-        message.content( content );
-        send( message );
+        message.destination(destination);
+        message.content(content);
+        send(message);
     }
 
     /**
@@ -194,12 +194,12 @@ public class StompClient {
      * @param headers     Additional headers.
      * @param content     The content, as a UTF-8 string.
      */
-    public void send( String destination, Headers headers, String content ) {
+    public void send(String destination, Headers headers, String content) {
         StompMessage message = new DefaultStompMessage();
-        message.headers().putAll( headers );
-        message.destination( destination );
-        message.content( content );
-        send( message );
+        message.headers().putAll(headers);
+        message.destination(destination);
+        message.content(content);
+        send(message);
     }
 
     /**
@@ -209,12 +209,12 @@ public class StompClient {
      * @param headers     Additional headers.
      * @param content     The content bytes.
      */
-    public void send( String destination, Headers headers, ByteBuf content ) {
+    public void send(String destination, Headers headers, ByteBuf content) {
         StompMessage message = new DefaultStompMessage();
-        message.headers().putAll( headers );
-        message.destination( destination );
-        message.content( content );
-        send( message );
+        message.headers().putAll(headers);
+        message.destination(destination);
+        message.content(content);
+        send(message);
     }
 
     /**
@@ -223,8 +223,8 @@ public class StompClient {
      * @param destination The destination to subscribe to.
      * @param handler     Handler for inbound messages sent from the server.
      */
-    public void subscribe( String destination, Consumer<StompMessage> handler ) {
-        subscribe( destination, new HeadersImpl(), handler );
+    public void subscribe(String destination, Consumer<StompMessage> handler) {
+        subscribe(destination, new HeadersImpl(), handler);
     }
 
     /**
@@ -238,14 +238,14 @@ public class StompClient {
      * @param headers     Additional headers.
      * @param handler     Handler for inbound messages sent from the server.
      */
-    public void subscribe( String destination, Headers headers, Consumer<StompMessage> handler ) {
+    public void subscribe(String destination, Headers headers, Consumer<StompMessage> handler) {
         String subscriptionId = "sub-" + subscriptionCounter.getAndIncrement();
-        this.subscriptions.put( subscriptionId, handler );
-        StompControlFrame frame = new StompControlFrame( Stomp.Command.SUBSCRIBE );
-        frame.headers().putAll( headers );
-        frame.headers().put( Headers.ID, subscriptionId );
-        frame.headers().put( Headers.DESTINATION, destination );
-        this.channel.writeAndFlush( frame );
+        this.subscriptions.put(subscriptionId, handler);
+        StompControlFrame frame = new StompControlFrame(Stomp.Command.SUBSCRIBE);
+        frame.headers().putAll(headers);
+        frame.headers().put(Headers.ID, subscriptionId);
+        frame.headers().put(Headers.DESTINATION, destination);
+        this.channel.writeAndFlush(frame);
     }
 
     private String host;
@@ -265,7 +265,7 @@ public class StompClient {
             return StompClient.this.host;
         }
 
-        public void setChannel( Channel channel ) {
+        public void setChannel(Channel channel) {
             StompClient.this.channel = channel;
         }
 
@@ -273,7 +273,7 @@ public class StompClient {
             return StompClient.this.channel;
         }
 
-        public void setConnectionState( ConnectionState connectionState ) {
+        public void setConnectionState(ConnectionState connectionState) {
             StompClient.this.connectionState = connectionState;
         }
 
@@ -281,7 +281,7 @@ public class StompClient {
             return StompClient.this.connectionState;
         }
 
-        public void setVersion( Stomp.Version version ) {
+        public void setVersion(Stomp.Version version) {
             StompClient.this.version = version;
         }
 
@@ -289,8 +289,8 @@ public class StompClient {
             return StompClient.this.version;
         }
 
-        public Consumer<StompMessage> getSubscriptionHandler( String subscriptionId ) {
-            return StompClient.this.subscriptions.get( subscriptionId );
+        public Consumer<StompMessage> getSubscriptionHandler(String subscriptionId) {
+            return StompClient.this.subscriptions.get(subscriptionId);
         }
 
     }

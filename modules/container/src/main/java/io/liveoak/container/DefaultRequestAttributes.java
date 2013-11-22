@@ -25,7 +25,7 @@ public class DefaultRequestAttributes implements RequestAttributes {
 
     @Override
     public Collection<String> getAttributeNames() {
-        if ( attributesMap == null ) {
+        if (attributesMap == null) {
             return null;
         } else {
             return attributesMap.keySet();
@@ -33,28 +33,28 @@ public class DefaultRequestAttributes implements RequestAttributes {
     }
 
     @Override
-    public Object getAttribute( String attributeName ) {
-        if ( attributesMap == null ) {
+    public Object getAttribute(String attributeName) {
+        if (attributesMap == null) {
             return null;
         } else {
-            return attributesMap.get( attributeName );
+            return attributesMap.get(attributeName);
         }
     }
 
     @Override
-    public void setAttribute( String attributeName, Object attributeValue ) {
-        if ( attributesMap == null ) {
+    public void setAttribute(String attributeName, Object attributeValue) {
+        if (attributesMap == null) {
             attributesMap = new HashMap<>();
         }
-        attributesMap.put( attributeName, attributeValue );
+        attributesMap.put(attributeName, attributeValue);
     }
 
     @Override
-    public Object removeAttribute( String attributeName ) {
-        if ( attributesMap == null ) {
+    public Object removeAttribute(String attributeName) {
+        if (attributesMap == null) {
             return null;
         } else {
-            return attributesMap.remove( attributeName );
+            return attributesMap.remove(attributeName);
         }
     }
 }

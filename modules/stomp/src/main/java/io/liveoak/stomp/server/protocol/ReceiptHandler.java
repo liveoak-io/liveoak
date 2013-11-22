@@ -20,15 +20,15 @@ public class ReceiptHandler extends SimpleChannelInboundHandler<StompFrame> {
     }
 
     @Override
-    protected void channelRead0( ChannelHandlerContext ctx, StompFrame msg ) throws Exception {
-        String receiptId = msg.headers().get( Headers.RECEIPT );
-        if ( receiptId != null ) {
-            ctx.writeAndFlush( StompFrame.newReceiptFrame( receiptId ) );
+    protected void channelRead0(ChannelHandlerContext ctx, StompFrame msg) throws Exception {
+        String receiptId = msg.headers().get(Headers.RECEIPT);
+        if (receiptId != null) {
+            ctx.writeAndFlush(StompFrame.newReceiptFrame(receiptId));
         }
 
         // retain and keep it moving upstream
-        ReferenceCountUtil.retain( msg );
-        ctx.fireChannelRead( msg );
+        ReferenceCountUtil.retain(msg);
+        ctx.fireChannelRead(msg);
     }
 
 }

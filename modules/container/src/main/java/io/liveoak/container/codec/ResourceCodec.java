@@ -22,7 +22,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public class ResourceCodec {
 
-    public ResourceCodec( DefaultContainer container, Class<? extends Encoder> encoderClass, ResourceDecoder decoder ) {
+    public ResourceCodec(DefaultContainer container, Class<? extends Encoder> encoderClass, ResourceDecoder decoder) {
         this.container = container;
         this.encoderClass = encoderClass;
         this.decoder = decoder;
@@ -36,24 +36,24 @@ public class ResourceCodec {
         return this.decoder != null;
     }
 
-    public ByteBuf encode( RequestContext ctx, Resource resource ) throws Exception {
+    public ByteBuf encode(RequestContext ctx, Resource resource) throws Exception {
         CompletableFuture<ByteBuf> future = new CompletableFuture<>();
-        newEncodingDriver( ctx, resource, future ).encode();
+        newEncodingDriver(ctx, resource, future).encode();
         ByteBuf result = future.get();
         return result;
     }
 
-    public ResourceState decode( ByteBuf resource ) throws Exception {
-        return this.decoder.decode( resource );
+    public ResourceState decode(ByteBuf resource) throws Exception {
+        return this.decoder.decode(resource);
     }
 
-    protected EncodingDriver newEncodingDriver( RequestContext ctx, Resource resource, CompletableFuture<ByteBuf> future ) throws Exception {
+    protected EncodingDriver newEncodingDriver(RequestContext ctx, Resource resource, CompletableFuture<ByteBuf> future) throws Exception {
         ByteBuf buffer = Unpooled.buffer();
         Encoder encoder = this.encoderClass.newInstance();
-        encoder.initialize( buffer );
-        RootEncodingDriver driver = new RootEncodingDriver( ctx, encoder, resource, () -> {
-            future.complete( buffer );
-        } );
+        encoder.initialize(buffer);
+        RootEncodingDriver driver = new RootEncodingDriver(ctx, encoder, resource, () -> {
+            future.complete(buffer);
+        });
         return driver;
     }
 

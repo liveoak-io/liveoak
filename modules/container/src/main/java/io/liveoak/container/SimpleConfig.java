@@ -22,31 +22,31 @@ public class SimpleConfig implements Config {
     private final Map<String, Object> fields;
 
     public SimpleConfig() {
-        this( new HashMap<>() );
+        this(new HashMap<>());
     }
 
-    public SimpleConfig( Map<String, Object> fields ) {
+    public SimpleConfig(Map<String, Object> fields) {
         this.fields = fields;
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T put( String name, T o ) {
-        return ( T ) fields.put( name, o );
+    public <T> T put(String name, T o) {
+        return (T) fields.put(name, o);
     }
 
     @Override
-    public <T> T get( String name, T defaultValue ) throws ConfigurationException {
-        Object field = fields.get( name );
-        if ( field == null ) {
+    public <T> T get(String name, T defaultValue) throws ConfigurationException {
+        Object field = fields.get(name);
+        if (field == null) {
             return defaultValue;
         } else {
             //TODO: Throw ConfigurationException for invalid types based on defaultValue type
-            return ( T ) field;
+            return (T) field;
         }
     }
 
-    public void putAll( Map<String, Object> config ) {
-        config.putAll( this.fields );
+    public void putAll(Map<String, Object> config) {
+        config.putAll(this.fields);
     }
 
     @Override

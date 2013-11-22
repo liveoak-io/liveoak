@@ -23,7 +23,7 @@ public class DefaultResourceState implements ResourceState {
 
     }
 
-    public DefaultResourceState( String id ) {
+    public DefaultResourceState(String id) {
         this.id = id;
     }
 
@@ -33,12 +33,12 @@ public class DefaultResourceState implements ResourceState {
     }
 
     @Override
-    public void id( String id ) {
+    public void id(String id) {
         this.id = id;
     }
 
     @Override
-    public void uri( URI uri ) {
+    public void uri(URI uri) {
         this.uri = uri;
     }
 
@@ -48,18 +48,18 @@ public class DefaultResourceState implements ResourceState {
     }
 
     @Override
-    public void putProperty( String name, Object value ) {
-        this.properties.put( name, value );
+    public void putProperty(String name, Object value) {
+        this.properties.put(name, value);
     }
 
     @Override
-    public Object getProperty( String name ) {
-        return this.properties.get( name );
+    public Object getProperty(String name) {
+        return this.properties.get(name);
     }
 
     @Override
     public Object removeProperty(String name) {
-        return this.properties.remove( name );
+        return this.properties.remove(name);
     }
 
     @Override
@@ -68,8 +68,8 @@ public class DefaultResourceState implements ResourceState {
     }
 
     @Override
-    public void addMember( ResourceState member ) {
-        this.members.add( member );
+    public void addMember(ResourceState member) {
+        this.members.add(member);
     }
 
     @Override

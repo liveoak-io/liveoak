@@ -16,21 +16,21 @@ import java.util.List;
  */
 public class StompMessageEncoder extends MessageToMessageEncoder<StompMessage> {
 
-    public StompMessageEncoder( boolean server ) {
+    public StompMessageEncoder(boolean server) {
         this.server = server;
 
     }
 
     @Override
-    protected void encode( ChannelHandlerContext ctx, StompMessage msg, List<Object> out ) throws Exception {
-        if ( server ) {
-            if ( msg.isError() ) {
-                out.add( StompFrame.newErrorFrame( msg.retain() ) );
+    protected void encode(ChannelHandlerContext ctx, StompMessage msg, List<Object> out) throws Exception {
+        if (server) {
+            if (msg.isError()) {
+                out.add(StompFrame.newErrorFrame(msg.retain()));
             } else {
-                out.add( StompFrame.newMessageFrame( msg.retain() ) );
+                out.add(StompFrame.newMessageFrame(msg.retain()));
             }
         } else {
-            out.add( StompFrame.newSendFrame( msg.retain() ) );
+            out.add(StompFrame.newSendFrame(msg.retain()));
         }
     }
 

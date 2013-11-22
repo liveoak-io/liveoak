@@ -17,8 +17,8 @@ import java.security.Signature;
  */
 public class RSAProvider {
 
-    public static String getJavaAlgorithm( String alg ) {
-        switch ( alg ) {
+    public static String getJavaAlgorithm(String alg) {
+        switch (alg) {
             case "RS256":
                 return "SHA256withRSA";
             case "RS384":
@@ -26,37 +26,37 @@ public class RSAProvider {
             case "RS512":
                 return "SHA512withRSA";
             default:
-                throw new IllegalArgumentException( "Not an RSA Algorithm" );
+                throw new IllegalArgumentException("Not an RSA Algorithm");
         }
     }
 
-    public static Signature getSignature( String alg ) {
+    public static Signature getSignature(String alg) {
         try {
-            return Signature.getInstance( getJavaAlgorithm( alg ) );
-        } catch ( Exception e ) {
-            throw new RuntimeException( e );
+            return Signature.getInstance(getJavaAlgorithm(alg));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static byte[] sign( byte[] data, String algorithm, PrivateKey privateKey ) {
+    public static byte[] sign(byte[] data, String algorithm, PrivateKey privateKey) {
         try {
-            Signature signature = getSignature( algorithm );
-            signature.initSign( privateKey );
-            signature.update( data );
+            Signature signature = getSignature(algorithm);
+            signature.initSign(privateKey);
+            signature.update(data);
             return signature.sign();
-        } catch ( Exception e ) {
-            throw new RuntimeException( e );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static boolean verify( JsonWebToken token, PublicKey publicKey ) {
+    public static boolean verify(JsonWebToken token, PublicKey publicKey) {
         try {
-            Signature verifier = getSignature( token.getHeader().getAlgorithm() );
-            verifier.initVerify( publicKey );
-            verifier.update( token.getClaimsBytes() );
-            return verifier.verify( token.getSignatureBytes() );
-        } catch ( Exception e ) {
-            throw new RuntimeException( e );
+            Signature verifier = getSignature(token.getHeader().getAlgorithm());
+            verifier.initVerify(publicKey);
+            verifier.update(token.getClaimsBytes());
+            return verifier.verify(token.getSignatureBytes());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
     }

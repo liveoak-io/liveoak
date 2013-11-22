@@ -13,7 +13,7 @@ import io.netty.buffer.ByteBuf;
  */
 public class EncodingResult {
 
-    public EncodingResult( MediaType mediaType, ByteBuf encoded ) {
+    public EncodingResult(MediaType mediaType, ByteBuf encoded) {
         this.mediaType = mediaType;
         this.encoded = encoded;
     }

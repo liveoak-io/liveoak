@@ -22,27 +22,27 @@ public class FilesystemResourceTest extends AbstractResourceTestCase {
 
     @Override
     public RootResource createRootResource() {
-        return new FilesystemResource( "files" );
+        return new FilesystemResource("files");
     }
 
     @Override
     public Config createConfig() {
         SimpleConfig config = new SimpleConfig();
-        config.put( "root", this.projectRoot.getAbsolutePath() );
+        config.put("root", this.projectRoot.getAbsolutePath());
         return config;
     }
 
     @Test
     public void testRoot() throws Exception {
-        ResourceState result = connector.read( new RequestContext.Builder().build(), "/files" );
+        ResourceState result = connector.read(new RequestContext.Builder().build(), "/files");
 
-        assertThat( result ).isNotNull();
+        assertThat(result).isNotNull();
     }
 
     @Test
     public void testChild() throws Exception {
-        ResourceState result = connector.read( new RequestContext.Builder().build(), "/files/pom.xml" );
-        assertThat( result ).isNotNull();
+        ResourceState result = connector.read(new RequestContext.Builder().build(), "/files/pom.xml");
+        assertThat(result).isNotNull();
     }
 
     /*

@@ -32,48 +32,48 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
     @Test
     public void testGetSimple() throws Exception {
         String methodName = "testSimpleGet";
-        assertFalse( db.collectionExists( methodName ) );
+        assertFalse(db.collectionExists(methodName));
 
         // create the object using the mongo driver directly
         BasicDBObject object = new BasicDBObject();
-        object.append( "foo", "bar" );
-        db.getCollection( methodName ).insert(object);
+        object.append("foo", "bar");
+        db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = object.getObjectId( "_id" ).toString();
+        String id = object.getObjectId("_id").toString();
 
         ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
 
         //verify response
-        assertThat( result ).isNotNull();
-        assertThat( result.getProperty( "foo" ) ).isEqualTo( "bar" );
+        assertThat(result).isNotNull();
+        assertThat(result.getProperty("foo")).isEqualTo("bar");
     }
 
     @Test
     public void testGetWithEmbedded() throws Exception {
         String methodName = "testGetWithEmbedded";
-        assertFalse( db.collectionExists( methodName ) );
+        assertFalse(db.collectionExists(methodName));
 
         // create the object using the mongo driver directly
         BasicDBObject object = new BasicDBObject();
-        object.append( "foo", "bar" );
-        object.append( "child", new BasicDBObject().append("ABC", "XYZ"));
-        db.getCollection( methodName ).insert(object);
-        assertEquals( 1, db.getCollection( methodName ).getCount() );
-        String id = object.getObjectId( "_id" ).toString();
+        object.append("foo", "bar");
+        object.append("child", new BasicDBObject().append("ABC", "XYZ"));
+        db.getCollection(methodName).insert(object);
+        assertEquals(1, db.getCollection(methodName).getCount());
+        String id = object.getObjectId("_id").toString();
 
-        ResourceState result = connector.read( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
+        ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
 
         //verify response
         assertThat(result).isNotNull();
-        assertThat( result.getProperty( "foo" ) ).isEqualTo( "bar" );
+        assertThat(result.getProperty("foo")).isEqualTo("bar");
         ResourceState resultChild = (ResourceState) result.getProperty("child");
-        assertThat (resultChild.getProperty("ABC")).isEqualTo("XYZ");
+        assertThat(resultChild.getProperty("ABC")).isEqualTo("XYZ");
     }
 
     @Test
     public void testGetEmbeddedWithReturnFields() throws Exception {
         String methodName = "testGetEmbeddedWithReturnFields";
-        assertFalse( db.collectionExists( methodName ) );
+        assertFalse(db.collectionExists(methodName));
 
         // create the object using the mongo driver directly
         BasicDBObject object = new BasicDBObject();
@@ -81,13 +81,13 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         object.append("child", new BasicDBObject().append("ABC", "XYZ").append("test", "123").append("grandchild", new BasicDBObject("123", 456)));
         object.append("baz", "123");
 
-        db.getCollection( methodName ).insert(object);
-        assertEquals( 1, db.getCollection( methodName ).getCount() );
-        String id = object.getObjectId( "_id" ).toString();
+        db.getCollection(methodName).insert(object);
+        assertEquals(1, db.getCollection(methodName).getCount());
+        String id = object.getObjectId("_id").toString();
 
         //check that we don't get back baz, but that we do get the child and grandchild
         RequestContext rCtx = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("foo,child")).build();
-        ResourceState result = connector.read( rCtx, BASEPATH + "/" + methodName + "/" + id);
+        ResourceState result = connector.read(rCtx, BASEPATH + "/" + methodName + "/" + id);
 
         //verify response
         assertThat(result).isNotNull();
@@ -95,15 +95,15 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertThat(result.getProperty("child")).isNotNull();
         assertThat(result.getProperty("baz")).isNull();
         ResourceState resultChild = (ResourceState) result.getProperty("child");
-        assertThat (resultChild.getProperty("ABC")).isEqualTo("XYZ");
-        assertThat (resultChild.getProperty("test")).isEqualTo("123");
+        assertThat(resultChild.getProperty("ABC")).isEqualTo("XYZ");
+        assertThat(resultChild.getProperty("test")).isEqualTo("123");
         ResourceState resultGrandChild = (ResourceState) resultChild.getProperty("grandchild");
-        assertThat (resultGrandChild.getProperty("123")).isEqualTo(456);
+        assertThat(resultGrandChild.getProperty("123")).isEqualTo(456);
 
 
         // check that we don't get back the non specified embedded objects
         rCtx = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("foo")).build();
-        result = connector.read( rCtx, BASEPATH + "/" + methodName + "/" + id);
+        result = connector.read(rCtx, BASEPATH + "/" + methodName + "/" + id);
 
         //verify response
         assertThat(result).isNotNull();
@@ -113,7 +113,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
         // check that we don't get back the non specified embedded child objects
         rCtx = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("foo,child(ABC,test)")).build();
-        result = connector.read( rCtx, BASEPATH + "/" + methodName + "/" + id);
+        result = connector.read(rCtx, BASEPATH + "/" + methodName + "/" + id);
 
         // verify response
         assertThat(result).isNotNull();
@@ -133,16 +133,16 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
         // create the object using the mongo driver directly
         BasicDBObject object = new BasicDBObject();
-        object.append( "foo", "bar" ).append( "abc", "123" ).append( "obj", new BasicDBObject( "foo2", "bar2" ) );
-        object.append( "child", new BasicDBObject( "grandchild", new BasicDBObject( "foo3", "bar3" ) ) );
-        db.getCollection( methodName ).insert( object );
-        assertEquals( 1, db.getCollection( methodName ).getCount() );
-        String id = object.getObjectId( "_id" ).toString();
+        object.append("foo", "bar").append("abc", "123").append("obj", new BasicDBObject("foo2", "bar2"));
+        object.append("child", new BasicDBObject("grandchild", new BasicDBObject("foo3", "bar3")));
+        db.getCollection(methodName).insert(object);
+        assertEquals(1, db.getCollection(methodName).getCount());
+        String id = object.getObjectId("_id").toString();
 
         try {
-            ResourceState result = connector.read( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/child" );
+            ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/child");
             Fail.fail();
-        } catch (ResourceNotFoundException e ) {
+        } catch (ResourceNotFoundException e) {
             //expected
         }
     }
@@ -178,8 +178,8 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("foobaz");
         // check the array
-        assertThat(((Collection)result.getProperty("array")).size()).isEqualTo(3);
-        Iterator arrayIter = ((Collection)result.getProperty("array")).iterator();
+        assertThat(((Collection) result.getProperty("array")).size()).isEqualTo(3);
+        Iterator arrayIter = ((Collection) result.getProperty("array")).iterator();
         assertThat(arrayIter.next()).isEqualTo(1);
         assertThat(arrayIter.next()).isEqualTo("A");
 
@@ -187,7 +187,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertThat(child.getProperty("foo")).isEqualTo("bar");
 
         assertThat(arrayIter.hasNext()).isFalse();
-        assertThat(((Collection)result.getProperty("eArray"))).isEmpty();
+        assertThat(((Collection) result.getProperty("eArray"))).isEmpty();
 
         try {
             result = connector.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*(*))")).build(), BASEPATH + "/" + methodName + "/foobaz/child");
@@ -226,12 +226,12 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
     @Test
     public void testGetInvalidId() throws Exception {
         String methodName = "testGetInvalidId";
-        assertFalse( db.collectionExists( methodName ) );
+        assertFalse(db.collectionExists(methodName));
 
         try {
-            ResourceState result = connector.read( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/foobar123" );
-            fail( "shouldn't get here" );
-        } catch ( ResourceNotFoundException rnfe ) {
+            ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/foobar123");
+            fail("shouldn't get here");
+        } catch (ResourceNotFoundException rnfe) {
             // expected
         }
     }
@@ -239,14 +239,14 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
     @Test
     public void testGetNonExistantId() throws Exception {
         String methodName = "testGetNonExistantId";
-        assertFalse( db.collectionExists( methodName ) );
+        assertFalse(db.collectionExists(methodName));
 
         ObjectId id = new ObjectId();
 
         try {
-            ResourceState result = connector.read( new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id );
-            fail( "shouldn't get here" );
-        } catch ( ResourceNotFoundException rnfe ) {
+            ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
+            fail("shouldn't get here");
+        } catch (ResourceNotFoundException rnfe) {
             // expected
         }
     }

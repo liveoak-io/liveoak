@@ -16,26 +16,26 @@ import io.netty.util.ReferenceCountUtil;
  */
 public abstract class AbstractFrameHandler extends SimpleChannelInboundHandler<StompFrame> {
 
-    public AbstractFrameHandler( Stomp.Command command ) {
+    public AbstractFrameHandler(Stomp.Command command) {
         this.command = command;
     }
 
-    public void channelRead0( ChannelHandlerContext ctx, StompFrame msg ) throws Exception {
-        if ( this.command != null ) {
-            if ( ( ( StompFrame ) msg ).command().equals( this.command ) ) {
-                handleFrame( ctx, ( StompFrame ) msg );
+    public void channelRead0(ChannelHandlerContext ctx, StompFrame msg) throws Exception {
+        if (this.command != null) {
+            if (((StompFrame) msg).command().equals(this.command)) {
+                handleFrame(ctx, (StompFrame) msg);
                 return;
             }
         } else {
-            handleFrame( ctx, ( StompFrame ) msg );
+            handleFrame(ctx, (StompFrame) msg);
             return;
         }
 
-        ReferenceCountUtil.retain( msg );
-        ctx.fireChannelRead( msg );
+        ReferenceCountUtil.retain(msg);
+        ctx.fireChannelRead(msg);
     }
 
-    protected abstract void handleFrame( ChannelHandlerContext ctx, StompFrame frame ) throws StompServerException;
+    protected abstract void handleFrame(ChannelHandlerContext ctx, StompFrame frame) throws StompServerException;
 
     private Stomp.Command command;
 }

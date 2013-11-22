@@ -45,7 +45,7 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
         assertThat(fromCollection.getProperty("cron")).isEqualTo("* * * * * ?");
         assertThat(fromCollection.getProperty("state")).isEqualTo("normal");
 
-        assertThat( fromCollection.members().size() ).isGreaterThanOrEqualTo( 2 );
+        assertThat(fromCollection.members().size()).isGreaterThanOrEqualTo(2);
     }
 
 }

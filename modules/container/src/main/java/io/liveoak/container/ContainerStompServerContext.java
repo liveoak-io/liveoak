@@ -18,40 +18,40 @@ import io.liveoak.stomp.server.StompServerContext;
  */
 public class ContainerStompServerContext implements StompServerContext {
 
-    public ContainerStompServerContext( DefaultContainer container ) {
+    public ContainerStompServerContext(DefaultContainer container) {
         this.container = container;
     }
 
     @Override
-    public void handleConnect( StompConnection connection ) {
+    public void handleConnect(StompConnection connection) {
     }
 
     @Override
-    public void handleDisconnect( StompConnection connection ) {
+    public void handleDisconnect(StompConnection connection) {
     }
 
     @Override
-    public void handleSubscribe( StompConnection connection, String destination, String subscriptionId, Headers headers ) {
-        String acceptMediaType = headers.get( "accept" );
-        if ( acceptMediaType == null ) {
+    public void handleSubscribe(StompConnection connection, String destination, String subscriptionId, Headers headers) {
+        String acceptMediaType = headers.get("accept");
+        if (acceptMediaType == null) {
             acceptMediaType = "application/json";
         }
-        MediaType mediaType = this.container.getCodecManager().determineMediaType( acceptMediaType, null );
-        if ( mediaType == null ) {
+        MediaType mediaType = this.container.getCodecManager().determineMediaType(acceptMediaType, null);
+        if (mediaType == null) {
             mediaType = MediaType.JSON;
         }
 
-        ResourceCodec codec = this.container.getCodecManager().getResourceCodec( mediaType );
-        StompSubscription subscription = new StompSubscription( this.container.getSubscriptionManager(), connection, destination, subscriptionId, mediaType, codec );
-        this.container.getSubscriptionManager().addSubscription( subscription );
+        ResourceCodec codec = this.container.getCodecManager().getResourceCodec(mediaType);
+        StompSubscription subscription = new StompSubscription(this.container.getSubscriptionManager(), connection, destination, subscriptionId, mediaType, codec);
+        this.container.getSubscriptionManager().addSubscription(subscription);
     }
 
     @Override
-    public void handleUnsubscribe( StompConnection connection, String subscriptionId ) {
+    public void handleUnsubscribe(StompConnection connection, String subscriptionId) {
     }
 
     @Override
-    public void handleSend( StompConnection connection, StompMessage message ) {
+    public void handleSend(StompConnection connection, StompMessage message) {
     }
 
     private DefaultContainer container;

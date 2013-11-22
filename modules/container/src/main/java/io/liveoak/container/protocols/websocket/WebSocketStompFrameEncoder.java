@@ -25,13 +25,13 @@ import java.util.List;
 public class WebSocketStompFrameEncoder extends MessageToMessageEncoder<ByteBuf> {
 
     @Override
-    public void handlerAdded( ChannelHandlerContext ctx ) throws Exception {
-        ctx.pipeline().addAfter( ctx.name(), "stomp-frame-encoder", new StompFrameEncoder() );
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        ctx.pipeline().addAfter(ctx.name(), "stomp-frame-encoder", new StompFrameEncoder());
     }
 
     @Override
-    protected void encode( ChannelHandlerContext ctx, ByteBuf msg, List<Object> out ) throws Exception {
-        out.add( new TextWebSocketFrame( msg.retain() ) );
+    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
+        out.add(new TextWebSocketFrame(msg.retain()));
     }
 
 }

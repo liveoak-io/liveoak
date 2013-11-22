@@ -21,11 +21,11 @@ public class URIMatcherCache {
     /**
      * @return URIMatcher for given rule or create new URIMatcher if it not exists yet. Method never returns null
      */
-    public URIMatcher getURIMatcher( String key ) {
-        URIMatcher mi = cache.get( key );
-        if ( mi == null ) {
+    public URIMatcher getURIMatcher(String key) {
+        URIMatcher mi = cache.get(key);
+        if (mi == null) {
             mi = new URIMatcher();
-            cache.put( key, mi );
+            cache.put(key, mi);
         }
         return mi;
     }

@@ -63,50 +63,50 @@ public class SubscriptionManager implements RootResource {
         }
 
         subscriptions.forEach((e) -> {
-            sink.accept( e );
+            sink.accept(e);
         });
         sink.close();
     }
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
-        Subscription subscription = getSubscription( id );
-        if ( subscription == null ) {
-            responder.noSuchResource( id );
+        Subscription subscription = getSubscription(id);
+        if (subscription == null) {
+            responder.noSuchResource(id);
         } else {
-            responder.resourceRead( subscription );
+            responder.resourceRead(subscription);
         }
     }
 
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
-        String path = (String) state.getProperty( "path" );
-        String destination = (String) state.getProperty( "destination" );
-        String contentType = (String) state.getProperty( "content-type" );
+        String path = (String) state.getProperty("path");
+        String destination = (String) state.getProperty("destination");
+        String contentType = (String) state.getProperty("content-type");
 
-        if ( contentType == null ) {
+        if (contentType == null) {
             contentType = "application/json";
         }
 
         ResourceCodec codec = this.codecManager.getResourceCodec(new MediaType(contentType));
 
-        if ( codec == null ) {
-            responder.internalError( "content-type not supported: " + contentType );
+        if (codec == null) {
+            responder.internalError("content-type not supported: " + contentType);
             return;
         }
 
 
         try {
-            URI destinationUri = new URI( destination );
+            URI destinationUri = new URI(destination);
             HttpClient httpClient = this.vertx.createHttpClient();
-            httpClient.setHost( destinationUri.getHost() );
-            httpClient.setPort( destinationUri.getPort() );
+            httpClient.setHost(destinationUri.getHost());
+            httpClient.setPort(destinationUri.getPort());
 
-            HttpSubscription sub = new HttpSubscription( this, httpClient, path, destinationUri, codec );
+            HttpSubscription sub = new HttpSubscription(this, httpClient, path, destinationUri, codec);
             addSubscription(sub);
-            responder.resourceCreated( sub );
+            responder.resourceCreated(sub);
         } catch (URISyntaxException e) {
-            responder.internalError( e.getMessage() );
+            responder.internalError(e.getMessage());
         }
     }
 
@@ -162,7 +162,7 @@ public class SubscriptionManager implements RootResource {
 
     public Subscription getSubscription(String id) {
         Optional<Subscription> found = this.subscriptions.stream().filter(e -> e.id().equals(id)).findFirst();
-        if ( found.isPresent() ) {
+        if (found.isPresent()) {
             return found.get();
         }
         return null;
@@ -211,7 +211,7 @@ public class SubscriptionManager implements RootResource {
     }
 
     public void removeSubscription(Subscription subscription) {
-        this.subscriptions.remove( subscription );
+        this.subscriptions.remove(subscription);
     }
 
     private String id;

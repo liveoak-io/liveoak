@@ -36,55 +36,55 @@ public class ReturnFieldsImpl implements ReturnFields {
     private ReturnFieldsImpl() {
     }
 
-    public ReturnFieldsImpl( String spec ) {
+    public ReturnFieldsImpl(String spec) {
 
-        if ( spec == null || spec.trim().length() == 0 ) {
-            throw new IllegalArgumentException( "Fields spec is null or empty!" );
+        if (spec == null || spec.trim().length() == 0) {
+            throw new IllegalArgumentException("Fields spec is null or empty!");
         }
         // parse the spec, building up the tree for nested children
         char[] buf = spec.toCharArray();
-        StringBuilder token = new StringBuilder( buf.length );
+        StringBuilder token = new StringBuilder(buf.length);
 
         // stack for handling depth
         LinkedList<HashMap<String, ReturnFieldsImpl>> specs = new LinkedList<>();
-        specs.add( fields );
+        specs.add(fields);
 
         // parser state
         FieldState fldState = FieldState.start;
         XpctState state = XpctState.xpctIdent;
 
         int i;
-        for ( i = 0; i < buf.length; i++ ) {
+        for (i = 0; i < buf.length; i++) {
             char c = buf[i];
 
-            if ( c == ',' ) {
-                if ( state == XpctState.xpctIdent ) {
-                    error( spec, i );
+            if (c == ',') {
+                if (state == XpctState.xpctIdent) {
+                    error(spec, i);
                 }
-                if ( fldState == FieldState.name ) {
-                    specs.getLast().put( token.toString(), null );
-                    token.setLength( 0 );
+                if (fldState == FieldState.name) {
+                    specs.getLast().put(token.toString(), null);
+                    token.setLength(0);
                 }
                 state = XpctState.xpctIdent;
                 fldState = FieldState.start;
-            } else if ( c == '(' ) {
-                if ( state != XpctState.xpctIdentCommaOpen && state != XpctState.xpctAnything ) {
-                    error( spec, i );
+            } else if (c == '(') {
+                if (state != XpctState.xpctIdentCommaOpen && state != XpctState.xpctAnything) {
+                    error(spec, i);
                 }
                 ReturnFieldsImpl sub = new ReturnFieldsImpl();
-                specs.getLast().put( token.toString(), sub );
-                specs.add( sub.fields );
-                token.setLength( 0 );
+                specs.getLast().put(token.toString(), sub);
+                specs.add(sub.fields);
+                token.setLength(0);
 
                 state = XpctState.xpctIdent;
                 fldState = FieldState.start;
-            } else if ( c == ')' ) {
-                if ( state != XpctState.xpctAnything ) {
-                    error( spec, i );
+            } else if (c == ')') {
+                if (state != XpctState.xpctAnything) {
+                    error(spec, i);
                 }
-                if ( fldState == FieldState.name ) {
-                    specs.getLast().put( token.toString(), null );
-                    token.setLength( 0 );
+                if (fldState == FieldState.name) {
+                    specs.getLast().put(token.toString(), null);
+                    token.setLength(0);
 
                 }
                 specs.removeLast();
@@ -92,35 +92,35 @@ public class ReturnFieldsImpl implements ReturnFields {
                 fldState = FieldState.end;
                 state = specs.size() > 1 ? XpctState.xpctAnything : XpctState.xpctComma;
             } else {
-                token.append( c );
-                if ( fldState == FieldState.start ) {
+                token.append(c);
+                if (fldState == FieldState.start) {
                     fldState = FieldState.name;
                     state = specs.size() > 1 ? XpctState.xpctAnything : XpctState.xpctIdentCommaOpen;
                 }
             }
         }
 
-        if ( specs.size() > 1 ) {
-            error( spec, i );
+        if (specs.size() > 1) {
+            error(spec, i);
         }
 
-        if ( token.length() > 0 ) {
-            specs.getLast().put( token.toString(), null );
-        } else if ( !( state == XpctState.xpctAnything || state == XpctState.xpctComma ) ) {
-            error( spec, i );
+        if (token.length() > 0) {
+            specs.getLast().put(token.toString(), null);
+        } else if (!(state == XpctState.xpctAnything || state == XpctState.xpctComma)) {
+            error(spec, i);
         }
     }
 
-    private void error( String spec, int i ) {
-        throw new RuntimeException( "Invalid fields specification at position " + i + ": " + spec );
+    private void error(String spec, int i) {
+        throw new RuntimeException("Invalid fields specification at position " + i + ": " + spec);
     }
 
     @Override
-    public ReturnFields child( String field ) {
-        ReturnFields returnFields = fields.get( field );
-        if ( returnFields == null ) {
-            returnFields = fields.get( "*" );
-            if ( returnFields == null ) {
+    public ReturnFields child(String field) {
+        ReturnFields returnFields = fields.get(field);
+        if (returnFields == null) {
+            returnFields = fields.get("*");
+            if (returnFields == null) {
                 returnFields = ReturnFields.NONE;
             }
         }
@@ -128,24 +128,24 @@ public class ReturnFieldsImpl implements ReturnFields {
     }
 
     @Override
-    public boolean included( String... pathSegments ) {
+    public boolean included(String... pathSegments) {
 
-        if ( pathSegments == null || pathSegments.length == 0 ) {
-            throw new IllegalArgumentException( "No path specified!" );
+        if (pathSegments == null || pathSegments.length == 0) {
+            throw new IllegalArgumentException("No path specified!");
         }
         ReturnFieldsImpl current = this;
 
-        for ( String path : pathSegments ) {
-            if ( current == null ) {
+        for (String path : pathSegments) {
+            if (current == null) {
                 return false;
             }
-            if ( current.fields.containsKey( "*" ) ) {
+            if (current.fields.containsKey("*")) {
                 return true;
             }
-            if ( !current.fields.containsKey( path ) ) {
+            if (!current.fields.containsKey(path)) {
                 return false;
             }
-            current = ( ReturnFieldsImpl ) current.fields.get( path );
+            current = (ReturnFieldsImpl) current.fields.get(path);
         }
         return true;
     }
@@ -162,7 +162,7 @@ public class ReturnFieldsImpl implements ReturnFields {
 
     @Override
     public boolean isAll() {
-        return this.fields.keySet().contains( "*" );
+        return this.fields.keySet().contains("*");
     }
 
     @Override
@@ -170,15 +170,15 @@ public class ReturnFieldsImpl implements ReturnFields {
         return "[ReturnFieldsImpl: fields=" + this.fields + "]";
     }
 
-    public ReturnFieldsImpl withExpand( String spec ) {
-        StringTokenizer expandFields = new StringTokenizer( spec );
+    public ReturnFieldsImpl withExpand(String spec) {
+        StringTokenizer expandFields = new StringTokenizer(spec);
 
         ReturnFieldsImpl merged = new ReturnFieldsImpl();
-        merged.fields.putAll( this.fields );
+        merged.fields.putAll(this.fields);
 
-        while ( expandFields.hasMoreTokens() ) {
+        while (expandFields.hasMoreTokens()) {
             String expandField = expandFields.nextToken();
-            merged.fields.put( expandField, new ReturnFieldsImpl( "*" ) );
+            merged.fields.put(expandField, new ReturnFieldsImpl("*"));
         }
 
         return merged;

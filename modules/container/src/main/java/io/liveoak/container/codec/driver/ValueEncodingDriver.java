@@ -14,24 +14,24 @@ import java.util.Date;
  */
 public class ValueEncodingDriver extends AbstractEncodingDriver {
 
-    public ValueEncodingDriver( EncodingDriver parent, Object object ) {
-        super( parent, object, null );
+    public ValueEncodingDriver(EncodingDriver parent, Object object) {
+        super(parent, object, null);
     }
 
     @Override
     public void encode() throws Exception {
         Object o = object();
 
-        if ( o instanceof String ) {
-            encoder().writeValue( ( String ) o );
-        } else if ( o instanceof Integer ) {
-            encoder().writeValue( ( Integer ) o );
-        } else if ( o instanceof Double ) {
-            encoder().writeValue( ( Double ) o );
-        } else if ( o instanceof Date ) {
-            encoder().writeValue( ( Date ) o );
-        } else if ( o instanceof Resource ) {
-            encoder().writeLink( ( Resource ) o );
+        if (o instanceof String) {
+            encoder().writeValue((String) o);
+        } else if (o instanceof Integer) {
+            encoder().writeValue((Integer) o);
+        } else if (o instanceof Double) {
+            encoder().writeValue((Double) o);
+        } else if (o instanceof Date) {
+            encoder().writeValue((Date) o);
+        } else if (o instanceof Resource) {
+            encoder().writeLink((Resource) o);
         } else {
         }
         close();

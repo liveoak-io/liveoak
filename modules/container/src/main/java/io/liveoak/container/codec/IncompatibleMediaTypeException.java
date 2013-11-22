@@ -15,8 +15,8 @@ import java.util.List;
  */
 public class IncompatibleMediaTypeException extends Exception {
 
-    public IncompatibleMediaTypeException( List<MediaType> requestedTypes, BinaryResource resource ) {
-        super( "Resource type '" + resource.mediaType() + "' is not compatible with requested types: " + requestedTypes );
+    public IncompatibleMediaTypeException(List<MediaType> requestedTypes, BinaryResource resource) {
+        super("Resource type '" + resource.mediaType() + "' is not compatible with requested types: " + requestedTypes);
         this.requestedTypes = requestedTypes;
         this.resource = resource;
     }

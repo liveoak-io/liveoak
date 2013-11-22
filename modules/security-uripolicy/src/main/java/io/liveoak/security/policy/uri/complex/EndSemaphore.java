@@ -18,7 +18,7 @@ public class EndSemaphore {
         return finished;
     }
 
-    public void setFinished( boolean finished ) {
+    public void setFinished(boolean finished) {
         this.finished = finished;
     }
 }

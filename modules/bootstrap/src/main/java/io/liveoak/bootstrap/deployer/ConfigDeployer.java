@@ -32,7 +32,8 @@ import java.util.Set;
 import java.util.Spliterators;
 import java.util.stream.StreamSupport;
 
-/** Deployer for resources defined in a JSON configuration file.
+/**
+ * Deployer for resources defined in a JSON configuration file.
  *
  * <p>The root of the configuration file should be an object which contains
  * a <code>resources</code> key, which itself is an object that contains a
@@ -85,7 +86,8 @@ import java.util.stream.StreamSupport;
  */
 public class ConfigDeployer {
 
-    /** Construct a deployer
+    /**
+     * Construct a deployer
      *
      * @param container The container to deploy into.
      */
@@ -93,7 +95,8 @@ public class ConfigDeployer {
         this.container = container;
     }
 
-    /** Deploy resources from a JSON configuration file.
+    /**
+     * Deploy resources from a JSON configuration file.
      *
      * @param configFilePath The file to read and deploy from.
      * @throws IOException If an error occurs while attempting to read the deployment file.
@@ -154,7 +157,7 @@ public class ConfigDeployer {
                     RootResource resource = construct(resourceId, resourceClass);
 
                     this.container.registerResource(resource, resourceConfig);
-                    System.err.println("registered resource: " + resource.uri() );
+                    System.err.println("registered resource: " + resource.uri());
                 } catch (Exception e) {
                     System.err.println("Unable to deploy '" + resourceId + "': " + e.getMessage());
                     e.printStackTrace();

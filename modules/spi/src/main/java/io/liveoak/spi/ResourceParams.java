@@ -21,22 +21,22 @@ public interface ResourceParams {
         }
 
         @Override
-        public boolean contains( String name ) {
+        public boolean contains(String name) {
             return false;
         }
 
         @Override
-        public String value( String name ) {
+        public String value(String name) {
             return null;
         }
 
         @Override
-        public List<String> values( String name ) {
+        public List<String> values(String name) {
             return null;
         }
 
         @Override
-        public int intValue( String name, int defaultValue ) {
+        public int intValue(String name, int defaultValue) {
             return defaultValue;
         }
     };
@@ -44,11 +44,11 @@ public interface ResourceParams {
 
     Collection<String> names();
 
-    boolean contains( String name );
+    boolean contains(String name);
 
-    String value( String name );
+    String value(String name);
 
-    List<String> values( String name );
+    List<String> values(String name);
 
-    int intValue( String name, int defaultValue );
+    int intValue(String name, int defaultValue);
 }

@@ -22,7 +22,7 @@ public class AuthorizationPolicyEntry {
     private final Set<ResourcePath> excludedResourcePrefixes = new HashSet<>();
     private final AuthorizationPolicy authorizationPolicy;
 
-    public AuthorizationPolicyEntry( String id, AuthorizationPolicy authorizationPolicy ) {
+    public AuthorizationPolicyEntry(String id, AuthorizationPolicy authorizationPolicy) {
         this.id = id;
         this.authorizationPolicy = authorizationPolicy;
     }
@@ -36,57 +36,57 @@ public class AuthorizationPolicyEntry {
     }
 
     public Set<ResourcePath> getIncludedResourcePrefixes() {
-        return Collections.unmodifiableSet( includedResourcePrefixes );
+        return Collections.unmodifiableSet(includedResourcePrefixes);
     }
 
     public Set<ResourcePath> getExcludedResourcePrefixes() {
-        return Collections.unmodifiableSet( excludedResourcePrefixes );
+        return Collections.unmodifiableSet(excludedResourcePrefixes);
     }
 
-    public AuthorizationPolicyEntry addIncludedResourcePrefix( ResourcePath path ) {
-        includedResourcePrefixes.add( path );
+    public AuthorizationPolicyEntry addIncludedResourcePrefix(ResourcePath path) {
+        includedResourcePrefixes.add(path);
         return this;
     }
 
-    public AuthorizationPolicyEntry addIncludedResourcePrefix( String uriPrefix ) {
-        includedResourcePrefixes.add( new ResourcePath( uriPrefix ) );
+    public AuthorizationPolicyEntry addIncludedResourcePrefix(String uriPrefix) {
+        includedResourcePrefixes.add(new ResourcePath(uriPrefix));
         return this;
     }
 
-    public AuthorizationPolicyEntry addExcludedResourcePrefix( ResourcePath path ) {
-        excludedResourcePrefixes.add( path );
+    public AuthorizationPolicyEntry addExcludedResourcePrefix(ResourcePath path) {
+        excludedResourcePrefixes.add(path);
         return this;
     }
 
-    public AuthorizationPolicyEntry addExcludedResourcePrefix( String uriPrefix ) {
-        excludedResourcePrefixes.add( new ResourcePath( uriPrefix ) );
+    public AuthorizationPolicyEntry addExcludedResourcePrefix(String uriPrefix) {
+        excludedResourcePrefixes.add(new ResourcePath(uriPrefix));
         return this;
     }
 
-    public boolean removeIncludedResourcePrefix( ResourcePath path ) {
-        return includedResourcePrefixes.remove( path );
+    public boolean removeIncludedResourcePrefix(ResourcePath path) {
+        return includedResourcePrefixes.remove(path);
     }
 
-    public boolean removeIncludedResourcePrefix( String uriPrefix ) {
-        return includedResourcePrefixes.remove( new ResourcePath( uriPrefix ) );
+    public boolean removeIncludedResourcePrefix(String uriPrefix) {
+        return includedResourcePrefixes.remove(new ResourcePath(uriPrefix));
     }
 
-    public boolean removeExcludedResourcePrefix( ResourcePath path ) {
-        return excludedResourcePrefixes.remove( path );
+    public boolean removeExcludedResourcePrefix(ResourcePath path) {
+        return excludedResourcePrefixes.remove(path);
     }
 
-    public boolean removeExcludedResourcePrefix( String uriPrefix ) {
-        return excludedResourcePrefixes.remove( new ResourcePath( uriPrefix ) );
+    public boolean removeExcludedResourcePrefix(String uriPrefix) {
+        return excludedResourcePrefixes.remove(new ResourcePath(uriPrefix));
     }
 
     @Override
     public String toString() {
-        return new StringBuilder( "AuthorizationPolicyEntry [ " )
-                .append( "id=" ).append( id )
-                .append( ", includedResourcePrefixes=" ).append( includedResourcePrefixes )
-                .append( ", excludedResourcePrefixes=" ).append( excludedResourcePrefixes )
-                .append( ", authorizationPolicy=" ).append( authorizationPolicy )
-                .append( " ]" ).toString();
+        return new StringBuilder("AuthorizationPolicyEntry [ ")
+                .append("id=").append(id)
+                .append(", includedResourcePrefixes=").append(includedResourcePrefixes)
+                .append(", excludedResourcePrefixes=").append(excludedResourcePrefixes)
+                .append(", authorizationPolicy=").append(authorizationPolicy)
+                .append(" ]").toString();
     }
 
 
@@ -96,18 +96,18 @@ public class AuthorizationPolicyEntry {
      * @param resourcePath
      * @return true if resource is subject of this policy
      */
-    public boolean isResourceMapped( ResourcePath resourcePath ) {
+    public boolean isResourceMapped(ResourcePath resourcePath) {
         String resPathString = resourcePath.toString();
 
         // Check excluded first
-        for ( ResourcePath current : excludedResourcePrefixes ) {
-            if ( resPathString.startsWith( current.toString() ) ) {
+        for (ResourcePath current : excludedResourcePrefixes) {
+            if (resPathString.startsWith(current.toString())) {
                 return false;
             }
         }
 
-        for ( ResourcePath current : includedResourcePrefixes ) {
-            if ( resPathString.startsWith( current.toString() ) ) {
+        for (ResourcePath current : includedResourcePrefixes) {
+            if (resPathString.startsWith(current.toString())) {
                 return true;
             }
         }

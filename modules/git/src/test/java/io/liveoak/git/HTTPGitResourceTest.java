@@ -23,7 +23,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
     @Override
     public RootResource createRootResource() {
-        return new GitRepoResource( "git" );
+        return new GitRepoResource("git");
     }
 
     @Override
@@ -40,21 +40,21 @@ public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
 
     @Test
     public void enumerateRoot() throws Exception {
-        HttpGet get = new HttpGet( "http://localhost:8080/git" );
-        get.addHeader( "Accept", "application/json" );
+        HttpGet get = new HttpGet("http://localhost:8080/git");
+        get.addHeader("Accept", "application/json");
 
         try {
-            System.out.println( "DO GET" );
-            CloseableHttpResponse result = httpClient.execute( get );
-            System.out.println( "=============>>>" );
-            System.out.println( result );
+            System.out.println("DO GET");
+            CloseableHttpResponse result = httpClient.execute(get);
+            System.out.println("=============>>>");
+            System.out.println(result);
 
             HttpEntity entity = result.getEntity();
-            if ( entity.getContentLength() > 0 ) {
-                entity.writeTo( System.out );
+            if (entity.getContentLength() > 0) {
+                entity.writeTo(System.out);
             }
-            System.out.println( "\n<<<=============" );
-            assertThat( result.getStatusLine().getStatusCode() ).isEqualTo( 200 );
+            System.out.println("\n<<<=============");
+            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(200);
         } finally {
             httpClient.close();
         }

@@ -28,18 +28,18 @@ import java.util.List;
  */
 public class HttpResourceResponseEncoder extends MessageToMessageEncoder<ResourceResponse> {
 
-    public HttpResourceResponseEncoder( ResourceCodecManager codecManager ) {
+    public HttpResourceResponseEncoder(ResourceCodecManager codecManager) {
         this.codecManager = codecManager;
     }
 
     @Override
-    protected void encode( ChannelHandlerContext ctx, ResourceResponse msg, List<Object> out ) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, ResourceResponse msg, List<Object> out) throws Exception {
 
         int responseStatusCode = 0;
         String responseMessage = null;
 
         boolean shouldEncodeState = false;
-        switch ( msg.responseType() ) {
+        switch (msg.responseType()) {
             case CREATED:
                 responseStatusCode = HttpResponseStatus.CREATED.code();
                 responseMessage = HttpResponseStatus.CREATED.reasonPhrase();
@@ -61,8 +61,8 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
                 shouldEncodeState = true;
                 break;
             case ERROR:
-                if ( msg instanceof ResourceErrorResponse ) {
-                    switch ( ( ( ResourceErrorResponse ) msg ).errorType() ) {
+                if (msg instanceof ResourceErrorResponse) {
+                    switch (((ResourceErrorResponse) msg).errorType()) {
                         case NOT_AUTHORIZED:
                             responseStatusCode = HttpResponseStatus.FORBIDDEN.code();
                             responseMessage = HttpResponseStatus.FORBIDDEN.reasonPhrase();
@@ -108,45 +108,45 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
         HttpResponseStatus responseStatus = null;
 
         EncodingResult encodingResult = null;
-        if ( shouldEncodeState ) {
+        if (shouldEncodeState) {
             MediaTypeMatcher matcher = msg.inReplyTo().mediaTypeMatcher();
             try {
-                encodingResult = encodeState( msg.inReplyTo().requestContext(), matcher, msg.resource() );
-            } catch ( IncompatibleMediaTypeException e ) {
+                encodingResult = encodeState(msg.inReplyTo().requestContext(), matcher, msg.resource());
+            } catch (IncompatibleMediaTypeException e) {
                 e.printStackTrace();
-                responseStatus = new HttpResponseStatus( HttpResponseStatus.NOT_ACCEPTABLE.code(), e.getMessage() );
-                response = new DefaultFullHttpResponse( HttpVersion.HTTP_1_1, responseStatus );
-                response.headers().add( HttpHeaders.Names.CONTENT_LENGTH, 0 );
-                out.add( response );
+                responseStatus = new HttpResponseStatus(HttpResponseStatus.NOT_ACCEPTABLE.code(), e.getMessage());
+                response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus);
+                response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
+                out.add(response);
                 return;
-            } catch ( Throwable e ) {
+            } catch (Throwable e) {
                 e.printStackTrace();
-                responseStatus = new HttpResponseStatus( HttpResponseStatus.INTERNAL_SERVER_ERROR.code(), HttpResponseStatus.INTERNAL_SERVER_ERROR.reasonPhrase() );
-                response = new DefaultFullHttpResponse( HttpVersion.HTTP_1_1, responseStatus );
-                response.headers().add( HttpHeaders.Names.CONTENT_LENGTH, 0 );
-                out.add( response );
+                responseStatus = new HttpResponseStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR.code(), HttpResponseStatus.INTERNAL_SERVER_ERROR.reasonPhrase());
+                response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus);
+                response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
+                out.add(response);
                 return;
             }
         }
 
-        responseStatus = new HttpResponseStatus( responseStatusCode, responseMessage );
+        responseStatus = new HttpResponseStatus(responseStatusCode, responseMessage);
 
-        if ( encodingResult != null ) {
+        if (encodingResult != null) {
             ByteBuf content = encodingResult.encoded();
-            response = new DefaultFullHttpResponse( HttpVersion.HTTP_1_1, responseStatus, content );
-            response.headers().add( HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes() );
-            response.headers().add( HttpHeaders.Names.LOCATION, msg.resource().uri().toString() );
-            response.headers().add( HttpHeaders.Names.CONTENT_TYPE, encodingResult.mediaType() );
+            response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus, content);
+            response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes());
+            response.headers().add(HttpHeaders.Names.LOCATION, msg.resource().uri().toString());
+            response.headers().add(HttpHeaders.Names.CONTENT_TYPE, encodingResult.mediaType());
         } else {
-            response = new DefaultFullHttpResponse( HttpVersion.HTTP_1_1, responseStatus );
-            response.headers().add( HttpHeaders.Names.CONTENT_LENGTH, 0 );
+            response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus);
+            response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
         }
 
-        out.add( response );
+        out.add(response);
     }
 
-    protected EncodingResult encodeState( RequestContext ctx, MediaTypeMatcher mediaTypeMatcher, Resource resource ) throws Exception {
-        return this.codecManager.encode( ctx, mediaTypeMatcher, resource );
+    protected EncodingResult encodeState(RequestContext ctx, MediaTypeMatcher mediaTypeMatcher, Resource resource) throws Exception {
+        return this.codecManager.encode(ctx, mediaTypeMatcher, resource);
     }
 
     private ResourceCodecManager codecManager;

@@ -35,7 +35,7 @@ public class ResourceCodecManagerTest {
 
         MediaTypeMatcher mediaTypeMatcher = new MediaTypeMatcher("application/json", "json");
         DefaultResourceState state = new DefaultResourceState();
-        InMemoryObjectResource resource = new InMemoryObjectResource( null, "gary", state );
+        InMemoryObjectResource resource = new InMemoryObjectResource(null, "gary", state);
 
         manager.encode(null, mediaTypeMatcher, resource);
     }

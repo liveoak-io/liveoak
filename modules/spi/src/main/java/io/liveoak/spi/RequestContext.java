@@ -32,27 +32,27 @@ public interface RequestContext {
 
         }
 
-        public Builder securityContext( SecurityContext securityContext ) {
+        public Builder securityContext(SecurityContext securityContext) {
             this.securityContext = securityContext;
             return this;
         }
 
-        public Builder pagination( Pagination pagination ) {
+        public Builder pagination(Pagination pagination) {
             this.pagination = pagination;
             return this;
         }
 
-        public Builder resourceParams( ResourceParams resourceParams ) {
+        public Builder resourceParams(ResourceParams resourceParams) {
             this.resourceParams = resourceParams;
             return this;
         }
 
-        public Builder returnFields( ReturnFields returnFields ) {
+        public Builder returnFields(ReturnFields returnFields) {
             this.returnFields = returnFields;
             return this;
         }
 
-        public Builder sorting( Sorting sorting ) {
+        public Builder sorting(Sorting sorting) {
             this.sorting = sorting;
             return this;
         }

@@ -7,12 +7,12 @@
   -->
 <module xmlns="urn:jboss:module:1.0" name="${module-name}">
 
-  <resources>
-    <resource-root path="${project.artifactId}.jar" />
-  </resources>
+    <resources>
+        <resource-root path="${project.artifactId}.jar"/>
+    </resources>
 
-  <dependencies>
-  <module name="io.vertx" />
-  <module name="io.liveoak.spi" />
+    <dependencies>
+    <module name="io.vertx"/>
+    <module name="io.liveoak.spi"/>
 </module>
 

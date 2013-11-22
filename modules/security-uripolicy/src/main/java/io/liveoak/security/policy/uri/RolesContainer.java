@@ -29,158 +29,158 @@ public class RolesContainer {
 
     // METHODS FOR ADDING ROLES INTO CONTAINER
 
-    public RolesContainer addAllowedRealmRole( String roleName ) {
-        if ( allowedRealmRoles == null ) {
+    public RolesContainer addAllowedRealmRole(String roleName) {
+        if (allowedRealmRoles == null) {
             allowedRealmRoles = new HashSet<>();
         }
-        allowedRealmRoles.add( roleName );
+        allowedRealmRoles.add(roleName);
         return this;
     }
 
-    public RolesContainer addAllowedApplicationRole( String roleName ) {
-        if ( allowedApplicationRoles == null ) {
+    public RolesContainer addAllowedApplicationRole(String roleName) {
+        if (allowedApplicationRoles == null) {
             allowedApplicationRoles = new HashSet<>();
         }
-        allowedApplicationRoles.add( roleName );
+        allowedApplicationRoles.add(roleName);
         return this;
     }
 
-    public RolesContainer addDeniedRealmRole( String roleName ) {
-        if ( deniedRealmRoles == null ) {
+    public RolesContainer addDeniedRealmRole(String roleName) {
+        if (deniedRealmRoles == null) {
             deniedRealmRoles = new HashSet<>();
         }
-        deniedRealmRoles.add( roleName );
+        deniedRealmRoles.add(roleName);
         return this;
     }
 
-    public RolesContainer addDeniedApplicationRole( String roleName ) {
-        if ( deniedApplicationRoles == null ) {
+    public RolesContainer addDeniedApplicationRole(String roleName) {
+        if (deniedApplicationRoles == null) {
             deniedApplicationRoles = new HashSet<>();
         }
-        deniedApplicationRoles.add( roleName );
+        deniedApplicationRoles.add(roleName);
         return this;
     }
 
-    public RolesContainer addAllowedUser( String username ) {
-        if ( allowedUsers == null ) {
+    public RolesContainer addAllowedUser(String username) {
+        if (allowedUsers == null) {
             allowedUsers = new HashSet<>();
         }
-        allowedUsers.add( username );
+        allowedUsers.add(username);
         return this;
     }
 
-    public RolesContainer addDeniedUser( String username ) {
-        if ( deniedUsers == null ) {
+    public RolesContainer addDeniedUser(String username) {
+        if (deniedUsers == null) {
             deniedUsers = new HashSet<>();
         }
-        deniedUsers.add( username );
+        deniedUsers.add(username);
         return this;
     }
 
-    public RolesContainer addAllAllowedRealmRoles( Collection<String> coll ) {
-        if ( allowedRealmRoles == null ) {
+    public RolesContainer addAllAllowedRealmRoles(Collection<String> coll) {
+        if (allowedRealmRoles == null) {
             allowedRealmRoles = new HashSet<>();
         }
-        allowedRealmRoles.addAll( coll );
+        allowedRealmRoles.addAll(coll);
         return this;
     }
 
-    public RolesContainer addAllAllowedApplicationRoles( Collection<String> coll ) {
-        if ( allowedApplicationRoles == null ) {
+    public RolesContainer addAllAllowedApplicationRoles(Collection<String> coll) {
+        if (allowedApplicationRoles == null) {
             allowedApplicationRoles = new HashSet<>();
         }
-        allowedApplicationRoles.addAll( coll );
+        allowedApplicationRoles.addAll(coll);
         return this;
     }
 
-    public RolesContainer addAllDeniedRealmRoles( Collection<String> coll ) {
-        if ( deniedRealmRoles == null ) {
+    public RolesContainer addAllDeniedRealmRoles(Collection<String> coll) {
+        if (deniedRealmRoles == null) {
             deniedRealmRoles = new HashSet<>();
         }
-        deniedRealmRoles.addAll( coll );
+        deniedRealmRoles.addAll(coll);
         return this;
     }
 
-    public RolesContainer addAllDeniedApplicationRoles( Collection<String> coll ) {
-        if ( deniedApplicationRoles == null ) {
+    public RolesContainer addAllDeniedApplicationRoles(Collection<String> coll) {
+        if (deniedApplicationRoles == null) {
             deniedApplicationRoles = new HashSet<>();
         }
-        deniedApplicationRoles.addAll( coll );
+        deniedApplicationRoles.addAll(coll);
         return this;
     }
 
-    public RolesContainer addAllAllowedUsers( Collection<String> coll ) {
-        if ( allowedUsers == null ) {
+    public RolesContainer addAllAllowedUsers(Collection<String> coll) {
+        if (allowedUsers == null) {
             allowedUsers = new HashSet<>();
         }
-        allowedUsers.addAll( coll );
+        allowedUsers.addAll(coll);
         return this;
     }
 
-    public RolesContainer addAllDeniedUsers( Collection<String> coll ) {
-        if ( deniedUsers == null ) {
+    public RolesContainer addAllDeniedUsers(Collection<String> coll) {
+        if (deniedUsers == null) {
             deniedUsers = new HashSet<>();
         }
-        deniedUsers.addAll( coll );
+        deniedUsers.addAll(coll);
         return this;
     }
 
     // GETTERS
 
     public Set<String> getAllowedRealmRoles() {
-        return Collections.unmodifiableSet( allowedRealmRoles );
+        return Collections.unmodifiableSet(allowedRealmRoles);
     }
 
     public Set<String> getAllowedApplicationRoles() {
-        return Collections.unmodifiableSet( allowedApplicationRoles );
+        return Collections.unmodifiableSet(allowedApplicationRoles);
     }
 
     public Set<String> getDeniedRealmRoles() {
-        return Collections.unmodifiableSet( deniedRealmRoles );
+        return Collections.unmodifiableSet(deniedRealmRoles);
     }
 
     public Set<String> getDeniedApplicationRoles() {
-        return Collections.unmodifiableSet( deniedApplicationRoles );
+        return Collections.unmodifiableSet(deniedApplicationRoles);
     }
 
     public Set<String> getAllowedUsers() {
-        return Collections.unmodifiableSet( allowedUsers );
+        return Collections.unmodifiableSet(allowedUsers);
     }
 
     public Set<String> getDeniedUsers() {
-        return Collections.unmodifiableSet( deniedUsers );
+        return Collections.unmodifiableSet(deniedUsers);
     }
 
     // CHECKS
 
-    public AuthorizationDecision isRealmRoleAllowed( String roleName ) {
-        if ( deniedRealmRoles != null && ( deniedRealmRoles.contains( roleName ) || deniedRealmRoles.contains( "*" ) ) ) {
+    public AuthorizationDecision isRealmRoleAllowed(String roleName) {
+        if (deniedRealmRoles != null && (deniedRealmRoles.contains(roleName) || deniedRealmRoles.contains("*"))) {
             return AuthorizationDecision.REJECT;
-        } else if ( allowedRealmRoles != null && ( allowedRealmRoles.contains( roleName ) || allowedRealmRoles.contains( "*" ) ) ) {
+        } else if (allowedRealmRoles != null && (allowedRealmRoles.contains(roleName) || allowedRealmRoles.contains("*"))) {
             return AuthorizationDecision.ACCEPT;
         }
 
         return AuthorizationDecision.IGNORE;
     }
 
-    public AuthorizationDecision isApplicationRoleAllowed( String roleName ) {
-        if ( deniedApplicationRoles != null && ( deniedApplicationRoles.contains( roleName ) || deniedRealmRoles.contains( "*" ) ) ) {
+    public AuthorizationDecision isApplicationRoleAllowed(String roleName) {
+        if (deniedApplicationRoles != null && (deniedApplicationRoles.contains(roleName) || deniedRealmRoles.contains("*"))) {
             return AuthorizationDecision.REJECT;
-        } else if ( allowedApplicationRoles != null && ( allowedApplicationRoles.contains( roleName ) || allowedApplicationRoles.contains( "*" ) ) ) {
+        } else if (allowedApplicationRoles != null && (allowedApplicationRoles.contains(roleName) || allowedApplicationRoles.contains("*"))) {
             return AuthorizationDecision.ACCEPT;
         }
 
         return AuthorizationDecision.IGNORE;
     }
 
-    public AuthorizationDecision isRealmRolesAllowed( Collection<String> roles ) {
+    public AuthorizationDecision isRealmRolesAllowed(Collection<String> roles) {
         boolean anyAllowed = false;
-        for ( String role : roles ) {
-            AuthorizationDecision authDecision = isRealmRoleAllowed( role );
-            if ( authDecision == AuthorizationDecision.REJECT ) {
+        for (String role : roles) {
+            AuthorizationDecision authDecision = isRealmRoleAllowed(role);
+            if (authDecision == AuthorizationDecision.REJECT) {
                 // REJECT always wins
                 return AuthorizationDecision.REJECT;
-            } else if ( authDecision == AuthorizationDecision.ACCEPT ) {
+            } else if (authDecision == AuthorizationDecision.ACCEPT) {
                 anyAllowed = true;
             }
         }
@@ -188,14 +188,14 @@ public class RolesContainer {
         return anyAllowed ? AuthorizationDecision.ACCEPT : AuthorizationDecision.IGNORE;
     }
 
-    public AuthorizationDecision isApplicationRolesAllowed( Collection<String> roles ) {
+    public AuthorizationDecision isApplicationRolesAllowed(Collection<String> roles) {
         boolean anyAllowed = false;
-        for ( String role : roles ) {
-            AuthorizationDecision authDecision = isApplicationRoleAllowed( role );
-            if ( authDecision == AuthorizationDecision.REJECT ) {
+        for (String role : roles) {
+            AuthorizationDecision authDecision = isApplicationRoleAllowed(role);
+            if (authDecision == AuthorizationDecision.REJECT) {
                 // REJECT always wins
                 return AuthorizationDecision.REJECT;
-            } else if ( authDecision == AuthorizationDecision.ACCEPT ) {
+            } else if (authDecision == AuthorizationDecision.ACCEPT) {
                 anyAllowed = true;
             }
         }
@@ -203,17 +203,17 @@ public class RolesContainer {
         return anyAllowed ? AuthorizationDecision.ACCEPT : AuthorizationDecision.IGNORE;
     }
 
-    public AuthorizationDecision isTokenAllowed( AuthToken token ) {
-        AuthorizationDecision realmDecision = isRealmRolesAllowed( token.getRealmRoles() );
-        AuthorizationDecision appRolesDecision = isApplicationRolesAllowed( token.getApplicationRoles() );
-        AuthorizationDecision usernameDecision = isUserAllowed( token.getUsername() );
-        return realmDecision.mergeDecision( appRolesDecision ).mergeDecision( usernameDecision );
+    public AuthorizationDecision isTokenAllowed(AuthToken token) {
+        AuthorizationDecision realmDecision = isRealmRolesAllowed(token.getRealmRoles());
+        AuthorizationDecision appRolesDecision = isApplicationRolesAllowed(token.getApplicationRoles());
+        AuthorizationDecision usernameDecision = isUserAllowed(token.getUsername());
+        return realmDecision.mergeDecision(appRolesDecision).mergeDecision(usernameDecision);
     }
 
-    public AuthorizationDecision isUserAllowed( String username ) {
-        if ( deniedUsers != null && ( deniedUsers.contains( username ) || deniedUsers.contains( "*" ) ) ) {
+    public AuthorizationDecision isUserAllowed(String username) {
+        if (deniedUsers != null && (deniedUsers.contains(username) || deniedUsers.contains("*"))) {
             return AuthorizationDecision.REJECT;
-        } else if ( allowedUsers != null && ( ( allowedUsers.contains( username ) ) || allowedUsers.contains( "*" ) ) ) {
+        } else if (allowedUsers != null && ((allowedUsers.contains(username)) || allowedUsers.contains("*"))) {
             return AuthorizationDecision.ACCEPT;
         }
 
@@ -224,18 +224,18 @@ public class RolesContainer {
 
     @Override
     public String toString() {
-        return new StringBuilder( "RolesContainer [ allowedRealmRoles=" )
-                .append( allowedRealmRoles )
-                .append( ", allowedApplicationRoles=" )
-                .append( allowedApplicationRoles )
-                .append( ", deniedRealmRoles=" )
-                .append( deniedRealmRoles )
-                .append( ", deniedApplicationRoles=" )
-                .append( deniedApplicationRoles )
-                .append( ", allowedUsers=" )
-                .append( allowedUsers )
-                .append( ", deniedUsers=" )
-                .append( deniedUsers )
-                .append( " ]" ).toString();
+        return new StringBuilder("RolesContainer [ allowedRealmRoles=")
+                .append(allowedRealmRoles)
+                .append(", allowedApplicationRoles=")
+                .append(allowedApplicationRoles)
+                .append(", deniedRealmRoles=")
+                .append(deniedRealmRoles)
+                .append(", deniedApplicationRoles=")
+                .append(deniedApplicationRoles)
+                .append(", allowedUsers=")
+                .append(allowedUsers)
+                .append(", deniedUsers=")
+                .append(deniedUsers)
+                .append(" ]").toString();
     }
 }

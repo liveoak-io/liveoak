@@ -25,7 +25,7 @@ public class AuthTestRequestContext implements RequestContext {
     private final ResourcePath resourcePath;
     private final ResourceParams resourceParams;
 
-    public AuthTestRequestContext( RequestType reqType, ResourcePath resourcePath, ResourceParams resourceParams ) {
+    public AuthTestRequestContext(RequestType reqType, ResourcePath resourcePath, ResourceParams resourceParams) {
         this.reqType = reqType;
         this.resourcePath = resourcePath;
         this.resourceParams = resourceParams;

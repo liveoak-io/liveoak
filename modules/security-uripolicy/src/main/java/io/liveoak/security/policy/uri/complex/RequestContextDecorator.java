@@ -22,7 +22,7 @@ public class RequestContextDecorator implements RequestContext {
 
     private final RequestContext delegate;
 
-    public RequestContextDecorator( RequestContext delegate ) {
+    public RequestContextDecorator(RequestContext delegate) {
         this.delegate = delegate;
     }
 
@@ -48,7 +48,7 @@ public class RequestContextDecorator implements RequestContext {
 
     @Override
     public ResourceParamsDecorator getResourceParams() {
-        return new ResourceParamsDecorator( delegate.getResourceParams() );
+        return new ResourceParamsDecorator(delegate.getResourceParams());
     }
 
     @Override

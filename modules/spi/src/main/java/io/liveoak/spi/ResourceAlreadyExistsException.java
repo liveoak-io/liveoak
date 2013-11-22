@@ -10,8 +10,8 @@ package io.liveoak.spi;
  */
 public class ResourceAlreadyExistsException extends ResourceException {
 
-    public ResourceAlreadyExistsException( String path ) {
-        super( path, "Resource with id '" + path + "' already exists." );
+    public ResourceAlreadyExistsException(String path) {
+        super(path, "Resource with id '" + path + "' already exists.");
     }
 }
 

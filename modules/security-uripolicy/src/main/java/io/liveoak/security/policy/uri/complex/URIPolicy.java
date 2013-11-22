@@ -36,12 +36,12 @@ import java.util.concurrent.Executors;
 public class URIPolicy implements AuthorizationPolicy {
 
     // TODO: Replace with real logging
-    private static final SimpleLogger log = new SimpleLogger( URIPolicy.class );
+    private static final SimpleLogger log = new SimpleLogger(URIPolicy.class);
 
     private RuleBase ruleBase;
 
     private final Executor executor = Executors.newSingleThreadExecutor();
-    private CountDownLatch latch = new CountDownLatch( 1 );
+    private CountDownLatch latch = new CountDownLatch(1);
 
     @Override
     public void init() {
@@ -50,7 +50,7 @@ public class URIPolicy implements AuthorizationPolicy {
             doInit();
             latch.countDown();
         };
-        executor.execute( initTask );
+        executor.execute(initTask);
     }
 
     /**
@@ -58,44 +58,44 @@ public class URIPolicy implements AuthorizationPolicy {
      */
     protected void doInit() {
         // Workaround for https://issues.jboss.org/browse/DROOLS-329 TODO: Remove when not needed or move to better place
-        System.setProperty( "drools.dialect.java.compiler", "JANINO" );
+        System.setProperty("drools.dialect.java.compiler", "JANINO");
 
-        RuleBaseConfiguration ruleBaseConfig = new RuleBaseConfiguration( URIPolicy.class.getClassLoader(), AuthorizationPolicy.class.getClassLoader() );
-        ruleBase = RuleBaseFactory.newRuleBase( ruleBaseConfig );
+        RuleBaseConfiguration ruleBaseConfig = new RuleBaseConfiguration(URIPolicy.class.getClassLoader(), AuthorizationPolicy.class.getClassLoader());
+        ruleBase = RuleBaseFactory.newRuleBase(ruleBaseConfig);
 
         // Add DRL with functions
-        InputStream functionsFileStream = URIPolicy.class.getClassLoader().getResourceAsStream( "templates/URIPolicyFunctions.drl" );
-        Reader functionsFileReader = new InputStreamReader( functionsFileStream );
-        addPackageToRuleBase( functionsFileReader );
+        InputStream functionsFileStream = URIPolicy.class.getClassLoader().getResourceAsStream("templates/URIPolicyFunctions.drl");
+        Reader functionsFileReader = new InputStreamReader(functionsFileStream);
+        addPackageToRuleBase(functionsFileReader);
     }
 
 
-    public void addURIPolicyEntry( URIPolicyEntry uriPolicyEntry ) {
-        InputStream templateStream = URIPolicy.class.getClassLoader().getResourceAsStream( "templates/URIPolicyTemplate.drl" );
-        URIPolicyTemplateDataProvider tdp = new URIPolicyTemplateDataProvider( uriPolicyEntry );
+    public void addURIPolicyEntry(URIPolicyEntry uriPolicyEntry) {
+        InputStream templateStream = URIPolicy.class.getClassLoader().getResourceAsStream("templates/URIPolicyTemplate.drl");
+        URIPolicyTemplateDataProvider tdp = new URIPolicyTemplateDataProvider(uriPolicyEntry);
         DataProviderCompiler converter = new DataProviderCompiler();
-        String drl = converter.compile( tdp, templateStream );
+        String drl = converter.compile(tdp, templateStream);
 
         // TODO:Logging
-        if ( log.isDebugEnabled() ) {
-            log.debug( "------------ ADDING NEW POLICY RULE INTO DROOLS ENGINE ----------------------" );
-            log.debug( drl );
-            log.debug( "------------ END NEW POLICY RULE ------------------" );
+        if (log.isDebugEnabled()) {
+            log.debug("------------ ADDING NEW POLICY RULE INTO DROOLS ENGINE ----------------------");
+            log.debug(drl);
+            log.debug("------------ END NEW POLICY RULE ------------------");
         }
 
         // Then add it into drools RuleBase
-        addPackageToRuleBase( drl );
+        addPackageToRuleBase(drl);
     }
 
 
     @Override
-    public AuthorizationDecision isAuthorized( AuthorizationRequestContext authRequestContext ) {
+    public AuthorizationDecision isAuthorized(AuthorizationRequestContext authRequestContext) {
         checkInitializationCompleted();
 
         RequestContext reqContext = authRequestContext.getRequestContext();
         AuthToken token = authRequestContext.getAuthToken();
-        if ( log.isTraceEnabled() ) {
-            log.debug( "Start checking request: " + reqContext + ", token: " + token );
+        if (log.isTraceEnabled()) {
+            log.debug("Start checking request: " + reqContext + ", token: " + token);
         }
 
         WorkingMemory workingMemory = null;
@@ -104,18 +104,18 @@ public class URIPolicy implements AuthorizationPolicy {
             workingMemory = ruleBase.newStatefulSession();
 
             RulesProcessingResult rulesProcessingResult = new RulesProcessingResult();
-            workingMemory.insert( rulesProcessingResult );
+            workingMemory.insert(rulesProcessingResult);
 
             EndSemaphore endSemaphore = new EndSemaphore();
-            workingMemory.insert( endSemaphore );
+            workingMemory.insert(endSemaphore);
 
             URIMatcherCache cache = new URIMatcherCache();
-            workingMemory.insert( cache );
+            workingMemory.insert(cache);
 
             // TODO: Verify if it's better to first insert request or token (Rules checking is triggered right after inserting, so it could affect performance)
-            RequestContextDecorator reqContextDecorator = new RequestContextDecorator( reqContext );
-            workingMemory.insert( reqContextDecorator );
-            workingMemory.insert( token );
+            RequestContextDecorator reqContextDecorator = new RequestContextDecorator(reqContext);
+            workingMemory.insert(reqContextDecorator);
+            workingMemory.insert(token);
 
             // Uncomment for drools debugging (TODO: should be somehow configurable...)
             //workingMemory.addEventListener(new DebugAgendaEventListener());
@@ -123,58 +123,58 @@ public class URIPolicy implements AuthorizationPolicy {
 
             int numberOfFiredPolicies = workingMemory.fireAllRules();
 
-            if ( log.isTraceEnabled() ) {
-                log.trace( "Overall result for request: " + reqContext + ". Count of fired policies=" + numberOfFiredPolicies + ", Result=" + rulesProcessingResult.getDecision() );
+            if (log.isTraceEnabled()) {
+                log.trace("Overall result for request: " + reqContext + ". Count of fired policies=" + numberOfFiredPolicies + ", Result=" + rulesProcessingResult.getDecision());
             }
             return rulesProcessingResult.getDecision();
         } finally {
-            if ( workingMemory != null ) {
+            if (workingMemory != null) {
                 workingMemory.dispose();
             }
         }
     }
 
 
-    protected void addPackageToRuleBase( String drl ) {
-        Reader uriPolicyEntriesReader = new StringReader( drl );
-        addPackageToRuleBase( uriPolicyEntriesReader );
+    protected void addPackageToRuleBase(String drl) {
+        Reader uriPolicyEntriesReader = new StringReader(drl);
+        addPackageToRuleBase(uriPolicyEntriesReader);
     }
 
 
-    protected void addPackageToRuleBase( Reader packageReader ) {
-        PackageBuilder packageBuilder = new PackageBuilder( ruleBase );
+    protected void addPackageToRuleBase(Reader packageReader) {
+        PackageBuilder packageBuilder = new PackageBuilder(ruleBase);
 
         try {
-            packageBuilder.addPackageFromDrl( packageReader );
-        } catch ( Exception e ) {
-            throw new RuntimeException( e );
+            packageBuilder.addPackageFromDrl(packageReader);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         PackageBuilderErrors errors = packageBuilder.getErrors();
-        if ( errors.getErrors().length > 0 ) {
+        if (errors.getErrors().length > 0) {
             StringBuilder errorMessages = new StringBuilder();
-            errorMessages.append( "Found errors in package builder\n" );
-            for ( int i = 0; i < errors.getErrors().length; i++ ) {
+            errorMessages.append("Found errors in package builder\n");
+            for (int i = 0; i < errors.getErrors().length; i++) {
                 DroolsError errorMessage = errors.getErrors()[i];
-                errorMessages.append( errorMessage );
-                errorMessages.append( "\n" );
+                errorMessages.append(errorMessage);
+                errorMessages.append("\n");
             }
-            errorMessages.append( "Could not parse knowledge" );
+            errorMessages.append("Could not parse knowledge");
 
-            throw new IllegalArgumentException( errorMessages.toString() );
+            throw new IllegalArgumentException(errorMessages.toString());
         }
 
         org.drools.rule.Package rulesPackage = packageBuilder.getPackage();
-        ruleBase.addPackage( rulesPackage );
+        ruleBase.addPackage(rulesPackage);
     }
 
 
     protected void checkInitializationCompleted() {
         try {
             latch.await();
-        } catch ( InterruptedException ie ) {
+        } catch (InterruptedException ie) {
             Thread.currentThread().interrupt();
-            throw new IllegalStateException( "Interrupted during wait for initialization" );
+            throw new IllegalStateException("Interrupted during wait for initialization");
         }
     }
 }

@@ -27,8 +27,8 @@ public class DefaultAuthToken implements AuthToken {
     private final Set<String> realmRoles;
     private final Map<String, Set<String>> applicationRolesMap;
 
-    public DefaultAuthToken( String username, String realmName, String applicationName, long expiration, long notBefore, long issuedAt,
-                             String issuer, Set<String> realmRoles, Map<String, Set<String>> applicationRolesMap ) {
+    public DefaultAuthToken(String username, String realmName, String applicationName, long expiration, long notBefore, long issuedAt,
+                            String issuer, Set<String> realmRoles, Map<String, Set<String>> applicationRolesMap) {
         this.username = username;
         this.realmName = realmName;
         this.applicationName = applicationName;
@@ -40,7 +40,7 @@ public class DefaultAuthToken implements AuthToken {
         this.applicationRolesMap = applicationRolesMap;
     }
 
-    public DefaultAuthToken( JsonWebToken internalToken ) {
+    public DefaultAuthToken(JsonWebToken internalToken) {
         JsonWebToken.Claims claims = internalToken.getClaims();
         this.username = claims.getSubject();
         this.realmName = claims.getAudience();
@@ -51,18 +51,18 @@ public class DefaultAuthToken implements AuthToken {
         this.issuer = claims.getIssuer();
 
         JsonWebToken.Access realmAccess = claims.getRealmAccess();
-        this.realmRoles = realmAccess != null ? Collections.unmodifiableSet( realmAccess.getRoles() ) : Collections.EMPTY_SET;
+        this.realmRoles = realmAccess != null ? Collections.unmodifiableSet(realmAccess.getRoles()) : Collections.EMPTY_SET;
 
         Map<String, JsonWebToken.Access> appAccess = claims.getResourceAccess();
-        if ( appAccess == null ) {
+        if (appAccess == null) {
             this.applicationRolesMap = Collections.EMPTY_MAP;
         } else {
             Map<String, Set<String>> applicationRolesMap = new HashMap<>();
-            for ( Map.Entry<String, JsonWebToken.Access> entry : appAccess.entrySet() ) {
+            for (Map.Entry<String, JsonWebToken.Access> entry : appAccess.entrySet()) {
                 Set<String> appRoles = entry.getValue() != null ? entry.getValue().getRoles() : Collections.EMPTY_SET;
-                applicationRolesMap.put( entry.getKey(), appRoles );
+                applicationRolesMap.put(entry.getKey(), appRoles);
             }
-            this.applicationRolesMap = Collections.unmodifiableMap( applicationRolesMap );
+            this.applicationRolesMap = Collections.unmodifiableMap(applicationRolesMap);
         }
     }
 
@@ -113,10 +113,10 @@ public class DefaultAuthToken implements AuthToken {
 
     @Override
     public String toString() {
-        return new StringBuilder( "DefaultAuthToken [ username=" ).append( username )
-                .append( ", realmRoles=" ).append( realmRoles )
-                .append( ", applicationRoles=" ).append( applicationRolesMap )
-                .append( " ]" )
+        return new StringBuilder("DefaultAuthToken [ username=").append(username)
+                .append(", realmRoles=").append(realmRoles)
+                .append(", applicationRoles=").append(applicationRolesMap)
+                .append(" ]")
                 .toString();
     }
 }

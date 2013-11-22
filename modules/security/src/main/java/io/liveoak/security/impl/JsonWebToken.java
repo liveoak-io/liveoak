@@ -32,15 +32,15 @@ public class JsonWebToken {
     private final Header header;
     private final Claims claims;
 
-    public JsonWebToken( String token ) {
-        String[] t = token.split( "\\." );
-        if ( t.length < 2 || t.length > 3 ) {
+    public JsonWebToken(String token) {
+        String[] t = token.split("\\.");
+        if (t.length < 2 || t.length > 3) {
             throw new IllegalArgumentException();
         }
 
-        headerBytes = Base64.getUrlDecoder().decode( t[0] );
-        claimsBytes = Base64.getUrlDecoder().decode( t[1] );
-        signatureBytes = t.length == 3 ? Base64.getUrlDecoder().decode( t[2] ) : null;
+        headerBytes = Base64.getUrlDecoder().decode(t[0]);
+        claimsBytes = Base64.getUrlDecoder().decode(t[1]);
+        signatureBytes = t.length == 3 ? Base64.getUrlDecoder().decode(t[2]) : null;
 
         header = parseHeader();
         claims = parseClaims();
@@ -68,27 +68,27 @@ public class JsonWebToken {
 
     private Header parseHeader() {
         try {
-            return mapper.readValue( headerBytes, Header.class );
-        } catch ( IOException e ) {
-            throw new IllegalArgumentException( e );
+            return mapper.readValue(headerBytes, Header.class);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
     private Claims parseClaims() {
         try {
-            return mapper.readValue( claimsBytes, Claims.class );
-        } catch ( IOException e ) {
-            throw new IllegalArgumentException( e );
+            return mapper.readValue(claimsBytes, Claims.class);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
-    @JsonIgnoreProperties( ignoreUnknown = true )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Header {
-        @JsonProperty( value = "typ", required = false )
+        @JsonProperty(value = "typ", required = false)
         private String type;
-        @JsonProperty( value = "alg", required = false )
+        @JsonProperty(value = "alg", required = false)
         private String algorithm;
-        @JsonProperty( value = "cty", required = false )
+        @JsonProperty(value = "cty", required = false)
         private String contentType;
 
         public String getType() {
@@ -104,43 +104,43 @@ public class JsonWebToken {
         }
     }
 
-    @JsonIgnoreProperties( ignoreUnknown = true )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Claims {
-        @JsonProperty( value = "iss", required = false )
+        @JsonProperty(value = "iss", required = false)
         private String issuer;
 
         // TODO Renamed to 'sub'
-        @JsonProperty( value = "prn", required = false )
+        @JsonProperty(value = "prn", required = false)
         private String subject;
 
-        @JsonProperty( value = "aud", required = false )
+        @JsonProperty(value = "aud", required = false)
         private String audience;
 
-        @JsonProperty( value = "exp", required = false )
+        @JsonProperty(value = "exp", required = false)
         private long expiration;
 
-        @JsonProperty( value = "nbf", required = false )
+        @JsonProperty(value = "nbf", required = false)
         private long notBefore;
 
-        @JsonProperty( value = "iat", required = false )
+        @JsonProperty(value = "iat", required = false)
         private long issuedAt;
 
-        @JsonProperty( value = "jti", required = false )
+        @JsonProperty(value = "jti", required = false)
         private String id;
 
-        @JsonProperty( value = "typ", required = false )
+        @JsonProperty(value = "typ", required = false)
         private String type;
 
-        @JsonProperty( value = "issuedFor", required = false )
+        @JsonProperty(value = "issuedFor", required = false)
         public String issuedFor;
 
-        @JsonProperty( value = "trusted-certs", required = false )
+        @JsonProperty(value = "trusted-certs", required = false)
         protected Set<String> trustedCertificates;
 
-        @JsonProperty( value = "realm_access", required = false )
+        @JsonProperty(value = "realm_access", required = false)
         private Access realmAccess;
 
-        @JsonProperty( value = "resource_access", required = false )
+        @JsonProperty(value = "resource_access", required = false)
         private Map<String, Access> resourceAccess = new HashMap<String, Access>();
 
         public String getIssuer() {
@@ -199,20 +199,20 @@ public class JsonWebToken {
 
         @JsonIgnore
         public boolean isNotBefore() {
-            return ( System.currentTimeMillis() / 1000 ) >= notBefore;
+            return (System.currentTimeMillis() / 1000) >= notBefore;
         }
 
         @JsonIgnore
         public boolean isActive() {
-            return ( !isExpired() || expiration == 0 ) && ( isNotBefore() || notBefore == 0 );
+            return (!isExpired() || expiration == 0) && (isNotBefore() || notBefore == 0);
         }
     }
 
-    @JsonIgnoreProperties( ignoreUnknown = true )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Access {
-        @JsonProperty( "roles" )
+        @JsonProperty("roles")
         protected java.util.Set<String> roles;
-        @JsonProperty( "verify_caller" )
+        @JsonProperty("verify_caller")
         protected Boolean verifyCaller;
 
         public Set<String> getRoles() {

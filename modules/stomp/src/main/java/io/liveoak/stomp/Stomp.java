@@ -14,29 +14,29 @@ public class Stomp {
      */
     public enum Version {
 
-        VERSION_1_0( "1.0", 1.0F ),
-        VERSION_1_1( "1.1", 1.1F ),
-        VERSION_1_2( "1.2", 1.1F );
+        VERSION_1_0("1.0", 1.0F),
+        VERSION_1_1("1.1", 1.1F),
+        VERSION_1_2("1.2", 1.1F);
 
         private String versionString;
         private float versionValue;
 
-        Version( String versionString, float versionValue ) {
+        Version(String versionString, float versionValue) {
             this.versionString = versionString;
             this.versionValue = versionValue;
         }
 
-        public boolean isAfter( Version version ) {
+        public boolean isAfter(Version version) {
             return versionValue > version.versionValue;
         }
 
-        public boolean isBefore( Version version ) {
+        public boolean isBefore(Version version) {
             return versionValue < version.versionValue;
         }
 
-        public static Version forVersionString( String versionString ) {
-            for ( Version version : Version.values() ) {
-                if ( versionString.equals( version.versionString ) )
+        public static Version forVersionString(String versionString) {
+            for (Version version : Version.values()) {
+                if (versionString.equals(version.versionString))
                     return version;
             }
             return null;
@@ -45,11 +45,11 @@ public class Stomp {
         public static String supportedVersions() {
             StringBuffer buf = new StringBuffer();
             Version[] versions = Version.values();
-            for ( int i = 0; i < versions.length; i++ ) {
-                if ( i > 0 ) {
-                    buf.append( "," );
+            for (int i = 0; i < versions.length; i++) {
+                if (i > 0) {
+                    buf.append(",");
                 }
-                buf.append( versions[i].versionString );
+                buf.append(versions[i].versionString);
             }
             return buf.toString();
         }
@@ -61,30 +61,30 @@ public class Stomp {
     }
 
     public enum Command {
-        STOMP( false ),
-        CONNECT( false ),
-        CONNECTED( false ),
-        DISCONNECT( false ),
+        STOMP(false),
+        CONNECT(false),
+        CONNECTED(false),
+        DISCONNECT(false),
 
-        SEND( true ),
-        MESSAGE( true ),
+        SEND(true),
+        MESSAGE(true),
 
-        SUBSCRIBE( false ),
-        UNSUBSCRIBE( false ),
+        SUBSCRIBE(false),
+        UNSUBSCRIBE(false),
 
-        BEGIN( false ),
-        COMMIT( false ),
-        ACK( false ),
-        NACK( false ),
-        ABORT( false ),
+        BEGIN(false),
+        COMMIT(false),
+        ACK(false),
+        NACK(false),
+        ABORT(false),
 
-        RECEIPT( false ),
+        RECEIPT(false),
 
-        ERROR( true );
+        ERROR(true);
 
         private boolean hasContent;
 
-        Command( boolean hasContent ) {
+        Command(boolean hasContent) {
             this.hasContent = hasContent;
         }
 

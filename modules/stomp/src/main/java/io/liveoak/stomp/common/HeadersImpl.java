@@ -18,18 +18,18 @@ public class HeadersImpl extends HashMap<String, String> implements Headers {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public String get( String headerName ) {
-        return super.get( headerName );
+    public String get(String headerName) {
+        return super.get(headerName);
     }
 
-    public void putAll( Headers headers ) {
-        for ( String name : headers.getHeaderNames() ) {
-            put( name, headers.get( name ) );
+    public void putAll(Headers headers) {
+        for (String name : headers.getHeaderNames()) {
+            put(name, headers.get(name));
         }
     }
 
-    public void remove( String headerName ) {
-        super.remove( headerName );
+    public void remove(String headerName) {
+        super.remove(headerName);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class HeadersImpl extends HashMap<String, String> implements Headers {
     @Override
     public Headers duplicate() {
         HeadersImpl dupe = new HeadersImpl();
-        dupe.putAll( ( Map<String, String> ) this );
+        dupe.putAll((Map<String, String>) this);
         return dupe;
     }
 

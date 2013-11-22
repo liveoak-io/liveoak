@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 public class StompConnection {
 
-    public StompConnection( Channel channel ) {
+    public StompConnection(Channel channel) {
         this.channel = channel;
         this.connectionId = UUID.randomUUID().toString();
     }
@@ -24,8 +24,8 @@ public class StompConnection {
         return this.connectionId;
     }
 
-    public void send( StompMessage message ) {
-        this.channel.writeAndFlush( message );
+    public void send(StompMessage message) {
+        this.channel.writeAndFlush(message);
     }
 
     private String connectionId;

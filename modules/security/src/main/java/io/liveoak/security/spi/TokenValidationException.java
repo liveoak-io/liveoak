@@ -10,11 +10,11 @@ package io.liveoak.security.spi;
  */
 public class TokenValidationException extends Exception {
 
-    public TokenValidationException( String message ) {
-        super( message );
+    public TokenValidationException(String message) {
+        super(message);
     }
 
-    public TokenValidationException( String message, Exception cause ) {
-        super( message, cause );
+    public TokenValidationException(String message, Exception cause) {
+        super(message, cause);
     }
 }

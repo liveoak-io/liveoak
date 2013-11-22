@@ -10,7 +10,7 @@ package io.liveoak.spi;
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  */
 public class RequiredKeyException extends RuntimeException {
-    public RequiredKeyException( String key ) {
-        super( key + " is required" );
+    public RequiredKeyException(String key) {
+        super(key + " is required");
     }
 }

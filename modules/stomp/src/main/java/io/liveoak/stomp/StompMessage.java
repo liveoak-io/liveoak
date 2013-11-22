@@ -21,23 +21,23 @@ public interface StompMessage extends ByteBufHolder {
 
     String destination();
 
-    void destination( String destination );
+    void destination(String destination);
 
     String contentType();
 
-    void contentType( String contentType );
+    void contentType(String contentType);
 
-    String content( Charset charset );
+    String content(Charset charset);
 
     String utf8Content();
 
-    void content( String content, Charset charset );
+    void content(String content, Charset charset);
 
-    void content( String content );
+    void content(String content);
 
     ByteBuf content();
 
-    void content( ByteBuf content );
+    void content(ByteBuf content);
 
     boolean isError();
 
@@ -45,9 +45,9 @@ public interface StompMessage extends ByteBufHolder {
 
     void nack() throws StompException;
 
-    void ack( String transactionId ) throws StompException;
+    void ack(String transactionId) throws StompException;
 
-    void nack( String transactionId ) throws StompException;
+    void nack(String transactionId) throws StompException;
 
     StompMessage duplicate();
 

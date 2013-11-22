@@ -21,5 +21,5 @@ public interface AuthorizationPolicy {
      * @param authRequestContext encapsulates all info about current request, token etc
      * @return true if request is authorized
      */
-    AuthorizationDecision isAuthorized( AuthorizationRequestContext authRequestContext );
+    AuthorizationDecision isAuthorized(AuthorizationRequestContext authRequestContext);
 }

@@ -18,30 +18,30 @@ import java.util.stream.Stream;
  */
 public class ListEncodingDriver extends AbstractEncodingDriver {
 
-    public ListEncodingDriver( EncodingDriver parent, Stream<Object> object, ReturnFields returnFields ) {
-        super( parent, object, returnFields );
+    public ListEncodingDriver(EncodingDriver parent, Stream<Object> object, ReturnFields returnFields) {
+        super(parent, object, returnFields);
     }
 
     @Override
     public void encode() throws Exception {
         encoder().startList();
-        ( ( Stream<Object> ) object() ).forEach( ( e ) -> {
-            if ( e instanceof Resource ) {
-                Resource r = (Resource)e;
+        ((Stream<Object>) object()).forEach((e) -> {
+            if (e instanceof Resource) {
+                Resource r = (Resource) e;
                 // embedded resource's don't have id's and should always be displayed unless the return field is set
                 if (r.id() == null && returnFields().isEmpty()) {
-                    addChildDriver( new ResourceEncodingDriver( this, ( Resource ) e, ReturnFields.ALL));
-                } else if ( returnFields().isEmpty() ) {
-                    addChildDriver( new ValueEncodingDriver( this, e ) );
+                    addChildDriver(new ResourceEncodingDriver(this, (Resource) e, ReturnFields.ALL));
+                } else if (returnFields().isEmpty()) {
+                    addChildDriver(new ValueEncodingDriver(this, e));
                 } else {
-                    addChildDriver( new ResourceEncodingDriver( this, ( Resource ) e, returnFields() ) );
+                    addChildDriver(new ResourceEncodingDriver(this, (Resource) e, returnFields()));
                 }
-            } else if ( e instanceof List || e instanceof Set ) {
-                addChildDriver( new ListEncodingDriver( this, ( ( Collection ) e ).stream(), returnFields() ) );
+            } else if (e instanceof List || e instanceof Set) {
+                addChildDriver(new ListEncodingDriver(this, ((Collection) e).stream(), returnFields()));
             } else {
-                addChildDriver( new ValueEncodingDriver( this, e ) );
+                addChildDriver(new ValueEncodingDriver(this, e));
             }
-        } );
+        });
         encodeNext();
     }
 

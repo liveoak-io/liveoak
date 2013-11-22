@@ -18,5 +18,5 @@ public interface AuthorizationService {
      * @param authRequestContext encapsulates all info about current request, token etc
      * @return true if request is authorized
      */
-    boolean isAuthorized( AuthorizationRequestContext authRequestContext );
+    boolean isAuthorized(AuthorizationRequestContext authRequestContext);
 }

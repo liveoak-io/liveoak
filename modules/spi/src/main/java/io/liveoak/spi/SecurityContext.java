@@ -45,16 +45,16 @@ public interface SecurityContext {
      * @param roleName
      * @return true if user is member of role roleName
      */
-    default boolean isUserInRealmRole( String roleName ) {
-        return getRealmRoles().contains( roleName );
+    default boolean isUserInRealmRole(String roleName) {
+        return getRealmRoles().contains(roleName);
     }
 
     /**
      * @param roleName
      * @return true if user is member of role roleName
      */
-    default boolean isUserInApplicationRole( String roleName ) {
-        return getApplicationRoles().contains( roleName );
+    default boolean isUserInApplicationRole(String roleName) {
+        return getApplicationRoles().contains(roleName);
     }
 
     public static final SecurityContext ANONYMOUS = new SecurityContext() {

@@ -15,27 +15,27 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class MongoBaseObjectResource extends MongoObjectResource {
 
-    public MongoBaseObjectResource( MongoCollectionResource parent, DBObject dbObject ) {
-        super( parent, dbObject );
+    public MongoBaseObjectResource(MongoCollectionResource parent, DBObject dbObject) {
+        super(parent, dbObject);
     }
 
     @Override
-    public void updateProperties( RequestContext ctx, ResourceState state, Responder responder ) {
-        state.getPropertyNames().stream().forEach( ( name ) -> {
-            if ( !name.equals( MONGO_ID_FIELD ) && !name.equals( MBAAS_ID_FIELD ) ) {
-                this.dbObject.put( name, state.getProperty( name ) );
+    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) {
+        state.getPropertyNames().stream().forEach((name) -> {
+            if (!name.equals(MONGO_ID_FIELD) && !name.equals(MBAAS_ID_FIELD)) {
+                this.dbObject.put(name, state.getProperty(name));
             }
-        } );
+        });
 
-        getParent().updateChild( ctx, this.id(), this.dbObject );
+        getParent().updateChild(ctx, this.id(), this.dbObject);
 
-        responder.resourceUpdated( this );
+        responder.resourceUpdated(this);
     }
 
     @Override
-    public void delete( RequestContext ctx, Responder responder ) {
-        getParent().deleteChild( ctx, id() );
-        responder.resourceDeleted( this );
+    public void delete(RequestContext ctx, Responder responder) {
+        getParent().deleteChild(ctx, id());
+        responder.resourceDeleted(this);
     }
 
     protected MongoCollectionResource getParent() {

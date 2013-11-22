@@ -18,18 +18,18 @@ import java.util.Set;
  */
 public class PropertiesEncodingDriver extends ResourceEncodingDriver {
 
-    public PropertiesEncodingDriver( ResourceEncodingDriver parent, Resource resource, ReturnFields returnFields ) {
-        super( parent, resource, returnFields );
+    public PropertiesEncodingDriver(ResourceEncodingDriver parent, Resource resource, ReturnFields returnFields) {
+        super(parent, resource, returnFields);
     }
 
     @Override
     public void encode() throws Exception {
-        resource().readProperties( requestContext(), new MyPropertySink() );
+        resource().readProperties(requestContext(), new MyPropertySink());
     }
 
     @Override
     public void close() throws Exception {
-        if ( this.hasProperties ) {
+        if (this.hasProperties) {
             encoder().endProperties();
         }
         parent().encodeNext();
@@ -38,34 +38,34 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
     private class MyPropertySink implements PropertySink {
 
         @Override
-        public void accept( String name, Object value ) {
-            if ( !returnFields().included( name ) ) {
+        public void accept(String name, Object value) {
+            if (!returnFields().included(name)) {
                 return;
             }
-            if ( !hasProperties ) {
+            if (!hasProperties) {
                 try {
                     encoder().startProperties();
-                } catch ( Exception e ) {
+                } catch (Exception e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
                 hasProperties = true;
             }
-            PropertyEncodingDriver propDriver = new PropertyEncodingDriver( PropertiesEncodingDriver.this, name, null );
-            if ( value instanceof Resource ) {
+            PropertyEncodingDriver propDriver = new PropertyEncodingDriver(PropertiesEncodingDriver.this, name, null);
+            if (value instanceof Resource) {
                 // embedded resource's don't have id's and should always be displayed unless the return field is set
-                if (((Resource)value).id() == null && returnFields().child(name).isEmpty()) {
-                    propDriver.addChildDriver( new ResourceEncodingDriver( propDriver, ( Resource ) value, returnFields().ALL ) );
-                } else if (!returnFields().child( name ).isEmpty())  {
-                    propDriver.addChildDriver( new ResourceEncodingDriver( propDriver, ( Resource ) value, returnFields().child( name ) ) );
+                if (((Resource) value).id() == null && returnFields().child(name).isEmpty()) {
+                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().ALL));
+                } else if (!returnFields().child(name).isEmpty()) {
+                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().child(name)));
                 } else {
-                    propDriver.addChildDriver( new ValueEncodingDriver( propDriver, value ) );
+                    propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value));
                 }
-            } else if ( value instanceof List || value instanceof Set ) {
-                propDriver.addChildDriver( new ListEncodingDriver( propDriver, ( ( Collection ) value ).stream(), returnFields().child( name ) ) );
+            } else if (value instanceof List || value instanceof Set) {
+                propDriver.addChildDriver(new ListEncodingDriver(propDriver, ((Collection) value).stream(), returnFields().child(name)));
             } else {
-                propDriver.addChildDriver( new ValueEncodingDriver( propDriver, value ) );
+                propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value));
             }
-            addChildDriver( propDriver );
+            addChildDriver(propDriver);
         }
 
         @Override
