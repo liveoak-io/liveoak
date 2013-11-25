@@ -115,7 +115,7 @@ Stomp
 
 Stomp.Client = function (host, port, secure) {
     this._host = host || Stomp.DEFAULT_HOST;
-    this._port = port || Stomp.DEFAULT_PORT || 8675;
+    this._port = port || Stomp.DEFAULT_PORT || 8080;
     this._secure = secure || Stomp.DEFAULT_SECURE_FLAG || false;
 }
 
@@ -160,8 +160,6 @@ Stomp.Client.prototype = {
         for (i = 0; i < Stomp.Transports.length; ++i) {
             var t = new Stomp.Transports[i](this._host, this._port, this._secure);
             t.client = this;
-            console.log("push transport");
-            console.debug(t);
             transports.push(t);
         }
 
@@ -176,7 +174,6 @@ Stomp.Client.prototype = {
                 var fallback = client._buildConnector(transports, i + 1, callback);
                 try {
                     transports[i].connect(function () {
-                        console.log("connect transport " + transports[i]);
                         client._transport = transports[i];
                         callback();
                     }, fallback);
@@ -186,18 +183,13 @@ Stomp.Client.prototype = {
             };
         } else if (i < transports.length) {
             return function () {
-                console.log("trying connect");
                 var fallback = client.connectionFailed.bind(this);
                 try {
-                    console.log("connect");
                     transports[i].connect(function () {
-                        console.log("connected");
                         client._transport = transports[i];
                         callback();
                     }, client.connectionFailed.bind(this));
                 } catch (err) {
-                    console.log("error connecting");
-                    console.debug(err);
                     fallback();
                 }
             };
@@ -232,7 +224,6 @@ Stomp.Client.prototype = {
         headers.destination = destination;
         headers.id = subscription_id;
         this._subscriptions['' + subscription_id] = callback;
-        console.log("sending subscribe");
         this._transmit("SUBSCRIBE", headers);
         return subscription_id;
     },
