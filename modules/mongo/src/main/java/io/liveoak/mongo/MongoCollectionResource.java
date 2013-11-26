@@ -30,13 +30,19 @@ class MongoCollectionResource extends MongoResource {
 
     DBCollection dbCollection;
 
-    MongoCollectionResource(RootMongoResource parent, DBCollection collection) {
+    MongoCollectionResource(MongoResource parent, DBCollection collection) {
         super(parent);
         this.dbCollection = collection;
     }
 
     @Override
     public void readMember(RequestContext ctx, String childId, Responder responder) {
+
+        if ("_aggregate".equals(childId)) {
+            responder.resourceRead(new MongoAggregationResource(this));
+            return;
+        }
+
         DBObject object = null;
         //TODO: figure out this whole object id thing better
         if (ObjectId.isValid(childId)) {
