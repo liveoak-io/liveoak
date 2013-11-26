@@ -35,6 +35,7 @@ public class GitResourceTest extends AbstractResourceTestCase {
 
         Config config = super.createConfig();
         config.put("repoPath", repoDir.getAbsolutePath());
+        config.put("createIfMissing", "true");
         return config;
     }
 

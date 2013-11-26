@@ -35,6 +35,7 @@ public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
 
         Config config = super.createConfig();
         config.put("repoPath", repoDir.getAbsolutePath());
+        config.put("createIfMissing", "true");
         return config;
     }
 

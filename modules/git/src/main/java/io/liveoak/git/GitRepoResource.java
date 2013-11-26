@@ -64,6 +64,9 @@ public class GitRepoResource extends GitDirectoryResource implements RootResourc
             throw new InitializationException("unable to readMember git repo at: " + this.file.getAbsolutePath());
         }
 
+        String createIfNotExisting = context.config().get("createIfMissing", "false");
+        boolean createRepo = Boolean.parseBoolean(createIfNotExisting);
+
         try {
             Repository repo = new RepositoryBuilder()
                     .setWorkTree(this.file)
@@ -71,8 +74,13 @@ public class GitRepoResource extends GitDirectoryResource implements RootResourc
             this.git = new Git(repo);
 
             if (!repo.getDirectory().exists()) {
-                // No git repo, need to create
-                this.git.getRepository().create();
+                if (createRepo) {
+                    // No git repo, need to create
+                    this.git.getRepository().create();
+                } else {
+                    throw new InitializationException("unable to setup repository at: " + this.file.getAbsolutePath()
+                            + "; no git repository found");
+                }
             }
         } catch (IOException e) {
             throw new InitializationException("unable to setup repository at: " + this.file.getAbsolutePath());
