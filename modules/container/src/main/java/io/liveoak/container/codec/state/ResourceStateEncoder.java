@@ -45,7 +45,12 @@ public class ResourceStateEncoder implements Encoder {
     @Override
     public void startResource(Resource resource) throws Exception {
         ResourceState state = new DefaultResourceState(resource.id());
-        state.uri(resource.uri());
+        if (resource.id() != null) {
+            if (resource.uri() == null) {
+                throw new IllegalStateException("Resource has id() but not uri(): " + resource.id());
+            }
+            state.uri(resource.uri());
+        }
         this.stack.push(state);
 
         if (this.root == null) {

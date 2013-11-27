@@ -39,6 +39,6 @@ public class MongoBaseObjectResource extends MongoObjectResource {
     }
 
     protected MongoCollectionResource getParent() {
-        return (MongoCollectionResource) parent;
+        return (MongoCollectionResource) parent();
     }
 }

@@ -11,18 +11,13 @@ import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
-import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.Sorting;
 import io.liveoak.spi.state.ResourceState;
 import org.fest.assertions.Fail;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -329,42 +324,6 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         @Override
         public int limit() {
             return limit;
-        }
-    }
-
-    private class SimpleResourceParams implements ResourceParams {
-
-        Map<String, String> map = new HashMap<String, String>();
-
-        public void put(String name, String value) {
-            map.put(name, value);
-        }
-
-        @Override
-        public Collection<String> names() {
-            return map.keySet();
-        }
-
-        @Override
-        public boolean contains(String name) {
-            return map.containsKey(name);
-        }
-
-        @Override
-        public String value(String name) {
-            return map.get(name);
-        }
-
-        @Override
-        public List<String> values(String name) {
-            List list = new ArrayList<String>();
-            list.add(map.get(name));
-            return list;
-        }
-
-        @Override
-        public int intValue(String name, int defaultValue) {
-            return defaultValue;
         }
     }
 }

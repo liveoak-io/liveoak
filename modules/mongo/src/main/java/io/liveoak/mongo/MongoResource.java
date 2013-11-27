@@ -13,7 +13,7 @@ import io.liveoak.spi.resource.async.Resource;
  */
 public abstract class MongoResource implements Resource, BlockingResource {
 
-    protected MongoResource parent;
+    private MongoResource parent;
 
     protected static final String MONGO_ID_FIELD = "_id";
     protected static final String MBAAS_ID_FIELD = "id";

@@ -98,7 +98,6 @@ public class RootMongoResource extends MongoResource implements RootResource {
         } else {
             responder.noSuchResource(id);
         }
-
     }
 
     @Override
