@@ -32,7 +32,7 @@ public class DefaultTokenManager implements TokenManager {
 
 
     protected JsonWebToken getInternalToken(RequestContext requestContext) {
-        String authorizationToken = requestContext.getRequestAttributes().getAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, String.class);
+        String authorizationToken = requestContext.requestAttributes().getAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, String.class);
 
         // Use null token if Authorization header was not present
         if (authorizationToken == null) {

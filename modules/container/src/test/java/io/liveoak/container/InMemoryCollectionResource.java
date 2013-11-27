@@ -73,7 +73,7 @@ public class InMemoryCollectionResource implements Resource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
-        Stream<Resource> stream = applyPagination(ctx.getPagination(), this.collection.values());
+        Stream<Resource> stream = applyPagination(ctx.pagination(), this.collection.values());
         stream.forEach((m) -> {
             sink.accept(m);
         });

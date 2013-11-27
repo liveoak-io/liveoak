@@ -63,6 +63,17 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/AuthorizationServiceTest.java</exclude>
+                        <exclude>**/DroolsFormattingUtilsTest.java</exclude>
+                        <exclude>**/URIPolicyTest.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 </project>

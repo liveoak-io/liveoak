@@ -29,8 +29,8 @@ public class MongoAggregationResource extends MongoAggregationItem {
 
     private BasicDBList aggregate(RequestContext ctx) {
         BasicDBList queryObject = new BasicDBList();
-        if (ctx.getResourceParams() != null && ctx.getResourceParams().contains("q")) {
-            String queryString = ctx.getResourceParams().value("q");
+        if (ctx.resourceParams() != null && ctx.resourceParams().contains("q")) {
+            String queryString = ctx.resourceParams().value("q");
             DBObject paramObject = (DBObject) JSON.parse(queryString);
 
             if (paramObject instanceof BasicDBList) {

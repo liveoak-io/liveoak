@@ -36,7 +36,7 @@ public class PolicyBasedAuthorizationService implements AuthorizationService {
         }
 
         for (AuthorizationPolicyEntry policyEntry : policies) {
-            ResourcePath resPath = request.getResourcePath();
+            ResourcePath resPath = request.resourcePath();
 
             // Check if policy is mapped to actual resourcePath
             if (policyEntry.isResourceMapped(resPath)) {

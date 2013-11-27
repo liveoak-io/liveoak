@@ -64,7 +64,7 @@ public class SimpleURIPolicy implements AuthorizationPolicy {
     @Override
     public AuthorizationDecision isAuthorized(AuthorizationRequestContext authRequestContext) {
         RequestContext req = authRequestContext.getRequestContext();
-        List<String> segments = req.getResourcePath().segments();
+        List<String> segments = req.resourcePath().segments();
         int segmentsSize = segments.size();
 
         // TODO: Refactor this
@@ -79,7 +79,7 @@ public class SimpleURIPolicy implements AuthorizationPolicy {
         }
 
         // Add last key for action
-        String action = req.getRequestType().name();
+        String action = req.requestType().name();
         keys.add(action);
 
         // Look for best RolesContainer

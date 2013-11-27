@@ -96,21 +96,21 @@ public class MongoCollectionResource extends MongoResource {
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
         DBObject queryObject = new BasicDBObject();
-        if (ctx.getResourceParams() != null && ctx.getResourceParams().contains("q")) {
-            String queryString = ctx.getResourceParams().value("q");
+        if (ctx.resourceParams() != null && ctx.resourceParams().contains("q")) {
+            String queryString = ctx.resourceParams().value("q");
             queryObject = (DBObject) JSON.parse(queryString);
         }
 
         DBObject returnFields = new BasicDBObject();
-        if (ctx.getReturnFields() != null && !ctx.getReturnFields().isAll()) {
-            ctx.getReturnFields().forEach((fieldName) -> {
+        if (ctx.returnFields() != null && !ctx.returnFields().isAll()) {
+            ctx.returnFields().forEach((fieldName) -> {
                 returnFields.put(fieldName, true);
             });
         }
 
         DBCursor dbCursor = dbCollection.find(queryObject, returnFields);
 
-        Sorting sorting = ctx.getSorting();
+        Sorting sorting = ctx.sorting();
         if (sorting != null) {
             BasicDBObject sortingObject = new BasicDBObject();
             for (Sorting.Spec spec : sorting) {
@@ -119,9 +119,9 @@ public class MongoCollectionResource extends MongoResource {
             dbCursor = dbCursor.sort(sortingObject);
         }
 
-        if (ctx.getPagination() != null) {
-            dbCursor.limit(ctx.getPagination().limit());
-            dbCursor.skip(ctx.getPagination().offset());
+        if (ctx.pagination() != null) {
+            dbCursor.limit(ctx.pagination().limit());
+            dbCursor.skip(ctx.pagination().offset());
         }
 
         dbCursor.forEach((dbObject) -> {
