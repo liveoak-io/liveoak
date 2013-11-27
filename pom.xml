@@ -37,6 +37,12 @@
 
         <!-- checkstyle -->
         <version.checkstyle.plugin>2.9.1</version.checkstyle.plugin>
+        <version.surefire.plugin>2.16</version.surefire.plugin>
+        <version.codehaus.helper.plugin>1.8</version.codehaus.helper.plugin>
+        <version.resources.plugin>2.6</version.resources.plugin>
+        <version.failsafe.plugin>2.16</version.failsafe.plugin>
+        <version.vertx.plugin>2.0.1-final</version.vertx.plugin>
+        <version.embedmongo.plugin>0.1.10</version.embedmongo.plugin>
     </properties>
     <modules>
         <module>support/build-config</module>
@@ -284,6 +290,16 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${version.surefire.plugin}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${version.surefire.plugin}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
@@ -340,6 +356,32 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${version.checkstyle.plugin}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${version.resources.plugin}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${version.failsafe.plugin}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${version.codehaus.helper.plugin}</version>
+            </plugin>
+            <plugin>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-maven-plugin</artifactId>
+                <version>${version.vertx.plugin}</version>
+            </plugin>
+            <plugin>
+                <groupId>com.github.joelittlejohn.embedmongo</groupId>
+                <artifactId>embedmongo-maven-plugin</artifactId>
+                <version>${version.embedmongo.plugin}</version>
             </plugin>
         </plugins>
     </build>
