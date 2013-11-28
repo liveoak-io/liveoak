@@ -32,47 +32,47 @@ public class AuthTestRequestContext implements RequestContext {
     }
 
     @Override
-    public Application getApplication() {
+    public Application application() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public SecurityContext getSecurityContext() {
+    public SecurityContext securityContext() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public Pagination getPagination() {
+    public Pagination pagination() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public ResourcePath getResourcePath() {
+    public ResourcePath resourcePath() {
         return resourcePath;
     }
 
     @Override
-    public ResourceParams getResourceParams() {
+    public ResourceParams resourceParams() {
         return resourceParams;
     }
 
     @Override
-    public RequestAttributes getRequestAttributes() {
+    public RequestAttributes requestAttributes() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public RequestType getRequestType() {
+    public RequestType requestType() {
         return reqType;
     }
 
     @Override
-    public ReturnFields getReturnFields() {
+    public ReturnFields returnFields() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public Sorting getSorting() {
+    public Sorting sorting() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

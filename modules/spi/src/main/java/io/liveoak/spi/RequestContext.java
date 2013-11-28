@@ -8,23 +8,23 @@ package io.liveoak.spi;
 
 public interface RequestContext {
 
-    Application getApplication();
+    Application application();
 
-    SecurityContext getSecurityContext();
+    SecurityContext securityContext();
 
-    Pagination getPagination();
+    Pagination pagination();
 
-    ResourcePath getResourcePath();
+    ResourcePath resourcePath();
 
-    ResourceParams getResourceParams();
+    ResourceParams resourceParams();
 
-    RequestAttributes getRequestAttributes();
+    RequestAttributes requestAttributes();
 
-    RequestType getRequestType();
+    RequestType requestType();
 
-    ReturnFields getReturnFields();
+    ReturnFields returnFields();
 
-    Sorting getSorting();
+    Sorting sorting();
 
     public static class Builder implements RequestContext {
 
@@ -62,47 +62,47 @@ public interface RequestContext {
         }
 
         @Override
-        public Application getApplication() {
+        public Application application() {
             return null;
         }
 
         @Override
-        public SecurityContext getSecurityContext() {
+        public SecurityContext securityContext() {
             return this.securityContext;
         }
 
         @Override
-        public Pagination getPagination() {
+        public Pagination pagination() {
             return this.pagination;
         }
 
         @Override
-        public ResourceParams getResourceParams() {
+        public ResourceParams resourceParams() {
             return this.resourceParams;
         }
 
         @Override
-        public ReturnFields getReturnFields() {
+        public ReturnFields returnFields() {
             return returnFields;
         }
 
         @Override
-        public ResourcePath getResourcePath() {
+        public ResourcePath resourcePath() {
             return null;
         }
 
         @Override
-        public RequestAttributes getRequestAttributes() {
+        public RequestAttributes requestAttributes() {
             return null;
         }
 
         @Override
-        public RequestType getRequestType() {
+        public RequestType requestType() {
             return null;
         }
 
         @Override
-        public Sorting getSorting() {
+        public Sorting sorting() {
             return sorting;
         }
 

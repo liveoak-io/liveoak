@@ -27,47 +27,47 @@ public class RequestContextDecorator implements RequestContext {
     }
 
     @Override
-    public Application getApplication() {
-        return delegate.getApplication();
+    public Application application() {
+        return delegate.application();
     }
 
     @Override
-    public SecurityContext getSecurityContext() {
-        return delegate.getSecurityContext();
+    public SecurityContext securityContext() {
+        return delegate.securityContext();
     }
 
     @Override
-    public Pagination getPagination() {
-        return delegate.getPagination();
+    public Pagination pagination() {
+        return delegate.pagination();
     }
 
     @Override
-    public ResourcePath getResourcePath() {
-        return delegate.getResourcePath();
+    public ResourcePath resourcePath() {
+        return delegate.resourcePath();
     }
 
     @Override
-    public ResourceParamsDecorator getResourceParams() {
-        return new ResourceParamsDecorator(delegate.getResourceParams());
+    public ResourceParamsDecorator resourceParams() {
+        return new ResourceParamsDecorator(delegate.resourceParams());
     }
 
     @Override
-    public RequestAttributes getRequestAttributes() {
-        return delegate.getRequestAttributes();
+    public RequestAttributes requestAttributes() {
+        return delegate.requestAttributes();
     }
 
     @Override
-    public RequestType getRequestType() {
-        return delegate.getRequestType();
+    public RequestType requestType() {
+        return delegate.requestType();
     }
 
     @Override
-    public ReturnFields getReturnFields() {
-        return delegate.getReturnFields();
+    public ReturnFields returnFields() {
+        return delegate.returnFields();
     }
 
     @Override
-    public Sorting getSorting() {
-        return delegate.getSorting();
+    public Sorting sorting() {
+        return delegate.sorting();
     }
 }

@@ -45,7 +45,7 @@ public class DefaultRequestContext implements RequestContext {
     }
 
     @Override
-    public Application getApplication() {
+    public Application application() {
         return app;
     }
 
@@ -54,7 +54,7 @@ public class DefaultRequestContext implements RequestContext {
     }
 
     @Override
-    public SecurityContext getSecurityContext() {
+    public SecurityContext securityContext() {
         return securityContext;
     }
 
@@ -63,7 +63,7 @@ public class DefaultRequestContext implements RequestContext {
     }
 
     @Override
-    public Pagination getPagination() {
+    public Pagination pagination() {
         return pagination;
     }
 
@@ -72,7 +72,7 @@ public class DefaultRequestContext implements RequestContext {
     }
 
     @Override
-    public ReturnFields getReturnFields() {
+    public ReturnFields returnFields() {
         return returnFields;
     }
 
@@ -81,7 +81,7 @@ public class DefaultRequestContext implements RequestContext {
     }
 
     @Override
-    public ResourceParams getResourceParams() {
+    public ResourceParams resourceParams() {
         return resourceParams;
     }
 
@@ -90,22 +90,22 @@ public class DefaultRequestContext implements RequestContext {
     }
 
     @Override
-    public ResourcePath getResourcePath() {
+    public ResourcePath resourcePath() {
         return resourcePath;
     }
 
     @Override
-    public RequestType getRequestType() {
+    public RequestType requestType() {
         return requestType;
     }
 
     @Override
-    public RequestAttributes getRequestAttributes() {
+    public RequestAttributes requestAttributes() {
         return requestAttributes;
     }
 
     @Override
-    public Sorting getSorting() {
+    public Sorting sorting() {
         return sorting;
     }
 }

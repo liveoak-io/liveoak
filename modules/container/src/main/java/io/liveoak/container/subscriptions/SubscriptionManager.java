@@ -52,7 +52,7 @@ public class SubscriptionManager implements RootResource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
-        String path = ctx.getResourceParams().value("path");
+        String path = ctx.resourceParams().value("path");
 
         Stream<Subscription> subscriptions = null;
 

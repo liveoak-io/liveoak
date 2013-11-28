@@ -53,7 +53,7 @@ public class HttpResourceRequestDecoderTest {
 
         //assertThat(decoded.mediaType()).isEqualTo(MediaType.JSON);
 
-        assertThat(decoded.pagination()).isNotNull();
+        assertThat(decoded.requestContext().pagination()).isNotNull();
         // TODO: still looking into whether this test failing is proper or not
         //assertThat( decoded.pagination() ).isEqualTo(Pagination.NONE);
 
@@ -73,8 +73,8 @@ public class HttpResourceRequestDecoderTest {
 
         //assertThat(decoded.mediaType()).isEqualTo(MediaType.JSON);
 
-        assertThat(decoded.pagination()).isNotNull();
-        assertThat(decoded.pagination()).isEqualTo(Pagination.NONE);
+        assertThat(decoded.requestContext().pagination()).isNotNull();
+        assertThat(decoded.requestContext().pagination()).isEqualTo(Pagination.NONE);
 
         assertThat(decoded.state()).isNull();
     }
@@ -92,8 +92,8 @@ public class HttpResourceRequestDecoderTest {
 
         //assertThat(decoded.mediaType()).isEqualTo(MediaType.JSON);
 
-        assertThat(decoded.pagination()).isNotNull();
-        assertThat(decoded.pagination()).isEqualTo(Pagination.NONE);
+        assertThat(decoded.requestContext().pagination()).isNotNull();
+        assertThat(decoded.requestContext().pagination()).isEqualTo(Pagination.NONE);
 
         assertThat(decoded.state()).isNotNull();
         assertThat(decoded.state()).isInstanceOf(ResourceState.class);
@@ -116,8 +116,8 @@ public class HttpResourceRequestDecoderTest {
 
         //assertThat(decoded.mediaType()).isEqualTo(MediaType.JSON);
 
-        assertThat(decoded.pagination()).isNotNull();
-        assertThat(decoded.pagination()).isEqualTo(Pagination.NONE);
+        assertThat(decoded.requestContext().pagination()).isNotNull();
+        assertThat(decoded.requestContext().pagination()).isEqualTo(Pagination.NONE);
 
         assertThat(decoded.state()).isNotNull();
         assertThat(decoded.state()).isInstanceOf(ResourceState.class);

@@ -49,28 +49,8 @@ public class ResourceRequest {
         return this.state;
     }
 
-    public Pagination pagination() {
-        return this.pagination;
-    }
-
-    public ResourceParams params() {
-        return this.params;
-    }
-
-    public RequestAttributes requestAttributes() {
-        return this.requestAttributes;
-    }
-
-    public ReturnFields returnFields() {
-        return this.returnFields;
-    }
-
     public RequestContext requestContext() {
         return this.requestContext;
-    }
-
-    public Sorting sorting() {
-        return this.sorting;
     }
 
     public String toString() {
@@ -79,25 +59,29 @@ public class ResourceRequest {
 
     private RequestType requestType;
     private ResourcePath resourcePath;
-    private RequestAttributes requestAttributes;
-    private ResourceParams params;
     private MediaTypeMatcher mediaTypeMatcher;
-    private Pagination pagination;
     private ResourceState state;
-    private ReturnFields returnFields;
     private RequestContext requestContext;
-    private Sorting sorting;
 
     public static class Builder {
 
         private ResourceRequest obj;
+
+        private ResourceParams params;
+        private ReturnFields returnFields;
+        private Pagination pagination;
+        private RequestAttributes requestAttributes;
+        private Sorting sorting;
 
         public Builder(RequestType type, ResourcePath path) {
             obj = new ResourceRequest(type, path);
         }
 
         public Builder resourceParams(ResourceParams params) {
-            obj.params = params;
+            if (obj.requestContext != null) {
+                throw new IllegalStateException("requestContext has been set already!");
+            }
+            this.params = params;
             return this;
         }
 
@@ -107,7 +91,10 @@ public class ResourceRequest {
         }
 
         public Builder pagination(Pagination pagination) {
-            obj.pagination = pagination;
+            if (obj.requestContext != null) {
+                throw new IllegalStateException("requestContext has been set already!");
+            }
+            this.pagination = pagination;
             return this;
         }
 
@@ -117,30 +104,58 @@ public class ResourceRequest {
         }
 
         public Builder returnFields(ReturnFields fields) {
-            obj.returnFields = fields;
+            if (obj.requestContext != null) {
+                throw new IllegalStateException("requestContext has been set already!");
+            }
+            this.returnFields = fields;
             return this;
         }
 
         public Builder requestAttributes(RequestAttributes reqAttributes) {
-            obj.requestAttributes = reqAttributes;
+            if (obj.requestContext != null) {
+                throw new IllegalStateException("requestContext has been set already!");
+            }
+            this.requestAttributes = reqAttributes;
             return this;
         }
 
         public Builder requestAttribute(String attributeName, Object attributeValue) {
-            if (obj.requestAttributes == null) {
-                obj.requestAttributes = new DefaultRequestAttributes();
+            if (obj.requestContext != null) {
+                throw new IllegalStateException("requestContext has been set already!");
             }
-            obj.requestAttributes.setAttribute(attributeName, attributeValue);
+            if (this.requestAttributes == null) {
+                this.requestAttributes = new DefaultRequestAttributes();
+            }
+            this.requestAttributes.setAttribute(attributeName, attributeValue);
             return this;
         }
 
         public Builder requestContext(RequestContext requestContext) {
+            if (params != null) {
+                throw new IllegalStateException("params has already been set!");
+            }
+            if (returnFields != null) {
+                throw new IllegalStateException("returnFields has already been set!");
+            }
+            if (pagination != null) {
+                throw new IllegalStateException("pagination has already been set!");
+            }
+            if (requestAttributes != null) {
+                throw new IllegalStateException("requestAttributes has already been set!");
+            }
+            if (sorting != null) {
+                throw new IllegalStateException("sorting has already been set!");
+            }
+
             obj.requestContext = requestContext;
             return this;
         }
 
         public Builder sorting(Sorting sorting) {
-            obj.sorting = sorting;
+            if (obj.requestContext != null) {
+                throw new IllegalStateException("requestContext has been set already!");
+            }
+            this.sorting = sorting;
             return this;
         }
 
@@ -150,20 +165,22 @@ public class ResourceRequest {
             }
 
             if (obj.requestContext == null) {
-                if (obj.pagination == null) {
-                    obj.pagination = Pagination.NONE;
+                if (pagination == null) {
+                    pagination = Pagination.NONE;
                 }
-                if (obj.params == null) {
-                    obj.params = ResourceParams.NONE;
+                if (params == null) {
+                    params = ResourceParams.NONE;
                 }
-                if (obj.requestAttributes == null) {
-                    obj.requestAttributes = new DefaultRequestAttributes();
+                if (requestAttributes == null) {
+                    requestAttributes = new DefaultRequestAttributes();
                 }
-                if (obj.returnFields == null) {
-                    obj.returnFields = ReturnFields.ALL;
+                if (returnFields == null) {
+                    returnFields = ReturnFields.ALL;
                 }
 
-                obj.requestContext = new DefaultRequestContext(SecurityContext.ANONYMOUS, obj.pagination, obj.returnFields, obj.params, obj.resourcePath, obj.requestType, obj.requestAttributes, obj.sorting);
+                // TODO: introduce Sorting.NONE to be in line with others
+                obj.requestContext = new DefaultRequestContext(SecurityContext.ANONYMOUS, pagination, returnFields, params,
+                        obj.resourcePath, obj.requestType, requestAttributes, sorting);
             }
             return obj;
         }

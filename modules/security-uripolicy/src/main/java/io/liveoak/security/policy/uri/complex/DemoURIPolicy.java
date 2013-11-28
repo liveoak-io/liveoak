@@ -21,11 +21,11 @@ public class DemoURIPolicy extends URIPolicy {
                 "READ", "\"role1\", \"role2\"", null, null, null, null, null);
 
         // Rule specifies that requests to '/droolsTest/*' are accepted if params condition matched as well
-        URIPolicyEntry rule2 = URIPolicyEntry.createEntry(9, "/droolsTest/*", "resourceParams.value(\"param1\") == \"foo\" && resourceParams.intValue(\"param2\") >= 10",
+        URIPolicyEntry rule2 = URIPolicyEntry.createEntry(9, "/droolsTest/*", "resourceParams().value(\"param1\") == \"foo\" && resourceParams().intValue(\"param2\") >= 10",
                 "*", null, null, null, null, "\"*\"", null);
 
         // Rule specifies that requests, which permits everything if URI matches regex and all params condition matched as well
-        URIPolicyEntry rule3 = URIPolicyEntry.createEntry(9, "/droolsTest/*/bar/([abc].*)", "resourceParams.value(\"param1\") == $uriMatcher.group(1) && resourceParams.value(\"param2\") == $uriMatcher.group(2) && resourceParams.value(\"param3\") == $token.username",
+        URIPolicyEntry rule3 = URIPolicyEntry.createEntry(9, "/droolsTest/*/bar/([abc].*)", "resourceParams().value(\"param1\") == $uriMatcher.group(1) && resourceParams().value(\"param2\") == $uriMatcher.group(2) && resourceParams().value(\"param3\") == $token.username",
                 "*", null, null, null, null, "\"*\"", null);
 
 
