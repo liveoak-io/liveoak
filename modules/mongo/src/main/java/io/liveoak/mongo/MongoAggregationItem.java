@@ -29,7 +29,7 @@ public class MongoAggregationItem extends MongoObjectResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         Set<String> keys = this.dbObject.keySet();
         for (String key : keys) {
             Object value = this.dbObject.get(key);

@@ -30,7 +30,7 @@ public class FireResource implements Resource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("fire_time", this.fireTime);
         sink.accept("scheduled_fire_time", this.scheduledFireTime);
         sink.close();

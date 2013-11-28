@@ -32,7 +32,7 @@ public class TriggerResource implements Resource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("cron", ((CronTrigger) this.trigger).getCronExpression());
         try {
             Trigger.TriggerState state = this.parent.scheduler().getTriggerState(this.trigger.getKey());

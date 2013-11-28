@@ -44,7 +44,7 @@ public class StompSubscription implements Subscription {
     // ----------------------------------------------------------------------
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("type", "stomp");
         sink.accept("path", this.resourcePath.toString());
         sink.accept("subscription-id", this.subscriptionId);

@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * @author Bob McWhirter
  */
-class MongoCollectionResource extends MongoResource {
+public class MongoCollectionResource extends MongoResource {
 
     DBCollection dbCollection;
 
@@ -194,7 +194,7 @@ class MongoCollectionResource extends MongoResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("type", "collection");
         sink.close();
     }

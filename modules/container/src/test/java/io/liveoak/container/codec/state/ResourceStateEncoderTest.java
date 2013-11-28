@@ -14,6 +14,7 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import org.fest.assertions.Fail;
 import org.junit.Test;
 
 import java.net.URI;
@@ -52,6 +53,25 @@ public class ResourceStateEncoderTest {
         assertThat(encoded.id()).isEqualTo("bob");
         assertThat(encoded.getPropertyNames()).isEmpty();
         assertThat(encoded.members()).isEmpty();
+    }
+
+    @Test
+    public void testInvalidObjectType() throws Exception {
+        DefaultResourceState state = new DefaultResourceState();
+        state.putProperty("invalid", new Object());
+
+        InMemoryObjectResource resource = new InMemoryObjectResource(null, "bob", state);
+
+        CompletableFuture<ResourceState> future = new CompletableFuture<>();
+        EncodingDriver driver = createDriver(resource, future);
+
+        try {
+            driver.encode();
+            Fail.fail();
+        } catch (IllegalArgumentException e) {
+            //expected
+        }
+
     }
 
     @Test

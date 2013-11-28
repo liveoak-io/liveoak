@@ -123,46 +123,32 @@ public class ResourceStateEncoder implements Encoder {
 
     @Override
     public void writeValue(String value) throws Exception {
-        Object top = this.stack.peek();
-
-        if (top instanceof Collection) {
-            ((Collection) top).add(value);
-        } else if (top instanceof PropertyCatcher) {
-            ((PropertyCatcher) top).value = value;
-        }
+        write(value);
     }
 
     @Override
     public void writeValue(Integer value) throws Exception {
-        Object top = this.stack.peek();
-
-        if (top instanceof Collection) {
-            ((Collection) top).add(value);
-        } else if (top instanceof PropertyCatcher) {
-            ((PropertyCatcher) top).value = value;
-        }
+        write(value);
     }
 
     @Override
     public void writeValue(Double value) throws Exception {
-        Object top = this.stack.peek();
+        write(value);
+    }
 
-        if (top instanceof Collection) {
-            ((Collection) top).add(value);
-        } else if (top instanceof PropertyCatcher) {
-            ((PropertyCatcher) top).value = value;
-        }
+    @Override
+    public void writeValue( Long value ) throws Exception {
+        write(value);
+    }
+
+    @Override
+    public void writeValue( Boolean value ) throws Exception {
+        write(value);
     }
 
     @Override
     public void writeValue(Date value) throws Exception {
-        Object top = this.stack.peek();
-
-        if (top instanceof Collection) {
-            ((Collection) top).add(value);
-        } else if (top instanceof PropertyCatcher) {
-            ((PropertyCatcher) top).value = value;
-        }
+        write(value);
     }
 
     @Override
@@ -183,5 +169,15 @@ public class ResourceStateEncoder implements Encoder {
 
     private static class PropertyCatcher {
         public Object value;
+    }
+
+    private void write(Object value) throws Exception{
+        Object top = this.stack.peek();
+
+        if (top instanceof Collection) {
+            ((Collection) top).add(value);
+        } else if (top instanceof PropertyCatcher) {
+            ((PropertyCatcher) top).value = value;
+        }
     }
 }

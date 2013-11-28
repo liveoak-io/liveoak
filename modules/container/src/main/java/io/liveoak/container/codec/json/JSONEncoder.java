@@ -124,6 +124,16 @@ public class JSONEncoder implements Encoder {
     }
 
     @Override
+    public void writeValue( Long value ) throws Exception {
+        this.generator.writeNumber(value);
+    }
+
+    @Override
+    public void writeValue( Boolean value ) throws Exception {
+        this.generator.writeBoolean( value );
+    }
+
+    @Override
     public void writeValue(Date value) throws Exception {
         this.generator.writeNumber(value.getTime());
     }

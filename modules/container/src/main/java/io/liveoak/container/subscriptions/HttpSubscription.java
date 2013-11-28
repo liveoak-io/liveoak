@@ -42,7 +42,7 @@ public class HttpSubscription implements Subscription {
     // ----------------------------------------------------------------------
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("type", "http");
         sink.accept("path", this.resourcePath.toString());
         sink.accept("destination", this.destination.toString());

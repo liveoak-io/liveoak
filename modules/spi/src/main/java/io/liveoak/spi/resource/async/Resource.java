@@ -79,7 +79,7 @@ public interface Resource {
      * @param ctx  The request context.
      * @param sink The sink to capture the properties.
      */
-    default void readProperties(RequestContext ctx, PropertySink sink) {
+    default void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.close();
     }
 

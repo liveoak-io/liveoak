@@ -138,7 +138,7 @@ public class RootMongoResource extends MongoResource implements RootResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("type", "collection");
         sink.close();
     }
