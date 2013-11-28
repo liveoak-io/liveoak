@@ -207,13 +207,13 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         BasicDBObject object = new BasicDBObject("_id", "foobaz");
 
         BasicDBList list = new BasicDBList();
-        list.add(1);
-        list.add("A");
-        list.add(new BasicDBObject("_id", "test123").append("foo", "bar"));
+        list.add( 1 );
+        list.add( "A" );
+        list.add( new BasicDBObject( "_id", "test123" ).append( "foo", "bar" ) );
         object.append("array", list);
 
         db.getCollection(methodName).insert(object);
-        assertEquals(1, db.getCollection(methodName).getCount());
+        assertEquals( 1, db.getCollection( methodName ).getCount() );
 
         try {
             ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/foobaz/array");
@@ -250,6 +250,4 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
             // expected
         }
     }
-
-
 }

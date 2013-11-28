@@ -28,11 +28,20 @@ public class ValueEncodingDriver extends AbstractEncodingDriver {
             encoder().writeValue((Integer) o);
         } else if (o instanceof Double) {
             encoder().writeValue((Double) o);
+        } else if (o instanceof Long) {
+            encoder().writeValue((Long)o);
         } else if (o instanceof Date) {
             encoder().writeValue((Date) o);
         } else if (o instanceof Resource) {
             encoder().writeLink((Resource) o);
+        } else if (o instanceof Boolean) {
+            encoder().writeValue((Boolean)o);
         } else {
+            if (o == null) {
+                throw new IllegalArgumentException("Cannot encode null objects");
+            } else {
+                throw new IllegalArgumentException("Cannot encode objects of type " + o.getClass() );
+            }
         }
         close();
     }

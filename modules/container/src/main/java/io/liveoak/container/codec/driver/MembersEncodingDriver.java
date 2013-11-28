@@ -55,7 +55,12 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
 
         @Override
         public void close() {
-            encodeNext();
+            //TODO: remove the try catch here and throw an exception instead
+            try {
+                encodeNext();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

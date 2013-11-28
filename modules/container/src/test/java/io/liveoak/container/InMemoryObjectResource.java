@@ -42,7 +42,7 @@ public class InMemoryObjectResource implements Resource, BlockingResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         for (String name : this.state.getPropertyNames()) {
             sink.accept(name, this.state.getProperty(name));
         }

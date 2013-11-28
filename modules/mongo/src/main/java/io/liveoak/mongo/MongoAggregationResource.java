@@ -61,7 +61,7 @@ public class MongoAggregationResource extends MongoAggregationItem {
 
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("result", getResourceCollection(aggregate(ctx)));
         sink.close();
     }

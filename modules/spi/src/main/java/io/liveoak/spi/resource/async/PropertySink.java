@@ -25,6 +25,6 @@ public interface PropertySink {
     /**
      * Close the sink, indicating all properties have been sunk.
      */
-    void close();
+    void close() throws Exception;
 
 }

@@ -47,6 +47,10 @@ public interface Encoder extends AutoCloseable {
 
     void writeValue(Double value) throws Exception;
 
+    void writeValue(Long value) throws Exception;
+
+    void writeValue(Boolean value) throws Exception;
+
     void writeValue(Date value) throws Exception;
 
 }

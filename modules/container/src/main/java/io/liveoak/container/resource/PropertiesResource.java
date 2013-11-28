@@ -21,7 +21,7 @@ public class PropertiesResource implements Resource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         Properties allProps = System.getProperties();
         for (String key : allProps.stringPropertyNames()) {
             sink.accept(key, allProps.getProperty(key));

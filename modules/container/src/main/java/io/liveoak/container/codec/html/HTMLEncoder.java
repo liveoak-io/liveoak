@@ -198,6 +198,16 @@ public class HTMLEncoder implements Encoder {
     }
 
     @Override
+    public void writeValue( Long value ) throws Exception {
+        text(value.toString());
+    }
+
+    @Override
+    public void writeValue( Boolean value ) throws Exception {
+        text(value.toString());
+    }
+
+    @Override
     public void writeValue(Date value) throws Exception {
         text(value.toString());
     }

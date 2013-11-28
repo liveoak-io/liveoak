@@ -46,7 +46,7 @@ public class MongoObjectResource extends MongoResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         Set<String> keys = this.dbObject.keySet();
         for (String key : keys) {
             if (!key.equals(MONGO_ID_FIELD) && !key.equals(MBAAS_ID_FIELD)) {

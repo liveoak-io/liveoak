@@ -22,7 +22,7 @@ public class VertxObjectResource extends AbstractVertxResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         for (String name : state.getFieldNames()) {
             sink.accept(name, state.getField(name));
         }

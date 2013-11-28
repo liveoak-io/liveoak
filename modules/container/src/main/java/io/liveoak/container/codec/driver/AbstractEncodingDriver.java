@@ -66,20 +66,12 @@ public abstract class AbstractEncodingDriver implements EncodingDriver {
         return depth;
     }
 
-    public void encodeNext() {
+    public void encodeNext() throws Exception {
         if (children.isEmpty()) {
-            try {
-                close();
-            } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
+            close();
         } else {
             EncodingDriver next = children.removeFirst();
-            try {
-                next.encode();
-            } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
+            next.encode();
         }
     }
 

@@ -71,7 +71,7 @@ public class SchedulerResource implements RootResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception{
         try {
             if (this.scheduler.isStarted()) {
                 sink.accept("status", "started");

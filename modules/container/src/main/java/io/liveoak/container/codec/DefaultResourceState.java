@@ -78,7 +78,7 @@ public class DefaultResourceState implements ResourceState {
     }
 
     public String toString() {
-        return "[DefaultResourceState: id=" + this.id + "; properties=" + this.properties + "; members=" + this.members + "]";
+        return "[DefaultResourceState: id=" + this.id + "; uri=" + this.uri() + "; properties=" + this.properties + "; members=" + this.members + "]";
     }
 
     private String id;
