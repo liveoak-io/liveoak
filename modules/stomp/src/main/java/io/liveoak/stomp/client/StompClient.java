@@ -12,7 +12,9 @@ import io.liveoak.stomp.StompMessage;
 import io.liveoak.stomp.client.protocol.ConnectionNegotiatingHandler;
 import io.liveoak.stomp.client.protocol.DisconnectionNegotiatingHandler;
 import io.liveoak.stomp.client.protocol.MessageHandler;
+import io.liveoak.stomp.client.protocol.ReceiptHandler;
 import io.liveoak.stomp.client.protocol.StompClientContext;
+import io.liveoak.stomp.client.protocol.SubscriptionEncoder;
 import io.liveoak.stomp.common.DefaultStompMessage;
 import io.liveoak.stomp.common.HeadersImpl;
 import io.liveoak.stomp.common.StompControlFrame;
@@ -75,11 +77,13 @@ public class StompClient {
                 //ch.pipeline().addLast( new DebugHandler( "client-head" ) );
                 ch.pipeline().addLast(new StompFrameEncoder());
                 ch.pipeline().addLast(new StompFrameDecoder());
+                ch.pipeline().addLast( new SubscriptionEncoder() );
+                ch.pipeline().addLast( new ReceiptHandler(executor));
                 //ch.pipeline().addLast( new DebugHandler( "client-frames" ) );
                 ch.pipeline().addLast(new ConnectionNegotiatingHandler(clientContext, callback));
                 ch.pipeline().addLast(new StompMessageEncoder(false));
                 ch.pipeline().addLast(new StompMessageDecoder());
-                ch.pipeline().addLast(new MessageHandler(clientContext, executor));
+                ch.pipeline().addLast(new MessageHandler(executor));
             }
         });
 
@@ -221,10 +225,10 @@ public class StompClient {
      * Subscribe to a destination.
      *
      * @param destination The destination to subscribe to.
-     * @param handler     Handler for inbound messages sent from the server.
+     * @param subscriptionSetup Code to setup subscription
      */
-    public void subscribe(String destination, Consumer<StompMessage> handler) {
-        subscribe(destination, new HeadersImpl(), handler);
+    public void subscribe(String destination, Consumer<Subscription> subscriptionSetup) {
+        subscribe(destination, new HeadersImpl(), subscriptionSetup);
     }
 
     /**
@@ -236,16 +240,12 @@ public class StompClient {
      *
      * @param destination The destination to subscribe to.
      * @param headers     Additional headers.
-     * @param handler     Handler for inbound messages sent from the server.
+     * @param subscriptionSetup Code to setup subscription
      */
-    public void subscribe(String destination, Headers headers, Consumer<StompMessage> handler) {
-        String subscriptionId = "sub-" + subscriptionCounter.getAndIncrement();
-        this.subscriptions.put(subscriptionId, handler);
-        StompControlFrame frame = new StompControlFrame(Stomp.Command.SUBSCRIBE);
-        frame.headers().putAll(headers);
-        frame.headers().put(Headers.ID, subscriptionId);
-        frame.headers().put(Headers.DESTINATION, destination);
-        this.channel.writeAndFlush(frame);
+    public void subscribe(String destination, Headers headers, Consumer<Subscription> subscriptionSetup) {
+        SubscriptionImpl subscription = new SubscriptionImpl( destination, headers );
+        subscriptionSetup.accept(subscription);
+        this.channel.writeAndFlush( subscription );
     }
 
     private String host;
@@ -288,10 +288,5 @@ public class StompClient {
         public Stomp.Version getVersion() {
             return StompClient.this.version;
         }
-
-        public Consumer<StompMessage> getSubscriptionHandler(String subscriptionId) {
-            return StompClient.this.subscriptions.get(subscriptionId);
-        }
-
     }
 }

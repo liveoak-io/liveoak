@@ -33,12 +33,21 @@ public class SimpleServerTest {
         server.start();
 
         final ObjectHolder received = new ObjectHolder();
+        CountDownLatch subscriptionLatch = new CountDownLatch(1);
 
         StompClient client = new StompClient();
         client.connectSync("localhost", 8675);
-        client.subscribe("/people/bob", (m) -> {
-            received.object = m;
+        client.subscribe("/people/bob", (subscription) -> {
+            subscription.onMessage( (m)->{
+                received.object = m;
+            });
+            subscription.onReceipt( ()->{
+                subscriptionLatch.countDown();
+
+            });
         });
+        subscriptionLatch.countDown();
+
         client.send("/people/bob", "howdy!");
         Thread.sleep(1000);
         client.disconnectSync();

@@ -5,6 +5,7 @@
  */
 package io.liveoak.container;
 
+import io.liveoak.container.subscriptions.Subscription;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.stomp.StompMessage;
@@ -29,6 +30,7 @@ import org.junit.Test;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -92,17 +94,25 @@ public class BasicServerTest {
         CompletableFuture<StompMessage> bobCreationNotification = new CompletableFuture<>();
 
         StompClient stompClient = new StompClient();
+
+        CountDownLatch subscriptionLatch = new CountDownLatch(1);
+
         stompClient.connect("localhost", 8080, (client) -> {
-            // Subscribe only to the contents of /memory/people, and not the
-            // memory/people itself plus contents.
-            client.subscribe("/memory/people/*", (msg) -> {
-                if (msg.headers().get("location").equals("/memory/people")) {
-                    peopleCreationNotification.complete(msg);
-                } else {
-                    bobCreationNotification.complete(msg);
-                }
+            stompClient.subscribe("/memory/poeple/*", (subscription) -> {
+                subscription.onMessage((msg) -> {
+                    if (msg.headers().get("location").equals("/memory/people")) {
+                        peopleCreationNotification.complete(msg);
+                    } else {
+                        bobCreationNotification.complete(msg);
+                    }
+                });
+                subscription.onReceipt(() -> {
+                    subscriptionLatch.countDown();
+                });
             });
         });
+
+        subscriptionLatch.await();
 
         Header header = new BasicHeader("Accept", "application/json");
 
@@ -226,7 +236,7 @@ public class BasicServerTest {
         assertThat(state.getProperty("id")).isNotNull();
         assertThat(state.getProperty("name")).isEqualTo("bob");
 
-        
+
         // check STOMP
         /* TODO: reenable this part of the test once the race condition is fixed and this test consistenly passes.
         System.err.println("TEST #STOMP");

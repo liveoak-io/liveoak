@@ -25,6 +25,4 @@ public interface StompClientContext {
     String getHost();
 
     StompClient getClient();
-
-    Consumer<StompMessage> getSubscriptionHandler(String subscriptionId);
 }

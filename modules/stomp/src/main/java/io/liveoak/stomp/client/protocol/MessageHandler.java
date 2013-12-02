@@ -7,9 +7,14 @@ package io.liveoak.stomp.client.protocol;
 
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.StompMessage;
+import io.liveoak.stomp.client.Subscription;
+import io.liveoak.stomp.client.SubscriptionImpl;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
@@ -18,23 +23,30 @@ import java.util.function.Consumer;
  */
 public class MessageHandler extends ChannelDuplexHandler {
 
-    public MessageHandler(StompClientContext clientContext, Executor executor) {
-        this.clientContext = clientContext;
+    public MessageHandler(Executor executor) {
         this.executor = executor;
+    }
+
+    @Override
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        if (msg instanceof SubscriptionImpl) {
+            this.subscriptions.put(((SubscriptionImpl) msg).subscriptionId(), (SubscriptionImpl) msg);
+        }
+        super.write(ctx, msg, promise);
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof StompMessage) {
             StompMessage stompMessage = (StompMessage) msg;
-            if (stompMessage.isError()) {
-
-            } else {
-                String subscriptionId = stompMessage.headers().get(Headers.SUBSCRIPTION);
-                this.clientContext.getSubscriptionHandler(subscriptionId);
-                Consumer<StompMessage> handler = this.clientContext.getSubscriptionHandler(subscriptionId);
+            String subscriptionId = stompMessage.headers().get(Headers.SUBSCRIPTION);
+            SubscriptionImpl subscription = this.subscriptions.get( subscriptionId );
+            if ( subscription != null ) {
                 this.executor.execute(() -> {
-                    handler.accept(stompMessage);
+                    Consumer<StompMessage> onMessage = subscription.onMessage();
+                    if ( onMessage != null ) {
+                        onMessage.accept( stompMessage );
+                    }
                 });
             }
         } else {
@@ -44,5 +56,5 @@ public class MessageHandler extends ChannelDuplexHandler {
 
 
     private Executor executor;
-    private StompClientContext clientContext;
+    private Map<String, SubscriptionImpl> subscriptions = new HashMap<>();
 }
