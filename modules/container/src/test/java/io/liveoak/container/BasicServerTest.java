@@ -98,7 +98,7 @@ public class BasicServerTest {
         CountDownLatch subscriptionLatch = new CountDownLatch(1);
 
         stompClient.connect("localhost", 8080, (client) -> {
-            stompClient.subscribe("/memory/poeple/*", (subscription) -> {
+            stompClient.subscribe("/memory/people/*", (subscription) -> {
                 subscription.onMessage((msg) -> {
                     if (msg.headers().get("location").equals("/memory/people")) {
                         peopleCreationNotification.complete(msg);
@@ -238,7 +238,6 @@ public class BasicServerTest {
 
 
         // check STOMP
-        /* TODO: reenable this part of the test once the race condition is fixed and this test consistenly passes.
         System.err.println("TEST #STOMP");
         StompMessage obj = bobCreationNotification.get(30000, TimeUnit.SECONDS);
         assertThat(obj).isNotNull();
@@ -247,7 +246,6 @@ public class BasicServerTest {
         assertThat(bobObjState.getProperty("name")).isEqualTo("bob");
 
         assertThat(((ResourceState) state).getProperty("id")).isEqualTo(bobObjState.getProperty("id"));
-        */
         response.close();
     }
 
