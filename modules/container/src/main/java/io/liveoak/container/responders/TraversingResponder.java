@@ -47,15 +47,15 @@ public abstract class TraversingResponder extends BaseResponder {
             this.executor.execute(() -> {
                 try {
                     resource.readMember(TraversingResponder.this.inReplyTo().requestContext(), next, this);
-                } catch (RuntimeException e) {
-                    noSuchResource(next);
+                } catch (Throwable t) {
+                    internalError( t.getMessage() );
                 }
             });
         } else {
             try {
                 resource.readMember(TraversingResponder.this.inReplyTo().requestContext(), next, this);
-            } catch (RuntimeException e) {
-                noSuchResource(next);
+            } catch (Throwable t) {
+                internalError( t.getMessage() );
             }
         }
     }
@@ -63,10 +63,18 @@ public abstract class TraversingResponder extends BaseResponder {
     protected void doPerform(Resource resource) {
         if (resource instanceof BlockingResource) {
             this.executor.execute(() -> {
-                perform(resource);
+                try {
+                    perform(resource);
+                } catch (Throwable t) {
+                    internalError( t.getMessage() );
+                }
             });
         } else {
+            try {
             perform(resource);
+            } catch ( Throwable t) {
+                internalError( t.getMessage() );
+            }
         }
     }
 
