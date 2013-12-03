@@ -21,6 +21,7 @@ import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.UpdateNotSupportedException;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
+import io.liveoak.stomp.common.DebugHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -155,8 +156,11 @@ public class DirectConnector {
         });
 
         try {
-            return future.get();
+            ResourceState result = future.get();
+            System.err.println( "RESULT: " + result );
+            return result;
         } catch (ExecutionException e) {
+            e.printStackTrace();
             if (e.getCause() instanceof ResourceException) {
                 throw (ResourceException) e.getCause();
             }
@@ -385,6 +389,9 @@ public class DirectConnector {
                 break;
             case DELETE_NOT_SUPPORTED:
                 future.completeExceptionally(new DeleteNotSupportedException(response.inReplyTo().resourcePath().toString()));
+                break;
+            case INTERNAL_ERROR:
+                future.completeExceptionally( response.cause() );
                 break;
         }
     }

@@ -12,6 +12,7 @@ import io.liveoak.spi.state.ResourceState;
 import org.quartz.*;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.triggers.AbstractTrigger;
 import org.quartz.impl.triggers.CronTriggerImpl;
 
 import java.text.ParseException;

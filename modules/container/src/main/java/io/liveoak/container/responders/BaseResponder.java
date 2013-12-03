@@ -17,7 +17,6 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public class BaseResponder implements Responder {
 
-
     public BaseResponder(ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
         this.inReplyTo = inReplyTo;
         this.ctx = ctx;
@@ -83,7 +82,12 @@ public class BaseResponder implements Responder {
 
     @Override
     public void internalError(String message) {
-        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
+        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR, message ));
+    }
+
+    @Override
+    public void internalError(Throwable cause) {
+        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR, cause));
     }
 
     private final ResourceRequest inReplyTo;

@@ -27,6 +27,34 @@ public class ResourceErrorResponse extends ResourceResponse {
         this.errorType = errorType;
     }
 
+    public ResourceErrorResponse(ResourceRequest inReplyTo, ErrorType errorType, String message) {
+        super(inReplyTo, ResponseType.ERROR);
+        this.errorType = errorType;
+        this.message = message;
+    }
+
+    public ResourceErrorResponse(ResourceRequest inReplyTo, ErrorType errorType, Throwable cause) {
+        super(inReplyTo, ResponseType.ERROR);
+        this.errorType = errorType;
+        this.cause = cause;
+    }
+
+    public Throwable cause() {
+        return this.cause;
+    }
+
+    public String message() {
+        if ( this.message != null ) {
+            return this.message;
+        }
+
+        if ( this.cause != null ) {
+            return this.cause.getMessage();
+        }
+        return null;
+    }
+
+
     public ErrorType errorType() {
         return this.errorType;
     }
@@ -36,4 +64,6 @@ public class ResourceErrorResponse extends ResourceResponse {
     }
 
     private ErrorType errorType;
+    private Throwable cause;
+    private String message;
 }

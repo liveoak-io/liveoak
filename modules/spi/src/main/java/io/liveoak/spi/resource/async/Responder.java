@@ -93,4 +93,6 @@ public interface Responder {
      * @param message
      */
     void internalError(String message);
+
+    void internalError(Throwable cause);
 }

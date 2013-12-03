@@ -48,14 +48,14 @@ public abstract class TraversingResponder extends BaseResponder {
                 try {
                     resource.readMember(TraversingResponder.this.inReplyTo().requestContext(), next, this);
                 } catch (Throwable t) {
-                    internalError( t.getMessage() );
+                    internalError(t);
                 }
             });
         } else {
             try {
                 resource.readMember(TraversingResponder.this.inReplyTo().requestContext(), next, this);
             } catch (Throwable t) {
-                internalError( t.getMessage() );
+                internalError(t);
             }
         }
     }
@@ -66,14 +66,16 @@ public abstract class TraversingResponder extends BaseResponder {
                 try {
                     perform(resource);
                 } catch (Throwable t) {
-                    internalError( t.getMessage() );
+                    t.printStackTrace();
+                    internalError(t);
                 }
             });
         } else {
             try {
-            perform(resource);
-            } catch ( Throwable t) {
-                internalError( t.getMessage() );
+                perform(resource);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                internalError(t);
             }
         }
     }

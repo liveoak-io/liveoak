@@ -69,5 +69,10 @@ public class DelegatingResponder implements Responder {
         delegate.internalError(message);
     }
 
+    @Override
+    public void internalError(Throwable cause) {
+        delegate.internalError( cause );
+    }
+
     private Responder delegate;
 }
