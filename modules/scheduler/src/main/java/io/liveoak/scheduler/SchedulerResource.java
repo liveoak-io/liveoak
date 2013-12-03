@@ -49,6 +49,7 @@ public class SchedulerResource implements RootResource {
         if (this.id == null) {
             throw new InitializationException("id cannot be null");
         }
+        System.err.println( "initialize scheduler resource" );
 
         try {
             StdSchedulerFactory factory = new StdSchedulerFactory();
@@ -104,9 +105,10 @@ public class SchedulerResource implements RootResource {
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
 
+        System.err.println( "create trigger" );
+
         try {
             String id = UUID.randomUUID().toString();
-            JobKey jobKey = JobKey.jobKey(id);
 
             TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger();
             triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule((String) state.getProperty("cron")));
@@ -125,14 +127,17 @@ public class SchedulerResource implements RootResource {
 
             JobDetail jobDetail = jobBuilder.build();
 
+            System.err.println( "scheduling trigger" );
+
             this.scheduler.scheduleJob(jobDetail, trigger);
+            System.err.println( "registering trigger" );
             this.children.put(id, resource);
-
+            System.err.println( "created trigger: " + resource );
             responder.resourceCreated(resource);
-
-        } catch (SchedulerException e) {
-            responder.internalError(e.getMessage());
+        } catch (Throwable e) {
+            System.err.println( "an error occurred while creating the trigger" );
             e.printStackTrace();
+            responder.internalError(e.getMessage());
         }
     }
 
