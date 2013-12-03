@@ -6,8 +6,11 @@
 
 package io.liveoak.mongo;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
+import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
+import com.mongodb.util.JSON;
 import io.liveoak.container.SimpleConfig;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.resource.RootResource;
@@ -49,5 +52,26 @@ public class BaseMongoDBTest extends AbstractResourceTestCase {
             e.printStackTrace();
         }
         return config;
+    }
+
+    protected void setupPeopleData(DBCollection collection) {
+        // add a few people
+        String[] data = {
+                "{name:'John', lastName:'Doe', country:'US', city:'San Francisco', identity:{type:'Facebook', id:'84904785333'}}",
+                "{name:'Jane', lastName:'Doe', country:'US', city:'New York', identity:{type:'Facebook', id:'89734343300'}}",
+                "{name:'Hans', lastName:'Gruber', country:'DE', city:'Berlin', identity:{type:'Google', id:'63aaa9090f0'}}",
+                "{name:'Helga', lastName:'Schmidt', country:'DE', city:'Munich', identity:{type:'Google', id:'8eb490ff90'}}",
+                "{name:'Francois', lastName:'Popo', country:'FR', city:'Marseille', identity:{type:'Google', id:'a3b2b16429'}}",
+                "{name:'Jacqueline', lastName:'Coco', country:'FR', city:'Paris', identity:{type:'Facebook', id:'328874222000'}}",
+        };
+
+        addPeopleItems(collection, data);
+    }
+
+    protected void addPeopleItems(DBCollection collection, String[] data) {
+        for (String rec : data) {
+            BasicDBObject obj = (BasicDBObject) JSON.parse(rec);
+            collection.insert(obj);
+        }
     }
 }

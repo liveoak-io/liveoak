@@ -6,12 +6,16 @@
 
 package io.liveoak.mongo;
 
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
 import java.net.URI;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -31,6 +35,21 @@ public class MongoEmbeddedObjectResource extends MongoObjectResource {
     @Override
     public URI uri() {
         return null;
+    }
+
+    @Override
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+        Set<String> keys = this.dbObject.keySet();
+        for (String key : keys) {
+            Object value = this.dbObject.get(key);
+            if (value instanceof BasicDBObject) {
+                value = new MongoEmbeddedObjectResource(this, (DBObject) value);
+            } else if (value instanceof BasicDBList) {
+                value = getResourceCollection(value);
+            }
+            sink.accept(key, value);
+        }
+        sink.close();
     }
 
     // Embedded Mongo Resources are read only. If you want to update an embedded resource, you need to do so on the base resource level

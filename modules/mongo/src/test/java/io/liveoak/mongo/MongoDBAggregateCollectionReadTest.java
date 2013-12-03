@@ -7,7 +7,6 @@ package io.liveoak.mongo;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -89,39 +88,5 @@ public class MongoDBAggregateCollectionReadTest extends BaseMongoDBTest {
         assertThat(val).isEqualTo(2);
 
         return (String) id.getProperty("country");
-    }
-
-    private String[] getFieldValues(ResourceState result, String field) {
-        List<String> ret = new LinkedList<>();
-        for (ResourceState item : result.members()) {
-            ret.add((String) item.getProperty(field));
-        }
-        return ret.toArray(new String[ret.size()]);
-    }
-
-    private void setupPeopleData(DBCollection collection) {
-        // add a few people
-        String[][] data = {
-                {"John", "Doe", "US", "San Francisco"},
-                {"Jane", "Doe", "US", "New York"},
-                {"Hans", "Gruber", "DE", "Berlin"},
-                {"Helga", "Schmidt", "DE", "Munich"},
-                {"Francois", "Popo", "FR", "Marseille"},
-                {"Jacqueline", "Coco", "FR", "Paris"}
-        };
-
-        addPeopleItems(collection, data);
-    }
-
-    private void addPeopleItems(DBCollection collection, String[][] data) {
-        for (String[] rec : data) {
-            BasicDBObject obj = new BasicDBObject();
-            obj.put("name", rec[0]);
-            obj.put("lastName", rec[1]);
-            obj.put("country", rec[2]);
-            obj.put("city", rec[3]);
-
-            collection.insert(obj);
-        }
     }
 }

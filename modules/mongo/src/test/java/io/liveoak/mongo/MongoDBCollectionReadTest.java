@@ -271,39 +271,58 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertThat(expected).isEqualTo(getNames(result));
     }
 
+    @Test
+    public void testGetExpandCollectionQuery() throws Exception {
+
+        DBCollection collection = db.getCollection("testExpandQueryCollection");
+        if (collection != null) {
+            collection.drop();
+        }
+        collection = db.createCollection("testExpandQueryCollection", new BasicDBObject("count", 0));
+
+        // insert data records for the test
+        setupPeopleData(collection);
+        assertThat(collection.count()).isEqualTo(6);
+
+        // This should return 3 items
+        //
+        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        RequestContext requestContext = new RequestContext.Builder()
+                .returnFields(new ReturnFieldsImpl("*").withExpand("members"))
+                .resourceParams(resourceParams)
+                .build();
+
+        ResourceState result = connector.read(requestContext, BASEPATH + "/testExpandQueryCollection");
+
+        // verify response
+        assertThat(result).isNotNull();
+
+        assertThat(result.id()).isEqualTo("testExpandQueryCollection");
+        assertThat(result.members()).isNotNull();
+
+        List results = (List) result.members();
+        assertThat(results.size()).isEqualTo(6);
+
+        Object item = results.get(0);
+        assertThat(item).isInstanceOf(ResourceState.class);
+        ResourceState person = (ResourceState) item;
+        assertThat(person.getProperty("identity")).isNotNull();
+        assertThat(person.getProperty("identity")).isInstanceOf(ResourceState.class);
+        ResourceState identity = (ResourceState) person.getProperty("identity");
+        assertThat(identity.id()).isNull();
+        assertThat(identity.uri()).isNull();
+        assertThat(identity.getProperty("type")).isNotNull();
+        assertThat(identity.getProperty("type")).isInstanceOf(String.class);
+        assertThat(identity.getProperty("id")).isNotNull();
+        assertThat(identity.getProperty("id")).isInstanceOf(String.class);
+    }
+
     private String[] getNames(ResourceState result) {
         List<String> ret = new LinkedList<>();
         for (ResourceState item : result.members()) {
             ret.add((String) item.getProperty("name"));
         }
         return ret.toArray(new String[ret.size()]);
-    }
-
-    private void setupPeopleData(DBCollection collection) {
-        // add a few people
-        String[][] data = {
-                {"John", "Doe", "US", "San Francisco"},
-                {"Jane", "Doe", "US", "New York"},
-                {"Hans", "Gruber", "DE", "Berlin"},
-                {"Helga", "Schmidt", "DE", "Munich"},
-                {"Francois", "Popo", "FR", "Marseille"},
-                {"Jacqueline", "Coco", "FR", "Paris"}
-        };
-
-        addPeopleItems(collection, data);
-    }
-
-    private void addPeopleItems(DBCollection collection, String[][] data) {
-        for (String[] rec : data) {
-            BasicDBObject obj = new BasicDBObject();
-            obj.put("name", rec[0]);
-            obj.put("lastName", rec[1]);
-            obj.put("country", rec[2]);
-            obj.put("city", rec[3]);
-
-            collection.insert(obj);
-
-        }
     }
 
     private class SimplePagination implements Pagination {
