@@ -55,6 +55,9 @@ public class MongoObjectResource extends MongoResource {
                     value = new MongoEmbeddedObjectResource(this, (DBObject) value);
                 } else if (value instanceof BasicDBList) {
                     value = getResourceCollection(value);
+                } else if (value instanceof DBRef) {
+                    DBRef dbRef = (DBRef)value;
+                    //TODO: handle the DBRef situation
                 }
                 sink.accept(key, value);
             }
@@ -84,6 +87,6 @@ public class MongoObjectResource extends MongoResource {
 
     @Override
     public String id() {
-        return this.dbObject.get(MONGO_ID_FIELD).toString();
+        return getResourceID( this.dbObject );
     }
 }

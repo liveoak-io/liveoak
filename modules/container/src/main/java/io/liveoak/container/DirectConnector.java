@@ -10,6 +10,7 @@ import io.liveoak.container.codec.state.ResourceStateEncoder;
 import io.liveoak.container.subscriptions.SubscriptionWatcher;
 import io.liveoak.spi.CreateNotSupportedException;
 import io.liveoak.spi.DeleteNotSupportedException;
+import io.liveoak.spi.NotAcceptableException;
 import io.liveoak.spi.NotAuthorizedException;
 import io.liveoak.spi.ReadNotSupportedException;
 import io.liveoak.spi.RequestContext;
@@ -18,10 +19,10 @@ import io.liveoak.spi.ResourceAlreadyExistsException;
 import io.liveoak.spi.ResourceException;
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.UpdateNotSupportedException;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.stomp.common.DebugHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -156,11 +157,8 @@ public class DirectConnector {
         });
 
         try {
-            ResourceState result = future.get();
-            System.err.println( "RESULT: " + result );
-            return result;
+            return future.get();
         } catch (ExecutionException e) {
-            e.printStackTrace();
             if (e.getCause() instanceof ResourceException) {
                 throw (ResourceException) e.getCause();
             }
@@ -201,7 +199,15 @@ public class DirectConnector {
                 try {
                     future.complete(encode(context, response.resource()));
                 } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    ResourceErrorResponse resourceErrorResponse = null;
+                    if (e instanceof ResourceProcessingException) {
+                        ResourceProcessingException rpe = (ResourceProcessingException)e;
+                        resourceErrorResponse = new ResourceErrorResponse (response.inReplyTo(),ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, rpe.getMessage(), rpe.getCause());
+                    } else {
+                        e.printStackTrace(); //TODO: figure out how to pass this to the client
+                        resourceErrorResponse = new ResourceErrorResponse( response.inReplyTo(), ResourceErrorResponse.ErrorType.INTERNAL_ERROR);
+                    }
+                    handleError(resourceErrorResponse, future);
                 }
             } else if (response instanceof ResourceErrorResponse) {
                 handleError((ResourceErrorResponse) response, future);
@@ -366,11 +372,12 @@ public class DirectConnector {
      * @param future   The future for populating.
      */
     void handleError(ResourceErrorResponse response, CompletableFuture<?> future) {
-        switch (((ResourceErrorResponse) response).errorType()) {
+        switch (response.errorType()) {
             case NOT_AUTHORIZED:
                 future.completeExceptionally(new NotAuthorizedException(response.inReplyTo().resourcePath().toString()));
                 break;
             case NOT_ACCEPTABLE:
+                future.completeExceptionally(new NotAcceptableException(response.inReplyTo().resourcePath().toString(), response.message(), response.cause()));
                 break;
             case NO_SUCH_RESOURCE:
                 future.completeExceptionally(new ResourceNotFoundException(response.inReplyTo().resourcePath().toString()));
