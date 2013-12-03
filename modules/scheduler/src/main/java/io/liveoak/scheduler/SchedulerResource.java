@@ -49,7 +49,7 @@ public class SchedulerResource implements RootResource {
         if (this.id == null) {
             throw new InitializationException("id cannot be null");
         }
-        System.err.println( "initialize scheduler resource" );
+        System.err.println("initialize scheduler resource");
 
         try {
             StdSchedulerFactory factory = new StdSchedulerFactory();
@@ -72,7 +72,7 @@ public class SchedulerResource implements RootResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception{
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         try {
             if (this.scheduler.isStarted()) {
                 sink.accept("status", "started");
@@ -105,39 +105,37 @@ public class SchedulerResource implements RootResource {
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
 
-        System.err.println( "create trigger" );
+        System.err.println("create trigger");
+
+        String id = UUID.randomUUID().toString();
+
+        TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger();
+        triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule((String) state.getProperty("cron")));
+        triggerBuilder.withIdentity(id);
+        Trigger trigger = triggerBuilder.build();
+
+        TriggerResource resource = new TriggerResource(this, trigger);
+
+        JobDataMap dataMap = new JobDataMap();
+        dataMap.put("resource", resource);
+
+        JobBuilder jobBuilder = JobBuilder.newJob();
+        jobBuilder.withIdentity(id);
+        jobBuilder.ofType(LiveOakJob.class);
+        jobBuilder.setJobData(dataMap);
+
+        JobDetail jobDetail = jobBuilder.build();
+
+        System.err.println("scheduling trigger: " + trigger + " // " + trigger.getClass() );
 
         try {
-            String id = UUID.randomUUID().toString();
-
-            TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger();
-            triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule((String) state.getProperty("cron")));
-            triggerBuilder.withIdentity(id);
-            Trigger trigger = triggerBuilder.build();
-
-            TriggerResource resource = new TriggerResource(this, trigger);
-
-            JobDataMap dataMap = new JobDataMap();
-            dataMap.put("resource", resource);
-
-            JobBuilder jobBuilder = JobBuilder.newJob();
-            jobBuilder.withIdentity(id);
-            jobBuilder.ofType(LiveOakJob.class);
-            jobBuilder.setJobData(dataMap);
-
-            JobDetail jobDetail = jobBuilder.build();
-
-            System.err.println( "scheduling trigger" );
-
             this.scheduler.scheduleJob(jobDetail, trigger);
-            System.err.println( "registering trigger" );
+            System.err.println("registering trigger");
             this.children.put(id, resource);
-            System.err.println( "created trigger: " + resource );
+            System.err.println("created trigger: " + resource);
             responder.resourceCreated(resource);
-        } catch (Throwable e) {
-            System.err.println( "an error occurred while creating the trigger" );
-            e.printStackTrace();
-            responder.internalError(e.getMessage());
+        } catch (SchedulerException e) {
+            responder.internalError( e.getMessage() );
         }
     }
 
