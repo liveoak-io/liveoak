@@ -31,14 +31,21 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
 
         ResourceState triggerState = new DefaultResourceState();
         triggerState.putProperty("cron", "* * * * * ?");
+        System.err.println( "creating a trigger" );
         ResourceState returnedState = connector.create(requestContext, "/scheduler", triggerState);
+        System.err.println( "created a trigger: " + returnedState );
 
         String id = returnedState.id();
 
+        System.err.println( "Sleeping 2 seconds" );
         // intentional, to allow the job to fire some
         Thread.sleep(2000);
 
+        System.err.println( "Fetching firings" );
+
         ResourceState fromCollection = connector.read(requestContext, "/scheduler/" + id);
+
+        System.err.println( "Fetched: " + fromCollection );
 
         assertThat(fromCollection).isNotNull();
         assertThat(fromCollection.getPropertyNames()).hasSize(2);
