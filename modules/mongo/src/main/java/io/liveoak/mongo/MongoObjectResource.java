@@ -33,7 +33,7 @@ public class MongoObjectResource extends MongoResource {
         Object object = this.dbObject.get(id);
         if (object != null) {
             if (object instanceof BasicDBObject || object instanceof BasicDBList) {
-                responder.noSuchResource(null);
+                responder.noSuchResource(id);
             } else if (object instanceof DBRef) {
                 //TODO: add in support here for references to other objects
                 responder.internalError("Referenced resources not yet supported");
