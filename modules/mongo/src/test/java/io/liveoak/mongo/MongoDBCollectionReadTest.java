@@ -8,6 +8,7 @@ package io.liveoak.mongo;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import io.liveoak.container.ReturnFieldsImpl;
+import io.liveoak.spi.NotAcceptableException;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
@@ -212,6 +213,169 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         assertThat(result.members().get(0).getProperty("name")).isEqualTo("John");
         assertThat(result.members().get(1).getProperty("name")).isEqualTo("Jane");
+    }
+
+    @Test
+    public void testGetStorageCollectionsQueryNoResult() throws Exception {
+        DBCollection collection = db.getCollection("testQueryCollectionNoResults");
+        if (collection != null) {
+            collection.drop();
+        }
+        collection = db.createCollection("testQueryCollectionNoResults", new BasicDBObject("count", 0));
+
+        // insert data records for the test
+        setupPeopleData(collection);
+        assertThat(collection.count()).isEqualTo(6);
+
+        // This should return 2 items
+        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams.put("q", "{lastName:\"foo\"}");
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+        ResourceState result = connector.read(requestContext, BASEPATH + "/testQueryCollectionNoResults");
+
+        // verify response
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo("testQueryCollectionNoResults");
+        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.members().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void testGetStorageCollectionsInvalidQueryString() throws Exception {
+        DBCollection collection = db.getCollection("testQueryCollectionInvalid");
+        if (collection != null) {
+            collection.drop();
+        }
+        collection = db.createCollection("testQueryCollectionInvalid", new BasicDBObject("count", 0));
+
+        // insert data records for the test
+        setupPeopleData(collection);
+        assertThat(collection.count()).isEqualTo(6);
+
+        // This should return 2 items
+        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams.put("q", "{lastName,\"foo\"}");
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+
+        try {
+            ResourceState result = connector.read(requestContext, BASEPATH + "/testQueryCollectionInvalid");
+            Fail.fail();
+        } catch (NotAcceptableException iee) {
+            assertThat(iee.message()).isEqualTo("Invalid JSON format for the 'query' parameter");
+            assertThat(iee.getCause().getClass().getName()).isEqualTo("com.mongodb.util.JSONParseException");
+        }
+    }
+
+    @Test
+    public void testGetStorageCollectionsQueryWithHinting() throws Exception {
+
+        DBCollection collection = db.getCollection("testGetStorageCollectionsQueryWithHinting");
+        if (collection != null) {
+            collection.drop();
+        }
+        collection = db.createCollection("testQueryCollection", new BasicDBObject("count", 0));
+
+        // insert data records for the test
+        setupPeopleData(collection);
+        assertThat(collection.count()).isEqualTo(6);
+
+        // This should return 2 items
+        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
+        resourceParams.put("hint", "_id_");
+
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+        ResourceState result = connector.read(requestContext, BASEPATH + "/testQueryCollection");
+
+        // verify response
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo("testQueryCollection");
+        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.members().size()).isEqualTo(2);
+
+        assertThat(result.members().get(0).getProperty("name")).isEqualTo("Hans");
+        assertThat(result.members().get(1).getProperty("name")).isEqualTo("Francois");
+
+        //Try another query
+        resourceParams = new SimpleResourceParams();
+        resourceParams.put("q", "{lastName:'Doe'}");
+        requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+        result = connector.read(requestContext, BASEPATH + "/testQueryCollection");
+
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo("testQueryCollection");
+        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.members().size()).isEqualTo(2);
+
+        assertThat(result.members().get(0).getProperty("name")).isEqualTo("John");
+        assertThat(result.members().get(1).getProperty("name")).isEqualTo("Jane");
+    }
+
+    @Test
+    public void testQueryNonExistantIndex() throws Exception {
+
+        DBCollection collection = db.getCollection("testQueryNonExistantIndex");
+        if (collection != null) {
+            collection.drop();
+        }
+        collection = db.createCollection("testQueryCollection", new BasicDBObject("count", 0));
+
+        // insert data records for the test
+        setupPeopleData(collection);
+        assertThat(collection.count()).isEqualTo(6);
+
+        // This should return 2 items
+        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
+        resourceParams.put("hint", "foobar");  //NOTE: foobar does not correspond to an index we can use
+
+
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+
+        try {
+            connector.read(requestContext, BASEPATH + "/testQueryCollection");
+            Fail.fail();
+        } catch (NotAcceptableException iee) {
+            assertThat(iee.message()).isEqualTo("Exception encountered trying to fetch data from the Mongo Database");
+
+            //Note: tying the test results to the internal mechanisms of Mongo is not a good idea, but
+            // its the only way to make sure that the exception is because of the failure we want.
+            assertThat(iee.getCause().getClass().getName()).isEqualTo("com.mongodb.MongoException");
+            assertThat(iee.getCause().getMessage()).isEqualTo("bad hint");
+        }
+    }
+
+    @Test
+    public void testQueryMalformedIndex() throws Exception {
+
+        DBCollection collection = db.getCollection("testQueryMalformedIndex");
+        if (collection != null) {
+            collection.drop();
+        }
+        collection = db.createCollection("testQueryCollection", new BasicDBObject("count", 0));
+
+        // insert data records for the test
+        setupPeopleData(collection);
+        assertThat(collection.count()).isEqualTo(6);
+
+        // This should return 2 items
+        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
+        resourceParams.put("hint", "{foobar, 1}");  //NOTE: foobar does not correspond to an index we can use
+
+
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+
+        try {
+            connector.read(requestContext, BASEPATH + "/testQueryCollection");
+            Fail.fail();
+        } catch (NotAcceptableException iee) {
+            assertThat(iee.message()).isEqualTo("Invalid JSON format for the 'hint' parameter");
+            assertThat(iee.getCause().getClass().getName()).isEqualTo("com.mongodb.util.JSONParseException");
+        }
     }
 
     @Test

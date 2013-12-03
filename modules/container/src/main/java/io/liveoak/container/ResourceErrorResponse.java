@@ -33,6 +33,13 @@ public class ResourceErrorResponse extends ResourceResponse {
         this.message = message;
     }
 
+    public ResourceErrorResponse(ResourceRequest inReplyTo, ErrorType errorType, String message, Throwable cause) {
+        super(inReplyTo, ResponseType.ERROR);
+        this.errorType = errorType;
+        this.cause = cause;
+        this.message = message;
+    }
+
     public ResourceErrorResponse(ResourceRequest inReplyTo, ErrorType errorType, Throwable cause) {
         super(inReplyTo, ResponseType.ERROR);
         this.errorType = errorType;

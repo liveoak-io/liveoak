@@ -108,7 +108,7 @@ public interface Resource {
      *
      * @param sink The sink to stream members to.
      */
-    default void readMembers(RequestContext ctx, ResourceSink sink) {
+    default void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         sink.close();
     }
 

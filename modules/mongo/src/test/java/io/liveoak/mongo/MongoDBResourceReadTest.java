@@ -8,6 +8,8 @@ package io.liveoak.mongo;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.DBRef;
 import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
@@ -39,13 +41,36 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         object.append("foo", "bar");
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = object.getObjectId("_id").toString();
+        String id = "_mOI:" + object.getObjectId("_id").toString();
 
         ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
 
         //verify response
         assertThat(result).isNotNull();
         assertThat(result.getProperty("foo")).isEqualTo("bar");
+    }
+
+    @Test
+    public void testSimilarIDs() throws Exception {
+        String methodName = "testSimpleGet";
+        assertFalse(db.collectionExists(methodName));
+
+        // create the object using the mongo driver directly
+        BasicDBObject objectWithObjectID = new BasicDBObject("_id", new ObjectId( "01234567890ABCDEF0123456" ));
+        objectWithObjectID.append("foo", "bar");
+        db.getCollection(methodName).insert(objectWithObjectID);
+
+        BasicDBObject objectWithStringID = new BasicDBObject("_id", "01234567890ABCDEF0123456" );
+        objectWithStringID.append("foo", "baz");
+        db.getCollection(methodName).insert( objectWithStringID );
+
+        assertEquals(2, db.getCollection(methodName).getCount());
+
+        ResourceState resultObject = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/_mOI:01234567890ABCDEF0123456" );
+        ResourceState resultString = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/01234567890ABCDEF0123456" );
+
+        assertThat(resultObject.getProperty( "foo" )).isEqualTo( "bar" );
+        assertThat(resultString.getProperty( "foo" )).isEqualTo( "baz" );
     }
 
     @Test
@@ -59,7 +84,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         object.append("child", new BasicDBObject().append("ABC", "XYZ"));
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = object.getObjectId("_id").toString();
+        String id = "_mOI:" + object.getObjectId("_id").toString();
 
         ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
 
@@ -83,7 +108,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = object.getObjectId("_id").toString();
+        String id = "_mOI:" + object.getObjectId("_id").toString();
 
         //check that we don't get back baz, but that we do get the child and grandchild
         RequestContext rCtx = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("foo,child")).build();
@@ -137,7 +162,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         object.append("child", new BasicDBObject("grandchild", new BasicDBObject("foo3", "bar3")));
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = object.getObjectId("_id").toString();
+        String id = "_mOI:" + object.getObjectId("_id").toString();
 
         try {
             ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/child");

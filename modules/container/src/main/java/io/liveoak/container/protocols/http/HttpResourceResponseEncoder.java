@@ -100,6 +100,11 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
                             responseMessage = HttpResponseStatus.INTERNAL_SERVER_ERROR.reasonPhrase();
                             break;
                     }
+
+                    //TODO: add content values here to return proper error messages to the client
+                    // eg unique error id, short error message, link to page with more information, etc...
+                    //response.content().writeBytes(...)
+
                 }
                 break;
         }

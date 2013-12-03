@@ -33,7 +33,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         object.append("foo", "bar");
         db.getCollection(methodName).insert(object);
         assertThat(db.getCollection(methodName).getCount()).isEqualTo(1);
-        String id = object.getObjectId("_id").toString();
+        String id = "_mOI:" + object.getObjectId("_id").toString();
 
         // now delete the object
         ResourceState result = connector.delete(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);

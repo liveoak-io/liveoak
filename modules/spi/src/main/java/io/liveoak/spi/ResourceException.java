@@ -19,6 +19,11 @@ public class ResourceException extends Exception {
         this.path = path;
     }
 
+    public ResourceException(String path, String message, Throwable cause) {
+        super(message, cause);
+        this.path = path;
+    }
+
     public ResourceException(String path, Throwable cause) {
         super(cause);
         this.path = path;

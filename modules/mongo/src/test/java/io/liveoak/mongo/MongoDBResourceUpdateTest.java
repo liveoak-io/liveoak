@@ -35,7 +35,7 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         object.append("foo", "bar");
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = object.getObjectId("_id").toString();
+        String id = "_mOI:" + object.getObjectId("_id").toString();
 
         // update the resource using the connector.update method
         ResourceState resourceState = new DefaultResourceState();
@@ -52,7 +52,7 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         assertThat(db.getCollection(methodName).getCount()).isEqualTo(1);
         DBObject dbObject = db.getCollection(methodName).findOne();
         assertEquals("baz", dbObject.get("foo"));
-        assertEquals(new ObjectId(id), dbObject.get("_id"));
+        assertEquals(new ObjectId(id.substring( "_mOI:".length() )), dbObject.get("_id"));
     }
 
     @Test
@@ -65,7 +65,7 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         object.append("foo", new BasicDBObject("bar", "baz"));
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = object.getObjectId("_id").toString();
+        String id = "_mOI:" + object.getObjectId("_id").toString();
 
         // update the resource using the connector.update method
         ResourceState resourceState = new DefaultResourceState();
@@ -92,7 +92,7 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         object.append("foo", new BasicDBObject("bar", new BasicDBObject("baz", "ABC")));
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = object.getObjectId("_id").toString();
+        String id = "_mOI:" + object.getObjectId("_id").toString();
 
         // update the resource using the connector.update method
         ResourceState resourceState = new DefaultResourceState();

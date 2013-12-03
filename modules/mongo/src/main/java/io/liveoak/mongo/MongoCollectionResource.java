@@ -10,9 +10,14 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.MongoException;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
+import io.liveoak.spi.NotAcceptableException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceException;
+import io.liveoak.spi.ResourceParams;
+import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.Sorting;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.ResourceSink;
@@ -21,6 +26,7 @@ import io.liveoak.spi.state.ResourceState;
 import org.bson.types.ObjectId;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -43,15 +49,7 @@ public class MongoCollectionResource extends MongoResource {
             return;
         }
 
-        DBObject object = null;
-        //TODO: figure out this whole object id thing better
-        if (ObjectId.isValid(childId)) {
-            object = dbCollection.findOne(new BasicDBObject(MONGO_ID_FIELD, new ObjectId(childId)));
-        }
-
-        if (object == null) {
-            object = dbCollection.findOne(new BasicDBObject(MONGO_ID_FIELD, childId));
-        }
+        DBObject object = dbCollection.findOne( getMongoID( childId ) );
 
         if (object == null) {
             responder.noSuchResource(childId);
@@ -73,13 +71,7 @@ public class MongoCollectionResource extends MongoResource {
 
     protected WriteResult deleteChild(RequestContext ctx, String childId) {
         WriteResult wResult = null;
-        if (ObjectId.isValid(childId)) {
-            wResult = dbCollection.remove(new BasicDBObject(MONGO_ID_FIELD, new ObjectId(childId)));
-        }
-        if (wResult == null || wResult.getN() == 0) {
-            wResult = dbCollection.remove(new BasicDBObject(MONGO_ID_FIELD, childId));
-        }
-
+        wResult = dbCollection.remove( getMongoID( childId ) );
         return wResult;
     }
 
@@ -94,11 +86,19 @@ public class MongoCollectionResource extends MongoResource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         DBObject queryObject = new BasicDBObject();
-        if (ctx.resourceParams() != null && ctx.resourceParams().contains("q")) {
-            String queryString = ctx.resourceParams().value("q");
-            queryObject = (DBObject) JSON.parse(queryString);
+
+        ResourceParams resourceParams = ctx.resourceParams();
+        if (resourceParams != null) {
+            if (resourceParams.contains("q")) {
+                String queryString = ctx.resourceParams().value("q");
+                try {
+                    queryObject = (DBObject) JSON.parse(queryString);
+                } catch (Exception e) {
+                    throw new ResourceProcessingException("Invalid JSON format for the 'query' parameter", e);
+                }
+            }
         }
 
         DBObject returnFields = new BasicDBObject();
@@ -109,6 +109,28 @@ public class MongoCollectionResource extends MongoResource {
         }
 
         DBCursor dbCursor = dbCollection.find(queryObject, returnFields);
+
+        if (ctx.resourceParams() != null && ctx.resourceParams().contains("hint")) {
+            String hint = ctx.resourceParams().value( "hint" );
+            if (hint.startsWith("{")) {
+                try {
+                    DBObject hintObject = (DBObject) JSON.parse(hint);
+                    dbCursor.hint(hintObject) ;
+                } catch (Exception e) {
+                    throw new ResourceProcessingException("Invalid JSON format for the 'hint' parameter", e);
+                }
+            } else {
+                dbCursor.hint(hint);
+            }
+        }
+
+        if (resourceParams != null && ctx.resourceParams().contains("explain")) {
+            if (ctx.resourceParams().value("explain").equalsIgnoreCase("true")) {
+                sink.accept( new MongoEmbeddedObjectResource(this, dbCursor.explain()));
+                sink.close();
+                return;
+            }
+        }
 
         Sorting sorting = ctx.sorting();
         if (sorting != null) {
@@ -122,6 +144,12 @@ public class MongoCollectionResource extends MongoResource {
         if (ctx.pagination() != null) {
             dbCursor.limit(ctx.pagination().limit());
             dbCursor.skip(ctx.pagination().offset());
+        }
+
+        try {
+            dbCursor.hasNext();
+        } catch (Exception e) {
+            throw new ResourceProcessingException("Exception encountered trying to fetch data from the Mongo Database", e);
         }
 
         dbCursor.forEach((dbObject) -> {
