@@ -5,6 +5,7 @@
  */
 package io.liveoak.container.responders;
 
+import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.ResourceRequest;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.resource.BlockingResource;
@@ -18,10 +19,11 @@ import java.util.concurrent.Executor;
  */
 public abstract class TraversingResponder extends BaseResponder {
 
-    public TraversingResponder(Executor executor, Resource root, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
+    public TraversingResponder(Executor executor, DefaultContainer container, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
         super(inReplyTo, ctx);
         this.executor = executor;
-        this.currentResource = root;
+        this.currentResource = container;
+        this.container = container;
         this.remainingPath = inReplyTo.resourcePath().subPath();
     }
 
@@ -100,9 +102,14 @@ public abstract class TraversingResponder extends BaseResponder {
         return this.currentResource;
     }
 
+    protected DefaultContainer container() {
+        return this.container;
+    }
+
     protected abstract void perform(Resource resource);
 
     private ResourcePath remainingPath;
     private Executor executor;
     private Resource currentResource;
+    private DefaultContainer container;
 }

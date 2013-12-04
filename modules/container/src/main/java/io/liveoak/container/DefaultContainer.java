@@ -87,6 +87,11 @@ public class DefaultContainer implements Container, Resource {
         this.resources.put(resource.id(), resource);
     }
 
+    public void unregisterResource(RootResource resource) {
+        this.resources.remove( resource.id() );
+        resource.destroy();
+    }
+
     public ResourceCodecManager getCodecManager() {
         return this.codecManager;
     }

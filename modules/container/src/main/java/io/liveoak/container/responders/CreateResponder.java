@@ -5,6 +5,7 @@
  */
 package io.liveoak.container.responders;
 
+import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.ResourceRequest;
 import io.liveoak.spi.resource.async.Resource;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,8 +17,8 @@ import java.util.concurrent.Executor;
  */
 public class CreateResponder extends TraversingResponder {
 
-    public CreateResponder(Executor executor, Resource root, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
-        super(executor, root, inReplyTo, ctx);
+    public CreateResponder(Executor executor, DefaultContainer container, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
+        super(executor, container, inReplyTo, ctx);
     }
 
     @Override

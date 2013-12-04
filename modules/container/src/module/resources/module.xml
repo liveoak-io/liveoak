@@ -21,6 +21,7 @@
         <module name="io.liveoak.security.uripolicy"/>
         <system>
             <paths>
+                <path name="org/jboss/modules"/>
                 <path name="javax/management"/>
                 <path name="javax/xml/stream"/>
                 <path name="javax/xml/stream/events"/>
