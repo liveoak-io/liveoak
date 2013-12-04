@@ -10,6 +10,9 @@ import io.liveoak.container.codec.ResourceCodecManager;
 import io.liveoak.container.codec.html.HTMLEncoder;
 import io.liveoak.container.codec.json.JSONDecoder;
 import io.liveoak.container.codec.json.JSONEncoder;
+import io.liveoak.container.deploy.ClasspathDeployer;
+import io.liveoak.container.deploy.Deployer;
+import io.liveoak.container.deploy.JBossModulesDeployer;
 import io.liveoak.container.subscriptions.SubscriptionManager;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.Container;
@@ -19,6 +22,7 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.ResourceState;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.platform.PlatformLocator;
 
@@ -63,6 +67,9 @@ public class DefaultContainer implements Container, Resource {
         } catch (InitializationException e) {
             // ignore
         }
+
+        this.deployers.put("classpath", new ClasspathDeployer(this));
+        this.deployers.put("jboss-module", new JBossModulesDeployer(this));
     }
 
     @Override
@@ -129,12 +136,36 @@ public class DefaultContainer implements Container, Resource {
         this.resources.values().forEach((e) -> {
             sink.accept(e);
         });
-        try {
-            sink.close();
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+        sink.close();
     }
+
+    @Override
+    public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
+        if (this.resources.containsKey(state.id())) {
+            responder.createNotSupported(this);
+            return;
+        }
+
+        String type = (String) state.getProperty("type");
+
+        Deployer deployer = this.deployers.get( type );
+
+        if (deployer == null) {
+            responder.internalError("unknown type: " + type);
+            return;
+        }
+
+        try {
+            System.err.println( "deploy: " + type + " // " + state );
+            RootResource deployed = deployer.deploy(state);
+            responder.resourceCreated( deployed );
+        } catch (Exception e) {
+            responder.internalError( e );
+        }
+
+
+    }
+
 
     @Override
     public Resource parent() {
@@ -152,6 +183,8 @@ public class DefaultContainer implements Container, Resource {
     private Vertx vertx;
     private SubscriptionManager subscriptionManager;
     private Executor workerPool;
+    private Map<String, Deployer> deployers = new HashMap<>();
+
 }
 
 
