@@ -106,8 +106,6 @@ public class SchedulerResource implements RootResource {
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
 
-        System.err.println("create trigger");
-
         String id = UUID.randomUUID().toString();
 
         TriggerBuilder triggerBuilder = TriggerBuilder.newTrigger();
@@ -127,13 +125,9 @@ public class SchedulerResource implements RootResource {
 
         JobDetail jobDetail = jobBuilder.build();
 
-        System.err.println("scheduling trigger: " + trigger + " // " + trigger.getClass() );
-
         try {
             this.scheduler.scheduleJob(jobDetail, trigger);
-            System.err.println("registering trigger");
             this.children.put(id, resource);
-            System.err.println("created trigger: " + resource);
             responder.resourceCreated(resource);
         } catch (SchedulerException e) {
             responder.internalError( e.getMessage() );
