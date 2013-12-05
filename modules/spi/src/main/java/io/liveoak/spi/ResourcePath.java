@@ -6,7 +6,9 @@
 package io.liveoak.spi;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -94,12 +96,23 @@ public class ResourcePath {
 
     public static class Segment {
 
-        public Segment(String name) {
-            this.name = name;
+        public Segment(String value) {
+            int semiLoc = value.indexOf(';');
+            if ( semiLoc < 0 ) {
+                this.name = value;
+                this.matrixParameters = new MatrixParameters();
+            } else {
+                this.name = value.substring(0, semiLoc );
+                this.matrixParameters = new MatrixParameters( value.substring( semiLoc+1 ) );
+            }
         }
 
         public String name() {
             return this.name;
+        }
+
+        public MatrixParameters matrixParameters() {
+            return this.matrixParameters;
         }
 
         @Override
@@ -115,6 +128,30 @@ public class ResourcePath {
         }
 
         private String name;
+        private MatrixParameters matrixParameters = new MatrixParameters();
+    }
+
+    public static class MatrixParameters extends HashMap<String,String> {
+
+        public MatrixParameters() {
+
+        }
+
+        public MatrixParameters(String params) {
+
+            StringTokenizer tokens = new StringTokenizer(params, ";");
+
+            while (tokens.hasMoreTokens()) {
+                String one = tokens.nextToken();
+                int equalsLoc = one.indexOf('=');
+
+                if ( equalsLoc < 0 ) {
+                    put( one, "true" );
+                } else {
+                    put( one.substring( 0, equalsLoc ), one.substring( equalsLoc + 1 ) );
+                }
+            }
+        }
     }
 
     private List<Segment> segments;

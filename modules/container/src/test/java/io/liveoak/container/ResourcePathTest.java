@@ -58,4 +58,29 @@ public class ResourcePathTest {
         assertThat(path.subPath().subPath().subPath().segments()).isEmpty();
     }
 
+    @Test
+    public void testParsingWithSimpleMatrix() {
+        ResourcePath path = new ResourcePath("/memory;config/clustering");
+
+        assertThat(path.segments()).hasSize(2);
+        assertThat(path.segments().get(0).name()).isEqualTo("memory");
+        assertThat(path.segments().get(0).matrixParameters()).hasSize(1);
+        assertThat(path.segments().get(0).matrixParameters().get("config")).isNotNull();
+        assertThat(path.segments().get(1).name()).isEqualTo("clustering");
+        assertThat(path.segments().get(1).matrixParameters()).isEmpty();
+    }
+
+    @Test
+    public void testParsingWithKeyValueMatrix() {
+        ResourcePath path = new ResourcePath("/memory;foo=bar;baz=taco/clustering");
+
+        assertThat(path.segments()).hasSize(2);
+        assertThat(path.segments().get(0).name()).isEqualTo("memory");
+        assertThat(path.segments().get(0).matrixParameters()).hasSize(2);
+        assertThat(path.segments().get(0).matrixParameters().get("foo")).isEqualTo("bar");
+        assertThat(path.segments().get(0).matrixParameters().get("baz")).isEqualTo("taco");
+        assertThat(path.segments().get(1).name()).isEqualTo("clustering");
+        assertThat(path.segments().get(1).matrixParameters()).isEmpty();
+    }
+
 }
