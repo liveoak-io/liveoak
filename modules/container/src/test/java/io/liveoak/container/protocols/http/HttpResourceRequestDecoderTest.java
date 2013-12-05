@@ -47,9 +47,9 @@ public class HttpResourceRequestDecoderTest {
         assertThat(decoded.requestType()).isEqualTo(RequestType.READ);
 
         assertThat(decoded.resourcePath().segments()).hasSize(3);
-        assertThat(decoded.resourcePath().segments().get(0)).isEqualTo("memory");
-        assertThat(decoded.resourcePath().segments().get(1)).isEqualTo("people");
-        assertThat(decoded.resourcePath().segments().get(2)).isEqualTo("bob");
+        assertThat(decoded.resourcePath().segments().get(0).name()).isEqualTo("memory");
+        assertThat(decoded.resourcePath().segments().get(1).name()).isEqualTo("people");
+        assertThat(decoded.resourcePath().segments().get(2).name()).isEqualTo("bob");
 
         //assertThat(decoded.mediaType()).isEqualTo(MediaType.JSON);
 
@@ -67,9 +67,9 @@ public class HttpResourceRequestDecoderTest {
         assertThat(decoded.requestType()).isEqualTo(RequestType.DELETE);
 
         assertThat(decoded.resourcePath().segments()).hasSize(3);
-        assertThat(decoded.resourcePath().segments().get(0)).isEqualTo("memory");
-        assertThat(decoded.resourcePath().segments().get(1)).isEqualTo("people");
-        assertThat(decoded.resourcePath().segments().get(2)).isEqualTo("bob");
+        assertThat(decoded.resourcePath().segments().get(0).name()).isEqualTo("memory");
+        assertThat(decoded.resourcePath().segments().get(1).name()).isEqualTo("people");
+        assertThat(decoded.resourcePath().segments().get(2).name()).isEqualTo("bob");
 
         //assertThat(decoded.mediaType()).isEqualTo(MediaType.JSON);
 
@@ -86,9 +86,9 @@ public class HttpResourceRequestDecoderTest {
         assertThat(decoded.requestType()).isEqualTo(RequestType.CREATE);
 
         assertThat(decoded.resourcePath().segments()).hasSize(3);
-        assertThat(decoded.resourcePath().segments().get(0)).isEqualTo("memory");
-        assertThat(decoded.resourcePath().segments().get(1)).isEqualTo("people");
-        assertThat(decoded.resourcePath().segments().get(2)).isEqualTo("bob");
+        assertThat(decoded.resourcePath().segments().get(0).name()).isEqualTo("memory");
+        assertThat(decoded.resourcePath().segments().get(1).name()).isEqualTo("people");
+        assertThat(decoded.resourcePath().segments().get(2).name()).isEqualTo("bob");
 
         //assertThat(decoded.mediaType()).isEqualTo(MediaType.JSON);
 
@@ -110,9 +110,9 @@ public class HttpResourceRequestDecoderTest {
         assertThat(decoded.requestType()).isEqualTo(RequestType.UPDATE);
 
         assertThat(decoded.resourcePath().segments()).hasSize(3);
-        assertThat(decoded.resourcePath().segments().get(0)).isEqualTo("memory");
-        assertThat(decoded.resourcePath().segments().get(1)).isEqualTo("people");
-        assertThat(decoded.resourcePath().segments().get(2)).isEqualTo("bob");
+        assertThat(decoded.resourcePath().segments().get(0).name()).isEqualTo("memory");
+        assertThat(decoded.resourcePath().segments().get(1).name()).isEqualTo("people");
+        assertThat(decoded.resourcePath().segments().get(2).name()).isEqualTo("bob");
 
         //assertThat(decoded.mediaType()).isEqualTo(MediaType.JSON);
 

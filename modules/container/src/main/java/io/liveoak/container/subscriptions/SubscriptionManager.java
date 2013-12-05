@@ -169,8 +169,8 @@ public class SubscriptionManager implements RootResource {
     }
 
     protected boolean matches(ResourcePath subscriptionPath, ResourcePath resourcePath) {
-        List<String> subscriptionSegments = subscriptionPath.segments();
-        List<String> resourceSegments = resourcePath.segments();
+        List<ResourcePath.Segment> subscriptionSegments = subscriptionPath.segments();
+        List<ResourcePath.Segment> resourceSegments = resourcePath.segments();
 
         if (subscriptionSegments.size() > resourceSegments.size()) {
             return false;
@@ -179,11 +179,11 @@ public class SubscriptionManager implements RootResource {
         int numSegments = subscriptionSegments.size();
 
         for (int i = 0; i < numSegments; ++i) {
-            String subscriptionSegment = subscriptionSegments.get(i);
-            if (subscriptionSegment.equals("*")) {
+            ResourcePath.Segment subscriptionSegment = subscriptionSegments.get(i);
+            if (subscriptionSegment.name().equals("*")) {
                 continue;
             }
-            String resourceSegment = resourceSegments.get(i);
+            ResourcePath.Segment resourceSegment = resourceSegments.get(i);
 
             if (!subscriptionSegment.equals(resourceSegment)) {
                 return false;

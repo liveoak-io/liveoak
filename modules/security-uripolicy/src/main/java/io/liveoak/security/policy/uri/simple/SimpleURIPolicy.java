@@ -12,6 +12,7 @@ import io.liveoak.security.spi.AuthorizationDecision;
 import io.liveoak.security.spi.AuthorizationPolicy;
 import io.liveoak.security.spi.AuthorizationRequestContext;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourcePath;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -64,14 +65,14 @@ public class SimpleURIPolicy implements AuthorizationPolicy {
     @Override
     public AuthorizationDecision isAuthorized(AuthorizationRequestContext authRequestContext) {
         RequestContext req = authRequestContext.getRequestContext();
-        List<String> segments = req.resourcePath().segments();
+        List<ResourcePath.Segment> segments = req.resourcePath().segments();
         int segmentsSize = segments.size();
 
         // TODO: Refactor this
         Deque<String> keys = new LinkedList<>();
         for (int i = 0; i < 3; i++) {
             if (i < segmentsSize) {
-                keys.add(segments.get(i));
+                keys.add(segments.get(i).name());
             } else {
                 // Segments have less keys than 3 (request without collectionName or resourceId). Fill rest with * TODO: Maybe we should add different char than * here?
                 keys.add(SimpleURIPolicy.WILDCARD);

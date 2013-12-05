@@ -33,7 +33,7 @@ public abstract class TraversingResponder extends BaseResponder {
         if (this.remainingPath.isEmpty()) {
             doPerform(resource);
         } else {
-            String next = this.remainingPath.head();
+            ResourcePath.Segment next = this.remainingPath.head();
             this.remainingPath = this.remainingPath.subPath();
             doRead(next, resource);
         }
@@ -43,19 +43,21 @@ public abstract class TraversingResponder extends BaseResponder {
         return this.remainingPath.isEmpty();
     }
 
-    public void doRead(String next, Resource resource) {
+    public void doRead(ResourcePath.Segment next, Resource resource) {
+
+        String id = ( next == null ? null : next.name() );
 
         if (resource instanceof BlockingResource) {
             this.executor.execute(() -> {
                 try {
-                    resource.readMember(TraversingResponder.this.inReplyTo().requestContext(), next, this);
+                    resource.readMember(TraversingResponder.this.inReplyTo().requestContext(), id, this);
                 } catch (Throwable t) {
                     internalError(t);
                 }
             });
         } else {
             try {
-                resource.readMember(TraversingResponder.this.inReplyTo().requestContext(), next, this);
+                resource.readMember(TraversingResponder.this.inReplyTo().requestContext(), id, this);
             } catch (Throwable t) {
                 internalError(t);
             }
@@ -89,7 +91,7 @@ public abstract class TraversingResponder extends BaseResponder {
                 int lastDotLoc = id.lastIndexOf('.');
                 if (lastDotLoc >= 0) {
                     String idWithoutExtension = id.substring(0, lastDotLoc);
-                    doRead(idWithoutExtension, currentResource);
+                    doRead(new ResourcePath.Segment( idWithoutExtension ), currentResource);
                     return;
                 }
             }

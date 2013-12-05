@@ -21,7 +21,8 @@ public class ResourcePath {
     public ResourcePath(String... segments) {
         this();
         for (int i = 0; i < segments.length; ++i) {
-            this.segments.add(segments[i]);
+            //this.segments.add(segments[i]);
+            this.segments.add( new Segment( segments[i]) );
         }
     }
 
@@ -30,23 +31,23 @@ public class ResourcePath {
         StringTokenizer tokens = new StringTokenizer(uri, "/");
 
         while (tokens.hasMoreTokens()) {
-            this.segments.add(tokens.nextToken());
+            this.segments.add( new Segment( tokens.nextToken()) );
         }
     }
 
-    ResourcePath(List<String> segments) {
+    ResourcePath(List<Segment> segments) {
         this.segments = segments;
     }
 
     public void appendSegment(String segment) {
-        this.segments.add(segment);
+        this.segments.add( new Segment( segment) );
     }
 
     public void prependSegment(String segment) {
-        this.segments.add(0, segment);
+        this.segments.add(0, new Segment( segment) );
     }
 
-    public String head() {
+    public Segment head() {
         if (this.segments.size() > 0) {
             return this.segments.get(0);
         }
@@ -64,7 +65,7 @@ public class ResourcePath {
         return this.segments.isEmpty();
     }
 
-    public List<String> segments() {
+    public List<Segment> segments() {
         return this.segments;
     }
 
@@ -91,6 +92,31 @@ public class ResourcePath {
         return segments.hashCode();
     }
 
-    private List<String> segments;
+    public static class Segment {
+
+        public Segment(String name) {
+            this.name = name;
+        }
+
+        public String name() {
+            return this.name;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if ( obj instanceof Segment ) {
+                return this.name.equals( ((Segment) obj).name() );
+            }
+            return false;
+        }
+
+        public String toString() {
+            return this.name;
+        }
+
+        private String name;
+    }
+
+    private List<Segment> segments;
 
 }

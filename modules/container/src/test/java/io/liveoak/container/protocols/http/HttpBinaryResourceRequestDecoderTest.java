@@ -43,8 +43,8 @@ public class HttpBinaryResourceRequestDecoderTest {
         assertThat(decoded.requestType()).isEqualTo(RequestType.CREATE);
 
         assertThat(decoded.resourcePath().segments()).hasSize(2);
-        assertThat(decoded.resourcePath().segments().get(0)).isEqualTo("memory");
-        assertThat(decoded.resourcePath().segments().get(1)).isEqualTo("data");
+        assertThat(decoded.resourcePath().segments().get(0).name()).isEqualTo("memory");
+        assertThat(decoded.resourcePath().segments().get(1).name()).isEqualTo("data");
 
         assertThat(decoded.state()).isNotNull();
         assertThat(decoded.state()).isInstanceOf(BinaryResourceState.class);
@@ -61,9 +61,9 @@ public class HttpBinaryResourceRequestDecoderTest {
         assertThat(decoded.requestType()).isEqualTo(RequestType.UPDATE);
 
         assertThat(decoded.resourcePath().segments()).hasSize(3);
-        assertThat(decoded.resourcePath().segments().get(0)).isEqualTo("memory");
-        assertThat(decoded.resourcePath().segments().get(1)).isEqualTo("data");
-        assertThat(decoded.resourcePath().segments().get(2)).isEqualTo("file");
+        assertThat(decoded.resourcePath().segments().get(0).name()).isEqualTo("memory");
+        assertThat(decoded.resourcePath().segments().get(1).name()).isEqualTo("data");
+        assertThat(decoded.resourcePath().segments().get(2).name()).isEqualTo("file");
 
         assertThat(decoded.state()).isNotNull();
         assertThat(decoded.state()).isInstanceOf(BinaryResourceState.class);

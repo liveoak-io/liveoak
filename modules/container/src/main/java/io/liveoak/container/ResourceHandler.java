@@ -9,6 +9,7 @@ import io.liveoak.container.responders.CreateResponder;
 import io.liveoak.container.responders.DeleteResponder;
 import io.liveoak.container.responders.ReadResponder;
 import io.liveoak.container.responders.UpdateResponder;
+import io.liveoak.spi.ResourcePath;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -20,7 +21,7 @@ public class ResourceHandler extends SimpleChannelInboundHandler<ResourceRequest
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResourceRequest msg) throws Exception {
-        String firstSegment = msg.resourcePath().head();
+        ResourcePath.Segment firstSegment = msg.resourcePath().head();
 
         switch (msg.requestType()) {
             case CREATE:
