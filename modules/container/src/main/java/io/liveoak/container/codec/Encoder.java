@@ -9,6 +9,7 @@ import io.liveoak.spi.resource.async.Resource;
 import io.netty.buffer.ByteBuf;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @author Bob McWhirter
@@ -52,5 +53,7 @@ public interface Encoder extends AutoCloseable {
     void writeValue(Boolean value) throws Exception;
 
     void writeValue(Date value) throws Exception;
+
+    void writeValue(Map value) throws Exception;
 
 }

@@ -18,6 +18,7 @@ import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Bob McWhirter
@@ -198,18 +199,41 @@ public class HTMLEncoder implements Encoder {
     }
 
     @Override
-    public void writeValue( Long value ) throws Exception {
+    public void writeValue(Long value) throws Exception {
         text(value.toString());
     }
 
     @Override
-    public void writeValue( Boolean value ) throws Exception {
+    public void writeValue(Boolean value) throws Exception {
         text(value.toString());
     }
 
     @Override
     public void writeValue(Date value) throws Exception {
         text(value.toString());
+    }
+
+    protected void writeValue(Object value) throws Exception {
+        if ( value instanceof Map ) {
+            writeValue( (Map) value );
+        } else {
+            writeValue( value.toString() );
+        }
+    }
+
+    @Override
+    public void writeValue(Map value) throws Exception {
+        startTag("dl");
+
+        for ( Object key : value.keySet() ) {
+            startTag( "dt" );
+            text( key.toString() );
+            endTag( "dt" );
+
+            writeValue( value.get( key ) );
+        }
+
+        endTag("dl");
     }
 
     @Override

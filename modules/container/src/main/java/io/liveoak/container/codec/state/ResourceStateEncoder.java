@@ -14,6 +14,7 @@ import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -148,6 +149,11 @@ public class ResourceStateEncoder implements Encoder {
 
     @Override
     public void writeValue(Date value) throws Exception {
+        write(value);
+    }
+
+    @Override
+    public void writeValue(Map value) throws Exception {
         write(value);
     }
 

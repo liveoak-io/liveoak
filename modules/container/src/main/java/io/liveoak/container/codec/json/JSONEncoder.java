@@ -9,12 +9,14 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import io.liveoak.container.codec.Encoder;
+import io.liveoak.container.codec.NonEncodableValueException;
 import io.liveoak.spi.resource.async.Resource;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @author Bob McWhirter
@@ -136,6 +138,32 @@ public class JSONEncoder implements Encoder {
     @Override
     public void writeValue(Date value) throws Exception {
         this.generator.writeNumber(value.getTime());
+    }
+
+    protected void writeValue(Object value) throws Exception {
+        if ( value instanceof String ) {
+            writeValue( (String) value );
+        } else if ( value instanceof Integer ) {
+            writeValue( (Integer) value );
+        } else if ( value instanceof Double ) {
+            writeValue( (Double) value);
+        } else if ( value instanceof Long ) {
+            writeValue( (Long) value);
+        } else if ( value instanceof Boolean ) {
+            writeValue( (Boolean) value );
+        } else {
+            throw new NonEncodableValueException( value );
+        }
+    }
+
+    @Override
+    public void writeValue(Map value) throws Exception {
+        this.generator.writeStartObject();
+        for ( Object key : value.keySet() ) {
+            this.generator.writeFieldName( key.toString() );
+            writeValue( value.get( key ) );
+        }
+        this.generator.writeEndObject();
     }
 
     public void writeLink(Resource resource) throws Exception {
