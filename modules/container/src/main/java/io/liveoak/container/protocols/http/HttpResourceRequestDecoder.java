@@ -32,6 +32,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -60,9 +61,17 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
     @Override
     protected void decode(ChannelHandlerContext ctx, FullHttpRequest msg, List<Object> out) throws Exception {
 
-        QueryStringDecoder decoder = new QueryStringDecoder(msg.getUri());
+        URI uri = new URI( msg.getUri() );
+        String query = uri.getRawQuery();
+        if ( query == null ) {
+            query = "?";
+        } else {
+            query = "?" + query;
+        }
 
-        String path = decoder.path();
+        QueryStringDecoder decoder = new QueryStringDecoder(query);
+
+        String path = uri.getPath();
 
         int lastDotLoc = path.lastIndexOf('.');
 
@@ -85,14 +94,14 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         if (msg.getMethod().equals(HttpMethod.POST)) {
             String contentTypeHeader = msg.headers().get(HttpHeaders.Names.CONTENT_TYPE);
             MediaType contentType = new MediaType(contentTypeHeader);
-            out.add(new ResourceRequest.Builder(RequestType.CREATE, new ResourcePath(decoder.path()))
+            out.add(new ResourceRequest.Builder(RequestType.CREATE, new ResourcePath(path))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
                     .resourceState(decodeState(contentType, msg.content()))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.GET)) {
-            out.add(new ResourceRequest.Builder(RequestType.READ, new ResourcePath(decoder.path()))
+            out.add(new ResourceRequest.Builder(RequestType.READ, new ResourcePath(path))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
@@ -103,14 +112,14 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         } else if (msg.getMethod().equals(HttpMethod.PUT)) {
             String contentTypeHeader = msg.headers().get(HttpHeaders.Names.CONTENT_TYPE);
             MediaType contentType = new MediaType(contentTypeHeader);
-            out.add(new ResourceRequest.Builder(RequestType.UPDATE, new ResourcePath(decoder.path()))
+            out.add(new ResourceRequest.Builder(RequestType.UPDATE, new ResourcePath(path))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
                     .resourceState(decodeState(contentType, msg.content()))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.DELETE)) {
-            out.add(new ResourceRequest.Builder(RequestType.DELETE, new ResourcePath(decoder.path()))
+            out.add(new ResourceRequest.Builder(RequestType.DELETE, new ResourcePath(path))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
