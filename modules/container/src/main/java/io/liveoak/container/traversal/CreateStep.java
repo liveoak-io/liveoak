@@ -7,7 +7,7 @@ import io.liveoak.spi.resource.async.Resource;
 */
 public class CreateStep implements TraversalPlan.Step {
     @Override
-    public void execute(TraversalPlan.StepContext context, Resource resource) {
+    public void execute(TraversalPlan.StepContext context, Resource resource) throws Exception {
         resource.createMember(context.requestContext(), context.state(), context.responder() );
     }
 }

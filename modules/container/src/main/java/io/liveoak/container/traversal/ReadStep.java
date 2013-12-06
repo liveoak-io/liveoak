@@ -17,7 +17,7 @@ public class ReadStep implements TraversalPlan.Step {
     private String name;
 
     @Override
-    public void execute(TraversalPlan.StepContext context, Resource resource) {
+    public void execute(TraversalPlan.StepContext context, Resource resource) throws Exception {
         resource.readMember(context.requestContext(), this.name, context.responder());
     }
 

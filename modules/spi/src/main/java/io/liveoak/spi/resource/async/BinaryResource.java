@@ -27,7 +27,7 @@ public interface BinaryResource extends Resource {
      *
      * @param sink The sink to stream content to.
      */
-    void readContent(RequestContext ctx, BinaryContentSink sink);
+    void readContent(RequestContext ctx, BinaryContentSink sink) throws Exception;
 
     /**
      * Update this object's content.
@@ -35,7 +35,7 @@ public interface BinaryResource extends Resource {
      * @param state     The inbound binary representation of the content.
      * @param responder To respond to the action.
      */
-    default void updateContent(RequestContext ctx, BinaryResourceState state, Responder responder) {
+    default void updateContent(RequestContext ctx, BinaryResourceState state, Responder responder) throws Exception {
         responder.updateNotSupported(this);
     }
 }

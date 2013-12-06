@@ -29,7 +29,7 @@ public class SchedulerResource implements RootResource, ConfigurableResource {
 
 
     public SchedulerResource() {
-        this.configuration = new SchedulerConfigurationResource( this );
+        this.configuration = new SchedulerConfigurationResource(this);
     }
 
     public SchedulerResource(String id) {
@@ -79,21 +79,17 @@ public class SchedulerResource implements RootResource, ConfigurableResource {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        try {
-            if (this.scheduler.isStarted()) {
-                sink.accept("status", "started");
-            } else {
-                sink.accept("stats", "stopped");
-            }
-
-            sink.accept("name", this.scheduler.getSchedulerName());
-            sink.accept("instance-id", this.scheduler.getSchedulerInstanceId());
-            SchedulerMetaData metaData = this.scheduler.getMetaData();
-
-            sink.accept("running-since", metaData.getRunningSince());
-        } catch (SchedulerException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        if (this.scheduler.isStarted()) {
+            sink.accept("status", "started");
+        } else {
+            sink.accept("stats", "stopped");
         }
+
+        sink.accept("name", this.scheduler.getSchedulerName());
+        sink.accept("instance-id", this.scheduler.getSchedulerInstanceId());
+        SchedulerMetaData metaData = this.scheduler.getMetaData();
+
+        sink.accept("running-since", metaData.getRunningSince());
 
         sink.close();
     }
@@ -109,7 +105,7 @@ public class SchedulerResource implements RootResource, ConfigurableResource {
     }
 
     @Override
-    public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
+    public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
 
         String id = UUID.randomUUID().toString();
 
@@ -130,13 +126,9 @@ public class SchedulerResource implements RootResource, ConfigurableResource {
 
         JobDetail jobDetail = jobBuilder.build();
 
-        try {
-            this.scheduler.scheduleJob(jobDetail, trigger);
-            this.children.put(id, resource);
-            responder.resourceCreated(resource);
-        } catch (SchedulerException e) {
-            responder.internalError( e.getMessage() );
-        }
+        this.scheduler.scheduleJob(jobDetail, trigger);
+        this.children.put(id, resource);
+        responder.resourceCreated(resource);
     }
 
     @Override
@@ -149,7 +141,6 @@ public class SchedulerResource implements RootResource, ConfigurableResource {
 
     @Override
     public Resource configuration() {
-        System.err.println( "scheduler asked for config" );
         return this.configuration;
     }
 

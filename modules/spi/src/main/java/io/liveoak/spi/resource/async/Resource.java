@@ -99,7 +99,7 @@ public interface Resource {
      * @param state     The inbound representation of the state.
      * @param responder To respond to the action.
      */
-    default void updateProperties(RequestContext ctx, ResourceState state, Responder responder) {
+    default void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         responder.updateNotSupported(this);
     }
 
@@ -109,7 +109,7 @@ public interface Resource {
      * @param state     The state for the child, which may include an ID.
      * @param responder To respond to the action.
      */
-    default void createMember(RequestContext ctx, ResourceState state, Responder responder) {
+    default void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         responder.createNotSupported(this);
     }
 
@@ -122,7 +122,7 @@ public interface Resource {
         sink.close();
     }
 
-    default void readMember(RequestContext ctx, String id, Responder responder) {
+    default void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
         responder.noSuchResource(id);
     }
 
@@ -131,7 +131,7 @@ public interface Resource {
      *
      * @param responder To respond to the action.
      */
-    default void delete(RequestContext ctx, Responder responder) {
+    default void delete(RequestContext ctx, Responder responder) throws Exception {
         responder.deleteNotSupported(this);
     }
 }

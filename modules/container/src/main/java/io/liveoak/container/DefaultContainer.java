@@ -39,7 +39,7 @@ import java.util.concurrent.Executors;
  *
  * @author Bob McWhirter
  */
-public class DefaultContainer implements Container, Resource, ConfigurableResource  {
+public class DefaultContainer implements Container, Resource, ConfigurableResource {
 
     /**
      * Construct a self-contained container.
@@ -90,7 +90,7 @@ public class DefaultContainer implements Container, Resource, ConfigurableResour
     }
 
     public void unregisterResource(RootResource resource) {
-        this.resources.remove( resource.id() );
+        this.resources.remove(resource.id());
         resource.destroy();
     }
 
@@ -119,23 +119,18 @@ public class DefaultContainer implements Container, Resource, ConfigurableResour
     // ----------------------------------------
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
-        try {
-            if (id == null) {
-                responder.resourceRead(this);
-                return;
-            }
-
-            if (!this.resources.containsKey(id)) {
-                responder.noSuchResource(id);
-                return;
-            }
-
-            responder.resourceRead(this.resources.get(id));
-
-        } catch (Throwable t) {
-            responder.internalError(t.getMessage());
+    public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
+        if (id == null) {
+            responder.resourceRead(this);
+            return;
         }
+
+        if (!this.resources.containsKey(id)) {
+            responder.noSuchResource(id);
+            return;
+        }
+
+        responder.resourceRead(this.resources.get(id));
     }
 
     @Override
@@ -147,7 +142,7 @@ public class DefaultContainer implements Container, Resource, ConfigurableResour
     }
 
     @Override
-    public void createMember(RequestContext ctx, ResourceState state, Responder responder) {
+    public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         if (this.resources.containsKey(state.id())) {
             responder.createNotSupported(this);
             return;
@@ -155,20 +150,16 @@ public class DefaultContainer implements Container, Resource, ConfigurableResour
 
         String type = (String) state.getProperty("type");
 
-        Deployer deployer = this.deployers.get( type );
+        Deployer deployer = this.deployers.get(type);
 
         if (deployer == null) {
             responder.internalError("unknown type: " + type);
             return;
         }
 
-        try {
-            System.err.println( "deploy: " + type + " // " + state );
-            RootResource deployed = deployer.deploy(state);
-            responder.resourceCreated( deployed );
-        } catch (Exception e) {
-            responder.internalError( e );
-        }
+        System.err.println("deploy: " + type + " // " + state);
+        RootResource deployed = deployer.deploy(state);
+        responder.resourceCreated(deployed);
 
 
     }
@@ -196,7 +187,7 @@ public class DefaultContainer implements Container, Resource, ConfigurableResour
     private Executor workerPool;
     private Map<String, Deployer> deployers = new HashMap<>();
 
-    private Resource configuration = new ContainerConfigurationResource( this );
+    private Resource configuration = new ContainerConfigurationResource(this);
 
 }
 

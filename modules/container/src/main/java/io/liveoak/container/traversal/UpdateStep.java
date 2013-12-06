@@ -9,7 +9,7 @@ import io.liveoak.spi.resource.async.Responder;
  */
 public class UpdateStep implements TraversalPlan.Step {
     @Override
-    public void execute(TraversalPlan.StepContext context, Resource resource) {
+    public void execute(TraversalPlan.StepContext context, Resource resource) throws Exception {
         resource.updateProperties(context.requestContext(), context.state(), context.responder());
     }
 

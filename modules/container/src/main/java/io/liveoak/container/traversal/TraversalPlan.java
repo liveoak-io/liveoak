@@ -65,7 +65,7 @@ public class TraversalPlan {
 // ----------------------------------------------------------------------
 
     public static interface Step {
-        void execute(StepContext context, Resource resource);
+        void execute(StepContext context, Resource resource) throws Exception;
 
         default Responder createResponder(TraversingResponder responder) {
             return responder;

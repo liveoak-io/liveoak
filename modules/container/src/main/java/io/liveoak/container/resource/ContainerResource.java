@@ -32,13 +32,9 @@ public class ContainerResource implements RootResource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         sink.accept(this.propertiesResource);
-        try {
-            sink.close();
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+        sink.close();
     }
 
     @Override
