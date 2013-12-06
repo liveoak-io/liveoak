@@ -13,11 +13,13 @@ import io.liveoak.container.codec.json.JSONEncoder;
 import io.liveoak.container.deploy.ClasspathDeployer;
 import io.liveoak.container.deploy.Deployer;
 import io.liveoak.container.deploy.JBossModulesDeployer;
+import io.liveoak.container.resource.ContainerConfigurationResource;
 import io.liveoak.container.subscriptions.SubscriptionManager;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.ConfigurableResource;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
@@ -37,7 +39,7 @@ import java.util.concurrent.Executors;
  *
  * @author Bob McWhirter
  */
-public class DefaultContainer implements Container, Resource {
+public class DefaultContainer implements Container, Resource, ConfigurableResource  {
 
     /**
      * Construct a self-contained container.
@@ -171,7 +173,6 @@ public class DefaultContainer implements Container, Resource {
 
     }
 
-
     @Override
     public Resource parent() {
         return null;
@@ -182,6 +183,11 @@ public class DefaultContainer implements Container, Resource {
         return this.prefix;
     }
 
+    @Override
+    public Resource configuration() {
+        return this.configuration;
+    }
+
     private String prefix = "";
     private Map<String, RootResource> resources = new HashMap<>();
     private ResourceCodecManager codecManager = new ResourceCodecManager();
@@ -189,6 +195,8 @@ public class DefaultContainer implements Container, Resource {
     private SubscriptionManager subscriptionManager;
     private Executor workerPool;
     private Map<String, Deployer> deployers = new HashMap<>();
+
+    private Resource configuration = new ContainerConfigurationResource( this );
 
 }
 

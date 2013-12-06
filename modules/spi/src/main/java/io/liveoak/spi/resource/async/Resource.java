@@ -49,12 +49,22 @@ public interface Resource {
             return URI.create("/");
         }
 
-        segments.forEach((s) -> {
-            if (s != null && !"".equals(s)) {
-                buf.append("/");
-                buf.append(s);
+        boolean initialSlash = false;
+
+        for ( String s : segments ) {
+            if (s != null) {
+                if (s.startsWith(";")) {
+                    if ( ! initialSlash ) {
+                        buf.append( "/" );
+                    }
+                    buf.append(s);
+                } else if (!"".equals(s)) {
+                    initialSlash = true;
+                    buf.append("/");
+                    buf.append(s);
+                }
             }
-        });
+        }
 
         return URI.create(buf.toString());
     }

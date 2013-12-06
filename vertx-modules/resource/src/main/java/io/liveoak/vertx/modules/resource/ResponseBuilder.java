@@ -70,7 +70,7 @@ public class ResponseBuilder {
     }
 
     public static JsonObject newUpdateNotSupportedResponse(String id) {
-        return newNotSupportedResponse("Update", id);
+        return newNotSupportedResponse("UpdateStep", id);
     }
 
     public static JsonObject newDeleteNotSupportedResponse(String id) {

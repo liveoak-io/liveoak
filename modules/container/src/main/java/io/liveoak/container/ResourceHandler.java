@@ -5,11 +5,7 @@
  */
 package io.liveoak.container;
 
-import io.liveoak.container.responders.CreateResponder;
-import io.liveoak.container.responders.DeleteResponder;
-import io.liveoak.container.responders.ReadResponder;
-import io.liveoak.container.responders.UpdateResponder;
-import io.liveoak.spi.ResourcePath;
+import io.liveoak.container.traversal.TraversingResponder;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -21,22 +17,26 @@ public class ResourceHandler extends SimpleChannelInboundHandler<ResourceRequest
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResourceRequest msg) throws Exception {
+        /*
         ResourcePath.Segment firstSegment = msg.resourcePath().head();
 
         switch (msg.requestType()) {
             case CREATE:
-                new CreateResponder(container.workerPool(), container, msg, ctx).doRead(firstSegment, container);
+                new CreateResponder(container.workerPool(), container, msg, ctx).resourceRead(container);
                 break;
             case READ:
-                new ReadResponder(container.workerPool(), container, msg, ctx).doRead(firstSegment, container);
+                new ReadResponder(container.workerPool(), container, msg, ctx).resourceRead(container);
                 break;
             case UPDATE:
-                new UpdateResponder(container.workerPool(), container, msg, ctx).doRead(firstSegment, container);
+                new UpdateResponder(container.workerPool(), container, msg, ctx).resourceRead(container);
                 break;
             case DELETE:
-                new DeleteResponder(container.workerPool(), container, msg, ctx).doRead(firstSegment, container);
+                new DeleteResponder(container.workerPool(), container, msg, ctx).resourceRead(container);
                 break;
         }
+        */
+
+        new TraversingResponder( container.workerPool(), container, msg, ctx ).resourceRead( container );
     }
 
     private DefaultContainer container;

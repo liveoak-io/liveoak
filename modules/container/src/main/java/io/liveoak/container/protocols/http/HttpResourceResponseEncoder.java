@@ -89,7 +89,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
                             break;
                         case UPDATE_NOT_SUPPORTED:
                             responseStatusCode = HttpResponseStatus.METHOD_NOT_ALLOWED.code();
-                            responseMessage = "Update not supported";
+                            responseMessage = "UpdateStep not supported";
                             break;
                         case DELETE_NOT_SUPPORTED:
                             responseStatusCode = HttpResponseStatus.METHOD_NOT_ALLOWED.code();
