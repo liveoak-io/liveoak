@@ -7,6 +7,7 @@ package io.liveoak.container.codec.state;
 
 import io.liveoak.container.InMemoryObjectResource;
 import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.container.codec.NonEncodableValueException;
 import io.liveoak.container.codec.driver.EncodingDriver;
 import io.liveoak.container.codec.driver.RootEncodingDriver;
 import io.liveoak.spi.RequestContext;
@@ -58,7 +59,8 @@ public class ResourceStateEncoderTest {
     @Test
     public void testInvalidObjectType() throws Exception {
         DefaultResourceState state = new DefaultResourceState();
-        state.putProperty("invalid", new Object());
+        Object invalid = new Object();
+        state.putProperty("invalid", invalid );
 
         InMemoryObjectResource resource = new InMemoryObjectResource(null, "bob", state);
 
@@ -68,8 +70,9 @@ public class ResourceStateEncoderTest {
         try {
             driver.encode();
             Fail.fail();
-        } catch (IllegalArgumentException e) {
+        } catch (NonEncodableValueException e) {
             //expected
+            assertThat( e.getValue() ).isSameAs( invalid );
         }
 
     }
