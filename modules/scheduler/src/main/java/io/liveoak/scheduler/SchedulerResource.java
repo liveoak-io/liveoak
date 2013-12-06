@@ -3,9 +3,11 @@ package io.liveoak.scheduler;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceContext;
+import io.liveoak.spi.resource.ConfigurableResource;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Notifier;
 import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
@@ -23,12 +25,15 @@ import java.util.UUID;
 /**
  * @author Bob McWhirter
  */
-public class SchedulerResource implements RootResource {
+public class SchedulerResource implements RootResource, ConfigurableResource {
+
 
     public SchedulerResource() {
+        this.configuration = new SchedulerConfigurationResource( this );
     }
 
     public SchedulerResource(String id) {
+        this();
         this.id = id;
     }
 
@@ -142,6 +147,12 @@ public class SchedulerResource implements RootResource {
         sink.close();
     }
 
+    @Override
+    public Resource configuration() {
+        System.err.println( "scheduler asked for config" );
+        return this.configuration;
+    }
+
     Notifier notifier() {
         return this.notifier;
     }
@@ -150,4 +161,6 @@ public class SchedulerResource implements RootResource {
     private Scheduler scheduler;
     private Map<String, TriggerResource> children = new HashMap<>();
     private Notifier notifier;
+    private final SchedulerConfigurationResource configuration;
+
 }
