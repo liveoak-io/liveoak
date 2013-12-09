@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.ConfigResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -16,7 +17,7 @@ import org.eclipse.jgit.lib.RepositoryBuilder;
 /**
  * @author Bob McWhirter
  */
-public class GitRepoConfigResource implements Resource {
+public class GitRepoConfigResource implements ConfigResource {
 
     public GitRepoConfigResource(GitRepoResource parent) {
         this.parent = parent;
@@ -25,11 +26,6 @@ public class GitRepoConfigResource implements Resource {
     @Override
     public Resource parent() {
         return this.parent;
-    }
-
-    @Override
-    public String id() {
-        return ";config";
     }
 
     @Override

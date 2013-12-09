@@ -4,6 +4,7 @@ import java.io.File;
 
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.ConfigResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -12,7 +13,7 @@ import io.liveoak.spi.state.ResourceState;
 /**
  * @author Bob McWhirter
  */
-public class FilesystemConfigResource implements Resource {
+public class FilesystemConfigResource implements ConfigResource {
 
     public FilesystemConfigResource(FilesystemResource parent) {
         this.parent = parent;
@@ -45,11 +46,6 @@ public class FilesystemConfigResource implements Resource {
 
         this.parent.file( file );
         responder.resourceUpdated( this );
-    }
-
-    @Override
-    public String id() {
-        return ";config";
     }
 
     private FilesystemResource parent;

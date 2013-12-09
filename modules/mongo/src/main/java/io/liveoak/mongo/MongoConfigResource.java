@@ -1,11 +1,10 @@
 package io.liveoak.mongo;
 
-import java.net.UnknownHostException;
-
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.ConfigResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -14,7 +13,7 @@ import io.liveoak.spi.state.ResourceState;
 /**
  * @author Bob McWhirter
  */
-public class MongoConfigResource implements Resource {
+public class MongoConfigResource implements ConfigResource {
 
     public MongoConfigResource(RootMongoResource parent) {
         this.parent = parent;
@@ -23,11 +22,6 @@ public class MongoConfigResource implements Resource {
     @Override
     public Resource parent() {
         return this.parent;
-    }
-
-    @Override
-    public String id() {
-        return ";config";
     }
 
     @Override
