@@ -5,6 +5,7 @@
  */
 package io.liveoak.container;
 
+import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.container.codec.ResourceCodec;
 import io.liveoak.container.codec.ResourceCodecManager;
 import io.liveoak.container.codec.html.HTMLEncoder;
@@ -65,7 +66,7 @@ public class DefaultContainer implements Container, Resource, ConfigurableResour
 
         this.subscriptionManager = new SubscriptionManager("subscriptions", this.codecManager);
         try {
-            registerResource(this.subscriptionManager, new SimpleConfig());
+            registerResource(this.subscriptionManager, new DefaultResourceState());
         } catch (InitializationException e) {
             // ignore
         }
@@ -83,10 +84,19 @@ public class DefaultContainer implements Container, Resource, ConfigurableResour
         this.resources.clear();
     }
 
-    public void registerResource(RootResource resource, Config config) throws InitializationException {
+    public void registerResource(RootResource resource, ResourceState config) throws InitializationException {
         //TODO: Lazy initialization in holder class when resourceRead controller is first accessed
-        resource.initialize(new SimpleResourceContext(this.vertx, this, config));
-        this.resources.put(resource.id(), resource);
+        resource.initialize(new SimpleResourceContext(resource.id(), this.vertx, this));
+        if (resource instanceof ConfigurableResource) {
+            RequestContext requestContext = new RequestContext.Builder().build();
+            try {
+                ((ConfigurableResource) resource).configuration().updateProperties(requestContext, config, new RegistrationResponder( resource ));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            this.resources.put(resource.id(), resource);
+        }
     }
 
     public void unregisterResource(RootResource resource) {
@@ -188,6 +198,66 @@ public class DefaultContainer implements Container, Resource, ConfigurableResour
     private Map<String, Deployer> deployers = new HashMap<>();
 
     private Resource configuration = new ContainerConfigurationResource(this);
+
+    // ----------------------------------------------------------------------
+
+    private class RegistrationResponder implements Responder {
+
+        private final RootResource rootResource;
+
+        public RegistrationResponder(RootResource rootResource) {
+            this.rootResource = rootResource;
+        }
+
+        public void resourceRead(Resource resource) {
+        }
+
+        public void resourceCreated(Resource resource) {
+        }
+
+        public void resourceDeleted(Resource resource) {
+        }
+
+        @Override
+        public void resourceUpdated(Resource resource) {
+            DefaultContainer.this.resources.put(this.rootResource.id(), (RootResource) this.rootResource);
+        }
+
+        @Override
+        public void createNotSupported(Resource resource) {
+        }
+
+        @Override
+        public void readNotSupported(Resource resource) {
+        }
+
+        @Override
+        public void updateNotSupported(Resource resource) {
+            // TODO complain loudly since it's not configurable
+        }
+
+        @Override
+        public void deleteNotSupported(Resource resource) {
+        }
+
+        @Override
+        public void noSuchResource(String id) {
+        }
+
+        @Override
+        public void resourceAlreadyExists(String id) {
+        }
+
+        @Override
+        public void internalError(String message) {
+            // TODO complain loudly
+        }
+
+        @Override
+        public void internalError(Throwable cause) {
+            // TODO complain loudly
+        }
+    }
 
 }
 

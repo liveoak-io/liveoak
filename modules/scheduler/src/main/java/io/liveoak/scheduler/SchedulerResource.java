@@ -12,12 +12,8 @@ import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import org.quartz.*;
-import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.impl.triggers.AbstractTrigger;
-import org.quartz.impl.triggers.CronTriggerImpl;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -27,14 +23,9 @@ import java.util.UUID;
  */
 public class SchedulerResource implements RootResource, ConfigurableResource {
 
-
-    public SchedulerResource() {
-        this.configuration = new SchedulerConfigurationResource(this);
-    }
-
     public SchedulerResource(String id) {
-        this();
         this.id = id;
+        this.configResource = new SchedulerConfigurationResource(this);
     }
 
     @Override
@@ -48,15 +39,6 @@ public class SchedulerResource implements RootResource, ConfigurableResource {
 
     @Override
     public void initialize(ResourceContext context) throws InitializationException {
-        if (this.id == null) {
-            this.id = context.config().get("id", null);
-        }
-
-        if (this.id == null) {
-            throw new InitializationException("id cannot be null");
-        }
-        System.err.println("initialize scheduler resource");
-
         try {
             StdSchedulerFactory factory = new StdSchedulerFactory();
             this.scheduler = factory.getScheduler();
@@ -141,7 +123,7 @@ public class SchedulerResource implements RootResource, ConfigurableResource {
 
     @Override
     public Resource configuration() {
-        return this.configuration;
+        return this.configResource;
     }
 
     Notifier notifier() {
@@ -152,6 +134,6 @@ public class SchedulerResource implements RootResource, ConfigurableResource {
     private Scheduler scheduler;
     private Map<String, TriggerResource> children = new HashMap<>();
     private Notifier notifier;
-    private final SchedulerConfigurationResource configuration;
+    private final SchedulerConfigurationResource configResource;
 
 }

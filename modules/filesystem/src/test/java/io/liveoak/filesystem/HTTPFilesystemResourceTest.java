@@ -6,8 +6,10 @@
 package io.liveoak.filesystem;
 
 import io.liveoak.container.SimpleConfig;
+import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -29,14 +31,14 @@ public class HTTPFilesystemResourceTest extends AbstractHTTPResourceTestCase {
     }
 
     @Override
-    public Config createConfig() {
+    public ResourceState createConfig() {
         File dataDir = new File(this.projectRoot, "/target/test-data/one");
         if (!dataDir.exists()) {
             dataDir.mkdirs();
         }
 
-        SimpleConfig config = new SimpleConfig();
-        config.put("root", dataDir.getAbsolutePath());
+        ResourceState config = new DefaultResourceState();
+        config.putProperty("root", dataDir.getAbsolutePath());
         return config;
     }
 

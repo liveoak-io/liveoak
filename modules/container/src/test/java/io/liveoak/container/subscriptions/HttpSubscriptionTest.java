@@ -29,7 +29,7 @@ public class HttpSubscriptionTest {
         InMemoryDBResource resource = new InMemoryDBResource("memory");
         resource.addMember(new InMemoryCollectionResource(resource, "data"));
         resource.addMember(new InMemoryCollectionResource(resource, "notifications"));
-        this.container.registerResource(resource, new SimpleConfig());
+        this.container.registerResource(resource, new DefaultResourceState() );
 
         this.server = new UnsecureServer(this.container, "localhost", 8080);
         this.server.start();

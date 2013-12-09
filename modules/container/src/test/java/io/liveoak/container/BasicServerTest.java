@@ -5,6 +5,7 @@
  */
 package io.liveoak.container;
 
+import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.container.subscriptions.Subscription;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.state.ResourceState;
@@ -46,7 +47,7 @@ public class BasicServerTest {
     public void setUpServer() throws Exception {
         this.container = new DefaultContainer();
         InMemoryDBResource resource = new InMemoryDBResource("memory");
-        this.container.registerResource(resource, new SimpleConfig());
+        this.container.registerResource(resource, new DefaultResourceState() );
 
         this.server = new UnsecureServer(this.container, InetAddress.getByName("localhost"), 8080);
         this.server.start();

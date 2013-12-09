@@ -37,7 +37,7 @@ public class DirectConnectorTest {
         db.addMember(new InMemoryCollectionResource(db, "people"));
         db.addMember(new InMemoryCollectionResource(db, "dogs"));
 
-        this.container.registerResource(db, new SimpleConfig());
+        this.container.registerResource(db, new DefaultResourceState() );
     }
 
     @After

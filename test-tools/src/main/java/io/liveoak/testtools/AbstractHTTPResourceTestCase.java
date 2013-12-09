@@ -8,8 +8,10 @@ package io.liveoak.testtools;
 import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.SimpleConfig;
 import io.liveoak.container.UnsecureServer;
+import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.state.ResourceState;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -28,8 +30,8 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
 
     public abstract RootResource createRootResource();
 
-    public Config createConfig() {
-        return new SimpleConfig();
+    public ResourceState createConfig() {
+        return new DefaultResourceState();
     }
 
     @Before

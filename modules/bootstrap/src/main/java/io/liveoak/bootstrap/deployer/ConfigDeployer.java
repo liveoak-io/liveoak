@@ -14,9 +14,14 @@ import io.liveoak.bootstrap.Bootstrap;
 import io.liveoak.bootstrap.StringPropertyReplacer;
 import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.SimpleConfig;
+import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.spi.ConfigurationException;
 import io.liveoak.spi.InitializationException;
+import io.liveoak.spi.MediaType;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.state.ResourceState;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoadException;
@@ -124,27 +129,26 @@ public class ConfigDeployer {
                 String className = resourceData.get("class-name").asText();
                 JsonNode config = resourceData.get("config");
 
-                SimpleConfig resourceConfig = null;
+                ResourceState resourceConfig = null;
 
-                if (config != null && config.isObject()) {
-                    resourceConfig = new SimpleConfig(mapper.treeToValue(config, Map.class));
+                if (config != null) {
+                    try {
+                        resourceConfig = container.getCodecManager().decode(MediaType.JSON, Unpooled.copiedBuffer(config.toString().getBytes()));
+                    } catch (Exception e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
                 } else {
-                    resourceConfig = new SimpleConfig();
+                    resourceConfig = new DefaultResourceState();
                 }
 
-                resourceConfig.put("id", resourceId);
 
-                Set<String> names = resourceConfig.names();
+                Set<String> names = resourceConfig.getPropertyNames();
 
                 for (String name : names) {
-                    try {
-                        String configValue = resourceConfig.get(name, null);
-                        if (configValue != null) {
-                            configValue = StringPropertyReplacer.replaceProperties(configValue, System.getProperties());
-                            resourceConfig.put(name, configValue);
-                        }
-                    } catch (ConfigurationException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    Object configValue = resourceConfig.getProperty(name);
+                    if (configValue != null && configValue instanceof String) {
+                        configValue = StringPropertyReplacer.replaceProperties(configValue.toString(), System.getProperties());
+                        resourceConfig.putProperty(name, configValue);
                     }
                 }
 

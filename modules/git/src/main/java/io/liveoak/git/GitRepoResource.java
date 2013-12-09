@@ -7,7 +7,9 @@ package io.liveoak.git;
 
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.ResourceContext;
+import io.liveoak.spi.resource.ConfigurableResource;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
@@ -19,19 +21,17 @@ import java.io.IOException;
 /**
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
-public class GitRepoResource extends GitDirectoryResource implements RootResource, GitResource {
+public class GitRepoResource extends GitDirectoryResource implements RootResource, ConfigurableResource, GitResource {
 
     private String id;
     private Vertx vertx;
     private Git git;
-
-    public GitRepoResource() {
-        super(null, null);
-    }
+    private GitRepoConfigResource configResource;
 
     public GitRepoResource(String id) {
         super(null, null);
         this.id = id;
+        this.configResource = new GitRepoConfigResource(this);
     }
 
     @Override
@@ -44,48 +44,12 @@ public class GitRepoResource extends GitDirectoryResource implements RootResourc
         return this.git;
     }
 
+    public void git(Git git) {
+        this.git = git;
+    }
+
     @Override
     public void initialize(ResourceContext context) throws InitializationException {
-        if (this.id == null) {
-            this.id = context.config().get("id", null);
-            if (this.id == null) {
-                throw new InitializationException("no id specified");
-            }
-        }
-
-        String repoPathStr = context.config().get("repoPath", null);
-        if (repoPathStr == null) {
-            throw new InitializationException("no git repo path specified");
-        }
-
-        this.file = new File(repoPathStr);
-
-        if (!this.file.canRead()) {
-            throw new InitializationException("unable to readMember git repo at: " + this.file.getAbsolutePath());
-        }
-
-        String createIfNotExisting = context.config().get("createIfMissing", "false");
-        boolean createRepo = Boolean.parseBoolean(createIfNotExisting);
-
-        try {
-            Repository repo = new RepositoryBuilder()
-                    .setWorkTree(this.file)
-                    .build();
-            this.git = new Git(repo);
-
-            if (!repo.getDirectory().exists()) {
-                if (createRepo) {
-                    // No git repo, need to create
-                    this.git.getRepository().create();
-                } else {
-                    throw new InitializationException("unable to setup repository at: " + this.file.getAbsolutePath()
-                            + "; no git repository found");
-                }
-            }
-        } catch (IOException e) {
-            throw new InitializationException("unable to setup repository at: " + this.file.getAbsolutePath());
-        }
-
         this.vertx = context.vertx();
     }
 
@@ -103,5 +67,10 @@ public class GitRepoResource extends GitDirectoryResource implements RootResourc
 
     public String toString() {
         return "[GitRepoResource: repoPath=" + this.file.getAbsolutePath() + "]";
+    }
+
+    @Override
+    public Resource configuration() {
+        return this.configResource;
     }
 }

@@ -12,8 +12,10 @@ import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
 import io.liveoak.container.SimpleConfig;
+import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
 
 import java.util.UUID;
@@ -34,15 +36,15 @@ public class BaseMongoDBTest extends AbstractResourceTestCase {
     }
 
     @Override
-    public Config createConfig() {
+    public ResourceState createConfig() {
         String database = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
         Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");
 
-        SimpleConfig config = new SimpleConfig();
-        config.put("db", database);
-        config.put("port", port);
-        config.put("host", host);
+        ResourceState config = new DefaultResourceState();
+        config.putProperty("db", database);
+        config.putProperty("port", port);
+        config.putProperty("host", host);
 
         try {
             mongoClient = new MongoClient(host, port);

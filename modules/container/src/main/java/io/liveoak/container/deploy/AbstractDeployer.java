@@ -4,6 +4,7 @@ import io.liveoak.container.DefaultContainer;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
@@ -14,7 +15,7 @@ public abstract class AbstractDeployer implements Deployer {
         this.container = container;
     }
 
-    protected void register(RootResource resource, Config config) throws InitializationException {
+    protected void register(RootResource resource, ResourceState config) throws InitializationException {
         this.container.registerResource( resource, config );
 
     }

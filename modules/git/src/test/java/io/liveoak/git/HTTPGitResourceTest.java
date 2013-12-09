@@ -7,6 +7,7 @@ package io.liveoak.git;
 
 import io.liveoak.spi.Config;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -27,15 +28,15 @@ public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
     }
 
     @Override
-    public Config createConfig() {
+    public ResourceState createConfig() {
         File repoDir = new File(this.projectRoot, "/target/repo_http");
         if (!repoDir.exists()) {
             repoDir.mkdirs();
         }
 
-        Config config = super.createConfig();
-        config.put("repoPath", repoDir.getAbsolutePath());
-        config.put("createIfMissing", "true");
+        ResourceState config = super.createConfig();
+        config.putProperty("repoPath", repoDir.getAbsolutePath());
+        config.putProperty("createIfMissing", Boolean.TRUE );
         return config;
     }
 

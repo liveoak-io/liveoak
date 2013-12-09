@@ -6,6 +6,7 @@
 package io.liveoak.filesystem;
 
 import io.liveoak.container.SimpleConfig;
+import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
@@ -26,9 +27,9 @@ public class FilesystemResourceTest extends AbstractResourceTestCase {
     }
 
     @Override
-    public Config createConfig() {
-        SimpleConfig config = new SimpleConfig();
-        config.put("root", this.projectRoot.getAbsolutePath());
+    public ResourceState createConfig() {
+        ResourceState config = new DefaultResourceState();
+        config.putProperty("root", this.projectRoot.getAbsolutePath());
         return config;
     }
 

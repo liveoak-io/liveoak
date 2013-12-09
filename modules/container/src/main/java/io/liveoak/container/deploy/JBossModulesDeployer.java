@@ -24,7 +24,7 @@ public class JBossModulesDeployer extends AbstractClassLoaderBasedDeployer {
         String moduleId = (String) state.getProperty("module-id");
         String className = (String) state.getProperty("class-name");
 
-        Config resourceConfig = new SimpleConfig();
+        ResourceState resourceConfig = (ResourceState) state.getProperty("config");
 
         ModuleLoader loader = ModuleLoader.forClass(JBossModulesDeployer.class);
 

@@ -22,7 +22,7 @@ public class ClasspathDeployer extends AbstractClassLoaderBasedDeployer {
         String resourceId = state.id();
         String className = (String) state.getProperty("class-name");
 
-        Config resourceConfig = new SimpleConfig();
+        ResourceState resourceConfig = (ResourceState) state.getProperty( "config" );
 
         ModuleLoader loader = ModuleLoader.forClass(ClasspathDeployer.class);
 

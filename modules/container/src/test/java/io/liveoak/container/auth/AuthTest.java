@@ -9,6 +9,7 @@ import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.InMemoryDBResource;
 import io.liveoak.container.SimpleConfig;
 import io.liveoak.container.UnsecureServer;
+import io.liveoak.container.codec.DefaultResourceState;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -63,7 +64,7 @@ public class AuthTest {
     public void beforeTest() throws Exception {
         // Always re-register resource again to ensure clean state
         InMemoryDBResource resource = new InMemoryDBResource("authTest");
-        container.registerResource(resource, new SimpleConfig());
+        container.registerResource(resource, new DefaultResourceState() );
     }
 
     @Test

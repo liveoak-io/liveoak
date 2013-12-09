@@ -29,13 +29,8 @@ public interface ResourceContext {
      */
     Container container();
 
-    /**
-     * Retrieve the controller config.
-     *
-     * @return The controller config.
-     */
-    Config config();
-
     Notifier notifier();
+
+    String id();
 
 }

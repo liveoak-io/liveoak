@@ -27,15 +27,15 @@ public class GitResourceTest extends AbstractResourceTestCase {
     }
 
     @Override
-    public Config createConfig() {
+    public ResourceState createConfig() {
         File repoDir = new File(this.projectRoot, "/target/repo");
         if (!repoDir.exists()) {
             repoDir.mkdirs();
         }
 
-        Config config = super.createConfig();
-        config.put("repoPath", repoDir.getAbsolutePath());
-        config.put("createIfMissing", "true");
+        ResourceState config = super.createConfig();
+        config.putProperty("repoPath", repoDir.getAbsolutePath());
+        config.putProperty("createIfMissing", Boolean.TRUE );
         return config;
     }
 

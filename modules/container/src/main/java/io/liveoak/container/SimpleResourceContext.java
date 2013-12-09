@@ -17,15 +17,20 @@ import org.vertx.java.core.Vertx;
 public class SimpleResourceContext implements ResourceContext {
 
     private final Vertx vertx;
+    private final String id;
     private final Container container;
-    private final Config config;
     private final Notifier notifier;
 
-    public SimpleResourceContext(Vertx vertx, DefaultContainer container, Config config) {
+    public SimpleResourceContext(String id, Vertx vertx, DefaultContainer container) {
+        this.id = id;
         this.vertx = vertx;
         this.container = container;
-        this.config = config;
         this.notifier = new NotifierImpl(container.getSubscriptionManager());
+    }
+
+    @Override
+    public String id() {
+        return this.id;
     }
 
     @Override
@@ -39,10 +44,6 @@ public class SimpleResourceContext implements ResourceContext {
     }
 
     @Override
-    public Config config() {
-        return config;
-    }
-
     public Notifier notifier() {
         return notifier;
     }

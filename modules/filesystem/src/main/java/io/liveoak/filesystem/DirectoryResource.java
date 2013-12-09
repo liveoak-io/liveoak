@@ -33,6 +33,10 @@ public class DirectoryResource implements FSResource {
         return this.file;
     }
 
+    public void file(File file) {
+        this.file = file;
+    }
+
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
         vertx().fileSystem().readDir(this.file.getPath(), (result) -> {

@@ -7,7 +7,9 @@ package io.liveoak.filesystem;
 
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.ResourceContext;
+import io.liveoak.spi.resource.ConfigurableResource;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 import org.vertx.java.core.Vertx;
 
 import java.io.File;
@@ -15,18 +17,13 @@ import java.io.File;
 /**
  * @author Bob McWhirter
  */
-public class FilesystemResource extends DirectoryResource implements RootResource, FSResource {
+public class FilesystemResource extends DirectoryResource implements RootResource, ConfigurableResource, FSResource {
 
-    private String id;
-    private Vertx vertx;
-
-    public FilesystemResource() {
-        super(null, null);
-    }
 
     public FilesystemResource(String id) {
         super(null, null);
         this.id = id;
+        this.configResource = new FilesystemConfigResource( this );
     }
 
     @Override
@@ -36,31 +33,12 @@ public class FilesystemResource extends DirectoryResource implements RootResourc
 
     @Override
     public void initialize(ResourceContext context) throws InitializationException {
-
-        if (this.id == null) {
-            this.id = context.config().get("id", null);
-            if (this.id == null) {
-                throw new InitializationException("no id specified");
-            }
-        }
-
-        String rootStr = context.config().get("root", null);
-        if (rootStr == null) {
-            throw new InitializationException("no filesystem root specified");
-        }
-
-        this.file = new File(rootStr);
-
-        if (!this.file.canRead()) {
-            throw new InitializationException("unable to readMember filesystem at: " + this.file.getAbsolutePath());
-        }
-
         this.vertx = context.vertx();
     }
 
     @Override
-    public void destroy() {
-        // nothing.
+    public Resource configuration() {
+        return this.configResource;
     }
 
 
@@ -72,4 +50,9 @@ public class FilesystemResource extends DirectoryResource implements RootResourc
     public String toString() {
         return "[FilesystemResource: root=" + this.file.getAbsolutePath() + "]";
     }
+
+    private String id;
+    private Vertx vertx;
+    private FilesystemConfigResource configResource;
+
 }

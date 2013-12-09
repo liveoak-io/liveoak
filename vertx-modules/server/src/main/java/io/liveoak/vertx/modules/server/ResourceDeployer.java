@@ -7,6 +7,7 @@ package io.liveoak.vertx.modules.server;
 
 import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.SimpleConfig;
+import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.vertx.resource.RootVertxCollectionResource;
 import org.vertx.java.core.eventbus.Message;
@@ -26,7 +27,7 @@ public class ResourceDeployer {
                 String id = message.body().getString("id");
                 String resourceAddress = message.body().getString("address");
                 try {
-                    this.container.registerResource(new RootVertxCollectionResource(id, resourceAddress), new SimpleConfig());
+                    this.container.registerResource(new RootVertxCollectionResource(id, resourceAddress), new DefaultResourceState());
                 } catch (InitializationException e) {
                     e.printStackTrace();
                 }

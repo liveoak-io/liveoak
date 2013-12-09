@@ -39,10 +39,6 @@ public class SubscriptionManager implements RootResource {
     }
 
     @Override
-    public void destroy() {
-    }
-
-    @Override
     public String id() {
         return this.id;
     }

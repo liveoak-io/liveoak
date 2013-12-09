@@ -17,6 +17,10 @@ import io.liveoak.spi.resource.async.Responder;
  */
 public class AggregatingFilesystemResource extends FilesystemResource {
 
+    public AggregatingFilesystemResource(String id) {
+        super( id );
+    }
+
     @Override
     public void readMember(RequestContext ctx, String originalId, Responder originalResponder) {
         super.readMember(ctx, originalId, new DelegatingResponder(originalResponder) {
