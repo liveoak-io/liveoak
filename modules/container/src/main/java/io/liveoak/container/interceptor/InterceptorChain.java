@@ -9,6 +9,7 @@ import io.liveoak.spi.container.interceptor.InboundInterceptorContext;
 import io.liveoak.spi.container.interceptor.Interceptor;
 import io.liveoak.spi.container.interceptor.OutboundInterceptorContext;
 import io.netty.channel.ChannelHandlerContext;
+import org.jboss.logging.Logger;
 
 /**
  * @author Bob McWhirter
@@ -69,7 +70,7 @@ public class InterceptorChain {
         try {
             interceptor.onInbound(context);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("", e);
         }
     }
 
@@ -84,7 +85,7 @@ public class InterceptorChain {
         try {
             interceptor.onOutbound(context);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("", e);
         }
     }
 
@@ -122,5 +123,5 @@ public class InterceptorChain {
     private int current = 0;
     private Direction direction;
 
-
+    private static final Logger log = Logger.getLogger(InterceptorChain.class);
 }

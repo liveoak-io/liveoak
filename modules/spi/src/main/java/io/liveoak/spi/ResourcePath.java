@@ -56,6 +56,13 @@ public class ResourcePath {
         return null;
     }
 
+    public Segment tail() {
+        if (segments.size() > 0) {
+            return segments.get(segments.size()-1);
+        }
+        return null;
+    }
+
     public ResourcePath subPath() {
         if (this.segments.isEmpty()) {
             return new ResourcePath();

@@ -55,7 +55,7 @@ public class MongoAggregationResource extends MongoAggregationItem {
             return result;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger().error("", e);
             throw new RuntimeException("Aggregation query failed: ", e);
         }
     }

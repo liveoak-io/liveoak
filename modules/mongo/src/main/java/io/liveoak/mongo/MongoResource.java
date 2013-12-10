@@ -19,6 +19,7 @@ import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
@@ -33,8 +34,14 @@ public abstract class MongoResource implements Resource, BlockingResource {
     // TODO: see if there is a more elegant way to handle this. Prefixes are lame....
     protected static final String MBAAS_MONGO_OBJECT_ID_PREFIX = "_mOI:";
 
+    private static final Logger log = Logger.getLogger("io.liveoak.mongo");
+
     public MongoResource(MongoResource parent) {
         this.parent = parent;
+    }
+
+    public Logger logger() {
+        return log;
     }
 
     @Override

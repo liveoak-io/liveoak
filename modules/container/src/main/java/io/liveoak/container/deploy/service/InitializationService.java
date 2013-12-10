@@ -10,6 +10,7 @@ import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.Deployer;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Notifier;
+import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -38,11 +39,11 @@ public class InitializationService implements Service<RootResource> {
                             this.notifierInjector.getValue());
             this.resourceInjector.getValue().initialize(resourceContext);
         } catch (InitializationException e) {
-            e.printStackTrace();
+            log.error("Error initializing resource", e);
             this.callback.accept(new Deployer.DeploymentResult(e));
             throw new StartException(e);
         } catch (Throwable t) {
-            t.printStackTrace();;
+            log.error("Unknown error initializing resource", t);
             throw new StartException(t);
         }
     }
@@ -86,5 +87,5 @@ public class InitializationService implements Service<RootResource> {
 
     private final Consumer<Deployer.DeploymentResult> callback;
 
-
+    private static final Logger log = Logger.getLogger(InitializationService.class);
 }

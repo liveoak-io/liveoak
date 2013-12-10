@@ -8,6 +8,7 @@ package io.liveoak.common.codec.driver;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
+import org.jboss.logging.Logger;
 
 /**
  * @author Bob McWhirter
@@ -42,7 +43,7 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
                 try {
                     encoder().startMembers();
                 } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    log.error("", e);
                 }
                 hasMembers = true;
             }
@@ -59,10 +60,12 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
             try {
                 encodeNext();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("", e);
             }
         }
     }
 
     private boolean hasMembers;
+
+    private static final Logger log = Logger.getLogger(MembersEncodingDriver.class);
 }

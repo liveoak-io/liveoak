@@ -11,11 +11,14 @@ import io.liveoak.stomp.common.DefaultStompMessage;
 import io.liveoak.stomp.server.StompServerException;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import org.jboss.logging.Logger;
 
 /**
  * @author Bob McWhirter
  */
 public class StompErrorHandler extends ChannelDuplexHandler {
+
+    private static final Logger log = Logger.getLogger(StompErrorHandler.class);
 
     public StompErrorHandler() {
 
@@ -23,7 +26,7 @@ public class StompErrorHandler extends ChannelDuplexHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
+        log.error("", cause);
         StompMessage errorMessage = new DefaultStompMessage(true);
 
         errorMessage.headers().put("status", "500");

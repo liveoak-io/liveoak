@@ -15,6 +15,7 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpClient;
 
@@ -117,7 +118,7 @@ public class DefaultSubscriptionManager implements SubscriptionManager, RootReso
             try {
                 e.resourceCreated(resource);
             } catch (Exception e1) {
-                e1.printStackTrace();
+                log.error("", e1);
             }
         });
     }
@@ -127,7 +128,7 @@ public class DefaultSubscriptionManager implements SubscriptionManager, RootReso
             try {
                 e.resourceUpdated(resource);
             } catch (Exception e1) {
-                e1.printStackTrace();
+                log.error("", e1);
             }
         });
     }
@@ -137,7 +138,7 @@ public class DefaultSubscriptionManager implements SubscriptionManager, RootReso
             try {
                 e.resourceDeleted(resource);
             } catch (Exception e1) {
-                e1.printStackTrace();
+                log.error("", e1);
             }
         });
     }
@@ -217,5 +218,6 @@ public class DefaultSubscriptionManager implements SubscriptionManager, RootReso
     private Vertx vertx;
     private List<Subscription> subscriptions = new ArrayList<>();
 
+    private static final Logger log = Logger.getLogger(DefaultSubscriptionManager.class);
 
 }

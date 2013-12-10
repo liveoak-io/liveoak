@@ -9,6 +9,7 @@ import java.io.File;
 
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
+import org.jboss.logging.Logger;
 
 /**
  * Bootstrapping <code>main()</code> method.
@@ -16,15 +17,20 @@ import io.liveoak.container.LiveOakSystem;
  * @author Bob McWhirter
  */
 public class Bootstrap {
-    public static void main(String... args) throws Exception {
-        System.err.println("LiveOak BaaS");
+    private static final Logger log = Logger.getLogger("io.liveoak.bootstrap");
 
+    public static void main(String... args) throws Exception {
         File configDir = null;
 
         if ( args.length == 1 ) {
             configDir = new File( args[0] );
         }
 
-        LiveOakSystem system = LiveOakFactory.create( configDir );
+        log.info("Booting up LiveOak BaaS");
+        long start = System.currentTimeMillis();
+
+        LiveOakFactory.create(configDir);
+
+        log.infof("LiveOak booted in %d ms", (System.currentTimeMillis() - start));
     }
 }

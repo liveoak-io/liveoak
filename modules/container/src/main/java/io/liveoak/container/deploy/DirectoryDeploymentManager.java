@@ -27,6 +27,7 @@ import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
+import org.jboss.logging.Logger;
 
 /**
  * @author Bob McWhirter
@@ -41,7 +42,7 @@ public class DirectoryDeploymentManager {
 
     public void start() {
         if (!this.configDir.exists()) {
-            System.err.println("creating dir: " + this.configDir);
+            log.infof("creating dir: %s", this.configDir);
             this.configDir.mkdirs();
         }
 
@@ -51,9 +52,9 @@ public class DirectoryDeploymentManager {
             try {
                 deploy(file);
             } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                log.errorf(e, "IOException during deployment of file %s", file.getName());
             } catch (DeploymentException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                log.errorf(e, "Deployment failed for file %s", file.getName());
             }
         }
     }
@@ -82,7 +83,7 @@ public class DirectoryDeploymentManager {
 
         this.deployer.deploy(id, descriptor, (result) -> {
             if (result.cause() != null) {
-                result.cause().printStackTrace();
+                log.errorf(result.cause(), "Error deploying resource file %s", file.getName());
             }
         });
     }
@@ -151,4 +152,6 @@ public class DirectoryDeploymentManager {
     private Deployer deployer;
     private File configDir;
     private JSONDecoder decoder;
+
+    private static final Logger log = Logger.getLogger(DirectoryDeploymentManager.class);
 }

@@ -32,6 +32,11 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.jboss.slf4j</groupId>
+            <artifactId>slf4j-jboss-logmanager</artifactId>
+        </dependency>
+
         <!-- com.fasterxml.jackson.core -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -199,12 +204,6 @@
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-        </dependency>
-
-        <!-- org.jboss.logging -->
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
         </dependency>
 
         <!-- org.jboss.xnio -->

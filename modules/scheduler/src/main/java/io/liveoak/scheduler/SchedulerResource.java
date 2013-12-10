@@ -9,6 +9,7 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
@@ -52,7 +53,7 @@ public class SchedulerResource implements RootResource {
         try {
             this.scheduler.shutdown();
         } catch (SchedulerException e) {
-            e.printStackTrace();
+            log.error("", e);
         }
     }
 
@@ -127,4 +128,5 @@ public class SchedulerResource implements RootResource {
     private Map<String, TriggerResource> children = new HashMap<>();
     private Notifier notifier;
 
+    private static final Logger log = Logger.getLogger(SchedulerResource.class);
 }

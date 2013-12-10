@@ -157,7 +157,7 @@ public class MongoCollectionResource extends MongoResource {
         try {
             sink.close();
         } catch (Exception e) {
-            e.printStackTrace();  //TODO: properly handle errors
+            logger().error("", e);  //TODO: properly handle errors
         }
     }
 
@@ -168,7 +168,7 @@ public class MongoCollectionResource extends MongoResource {
             basicDBObject = (BasicDBObject) createObject(state);
             WriteResult wResult = getDBCollection().insert(basicDBObject);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger().error("", e);
         }
 
         DBObject newDBObject = getDBCollection().findOne(new BasicDBObject(MONGO_ID_FIELD, basicDBObject.get(MONGO_ID_FIELD)));

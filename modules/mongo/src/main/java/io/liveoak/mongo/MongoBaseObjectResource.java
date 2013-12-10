@@ -114,7 +114,7 @@ public class MongoBaseObjectResource extends MongoObjectResource {
                         }
                     }catch (Exception e)  {
                         responder.invalidRequest( "Could not update Property");
-                        e.printStackTrace();
+                        logger().error("", e);
                     }
                 }
                 if (value == null) {

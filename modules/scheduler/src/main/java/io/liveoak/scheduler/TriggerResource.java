@@ -4,6 +4,7 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
+import org.jboss.logging.Logger;
 import org.quartz.CronTrigger;
 import org.quartz.JobExecutionContext;
 import org.quartz.SchedulerException;
@@ -38,7 +39,7 @@ public class TriggerResource implements Resource {
             Trigger.TriggerState state = this.parent.scheduler().getTriggerState(this.trigger.getKey());
             sink.accept("state", state.toString().toLowerCase());
         } catch (SchedulerException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            log.error("", e);
         }
         sink.close();
     }
@@ -62,4 +63,5 @@ public class TriggerResource implements Resource {
     private Trigger trigger;
     private LinkedList<FireResource> fires = new LinkedList<>();
 
+    private static final Logger log = Logger.getLogger(TriggerResource.class);
 }

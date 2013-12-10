@@ -22,7 +22,7 @@ import java.security.PublicKey;
  */
 public class KeycloakRootResource implements RootResource {
 
-    private static final Logger log = Logger.getLogger(KeycloakRootResource.class);
+    private static final Logger log = Logger.getLogger("io.liveoak.keycloak");
 
     private String id;
     private UndertowServer undertow;
@@ -82,7 +82,7 @@ public class KeycloakRootResource implements RootResource {
         try {
             // TODO Remove once fixed in Keycloak
             Thread.currentThread().setContextClassLoader(KeycloakServer.class.getClassLoader());
-            log.info("Going to bootstrap undertow on " + host + ":" + port);
+            log.infof("Going to bootstrap undertow on %s:%d", host, port);
             undertow = new UndertowServer(host, port);
             server = new KeycloakServer(undertow);
             try {
@@ -207,5 +207,9 @@ public class KeycloakRootResource implements RootResource {
     public ApplicationRepresentation getApp() {
         return app;
     }
+
+    public Logger logger() {
+        return log;
+    };
 }
 

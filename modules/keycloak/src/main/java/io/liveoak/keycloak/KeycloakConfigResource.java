@@ -73,15 +73,14 @@ public class KeycloakConfigResource implements ConfigResource {
                     ApplicationRepresentation appRep = loadJson(file, ApplicationRepresentation.class);
                     keycloak.setApp(appRep);
                 } else {
-                    // TODO LOG
-                    System.out.println(appConfig + " not found");
+                    keycloak.logger().warnf("%s not found", appConfig);
                 }
                 this.appConfig = appConfig;
             }
 
             responder.resourceUpdated(this);
         } catch (Throwable t) {
-            t.printStackTrace();
+            keycloak.logger().error("Error updating configuration for keycloak", t);
             responder.internalError(t);
         }
     }

@@ -11,6 +11,7 @@ import io.liveoak.spi.container.Deployer;
 import io.liveoak.spi.container.Server;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.ResourceSink;
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceContainer;
 import org.vertx.java.core.Vertx;
 
@@ -30,7 +31,7 @@ public class LiveOakSystem implements RootResource {
         try {
             this.serviceContainer.awaitTermination();
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            log.error("Interrupted before all services shutdown.", e);
         }
     }
 
@@ -85,4 +86,6 @@ public class LiveOakSystem implements RootResource {
 
     private PropertiesResource propertiesResource;
     private ServersResource serversResource;
+
+    private static final Logger log = Logger.getLogger(LiveOakSystem.class);
 }

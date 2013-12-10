@@ -39,6 +39,11 @@ public interface ResourceParams {
         public int intValue(String name, int defaultValue) {
             return defaultValue;
         }
+
+        @Override
+        public boolean booleanValue(String name, boolean defaultValue) {
+            return defaultValue;
+        }
     };
 
 
@@ -51,4 +56,11 @@ public interface ResourceParams {
     List<String> values(String name);
 
     int intValue(String name, int defaultValue);
+
+    default boolean booleanValue(String name, boolean defaultValue) {
+        String val = value(name);
+        if (val == null) return defaultValue;
+
+        return Boolean.parseBoolean(value(name));
+    }
 }
