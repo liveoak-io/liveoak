@@ -87,10 +87,11 @@ public class DefaultContainer implements Container, Resource {
     public void registerResource(RootResource resource, ResourceState config) throws InitializationException {
         //TODO: Lazy initialization in holder class when resourceRead controller is first accessed
         resource.initialize(new SimpleResourceContext(resource.id(), this.vertx, this));
-        if (resource.getClass().isAnnotationPresent(Configurable.class)) {
+        Resource configResource = resource.configuration();
+        if (configResource != null) {
             RequestContext requestContext = new RequestContext.Builder().build();
             try {
-                resource.configuration().updateProperties(requestContext, config, new RegistrationResponder( resource ));
+                configResource.updateProperties(requestContext, config, new RegistrationResponder( resource ));
             } catch (Exception e) {
                 e.printStackTrace();
             }

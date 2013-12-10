@@ -7,7 +7,6 @@ package io.liveoak.filesystem;
 
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.ResourceContext;
-import io.liveoak.spi.resource.Configurable;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import org.vertx.java.core.Vertx;
@@ -15,7 +14,6 @@ import org.vertx.java.core.Vertx;
 /**
  * @author Bob McWhirter
  */
-@Configurable
 public class FilesystemResource extends DirectoryResource implements RootResource, FSResource {
 
     public FilesystemResource(String id) {

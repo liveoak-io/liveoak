@@ -3,7 +3,6 @@ package io.liveoak.scheduler;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceContext;
-import io.liveoak.spi.resource.Configurable;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Notifier;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -21,7 +20,6 @@ import java.util.UUID;
 /**
  * @author Bob McWhirter
  */
-@Configurable
 public class SchedulerResource implements RootResource {
 
     public SchedulerResource(String id) {

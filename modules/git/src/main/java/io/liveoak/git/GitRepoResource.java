@@ -7,7 +7,6 @@ package io.liveoak.git;
 
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.ResourceContext;
-import io.liveoak.spi.resource.Configurable;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import org.eclipse.jgit.api.Git;
@@ -16,7 +15,6 @@ import org.vertx.java.core.Vertx;
 /**
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
-@Configurable
 public class GitRepoResource extends GitDirectoryResource implements RootResource, GitResource {
 
     private String id;

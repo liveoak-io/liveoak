@@ -11,7 +11,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.Configurable;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
@@ -26,7 +25,6 @@ import java.util.stream.Stream;
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-@Configurable
 public class RootMongoResource extends MongoResource implements RootResource {
 
     private MongoClient mongo;
