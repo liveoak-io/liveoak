@@ -5,7 +5,6 @@
  */
 package io.liveoak.security.policy.uri.complex;
 
-import io.liveoak.security.impl.SimpleLogger;
 import io.liveoak.security.spi.AuthToken;
 import io.liveoak.security.spi.AuthorizationDecision;
 import io.liveoak.security.spi.AuthorizationPolicy;
@@ -19,6 +18,7 @@ import org.drools.compiler.DroolsError;
 import org.drools.compiler.PackageBuilder;
 import org.drools.compiler.PackageBuilderErrors;
 import org.drools.template.DataProviderCompiler;
+import org.jboss.logging.Logger;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,8 +35,7 @@ import java.util.concurrent.Executors;
  */
 public class URIPolicy implements AuthorizationPolicy {
 
-    // TODO: Replace with real logging
-    private static final SimpleLogger log = new SimpleLogger(URIPolicy.class);
+    private static final Logger log = Logger.getLogger(URIPolicy.class);
 
     private RuleBase ruleBase;
 

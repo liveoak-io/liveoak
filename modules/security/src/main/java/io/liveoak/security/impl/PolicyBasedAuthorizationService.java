@@ -12,6 +12,7 @@ import io.liveoak.security.spi.AuthorizationRequestContext;
 import io.liveoak.security.spi.AuthorizationService;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
+import org.jboss.logging.Logger;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ import java.util.List;
  */
 public class PolicyBasedAuthorizationService implements AuthorizationService {
 
-    SimpleLogger log = new SimpleLogger(PolicyBasedAuthorizationService.class);
+    private static final Logger log = Logger.getLogger(PolicyBasedAuthorizationService.class);
 
     @Override
     public boolean isAuthorized(AuthorizationRequestContext authRequestContext) {

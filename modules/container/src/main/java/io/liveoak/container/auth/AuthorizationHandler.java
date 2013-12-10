@@ -10,7 +10,6 @@ import io.liveoak.container.ResourceErrorResponse;
 import io.liveoak.container.ResourceRequest;
 import io.liveoak.security.impl.AuthServicesHolder;
 import io.liveoak.security.impl.DefaultSecurityContext;
-import io.liveoak.security.impl.SimpleLogger;
 import io.liveoak.security.spi.AuthToken;
 import io.liveoak.security.spi.AuthorizationRequestContext;
 import io.liveoak.security.spi.AuthorizationService;
@@ -20,6 +19,7 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.SecurityContext;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.jboss.logging.Logger;
 
 /**
  * Handler for checking authorization of current request. It's independent of protocol. It delegates the work to {@link AuthorizationService}.
@@ -29,7 +29,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRequest> {
 
     // TODO: replace with real logging
-    private static final SimpleLogger log = new SimpleLogger(AuthorizationHandler.class);
+    private static final Logger log = Logger.getLogger(AuthorizationHandler.class);
 
     // TODO: Should be removed...
     static {
@@ -37,7 +37,7 @@ public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRe
             AuthServicesHolder.getInstance().registerClassloader(AuthorizationHandler.class.getClassLoader());
             AuthServicesHolder.getInstance().registerDefaultPolicies();
         } catch (Throwable e) {
-            log.error("Error occured during initialization of AuthorizationService", e);
+            log.error("Error occurred during initialization of AuthorizationService", e);
             throw e;
         }
     }
@@ -70,7 +70,7 @@ public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRe
                 sendAuthorizationError(ctx, req);
             }
         } catch (Throwable e) {
-            log.error("Exception occured in AuthorizationService check", e);
+            log.error("Exception occurred in AuthorizationService check", e);
             throw e;
         }
     }

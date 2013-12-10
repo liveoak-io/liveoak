@@ -36,6 +36,18 @@ resources: {
         }
     },
 
+    logging: {
+        type: 'jboss-module',
+        module-id:   'io.liveoak.logging',
+        class-name:  'io.liveoak.logging.LoggingRootResource',
+        config: {
+            logDir: {
+                path: '${io.liveoak.log}',
+                filter: '.*liveoak\\.log.*'
+            }
+        }
+    },
+
     storage: {
         type: 'jboss-module',
         module-id:  'io.liveoak.mongo',

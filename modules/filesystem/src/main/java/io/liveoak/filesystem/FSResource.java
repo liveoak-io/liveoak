@@ -5,16 +5,16 @@
  */
 package io.liveoak.filesystem;
 
-import io.liveoak.spi.resource.async.Resource;
-import org.vertx.java.core.Vertx;
-
 import java.io.File;
+
+import io.liveoak.spi.resource.VertxResource;
 
 /**
  * @author Bob McWhirter
  */
-public interface FSResource extends Resource {
-    Vertx vertx();
+public interface FSResource extends VertxResource {
 
     File file();
+
+    boolean writable();
 }

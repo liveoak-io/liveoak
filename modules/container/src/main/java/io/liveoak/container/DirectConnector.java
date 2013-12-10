@@ -92,7 +92,7 @@ public class DirectConnector {
                 try {
                     future.complete(response.resource());
                 } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    container.logger().error(null, e);
                 }
             } else if (response instanceof ResourceErrorResponse) {
                 handleError((ResourceErrorResponse) response, future);
@@ -147,7 +147,7 @@ public class DirectConnector {
                 try {
                     future.complete(encode(context, response.resource()));
                 } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    container.logger().error(null, e);
                 }
             } else if (response instanceof ResourceErrorResponse) {
                 handleError((ResourceErrorResponse) response, future);
@@ -204,7 +204,7 @@ public class DirectConnector {
                         ResourceProcessingException rpe = (ResourceProcessingException)e;
                         resourceErrorResponse = new ResourceErrorResponse (response.inReplyTo(),ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, rpe.getMessage(), rpe.getCause());
                     } else {
-                        e.printStackTrace(); //TODO: figure out how to pass this to the client
+                        container.logger().error(null, e);
                         resourceErrorResponse = new ResourceErrorResponse( response.inReplyTo(), ResourceErrorResponse.ErrorType.INTERNAL_ERROR);
                     }
                     handleError(resourceErrorResponse, future);
@@ -272,7 +272,7 @@ public class DirectConnector {
                 try {
                     future.complete(encode(context, response.resource()));
                 } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    container.logger().error(null, e);
                 }
             } else if (response instanceof ResourceErrorResponse) {
                 handleError((ResourceErrorResponse) response, future);
@@ -324,7 +324,7 @@ public class DirectConnector {
                 try {
                     future.complete(encode(context, response.resource()));
                 } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    container.logger().error(null, e);
                 }
             } else if (response instanceof ResourceErrorResponse) {
                 handleError((ResourceErrorResponse) response, future);

@@ -21,9 +21,8 @@ public class Bootstrap {
 
     public static void main(String... args) throws Exception {
 
-        System.err.println("Booting up the mBaaS");
-
         DefaultContainer container = new DefaultContainer();
+        container.logger().info("Booting up LiveOak");
         UnsecureServer server = new UnsecureServer(container, "localhost", 8080);
 
         container.registerResource(new ContainerResource("_container"), new DefaultResourceState());

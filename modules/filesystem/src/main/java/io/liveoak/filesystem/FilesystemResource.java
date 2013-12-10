@@ -9,6 +9,7 @@ import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
+import org.jboss.logging.Logger;
 import org.vertx.java.core.Vertx;
 
 /**
@@ -16,8 +17,16 @@ import org.vertx.java.core.Vertx;
  */
 public class FilesystemResource extends DirectoryResource implements RootResource, FSResource {
 
+    public FilesystemResource() {
+        this(null);
+    }
+
     public FilesystemResource(String id) {
-        super(null, null);
+        this(id, false);
+    }
+
+    public FilesystemResource(String id, boolean writable) {
+        super(null, null, writable);
         this.id = id;
         this.configResource = new FilesystemConfigResource(this);
     }
@@ -50,5 +59,8 @@ public class FilesystemResource extends DirectoryResource implements RootResourc
     private String id;
     private Vertx vertx;
     private FilesystemConfigResource configResource;
+
+    private static final Logger log = Logger.getLogger("io.liveoak.filesystem"); //TODO: This could be done for us, and passed/set for each RootResource that wants one
+    static Logger FILE_SYSTEM_LOGGER = log;
 
 }

@@ -5,7 +5,11 @@
  */
 package io.liveoak.spi;
 
+import org.jboss.logging.Logger;
+
 public interface Container {
 
     void shutdown();
+
+    Logger logger();
 }
