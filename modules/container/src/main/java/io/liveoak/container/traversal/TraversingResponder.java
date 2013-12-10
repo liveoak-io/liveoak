@@ -6,6 +6,7 @@
 package io.liveoak.container.traversal;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicReference;
 
 import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.spi.Container;
@@ -48,6 +49,8 @@ public class TraversingResponder extends BaseResponder {
     protected void doStep(TraversalPlan.Step step, Resource resource) {
         Responder nextResponder = nextResponder();
 
+        AtomicReference<Runnable> ref = new AtomicReference<>();
+
         TraversalPlan.StepContext stepContext = new TraversalPlan.StepContext() {
             @Override
             public Container container() {
@@ -68,23 +71,33 @@ public class TraversingResponder extends BaseResponder {
             public Responder responder() {
                 return nextResponder;
             }
+
+            @Override
+            public Runnable invocation() {
+                return ref.get();
+            }
         };
 
-        if (resource instanceof BlockingResource) {
-            this.executor.execute(() -> {
+        Runnable stepRunner = () -> {
+            if (resource instanceof BlockingResource) {
+                this.executor.execute(() -> {
+                    try {
+                        step.execute(stepContext, resource);
+                    } catch (Throwable t) {
+                        internalError(t);
+                    }
+                });
+            } else {
                 try {
                     step.execute(stepContext, resource);
                 } catch (Throwable t) {
                     internalError(t);
                 }
-            });
-        } else {
-            try {
-                step.execute(stepContext, resource);
-            } catch (Throwable t) {
-                internalError(t);
             }
-        }
+        };
+        ref.set(stepRunner);
+
+        stepRunner.run();
     }
 
     @Override

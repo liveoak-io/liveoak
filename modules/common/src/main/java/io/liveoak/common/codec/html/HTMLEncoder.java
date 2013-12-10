@@ -215,13 +215,15 @@ public class HTMLEncoder implements StateEncoder {
 
     @Override
     public void writeLink(ResourceState resourcestate) throws Exception {
-        startTag("div");
-        attribute("class", "resource");
-        startTag("a");
-        attribute( "href", resourcestate.uri().toString() );
-        text( resourcestate.id() );
-        endTag("a");
-        endTag("div");
+        if (resourcestate.id() != null) {
+            startTag("div");
+            attribute("class", "resource");
+            startTag("a");
+            attribute( "href", resourcestate.uri().toString() );
+            text( resourcestate.id() );
+            endTag("a");
+            endTag("div");
+        }
     }
 
     private XMLEventWriter writer;

@@ -4,19 +4,50 @@ import io.liveoak.spi.resource.async.BinaryResource;
 import io.liveoak.spi.resource.async.DelegatingResponder;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
-import io.liveoak.spi.state.BinaryResourceState;
 
 /**
  * @author Bob McWhirter
  */
 public class UpdateStep implements TraversalPlan.Step {
+
+    private boolean complete;
+
     @Override
     public void execute(TraversalPlan.StepContext context, Resource resource) throws Exception {
-        if (resource instanceof BinaryResource) {
-            ((BinaryResource) resource).updateContent(context.requestContext(), (BinaryResourceState) context.state(), context.responder());
+        if (complete) {
+            if (resource instanceof BinaryResource) {
+                ((BinaryResource) resource)
+                    .updateContent(context.requestContext(), context.state(), context.responder());
+            } else {
+                resource.updateProperties(context.requestContext(), context.state(), context.responder());
+            }
         } else {
-            resource.updateProperties(context.requestContext(), context.state(), context.responder());
+            if (resource instanceof BinaryResource) {
+                BinaryResource binResource = (BinaryResource) resource;
+                if (binResource.willProcessUpdate(context.requestContext(), context.state(), context.responder())) {
+                    arrangeCompletion(context);
+                }
+            } else {
+                if (!arrangeCompletion(context)) {
+                    resource.updateProperties(context.requestContext(), context.state(), context.responder());
+                }
+            }
         }
+    }
+
+    protected boolean arrangeCompletion(TraversalPlan.StepContext context) {
+        Responder responder = context.responder();
+        if (responder instanceof TraversingResponder == false) {
+            throw new IllegalStateException("Update operation only works within the context of TraversingResponder!");
+        }
+        TraversingResponder tr = (TraversingResponder) responder;
+        if (tr.canContinue()) {
+            complete = true;
+            tr.dispatchInvocation(context.invocation());
+            return true;
+        }
+
+        return false;
     }
 
     @Override

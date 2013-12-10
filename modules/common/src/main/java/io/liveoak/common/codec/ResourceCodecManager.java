@@ -35,6 +35,9 @@ public class ResourceCodecManager {
     }
 
     public ResourceState decode(MediaType mediaType, ByteBuf buf) throws Exception {
+        if (buf == null) {
+            buf = Unpooled.EMPTY_BUFFER;
+        }
         if (MediaType.OCTET_STREAM.equals(mediaType)) {
             return new DefaultBinaryResourceState(buf.retain());
         }
@@ -50,7 +53,7 @@ public class ResourceCodecManager {
         Resource resource = response.resource();
         if (resource instanceof BinaryResource) {
             MediaType match = mediaTypeMatcher.findBestMatch(Collections.singletonList(((BinaryResource) resource).mediaType()));
-            ;
+
             if (match != null) {
                 CompletableFuture<ByteBuf> future = new CompletableFuture<>();
                 ((BinaryResource) resource).readContent(ctx, new MyBinaryContentSink(future));
@@ -117,6 +120,11 @@ public class ResourceCodecManager {
             this.mediaType = mediaType;
             this.codec = codec;
 
+        }
+
+        @Override
+        public String toString() {
+            return "[CodecRegistration: mediaType=" + mediaType + ", codec=" + codec + "]";
         }
     }
 

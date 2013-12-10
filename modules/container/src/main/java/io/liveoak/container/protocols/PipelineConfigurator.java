@@ -17,6 +17,7 @@ import io.liveoak.container.deploy.ConfigurationWatcher;
 import io.liveoak.container.deploy.DirectoryDeploymentManager;
 import io.liveoak.container.interceptor.InterceptorHandler;
 import io.liveoak.container.interceptor.InterceptorManager;
+import io.liveoak.container.protocols.http.HttpRequestBodyHandler;
 import io.liveoak.container.protocols.http.HttpResourceRequestDecoder;
 import io.liveoak.container.protocols.http.HttpResourceResponseEncoder;
 import io.liveoak.container.protocols.local.LocalResourceResponseEncoder;
@@ -109,6 +110,10 @@ public class PipelineConfigurator {
         return this.interceptorManager;
     }
 
+    public String tempDir() {
+        return System.getProperty("java.io.tmpdir");
+    }
+
     public void switchToPureStomp(ChannelPipeline pipeline) {
         pipeline.remove(ProtocolDetector.class);
 
@@ -136,8 +141,12 @@ public class PipelineConfigurator {
         pipeline.remove(ProtocolDetector.class);
         pipeline.addLast(new HttpRequestDecoder());
         pipeline.addLast(new HttpResponseEncoder());
-        pipeline.addLast(new HttpObjectAggregator(1024 * 1024)); //TODO: Remove this to support chunked http
-        pipeline.addLast(new WebSocketHandshakerHandler(this));
+        //pipeline.addLast(new HttpObjectAggregator(1024 * 1024)); //TODO: Remove this to support chunked http
+        pipeline.addLast("ws-handshake", new WebSocketHandshakerHandler(this));
+    }
+
+    public void switchToWebSocketsHandshake(ChannelPipeline pipeline) {
+        pipeline.addBefore("ws-handshake", "aggregator", new HttpObjectAggregator(1024 * 1024));
     }
 
     public void switchToWebSockets(ChannelPipeline pipeline) {
@@ -164,9 +173,12 @@ public class PipelineConfigurator {
     }
 
     public void switchToPlainHttp(ChannelPipeline pipeline) {
+        // turn off automatic socket read for better http body read control
+        pipeline.channel().config().setAutoRead(false);
         pipeline.remove(WebSocketHandshakerHandler.class);
         pipeline.addLast("http-resourceRead-decoder", new HttpResourceRequestDecoder(this.codecManager));
         pipeline.addLast("http-resourceRead-encoder", new HttpResourceResponseEncoder(this.codecManager));
+        pipeline.addLast("http-requestBody-handler", new HttpRequestBodyHandler());
         pipeline.addLast("interceptor", new InterceptorHandler( this.interceptorManager ) );
 
         if (container.hasResource("auth")) {
