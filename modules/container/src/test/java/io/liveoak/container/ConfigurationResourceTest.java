@@ -79,4 +79,12 @@ public class ConfigurationResourceTest {
         assertThat(value).isInstanceOf(String.class);
         assertThat(value).toString().equals(SECOND_VALUE);
     }
+
+    @Test
+    public void testConfigPropertyNotFound() throws Exception {
+        InMemoryConfigResource resource = new InMemoryConfigResource(RESOURCE + 3);
+        DefaultResourceState state = new DefaultResourceState();
+        state.putProperty(SECOND_KEY, SECOND_VALUE);
+        this.container.registerResource(resource, state);
+    }
 }

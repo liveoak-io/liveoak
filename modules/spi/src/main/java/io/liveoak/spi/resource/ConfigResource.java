@@ -75,7 +75,9 @@ public interface ConfigResource extends Resource {
                     Object value = state.getProperty(key);
 
                     if (value == null) {
-                        String msg = !"".equals(configProperty.msg()) ? configProperty.msg() : "No configuration value specified for: " + key;
+                        String msg = !"".equals(configProperty.msg())
+                                ? configProperty.msg()
+                                : "No configuration value specified for: " + key + " on Resource with id: " + resource.id();
                         throw new InitializationException(msg);
                     }
 

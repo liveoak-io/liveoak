@@ -20,7 +20,7 @@ public @interface ConfigProperty {
 
     String name() default "";
 
-    String msg() default "No config property found for defined @ConfigProperty.";
+    String msg() default "";
 
     Class<? extends ConfigPropertyConverter> converter() default ConfigPropertyConverter.class;
 }
