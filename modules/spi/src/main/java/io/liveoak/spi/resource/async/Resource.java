@@ -6,6 +6,8 @@
 package io.liveoak.spi.resource.async;
 
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.ConfigResource;
+import io.liveoak.spi.resource.Configurable;
 import io.liveoak.spi.state.ResourceState;
 
 import java.net.URI;
@@ -133,5 +135,18 @@ public interface Resource {
      */
     default void delete(RequestContext ctx, Responder responder) throws Exception {
         responder.deleteNotSupported(this);
+    }
+
+    default Resource configuration() {
+        if (this.getClass().isAnnotationPresent(Configurable.class)) {
+            return new ConfigResource() {
+                @Override
+                public Resource parent() {
+                    return Resource.this;
+                }
+            };
+        } else {
+            return null;
+        }
     }
 }

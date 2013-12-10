@@ -16,11 +16,10 @@ import io.liveoak.container.deploy.Deployer;
 import io.liveoak.container.deploy.JBossModulesDeployer;
 import io.liveoak.container.resource.ContainerConfigurationResource;
 import io.liveoak.container.subscriptions.SubscriptionManager;
-import io.liveoak.spi.Config;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.ConfigurableResource;
+import io.liveoak.spi.resource.Configurable;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
@@ -40,7 +39,8 @@ import java.util.concurrent.Executors;
  *
  * @author Bob McWhirter
  */
-public class DefaultContainer implements Container, Resource, ConfigurableResource {
+@Configurable
+public class DefaultContainer implements Container, Resource {
 
     /**
      * Construct a self-contained container.
@@ -87,10 +87,10 @@ public class DefaultContainer implements Container, Resource, ConfigurableResour
     public void registerResource(RootResource resource, ResourceState config) throws InitializationException {
         //TODO: Lazy initialization in holder class when resourceRead controller is first accessed
         resource.initialize(new SimpleResourceContext(resource.id(), this.vertx, this));
-        if (resource instanceof ConfigurableResource) {
+        if (resource.getClass().isAnnotationPresent(Configurable.class)) {
             RequestContext requestContext = new RequestContext.Builder().build();
             try {
-                ((ConfigurableResource) resource).configuration().updateProperties(requestContext, config, new RegistrationResponder( resource ));
+                resource.configuration().updateProperties(requestContext, config, new RegistrationResponder( resource ));
             } catch (Exception e) {
                 e.printStackTrace();
             }

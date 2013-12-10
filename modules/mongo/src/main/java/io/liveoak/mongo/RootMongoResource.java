@@ -9,12 +9,9 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
-import io.liveoak.spi.Config;
-import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceContext;
-import io.liveoak.spi.resource.ConfigurableResource;
+import io.liveoak.spi.resource.Configurable;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
@@ -22,7 +19,6 @@ import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
-import java.net.UnknownHostException;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -30,7 +26,8 @@ import java.util.stream.Stream;
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class RootMongoResource extends MongoResource implements RootResource, ConfigurableResource {
+@Configurable
+public class RootMongoResource extends MongoResource implements RootResource {
 
     private MongoClient mongo;
     protected DB db;
