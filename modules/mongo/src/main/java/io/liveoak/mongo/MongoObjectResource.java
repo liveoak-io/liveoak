@@ -5,16 +5,18 @@
  */
 package io.liveoak.mongo;
 
+import java.util.ArrayList;
+import java.util.Set;
+
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
+
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Responder;
-
-import java.util.ArrayList;
-import java.util.Set;
 
 /**
  * @author Bob McWhirter
@@ -30,13 +32,16 @@ public class MongoObjectResource extends MongoResource {
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
-        Object object = this.dbObject.get(id);
+        Object object = getDBObject().get(id);
         if (object != null) {
             if (object instanceof BasicDBObject || object instanceof BasicDBList) {
                 responder.noSuchResource(id);
             } else if (object instanceof DBRef) {
-                //TODO: add in support here for references to other objects
-                responder.internalError("Referenced resources not yet supported");
+                try {
+                    responder.resourceRead(getResource((DBRef) object, ctx.returnFields().child(id).isEmpty()));
+                } catch (ResourceProcessingException e) {
+                    responder.invalidRequest(e.getMessage());
+                }
             } else {
                 responder.internalError("ERROR: Object type (" + object.getClass() + ") not recognized");
             }
@@ -47,17 +52,17 @@ public class MongoObjectResource extends MongoResource {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        Set<String> keys = this.dbObject.keySet();
+        // TODO: only read properties specified in the return fields and not everything
+        Set<String> keys = getDBObject().keySet();
         for (String key : keys) {
             if (!key.equals(MONGO_ID_FIELD) && !key.equals(MBAAS_ID_FIELD)) {
-                Object value = this.dbObject.get(key);
+                Object value = getDBObject().get(key);
                 if (value instanceof BasicDBObject) {
                     value = new MongoEmbeddedObjectResource(this, (DBObject) value);
                 } else if (value instanceof BasicDBList) {
                     value = getResourceCollection(value);
                 } else if (value instanceof DBRef) {
-                    DBRef dbRef = (DBRef)value;
-                    //TODO: handle the DBRef situation
+                    value = getResource((DBRef) value, ctx.returnFields().child(key).isEmpty());
                 }
                 sink.accept(key, value);
             }
@@ -65,7 +70,7 @@ public class MongoObjectResource extends MongoResource {
         sink.close();
     }
 
-    protected Object getResourceCollection(Object object) {
+    protected Object getResourceCollection(Object object) throws Exception {
         if (object instanceof BasicDBObject) {
             return new MongoEmbeddedObjectResource(this, (DBObject) object);
         } else if (object instanceof BasicDBList) {
@@ -76,17 +81,23 @@ public class MongoObjectResource extends MongoResource {
                 list.add(getResourceCollection(child));
             }
             return list;
+        } else if (object instanceof DBRef) {
+            return getResource((DBRef) object, true);
         } else {
             return object;
         }
     }
 
     public String toString() {
-        return "[" + this.getClass() + ": obj=" + this.dbObject + "]";
+        return "[" + this.getClass() + ": obj=" + getDBObject() + "]";
     }
 
     @Override
     public String id() {
-        return getResourceID( this.dbObject );
+        return getResourceID(getDBObject());
+    }
+
+    protected DBObject getDBObject() {
+        return dbObject;
     }
 }

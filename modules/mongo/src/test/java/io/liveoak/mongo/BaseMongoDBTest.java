@@ -6,19 +6,18 @@
 
 package io.liveoak.mongo;
 
+import java.util.UUID;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
-import io.liveoak.container.SimpleConfig;
+
 import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.spi.Config;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
-
-import java.util.UUID;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>

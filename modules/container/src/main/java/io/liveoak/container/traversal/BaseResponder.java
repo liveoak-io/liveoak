@@ -90,6 +90,11 @@ public class BaseResponder implements Responder {
         this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR, cause));
     }
 
+    @Override
+    public void invalidRequest(String message) {
+        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, message));
+    }
+
     private final ResourceRequest inReplyTo;
     private final ChannelHandlerContext ctx;
 }

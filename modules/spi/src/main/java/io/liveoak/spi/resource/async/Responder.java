@@ -95,4 +95,11 @@ public interface Responder {
     void internalError(String message);
 
     void internalError(Throwable cause);
+
+    /**
+     * Indicates the request was invalid in some manner.
+     * This can include things such as missing required parameters, passing parameters in an invalid format, etc.
+     * @param message
+     */
+    void invalidRequest(String message);
 }

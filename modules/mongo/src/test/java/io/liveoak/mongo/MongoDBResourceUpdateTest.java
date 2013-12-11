@@ -1,24 +1,26 @@
 /*
-* Copyright 2013 Red Hat, Inc. and/or its affiliates.
-*
-* Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
-*/
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+ */
 
 package io.liveoak.mongo;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
+import org.bson.types.ObjectId;
+import org.fest.assertions.Fail;
+import org.junit.Test;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+
 import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.spi.CreateNotSupportedException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
-import org.bson.types.ObjectId;
-import org.fest.assertions.Fail;
-import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -52,7 +54,7 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         assertThat(db.getCollection(methodName).getCount()).isEqualTo(1);
         DBObject dbObject = db.getCollection(methodName).findOne();
         assertEquals("baz", dbObject.get("foo"));
-        assertEquals(new ObjectId(id.substring( "_mOI:".length() )), dbObject.get("_id"));
+        assertEquals(new ObjectId(id.substring("_mOI:".length())), dbObject.get("_id"));
     }
 
     @Test
@@ -76,7 +78,7 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
             ResourceState result = connector.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo", resourceState);
             Fail.fail();
         } catch (CreateNotSupportedException e) {
-            //expected
+            // expected
         }
 
         assertThat((DBObject) object).isEqualTo(db.getCollection(methodName).findOne());

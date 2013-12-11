@@ -5,21 +5,25 @@
  */
 package io.liveoak.mongo;
 
+import java.util.UUID;
+import java.util.stream.Stream;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
+
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-
-import java.util.UUID;
-import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
@@ -30,16 +34,11 @@ public class RootMongoResource extends MongoResource implements RootResource {
     private MongoClient mongo;
     protected DB db;
     private String id;
-    private MongoConfigResource configResource;
+    private MongoConfigResource configResource = null;
 
     public RootMongoResource(String id) {
         super(null);
         this.id = id;
-        this.configResource = new MongoConfigResource( this );
-    }
-
-    protected DB getDB() {
-        return this.db;
     }
 
     protected void configure(MongoClient mongo, DB db) {
@@ -47,13 +46,9 @@ public class RootMongoResource extends MongoResource implements RootResource {
         this.mongo = mongo;
         this.db = db;
 
-        if ( oldMongo != null ) {
+        if (oldMongo != null) {
             oldMongo.close();
         }
-    }
-
-    protected MongoClient mongoClient() {
-        return this.mongo;
     }
 
     @Override
@@ -68,6 +63,9 @@ public class RootMongoResource extends MongoResource implements RootResource {
 
     @Override
     public Resource configuration() {
+        if (configResource == null) {
+            this.configResource = new MongoConfigResource(this, mongo, db);
+        }
         return this.configResource;
     }
 
@@ -116,7 +114,7 @@ public class RootMongoResource extends MongoResource implements RootResource {
                 id = UUID.randomUUID().toString();
             }
 
-            DBCollection collection = db.createCollection(id, new BasicDBObject()); //send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
+            DBCollection collection = db.createCollection(id, new BasicDBObject()); // send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
 
             responder.resourceCreated(new MongoCollectionResource(this, collection));
         } else {
@@ -130,4 +128,66 @@ public class RootMongoResource extends MongoResource implements RootResource {
         sink.close();
     }
 
+    @Override
+    protected MongoObjectResource getResource(DBRef dbRef, boolean byReference) throws ResourceProcessingException {
+        if (dbRef != null)
+        {
+            if (dbRef.getDB() == null) {
+                throw new ResourceProcessingException("Invalid Reference. Reference Database is null.");
+            }
+            if (dbRef.getDB().getName() != db.getName()) {
+                throw new ResourceProcessingException("LiveOak only supports MongoResource objects within the same database.");
+            }
+
+            String collectionName = dbRef.getRef();
+            if (!db.collectionExists(collectionName)) {
+                throw new ResourceProcessingException("Cannot find collection specified in a reference. No collection named '" + collectionName + "' found");
+            }
+
+            MongoCollectionResource mongoCollectionResource = new MongoCollectionResource(this, collectionName);
+
+            if (byReference) {
+
+                MongoObjectResource mongoObjectResource = new MongoBaseObjectResource(mongoCollectionResource, dbRef.getId());
+
+                return mongoObjectResource;
+            } else {
+                DBObject referencedObject = dbRef.fetch();
+                if (referencedObject == null) {
+                    throw new ResourceProcessingException("Cannot find referenced resource. No resource in collection '" + collectionName + "' with id '" + dbRef.getId()
+                            + "'");
+                }
+                return new MongoBaseObjectResource(mongoCollectionResource, referencedObject);
+            }
+        } else {
+            throw new ResourceProcessingException("Invalid Reference. Reference cannot be null.");
+        }
+    }
+
+    @Override
+    protected DBRef getDBRef(String uri) throws ResourceProcessingException {
+        if (uri != null) {
+            String rootURI = this.uri().toString();
+            if (uri.startsWith(rootURI + "/")) {
+
+                String resourcePath = uri.substring(rootURI.length());
+                String[] paths = resourcePath.split("/");
+
+                if (paths.length != 3) {
+                    throw new ResourceProcessingException("$DBRefs must be in the format /rootContextPath/collectionName/resourceID");
+                } else {
+                    String collectionName = paths[1];
+                    String resourceID = paths[2];
+                    return new DBRef(this.db, collectionName, resourceID);
+                }
+
+            } else {
+                throw new ResourceProcessingException("$DBRefs are only supported under the same context root. URL specified ('" + uri + "')should start with " + rootURI
+                        + ".");
+            }
+        }
+        else {
+            throw new ResourceProcessingException("$DBRefs must be URL, they cannot be null.");
+        }
+    }
 }

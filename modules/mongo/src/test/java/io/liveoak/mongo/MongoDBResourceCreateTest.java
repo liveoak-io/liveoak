@@ -6,22 +6,24 @@
 
 package io.liveoak.mongo;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import de.flapdoodle.embed.process.collections.Collections;
-import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.state.ResourceState;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Test;
+
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
+import de.flapdoodle.embed.process.collections.Collections;
+import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -38,7 +40,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         state.putProperty("foo", "bar");
         ResourceState result = connector.create(new RequestContext.Builder().build(), BASEPATH + "/" + methodName, state);
 
-        //verify response
+        // verify response
         assertThat(result).isNotNull();
         assertThat(result.id()).isNotNull();
         assertThat(result.getProperty("foo")).isEqualTo("bar");
@@ -61,7 +63,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         state.putProperty("foo", "bar");
         ResourceState result = connector.create(new RequestContext.Builder().build(), BASEPATH + "/" + methodName, state);
 
-        //verify response
+        // verify response
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("helloworld");
         assertThat(result.getProperty("foo")).isEqualTo("bar");
@@ -103,7 +105,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
 
         state.putProperty("arr", arr);
 
-        RequestContext requestContext = new RequestContext.Builder().build();//.returnFields(new ReturnFieldsImpl("*(arr(*(*)))")).build();
+        RequestContext requestContext = new RequestContext.Builder().build();// .returnFields(new ReturnFieldsImpl("*(arr(*(*)))")).build();
         ResourceState result = connector.create(requestContext, BASEPATH + "/" + methodName, state);
 
         // verify the result
@@ -198,7 +200,6 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
 
         assertThat(list.get(2)).isEqualTo("ABC");
 
-
         // verify what is in the database
         DBObject dbObject = db.getCollection(methodName).findOne();
         assertThat(dbObject).isNotNull();
@@ -230,7 +231,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         ResourceState state = new DefaultResourceState("helloworld");
         state.putProperty("foo", "bar");
         state.putProperty("test", 123);
-        Object[] arr = {1, 1, 2, 3, 5, 8, 13, 21};
+        Object[] arr = { 1, 1, 2, 3, 5, 8, 13, 21 };
         state.putProperty("arr", Collections.newArrayList(arr));
         state.putProperty("arr2", arr);
 

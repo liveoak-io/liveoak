@@ -1,8 +1,8 @@
 /*
-* Copyright 2013 Red Hat, Inc. and/or its affiliates.
-*
-* Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
-*/
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+ */
 package io.liveoak.mongo;
 
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.Set;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 

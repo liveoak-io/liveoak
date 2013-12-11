@@ -6,17 +6,19 @@
 
 package io.liveoak.mongo;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import io.liveoak.container.ReturnFieldsImpl;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceNotFoundException;
-import io.liveoak.spi.state.ResourceState;
+import static org.fest.assertions.Assertions.assertThat;
+
 import org.bson.types.ObjectId;
 import org.fest.assertions.Fail;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
+import io.liveoak.container.ReturnFieldsImpl;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceNotFoundException;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -84,10 +86,11 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
 
         // we should not be able to directly delete a child object
         try {
-            ResourceState result = connector.delete(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("bar(ABC(*))")).build(), BASEPATH + "/" + methodName + "/" + id + "/foo");
+            ResourceState result = connector.delete(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("bar(ABC(*))")).build(), BASEPATH + "/" + methodName
+                    + "/" + id + "/foo");
             Fail.fail("We should not be able to directly delete a child object");
         } catch (ResourceNotFoundException e) {
-            //expected
+            // expected
         }
 
         assertThat((DBObject) object).isEqualTo(db.getCollection(methodName).findOne());
@@ -110,7 +113,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
             ResourceState result = connector.delete(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo/bar");
             Fail.fail("We should not be able to directly delete a property on a child object");
         } catch (ResourceNotFoundException e) {
-            //expected
+            // expected
         }
 
         assertThat((DBObject) object).isEqualTo(db.getCollection(methodName).findOne());
@@ -130,10 +133,11 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
 
         // we should not be able to directly delete a child object
         try {
-            ResourceState result = connector.delete(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("bar(ABC(*))")).build(), BASEPATH + "/" + methodName + "/" + id + "/foo");
+            ResourceState result = connector.delete(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("bar(ABC(*))")).build(), BASEPATH + "/" + methodName
+                    + "/" + id + "/foo");
             Fail.fail();
         } catch (ResourceNotFoundException e) {
-            //expected
+            // expected
         }
 
         assertThat((DBObject) object).isEqualTo(db.getCollection(methodName).findOne());

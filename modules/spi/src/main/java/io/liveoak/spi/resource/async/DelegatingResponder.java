@@ -74,5 +74,10 @@ public class DelegatingResponder implements Responder {
         delegate.internalError( cause );
     }
 
+    @Override
+    public void invalidRequest( String message ) {
+        delegate.invalidRequest( message );
+    }
+
     private Responder delegate;
 }

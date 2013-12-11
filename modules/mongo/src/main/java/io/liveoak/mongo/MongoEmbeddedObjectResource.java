@@ -6,16 +6,17 @@
 
 package io.liveoak.mongo;
 
+import java.net.URI;
+import java.util.Set;
+
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-
-import java.net.URI;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
