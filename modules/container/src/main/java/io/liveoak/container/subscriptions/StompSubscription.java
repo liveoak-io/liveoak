@@ -9,6 +9,8 @@ import io.liveoak.container.codec.ResourceCodec;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.container.Subscription;
+import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.stomp.Headers;

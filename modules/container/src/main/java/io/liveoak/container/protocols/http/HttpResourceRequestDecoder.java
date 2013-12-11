@@ -6,13 +6,14 @@
 package io.liveoak.container.protocols.http;
 
 import io.liveoak.container.DefaultResourceParams;
-import io.liveoak.container.ResourceRequest;
+import io.liveoak.container.DefaultResourceRequest;
 import io.liveoak.container.ReturnFieldsImpl;
-import io.liveoak.container.codec.MediaTypeMatcher;
+import io.liveoak.container.codec.DefaultMediaTypeMatcher;
 import io.liveoak.container.codec.ResourceCodecManager;
 import io.liveoak.container.codec.UnsupportedMediaTypeException;
 import io.liveoak.security.impl.AuthConstants;
 import io.liveoak.spi.MediaType;
+import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourceParams;
@@ -85,7 +86,7 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         if (acceptHeader == null) {
             acceptHeader = "application/json";
         }
-        MediaTypeMatcher mediaTypeMatcher = new MediaTypeMatcher(acceptHeader, extension);
+        MediaTypeMatcher mediaTypeMatcher = new DefaultMediaTypeMatcher(acceptHeader, extension);
 
         String authToken = getAuthorizationToken(msg);
 
@@ -94,14 +95,14 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         if (msg.getMethod().equals(HttpMethod.POST)) {
             String contentTypeHeader = msg.headers().get(HttpHeaders.Names.CONTENT_TYPE);
             MediaType contentType = new MediaType(contentTypeHeader);
-            out.add(new ResourceRequest.Builder(RequestType.CREATE, new ResourcePath(path))
+            out.add(new DefaultResourceRequest.Builder(RequestType.CREATE, new ResourcePath(path))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
                     .resourceState(decodeState(contentType, msg.content()))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.GET)) {
-            out.add(new ResourceRequest.Builder(RequestType.READ, new ResourcePath(path))
+            out.add(new DefaultResourceRequest.Builder(RequestType.READ, new ResourcePath(path))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
@@ -112,14 +113,14 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         } else if (msg.getMethod().equals(HttpMethod.PUT)) {
             String contentTypeHeader = msg.headers().get(HttpHeaders.Names.CONTENT_TYPE);
             MediaType contentType = new MediaType(contentTypeHeader);
-            out.add(new ResourceRequest.Builder(RequestType.UPDATE, new ResourcePath(path))
+            out.add(new DefaultResourceRequest.Builder(RequestType.UPDATE, new ResourcePath(path))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)
                     .resourceState(decodeState(contentType, msg.content()))
                     .build());
         } else if (msg.getMethod().equals(HttpMethod.DELETE)) {
-            out.add(new ResourceRequest.Builder(RequestType.DELETE, new ResourcePath(path))
+            out.add(new DefaultResourceRequest.Builder(RequestType.DELETE, new ResourcePath(path))
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .requestAttribute(AuthConstants.ATTR_AUTHORIZATION_TOKEN, authToken)

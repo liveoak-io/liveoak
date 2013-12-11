@@ -6,11 +6,12 @@
 package io.liveoak.container.protocols.http;
 
 
-import io.liveoak.container.ResourceRequest;
+import io.liveoak.container.DefaultResourceRequest;
 import io.liveoak.container.codec.ResourceCodec;
 import io.liveoak.container.codec.ResourceCodecManager;
 import io.liveoak.container.codec.json.JSONDecoder;
 import io.liveoak.container.codec.json.JSONEncoder;
+import io.liveoak.spi.MediaType;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.state.ResourceState;
@@ -36,13 +37,13 @@ public class HttpResourceRequestDecoderTest {
     @Before
     public void setUp() {
         this.codecManager = new ResourceCodecManager();
-        this.codecManager.registerResourceCodec("application/json", new ResourceCodec(null, JSONEncoder.class, new JSONDecoder()));
+        this.codecManager.registerResourceCodec(MediaType.JSON, new ResourceCodec(JSONEncoder.class, new JSONDecoder()));
         this.channel = new EmbeddedChannel(new HttpResourceRequestDecoder(this.codecManager));
     }
 
     @Test
     public void testDecodeGet() throws Exception {
-        ResourceRequest decoded = decode(HttpMethod.GET, "/memory/people/bob");
+        DefaultResourceRequest decoded = decode(HttpMethod.GET, "/memory/people/bob");
 
         assertThat(decoded.requestType()).isEqualTo(RequestType.READ);
 
@@ -62,7 +63,7 @@ public class HttpResourceRequestDecoderTest {
 
     @Test
     public void testDecodeDelete() throws Exception {
-        ResourceRequest decoded = decode(HttpMethod.DELETE, "/memory/people/bob");
+        DefaultResourceRequest decoded = decode(HttpMethod.DELETE, "/memory/people/bob");
 
         assertThat(decoded.requestType()).isEqualTo(RequestType.DELETE);
 
@@ -81,7 +82,7 @@ public class HttpResourceRequestDecoderTest {
 
     @Test
     public void testDecodePost() throws Exception {
-        ResourceRequest decoded = decode(HttpMethod.POST, "/memory/people/bob", "{ name: 'bob' }");
+        DefaultResourceRequest decoded = decode(HttpMethod.POST, "/memory/people/bob", "{ name: 'bob' }");
 
         assertThat(decoded.requestType()).isEqualTo(RequestType.CREATE);
 
@@ -105,7 +106,7 @@ public class HttpResourceRequestDecoderTest {
 
     @Test
     public void testDecodePut() throws Exception {
-        ResourceRequest decoded = decode(HttpMethod.PUT, "/memory/people/bob", "{ name: 'bob' }");
+        DefaultResourceRequest decoded = decode(HttpMethod.PUT, "/memory/people/bob", "{ name: 'bob' }");
 
         assertThat(decoded.requestType()).isEqualTo(RequestType.UPDATE);
 
@@ -127,17 +128,17 @@ public class HttpResourceRequestDecoderTest {
         assertThat(state.getProperty("name")).isEqualTo("bob");
     }
 
-    protected ResourceRequest decode(HttpMethod method, String uri) {
+    protected DefaultResourceRequest decode(HttpMethod method, String uri) {
         FullHttpRequest httpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, "/memory/people/bob");
         channel.writeInbound(httpRequest);
-        return (ResourceRequest) channel.readInbound();
+        return (DefaultResourceRequest) channel.readInbound();
     }
 
-    protected ResourceRequest decode(HttpMethod method, String uri, String body) {
+    protected DefaultResourceRequest decode(HttpMethod method, String uri, String body) {
         FullHttpRequest httpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, "/memory/people/bob");
         httpRequest.headers().add(HttpHeaders.Names.CONTENT_TYPE, "application/json");
         httpRequest.content().writeBytes(body.getBytes());
         channel.writeInbound(httpRequest);
-        return (ResourceRequest) channel.readInbound();
+        return (DefaultResourceRequest) channel.readInbound();
     }
 }

@@ -6,7 +6,9 @@
 package io.liveoak.vertx.modules.resource;
 
 import io.liveoak.container.DefaultContainer;
-import io.liveoak.container.DirectConnector;
+import io.liveoak.container.LiveOakFactory;
+import io.liveoak.container.LiveOakSystem;
+import io.liveoak.spi.container.DirectConnector;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceException;
 import io.liveoak.spi.resource.async.Resource;
@@ -34,23 +36,24 @@ import static org.fest.assertions.Assertions.assertThat;
  */
 public class VertxResourceTest {
 
-    private DefaultContainer container;
-    private ResourceDeployer deployer;
+    private LiveOakSystem system;
     private DirectConnector connector;
+    private ResourceDeployer deployer;
+
     private Map<String, JsonObject> objects = new HashMap<>();
     private CollectionResourceAdapter adapter;
 
 
     @Before
-    public void setUpContainer() throws Exception {
-        this.container = new DefaultContainer();
-        this.connector = this.container.directConnector();
-        this.deployer = new ResourceDeployer(this.container, "test.register");
+    public void setUpSystem() throws Exception {
+        this.system = LiveOakFactory.create();
+        this.connector = this.system.directConnector();
+        this.deployer = new ResourceDeployer(this.system, "test.register");
     }
 
     @Before
     public void setUpResource() throws Exception {
-        this.adapter = new CollectionResourceAdapter(container.vertx(), "people", "test.register");
+        this.adapter = new CollectionResourceAdapter(this.system.vertx(), "people", "test.register");
 
         this.objects.put("bob", new JsonObject().putString("id", "bob").putString("name", "Bob McWhirter"));
         this.objects.put("ben", new JsonObject().putString("id", "ben").putString("name", "Ben Browning"));

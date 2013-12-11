@@ -5,9 +5,11 @@
  */
 package io.liveoak.container.traversal;
 
-import io.liveoak.container.ResourceErrorResponse;
-import io.liveoak.container.ResourceRequest;
-import io.liveoak.container.ResourceResponse;
+import io.liveoak.container.DefaultResourceErrorResponse;
+import io.liveoak.container.DefaultResourceResponse;
+import io.liveoak.spi.ResourceErrorResponse;
+import io.liveoak.spi.ResourceRequest;
+import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,67 +34,67 @@ public class BaseResponder implements Responder {
 
     @Override
     public void resourceRead(Resource resource) {
-        this.ctx.writeAndFlush(new ResourceResponse(this.inReplyTo, ResourceResponse.ResponseType.READ, resource));
+        this.ctx.writeAndFlush(new DefaultResourceResponse(this.inReplyTo, DefaultResourceResponse.ResponseType.READ, resource));
     }
 
     @Override
     public void resourceCreated(Resource resource) {
-        this.ctx.writeAndFlush(new ResourceResponse(this.inReplyTo, ResourceResponse.ResponseType.CREATED, resource));
+        this.ctx.writeAndFlush(new DefaultResourceResponse(this.inReplyTo, DefaultResourceResponse.ResponseType.CREATED, resource));
     }
 
     @Override
     public void resourceDeleted(Resource resource) {
-        this.ctx.writeAndFlush(new ResourceResponse(this.inReplyTo, ResourceResponse.ResponseType.DELETED, resource));
+        this.ctx.writeAndFlush(new DefaultResourceResponse(this.inReplyTo, DefaultResourceResponse.ResponseType.DELETED, resource));
     }
 
     @Override
     public void resourceUpdated(Resource resource) {
-        this.ctx.writeAndFlush(new ResourceResponse(this.inReplyTo, ResourceResponse.ResponseType.UPDATED, resource));
+        this.ctx.writeAndFlush(new DefaultResourceResponse(this.inReplyTo, DefaultResourceResponse.ResponseType.UPDATED, resource));
     }
 
     @Override
     public void createNotSupported(Resource resource) {
-        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.CREATE_NOT_SUPPORTED));
+        this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, DefaultResourceErrorResponse.ErrorType.CREATE_NOT_SUPPORTED));
     }
 
     @Override
     public void readNotSupported(Resource resource) {
-        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.READ_NOT_SUPPORTED));
+        this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, DefaultResourceErrorResponse.ErrorType.READ_NOT_SUPPORTED));
     }
 
     @Override
     public void updateNotSupported(Resource resource) {
-        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.UPDATE_NOT_SUPPORTED));
+        this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, DefaultResourceErrorResponse.ErrorType.UPDATE_NOT_SUPPORTED));
     }
 
     @Override
     public void deleteNotSupported(Resource resource) {
-        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.DELETE_NOT_SUPPORTED));
+        this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, DefaultResourceErrorResponse.ErrorType.DELETE_NOT_SUPPORTED));
     }
 
     @Override
     public void noSuchResource(String id) {
-        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.NO_SUCH_RESOURCE));
+        this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, DefaultResourceErrorResponse.ErrorType.NO_SUCH_RESOURCE));
     }
 
     @Override
     public void resourceAlreadyExists(String id) {
-        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.RESOURCE_ALREADY_EXISTS));
+        this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, DefaultResourceErrorResponse.ErrorType.RESOURCE_ALREADY_EXISTS));
     }
 
     @Override
     public void internalError(String message) {
-        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR, message ));
+        this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, DefaultResourceErrorResponse.ErrorType.INTERNAL_ERROR, message ));
     }
 
     @Override
     public void internalError(Throwable cause) {
-        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR, cause));
+        this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, DefaultResourceErrorResponse.ErrorType.INTERNAL_ERROR, cause));
     }
 
     @Override
     public void invalidRequest(String message) {
-        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, message));
+        this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, message));
     }
 
     private final ResourceRequest inReplyTo;

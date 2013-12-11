@@ -6,8 +6,8 @@
 package io.liveoak.container.auth;
 
 import io.liveoak.container.DefaultRequestContext;
-import io.liveoak.container.ResourceErrorResponse;
-import io.liveoak.container.ResourceRequest;
+import io.liveoak.container.DefaultResourceRequest;
+import io.liveoak.container.DefaultResourceErrorResponse;
 import io.liveoak.security.impl.AuthServicesHolder;
 import io.liveoak.security.impl.DefaultSecurityContext;
 import io.liveoak.security.impl.SimpleLogger;
@@ -26,7 +26,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRequest> {
+public class AuthorizationHandler extends SimpleChannelInboundHandler<DefaultResourceRequest> {
 
     // TODO: replace with real logging
     private static final SimpleLogger log = new SimpleLogger(AuthorizationHandler.class);
@@ -43,7 +43,7 @@ public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRe
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ResourceRequest req) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, DefaultResourceRequest req) throws Exception {
         try {
             AuthToken token;
             AuthorizationService authService = AuthServicesHolder.getInstance().getAuthorizationService();
@@ -75,8 +75,8 @@ public class AuthorizationHandler extends SimpleChannelInboundHandler<ResourceRe
         }
     }
 
-    protected void sendAuthorizationError(ChannelHandlerContext ctx, ResourceRequest req) {
-        ctx.writeAndFlush(new ResourceErrorResponse(req, ResourceErrorResponse.ErrorType.NOT_AUTHORIZED));
+    protected void sendAuthorizationError(ChannelHandlerContext ctx, DefaultResourceRequest req) {
+        ctx.writeAndFlush(new DefaultResourceErrorResponse(req, DefaultResourceErrorResponse.ErrorType.NOT_AUTHORIZED));
     }
 
     protected void establishSecurityContext(AuthToken token, RequestContext reqContext) {

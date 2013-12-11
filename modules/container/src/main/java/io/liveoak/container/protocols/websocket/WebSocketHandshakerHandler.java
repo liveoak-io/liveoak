@@ -5,7 +5,7 @@
  */
 package io.liveoak.container.protocols.websocket;
 
-import io.liveoak.container.PipelineConfigurator;
+import io.liveoak.container.protocols.PipelineConfigurator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

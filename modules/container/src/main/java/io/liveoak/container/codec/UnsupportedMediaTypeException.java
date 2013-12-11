@@ -6,6 +6,7 @@
 package io.liveoak.container.codec;
 
 import io.liveoak.spi.MediaType;
+import io.liveoak.spi.MediaTypeMatcher;
 
 import java.util.List;
 
@@ -14,14 +15,14 @@ import java.util.List;
  */
 public class UnsupportedMediaTypeException extends Exception {
 
-    public UnsupportedMediaTypeException(List<MediaType> mediaTypes) {
-        super("Unsupported media-types: " + mediaTypes);
-        this.mediaTypes = mediaTypes;
+    public UnsupportedMediaTypeException(MediaTypeMatcher matcher) {
+        super("Unsupported media-types: " + matcher);
+        this.matcher = matcher;
     }
 
-    public List<MediaType> mediaTypes() {
-        return this.mediaTypes;
+    public MediaTypeMatcher matcher() {
+        return this.matcher;
     }
 
-    private List<MediaType> mediaTypes;
+    private MediaTypeMatcher matcher;
 }

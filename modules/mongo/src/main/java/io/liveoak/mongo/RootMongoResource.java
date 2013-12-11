@@ -51,6 +51,14 @@ public class RootMongoResource extends MongoResource implements RootResource {
         }
     }
 
+    MongoClient client() {
+        return this.mongo;
+    }
+
+    DB db() {
+        return this.db;
+    }
+
     @Override
     public Resource parent() {
         return null;

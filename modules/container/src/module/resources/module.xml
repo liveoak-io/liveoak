@@ -13,12 +13,13 @@
 
     <dependencies>
         <module name="io.netty"/>
-        <module name="io.vertx"/>
+        <module name="io.vertx" services="import"/>
         <module name="com.fasterxml.jackson.core"/>
         <module name="io.liveoak.stomp"/>
         <module name="io.liveoak.spi"/>
         <module name="io.liveoak.security"/>
         <module name="io.liveoak.security.uripolicy"/>
+        <module name="org.jboss.msc"/>
         <system>
             <paths>
                 <path name="org/jboss/modules"/>

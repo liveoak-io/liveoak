@@ -7,6 +7,7 @@ package io.liveoak.container.codec;
 
 import io.liveoak.container.codec.binary.DefaultBinaryResourceState;
 import io.liveoak.spi.MediaType;
+import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.BinaryContentSink;
 import io.liveoak.spi.resource.async.BinaryResource;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -27,8 +29,8 @@ import java.util.stream.Collectors;
  */
 public class ResourceCodecManager {
 
-    public void registerResourceCodec(String mediaType, ResourceCodec codec) {
-        this.codecs.add(new CodecRegistration(new MediaType(mediaType), codec));
+    public void registerResourceCodec(MediaType mediaType, ResourceCodec codec) {
+        this.codecs.add(new CodecRegistration(mediaType, codec));
     }
 
     public ResourceState decode(MediaType mediaType, ByteBuf buf) throws Exception {
@@ -38,7 +40,7 @@ public class ResourceCodecManager {
 
         ResourceCodec codec = getResourceCodec(mediaType);
         if (codec == null || !codec.hasDecoder()) {
-            throw new UnsupportedMediaTypeException(Collections.singletonList(mediaType));
+            throw new UnsupportedMediaTypeException(MediaTypeMatcher.singleton(mediaType));
         }
         return codec.decode(buf);
     }
@@ -53,7 +55,7 @@ public class ResourceCodecManager {
                 ((BinaryResource) resource).readContent(ctx, new MyBinaryContentSink(future));
                 return new EncodingResult(match, future.get());
             } else {
-                throw new IncompatibleMediaTypeException(mediaTypeMatcher.mediaTypes(), (BinaryResource) resource);
+                throw new IncompatibleMediaTypeException(mediaTypeMatcher, (BinaryResource) resource);
             }
         }
 
@@ -62,7 +64,7 @@ public class ResourceCodecManager {
         }).collect(Collectors.toList()));
 
         if (bestMatch == null) {
-            throw new UnsupportedMediaTypeException(mediaTypeMatcher.mediaTypes());
+            throw new UnsupportedMediaTypeException(mediaTypeMatcher);
         }
 
         ResourceCodec codec = getResourceCodec(bestMatch);
@@ -73,7 +75,7 @@ public class ResourceCodecManager {
         }
 
         if (!codec.hasEncoder()) {
-            throw new UnsupportedMediaTypeException(mediaTypeMatcher.mediaTypes());
+            throw new UnsupportedMediaTypeException(mediaTypeMatcher);
         }
 
         return new EncodingResult(bestMatch, codec.encode(ctx, resource));
@@ -94,7 +96,7 @@ public class ResourceCodecManager {
             return MediaType.JSON;
         }
 
-        MediaTypeMatcher matcher = new MediaTypeMatcher(acceptMediaTypes, extension);
+        MediaTypeMatcher matcher = new DefaultMediaTypeMatcher(acceptMediaTypes, extension);
 
         MediaType match = matcher.findBestMatch(this.codecs.stream().map((e) -> {
             return e.mediaType;
@@ -103,7 +105,7 @@ public class ResourceCodecManager {
         return match;
     }
 
-    private List<CodecRegistration> codecs = new ArrayList<>();
+    private List<CodecRegistration> codecs = new CopyOnWriteArrayList<>();
 
     private static class CodecRegistration {
 

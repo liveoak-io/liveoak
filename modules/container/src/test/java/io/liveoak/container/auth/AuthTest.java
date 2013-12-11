@@ -7,9 +7,12 @@ package io.liveoak.container.auth;
 
 import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.InMemoryDBResource;
-import io.liveoak.container.SimpleConfig;
-import io.liveoak.container.UnsecureServer;
+import io.liveoak.container.LiveOakFactory;
+import io.liveoak.container.LiveOakSystem;
+import io.liveoak.container.server.UnsecureServer;
 import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.spi.Container;
+import io.liveoak.spi.container.Server;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -36,17 +39,17 @@ import static org.junit.Assert.assertEquals;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AuthTest {
 
-    private static DefaultContainer container;
+    private static LiveOakSystem system;
+    private static Container container;
     private static CloseableHttpClient httpClient;
-    private static UnsecureServer server;
+    private static Server server;
 
     @BeforeClass
     public static void before() throws Exception {
-        container = new DefaultContainer();
+        system = LiveOakFactory.create();
+        container = system.container();
 
-        server = new UnsecureServer(container, InetAddress.getByName("localhost"), 8080);
-        server.start();
-
+        server = system.server( "unsecure" );
         httpClient = HttpClientBuilder.create().build();
     }
 
@@ -55,7 +58,7 @@ public class AuthTest {
         try {
             httpClient.close();
         } finally {
-            server.stop();
+            system.stop();
             System.err.flush();
         }
     }
@@ -64,7 +67,7 @@ public class AuthTest {
     public void beforeTest() throws Exception {
         // Always re-register resource again to ensure clean state
         InMemoryDBResource resource = new InMemoryDBResource("authTest");
-        container.registerResource(resource, new DefaultResourceState() );
+        container.registerResource(resource);
     }
 
     @Test

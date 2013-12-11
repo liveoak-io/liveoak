@@ -30,7 +30,4 @@ public interface ResourceContext {
     Container container();
 
     Notifier notifier();
-
-    String id();
-
 }

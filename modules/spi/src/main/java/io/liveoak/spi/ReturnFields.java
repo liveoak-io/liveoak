@@ -78,6 +78,34 @@ public interface ReturnFields extends Iterable<String> {
         }
     };
 
+    public static ReturnFields ALL_RECURSIVELY = new ReturnFields() {
+        @Override
+        public ReturnFields child(String field) {
+            return this;
+        }
+
+        @Override
+        public boolean included(String... pathSegments) {
+            return true;
+        }
+
+        @Override
+        public Iterator<String> iterator() {
+            List<String> emptyList = Collections.emptyList();
+            return emptyList.iterator();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public boolean isAll() {
+            return true;
+        }
+    };
+
 
     /**
      * Get ReturnFields for a child field of JSONObject type.

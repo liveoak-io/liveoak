@@ -61,9 +61,9 @@ public class MongoConfigResource implements ConfigResource {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("host", mongoClient.getAddress().getHost());
-        sink.accept("port", mongoClient.getAddress().getPort());
-        sink.accept("db", database.getName());
+        sink.accept("host", parent.client().getAddress().getHost());
+        sink.accept("port", parent.client().getAddress().getPort());
+        sink.accept("db", parent.db().getName());
         sink.close();
     }
 }

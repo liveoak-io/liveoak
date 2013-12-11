@@ -5,13 +5,15 @@
  */
 package io.liveoak.container.protocols.http;
 
-import io.liveoak.container.ResourceErrorResponse;
-import io.liveoak.container.ResourceResponse;
+import io.liveoak.container.DefaultResourceResponse;
+import io.liveoak.container.DefaultResourceErrorResponse;
+import io.liveoak.container.codec.DefaultMediaTypeMatcher;
 import io.liveoak.container.codec.EncodingResult;
 import io.liveoak.container.codec.IncompatibleMediaTypeException;
-import io.liveoak.container.codec.MediaTypeMatcher;
 import io.liveoak.container.codec.ResourceCodecManager;
+import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.resource.async.Resource;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -26,14 +28,14 @@ import java.util.List;
 /**
  * @author Bob McWhirter
  */
-public class HttpResourceResponseEncoder extends MessageToMessageEncoder<ResourceResponse> {
+public class HttpResourceResponseEncoder extends MessageToMessageEncoder<DefaultResourceResponse> {
 
     public HttpResourceResponseEncoder(ResourceCodecManager codecManager) {
         this.codecManager = codecManager;
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ResourceResponse msg, List<Object> out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, DefaultResourceResponse msg, List<Object> out) throws Exception {
 
         int responseStatusCode = 0;
         String responseMessage = null;
@@ -62,7 +64,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
                 break;
             case ERROR:
                 if (msg instanceof ResourceErrorResponse) {
-                    switch (((ResourceErrorResponse) msg).errorType()) {
+                    switch (((DefaultResourceErrorResponse) msg).errorType()) {
                         case NOT_AUTHORIZED:
                             responseStatusCode = HttpResponseStatus.FORBIDDEN.code();
                             responseMessage = HttpResponseStatus.FORBIDDEN.reasonPhrase();

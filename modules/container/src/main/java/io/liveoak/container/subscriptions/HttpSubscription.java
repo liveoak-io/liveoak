@@ -3,6 +3,7 @@ package io.liveoak.container.subscriptions;
 import io.liveoak.container.codec.ResourceCodec;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.container.Subscription;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -19,7 +20,7 @@ import java.util.UUID;
  */
 public class HttpSubscription implements Subscription {
 
-    public HttpSubscription(SubscriptionManager subscriptionManager, HttpClient httpClient, String path, URI destination, ResourceCodec codec) {
+    public HttpSubscription(DefaultSubscriptionManager subscriptionManager, HttpClient httpClient, String path, URI destination, ResourceCodec codec) {
         this.subscriptionManager = subscriptionManager;
         this.id = UUID.randomUUID().toString();
         this.httpClient = httpClient;
@@ -101,7 +102,7 @@ public class HttpSubscription implements Subscription {
         return uri;
     }
 
-    private SubscriptionManager subscriptionManager;
+    private DefaultSubscriptionManager subscriptionManager;
     private String id;
     private HttpClient httpClient;
     private ResourcePath resourcePath;

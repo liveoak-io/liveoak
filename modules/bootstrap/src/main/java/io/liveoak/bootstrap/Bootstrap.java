@@ -5,12 +5,10 @@
  */
 package io.liveoak.bootstrap;
 
-import io.liveoak.bootstrap.deployer.ConfigDeployer;
-import io.liveoak.container.DefaultContainer;
-import io.liveoak.container.SimpleConfig;
-import io.liveoak.container.UnsecureServer;
-import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.container.resource.ContainerResource;
+import java.io.File;
+
+import io.liveoak.container.LiveOakFactory;
+import io.liveoak.container.LiveOakSystem;
 
 /**
  * Bootstrapping <code>main()</code> method.
@@ -18,21 +16,15 @@ import io.liveoak.container.resource.ContainerResource;
  * @author Bob McWhirter
  */
 public class Bootstrap {
-
     public static void main(String... args) throws Exception {
+        System.err.println("LiveOak BaaS");
 
-        System.err.println("Booting up the mBaaS");
+        File configDir = null;
 
-        DefaultContainer container = new DefaultContainer();
-        UnsecureServer server = new UnsecureServer(container, "localhost", 8080);
-
-        container.registerResource(new ContainerResource("_container"), new DefaultResourceState());
-
-        if (args.length > 0) {
-            ConfigDeployer deployer = new ConfigDeployer(container);
-            deployer.deploy(args[0]);
+        if ( args.length == 1 ) {
+            configDir = new File( args[0] );
         }
 
-        server.start();
+        LiveOakSystem system = LiveOakFactory.create( configDir );
     }
 }

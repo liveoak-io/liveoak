@@ -23,6 +23,7 @@
         <vertx.testtools.version>2.0.1-final</vertx.testtools.version>
         <netty.version>4.0.2.Final</netty.version>
         <jboss.modules.version>1.3.0.Beta2</jboss.modules.version>
+        <jboss.msc.version>1.2.0.CR1</jboss.msc.version>
         <jboss.logging.version>3.1.1.GA</jboss.logging.version>
         <jackson.version>2.2.2</jackson.version>
         <mongo.version>2.11.3</mongo.version>
@@ -129,6 +130,11 @@
                 <groupId>org.jboss.modules</groupId>
                 <artifactId>jboss-modules</artifactId>
                 <version>${jboss.modules.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.msc</groupId>
+                <artifactId>jboss-msc</artifactId>
+                <version>${jboss.msc.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>

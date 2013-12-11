@@ -5,33 +5,21 @@
  */
 package io.liveoak.container;
 
-import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.container.codec.ResourceCodec;
-import io.liveoak.container.codec.ResourceCodecManager;
-import io.liveoak.container.codec.html.HTMLEncoder;
-import io.liveoak.container.codec.json.JSONDecoder;
-import io.liveoak.container.codec.json.JSONEncoder;
-import io.liveoak.container.deploy.ClasspathDeployer;
-import io.liveoak.container.deploy.Deployer;
-import io.liveoak.container.deploy.JBossModulesDeployer;
+import java.util.HashMap;
+import java.util.Map;
+
+import io.liveoak.container.deploy.DeploymentException;
+import io.liveoak.container.deploy.DirectoryDeploymentManager;
 import io.liveoak.container.resource.ContainerConfigurationResource;
-import io.liveoak.container.subscriptions.SubscriptionManager;
 import io.liveoak.spi.Container;
-import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.container.Deployer;
 import io.liveoak.spi.resource.Configurable;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.platform.PlatformLocator;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 
 /**
@@ -48,81 +36,44 @@ public class DefaultContainer implements Container, Resource {
      * The container will instantiate its own Vertx platform.
      */
     public DefaultContainer() {
-        this(PlatformLocator.factory.createPlatformManager().vertx());
     }
 
+    public void deployer(Deployer deployer) {
+        this.deployer = deployer;
+    }
 
-    /**
-     * Construct a container around an existing vertx.
-     *
-     * @param vertx
-     */
-    public DefaultContainer(Vertx vertx) {
-        this.codecManager.registerResourceCodec("application/json", new ResourceCodec(this, JSONEncoder.class, new JSONDecoder()));
-        this.codecManager.registerResourceCodec("text/html", new ResourceCodec(this, HTMLEncoder.class, null));
+    public Deployer deployer() {
+        return this.deployer;
+    }
 
-        this.vertx = vertx;
-        this.workerPool = Executors.newCachedThreadPool();
+    public void deploymentManager(DirectoryDeploymentManager deploymentManager) {
+        this.deploymentManager = deploymentManager;
+    }
 
-        this.subscriptionManager = new SubscriptionManager("subscriptions", this.codecManager);
-        try {
-            registerResource(this.subscriptionManager, new DefaultResourceState());
-        } catch (InitializationException e) {
-            // ignore
-        }
+    public DirectoryDeploymentManager deploymentManager() {
+        return this.deploymentManager;
+    }
 
-        this.deployers.put("classpath", new ClasspathDeployer(this));
-        this.deployers.put("jboss-module", new JBossModulesDeployer(this));
+    @Override
+    public void start() {
     }
 
     @Override
     public void shutdown() {
-        this.resources.values().forEach((res) -> {
-            res.destroy();
-        });
 
-        this.resources.clear();
     }
 
-    public void registerResource(RootResource resource, ResourceState config) throws InitializationException {
-        //TODO: Lazy initialization in holder class when resourceRead controller is first accessed
-        resource.initialize(new SimpleResourceContext(resource.id(), this.vertx, this));
-        Resource configResource = resource.configuration();
-        if (configResource != null) {
-            RequestContext requestContext = new RequestContext.Builder().build();
-            try {
-                configResource.updateProperties(requestContext, config, new RegistrationResponder( resource ));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            this.resources.put(resource.id(), resource);
-        }
+
+    // ----------------------------------------
+    // ----------------------------------------
+
+    public void registerResource(RootResource resource) {
+        this.resources.put(resource.id(), resource);
     }
 
     public void unregisterResource(RootResource resource) {
         this.resources.remove(resource.id());
         resource.destroy();
-    }
-
-    public ResourceCodecManager getCodecManager() {
-        return this.codecManager;
-    }
-
-    public Vertx vertx() {
-        return this.vertx;
-    }
-
-    SubscriptionManager getSubscriptionManager() {
-        return this.subscriptionManager;
-    }
-
-    Executor workerPool() {
-        return this.workerPool;
-    }
-
-    public DirectConnector directConnector() {
-        return new DirectConnector(this);
     }
 
     // ----------------------------------------
@@ -159,19 +110,24 @@ public class DefaultContainer implements Container, Resource {
             return;
         }
 
-        String type = (String) state.getProperty("type");
-
-        Deployer deployer = this.deployers.get(type);
-
-        if (deployer == null) {
-            responder.internalError("unknown type: " + type);
-            return;
+        try {
+            this.deployer.deploy(state.id(), state, (result) -> {
+                if (result.cause() != null) {
+                    responder.internalError(result.cause());
+                } else {
+                    if (this.deploymentManager != null) {
+                        try {
+                            this.deploymentManager.addConfiguration(state.id(), state);
+                        } catch (Exception e) {
+                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        }
+                    }
+                    responder.resourceCreated(result.rootResource());
+                }
+            });
+        } catch (DeploymentException e) {
+            responder.internalError(e);
         }
-
-        System.err.println("deploy: " + type + " // " + state);
-        RootResource deployed = deployer.deploy(state);
-        responder.resourceCreated(deployed);
-
 
     }
 
@@ -191,80 +147,11 @@ public class DefaultContainer implements Container, Resource {
     }
 
     private String prefix = "";
-    private Map<String, RootResource> resources = new HashMap<>();
-    private ResourceCodecManager codecManager = new ResourceCodecManager();
-    private Vertx vertx;
-    private SubscriptionManager subscriptionManager;
-    private Executor workerPool;
-    private Map<String, Deployer> deployers = new HashMap<>();
-
     private Resource configuration = new ContainerConfigurationResource(this);
+    private Map<String, RootResource> resources = new HashMap<>();
 
-    // ----------------------------------------------------------------------
-
-    private class RegistrationResponder implements Responder {
-
-        private final RootResource rootResource;
-
-        public RegistrationResponder(RootResource rootResource) {
-            this.rootResource = rootResource;
-        }
-
-        public void resourceRead(Resource resource) {
-        }
-
-        public void resourceCreated(Resource resource) {
-        }
-
-        public void resourceDeleted(Resource resource) {
-        }
-
-        @Override
-        public void resourceUpdated(Resource resource) {
-            DefaultContainer.this.resources.put(this.rootResource.id(), (RootResource) this.rootResource);
-        }
-
-        @Override
-        public void createNotSupported(Resource resource) {
-        }
-
-        @Override
-        public void readNotSupported(Resource resource) {
-        }
-
-        @Override
-        public void updateNotSupported(Resource resource) {
-            // TODO complain loudly since it's not configurable
-        }
-
-        @Override
-        public void deleteNotSupported(Resource resource) {
-        }
-
-        @Override
-        public void noSuchResource(String id) {
-        }
-
-        @Override
-        public void resourceAlreadyExists(String id) {
-        }
-
-        @Override
-        public void internalError(String message) {
-            // TODO complain loudly
-        }
-
-        @Override
-        public void internalError(Throwable cause) {
-            // TODO complain loudly
-        }
-
-        @Override
-        public void invalidRequest( String message ) {
-            // TODO: complain back to the client
-        }
-    }
-
+    private Deployer deployer;
+    private DirectoryDeploymentManager deploymentManager;
 }
 
 

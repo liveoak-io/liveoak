@@ -6,6 +6,7 @@
 package io.liveoak.container.codec;
 
 import io.liveoak.spi.MediaType;
+import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.resource.async.BinaryResource;
 
 import java.util.List;
@@ -15,20 +16,20 @@ import java.util.List;
  */
 public class IncompatibleMediaTypeException extends Exception {
 
-    public IncompatibleMediaTypeException(List<MediaType> requestedTypes, BinaryResource resource) {
-        super("Resource type '" + resource.mediaType() + "' is not compatible with requested types: " + requestedTypes);
-        this.requestedTypes = requestedTypes;
+    public IncompatibleMediaTypeException(MediaTypeMatcher matcher, BinaryResource resource) {
+        super("Resource type '" + resource.mediaType() + "' is not compatible with requested types: " + matcher);
+        this.matcher = matcher;
         this.resource = resource;
     }
 
-    public List<MediaType> requestedMediaTypes() {
-        return this.requestedTypes;
+    public MediaTypeMatcher matcher() {
+        return this.matcher;
     }
 
     public BinaryResource resource() {
         return this.resource;
     }
 
-    private List<MediaType> requestedTypes;
+    private MediaTypeMatcher matcher;
     private BinaryResource resource;
 }

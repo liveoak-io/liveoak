@@ -1,6 +1,7 @@
 package io.liveoak.container;
 
-import io.liveoak.container.subscriptions.SubscriptionManager;
+import io.liveoak.container.subscriptions.DefaultSubscriptionManager;
+import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.spi.resource.async.Notifier;
 import io.liveoak.spi.resource.async.Resource;
 

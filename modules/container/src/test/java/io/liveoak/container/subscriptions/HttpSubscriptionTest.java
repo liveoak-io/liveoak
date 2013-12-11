@@ -2,9 +2,12 @@ package io.liveoak.container.subscriptions;
 
 import io.liveoak.container.*;
 import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.container.server.UnsecureServer;
+import io.liveoak.spi.Container;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceException;
 import io.liveoak.spi.ResourceNotFoundException;
+import io.liveoak.spi.container.DirectConnector;
+import io.liveoak.spi.container.Server;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.After;
 import org.junit.Before;
@@ -18,28 +21,25 @@ import static org.junit.Assert.*;
  */
 public class HttpSubscriptionTest {
 
-    protected DefaultContainer container;
-    protected UnsecureServer server;
+    protected LiveOakSystem system;
     protected DirectConnector connector;
 
     @Before
     public void setUp() throws Exception {
+        this.system = LiveOakFactory.create();
 
-        this.container = new DefaultContainer();
         InMemoryDBResource resource = new InMemoryDBResource("memory");
         resource.addMember(new InMemoryCollectionResource(resource, "data"));
         resource.addMember(new InMemoryCollectionResource(resource, "notifications"));
-        this.container.registerResource(resource, new DefaultResourceState() );
 
-        this.server = new UnsecureServer(this.container, "localhost", 8080);
-        this.server.start();
+        this.system.directDeployer().deploy( resource );
 
-        this.connector = this.container.directConnector();
+        this.connector = this.system.directConnector();
     }
 
     @After
     public void tearDown() throws Exception {
-        this.server.stop();
+        this.system.stop();
     }
 
     @Test
@@ -113,7 +113,7 @@ public class HttpSubscriptionTest {
         String kenId = createdKen.id();
         assertThat(kenId).isNotEmpty();
 
-        Thread.sleep(1000);
+        Thread.sleep(2000);
 
         try {
             this.connector.read(requestContext, "/memory/notifications/" + kenId);

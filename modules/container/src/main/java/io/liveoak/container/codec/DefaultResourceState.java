@@ -10,6 +10,7 @@ import io.liveoak.spi.state.ResourceState;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,7 +84,7 @@ public class DefaultResourceState implements ResourceState {
 
     private String id;
     private URI uri;
-    private Map<String, Object> properties = new HashMap<>();
+    private Map<String, Object> properties = new LinkedHashMap<>();
     private List<ResourceState> members = new ArrayList<>();
 
 }

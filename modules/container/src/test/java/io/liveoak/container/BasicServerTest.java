@@ -6,8 +6,10 @@
 package io.liveoak.container;
 
 import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.container.subscriptions.Subscription;
+import io.liveoak.container.server.UnsecureServer;
+import io.liveoak.spi.Container;
 import io.liveoak.spi.MediaType;
+import io.liveoak.spi.container.Server;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.stomp.StompMessage;
 import io.liveoak.stomp.client.StompClient;
@@ -38,19 +40,20 @@ import static org.fest.assertions.Assertions.assertThat;
 
 public class BasicServerTest {
 
-    private DefaultContainer container;
-    private UnsecureServer server;
+    private LiveOakSystem system;
+    private Container container;
+    private Server server;
 
     protected CloseableHttpClient httpClient;
 
     @Before
     public void setUpServer() throws Exception {
-        this.container = new DefaultContainer();
+        this.system = LiveOakFactory.create();
+        this.container = this.system.container();
         InMemoryDBResource resource = new InMemoryDBResource("memory");
-        this.container.registerResource(resource, new DefaultResourceState() );
+        this.container.registerResource(resource );
 
-        this.server = new UnsecureServer(this.container, InetAddress.getByName("localhost"), 8080);
-        this.server.start();
+        this.server = this.system.server( "unsecure" );
     }
 
     @Before
@@ -65,7 +68,7 @@ public class BasicServerTest {
 
     @After
     public void tearDownServer() throws Exception {
-        this.server.stop();
+        this.system.stop();
         System.err.flush();
     }
 
@@ -78,14 +81,14 @@ public class BasicServerTest {
         System.err.println("===================");
         System.err.println(buffer.toString(Charset.defaultCharset()));
         System.err.println("===================");
-        return this.container.getCodecManager().decode(MediaType.JSON, buffer);
+        return this.system.codecManager().decode(MediaType.JSON, buffer);
     }
 
     protected ResourceState decode(ByteBuf buffer) throws Exception {
         System.err.println("===================");
         System.err.println(buffer.toString(Charset.defaultCharset()));
         System.err.println("===================");
-        return this.container.getCodecManager().decode(MediaType.JSON, buffer);
+        return this.system.codecManager().decode(MediaType.JSON, buffer);
     }
 
     @Test

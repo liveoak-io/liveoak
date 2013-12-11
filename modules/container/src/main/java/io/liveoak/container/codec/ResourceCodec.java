@@ -22,8 +22,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public class ResourceCodec {
 
-    public ResourceCodec(DefaultContainer container, Class<? extends Encoder> encoderClass, ResourceDecoder decoder) {
-        this.container = container;
+    public ResourceCodec(Class<? extends Encoder> encoderClass, ResourceDecoder decoder) {
         this.encoderClass = encoderClass;
         this.decoder = decoder;
     }
@@ -58,7 +57,6 @@ public class ResourceCodec {
     }
 
 
-    private final DefaultContainer container;
     private final Class<? extends Encoder> encoderClass;
     private final ResourceDecoder decoder;
 

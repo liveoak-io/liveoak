@@ -21,7 +21,7 @@ public class ResourceCodecManagerTest {
     @Test(expected = UnsupportedMediaTypeException.class)
     public void nullDecoderTest() throws Exception {
         ResourceCodecManager manager = new ResourceCodecManager();
-        manager.registerResourceCodec("text/html", new ResourceCodec(null, HTMLEncoder.class, null));
+        manager.registerResourceCodec(MediaType.HTML, new ResourceCodec(HTMLEncoder.class, null));
 
         MediaType contentType = new MediaType("text/html");
         ByteBuf buffer = Unpooled.copiedBuffer("<html></html>".getBytes());
@@ -31,9 +31,9 @@ public class ResourceCodecManagerTest {
     @Test(expected = UnsupportedMediaTypeException.class)
     public void nullEncoderTest() throws Exception {
         ResourceCodecManager manager = new ResourceCodecManager();
-        manager.registerResourceCodec("application/json", new ResourceCodec(null, null, new JSONDecoder()));
+        manager.registerResourceCodec(MediaType.JSON, new ResourceCodec(null, new JSONDecoder()));
 
-        MediaTypeMatcher mediaTypeMatcher = new MediaTypeMatcher("application/json", "json");
+        DefaultMediaTypeMatcher mediaTypeMatcher = new DefaultMediaTypeMatcher("application/json", "json");
         DefaultResourceState state = new DefaultResourceState();
         InMemoryObjectResource resource = new InMemoryObjectResource(null, "gary", state);
 

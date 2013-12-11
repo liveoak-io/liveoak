@@ -1,9 +1,12 @@
 package io.liveoak.container;
 
 import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.spi.Container;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
+import io.liveoak.spi.container.DirectConnector;
 import io.liveoak.spi.state.ResourceState;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,13 +18,20 @@ import static org.junit.Assert.*;
  */
 public class DeployerTest {
 
-    private DefaultContainer container;
+    private LiveOakSystem system;
+    private Container container;
     private DirectConnector connector;
 
     @Before
     public void setUp() throws Exception {
-        this.container = new DefaultContainer();
-        this.connector = new DirectConnector(this.container);
+        this.system = LiveOakFactory.create();
+        this.container = this.system.container();
+        this.connector = this.system.directConnector();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        this.system.stop();
     }
 
     @Test

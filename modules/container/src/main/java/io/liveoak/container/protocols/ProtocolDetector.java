@@ -5,7 +5,6 @@
  */
 package io.liveoak.container.protocols;
 
-import io.liveoak.container.PipelineConfigurator;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;

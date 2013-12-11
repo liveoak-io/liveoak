@@ -5,7 +5,7 @@
  */
 package io.liveoak.container.protocols.http;
 
-import io.liveoak.container.ResourceRequest;
+import io.liveoak.container.DefaultResourceRequest;
 import io.liveoak.container.codec.ResourceCodecManager;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.state.BinaryResourceState;
@@ -38,7 +38,7 @@ public class HttpBinaryResourceRequestDecoderTest {
 
     @Test
     public void testDecodePost() throws Exception {
-        ResourceRequest decoded = decode(HttpMethod.POST, "/memory/data", "Some text to be saved!");
+        DefaultResourceRequest decoded = decode(HttpMethod.POST, "/memory/data", "Some text to be saved!");
 
         assertThat(decoded.requestType()).isEqualTo(RequestType.CREATE);
 
@@ -56,7 +56,7 @@ public class HttpBinaryResourceRequestDecoderTest {
 
     @Test
     public void testDecodePut() throws Exception {
-        ResourceRequest decoded = decode(HttpMethod.PUT, "/memory/data/file", "Some updated text to be saved!");
+        DefaultResourceRequest decoded = decode(HttpMethod.PUT, "/memory/data/file", "Some updated text to be saved!");
 
         assertThat(decoded.requestType()).isEqualTo(RequestType.UPDATE);
 
@@ -73,11 +73,11 @@ public class HttpBinaryResourceRequestDecoderTest {
         assertThat(state.getBuffer().toString(Charset.defaultCharset())).isEqualTo("Some updated text to be saved!");
     }
 
-    protected ResourceRequest decode(HttpMethod method, String uri, String body) {
+    protected DefaultResourceRequest decode(HttpMethod method, String uri, String body) {
         FullHttpRequest httpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, method, uri);
         httpRequest.headers().add(HttpHeaders.Names.CONTENT_TYPE, "application/octet-stream");
         httpRequest.content().writeBytes(body.getBytes());
         channel.writeInbound(httpRequest);
-        return (ResourceRequest) channel.readInbound();
+        return (DefaultResourceRequest) channel.readInbound();
     }
 }

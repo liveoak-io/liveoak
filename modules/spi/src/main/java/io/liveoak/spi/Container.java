@@ -5,7 +5,14 @@
  */
 package io.liveoak.spi;
 
-public interface Container {
+import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 
+public interface Container extends Resource {
+
+    void registerResource(RootResource resource);
+    void unregisterResource(RootResource resource);
+
+    void start();
     void shutdown();
 }

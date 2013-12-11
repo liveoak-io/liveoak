@@ -6,10 +6,11 @@
 package io.liveoak.testtools;
 
 import io.liveoak.container.DefaultContainer;
-import io.liveoak.container.DirectConnector;
-import io.liveoak.container.SimpleConfig;
+import io.liveoak.container.LiveOakFactory;
+import io.liveoak.container.LiveOakSystem;
+import io.liveoak.spi.Container;
+import io.liveoak.spi.container.DirectConnector;
 import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.spi.Config;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.After;
@@ -22,7 +23,8 @@ import org.vertx.java.core.Vertx;
  */
 public abstract class AbstractResourceTestCase extends AbstractTestCase {
 
-    private DefaultContainer container;
+    private LiveOakSystem system;
+
     protected DirectConnector connector;
     protected RootResource resource;
     protected Vertx vertx;
@@ -35,18 +37,17 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
     }
 
     @Before
-    public void setUpContainer() throws Exception {
-        this.container = new DefaultContainer();
+    public void setUpSystem() throws Exception {
+        this.system = LiveOakFactory.create();
         this.resource = createRootResource();
-        this.container.registerResource(this.resource, createConfig());
-        this.connector = this.container.directConnector();
-        this.vertx = this.container.vertx();
+        this.system.directDeployer().deploy(this.resource, createConfig());
+        this.connector = this.system.directConnector();
+        this.vertx = this.system.vertx();
     }
 
     @After
-    public void shutdownContainer() throws Exception {
-        this.vertx.stop();
-        this.container.shutdown();
+    public void tearDownSystem() throws Exception {
+        this.system.stop();
     }
 
 }

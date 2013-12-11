@@ -5,11 +5,16 @@ import java.net.URL;
 
 import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.container.resource.ContainerConfigurationResource;
+import io.liveoak.spi.Container;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.container.DirectConnector;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -17,6 +22,9 @@ import static org.fest.assertions.Assertions.assertThat;
  * @author Bob McWhirter
  */
 public class ConfigurationResourceTest {
+
+    private LiveOakSystem system;
+    private DirectConnector connector;
 
     private static final String CONFIG_PARAM = ";config";
     private static final String ROOT_WITH_CONFIG = "/" + CONFIG_PARAM;
@@ -27,8 +35,6 @@ public class ConfigurationResourceTest {
     private static final String RESOURCE = "memory";
     private static final String RESOURCE_WITH_CONFIG = "/" + RESOURCE + CONFIG_PARAM;
 
-    private DefaultContainer container;
-    private DirectConnector connector;
 
     private File projectRoot;
 
@@ -55,14 +61,18 @@ public class ConfigurationResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        this.container = new DefaultContainer();
+        this.system = LiveOakFactory.create(new File(this.projectRoot, "target/etc"));
+        this.connector = this.system.directConnector();
         InMemoryConfigResource resource = new InMemoryConfigResource(RESOURCE);
         DefaultResourceState state = new DefaultResourceState();
         state.putProperty(FIRST_KEY, FIRST_VALUE);
         state.putProperty(SECOND_KEY, SECOND_VALUE);
-        this.container.registerResource(resource, state);
+        this.system.directDeployer().deploy(resource, state);
+    }
 
-        this.connector = this.container.directConnector();
+    @After
+    public void tearDown() {
+        this.system.stop();
     }
 
     @Test
@@ -111,7 +121,12 @@ public class ConfigurationResourceTest {
         InMemoryConfigResource resource = new InMemoryConfigResource(RESOURCE + 3);
         DefaultResourceState state = new DefaultResourceState();
         state.putProperty(SECOND_KEY, SECOND_VALUE);
-        this.container.registerResource(resource, state);
+        try {
+            this.system.directDeployer().deploy(resource, state);
+            fail("Should throw due to missing config for 'path1'");
+        } catch (Exception e) {
+            // expected and correct
+        }
     }
 
     @Test
@@ -119,7 +134,7 @@ public class ConfigurationResourceTest {
         InMemoryConfigResourceWithConverter resource = new InMemoryConfigResourceWithConverter(RESOURCE + 5);
         DefaultResourceState state = new DefaultResourceState();
         state.putProperty("file", this.projectRoot.getAbsolutePath());
-        this.container.registerResource(resource, state);
+        this.system.directDeployer().deploy(resource, state);
 
         RequestContext context = new RequestContext.Builder().build();
 

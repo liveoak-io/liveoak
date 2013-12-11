@@ -18,4 +18,4 @@ java $JAVA_OPTS \
   $M2_REPO_CLAUSE \
   -jar $jboss_modules_jar \
   -modulepath $modulepath \
-  io.liveoak.bootstrap:main $etcdir/liveoak-config.json $*
+  io.liveoak.bootstrap:main $etcdir $*

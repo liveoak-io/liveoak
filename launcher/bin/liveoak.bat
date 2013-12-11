@@ -49,7 +49,7 @@ set JAVA_OPTS=%JAVA_OPTS%
  %M2_REPO_CLAUSE% ^
     -jar "%JBOSS_MODULES_JAR%" ^
     -modulepath "%MODULEPATH%" ^
-     io.liveoak.bootstrap:main "%ETCDIR%\liveoak-config.json" ^
+     io.liveoak.bootstrap:main "%ETCDIR%" ^
      %*
 
 if ERRORLEVEL 10 goto RESTART

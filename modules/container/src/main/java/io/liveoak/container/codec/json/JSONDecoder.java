@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.container.codec.ResourceDecoder;
+import io.liveoak.container.util.StringPropertyReplacer;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -24,6 +25,10 @@ import java.util.Collection;
 public class JSONDecoder implements ResourceDecoder {
 
     public JSONDecoder() {
+    }
+
+    public JSONDecoder(boolean replaceProperties) {
+        this.replaceProperties = replaceProperties;
     }
 
     @Override
@@ -61,6 +66,9 @@ public class JSONDecoder implements ResourceDecoder {
 
         if (token == JsonToken.VALUE_STRING) {
             value = parser.getValueAsString();
+            if ( this.replaceProperties) {
+                value = StringPropertyReplacer.replaceProperties(value.toString(), System.getProperties());
+            }
             parser.nextToken();
             return value;
         }
@@ -145,4 +153,6 @@ public class JSONDecoder implements ResourceDecoder {
             state.id(value.toString());
         }
     }
+
+    private boolean replaceProperties = false;
 }

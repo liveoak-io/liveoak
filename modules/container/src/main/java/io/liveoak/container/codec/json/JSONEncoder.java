@@ -26,6 +26,10 @@ public class JSONEncoder implements Encoder {
     public JSONEncoder() {
     }
 
+    public JSONEncoder(boolean inhibitIds) {
+        this.inhibitIds = inhibitIds;
+    }
+
     @Override
     public void initialize(ByteBuf buffer) throws Exception {
         JsonFactory factory = new JsonFactory();
@@ -45,7 +49,7 @@ public class JSONEncoder implements Encoder {
     @Override
     public void startResource(Resource resource) throws Exception {
         this.generator.writeStartObject();
-        if (resource.id() != null) {
+        if (resource.id() != null && ! this.inhibitIds) {
             this.generator.writeFieldName("id");
             this.generator.writeString(resource.id());
             this.generator.writeFieldName("self");
@@ -176,5 +180,6 @@ public class JSONEncoder implements Encoder {
 
     }
 
+    private boolean inhibitIds = false;
     private JsonGenerator generator;
 }

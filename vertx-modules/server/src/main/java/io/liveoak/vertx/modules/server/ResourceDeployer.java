@@ -6,10 +6,12 @@
 package io.liveoak.vertx.modules.server;
 
 import io.liveoak.container.DefaultContainer;
+import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.SimpleConfig;
 import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.vertx.resource.RootVertxCollectionResource;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
 
@@ -18,19 +20,13 @@ import org.vertx.java.core.json.JsonObject;
  */
 public class ResourceDeployer {
 
-    public ResourceDeployer(DefaultContainer container, String address) {
-        this.container = container;
-
-        this.container.vertx().eventBus().registerHandler(address, (Message<JsonObject> message) -> {
+    public ResourceDeployer(LiveOakSystem system, String address) {
+        system.vertx().eventBus().registerHandler(address, (Message<JsonObject> message) -> {
             String action = message.body().getString("action");
             if (action.equals("register")) {
                 String id = message.body().getString("id");
                 String resourceAddress = message.body().getString("address");
-                try {
-                    this.container.registerResource(new RootVertxCollectionResource(id, resourceAddress), new DefaultResourceState());
-                } catch (InitializationException e) {
-                    e.printStackTrace();
-                }
+                system.container().registerResource(new RootVertxCollectionResource(id, resourceAddress));
             } else if (action.equals("unregister")) {
 
             } else {
@@ -39,6 +35,4 @@ public class ResourceDeployer {
 
         });
     }
-
-    private DefaultContainer container;
 }

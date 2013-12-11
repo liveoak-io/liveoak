@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.liveoak.container.DefaultContainer;
+import io.liveoak.spi.Container;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
@@ -73,7 +74,7 @@ public class TraversalPlan {
     }
 
     public static interface StepContext {
-        DefaultContainer container();
+        Container container();
 
         RequestContext requestContext();
 

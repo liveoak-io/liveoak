@@ -5,40 +5,26 @@
  */
 package io.liveoak.container;
 
+import java.util.concurrent.Executor;
+
 import io.liveoak.container.traversal.TraversingResponder;
+import io.liveoak.spi.Container;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
-public class ResourceHandler extends SimpleChannelInboundHandler<ResourceRequest> {
+public class ResourceHandler extends SimpleChannelInboundHandler<DefaultResourceRequest> {
 
-    public ResourceHandler(DefaultContainer container) {
+    public ResourceHandler(Container container, Executor workerPool) {
         this.container = container;
+        this.workerPool = workerPool;
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ResourceRequest msg) throws Exception {
-        /*
-        ResourcePath.Segment firstSegment = msg.resourcePath().head();
-
-        switch (msg.requestType()) {
-            case CREATE:
-                new CreateResponder(container.workerPool(), container, msg, ctx).resourceRead(container);
-                break;
-            case READ:
-                new ReadResponder(container.workerPool(), container, msg, ctx).resourceRead(container);
-                break;
-            case UPDATE:
-                new UpdateResponder(container.workerPool(), container, msg, ctx).resourceRead(container);
-                break;
-            case DELETE:
-                new DeleteResponder(container.workerPool(), container, msg, ctx).resourceRead(container);
-                break;
-        }
-        */
-
-        new TraversingResponder( container.workerPool(), container, msg, ctx ).resourceRead( container );
+    protected void channelRead0(ChannelHandlerContext ctx, DefaultResourceRequest msg) throws Exception {
+        new TraversingResponder( this.workerPool, container, msg, ctx ).resourceRead(container);
     }
 
-    private DefaultContainer container;
+    private Container container;
+    private Executor workerPool;
 
 }

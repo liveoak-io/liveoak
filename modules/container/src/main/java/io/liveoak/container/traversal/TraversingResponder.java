@@ -7,8 +7,8 @@ package io.liveoak.container.traversal;
 
 import java.util.concurrent.Executor;
 
-import io.liveoak.container.DefaultContainer;
-import io.liveoak.container.ResourceRequest;
+import io.liveoak.container.DefaultResourceRequest;
+import io.liveoak.spi.Container;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -21,7 +21,7 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public class TraversingResponder extends BaseResponder {
 
-    public TraversingResponder(Executor executor, DefaultContainer container, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
+    public TraversingResponder(Executor executor, Container container, DefaultResourceRequest inReplyTo, ChannelHandlerContext ctx) {
         super(inReplyTo, ctx);
         this.executor = executor;
         this.currentResource = container;
@@ -50,7 +50,7 @@ public class TraversingResponder extends BaseResponder {
 
         TraversalPlan.StepContext stepContext = new TraversalPlan.StepContext() {
             @Override
-            public DefaultContainer container() {
+            public Container container() {
                 return TraversingResponder.this.container();
             }
 
@@ -107,7 +107,7 @@ public class TraversingResponder extends BaseResponder {
         return this.currentResource;
     }
 
-    protected DefaultContainer container() {
+    protected Container container() {
         return this.container;
     }
 
@@ -145,5 +145,5 @@ public class TraversingResponder extends BaseResponder {
     private Executor executor;
 
     private Resource currentResource;
-    private DefaultContainer container;
+    private Container container;
 }

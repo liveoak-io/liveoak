@@ -5,8 +5,9 @@
  */
 package io.liveoak.container.mime;
 
-import io.liveoak.container.codec.MediaTypeMatcher;
+import io.liveoak.container.codec.DefaultMediaTypeMatcher;
 import io.liveoak.spi.MediaType;
+import io.liveoak.spi.MediaTypeMatcher;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class MediaTypeMatcherTest {
 
     @Test
     public void testMatcherOneType() throws Exception {
-        MediaTypeMatcher matcher = new MediaTypeMatcher("application/json");
+        DefaultMediaTypeMatcher matcher = new DefaultMediaTypeMatcher("application/json");
 
         assertThat(matcher.mediaTypes()).hasSize(1);
         assertThat(matcher.mediaTypes().get(0).type()).isEqualTo("application");
@@ -31,7 +32,7 @@ public class MediaTypeMatcherTest {
 
     @Test
     public void testMatcherMultipleTypes() throws Exception {
-        MediaTypeMatcher matcher = new MediaTypeMatcher("application/json, text/xml, */*");
+        DefaultMediaTypeMatcher matcher = new DefaultMediaTypeMatcher("application/json, text/xml, */*");
 
         assertThat(matcher.mediaTypes()).hasSize(3);
         assertThat(matcher.mediaTypes().get(0).type()).isEqualTo("application");
@@ -49,7 +50,7 @@ public class MediaTypeMatcherTest {
 
     @Test
     public void testMatcherMultipleTypesWithQuality() throws Exception {
-        MediaTypeMatcher matcher = new MediaTypeMatcher("application/json; q=0.5, text/xml; q=0.8, */*; q=0.2");
+        DefaultMediaTypeMatcher matcher = new DefaultMediaTypeMatcher("application/json; q=0.5, text/xml; q=0.8, */*; q=0.2");
 
         assertThat(matcher.mediaTypes()).hasSize(3);
 
@@ -68,7 +69,7 @@ public class MediaTypeMatcherTest {
 
     @Test
     public void testFindBestMatch() throws Exception {
-        MediaTypeMatcher matcher = new MediaTypeMatcher("application/json; q=0.5, text/xml; q=0.8, */*; q=0.2");
+        MediaTypeMatcher matcher = new DefaultMediaTypeMatcher("application/json; q=0.5, text/xml; q=0.8, */*; q=0.2");
 
         List<MediaType> candidates = new ArrayList<>();
 
@@ -85,7 +86,7 @@ public class MediaTypeMatcherTest {
 
     @Test
     public void testFindBestMatchWithSuffixes() throws Exception {
-        MediaTypeMatcher matcher = new MediaTypeMatcher("application/json; q=0.5, text/foo+xml; q=0.8, */*; q=0.2");
+        MediaTypeMatcher matcher = new DefaultMediaTypeMatcher("application/json; q=0.5, text/foo+xml; q=0.8, */*; q=0.2");
 
         List<MediaType> candidates = new ArrayList<>();
 

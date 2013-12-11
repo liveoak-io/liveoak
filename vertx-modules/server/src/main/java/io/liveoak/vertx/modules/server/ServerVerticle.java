@@ -5,7 +5,9 @@
  */
 package io.liveoak.vertx.modules.server;
 
-import io.liveoak.container.UnsecureServer;
+import io.liveoak.container.LiveOakFactory;
+import io.liveoak.container.LiveOakSystem;
+import io.liveoak.container.server.UnsecureServer;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
@@ -17,7 +19,7 @@ This is a simple Java verticle which starts the server
  */
 public class ServerVerticle extends Verticle {
 
-    private UnsecureServer server;
+    private LiveOakSystem system;
     private ResourceDeployer deployer;
 
     @Override
@@ -28,32 +30,24 @@ public class ServerVerticle extends Verticle {
         int port = config.getInteger("port", 8080);
 
         try {
-            server = new UnsecureServer(this.vertx, host, port);
-        } catch (UnknownHostException e) {
+            this.system = LiveOakFactory.create( this.vertx );
+        } catch (Exception e) {
             startResult.setFailure(e);
             return;
         }
 
-        try {
-            server.start();
-        } catch (InterruptedException e) {
-            startResult.setFailure(e);
-        }
-
         String address = config.getString("address", "server.resource.registration");
 
-        this.deployer = new ResourceDeployer(this.server.container(), address);
+        this.deployer = new ResourceDeployer(this.system, address);
 
         startResult.setResult(null);
     }
 
     @Override
     public void stop() {
-        if (server == null)
+        if (this.system == null) {
             return;
-        try {
-            server.stop();
-        } catch (InterruptedException ignored) {
         }
+        this.system.stop();
     }
 }

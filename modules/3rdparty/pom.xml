@@ -18,6 +18,20 @@
     <packaging>pom</packaging>
     <dependencies>
 
+        <!-- org.jboss.msc -->
+        <dependency>
+            <groupId>org.jboss.msc</groupId>
+            <artifactId>jboss-msc</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- org.jboss.logging -->
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- com.fasterxml.jackson.core -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
