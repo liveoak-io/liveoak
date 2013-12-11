@@ -44,6 +44,13 @@ public interface ConfigResource extends Resource {
                     Object value = field.get(resource);
 
                     if (value != null) {
+                        // Check for converter
+                        if (!configProperty.converter().isInterface()) {
+                            Class<? extends ConfigPropertyConverter> converterClass = configProperty.converter();
+                            ConfigPropertyConverter converter = converterClass.getConstructor().newInstance();
+                            value = converter.toConfig(value);
+                        }
+
                         // Add the value to the sink if it's not null
                         sink.accept(key, value);
                     }
@@ -79,6 +86,13 @@ public interface ConfigResource extends Resource {
                                 ? configProperty.msg()
                                 : "No configuration value specified for: " + key + " on Resource with id: " + resource.id();
                         throw new InitializationException(msg);
+                    }
+
+                    // Check for converter
+                    if (!configProperty.converter().isInterface()) {
+                        Class<? extends ConfigPropertyConverter> converterClass = configProperty.converter();
+                        ConfigPropertyConverter converter = converterClass.getConstructor().newInstance();
+                        value = converter.fromConfig(value);
                     }
 
                     // Set the value on the field

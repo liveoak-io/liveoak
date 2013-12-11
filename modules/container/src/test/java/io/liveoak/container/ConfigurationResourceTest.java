@@ -1,5 +1,8 @@
 package io.liveoak.container;
 
+import java.io.File;
+import java.net.URL;
+
 import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.container.resource.ContainerConfigurationResource;
 import io.liveoak.spi.RequestContext;
@@ -26,6 +29,29 @@ public class ConfigurationResourceTest {
 
     private DefaultContainer container;
     private DirectConnector connector;
+
+    private File projectRoot;
+
+    @Before
+    public void setupUserDir() {
+        String name = getClass().getName().replace(".", "/") + ".class";
+        URL resource = getClass().getClassLoader().getResource(name);
+
+        if (resource != null) {
+            File current = new File(resource.getFile());
+
+            while (current.exists()) {
+                if (current.isDirectory()) {
+                    if (new File(current, "pom.xml").exists()) {
+                        this.projectRoot = current;
+                        break;
+                    }
+                }
+
+                current = current.getParentFile();
+            }
+        }
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -86,5 +112,24 @@ public class ConfigurationResourceTest {
         DefaultResourceState state = new DefaultResourceState();
         state.putProperty(SECOND_KEY, SECOND_VALUE);
         this.container.registerResource(resource, state);
+    }
+
+    @Test
+    public void testConfigPropertyConverter() throws Exception {
+        InMemoryConfigResourceWithConverter resource = new InMemoryConfigResourceWithConverter(RESOURCE + 5);
+        DefaultResourceState state = new DefaultResourceState();
+        state.putProperty("file", this.projectRoot.getAbsolutePath());
+        this.container.registerResource(resource, state);
+
+        RequestContext context = new RequestContext.Builder().build();
+
+        ResourceState configState = this.connector.read(context, "/" + RESOURCE + 5 + CONFIG_PARAM);
+
+        assertThat(configState).isNotNull();
+
+        Object value = configState.getProperty("file");
+        assertThat(value).isNotNull();
+        assertThat(value).isInstanceOf(String.class);
+        assertThat(value).toString().equals(this.projectRoot.getAbsolutePath());
     }
 }
