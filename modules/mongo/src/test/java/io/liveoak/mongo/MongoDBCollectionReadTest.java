@@ -5,8 +5,20 @@
  */
 package io.liveoak.mongo;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import org.fest.assertions.Fail;
+import org.junit.Test;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+
 import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.spi.NotAcceptableException;
 import io.liveoak.spi.Pagination;
@@ -14,16 +26,6 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.Sorting;
 import io.liveoak.spi.state.ResourceState;
-import org.fest.assertions.Fail;
-import org.junit.Test;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -48,7 +50,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
     @Test
     public void testGetStorageEmpty() throws Exception {
-        db.dropDatabase(); //TODO: create a new DB here instead of dropping the old one
+        db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one
         assertThat(db.getCollectionNames()).hasSize(0);
 
         ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH);
@@ -61,10 +63,9 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertThat(result.members()).isEmpty();
     }
 
-
     @Test
     public void testGetStorageCollections() throws Exception {
-        db.dropDatabase(); //TODO: create a new DB here instead of dropping the old one
+        db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one
         assertThat(db.getCollectionNames()).hasSize(0);
 
         // create a couple of collections
@@ -74,7 +75,6 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
         assertThat(db.getCollectionNames()).hasSize(4);
-
 
         ResourceState result = connector.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).build(), BASEPATH);
 
@@ -93,7 +93,6 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         }
     }
 
-
     @Test
     public void testGetEmptyCollection() throws Exception {
         String methodName = "testEmptyCollection";
@@ -104,14 +103,14 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
             ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName);
             Fail.fail();
         } catch (ResourceNotFoundException e) {
-            //expected
+            // expected
         }
 
         db.createCollection(methodName, new BasicDBObject());
 
         ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName);
 
-        //verify the result
+        // verify the result
         assertThat(result.id()).isEqualTo(methodName);
         assertThat(result.getPropertyNames().size()).isEqualTo(1);
         assertThat(result.getProperty("type")).isEqualTo("collection");
@@ -134,10 +133,11 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertEquals(1014, db.getCollectionNames().size());
 
         // This should return 23 collections
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).pagination(new SimplePagination(11, 23)).build();
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members"))
+                .pagination(new SimplePagination(11, 23)).build();
         ResourceState result = connector.read(requestContext, BASEPATH);
 
-        //verify the result
+        // verify the result
         assertThat(result.id()).isEqualTo(BASEPATH);
         assertThat(result.getPropertyNames().size()).isEqualTo(1);
         assertThat(result.getProperty("type")).isEqualTo("collection");
@@ -155,7 +155,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).pagination(new SimplePagination(1010, 20)).build();
         result = connector.read(requestContext, BASEPATH);
 
-        //verify the result
+        // verify the result
         assertThat(result.id()).isEqualTo(BASEPATH);
         assertThat(result.getPropertyNames().size()).isEqualTo(1);
         assertThat(result.getProperty("type")).isEqualTo("collection");
@@ -199,7 +199,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertThat(result.members().get(0).getProperty("name")).isEqualTo("Hans");
         assertThat(result.members().get(1).getProperty("name")).isEqualTo("Francois");
 
-        //Try another query
+        // Try another query
         resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:'Doe'}");
         requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
@@ -298,7 +298,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertThat(result.members().get(0).getProperty("name")).isEqualTo("Hans");
         assertThat(result.members().get(1).getProperty("name")).isEqualTo("Francois");
 
-        //Try another query
+        // Try another query
         resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:'Doe'}");
         requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
@@ -330,8 +330,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // This should return 2 items
         SimpleResourceParams resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
-        resourceParams.put("hint", "foobar");  //NOTE: foobar does not correspond to an index we can use
-
+        resourceParams.put("hint", "foobar"); // NOTE: foobar does not correspond to an index we can use
 
         RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
 
@@ -341,7 +340,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         } catch (NotAcceptableException iee) {
             assertThat(iee.message()).isEqualTo("Exception encountered trying to fetch data from the Mongo Database");
 
-            //Note: tying the test results to the internal mechanisms of Mongo is not a good idea, but
+            // Note: tying the test results to the internal mechanisms of Mongo is not a good idea, but
             // its the only way to make sure that the exception is because of the failure we want.
             assertThat(iee.getCause().getClass().getName()).isEqualTo("com.mongodb.MongoException");
             assertThat(iee.getCause().getMessage()).isEqualTo("bad hint");
@@ -364,8 +363,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // This should return 2 items
         SimpleResourceParams resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
-        resourceParams.put("hint", "{foobar, 1}");  //NOTE: foobar does not correspond to an index we can use
-
+        resourceParams.put("hint", "{foobar, 1}"); // NOTE: foobar does not correspond to an index we can use
 
         RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
 
@@ -402,7 +400,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
                 .resourceParams(resourceParams).build();
         ResourceState result = connector.read(requestContext, BASEPATH + "/testSortCollection");
 
-        String[] expected = {"Jacqueline", "John", "Jane", "Hans", "Francois", "Helga"};
+        String[] expected = { "Jacqueline", "John", "Jane", "Hans", "Francois", "Helga" };
         assertThat(expected).isEqualTo(getNames(result));
     }
 
@@ -431,7 +429,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
                 .resourceParams(resourceParams).build();
         ResourceState result = connector.read(requestContext, BASEPATH + "/testQuerySortCollection");
 
-        String[] expected = {"Helga", "Hans", "Jane", "John"};
+        String[] expected = { "Helga", "Hans", "Jane", "John" };
         assertThat(expected).isEqualTo(getNames(result));
     }
 

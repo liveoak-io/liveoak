@@ -2,6 +2,7 @@ package io.liveoak.mongo;
 
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
+
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.ConfigResource;
@@ -15,8 +16,14 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class MongoConfigResource implements ConfigResource {
 
-    public MongoConfigResource(RootMongoResource parent) {
+    protected MongoClient mongoClient;
+    protected DB database;
+    private RootMongoResource parent;
+
+    public MongoConfigResource(RootMongoResource parent, MongoClient mongoClient, DB database) {
         this.parent = parent;
+        this.mongoClient = mongoClient;
+        this.database = database;
     }
 
     @Override
@@ -48,17 +55,15 @@ public class MongoConfigResource implements ConfigResource {
             throw new InitializationException("Unknown database " + dbName);
         }
 
-        this.parent.configure( mongo, db );
-        responder.resourceUpdated( this );
+        this.parent.configure(mongo, db);
+        responder.resourceUpdated(this);
     }
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept( "host", this.parent.mongoClient().getAddress().getHost() );
-        sink.accept( "port", this.parent.mongoClient().getAddress().getPort() );
-        sink.accept( "db", this.parent.getDB().getName() );
+        sink.accept("host", mongoClient.getAddress().getHost());
+        sink.accept("port", mongoClient.getAddress().getPort());
+        sink.accept("db", database.getName());
         sink.close();
     }
-
-    private RootMongoResource parent;
 }

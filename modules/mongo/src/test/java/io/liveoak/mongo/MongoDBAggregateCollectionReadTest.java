@@ -5,19 +5,21 @@
  */
 package io.liveoak.mongo;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Test;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+
 import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
-import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -59,13 +61,13 @@ public class MongoDBAggregateCollectionReadTest extends BaseMongoDBTest {
         assertThat(results.size()).isEqualTo(3);
 
         Set countries = checkAggregateItems(results);
-        Set expected = new HashSet(Arrays.asList(new String[] {"DE", "FR", "US"}));
+        Set expected = new HashSet(Arrays.asList(new String[] { "DE", "FR", "US" }));
         assertThat(countries).isEqualTo(expected);
     }
 
     private Set checkAggregateItems(List results) {
         HashSet<String> keys = new HashSet<>();
-        for (Object item: results) {
+        for (Object item : results) {
             assertThat(item).isInstanceOf(ResourceState.class);
             keys.add(checkAggregateItem((ResourceState) item));
         }

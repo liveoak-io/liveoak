@@ -5,17 +5,14 @@
  */
 package io.liveoak.mongo;
 
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MongoException;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
-import io.liveoak.spi.NotAcceptableException;
+
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceException;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.Sorting;
@@ -23,11 +20,6 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-import org.bson.types.ObjectId;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Bob McWhirter
@@ -35,10 +27,16 @@ import java.util.Set;
 public class MongoCollectionResource extends MongoResource {
 
     DBCollection dbCollection;
+    String collectionName;
 
-    MongoCollectionResource(MongoResource parent, DBCollection collection) {
+    MongoCollectionResource(RootMongoResource parent, DBCollection collection) {
         super(parent);
         this.dbCollection = collection;
+    }
+
+    MongoCollectionResource(MongoResource parent, String collectionName) {
+        super(parent);
+        this.collectionName = collectionName;
     }
 
     @Override
@@ -49,7 +47,7 @@ public class MongoCollectionResource extends MongoResource {
             return;
         }
 
-        DBObject object = dbCollection.findOne( getMongoID( childId ) );
+        DBObject object = dbCollection.findOne(getMongoID(childId));
 
         if (object == null) {
             responder.noSuchResource(childId);
@@ -60,18 +58,18 @@ public class MongoCollectionResource extends MongoResource {
 
     @Override
     public String id() {
-        return dbCollection.getName();
+        return getDBCollection().getName();
     }
 
     @Override
     public void delete(RequestContext ctx, Responder responder) {
-        dbCollection.drop();
+        getDBCollection().drop();
         responder.resourceDeleted(this);
     }
 
     protected WriteResult deleteChild(RequestContext ctx, String childId) {
         WriteResult wResult = null;
-        wResult = dbCollection.remove( getMongoID( childId ) );
+        wResult = getDBCollection().remove(getMongoID(childId));
         return wResult;
     }
 
@@ -81,7 +79,7 @@ public class MongoCollectionResource extends MongoResource {
             WriteResult wResult = dbCollection.update(new BasicDBObject(MONGO_ID_FIELD, childObject.get(MONGO_ID_FIELD)), childObject);
             return wResult;
         } else {
-            throw new RuntimeException("ERROR"); //TODO: fix this
+            throw new RuntimeException("ERROR"); // TODO: fix this
         }
     }
 
@@ -168,12 +166,12 @@ public class MongoCollectionResource extends MongoResource {
         BasicDBObject basicDBObject = null;
         try {
             basicDBObject = (BasicDBObject) createObject(state);
-            WriteResult wResult = dbCollection.insert(basicDBObject);
+            WriteResult wResult = getDBCollection().insert(basicDBObject);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        DBObject newDBObject = dbCollection.findOne(new BasicDBObject(MONGO_ID_FIELD, basicDBObject.get(MONGO_ID_FIELD)));
+        DBObject newDBObject = getDBCollection().findOne(new BasicDBObject(MONGO_ID_FIELD, basicDBObject.get(MONGO_ID_FIELD)));
         responder.resourceCreated(new MongoBaseObjectResource(this, newDBObject));
     }
 
@@ -181,50 +179,23 @@ public class MongoCollectionResource extends MongoResource {
         return "[MongoCollectionResource: id=" + this.id() + "]";
     }
 
-    protected BasicDBObject createObject(ResourceState resourceState) {
-        BasicDBObject basicDBObject = new BasicDBObject();
-
-        // if the state already has an id set, use it here. Otherwise one will be autocreated on insert
-        String rid = resourceState.id();
-        if (rid != null) {
-            basicDBObject.append(MONGO_ID_FIELD, rid);
-        }
-
-        Set<String> keys = resourceState.getPropertyNames();
-
-        for (String key : keys) {
-            if (!key.equals(MBAAS_ID_FIELD)) { //don't append the ID field again
-                Object value = resourceState.getProperty(key);
-                if (value instanceof ResourceState) {
-                    value = createObject((ResourceState) value);
-                } else if (value instanceof Collection) {
-                    value = createObjectList((Collection) value);
-                }
-                basicDBObject.append(key, value);
-            }
-        }
-
-        return basicDBObject;
-    }
-
-    protected BasicDBList createObjectList(Collection collection) {
-        BasicDBList dbList = new BasicDBList();
-        for (Object object : collection) {
-            if (object instanceof ResourceState) {
-                dbList.add(createObject((ResourceState) object));
-            } else if (object instanceof Collection) {
-                dbList.add(createObjectList((Collection) object));
-            } else {
-                dbList.add(object);
-            }
-        }
-        return dbList;
-    }
-
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("type", "collection");
         sink.close();
     }
+
+    public DBObject getChild(String id) {
+        DBCursor cursor = getDBCollection().find();
+        return getDBCollection().findOne(getMongoID(id));
+    }
+
+    protected DBCollection getDBCollection() {
+        if (dbCollection == null) {
+            this.dbCollection = ((RootMongoResource) parent()).db.getCollection(collectionName);
+        }
+
+        return this.dbCollection;
+   }
 
 }

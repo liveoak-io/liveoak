@@ -258,6 +258,11 @@ public class DefaultContainer implements Container, Resource {
         public void internalError(Throwable cause) {
             // TODO complain loudly
         }
+
+        @Override
+        public void invalidRequest( String message ) {
+            // TODO: complain back to the client
+        }
     }
 
 }
