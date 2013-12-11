@@ -15,6 +15,10 @@ pushd %DIRNAME%..
 set "ETCDIR=%CD%\etc"
 popd
 
+pushd %DIRNAME%..
+set "LOGDIR=%CD%\logs"
+popd
+
 if "x%INSTALLATION_CONF%" == "x" (
   set "INSTALLATION_CONF=%BINDIR%installation.conf.bat"
 )
@@ -46,6 +50,8 @@ set JAVA_OPTS=%JAVA_OPTS%
 "%JAVA%" %JAVA_OPTS% ^
  "-Djs.client.dir=%JS_CLIENT_DIR%" ^
  "-Dcss.dir=%CSS_DIR%" ^
+ "-Dio.liveoak.log=%LOGDIR%" ^
+ "-Dlogging.configuration=file:%LOGDIR%\logging.properties" ^
  %M2_REPO_CLAUSE% ^
     -jar "%JBOSS_MODULES_JAR%" ^
     -modulepath "%MODULEPATH%" ^

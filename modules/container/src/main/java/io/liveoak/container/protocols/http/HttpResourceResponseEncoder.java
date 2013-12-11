@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import org.jboss.logging.Logger;
 
 import java.util.List;
 
@@ -118,14 +119,14 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
             try {
                 encodingResult = encodeState(msg.inReplyTo().requestContext(), matcher, msg.resource());
             } catch (IncompatibleMediaTypeException e) {
-                e.printStackTrace();
+                log.error("Incompatible media type", e);
                 responseStatus = new HttpResponseStatus(HttpResponseStatus.NOT_ACCEPTABLE.code(), e.getMessage());
                 response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus);
                 response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
                 out.add(response);
                 return;
             } catch (Throwable e) {
-                e.printStackTrace();
+                log.error("Could not encode HTTP response", e);
                 responseStatus = new HttpResponseStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR.code(), HttpResponseStatus.INTERNAL_SERVER_ERROR.reasonPhrase());
                 response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus);
                 response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
@@ -155,4 +156,6 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Resourc
     }
 
     private ResourceCodecManager codecManager;
+
+    private static final Logger log = Logger.getLogger(HttpResourceResponseEncoder.class);
 }

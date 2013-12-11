@@ -31,6 +31,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
+import org.jboss.logging.Logger;
 
 import java.net.URI;
 import java.util.List;
@@ -178,7 +179,7 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
         if (authorization == null) {
             return null;
         } else if (authorization.length != 2 || !authorization[0].equalsIgnoreCase("Bearer")) {
-            System.err.println("Authorization header is invalid or it's of different type than 'Bearer'. Ignoring");
+            log.error("Authorization header is invalid or it's of different type than 'Bearer'. Ignoring");
             return null;
         } else {
             return authorization[1];
@@ -195,4 +196,5 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<FullHttp
     }
 
     private ResourceCodecManager codecManager;
+    private static final Logger log = Logger.getLogger(HttpResourceRequestDecoder.class);
 }

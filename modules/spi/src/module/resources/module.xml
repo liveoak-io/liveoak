@@ -13,6 +13,7 @@
 
     <dependencies>
         <module name="io.vertx" services="export" export="true"/>
+        <module name="org.jboss.logging" export="true"/>
     </dependencies>
 </module>
 

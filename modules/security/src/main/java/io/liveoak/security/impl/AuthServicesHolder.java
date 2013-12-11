@@ -13,6 +13,7 @@ import io.liveoak.security.spi.AuthorizationPolicyEntry;
 import io.liveoak.security.spi.AuthorizationService;
 import io.liveoak.security.spi.TokenManager;
 import io.liveoak.spi.ResourcePath;
+import org.jboss.logging.Logger;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,8 +27,7 @@ import java.util.Set;
  */
 public class AuthServicesHolder {
 
-    // TODO: replace with real logging
-    private final SimpleLogger log = new SimpleLogger(AuthServicesHolder.class);
+    private final Logger log = Logger.getLogger(AuthServicesHolder.class);
 
     private static AuthServicesHolder INSTANCE = new AuthServicesHolder();
 
@@ -120,14 +120,14 @@ public class AuthServicesHolder {
         }
 
         if (clazz == null) {
-            log.error("Unable to load policy class " + policyClassname);
+            log.errorf("Unable to load policy class %s", policyClassname);
             throw new IllegalStateException("Unable to load policy class: " + policyClassname + " with classloaders: " + policyLoaders);
         }
 
         try {
             return (AuthorizationPolicy) clazz.newInstance();
         } catch (Exception e) {
-            log.error("Unable to instantiate instance of policy class " + clazz);
+            log.errorf("Unable to instantiate instance of policy class %s", clazz);
             throw new IllegalStateException("Unable to instantiate instance of policy class " + clazz);
         }
     }

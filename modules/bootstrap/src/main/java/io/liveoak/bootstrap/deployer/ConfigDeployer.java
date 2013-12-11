@@ -107,11 +107,12 @@ public class ConfigDeployer {
      * @throws IOException If an error occurs while attempting to read the deployment file.
      */
     public void deploy(String configFilePath) throws IOException {
-        System.err.println("deploying from: " + configFilePath);
+        container.logger().info("deploying from: " + configFilePath);
 
         JsonFactory factory = new JsonFactory();
         factory.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES);
         factory.enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES);
+        factory.enable(JsonParser.Feature.ALLOW_COMMENTS);
         ObjectMapper mapper = new ObjectMapper(factory);
 
         JsonNode tree = mapper.readTree(new File(configFilePath));
@@ -135,22 +136,15 @@ public class ConfigDeployer {
                     try {
                         resourceConfig = container.getCodecManager().decode(MediaType.JSON, Unpooled.copiedBuffer(config.toString().getBytes()));
                     } catch (Exception e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        container.logger().error(null, e);
                     }
                 } else {
                     resourceConfig = new DefaultResourceState();
                 }
 
 
-                Set<String> names = resourceConfig.getPropertyNames();
-
-                for (String name : names) {
-                    Object configValue = resourceConfig.getProperty(name);
-                    if (configValue != null && configValue instanceof String) {
-                        configValue = StringPropertyReplacer.replaceProperties(configValue.toString(), System.getProperties());
-                        resourceConfig.putProperty(name, configValue);
-                    }
-                }
+                //TODO: Would be nice to replace properties as we traverse the tree in JSONDecoder
+                replaceSystemProperties(resourceConfig);
 
 
                 ModuleLoader loader = ModuleLoader.forClass(Bootstrap.class);
@@ -161,13 +155,12 @@ public class ConfigDeployer {
                     RootResource resource = construct(resourceId, resourceClass);
 
                     this.container.registerResource(resource, resourceConfig);
-                    System.err.println("registered resource: " + resource.uri());
+                    this.container.logger().info("registered resource: " + resource.uri());
                 } catch (Exception e) {
-                    System.err.println("Unable to deploy '" + resourceId + "': " + e.getMessage());
-                    e.printStackTrace();
+                    this.container.logger().errorf(e, "Unable to deploy '%s'", resourceId);
                 }
             } else {
-                System.err.println("unknown resource deployment type: " + type);
+                this.container.logger().errorf("unknown resource deployment type: %s", type);
             }
         }
     }
@@ -184,6 +177,17 @@ public class ConfigDeployer {
         }
     }
 
+    private static void replaceSystemProperties(ResourceState config) {
+        for (String name : config.getPropertyNames()) {
+            Object configValue = config.getProperty(name);
+            if (configValue instanceof String) {
+                configValue = StringPropertyReplacer.replaceProperties(configValue.toString(), System.getProperties());
+                config.putProperty(name, configValue);
+            } else if (configValue instanceof ResourceState) {
+                replaceSystemProperties((ResourceState) configValue);
+            }
+        }
+    }
 
     private DefaultContainer container;
 }

@@ -43,6 +43,7 @@ public abstract class AbstractServer {
                 .childHandler(createChildHandler());
         ChannelFuture future = serverBootstrap.bind();
         future.sync();
+        container.logger().info("LiveOak started !");
     }
 
     /**

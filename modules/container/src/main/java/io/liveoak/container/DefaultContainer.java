@@ -25,6 +25,7 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.platform.PlatformLocator;
 
@@ -41,6 +42,8 @@ import java.util.concurrent.Executors;
  */
 @Configurable
 public class DefaultContainer implements Container, Resource {
+
+    private static final Logger log = Logger.getLogger("io.liveoak.container");
 
     /**
      * Construct a self-contained container.
@@ -85,7 +88,6 @@ public class DefaultContainer implements Container, Resource {
     }
 
     public void registerResource(RootResource resource, ResourceState config) throws InitializationException {
-        //TODO: Lazy initialization in holder class when resourceRead controller is first accessed
         resource.initialize(new SimpleResourceContext(resource.id(), this.vertx, this));
         Resource configResource = resource.configuration();
         if (configResource != null) {
@@ -93,11 +95,16 @@ public class DefaultContainer implements Container, Resource {
             try {
                 configResource.updateProperties(requestContext, config, new RegistrationResponder( resource ));
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Could not update configurable resource " + resource, e);
             }
         } else {
             this.resources.put(resource.id(), resource);
         }
+    }
+
+    @Override
+    public Logger logger() {
+        return log;
     }
 
     public void unregisterResource(RootResource resource) {
@@ -168,7 +175,7 @@ public class DefaultContainer implements Container, Resource {
             return;
         }
 
-        System.err.println("deploy: " + type + " // " + state);
+        log.infof("deploy: %s // %s", type, state);
         RootResource deployed = deployer.deploy(state);
         responder.resourceCreated(deployed);
 
