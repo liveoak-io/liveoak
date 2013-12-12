@@ -125,7 +125,26 @@ public interface Resource {
     }
 
     default void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        responder.noSuchResource(id);
+        readMembers( ctx, new ResourceSink() {
+            private boolean found = false;
+            @Override
+            public void close() {
+                if ( ! found ) {
+                    responder.noSuchResource( id );
+                }
+            }
+
+            @Override
+            public void accept(Resource resource) {
+                if ( found ) {
+                    return;
+                }
+                if ( resource.id().equals( id ) ) {
+                    responder.resourceRead( resource );
+                    found = true;
+                }
+            }
+        });
     }
 
     /**

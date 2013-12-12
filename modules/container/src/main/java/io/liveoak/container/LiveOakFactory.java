@@ -78,6 +78,7 @@ public class LiveOakFactory {
 
     public static LiveOakSystem create(File configDir, Vertx vertx) throws Exception {
         ServiceContainer serviceContainer = ServiceContainer.Factory.create();
+        LiveOakSystem system = new LiveOakSystem(serviceContainer);
 
         /*
         serviceContainer.addListener( new AbstractServiceListener<Object>() {
@@ -87,6 +88,9 @@ public class LiveOakFactory {
             }
         });
         */
+
+        serviceContainer.addService( LIVEOAK, new ValueService<>(new ImmediateValue<>(system)))
+                .install();
 
         UnsecureServerService server = new UnsecureServerService();
         serviceContainer.addService(server("unsecure"), server)
@@ -153,7 +157,6 @@ public class LiveOakFactory {
                 .install();
 
         if (configDir != null) {
-            System.err.println("adding deployment manager dependency to pipeline");
             DeploymentManagerService deploymentManager = new DeploymentManagerService();
             serviceContainer.addService(DEPLOYMENT_MANAGER, deploymentManager)
                     .addDependency(DEPLOYER, Deployer.class, deploymentManager.deployerInjector())
@@ -171,7 +174,7 @@ public class LiveOakFactory {
             serviceContainer.addService(VERTX_PLATFORM_MANAGER, new PlatformManagerService())
                     .install();
         } else {
-            serviceContainer.addService(VERTX, new ValueService<Vertx>(new ImmediateValue<Vertx>(vertx)))
+            serviceContainer.addService(VERTX, new ValueService<>(new ImmediateValue<>(vertx)))
                     .install();
         }
 
@@ -185,13 +188,15 @@ public class LiveOakFactory {
         installRootResourceFactory(serviceContainer, new ModuleBasedResourceFactory());
 
         installInternalResource(serviceContainer, LiveOak.SUBSCRIPTION_MANAGER);
+        installInternalResource(serviceContainer, LiveOak.LIVEOAK);
 
         // ----------------------------------------
         // ----------------------------------------
 
         serviceContainer.awaitStability();
 
-        return new LiveOakSystem(serviceContainer);
+
+        return system;
     }
 
     private static void installCodec(ServiceContainer serviceContainer, MediaType mediaType, Class<? extends Encoder> encoderClass, ResourceDecoder decoder) {

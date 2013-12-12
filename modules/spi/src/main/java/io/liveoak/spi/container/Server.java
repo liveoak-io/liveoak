@@ -2,8 +2,6 @@ package io.liveoak.spi.container;
 
 import java.net.InetAddress;
 
-import io.liveoak.spi.Container;
-
 /**
  * @author Bob McWhirter
  */

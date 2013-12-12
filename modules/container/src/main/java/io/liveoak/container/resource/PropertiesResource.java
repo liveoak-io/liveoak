@@ -16,7 +16,7 @@ import java.util.Properties;
  */
 public class PropertiesResource implements Resource {
 
-    public PropertiesResource(ContainerResource parent) {
+    public PropertiesResource(Resource parent) {
         this.parent = parent;
     }
 
@@ -40,5 +40,5 @@ public class PropertiesResource implements Resource {
         return "properties";
     }
 
-    private ContainerResource parent;
+    private Resource parent;
 }

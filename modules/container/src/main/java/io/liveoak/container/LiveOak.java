@@ -23,8 +23,8 @@ public class LiveOak {
     public static final ServiceName VERTX = LIVEOAK.append( "vertx" );
     public static final ServiceName VERTX_PLATFORM_MANAGER = VERTX.append( "platform-manager" );
 
-    private static final ServiceName SERVER = LIVEOAK.append( "server" );
-    private static final ServiceName CODEC = LIVEOAK.append( "codec" );
+    public static final ServiceName SERVER = LIVEOAK.append( "server" );
+    public static final ServiceName CODEC = LIVEOAK.append( "codec" );
 
     private static final ServiceName RESOURCE = LIVEOAK.append( "resource" );
     private static final ServiceName RESOURCE_FACTORY = LIVEOAK.append( "resource-factory" );

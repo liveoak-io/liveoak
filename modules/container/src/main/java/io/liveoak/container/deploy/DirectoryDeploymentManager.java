@@ -107,6 +107,13 @@ public class DirectoryDeploymentManager {
         configBuffer.readBytes( out, configBuffer.readableBytes() );
     }
 
+    public void deleteConfiguration(String id) {
+        File configFile = new File(this.configDir, id + ".json" );
+        if ( configFile.exists() ) {
+            configFile.delete();
+        }
+    }
+
     public void updateConfiguration(RootResource rootResource, ConfigResource configResource) throws Exception {
         if (configResource.parent() != rootResource) {
             throw new Exception("fancy configuration not yet supported");

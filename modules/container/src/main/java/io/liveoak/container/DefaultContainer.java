@@ -5,13 +5,11 @@
  */
 package io.liveoak.container;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.liveoak.container.deploy.DeploymentException;
 import io.liveoak.container.deploy.DirectoryDeploymentManager;
-import io.liveoak.container.resource.ContainerConfigurationResource;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.container.Deployer;
@@ -142,13 +140,7 @@ public class DefaultContainer implements Container, Resource {
         return this.prefix;
     }
 
-    @Override
-    public Resource configuration() {
-        return this.configuration;
-    }
-
     private String prefix = "";
-    private Resource configuration = new ContainerConfigurationResource(this);
     private Map<String, RootResource> resources = new ConcurrentHashMap<>();
 
     private Deployer deployer;
