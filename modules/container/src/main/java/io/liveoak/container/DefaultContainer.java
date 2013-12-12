@@ -7,6 +7,7 @@ package io.liveoak.container;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.liveoak.container.deploy.DeploymentException;
 import io.liveoak.container.deploy.DirectoryDeploymentManager;
@@ -148,7 +149,7 @@ public class DefaultContainer implements Container, Resource {
 
     private String prefix = "";
     private Resource configuration = new ContainerConfigurationResource(this);
-    private Map<String, RootResource> resources = new HashMap<>();
+    private Map<String, RootResource> resources = new ConcurrentHashMap<>();
 
     private Deployer deployer;
     private DirectoryDeploymentManager deploymentManager;
