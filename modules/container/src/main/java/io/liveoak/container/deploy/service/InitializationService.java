@@ -8,10 +8,12 @@ import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.container.Deployer;
+import io.liveoak.spi.container.DirectConnector;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Notifier;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.msc.inject.InjectionException;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -35,10 +37,12 @@ public class InitializationService implements Service<RootResource> {
             ResourceContext resourceContext =
                     new DefaultResourceContext(
                             this.containerInjector.getValue(),
+                            this.connectorInjector.getValue(),
                             this.vertxInjector.getValue(),
                             this.notifierInjector.getValue());
             this.resourceInjector.getValue().initialize(resourceContext);
         } catch (InitializationException e) {
+            e.printStackTrace();
             this.callback.accept(new Deployer.DeploymentResult(e));
             throw new StartException(e);
         }
@@ -70,11 +74,16 @@ public class InitializationService implements Service<RootResource> {
         return this.notifierInjector;
     }
 
+    public Injector<DirectConnector> connectorInjector() {
+        return this.connectorInjector;
+    }
+
     private InjectedValue<RootResource> resourceInjector = new InjectedValue<>();
 
     private InjectedValue<Vertx> vertxInjector = new InjectedValue<>();
     private InjectedValue<Container> containerInjector = new InjectedValue<>();
     private InjectedValue<Notifier> notifierInjector = new InjectedValue<>();
+    private InjectedValue<DirectConnector> connectorInjector = new InjectedValue<>();
 
     private final Consumer<Deployer.DeploymentResult> callback;
 

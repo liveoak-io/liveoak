@@ -11,6 +11,7 @@ import io.liveoak.container.deploy.service.InitializationService;
 import io.liveoak.container.deploy.service.RegistrationService;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.container.Deployer;
+import io.liveoak.spi.container.DirectConnector;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Notifier;
 import io.liveoak.spi.resource.async.Resource;
@@ -63,6 +64,7 @@ public class DirectDeployer {
                 .addDependency(LiveOak.CONTAINER, Container.class, initialization.containerInjector())
                 .addDependency(LiveOak.NOTIFIER, Notifier.class, initialization.notifierInjector())
                 .addDependency(LiveOak.VERTX, Vertx.class, initialization.vertxInjector())
+                .addDependency(LiveOak.DIRECT_CONNECTOR, DirectConnector.class, initialization.connectorInjector())
                 .addDependency(name.append("configure"))
                 .install();
 

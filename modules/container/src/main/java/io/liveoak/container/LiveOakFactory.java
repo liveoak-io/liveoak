@@ -45,8 +45,10 @@ import io.liveoak.spi.container.Deployer;
 import io.liveoak.spi.container.RootResourceFactory;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.spi.resource.RootResource;
+import org.jboss.msc.service.AbstractServiceListener;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceContainer;
+import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
@@ -76,6 +78,15 @@ public class LiveOakFactory {
 
     public static LiveOakSystem create(File configDir, Vertx vertx) throws Exception {
         ServiceContainer serviceContainer = ServiceContainer.Factory.create();
+
+        /*
+        serviceContainer.addListener( new AbstractServiceListener<Object>() {
+            @Override
+            public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
+                System.err.println( controller.getName() + " // " + transition );
+            }
+        });
+        */
 
         UnsecureServerService server = new UnsecureServerService();
         serviceContainer.addService(server("unsecure"), server)

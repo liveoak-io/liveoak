@@ -51,7 +51,7 @@ public class BasicServerTest {
         this.system = LiveOakFactory.create();
         this.container = this.system.container();
         InMemoryDBResource resource = new InMemoryDBResource("memory");
-        this.container.registerResource(resource );
+        this.system.directDeployer().deploy( resource );
 
         this.server = this.system.server( "unsecure" );
     }
