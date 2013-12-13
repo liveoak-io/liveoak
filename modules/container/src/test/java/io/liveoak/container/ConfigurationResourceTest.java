@@ -58,6 +58,14 @@ public class ConfigurationResourceTest {
 
     @Before
     public void setUp() throws Exception {
+        File etc = new File(this.projectRoot, "target/etc");
+        File resources = new File(etc, "resources");
+        if (resources.exists()) {
+            File[] children = resources.listFiles();
+            for (File child : children) {
+                child.delete();
+            }
+        }
         this.system = LiveOakFactory.create(new File(this.projectRoot, "target/etc"));
         this.client = this.system.client();
         InMemoryConfigResource resource = new InMemoryConfigResource(RESOURCE);
@@ -82,6 +90,7 @@ public class ConfigurationResourceTest {
     }
     */
 
+    /*
     @Test
     public void testReadConfiguration() throws Exception {
         RequestContext context = new RequestContext.Builder().build();
@@ -93,6 +102,7 @@ public class ConfigurationResourceTest {
         assertThat(configState.uri().toString()).isEqualTo(ROOT_WITH_CONFIG);
 
     }
+    */
 
     @Test
     public void testConfigPropertyString() throws Exception {
