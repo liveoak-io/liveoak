@@ -2,7 +2,6 @@ package io.liveoak.spi.container;
 
 import java.util.function.Consumer;
 
-import io.liveoak.container.deploy.DeploymentException;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
 

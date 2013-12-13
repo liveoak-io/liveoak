@@ -1,6 +1,6 @@
 package io.liveoak.container.subscriptions;
 
-import io.liveoak.container.codec.ResourceCodec;
+import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.container.Subscription;

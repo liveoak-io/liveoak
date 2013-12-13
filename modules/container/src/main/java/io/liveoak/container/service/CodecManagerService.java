@@ -1,7 +1,6 @@
 package io.liveoak.container.service;
 
-import io.liveoak.container.codec.ResourceCodecManager;
-import org.jboss.msc.inject.Injector;
+import io.liveoak.common.codec.ResourceCodecManager;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;

@@ -5,9 +5,7 @@
  */
 package io.liveoak.filesystem;
 
-import io.liveoak.container.SimpleConfig;
-import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.spi.Config;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
@@ -35,14 +33,14 @@ public class FilesystemResourceTest extends AbstractResourceTestCase {
 
     @Test
     public void testRoot() throws Exception {
-        ResourceState result = connector.read(new RequestContext.Builder().build(), "/files");
+        ResourceState result = client.read(new RequestContext.Builder().build(), "/files");
 
         assertThat(result).isNotNull();
     }
 
     @Test
     public void testChild() throws Exception {
-        ResourceState result = connector.read(new RequestContext.Builder().build(), "/files/pom.xml");
+        ResourceState result = client.read(new RequestContext.Builder().build(), "/files/pom.xml");
         assertThat(result).isNotNull();
     }
 

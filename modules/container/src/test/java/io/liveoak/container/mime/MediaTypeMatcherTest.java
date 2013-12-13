@@ -5,7 +5,7 @@
  */
 package io.liveoak.container.mime;
 
-import io.liveoak.container.codec.DefaultMediaTypeMatcher;
+import io.liveoak.common.DefaultMediaTypeMatcher;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.MediaTypeMatcher;
 import org.junit.Test;

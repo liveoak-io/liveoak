@@ -5,12 +5,11 @@ import java.net.URL;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.liveoak.container.InMemoryConfigResource;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
-import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.container.DirectConnector;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +24,7 @@ public class DirectoryDeploymentManagerTest {
 
     private File projectRoot;
     private LiveOakSystem system;
-    private DirectConnector connector;
+    private Client client;
 
     @Before
     public void setupUserDir() {
@@ -58,7 +57,7 @@ public class DirectoryDeploymentManagerTest {
             }
         }
         this.system = LiveOakFactory.create(new File(this.projectRoot, "target/etc"));
-        this.connector = this.system.directConnector();
+        this.client = this.system.client();
     }
 
     @After
@@ -80,7 +79,7 @@ public class DirectoryDeploymentManagerTest {
         state.putProperty("config", config);
 
         RequestContext requestContext = new RequestContext.Builder().build();
-        ResourceState result = this.connector.create(requestContext, "/", state);
+        ResourceState result = this.client.create(requestContext, "/", state);
         assertThat( result ).isNotNull();
 
         File myresourceJson = new File( this.projectRoot, "target/etc/resources/myresource.json" );
@@ -115,7 +114,7 @@ public class DirectoryDeploymentManagerTest {
         state.putProperty("config", config);
 
         RequestContext requestContext = new RequestContext.Builder().build();
-        ResourceState result = this.connector.create(requestContext, "/", state);
+        ResourceState result = this.client.create(requestContext, "/", state);
         assertThat( result ).isNotNull();
 
         File myresourceJson = new File( this.projectRoot, "target/etc/resources/myresource.json" );
@@ -127,19 +126,19 @@ public class DirectoryDeploymentManagerTest {
 
         assertThat( tree ).isNotNull();
 
-        assertThat( tree.get( "class-name" ).asText() ).isEqualTo( MockConfigurableResource.class.getName() );
+        assertThat( tree.get( "class-name" ).asText() ).isEqualTo(MockConfigurableResource.class.getName());
         assertThat( tree.get( "type" ).asText() ).isEqualTo( "classpath" );
 
         JsonNode configTree = tree.get( "config" );
 
         assertThat( configTree ).isNotNull();
-        assertThat( configTree.get( "name" ).asText() ).isEqualTo( "Bob" );
+        assertThat( configTree.get( "name" ).asText() ).isEqualTo("Bob");
         assertThat( configTree.get( "age" ).asInt() ).isEqualTo( 40 );
 
-        config.putProperty( "name", "Gary" );
+        config.putProperty("name", "Gary");
         config.putProperty( "age", 105 );
 
-        result = this.connector.update(requestContext, "/myresource;config", config);
+        result = this.client.update(requestContext, "/myresource;config", config);
 
         assertThat( result ).isNotNull();
 

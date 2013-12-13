@@ -1,6 +1,6 @@
 package io.liveoak.container.service;
 
-import io.liveoak.container.codec.ResourceCodecManager;
+import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.subscriptions.DefaultSubscriptionManager;
 import io.liveoak.spi.container.SubscriptionManager;
 import org.jboss.msc.inject.Injector;

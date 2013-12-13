@@ -7,10 +7,11 @@ package io.liveoak.container.codec.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.liveoak.common.codec.json.JSONEncoder;
 import io.liveoak.container.InMemoryObjectResource;
-import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.container.codec.driver.EncodingDriver;
-import io.liveoak.container.codec.driver.RootEncodingDriver;
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.common.codec.driver.EncodingDriver;
+import io.liveoak.common.codec.driver.RootEncodingDriver;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
 import io.netty.buffer.ByteBuf;
@@ -20,7 +21,6 @@ import org.junit.Test;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 

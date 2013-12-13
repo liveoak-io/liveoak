@@ -5,12 +5,11 @@
  */
 package io.liveoak.vertx.modules.resource;
 
-import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
-import io.liveoak.spi.container.DirectConnector;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceException;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.state.ResourceState;
@@ -37,7 +36,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class VertxResourceTest {
 
     private LiveOakSystem system;
-    private DirectConnector connector;
+    private Client client;
     private ResourceDeployer deployer;
 
     private Map<String, JsonObject> objects = new HashMap<>();
@@ -47,7 +46,7 @@ public class VertxResourceTest {
     @Before
     public void setUpSystem() throws Exception {
         this.system = LiveOakFactory.create();
-        this.connector = this.system.directConnector();
+        this.client = this.system.client();
         this.deployer = new ResourceDeployer(this.system, "test.register");
     }
 
@@ -80,7 +79,7 @@ public class VertxResourceTest {
 
     @Test
     public void testReadMember() throws Exception {
-        ResourceState result = connector.read(new RequestContext.Builder().build(), "/people/bob");
+        ResourceState result = client.read(new RequestContext.Builder().build(), "/people/bob");
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("bob");
     }
@@ -89,7 +88,7 @@ public class VertxResourceTest {
     /*
     @Test
     public void testReadMemberProperty() throws Exception {
-        Resource result = connector.read("/people/bob/name");
+        Resource result = client.read("/people/bob/name");
         assertThat(result).isNotNull();
         assertThat(result).isInstanceOf(PropertyResource.class);
         assertThat(((PropertyResource) result).get(null)).isEqualTo("Bob McWhirter");
@@ -99,7 +98,7 @@ public class VertxResourceTest {
     @Test
     public void testReadNonExistentResource() {
         try {
-            connector.read(new RequestContext.Builder().build(), "/people/lance");
+            client.read(new RequestContext.Builder().build(), "/people/lance");
         } catch (ResourceException e) {
             assertThat(e.path()).isEqualTo("/people/lance");
         } catch (Exception e) {
@@ -124,7 +123,7 @@ public class VertxResourceTest {
             }
         };
 
-        ResourceState resource = connector.read(new RequestContext.Builder().build(), "/people");
+        ResourceState resource = client.read(new RequestContext.Builder().build(), "/people");
         assertThat(resource).isNotNull();
         assertThat(resource.members()).hasSize(2);
 

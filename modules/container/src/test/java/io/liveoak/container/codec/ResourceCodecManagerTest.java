@@ -5,9 +5,14 @@
  */
 package io.liveoak.container.codec;
 
+import io.liveoak.common.DefaultMediaTypeMatcher;
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.common.codec.ResourceCodec;
+import io.liveoak.common.codec.ResourceCodecManager;
+import io.liveoak.common.codec.UnsupportedMediaTypeException;
 import io.liveoak.container.InMemoryObjectResource;
-import io.liveoak.container.codec.html.HTMLEncoder;
-import io.liveoak.container.codec.json.JSONDecoder;
+import io.liveoak.common.codec.html.HTMLEncoder;
+import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.spi.MediaType;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

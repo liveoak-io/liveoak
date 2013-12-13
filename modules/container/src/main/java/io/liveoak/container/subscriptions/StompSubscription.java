@@ -5,7 +5,7 @@
  */
 package io.liveoak.container.subscriptions;
 
-import io.liveoak.container.codec.ResourceCodec;
+import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;

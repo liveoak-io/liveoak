@@ -8,29 +8,32 @@ package io.liveoak.container;
 import java.io.File;
 import java.net.InetAddress;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 
-import io.liveoak.container.codec.Encoder;
-import io.liveoak.container.codec.ResourceCodec;
-import io.liveoak.container.codec.ResourceCodecManager;
-import io.liveoak.container.codec.ResourceDecoder;
-import io.liveoak.container.codec.html.HTMLEncoder;
-import io.liveoak.container.codec.json.JSONDecoder;
-import io.liveoak.container.codec.json.JSONEncoder;
+import io.liveoak.common.codec.Encoder;
+import io.liveoak.common.codec.ResourceCodec;
+import io.liveoak.common.codec.ResourceCodecManager;
+import io.liveoak.common.codec.ResourceDecoder;
+import io.liveoak.common.codec.html.HTMLEncoder;
+import io.liveoak.common.codec.json.JSONDecoder;
+import io.liveoak.common.codec.json.JSONEncoder;
 import io.liveoak.container.deploy.DefaultDeployer;
 import io.liveoak.container.deploy.DirectDeployer;
 import io.liveoak.container.deploy.DirectoryDeploymentManager;
 import io.liveoak.container.deploy.factory.ClasspathBasedResourceFactory;
 import io.liveoak.container.deploy.factory.ModuleBasedResourceFactory;
 import io.liveoak.container.protocols.PipelineConfigurator;
+import io.liveoak.container.server.LocalServer;
+import io.liveoak.container.service.ClientService;
 import io.liveoak.container.service.CodecInstallationService;
 import io.liveoak.container.service.CodecManagerService;
 import io.liveoak.container.service.CodecService;
 import io.liveoak.container.service.ContainerService;
 import io.liveoak.container.service.DeployerService;
 import io.liveoak.container.service.DeploymentManagerService;
-import io.liveoak.container.service.DirectConnectorService;
 import io.liveoak.container.service.DirectDeployerService;
 import io.liveoak.container.service.InternalResourceDeploymentService;
+import io.liveoak.container.service.LocalServerService;
 import io.liveoak.container.service.NotifierService;
 import io.liveoak.container.service.PipelineConfiguratorService;
 import io.liveoak.container.service.PlatformManagerService;
@@ -80,35 +83,41 @@ public class LiveOakFactory {
         ServiceContainer serviceContainer = ServiceContainer.Factory.create();
         LiveOakSystem system = new LiveOakSystem(serviceContainer);
 
-        /*
-        serviceContainer.addListener( new AbstractServiceListener<Object>() {
+        serviceContainer.addListener(new AbstractServiceListener<Object>() {
             @Override
             public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
-                System.err.println( controller.getName() + " // " + transition );
+                if (transition.getAfter().equals( ServiceController.Substate.START_FAILED ) ) {
+                        System.err.println( "Unable to start service: " + controller.getName() );
+                        controller.getStartException().printStackTrace();
+                }
             }
         });
-        */
 
-        serviceContainer.addService( LIVEOAK, new ValueService<>(new ImmediateValue<>(system)))
+        serviceContainer.addService(LIVEOAK, new ValueService<>(new ImmediateValue<>(system)))
                 .install();
 
-        UnsecureServerService server = new UnsecureServerService();
-        serviceContainer.addService(server("unsecure"), server)
-                .addDependency(PIPELINE_CONFIGURATOR, PipelineConfigurator.class, server.pipelineConfiguratorInjector())
-                .addInjection(server.hostInjector(), InetAddress.getByName("localhost"))
-                .addInjection(server.portInjector(), 8080)
+        UnsecureServerService unsecureServer = new UnsecureServerService();
+        serviceContainer.addService(server("unsecure", true), unsecureServer)
+                .addDependency(PIPELINE_CONFIGURATOR, PipelineConfigurator.class, unsecureServer.pipelineConfiguratorInjector())
+                .addInjection(unsecureServer.hostInjector(), InetAddress.getByName("localhost"))
+                .addInjection(unsecureServer.portInjector(), 8080)
                 .install();
 
-        DirectConnectorService directConnector = new DirectConnectorService();
-        serviceContainer.addService(DIRECT_CONNECTOR, directConnector)
-                .addDependency(PIPELINE_CONFIGURATOR, PipelineConfigurator.class, directConnector.pipelineConfiguratorInjector())
+        LocalServerService localServer = new LocalServerService();
+        serviceContainer.addService(server("local", false), localServer)
+                .addDependency(PIPELINE_CONFIGURATOR, PipelineConfigurator.class, localServer.pipelineConfiguratorInjector())
+                .install();
+
+        ClientService client = new ClientService();
+        serviceContainer.addService(CLIENT, client)
+                .addDependency(server("local", false), LocalServer.class, client.serverInjector())
                 .install();
 
         ContainerService container = new ContainerService();
         ServiceBuilder<Container> containerBuilder = serviceContainer.addService(CONTAINER, container)
                 .addDependency(DEPLOYER, Deployer.class, container.deployerInjector());
 
-        if ( configDir != null ) {
+        if (configDir != null) {
             containerBuilder.addDependency(DEPLOYMENT_MANAGER, DirectoryDeploymentManager.class, container.deploymentManagerInjector());
         }
 
@@ -194,7 +203,6 @@ public class LiveOakFactory {
         // ----------------------------------------
 
         serviceContainer.awaitStability();
-
 
         return system;
     }

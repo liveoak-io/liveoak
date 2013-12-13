@@ -16,7 +16,7 @@ import org.junit.Test;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
-import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.CreateNotSupportedException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
@@ -39,11 +39,11 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         assertEquals(1, db.getCollection(methodName).getCount());
         String id = "_mOI:" + object.getObjectId("_id").toString();
 
-        // update the resource using the connector.update method
+        // update the resource using the client.update method
         ResourceState resourceState = new DefaultResourceState();
         resourceState.putProperty("foo", "baz");
 
-        ResourceState result = connector.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id, resourceState);
+        ResourceState result = client.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id, resourceState);
 
         // verify the result
         assertThat(result).isNotNull();
@@ -69,13 +69,13 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         assertEquals(1, db.getCollection(methodName).getCount());
         String id = "_mOI:" + object.getObjectId("_id").toString();
 
-        // update the resource using the connector.update method
+        // update the resource using the client.update method
         ResourceState resourceState = new DefaultResourceState();
         resourceState.putProperty("bar", 123);
 
         // should not be able to directly update a child object
         try {
-            ResourceState result = connector.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo", resourceState);
+            ResourceState result = client.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo", resourceState);
             Fail.fail();
         } catch (CreateNotSupportedException e) {
             // expected
@@ -96,12 +96,12 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         assertEquals(1, db.getCollection(methodName).getCount());
         String id = "_mOI:" + object.getObjectId("_id").toString();
 
-        // update the resource using the connector.update method
+        // update the resource using the client.update method
         ResourceState resourceState = new DefaultResourceState();
         resourceState.putProperty("baz", "XYZ");
 
         try {
-            ResourceState result = connector.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo/bar", resourceState);
+            ResourceState result = client.update(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/foo/bar", resourceState);
             Fail.fail();
         } catch (ResourceNotFoundException e) {
             // expected

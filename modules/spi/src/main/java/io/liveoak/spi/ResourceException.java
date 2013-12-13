@@ -10,7 +10,7 @@ package io.liveoak.spi;
  */
 public class ResourceException extends Exception {
 
-    protected ResourceException(String path) {
+    public ResourceException(String path) {
         this.path = path;
     }
 

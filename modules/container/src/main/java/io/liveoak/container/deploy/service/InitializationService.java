@@ -5,15 +5,11 @@ import java.util.function.Consumer;
 import io.liveoak.container.DefaultResourceContext;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.InitializationException;
-import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceContext;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.Deployer;
-import io.liveoak.spi.container.DirectConnector;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Notifier;
-import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
-import org.jboss.msc.inject.InjectionException;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -37,7 +33,7 @@ public class InitializationService implements Service<RootResource> {
             ResourceContext resourceContext =
                     new DefaultResourceContext(
                             this.containerInjector.getValue(),
-                            this.connectorInjector.getValue(),
+                            this.clientInjector.getValue(),
                             this.vertxInjector.getValue(),
                             this.notifierInjector.getValue());
             this.resourceInjector.getValue().initialize(resourceContext);
@@ -45,6 +41,9 @@ public class InitializationService implements Service<RootResource> {
             e.printStackTrace();
             this.callback.accept(new Deployer.DeploymentResult(e));
             throw new StartException(e);
+        } catch (Throwable t) {
+            t.printStackTrace();;
+            throw new StartException(t);
         }
     }
 
@@ -74,8 +73,8 @@ public class InitializationService implements Service<RootResource> {
         return this.notifierInjector;
     }
 
-    public Injector<DirectConnector> connectorInjector() {
-        return this.connectorInjector;
+    public Injector<Client> clientInjector() {
+        return this.clientInjector;
     }
 
     private InjectedValue<RootResource> resourceInjector = new InjectedValue<>();
@@ -83,7 +82,7 @@ public class InitializationService implements Service<RootResource> {
     private InjectedValue<Vertx> vertxInjector = new InjectedValue<>();
     private InjectedValue<Container> containerInjector = new InjectedValue<>();
     private InjectedValue<Notifier> notifierInjector = new InjectedValue<>();
-    private InjectedValue<DirectConnector> connectorInjector = new InjectedValue<>();
+    private InjectedValue<Client> clientInjector = new InjectedValue<>();
 
     private final Consumer<Deployer.DeploymentResult> callback;
 

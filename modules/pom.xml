@@ -91,6 +91,8 @@
         </plugins>
     </build>
     <modules>
+        <module>common</module>
+        <module>client</module>
         <module>bootstrap</module>
         <module>spi</module>
         <module>stomp</module>

@@ -43,7 +43,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals(1, db.getCollection(methodName).getCount());
         String id = "_mOI:" + object.getObjectId("_id").toString();
 
-        ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
+        ResourceState result = client.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
 
         // verify response
         assertThat(result).isNotNull();
@@ -66,8 +66,8 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
         assertEquals(2, db.getCollection(methodName).getCount());
 
-        ResourceState resultObject = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/_mOI:01234567890ABCDEF0123456");
-        ResourceState resultString = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/01234567890ABCDEF0123456");
+        ResourceState resultObject = client.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/_mOI:01234567890ABCDEF0123456");
+        ResourceState resultString = client.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/01234567890ABCDEF0123456");
 
         assertThat(resultObject.getProperty("foo")).isEqualTo("bar");
         assertThat(resultString.getProperty("foo")).isEqualTo("baz");
@@ -86,7 +86,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals(1, db.getCollection(methodName).getCount());
         String id = "_mOI:" + object.getObjectId("_id").toString();
 
-        ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
+        ResourceState result = client.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
 
         // verify response
         assertThat(result).isNotNull();
@@ -112,7 +112,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
         // check that we don't get back baz, but that we do get the child and grandchild
         RequestContext rCtx = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("foo,child")).build();
-        ResourceState result = connector.read(rCtx, BASEPATH + "/" + methodName + "/" + id);
+        ResourceState result = client.read(rCtx, BASEPATH + "/" + methodName + "/" + id);
 
         // verify response
         assertThat(result).isNotNull();
@@ -127,7 +127,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
         // check that we don't get back the non specified embedded objects
         rCtx = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("foo")).build();
-        result = connector.read(rCtx, BASEPATH + "/" + methodName + "/" + id);
+        result = client.read(rCtx, BASEPATH + "/" + methodName + "/" + id);
 
         // verify response
         assertThat(result).isNotNull();
@@ -137,7 +137,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
         // check that we don't get back the non specified embedded child objects
         rCtx = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("foo,child(ABC,test)")).build();
-        result = connector.read(rCtx, BASEPATH + "/" + methodName + "/" + id);
+        result = client.read(rCtx, BASEPATH + "/" + methodName + "/" + id);
 
         // verify response
         assertThat(result).isNotNull();
@@ -164,7 +164,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         String id = "_mOI:" + object.getObjectId("_id").toString();
 
         try {
-            ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/child");
+            ResourceState result = client.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id + "/child");
             Fail.fail();
         } catch (ResourceNotFoundException e) {
             // expected
@@ -196,7 +196,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
 
-        ResourceState result = connector
+        ResourceState result = client
                 .read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*(*))")).build(), BASEPATH + "/" + methodName + "/foobaz");
 
         // verify the result
@@ -215,7 +215,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertThat(((Collection) result.getProperty("eArray"))).isEmpty();
 
         try {
-            result = connector.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*(*))")).build(), BASEPATH + "/" + methodName + "/foobaz/child");
+            result = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*(*))")).build(), BASEPATH + "/" + methodName + "/foobaz/child");
             Fail.fail();
         } catch (ResourceNotFoundException e) {
             // expected
@@ -240,7 +240,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals(1, db.getCollection(methodName).getCount());
 
         try {
-            ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/foobaz/array");
+            ResourceState result = client.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/foobaz/array");
             Fail.fail();
         } catch (ResourceNotFoundException e) {
             // expected
@@ -253,7 +253,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertFalse(db.collectionExists(methodName));
 
         try {
-            ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/foobar123");
+            ResourceState result = client.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/foobar123");
             fail("shouldn't get here");
         } catch (ResourceNotFoundException rnfe) {
             // expected
@@ -268,7 +268,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         ObjectId id = new ObjectId();
 
         try {
-            ResourceState result = connector.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
+            ResourceState result = client.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/" + id);
             fail("shouldn't get here");
         } catch (ResourceNotFoundException rnfe) {
             // expected

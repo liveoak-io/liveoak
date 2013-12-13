@@ -1,6 +1,5 @@
 package io.liveoak.container.deploy;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -12,8 +11,9 @@ import io.liveoak.container.deploy.service.InitializationService;
 import io.liveoak.container.deploy.service.InstantiationService;
 import io.liveoak.container.deploy.service.RegistrationService;
 import io.liveoak.spi.Container;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.Deployer;
-import io.liveoak.spi.container.DirectConnector;
+import io.liveoak.spi.container.DeploymentException;
 import io.liveoak.spi.container.RootResourceFactory;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Notifier;
@@ -67,7 +67,7 @@ public class DefaultDeployer implements Deployer {
                 .addDependency(LiveOak.CONTAINER, Container.class, initialization.containerInjector())
                 .addDependency(LiveOak.NOTIFIER, Notifier.class, initialization.notifierInjector())
                 .addDependency(LiveOak.VERTX, Vertx.class, initialization.vertxInjector())
-                .addDependency(LiveOak.DIRECT_CONNECTOR, DirectConnector.class, initialization.connectorInjector())
+                .addDependency(LiveOak.CLIENT, Client.class, initialization.clientInjector())
                 .addDependency(name.append("configure"))
                 .install();
 

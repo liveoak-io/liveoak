@@ -7,6 +7,7 @@ package io.liveoak.container;
 
 import java.util.concurrent.Executor;
 
+import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.container.traversal.TraversingResponder;
 import io.liveoak.spi.Container;
 import io.netty.channel.ChannelHandlerContext;

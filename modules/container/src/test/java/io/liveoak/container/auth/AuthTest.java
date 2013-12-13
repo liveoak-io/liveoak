@@ -5,12 +5,9 @@
  */
 package io.liveoak.container.auth;
 
-import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.InMemoryDBResource;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
-import io.liveoak.container.server.UnsecureServer;
-import io.liveoak.container.codec.DefaultResourceState;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.container.Server;
 import org.apache.http.HttpStatus;
@@ -32,7 +29,6 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 import static org.junit.Assert.assertEquals;
 
@@ -49,7 +45,7 @@ public class AuthTest {
         system = LiveOakFactory.create();
         container = system.container();
 
-        server = system.server( "unsecure" );
+        server = system.networkServer("unsecure");
         httpClient = HttpClientBuilder.create().build();
     }
 

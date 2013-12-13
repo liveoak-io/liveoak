@@ -4,7 +4,7 @@ import java.util.concurrent.Executor;
 
 import io.liveoak.container.deploy.DirectoryDeploymentManager;
 import io.liveoak.container.protocols.PipelineConfigurator;
-import io.liveoak.container.codec.ResourceCodecManager;
+import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.container.SubscriptionManager;
 import org.jboss.msc.inject.Injector;

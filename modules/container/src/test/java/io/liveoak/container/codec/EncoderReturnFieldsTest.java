@@ -5,11 +5,12 @@
  */
 package io.liveoak.container.codec;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.InMemoryObjectResource;
 import io.liveoak.container.ReturnFieldsImpl;
-import io.liveoak.container.codec.driver.EncodingDriver;
-import io.liveoak.container.codec.driver.RootEncodingDriver;
-import io.liveoak.container.codec.state.ResourceStateEncoder;
+import io.liveoak.common.codec.driver.EncodingDriver;
+import io.liveoak.common.codec.driver.RootEncodingDriver;
+import io.liveoak.common.codec.state.ResourceStateEncoder;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.Resource;

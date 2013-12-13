@@ -1,13 +1,10 @@
 package io.liveoak.container.subscriptions;
 
 import io.liveoak.container.*;
-import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.container.server.UnsecureServer;
-import io.liveoak.spi.Container;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
-import io.liveoak.spi.container.DirectConnector;
-import io.liveoak.spi.container.Server;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +19,7 @@ import static org.junit.Assert.*;
 public class HttpSubscriptionTest {
 
     protected LiveOakSystem system;
-    protected DirectConnector connector;
+    protected Client client;
 
     @Before
     public void setUp() throws Exception {
@@ -34,7 +31,7 @@ public class HttpSubscriptionTest {
 
         this.system.directDeployer().deploy( resource );
 
-        this.connector = this.system.directConnector();
+        this.client = this.system.client();
     }
 
     @After
@@ -52,7 +49,7 @@ public class HttpSubscriptionTest {
         DefaultResourceState subscriptionState = new DefaultResourceState();
         subscriptionState.putProperty("path", "/memory/data/*");
         subscriptionState.putProperty("destination", "http://localhost:8080/memory/notifications/");
-        ResourceState createdSubscription = this.connector.create(requestContext, "/subscriptions", subscriptionState);
+        ResourceState createdSubscription = this.client.create(requestContext, "/subscriptions", subscriptionState);
 
         assertThat(createdSubscription).isNotNull();
         assertThat(createdSubscription.getProperty("path")).isEqualTo("/memory/data/*");
@@ -62,7 +59,7 @@ public class HttpSubscriptionTest {
 
         DefaultResourceState bobState = new DefaultResourceState();
         bobState.putProperty("name", "Bob McWhirter");
-        ResourceState createdBob = this.connector.create(requestContext, "/memory/data", bobState);
+        ResourceState createdBob = this.client.create(requestContext, "/memory/data", bobState);
 
         String bobId = createdBob.id();
         assertThat(bobId).isNotEmpty();
@@ -74,7 +71,7 @@ public class HttpSubscriptionTest {
 
         // Check that subscription fired, creating target
 
-        ResourceState notifiedBob = this.connector.read(requestContext, "/memory/notifications/" + bobId);
+        ResourceState notifiedBob = this.client.read(requestContext, "/memory/notifications/" + bobId);
 
         assertThat(notifiedBob).isNotNull();
         assertThat(notifiedBob.id()).isEqualTo(bobId);
@@ -84,7 +81,7 @@ public class HttpSubscriptionTest {
 
         // Delete a subscribed thing
 
-        ResourceState deletedBob = this.connector.delete(requestContext, createdBob.uri().toString());
+        ResourceState deletedBob = this.client.delete(requestContext, createdBob.uri().toString());
 
         // Give it time to propagate
 
@@ -93,7 +90,7 @@ public class HttpSubscriptionTest {
         // ensure delete was notified to subscriber
 
         try {
-            this.connector.read(requestContext, notifiedBob.uri().toString());
+            this.client.read(requestContext, notifiedBob.uri().toString());
             fail("Should have thrown ResourceNotFoundException");
         } catch (ResourceNotFoundException e) {
             // expected and correct
@@ -101,14 +98,14 @@ public class HttpSubscriptionTest {
 
         // Delete the subscription
 
-        ResourceState deletedSubscription = this.connector.delete(requestContext, createdSubscription.uri().toString());
+        ResourceState deletedSubscription = this.client.delete(requestContext, createdSubscription.uri().toString());
         assertThat(deletedSubscription).isNotNull();
 
         // Ensure that further notifications do not occur.
 
         DefaultResourceState kenState = new DefaultResourceState();
         kenState.putProperty("name", "Ken Finnigan");
-        ResourceState createdKen = this.connector.create(requestContext, "/memory/data", kenState);
+        ResourceState createdKen = this.client.create(requestContext, "/memory/data", kenState);
 
         String kenId = createdKen.id();
         assertThat(kenId).isNotEmpty();
@@ -116,7 +113,7 @@ public class HttpSubscriptionTest {
         Thread.sleep(2000);
 
         try {
-            this.connector.read(requestContext, "/memory/notifications/" + kenId);
+            this.client.read(requestContext, "/memory/notifications/" + kenId);
             fail("should have thrown ResourceNotFoundException");
         } catch (ResourceNotFoundException e) {
             // expected and corret

@@ -6,13 +6,11 @@
 package io.liveoak.container.server;
 
 import io.liveoak.container.protocols.ProtocolDetector;
-import io.liveoak.container.server.AbstractServer;
-import io.liveoak.spi.resource.async.Resource;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-public class UnsecureServer extends AbstractServer {
+public class UnsecureServer extends AbstractNetworkServer {
 
     public UnsecureServer() {
         super();

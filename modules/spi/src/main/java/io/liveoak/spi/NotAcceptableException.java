@@ -12,6 +12,10 @@ public class NotAcceptableException extends ResourceException {
 
     protected String message;
 
+    public NotAcceptableException(String path) {
+        super(path, "Request not acceptable" );
+    }
+
     public NotAcceptableException(String path, String errorCode) {
         this(path, errorCode, null);
     }

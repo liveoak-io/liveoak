@@ -5,9 +5,9 @@
  */
 package io.liveoak.container.auth;
 
-import io.liveoak.container.DefaultRequestContext;
-import io.liveoak.container.DefaultResourceRequest;
-import io.liveoak.container.DefaultResourceErrorResponse;
+import io.liveoak.common.DefaultRequestContext;
+import io.liveoak.common.DefaultResourceRequest;
+import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.security.impl.AuthServicesHolder;
 import io.liveoak.security.impl.DefaultSecurityContext;
 import io.liveoak.security.impl.SimpleLogger;

@@ -5,7 +5,6 @@
  */
 package io.liveoak.git;
 
-import io.liveoak.spi.Config;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
@@ -41,7 +40,7 @@ public class GitResourceTest extends AbstractResourceTestCase {
 
     @Test
     public void testRoot() throws Exception {
-        ResourceState result = connector.read(new RequestContext.Builder().build(), "/git");
+        ResourceState result = client.read(new RequestContext.Builder().build(), "/git");
 
         assertThat(result).isNotNull();
     }

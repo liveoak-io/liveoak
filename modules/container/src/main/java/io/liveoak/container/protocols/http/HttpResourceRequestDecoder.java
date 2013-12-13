@@ -5,12 +5,12 @@
  */
 package io.liveoak.container.protocols.http;
 
-import io.liveoak.container.DefaultResourceParams;
-import io.liveoak.container.DefaultResourceRequest;
+import io.liveoak.common.DefaultResourceParams;
+import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.container.ReturnFieldsImpl;
-import io.liveoak.container.codec.DefaultMediaTypeMatcher;
-import io.liveoak.container.codec.ResourceCodecManager;
-import io.liveoak.container.codec.UnsupportedMediaTypeException;
+import io.liveoak.common.DefaultMediaTypeMatcher;
+import io.liveoak.common.codec.ResourceCodecManager;
+import io.liveoak.common.codec.UnsupportedMediaTypeException;
 import io.liveoak.security.impl.AuthConstants;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.MediaTypeMatcher;

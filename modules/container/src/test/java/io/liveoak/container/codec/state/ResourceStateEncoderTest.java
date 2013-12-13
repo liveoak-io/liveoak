@@ -5,11 +5,12 @@
  */
 package io.liveoak.container.codec.state;
 
+import io.liveoak.common.codec.state.ResourceStateEncoder;
 import io.liveoak.container.InMemoryObjectResource;
-import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.container.codec.NonEncodableValueException;
-import io.liveoak.container.codec.driver.EncodingDriver;
-import io.liveoak.container.codec.driver.RootEncodingDriver;
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.common.codec.NonEncodableValueException;
+import io.liveoak.common.codec.driver.EncodingDriver;
+import io.liveoak.common.codec.driver.RootEncodingDriver;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;

@@ -21,7 +21,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 import de.flapdoodle.embed.process.collections.Collections;
-import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 
@@ -38,7 +38,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
 
         ResourceState state = new DefaultResourceState();
         state.putProperty("foo", "bar");
-        ResourceState result = connector.create(new RequestContext.Builder().build(), BASEPATH + "/" + methodName, state);
+        ResourceState result = client.create(new RequestContext.Builder().build(), BASEPATH + "/" + methodName, state);
 
         // verify response
         assertThat(result).isNotNull();
@@ -61,7 +61,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
 
         ResourceState state = new DefaultResourceState("helloworld");
         state.putProperty("foo", "bar");
-        ResourceState result = connector.create(new RequestContext.Builder().build(), BASEPATH + "/" + methodName, state);
+        ResourceState result = client.create(new RequestContext.Builder().build(), BASEPATH + "/" + methodName, state);
 
         // verify response
         assertThat(result).isNotNull();
@@ -106,7 +106,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         state.putProperty("arr", arr);
 
         RequestContext requestContext = new RequestContext.Builder().build();// .returnFields(new ReturnFieldsImpl("*(arr(*(*)))")).build();
-        ResourceState result = connector.create(requestContext, BASEPATH + "/" + methodName, state);
+        ResourceState result = client.create(requestContext, BASEPATH + "/" + methodName, state);
 
         // verify the result
         assertThat(result).isNotNull();
@@ -179,7 +179,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         state.putProperty("arr", arr);
 
         RequestContext requestContext = new RequestContext.Builder().build();
-        ResourceState result = connector.create(requestContext, BASEPATH + "/" + methodName, state);
+        ResourceState result = client.create(requestContext, BASEPATH + "/" + methodName, state);
 
         // verify the result
         assertThat(result).isNotNull();
@@ -251,7 +251,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         obj.putProperty("subobject", subObj);
         state.putProperty("obj", obj);
 
-        ResourceState result = connector.create(new RequestContext.Builder().build(), BASEPATH + "/" + methodName, state);
+        ResourceState result = client.create(new RequestContext.Builder().build(), BASEPATH + "/" + methodName, state);
 
         // verify the result
         assertThat(result).isNotNull();

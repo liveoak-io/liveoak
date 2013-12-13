@@ -5,12 +5,10 @@
  */
 package io.liveoak.testtools;
 
-import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
-import io.liveoak.spi.Container;
-import io.liveoak.spi.container.DirectConnector;
-import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.After;
@@ -25,7 +23,7 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
 
     private LiveOakSystem system;
 
-    protected DirectConnector connector;
+    protected Client client;
     protected RootResource resource;
     protected Vertx vertx;
 
@@ -41,7 +39,7 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
         this.system = LiveOakFactory.create();
         this.resource = createRootResource();
         this.system.directDeployer().deploy(this.resource, createConfig());
-        this.connector = this.system.directConnector();
+        this.client = this.system.client();
         this.vertx = this.system.vertx();
     }
 

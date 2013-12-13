@@ -10,7 +10,7 @@ import java.util.concurrent.Executor;
 import io.liveoak.container.ErrorHandler;
 import io.liveoak.container.ResourceHandler;
 import io.liveoak.container.auth.AuthorizationHandler;
-import io.liveoak.container.codec.ResourceCodecManager;
+import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.deploy.ConfigurationWatcher;
 import io.liveoak.container.deploy.DirectoryDeploymentManager;
 import io.liveoak.container.protocols.http.HttpResourceRequestDecoder;
@@ -119,7 +119,7 @@ public class PipelineConfigurator {
 
     public void switchToWebSockets(ChannelPipeline pipeline) {
         pipeline.remove(WebSocketHandshakerHandler.class);
-        //pipeline.addLast( new DebugHandler( "server-1" ) );
+        //pipeline.addLast( new DebugHandler( "networkServer-1" ) );
         pipeline.addLast(new WebSocketStompFrameDecoder());
         pipeline.addLast(new WebSocketStompFrameEncoder());
 
@@ -142,11 +142,11 @@ public class PipelineConfigurator {
 
     public void switchToPlainHttp(ChannelPipeline pipeline) {
         pipeline.remove(WebSocketHandshakerHandler.class);
-        //pipeline.addLast( new DebugHandler( "server-1" ) );
+        //pipeline.addLast( new DebugHandler( "networkServer-1" ) );
         pipeline.addLast("http-resourceRead-decoder", new HttpResourceRequestDecoder(this.codecManager));
         pipeline.addLast("http-resourceRead-encoder", new HttpResourceResponseEncoder(this.codecManager));
         pipeline.addLast("auth-handler", new AuthorizationHandler());
-        //pipeline.addLast( new DebugHandler( "server-2" ) );
+        //pipeline.addLast( new DebugHandler( "networkServer-2" ) );
         if (this.deploymentManager != null) {
             pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));
         }
@@ -156,6 +156,15 @@ public class PipelineConfigurator {
     }
 
     public void setupDirectConnector(ChannelPipeline pipeline) {
+        pipeline.addLast(new SubscriptionWatcher(this.subscriptionManager));
+        if (this.deploymentManager != null) {
+            pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));
+        }
+        pipeline.addLast(new ResourceHandler(this.container, this.workerPool));
+    }
+
+    public void setupLocal(ChannelPipeline pipeline) {
+        //pipeline.addLast( new DebugHandler( "local-head" ) );
         pipeline.addLast(new SubscriptionWatcher(this.subscriptionManager));
         if (this.deploymentManager != null) {
             pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));

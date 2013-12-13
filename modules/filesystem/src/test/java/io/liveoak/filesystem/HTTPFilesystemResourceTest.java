@@ -5,9 +5,7 @@
  */
 package io.liveoak.filesystem;
 
-import io.liveoak.container.SimpleConfig;
-import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.spi.Config;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;

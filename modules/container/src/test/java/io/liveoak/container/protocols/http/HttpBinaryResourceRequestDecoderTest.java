@@ -5,8 +5,8 @@
  */
 package io.liveoak.container.protocols.http;
 
-import io.liveoak.container.DefaultResourceRequest;
-import io.liveoak.container.codec.ResourceCodecManager;
+import io.liveoak.common.DefaultResourceRequest;
+import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.state.BinaryResourceState;
 import io.netty.channel.embedded.EmbeddedChannel;

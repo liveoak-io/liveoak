@@ -5,7 +5,7 @@
  */
 package io.liveoak.container.subscriptions;
 
-import io.liveoak.container.DefaultResourceResponse;
+import io.liveoak.common.DefaultResourceResponse;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;

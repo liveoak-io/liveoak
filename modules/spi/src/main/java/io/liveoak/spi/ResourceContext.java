@@ -5,7 +5,7 @@
  */
 package io.liveoak.spi;
 
-import io.liveoak.spi.container.DirectConnector;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.async.Notifier;
 import org.vertx.java.core.Vertx;
 
@@ -32,5 +32,5 @@ public interface ResourceContext {
 
     Notifier notifier();
 
-    DirectConnector directConnector();
+    Client client();
 }

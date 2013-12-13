@@ -1,8 +1,8 @@
 package io.liveoak.container.service;
 
-import io.liveoak.container.codec.Encoder;
-import io.liveoak.container.codec.ResourceCodec;
-import io.liveoak.container.codec.ResourceDecoder;
+import io.liveoak.common.codec.Encoder;
+import io.liveoak.common.codec.ResourceCodec;
+import io.liveoak.common.codec.ResourceDecoder;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;

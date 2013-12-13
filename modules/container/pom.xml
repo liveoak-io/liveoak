@@ -27,6 +27,16 @@
         </dependency>
         <dependency>
             <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-common</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-client</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
             <artifactId>liveoak-stomp</artifactId>
             <scope>provided</scope>
         </dependency>

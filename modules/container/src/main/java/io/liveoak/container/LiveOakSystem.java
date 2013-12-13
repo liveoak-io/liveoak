@@ -1,23 +1,17 @@
 package io.liveoak.container;
 
-import java.util.List;
-
-import io.liveoak.container.codec.ResourceCodec;
-import io.liveoak.container.codec.ResourceCodecManager;
+import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.deploy.DirectDeployer;
 import io.liveoak.container.resource.PropertiesResource;
 import io.liveoak.container.resource.ServersResource;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.Deployer;
-import io.liveoak.spi.container.DirectConnector;
 import io.liveoak.spi.container.Server;
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.ResourceSink;
 import org.jboss.msc.service.ServiceContainer;
-import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceName;
 import org.vertx.java.core.Vertx;
 
 /**
@@ -44,12 +38,16 @@ public class LiveOakSystem implements RootResource {
         return (Container) this.serviceContainer.getService(LiveOak.CONTAINER).getValue();
     }
 
-    public DirectConnector directConnector() {
-        return (DirectConnector) this.serviceContainer.getService(LiveOak.DIRECT_CONNECTOR).getValue();
+    public Client client() {
+        return (Client) this.serviceContainer.getService(LiveOak.CLIENT).getValue();
     }
 
-    public Server server(String name) {
-        return (Server) this.serviceContainer.getService(LiveOak.server(name)).getValue();
+    public Server networkServer(String name) {
+        return (Server) this.serviceContainer.getService(LiveOak.server(name, true)).getValue();
+    }
+
+    public Server localServer(String name) {
+        return (Server) this.serviceContainer.getService(LiveOak.server(name, false)).getValue();
     }
 
     public ResourceCodecManager codecManager() {

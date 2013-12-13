@@ -17,6 +17,8 @@
         <module name="com.fasterxml.jackson.core"/>
         <module name="io.liveoak.stomp"/>
         <module name="io.liveoak.spi"/>
+        <module name="io.liveoak.common"/>
+        <module name="io.liveoak.client"/>
         <module name="io.liveoak.security"/>
         <module name="io.liveoak.security.uripolicy"/>
         <module name="org.jboss.msc"/>

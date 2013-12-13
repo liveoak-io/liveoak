@@ -1,16 +1,16 @@
 package io.liveoak.container.service;
 
+import io.liveoak.container.server.AbstractNetworkServer;
 import io.liveoak.container.server.AbstractServer;
-import io.liveoak.spi.container.Server;
 import io.liveoak.container.server.UnsecureServer;
 
 /**
  * @author Bob McWhirter
  */
-public class UnsecureServerService extends AbstractServerService {
+public class UnsecureServerService extends AbstractNetworkServerService {
 
     @Override
-    public AbstractServer newServer() {
+    public AbstractNetworkServer newServer() {
         return new UnsecureServer();
     }
 }

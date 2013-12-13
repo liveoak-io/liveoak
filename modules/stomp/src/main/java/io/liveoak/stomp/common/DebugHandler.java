@@ -57,10 +57,11 @@ public class DebugHandler extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.err.println("DEBUG: " + this.name + " read: " + msg);
+        System.err.println("DEBUG: " + this.name + " read: " + msg + " // " + msg.getClass() );
         ReferenceCountUtil.retain(msg);
         super.channelRead(ctx, msg);
     }
+
 
     private String name;
 

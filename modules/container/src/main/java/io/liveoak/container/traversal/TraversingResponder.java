@@ -7,7 +7,7 @@ package io.liveoak.container.traversal;
 
 import java.util.concurrent.Executor;
 
-import io.liveoak.container.DefaultResourceRequest;
+import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.BlockingResource;

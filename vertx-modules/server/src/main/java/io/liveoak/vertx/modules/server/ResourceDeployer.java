@@ -5,13 +5,8 @@
  */
 package io.liveoak.vertx.modules.server;
 
-import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.LiveOakSystem;
-import io.liveoak.container.SimpleConfig;
-import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.spi.InitializationException;
 import io.liveoak.vertx.resource.RootVertxCollectionResource;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
 

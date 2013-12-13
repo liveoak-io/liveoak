@@ -16,4 +16,10 @@ public interface ResourceErrorResponse extends ResourceResponse {
         DELETE_NOT_SUPPORTED,
         INTERNAL_ERROR
     }
+
+    ErrorType errorType();
+
+    Throwable cause();
+
+    String message();
 }

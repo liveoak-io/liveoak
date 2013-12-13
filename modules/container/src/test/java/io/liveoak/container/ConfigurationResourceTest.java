@@ -3,10 +3,9 @@ package io.liveoak.container;
 import java.io.File;
 import java.net.URL;
 
-import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.container.DirectConnector;
-import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +21,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class ConfigurationResourceTest {
 
     private LiveOakSystem system;
-    private DirectConnector connector;
+    private Client client;
 
     private static final String CONFIG_PARAM = ";config";
     private static final String ROOT_WITH_CONFIG = "/" + CONFIG_PARAM;
@@ -60,7 +59,7 @@ public class ConfigurationResourceTest {
     @Before
     public void setUp() throws Exception {
         this.system = LiveOakFactory.create(new File(this.projectRoot, "target/etc"));
-        this.connector = this.system.directConnector();
+        this.client = this.system.client();
         InMemoryConfigResource resource = new InMemoryConfigResource(RESOURCE);
         DefaultResourceState state = new DefaultResourceState();
         state.putProperty(FIRST_KEY, FIRST_VALUE);
@@ -76,7 +75,7 @@ public class ConfigurationResourceTest {
     /*
     @Test
     public void testFetchConfiguration() throws Exception {
-        Resource configResource = this.connector.fetch(ROOT_WITH_CONFIG);
+        Resource configResource = this.client.fetch(ROOT_WITH_CONFIG);
         assertThat(configResource).isNotNull();
         assertThat(configResource).isInstanceOf(ContainerConfigurationResource.class);
 
@@ -87,7 +86,7 @@ public class ConfigurationResourceTest {
     public void testReadConfiguration() throws Exception {
         RequestContext context = new RequestContext.Builder().build();
 
-        ResourceState configState = this.connector.read(context, ROOT_WITH_CONFIG);
+        ResourceState configState = this.client.read(context, ROOT_WITH_CONFIG);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(CONFIG_PARAM);
@@ -99,7 +98,7 @@ public class ConfigurationResourceTest {
     public void testConfigPropertyString() throws Exception {
         RequestContext context = new RequestContext.Builder().build();
 
-        ResourceState configState = this.connector.read(context, RESOURCE_WITH_CONFIG);
+        ResourceState configState = this.client.read(context, RESOURCE_WITH_CONFIG);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(CONFIG_PARAM);
@@ -138,7 +137,7 @@ public class ConfigurationResourceTest {
 
         RequestContext context = new RequestContext.Builder().build();
 
-        ResourceState configState = this.connector.read(context, "/" + RESOURCE + 5 + CONFIG_PARAM);
+        ResourceState configState = this.client.read(context, "/" + RESOURCE + 5 + CONFIG_PARAM);
 
         assertThat(configState).isNotNull();
 

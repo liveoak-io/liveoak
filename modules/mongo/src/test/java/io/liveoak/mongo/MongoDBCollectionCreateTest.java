@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import com.mongodb.BasicDBObject;
 
-import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceAlreadyExistsException;
 import io.liveoak.spi.state.ResourceState;
@@ -26,12 +26,12 @@ public class MongoDBCollectionCreateTest extends BaseMongoDBTest {
     public void testCreateCollection() throws Exception {
         // check that we can create the resource
         ResourceState state = new DefaultResourceState("movies");
-        ResourceState createdResource = connector.create(new RequestContext.Builder().build(), "/storage", state);
+        ResourceState createdResource = client.create(new RequestContext.Builder().build(), "/storage", state);
         assertThat(createdResource).isNotNull();
         assertThat(createdResource.id()).isEqualTo("movies");
 
         // test that we get this resource back on a read
-        ResourceState movies = connector.read(new RequestContext.Builder().build(), "/storage/movies");
+        ResourceState movies = client.read(new RequestContext.Builder().build(), "/storage/movies");
         assertThat(movies).isNotNull();
         assertThat(movies.id()).isEqualTo("movies");
     }
@@ -45,7 +45,7 @@ public class MongoDBCollectionCreateTest extends BaseMongoDBTest {
 
         ResourceState state = new DefaultResourceState("testCollection");
 
-        ResourceState response = connector.create(new RequestContext.Builder().build(), BASEPATH, state);
+        ResourceState response = client.create(new RequestContext.Builder().build(), BASEPATH, state);
 
         // verify response
         assertThat(response).isNotNull();
@@ -64,7 +64,7 @@ public class MongoDBCollectionCreateTest extends BaseMongoDBTest {
         db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one ?
         assertThat(db.getCollectionNames()).hasSize(0);
 
-        ResourceState response = connector.create(new RequestContext.Builder().build(), BASEPATH, new DefaultResourceState());
+        ResourceState response = client.create(new RequestContext.Builder().build(), BASEPATH, new DefaultResourceState());
 
         // verfiy response
         assertThat(response).isNotNull();
@@ -87,7 +87,7 @@ public class MongoDBCollectionCreateTest extends BaseMongoDBTest {
         assertThat(db.collectionExists("foobar")).isTrue();
 
         try {
-            ResourceState response = connector.create(new RequestContext.Builder().build(), BASEPATH, new DefaultResourceState("foobar"));
+            ResourceState response = client.create(new RequestContext.Builder().build(), BASEPATH, new DefaultResourceState("foobar"));
             Fail.fail("shouldn't get here");
         } catch (ResourceAlreadyExistsException e) {
             // expected

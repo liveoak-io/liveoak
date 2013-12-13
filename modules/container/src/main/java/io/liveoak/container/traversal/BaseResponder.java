@@ -5,11 +5,10 @@
  */
 package io.liveoak.container.traversal;
 
-import io.liveoak.container.DefaultResourceErrorResponse;
-import io.liveoak.container.DefaultResourceResponse;
+import io.liveoak.common.DefaultResourceErrorResponse;
+import io.liveoak.common.DefaultResourceResponse;
 import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourceRequest;
-import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.netty.channel.ChannelHandlerContext;

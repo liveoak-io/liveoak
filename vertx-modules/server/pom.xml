@@ -50,6 +50,11 @@
             <artifactId>liveoak-container</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-client</artifactId>
+            <scope>compile</scope>
+        </dependency>
         <!--Test dependencies-->
         <dependency>
             <groupId>io.liveoak</groupId>

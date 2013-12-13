@@ -8,7 +8,7 @@ package io.liveoak.container;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.liveoak.container.deploy.DeploymentException;
+import io.liveoak.spi.container.DeploymentException;
 import io.liveoak.container.deploy.DirectoryDeploymentManager;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.RequestContext;

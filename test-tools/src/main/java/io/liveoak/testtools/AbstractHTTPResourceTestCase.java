@@ -5,12 +5,9 @@
  */
 package io.liveoak.testtools;
 
-import io.liveoak.container.DefaultContainer;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
-import io.liveoak.container.server.UnsecureServer;
-import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.spi.container.Server;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
 import org.apache.http.client.config.RequestConfig;

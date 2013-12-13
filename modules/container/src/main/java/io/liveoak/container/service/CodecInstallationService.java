@@ -1,9 +1,7 @@
 package io.liveoak.container.service;
 
-import io.liveoak.container.codec.Encoder;
-import io.liveoak.container.codec.ResourceCodec;
-import io.liveoak.container.codec.ResourceCodecManager;
-import io.liveoak.container.codec.ResourceDecoder;
+import io.liveoak.common.codec.ResourceCodec;
+import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.spi.MediaType;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;

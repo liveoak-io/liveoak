@@ -1,7 +1,7 @@
 package io.liveoak.scheduler;
 
 import io.liveoak.container.ReturnFieldsImpl;
-import io.liveoak.container.codec.DefaultResourceState;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
@@ -32,7 +32,7 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
         ResourceState triggerState = new DefaultResourceState();
         triggerState.putProperty("cron", "* * * * * ?");
         System.err.println( "creating a trigger" );
-        ResourceState returnedState = connector.create(requestContext, "/scheduler", triggerState);
+        ResourceState returnedState = client.create(requestContext, "/scheduler", triggerState);
         System.err.println( "created a trigger: " + returnedState );
 
         String id = returnedState.id();
@@ -43,7 +43,7 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
 
         System.err.println( "Fetching firings" );
 
-        ResourceState fromCollection = connector.read(requestContext, "/scheduler/" + id);
+        ResourceState fromCollection = client.read(requestContext, "/scheduler/" + id);
 
         System.err.println( "Fetched: " + fromCollection );
 

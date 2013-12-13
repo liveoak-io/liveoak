@@ -5,8 +5,6 @@
  */
 package io.liveoak.container;
 
-import io.liveoak.container.codec.DefaultResourceState;
-import io.liveoak.container.server.UnsecureServer;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.container.Server;
@@ -30,7 +28,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
@@ -53,7 +50,7 @@ public class BasicServerTest {
         InMemoryDBResource resource = new InMemoryDBResource("memory");
         this.system.directDeployer().deploy( resource );
 
-        this.server = this.system.server( "unsecure" );
+        this.server = this.system.networkServer("unsecure");
     }
 
     @Before

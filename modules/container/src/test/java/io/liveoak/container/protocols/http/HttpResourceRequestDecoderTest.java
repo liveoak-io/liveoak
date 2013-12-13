@@ -6,11 +6,11 @@
 package io.liveoak.container.protocols.http;
 
 
-import io.liveoak.container.DefaultResourceRequest;
-import io.liveoak.container.codec.ResourceCodec;
-import io.liveoak.container.codec.ResourceCodecManager;
-import io.liveoak.container.codec.json.JSONDecoder;
-import io.liveoak.container.codec.json.JSONEncoder;
+import io.liveoak.common.DefaultResourceRequest;
+import io.liveoak.common.codec.ResourceCodec;
+import io.liveoak.common.codec.ResourceCodecManager;
+import io.liveoak.common.codec.json.JSONDecoder;
+import io.liveoak.common.codec.json.JSONEncoder;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestType;

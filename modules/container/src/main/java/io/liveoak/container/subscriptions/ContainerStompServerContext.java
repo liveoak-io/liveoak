@@ -5,9 +5,8 @@
  */
 package io.liveoak.container.subscriptions;
 
-import io.liveoak.container.codec.ResourceCodec;
-import io.liveoak.container.codec.ResourceCodecManager;
-import io.liveoak.container.subscriptions.StompSubscription;
+import io.liveoak.common.codec.ResourceCodec;
+import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.stomp.Headers;
