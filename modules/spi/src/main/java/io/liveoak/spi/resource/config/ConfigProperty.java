@@ -1,4 +1,4 @@
-package io.liveoak.spi.resource;
+package io.liveoak.spi.resource.config;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -7,9 +7,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Defines a configuration property on a {@link RootResource} for reading and updating.
- * If <code>name</code> is set to an empty string, then the name of the configuration
- * property will be set to the field name.
+ * Defines a configuration property on a {@link io.liveoak.spi.resource.RootResource} for reading and updating.
+ * If <code>value</code> is set to an empty string, then the name of the configuration property will default
+ * to the field name.
  *
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface ConfigProperty {
 
-    String name() default "";
+    String value() default "";
 
     String msg() default "";
 

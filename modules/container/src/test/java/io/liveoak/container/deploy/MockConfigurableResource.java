@@ -1,7 +1,7 @@
 package io.liveoak.container.deploy;
 
-import io.liveoak.spi.resource.ConfigProperty;
-import io.liveoak.spi.resource.Configurable;
+import io.liveoak.spi.resource.config.ConfigProperty;
+import io.liveoak.spi.resource.config.Configurable;
 import io.liveoak.spi.resource.RootResource;
 
 /**

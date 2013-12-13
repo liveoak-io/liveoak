@@ -1,4 +1,4 @@
-package io.liveoak.spi.resource;
+package io.liveoak.spi.resource.config;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -7,13 +7,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Defines whether a {@link RootResource} wishes to specify its' configuration as fields
- * on itself with {@link ConfigProperty}, instead of a separate {@link ConfigResource} implementation.
+ * Provides a way map multiple configuration values that are used to construct a single object within
+ * a {@link io.liveoak.spi.resource.RootResource}.
  *
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Configurable {
+public @interface ConfigMapping {
+    ConfigProperty[] properties();
+
+    String importMethod();
 }

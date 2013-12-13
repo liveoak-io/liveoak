@@ -1,7 +1,7 @@
 package io.liveoak.container.deploy;
 
 import io.liveoak.spi.ResourceResponse;
-import io.liveoak.spi.resource.ConfigResource;
+import io.liveoak.spi.resource.config.ConfigResource;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.netty.channel.ChannelHandlerContext;

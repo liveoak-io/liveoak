@@ -13,7 +13,6 @@ import io.liveoak.container.deploy.DirectoryDeploymentManager;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.container.Deployer;
-import io.liveoak.spi.resource.Configurable;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
@@ -26,7 +25,6 @@ import io.liveoak.spi.state.ResourceState;
  *
  * @author Bob McWhirter
  */
-@Configurable
 public class DefaultContainer implements Container, Resource {
 
     /**

@@ -133,6 +133,8 @@ public class ConfigurationResourceTest {
         InMemoryConfigResourceWithConverter resource = new InMemoryConfigResourceWithConverter(RESOURCE + 5);
         DefaultResourceState state = new DefaultResourceState();
         state.putProperty("file", this.projectRoot.getAbsolutePath());
+        state.putProperty("firstValue", "firstValue");
+        state.putProperty("secondValue", "another");
         this.system.directDeployer().deploy(resource, state);
 
         RequestContext context = new RequestContext.Builder().build();
@@ -145,5 +147,15 @@ public class ConfigurationResourceTest {
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
         assertThat(value).toString().equals(this.projectRoot.getAbsolutePath());
+
+        value = configState.getProperty("firstValue");
+        assertThat(value).isNotNull();
+        assertThat(value).isInstanceOf(String.class);
+        assertThat(value).toString().equals("firstValue");
+
+        value = configState.getProperty("secondValue");
+        assertThat(value).isNotNull();
+        assertThat(value).isInstanceOf(String.class);
+        assertThat(value).toString().equals("another");
     }
 }

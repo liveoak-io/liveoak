@@ -1,7 +1,7 @@
 package io.liveoak.container;
 
-import io.liveoak.spi.resource.ConfigProperty;
-import io.liveoak.spi.resource.Configurable;
+import io.liveoak.spi.resource.config.ConfigProperty;
+import io.liveoak.spi.resource.config.Configurable;
 import io.liveoak.spi.resource.RootResource;
 
 /**
@@ -19,7 +19,7 @@ public class InMemoryConfigResource implements RootResource {
     @ConfigProperty
     private String path1;
 
-    @ConfigProperty(name = "other")
+    @ConfigProperty(value = "other")
     private String path2;
 
     @Override

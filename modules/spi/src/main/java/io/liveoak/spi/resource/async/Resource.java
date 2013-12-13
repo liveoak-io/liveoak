@@ -6,8 +6,8 @@
 package io.liveoak.spi.resource.async;
 
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.ConfigResource;
-import io.liveoak.spi.resource.Configurable;
+import io.liveoak.spi.resource.config.ConfigResource;
+import io.liveoak.spi.resource.config.Configurable;
 import io.liveoak.spi.state.ResourceState;
 
 import java.net.URI;

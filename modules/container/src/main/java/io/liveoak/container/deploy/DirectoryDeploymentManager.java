@@ -21,7 +21,7 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.container.Deployer;
 import io.liveoak.spi.container.DeploymentException;
-import io.liveoak.spi.resource.ConfigResource;
+import io.liveoak.spi.resource.config.ConfigResource;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
