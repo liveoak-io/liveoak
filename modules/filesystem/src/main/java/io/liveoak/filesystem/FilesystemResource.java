@@ -5,21 +5,27 @@
  */
 package io.liveoak.filesystem;
 
+import java.io.File;
+
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.config.ConfigMapping;
+import io.liveoak.spi.resource.config.ConfigMappingExporter;
+import io.liveoak.spi.resource.config.ConfigProperty;
+import io.liveoak.spi.resource.config.Configurable;
 import org.vertx.java.core.Vertx;
 
 /**
  * @author Bob McWhirter
  */
+@Configurable
 public class FilesystemResource extends DirectoryResource implements RootResource, FSResource {
 
     public FilesystemResource(String id) {
         super(null, null);
         this.id = id;
-        this.configResource = new FilesystemConfigResource(this);
     }
 
     @Override
@@ -33,14 +39,30 @@ public class FilesystemResource extends DirectoryResource implements RootResourc
     }
 
     @Override
-    public Resource configuration() {
-        return this.configResource;
-    }
-
-
-    @Override
     public String id() {
         return this.id;
+    }
+
+    @ConfigMapping(@ConfigProperty("root"))
+    private void updateConfig(Object... configValues) throws InitializationException {
+        String rootStr = configValues[0].toString();
+
+        if (rootStr == null) {
+            throw new InitializationException("no filesystem root specified");
+        }
+
+        File file = new File(rootStr);
+
+        if (!file.canRead()) {
+            throw new InitializationException("unable to readMember filesystem at: " + file.getAbsolutePath());
+        }
+
+        this.file(file);
+    }
+
+    @ConfigMappingExporter("root")
+    public Object getPath() {
+        return this.file().getAbsolutePath();
     }
 
     public String toString() {
@@ -49,6 +71,5 @@ public class FilesystemResource extends DirectoryResource implements RootResourc
 
     private String id;
     private Vertx vertx;
-    private FilesystemConfigResource configResource;
 
 }
