@@ -37,7 +37,6 @@ import io.liveoak.spi.state.ResourceState;
 @Configurable
 public class RootMongoResource extends MongoResource implements RootResource {
 
-    @ConfigMapping(properties = {@ConfigProperty("host"), @ConfigProperty("port"), @ConfigProperty("db")}, importMethod = "updateConfig")
     private MongoClient mongo;
     protected DB db;
     private String id;
@@ -47,6 +46,7 @@ public class RootMongoResource extends MongoResource implements RootResource {
         this.id = id;
     }
 
+    @ConfigMapping({@ConfigProperty("host"), @ConfigProperty("port"), @ConfigProperty("db")})
     private void updateConfig(Object... values) throws Exception {
         String host = (String) values[0];
         if (host == null) {

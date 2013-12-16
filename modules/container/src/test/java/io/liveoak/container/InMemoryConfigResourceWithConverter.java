@@ -24,9 +24,9 @@ public class InMemoryConfigResourceWithConverter implements RootResource {
     @ConfigProperty(converter = FileConverter.class)
     private File file;
 
-    @ConfigMapping(properties = {@ConfigProperty("firstValue"), @ConfigProperty("secondValue")}, importMethod = "importConfig")
     private Thing thing;
 
+    @ConfigMapping({@ConfigProperty("firstValue"), @ConfigProperty("secondValue")})
     private void importConfig(Object... configValues) throws Exception {
         thing = new Thing((String)configValues[0], (String)configValues[1]);
     }

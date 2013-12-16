@@ -12,11 +12,9 @@ import java.lang.annotation.Target;
  *
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
-@Target(ElementType.FIELD)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface ConfigMapping {
-    ConfigProperty[] properties();
-
-    String importMethod();
+    ConfigProperty[] value();
 }

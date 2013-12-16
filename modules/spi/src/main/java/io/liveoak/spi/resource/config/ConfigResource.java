@@ -94,11 +94,11 @@ public interface ConfigResource extends Resource {
 
     default void updateConfigProperties(RequestContext ctx, ResourceState state, Responder responder, Resource resource) throws Exception {
         Field[] fields = resource.getClass().getDeclaredFields();
+        Method[] methods = resource.getClass().getDeclaredMethods();
 
         if (fields != null && fields.length > 0) {
             for (Field field : fields) {
                 ConfigProperty configProperty = field.getAnnotation(ConfigProperty.class);
-                ConfigMapping configMapping = field.getAnnotation(ConfigMapping.class);
 
                 if (configProperty != null) {
                     // Retrieve the key for the property.
@@ -129,10 +129,17 @@ public interface ConfigResource extends Resource {
                     if (value.getClass().isAssignableFrom((Class<?>) field.getGenericType())) {
                         field.set(resource, value);
                     }
+                }
+            }
+        }
 
-                } else if (configMapping != null) {
-                    ConfigProperty[] mappingProperties = configMapping.properties();
-                    String importMethod = configMapping.importMethod();
+        // Check methods
+        if (methods != null && methods.length > 0) {
+            for (Method method : methods) {
+                ConfigMapping configMapping = method.getAnnotation(ConfigMapping.class);
+
+                if (configMapping != null) {
+                    ConfigProperty[] mappingProperties = configMapping.value();
                     Object[] configValues = new Object[mappingProperties.length];
                     int count = 0;
 
@@ -142,7 +149,6 @@ public interface ConfigResource extends Resource {
                     }
 
                     // Create object from config state
-                    Method method = resource.getClass().getDeclaredMethod(importMethod, Object[].class);
                     method.setAccessible(Boolean.TRUE);
                     method.invoke(resource, new Object[] {configValues});
                 }

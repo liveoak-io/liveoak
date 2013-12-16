@@ -28,7 +28,6 @@ public class GitRepoResource extends GitDirectoryResource implements RootResourc
     private String id;
     private Vertx vertx;
 
-    @ConfigMapping(properties = {@ConfigProperty("repoPath"), @ConfigProperty("createIfMissing")}, importMethod = "updateConfig")
     private Git git;
 
     public GitRepoResource(String id) {
@@ -36,6 +35,7 @@ public class GitRepoResource extends GitDirectoryResource implements RootResourc
         this.id = id;
     }
 
+    @ConfigMapping({@ConfigProperty("repoPath"), @ConfigProperty("createIfMissing")})
     public void updateConfig(Object... values) throws Exception {
         String repoPathStr = (String) values[0];
 
