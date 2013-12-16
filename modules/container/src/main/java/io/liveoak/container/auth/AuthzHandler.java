@@ -7,6 +7,7 @@ package io.liveoak.container.auth;
 
 import io.liveoak.common.DefaultRequestAttributes;
 import io.liveoak.common.DefaultResourceErrorResponse;
+import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.ResourceErrorResponse;
@@ -26,9 +27,6 @@ import java.util.function.Consumer;
  */
 public class AuthzHandler extends SimpleChannelInboundHandler<ResourceRequest> {
 
-    // TODO: replace with real logging
-    private static final SimpleLogger log = new SimpleLogger(AuthzHandler.class);
-
     private final Client client;
 
     public AuthzHandler(Client client) {
@@ -41,6 +39,7 @@ public class AuthzHandler extends SimpleChannelInboundHandler<ResourceRequest> {
             // Put current request as attribute of the request, which will be sent to AuthzService
             RequestAttributes attribs = new DefaultRequestAttributes();
             attribs.setAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, req.requestContext());
+            attribs.setAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, req.state());
             RequestContext authzRequest = new RequestContext.Builder().requestAttributes(attribs).build();
 
             client.read(authzRequest, "/authz/authzCheck", new Consumer<ClientResourceResponse>() {

@@ -8,7 +8,7 @@ package io.liveoak.security.policy.uri;
 import io.liveoak.common.DefaultResourceParams;
 import io.liveoak.common.DefaultSecurityContext;
 import io.liveoak.security.policy.uri.complex.URIPolicy;
-import io.liveoak.security.spi.AuthzDecision;
+import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourceParams;

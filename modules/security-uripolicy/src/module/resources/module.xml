@@ -13,9 +13,9 @@
 
     <dependencies>
         <module name="io.liveoak.spi"/>
-        <module name="io.liveoak.container"/>
-        <module name="io.liveoak.security"/>
+        <module name="io.liveoak.common"/>
         <module name="com.fasterxml.jackson.core"/>
+        <module name="org.jboss.logging"/>
         <module name="org.drools"/>
     </dependencies>
 </module>

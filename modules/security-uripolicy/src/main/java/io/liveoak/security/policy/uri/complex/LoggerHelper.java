@@ -1,15 +1,15 @@
 package io.liveoak.security.policy.uri.complex;
 
-import io.liveoak.container.auth.SimpleLogger;
+import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public class LoggerHelper {
 
-    private static final SimpleLogger log = new SimpleLogger("DROOLS");
+    private static final Logger log = Logger.getLogger("DROOLS");
 
-    public static SimpleLogger logger() {
+    public static Logger logger() {
         return log;
     }
 }

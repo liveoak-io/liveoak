@@ -18,11 +18,12 @@ import io.liveoak.security.policy.uri.complex.URIMatcher;
 import io.liveoak.security.policy.uri.complex.URIMatcherCache;
 import io.liveoak.security.policy.uri.complex.RequestContextDecorator;
 import io.liveoak.security.policy.uri.RolesContainer
-import io.liveoak.security.spi.AuthzDecision;
+import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.SecurityContext;
-import io.liveoak.container.auth.SimpleLogger;
+import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ when
   $rulesProcessingResult: RulesProcessingResult( isAlreadyProcessedRule("URIPolicyRule_@{POLICY_COUNTER}") == false )
   $endSemaphore: EndSemaphore( finished == false )
   $securityContext: SecurityContext()
+  $requestState: ResourceState()
   URIMatcherCache($uriMatcher: getURIMatcher("URIPolicyRule_@{POLICY_COUNTER}"));
   $request: RequestContextDecorator(
                             uriMatches("URIPolicyRule_@{POLICY_COUNTER}", @{URI_PATTERN}, resourcePath, $uriMatcher) &&

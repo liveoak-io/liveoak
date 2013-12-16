@@ -1,7 +1,6 @@
 package io.liveoak.security.policy.uri.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.liveoak.container.auth.SimpleLogger;
 import io.liveoak.security.policy.uri.complex.URIPolicy;
 import io.liveoak.security.policy.uri.complex.URIPolicyRule;
 import io.liveoak.spi.RequestContext;
@@ -10,6 +9,7 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 
 import java.io.File;
 
@@ -18,14 +18,14 @@ import java.io.File;
  */
 public class URIPolicyConfigResource implements ConfigResource {
 
-    private static final SimpleLogger log = new SimpleLogger(URIPolicyConfigResource.class);
+    private static final Logger log = Logger.getLogger(URIPolicyConfigResource.class);
 
     private URIPolicyRootResource uriPolicy;
 
     private String config;
 
-    public URIPolicyConfigResource(URIPolicyRootResource authzService) {
-        this.uriPolicy = authzService;
+    public URIPolicyConfigResource(URIPolicyRootResource uriPolicy) {
+        this.uriPolicy = uriPolicy;
     }
 
     @Override
@@ -57,8 +57,7 @@ public class URIPolicyConfigResource implements ConfigResource {
                     URIPolicy policy = createPolicy(c);
                     uriPolicy.setUriPolicy(policy);
                 } else {
-                    // TODO LOG
-                    System.out.println(config + " not found");
+                    log.info(config + " not found");
                 }
                 this.config = config;
             }

@@ -32,22 +32,18 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-container</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-test-tools</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-test-tools</artifactId>
         </dependency>
     </dependencies>
 

@@ -5,10 +5,10 @@
  */
 package io.liveoak.security.policy.uri.complex;
 
-import io.liveoak.container.auth.SimpleLogger;
-import io.liveoak.security.spi.AuthzDecision;
-import io.liveoak.security.spi.AuthzPolicy;
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.state.ResourceState;
 import org.drools.RuleBase;
 import org.drools.RuleBaseConfiguration;
 import org.drools.RuleBaseFactory;
@@ -17,24 +17,21 @@ import org.drools.compiler.DroolsError;
 import org.drools.compiler.PackageBuilder;
 import org.drools.compiler.PackageBuilderErrors;
 import org.drools.template.DataProviderCompiler;
+import org.jboss.logging.Logger;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 /**
  * Policy for authorization of resources based on resource URI. Policy implementation is based on drools engine
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class URIPolicy implements AuthzPolicy {
+public class URIPolicy {
 
-    // TODO: Replace with real logging
-    private static final SimpleLogger log = new SimpleLogger(URIPolicy.class);
+    private static final Logger log = Logger.getLogger(URIPolicy.class);
 
     private RuleBase ruleBase;
 
@@ -50,7 +47,7 @@ public class URIPolicy implements AuthzPolicy {
         // Workaround for https://issues.jboss.org/browse/DROOLS-329 TODO: Remove when not needed or move to better place
         System.setProperty("drools.dialect.java.compiler", "JANINO");
 
-        RuleBaseConfiguration ruleBaseConfig = new RuleBaseConfiguration(URIPolicy.class.getClassLoader(), AuthzPolicy.class.getClassLoader());
+        RuleBaseConfiguration ruleBaseConfig = new RuleBaseConfiguration(URIPolicy.class.getClassLoader());
         ruleBase = RuleBaseFactory.newRuleBase(ruleBaseConfig);
 
         // Add DRL with functions
@@ -77,9 +74,11 @@ public class URIPolicy implements AuthzPolicy {
         addPackageToRuleBase(drl);
     }
 
-
-    @Override
     public AuthzDecision isAuthorized(RequestContext reqContext) {
+        return isAuthorized(reqContext, null);
+    }
+
+    public AuthzDecision isAuthorized(RequestContext reqContext, ResourceState reqResourceState) {
         if (log.isTraceEnabled()) {
             log.trace("Start checking request: " + reqContext);
         }
@@ -102,6 +101,12 @@ public class URIPolicy implements AuthzPolicy {
             RequestContextDecorator reqContextDecorator = new RequestContextDecorator(reqContext);
             workingMemory.insert(reqContextDecorator);
             workingMemory.insert(reqContextDecorator.securityContext());
+
+            // TODO: this is temporary
+            if (reqResourceState == null) {
+                reqResourceState = new DefaultResourceState();
+            }
+            workingMemory.insert(reqResourceState);
 
             // Uncomment for drools debugging (TODO: should be somehow configurable...)
             //workingMemory.addEventListener(new DebugAgendaEventListener());
