@@ -22,6 +22,8 @@ import io.liveoak.container.deploy.DirectDeployer;
 import io.liveoak.container.deploy.DirectoryDeploymentManager;
 import io.liveoak.container.deploy.factory.ClasspathBasedResourceFactory;
 import io.liveoak.container.deploy.factory.ModuleBasedResourceFactory;
+import io.liveoak.container.interceptor.InterceptorManager;
+import io.liveoak.container.interceptor.TimingInterceptor;
 import io.liveoak.container.protocols.PipelineConfigurator;
 import io.liveoak.container.server.LocalServer;
 import io.liveoak.container.service.ClientService;
@@ -32,6 +34,7 @@ import io.liveoak.container.service.ContainerService;
 import io.liveoak.container.service.DeployerService;
 import io.liveoak.container.service.DeploymentManagerService;
 import io.liveoak.container.service.DirectDeployerService;
+import io.liveoak.container.service.InterceptorRegistrationService;
 import io.liveoak.container.service.InternalResourceDeploymentService;
 import io.liveoak.container.service.LocalServerService;
 import io.liveoak.container.service.NotifierService;
@@ -47,6 +50,7 @@ import io.liveoak.spi.MediaType;
 import io.liveoak.spi.container.Deployer;
 import io.liveoak.spi.container.RootResourceFactory;
 import io.liveoak.spi.container.SubscriptionManager;
+import io.liveoak.spi.container.interceptor.Interceptor;
 import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.service.AbstractServiceListener;
 import org.jboss.msc.service.ServiceBuilder;
@@ -57,6 +61,7 @@ import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.platform.PlatformManager;
+import sun.misc.Service;
 
 import static io.liveoak.container.LiveOak.*;
 
@@ -86,9 +91,9 @@ public class LiveOakFactory {
         serviceContainer.addListener(new AbstractServiceListener<Object>() {
             @Override
             public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
-                if (transition.getAfter().equals( ServiceController.Substate.START_FAILED ) ) {
-                        System.err.println( "Unable to start service: " + controller.getName() );
-                        controller.getStartException().printStackTrace();
+                if (transition.getAfter().equals(ServiceController.Substate.START_FAILED)) {
+                    System.err.println("Unable to start service: " + controller.getName());
+                    controller.getStartException().printStackTrace();
                 }
             }
         });
@@ -130,6 +135,10 @@ public class LiveOakFactory {
                 .addInjection(subscriptionManager.idInjector(), "subscriptions")
                 .install();
 
+        ValueService<InterceptorManager> interceptorManager = new ValueService<>(new ImmediateValue<InterceptorManager>(new InterceptorManager()));
+        serviceContainer.addService(INTERCEPTOR_MANAGER, interceptorManager)
+                .install();
+
         CodecManagerService codecManager = new CodecManagerService();
         serviceContainer.addService(CODEC_MANAGER, codecManager)
                 .install();
@@ -141,6 +150,7 @@ public class LiveOakFactory {
         PipelineConfiguratorService pipelineConfigurator = new PipelineConfiguratorService();
         ServiceBuilder<PipelineConfigurator> pipelineBuilder = serviceContainer.addService(PIPELINE_CONFIGURATOR, pipelineConfigurator)
                 .addDependency(SUBSCRIPTION_MANAGER, SubscriptionManager.class, pipelineConfigurator.subscriptionManagerInjector())
+                .addDependency(INTERCEPTOR_MANAGER, InterceptorManager.class, pipelineConfigurator.interceptorManagerInjector())
                 .addDependency(CONTAINER, Container.class, pipelineConfigurator.containerInjector())
                 .addDependency(CODEC_MANAGER, ResourceCodecManager.class, pipelineConfigurator.codecManagerInjector())
                 .addDependency(WORKER_POOL, Executor.class, pipelineConfigurator.workerPoolInjector());
@@ -190,6 +200,8 @@ public class LiveOakFactory {
         // ----------------------------------------
         // ----------------------------------------
 
+        installInterceptor(serviceContainer, "timing", new TimingInterceptor());
+
         installCodec(serviceContainer, MediaType.JSON, JSONEncoder.class, new JSONDecoder());
         installCodec(serviceContainer, MediaType.HTML, HTMLEncoder.class, null);
 
@@ -205,6 +217,19 @@ public class LiveOakFactory {
         serviceContainer.awaitStability();
 
         return system;
+    }
+
+    private static void installInterceptor(ServiceContainer serviceContainer, String name, Interceptor interceptor) {
+        ServiceName serviceName = interceptor(name);
+        InterceptorRegistrationService registration = new InterceptorRegistrationService();
+
+        serviceContainer.addService(serviceName, new ValueService<Interceptor>(new ImmediateValue<Interceptor>(interceptor)))
+                .install();
+
+        serviceContainer.addService(serviceName.append("register"), registration)
+                .addDependency(INTERCEPTOR_MANAGER, InterceptorManager.class, registration.interceptorManagerInjector())
+                .addDependency(serviceName, Interceptor.class, registration.interceptorInjector())
+                .install();
     }
 
     private static void installCodec(ServiceContainer serviceContainer, MediaType mediaType, Class<? extends Encoder> encoderClass, ResourceDecoder decoder) {

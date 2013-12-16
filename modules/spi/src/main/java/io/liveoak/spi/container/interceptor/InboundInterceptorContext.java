@@ -1,6 +1,7 @@
 package io.liveoak.spi.container.interceptor;
 
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.state.ResourceState;
 
@@ -9,8 +10,10 @@ import io.liveoak.spi.state.ResourceState;
  */
 public interface InboundInterceptorContext extends InterceptorContext {
 
+    ResourceRequest request();
+
     void forward();
-    void forward(RequestContext requestContext, ResourceState state);
+    void forward(ResourceRequest request);
 
     void replyWith(ResourceResponse response);
 

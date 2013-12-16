@@ -9,6 +9,7 @@ public class LiveOak {
     public static final ServiceName LIVEOAK = ServiceName.of("liveoak");
     public static final ServiceName CONTAINER = LIVEOAK.append("container");
     public static final ServiceName SUBSCRIPTION_MANAGER = LIVEOAK.append("subscription-manager");
+    public static final ServiceName INTERCEPTOR_MANAGER = LIVEOAK.append("interceptor-manager");
     public static final ServiceName CODEC_MANAGER = LIVEOAK.append("codec-manager");
     public static final ServiceName PIPELINE_CONFIGURATOR = LIVEOAK.append("pipeline-configurator");
     public static final ServiceName WORKER_POOL = LIVEOAK.append("worker-pool");
@@ -32,6 +33,7 @@ public class LiveOak {
 
     private static final ServiceName RESOURCE = LIVEOAK.append("resource");
     private static final ServiceName RESOURCE_FACTORY = LIVEOAK.append("resource-factory");
+    private static final ServiceName INTERCEPTOR = LIVEOAK.append( "interceptor" );
 
     public static ServiceName server(String name, boolean network) {
         if (network) {
@@ -54,6 +56,10 @@ public class LiveOak {
 
     public static ServiceName rootResourceFactory(String type) {
         return RESOURCE_FACTORY.append(type);
+    }
+
+    public static ServiceName interceptor(String name) {
+        return INTERCEPTOR.append( name );
     }
 
 }

@@ -3,12 +3,12 @@ package io.liveoak.container.interceptor;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.container.interceptor.InboundInterceptorContext;
 import io.liveoak.spi.container.interceptor.Interceptor;
 import io.liveoak.spi.container.interceptor.OutboundInterceptorContext;
-import io.liveoak.spi.state.ResourceState;
+import io.netty.channel.ChannelHandlerContext;
 
 /**
  * @author Bob McWhirter
@@ -21,20 +21,29 @@ public class InterceptorChain {
         OUTBOUND
     }
 
-    ;
-
-    public InterceptorChain(List<Interceptor> interceptors, RequestContext requestContext, ResourceState state) {
+    public InterceptorChain(ChannelHandlerContext ctx, List<Interceptor> interceptors, ResourceRequest request) {
+        this.ctx = ctx;
         this.interceptors = new ArrayList(interceptors);
-        this.requestContext = requestContext;
-        this.state = state;
+        this.request = request;
+        this.direction = Direction.INBOUND;
     }
 
-    public RequestContext requestContext() {
-        return this.requestContext;
+    public InterceptorChain(ChannelHandlerContext ctx, List<Interceptor> interceptors, ResourceResponse response) {
+        this.ctx = ctx;
+        this.interceptors = new ArrayList(interceptors);
+        this.response = response;
+        this.direction = Direction.OUTBOUND;
     }
 
-    public ResourceState state() {
-        return this.state;
+    public ResourceRequest request() {
+        if (this.request != null) {
+            return this.request;
+        }
+        return this.response.inReplyTo();
+    }
+
+    public ResourceResponse response() {
+        return this.response;
     }
 
     public void fireInbound() {
@@ -43,7 +52,18 @@ public class InterceptorChain {
         fireCurrentInbound();
     }
 
-    protected void fireCurrentInbound() {
+    public void fireOutbound() {
+        this.direction = Direction.OUTBOUND;
+        this.current = this.interceptors.size() - 1;
+        fireCurrentOutbound();
+    }
+
+    private void fireCurrentInbound() {
+        if (this.current > (this.interceptors.size() - 1)) {
+            this.ctx.fireChannelRead(this.request);
+            return;
+        }
+
         InboundInterceptorContext context = new InboundInterceptorContextImpl(this);
         Interceptor interceptor = this.interceptors.get(this.current);
         try {
@@ -53,11 +73,16 @@ public class InterceptorChain {
         }
     }
 
-    protected void fireCurrentOutbound() {
+    private void fireCurrentOutbound() {
+        if (this.current < 0) {
+            this.ctx.writeAndFlush(this.response);
+            return;
+        }
+
         OutboundInterceptorContext context = new OutboundInterceptorContextImpl(this);
         Interceptor interceptor = this.interceptors.get(this.current);
         try {
-            interceptor.onOutbound( context );
+            interceptor.onOutbound(context);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,9 +98,8 @@ public class InterceptorChain {
         }
     }
 
-    public void forward(RequestContext requestContext, ResourceState state) {
-        this.requestContext = requestContext;
-        this.state = state;
+    public void forward(ResourceRequest request) {
+        this.request = request;
         forward();
     }
 
@@ -86,12 +110,14 @@ public class InterceptorChain {
 
     public void replyWith(ResourceResponse response) {
         this.direction = Direction.OUTBOUND;
+        this.response = response;
+        forward();
     }
 
-    private RequestContext requestContext;
-    private ResourceState state;
+    private ResourceRequest request;
     private ResourceResponse response;
 
+    private final ChannelHandlerContext ctx;
     private final ArrayList<Interceptor> interceptors;
     private int current = 0;
     private Direction direction;

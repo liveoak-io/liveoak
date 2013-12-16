@@ -1,6 +1,7 @@
 package io.liveoak.container.interceptor;
 
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.container.interceptor.OutboundInterceptorContext;
 import io.liveoak.spi.state.ResourceState;
@@ -25,13 +26,13 @@ public class OutboundInterceptorContextImpl implements OutboundInterceptorContex
     }
 
     @Override
-    public RequestContext requestContext() {
-        return this.chain.requestContext();
+    public ResourceRequest request() {
+        return this.chain.request();
     }
 
     @Override
-    public ResourceState state() {
-        return this.chain.state();
+    public ResourceResponse response() {
+        return this.chain.response();
     }
 
     private final InterceptorChain chain;

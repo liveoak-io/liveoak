@@ -3,6 +3,7 @@ package io.liveoak.container.service;
 import java.util.concurrent.Executor;
 
 import io.liveoak.container.deploy.DirectoryDeploymentManager;
+import io.liveoak.container.interceptor.InterceptorManager;
 import io.liveoak.container.protocols.PipelineConfigurator;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.spi.Container;
@@ -25,7 +26,7 @@ public class PipelineConfiguratorService implements Service<PipelineConfigurator
         this.pipelineConfigurator.subscriptionManager( this.subscriptionManagerInjector.getValue() );
         this.pipelineConfigurator.workerPool( this.workerPoolInjector.getValue() );
         this.pipelineConfigurator.container( this.containerInjector.getValue() );
-
+        this.pipelineConfigurator.interceptorManager( this.interceptorManagerInjector.getValue() );
         this.pipelineConfigurator.deploymentManager( this.deploymentManagerInjector.getOptionalValue() );
     }
 
@@ -59,6 +60,10 @@ public class PipelineConfiguratorService implements Service<PipelineConfigurator
         return this.deploymentManagerInjector;
     }
 
+    public Injector<InterceptorManager> interceptorManagerInjector() {
+        return this.interceptorManagerInjector;
+    }
+
     private PipelineConfigurator pipelineConfigurator;
 
     private InjectedValue<Container> containerInjector = new InjectedValue<>();
@@ -66,6 +71,7 @@ public class PipelineConfiguratorService implements Service<PipelineConfigurator
     private InjectedValue<SubscriptionManager> subscriptionManagerInjector = new InjectedValue<>();
     private InjectedValue<Executor> workerPoolInjector = new InjectedValue<>();
     private InjectedValue<DirectoryDeploymentManager> deploymentManagerInjector = new InjectedValue<>();
+    private InjectedValue<InterceptorManager> interceptorManagerInjector = new InjectedValue<>();
 
 
 }

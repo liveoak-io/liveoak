@@ -7,13 +7,14 @@ package io.liveoak.container.protocols;
 
 import java.util.concurrent.Executor;
 
-import io.liveoak.common.protocol.DebugHandler;
+import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.ErrorHandler;
 import io.liveoak.container.ResourceHandler;
 import io.liveoak.container.auth.AuthorizationHandler;
-import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.deploy.ConfigurationWatcher;
 import io.liveoak.container.deploy.DirectoryDeploymentManager;
+import io.liveoak.container.interceptor.InterceptorHandler;
+import io.liveoak.container.interceptor.InterceptorManager;
 import io.liveoak.container.protocols.http.HttpResourceRequestDecoder;
 import io.liveoak.container.protocols.http.HttpResourceResponseEncoder;
 import io.liveoak.container.protocols.local.LocalResourceResponseEncoder;
@@ -88,6 +89,14 @@ public class PipelineConfigurator {
         return this.deploymentManager;
     }
 
+    public void interceptorManager(InterceptorManager interceptorManager) {
+        this.interceptorManager  = interceptorManager;
+    }
+
+    public InterceptorManager interceptorManager() {
+        return this.interceptorManager;
+    }
+
     public void switchToPureStomp(ChannelPipeline pipeline) {
         pipeline.remove(ProtocolDetector.class);
 
@@ -147,6 +156,7 @@ public class PipelineConfigurator {
         //pipeline.addLast( new DebugHandler( "networkServer-1" ) );
         pipeline.addLast("http-resourceRead-decoder", new HttpResourceRequestDecoder(this.codecManager));
         pipeline.addLast("http-resourceRead-encoder", new HttpResourceResponseEncoder(this.codecManager));
+        pipeline.addLast("interceptor", new InterceptorHandler( this.interceptorManager ) );
         pipeline.addLast("auth-handler", new AuthorizationHandler());
         //pipeline.addLast( new DebugHandler( "networkServer-2" ) );
         if (this.deploymentManager != null) {
@@ -157,17 +167,10 @@ public class PipelineConfigurator {
         pipeline.addLast("error-handler", new ErrorHandler());
     }
 
-    public void setupDirectConnector(ChannelPipeline pipeline) {
-        pipeline.addLast(new SubscriptionWatcher(this.subscriptionManager));
-        if (this.deploymentManager != null) {
-            pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));
-        }
-        pipeline.addLast(new ResourceHandler(this.container, this.workerPool));
-    }
-
     public void setupLocal(ChannelPipeline pipeline) {
         //pipeline.addLast( new DebugHandler( "local-server-head" ) );
         pipeline.addLast( new LocalResourceResponseEncoder( this.workerPool) );
+        pipeline.addLast("interceptor", new InterceptorHandler( this.interceptorManager ) );
         pipeline.addLast(new SubscriptionWatcher(this.subscriptionManager));
         if (this.deploymentManager != null) {
             pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));
@@ -178,6 +181,7 @@ public class PipelineConfigurator {
     private ResourceCodecManager codecManager;
     private SubscriptionManager subscriptionManager;
     private DirectoryDeploymentManager deploymentManager;
+    private InterceptorManager interceptorManager;
     private Executor workerPool;
     private Container container;
 
