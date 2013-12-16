@@ -16,6 +16,7 @@ import io.liveoak.container.deploy.ConfigurationWatcher;
 import io.liveoak.container.deploy.DirectoryDeploymentManager;
 import io.liveoak.container.protocols.http.HttpResourceRequestDecoder;
 import io.liveoak.container.protocols.http.HttpResourceResponseEncoder;
+import io.liveoak.container.protocols.local.LocalResourceResponseEncoder;
 import io.liveoak.container.protocols.websocket.WebSocketHandshakerHandler;
 import io.liveoak.container.protocols.websocket.WebSocketStompFrameDecoder;
 import io.liveoak.container.protocols.websocket.WebSocketStompFrameEncoder;
@@ -166,6 +167,7 @@ public class PipelineConfigurator {
 
     public void setupLocal(ChannelPipeline pipeline) {
         //pipeline.addLast( new DebugHandler( "local-server-head" ) );
+        pipeline.addLast( new LocalResourceResponseEncoder( this.workerPool) );
         pipeline.addLast(new SubscriptionWatcher(this.subscriptionManager));
         if (this.deploymentManager != null) {
             pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));

@@ -1,5 +1,7 @@
 package io.liveoak.client.impl;
 
+import io.liveoak.client.ClientRequest;
+import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.state.ResourceState;
 
@@ -8,10 +10,15 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class ClientResourceResponseImpl implements ClientResourceResponse {
 
-    public ClientResourceResponseImpl(ResponseType responseType, String path, ResourceState state) {
+    public ClientResourceResponseImpl(ResourceRequest inReplyTo, ResponseType responseType, String path, ResourceState state) {
+        this.inReplyTo = inReplyTo;
         this.responseType = responseType;
         this.path = path;
         this.state = state;
+    }
+
+    public ResourceRequest inReplyTo() {
+        return this.inReplyTo;
     }
 
     @Override
@@ -33,6 +40,7 @@ public class ClientResourceResponseImpl implements ClientResourceResponse {
         return "[ClientResourceResponseImpl: type=" + this.responseType + "; state=" + this.state + "]";
     }
 
+    private ResourceRequest inReplyTo;
     private ResponseType responseType;
     private String path;
     private ResourceState state;
