@@ -15,6 +15,7 @@ import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
 
+import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceProcessingException;
@@ -23,22 +24,68 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.resource.config.ConfigMapping;
+import io.liveoak.spi.resource.config.ConfigMappingExporter;
+import io.liveoak.spi.resource.config.ConfigProperty;
+import io.liveoak.spi.resource.config.Configurable;
 import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
+@Configurable
 public class RootMongoResource extends MongoResource implements RootResource {
 
+    @ConfigMapping(properties = {@ConfigProperty("host"), @ConfigProperty("port"), @ConfigProperty("db")}, importMethod = "updateConfig")
     private MongoClient mongo;
     protected DB db;
     private String id;
-    private MongoConfigResource configResource = null;
 
     public RootMongoResource(String id) {
         super(null);
         this.id = id;
+    }
+
+    private void updateConfig(Object... values) throws Exception {
+        String host = (String) values[0];
+        if (host == null) {
+            host = "localhost";
+        }
+
+        Integer port = (Integer) values[1];
+        if (port == null) {
+            port = 27017;
+        }
+
+        String dbName = (String) values[2];
+
+        if (dbName == null) {
+            throw new InitializationException("Configuration value required for 'db'");
+        }
+
+        MongoClient mongo = new MongoClient(host, port);
+        DB db = mongo.getDB(dbName);
+        if (db == null) {
+            throw new InitializationException("Unknown database " + dbName);
+        }
+
+        this.configure(mongo, db);
+    }
+
+    @ConfigMappingExporter("host")
+    public Object configHost() {
+        return client().getAddress().getHost();
+    }
+
+    @ConfigMappingExporter("port")
+    public Object configPort() {
+        return client().getAddress().getPort();
+    }
+
+    @ConfigMappingExporter("db")
+    public Object configDb() {
+        return db().getName();
     }
 
     protected void configure(MongoClient mongo, DB db) {
@@ -67,14 +114,6 @@ public class RootMongoResource extends MongoResource implements RootResource {
     @Override
     public String id() {
         return this.id;
-    }
-
-    @Override
-    public Resource configuration() {
-        if (configResource == null) {
-            this.configResource = new MongoConfigResource(this, mongo, db);
-        }
-        return this.configResource;
     }
 
     @Override

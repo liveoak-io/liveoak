@@ -40,7 +40,7 @@ public class GitResourceTest extends AbstractResourceTestCase {
 
     @Test
     public void testRoot() throws Exception {
-        ResourceState result = client.read(new RequestContext.Builder().build(), "/git");
+        ResourceState result = this.client.read(new RequestContext.Builder().build(), "/git");
 
         assertThat(result).isNotNull();
     }

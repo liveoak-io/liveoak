@@ -6,7 +6,6 @@ import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Notifier;
 import io.liveoak.spi.resource.async.PropertySink;
-import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
@@ -24,7 +23,6 @@ public class SchedulerResource implements RootResource {
 
     public SchedulerResource(String id) {
         this.id = id;
-        this.configResource = new SchedulerConfigurationResource(this);
     }
 
     @Override
@@ -120,11 +118,6 @@ public class SchedulerResource implements RootResource {
         sink.close();
     }
 
-    @Override
-    public Resource configuration() {
-        return this.configResource;
-    }
-
     Notifier notifier() {
         return this.notifier;
     }
@@ -133,6 +126,5 @@ public class SchedulerResource implements RootResource {
     private Scheduler scheduler;
     private Map<String, TriggerResource> children = new HashMap<>();
     private Notifier notifier;
-    private final SchedulerConfigurationResource configResource;
 
 }
