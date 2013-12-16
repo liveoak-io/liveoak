@@ -79,5 +79,15 @@ public class DelegatingResponder implements Responder {
         delegate.invalidRequest( message );
     }
 
+    @Override
+    public void invalidRequest( Throwable cause ) {
+        delegate.invalidRequest(cause);
+    }
+
+    @Override
+    public void invalidRequest( String message, Throwable cause ) {
+        delegate.invalidRequest( message, cause );
+    }
+
     private Responder delegate;
 }

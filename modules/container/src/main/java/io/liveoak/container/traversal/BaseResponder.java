@@ -95,6 +95,16 @@ public class BaseResponder implements Responder {
         this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, message));
     }
 
+    @Override
+    public void invalidRequest( Throwable cause ) {
+        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, cause));
+    }
+
+    @Override
+    public void invalidRequest( String message, Throwable cause ) {
+        this.ctx.writeAndFlush(new ResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, cause));
+    }
+
     private final ResourceRequest inReplyTo;
     private final ChannelHandlerContext ctx;
 }

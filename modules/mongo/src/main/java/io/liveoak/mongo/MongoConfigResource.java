@@ -33,9 +33,20 @@ public class MongoConfigResource implements ConfigResource {
 
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        String host = (String) state.getProperty("host");
+
+        Object hostObject = state.getProperty("host");
+        if (!(hostObject instanceof String) || ((String)(hostObject)).isEmpty()) {
+            throw new InitializationException("Configuration value for 'host' invalid. Requires a string value. Received : " + hostObject);
+        }
+
+        String host = (String) hostObject;
         if (host == null) {
             host = "localhost";
+        }
+
+        Object portObject = state.getProperty("port");
+        if (portObject == null || !(portObject instanceof Integer)) {
+            throw new InitializationException("Configuration value for 'port' invalid. Requires an integer value. Received : " + portObject);
         }
 
         Integer port = (Integer) state.getProperty("port");
@@ -45,7 +56,7 @@ public class MongoConfigResource implements ConfigResource {
 
         String dbName = (String) state.getProperty("db");
 
-        if (dbName == null) {
+        if (dbName == null || dbName.isEmpty()) {
             throw new InitializationException("Configuration value required for 'db'");
         }
 
@@ -56,6 +67,8 @@ public class MongoConfigResource implements ConfigResource {
         }
 
         this.parent.configure(mongo, db);
+        this.mongoClient = mongo;
+        this.database = db;
         responder.resourceUpdated(this);
     }
 

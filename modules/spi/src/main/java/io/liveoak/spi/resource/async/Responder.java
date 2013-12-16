@@ -102,4 +102,6 @@ public interface Responder {
      * @param message
      */
     void invalidRequest(String message);
+    void invalidRequest(Throwable cause);
+    void invalidRequest(String message, Throwable cause);
 }
