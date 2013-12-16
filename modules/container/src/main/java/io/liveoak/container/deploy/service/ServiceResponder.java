@@ -79,6 +79,16 @@ public class ServiceResponder implements Responder {
         context.failed(new StartException(message));
     }
 
+    @Override
+    public void invalidRequest( Throwable cause ) {
+        context.failed(new StartException(cause));
+    }
+
+    @Override
+    public void invalidRequest( String message, Throwable cause ) {
+        context.failed(new StartException(message, cause));
+    }
+
     private final StartContext context;
 
 }

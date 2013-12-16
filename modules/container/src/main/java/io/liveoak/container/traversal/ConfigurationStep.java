@@ -9,6 +9,11 @@ public class ConfigurationStep implements TraversalPlan.Step {
 
     @Override
     public void execute(TraversalPlan.StepContext context, Resource resource) {
-        context.responder().resourceRead(resource.configuration());
+        Resource configurationResource = resource.configuration();
+        if (configurationResource != null) {
+            context.responder().resourceRead(configurationResource);
+        } else {
+            context.responder().invalidRequest("No configuration option available on resource at " + resource.uri());
+        }
     }
 }
