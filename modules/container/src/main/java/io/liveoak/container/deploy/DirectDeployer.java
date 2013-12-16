@@ -17,6 +17,7 @@ import io.liveoak.spi.resource.async.Notifier;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.msc.service.ServiceContainer;
+import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
@@ -33,6 +34,13 @@ public class DirectDeployer {
 
     public void deploy(RootResource resource) throws Exception {
         deploy(resource, null);
+    }
+
+    public void undeploy(RootResource resource) throws InterruptedException {
+        ServiceName name = LiveOak.resource( resource.id() );
+        ServiceController<?> service = this.serviceContainer.getService(name);
+        service.setMode( ServiceController.Mode.REMOVE);
+        this.serviceContainer.awaitStability();
     }
 
     public void deploy(RootResource resource, ResourceState config) throws Exception {

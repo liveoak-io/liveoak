@@ -3,6 +3,7 @@ package io.liveoak.client;
 import java.net.SocketAddress;
 
 import io.liveoak.client.protocol.LocalResponseHandler;
+import io.liveoak.common.protocol.DebugHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -49,6 +50,7 @@ public class LocalConnection implements Connection {
     protected ChannelHandler createHandler() {
         return new ChannelInitializer<LocalChannel>() {
             protected void initChannel(LocalChannel ch) throws Exception {
+                //ch.pipeline().addLast(new DebugHandler( "local-client-head" ) );
                 ch.pipeline().addLast(new LocalResponseHandler());
             }
         };

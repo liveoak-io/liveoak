@@ -7,20 +7,14 @@ package io.liveoak.container.server;
 
 import io.liveoak.spi.container.Server;
 import io.liveoak.container.protocols.PipelineConfigurator;
-import io.liveoak.spi.Container;
-import io.liveoak.stomp.common.DebugHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.Future;
 
-import java.net.InetAddress;
 import java.net.SocketAddress;
-import java.nio.channels.Channel;
 
 /**
  * Base networkServer capable of connecting a container to a network ports.

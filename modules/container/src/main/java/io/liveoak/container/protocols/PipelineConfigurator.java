@@ -7,6 +7,7 @@ package io.liveoak.container.protocols;
 
 import java.util.concurrent.Executor;
 
+import io.liveoak.common.protocol.DebugHandler;
 import io.liveoak.container.ErrorHandler;
 import io.liveoak.container.ResourceHandler;
 import io.liveoak.container.auth.AuthorizationHandler;
@@ -164,7 +165,7 @@ public class PipelineConfigurator {
     }
 
     public void setupLocal(ChannelPipeline pipeline) {
-        //pipeline.addLast( new DebugHandler( "local-head" ) );
+        //pipeline.addLast( new DebugHandler( "local-server-head" ) );
         pipeline.addLast(new SubscriptionWatcher(this.subscriptionManager));
         if (this.deploymentManager != null) {
             pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));

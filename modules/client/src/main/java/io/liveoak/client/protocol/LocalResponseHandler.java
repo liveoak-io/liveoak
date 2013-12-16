@@ -3,9 +3,13 @@ package io.liveoak.client.protocol;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 import io.liveoak.client.ClientRequest;
+import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.client.impl.ClientResourceResponseImpl;
@@ -15,6 +19,7 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
+import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.channel.ChannelDuplexHandler;
@@ -25,6 +30,11 @@ import io.netty.channel.ChannelPromise;
  * @author Bob McWhirter
  */
 public class LocalResponseHandler extends ChannelDuplexHandler {
+
+    public LocalResponseHandler() {
+        this.executor = Executors.newCachedThreadPool();
+    }
+
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         if (msg instanceof ClientRequest) {
@@ -42,25 +52,20 @@ public class LocalResponseHandler extends ChannelDuplexHandler {
         if (msg instanceof ResourceResponse) {
             Consumer<ClientResourceResponse> handler = this.handlers.remove(((ResourceResponse) msg).inReplyTo());
             if (handler != null) {
-                ClientResourceResponse.ResponseType responseType = null;
-                if (msg instanceof ResourceErrorResponse) {
-                    responseType = decodeResponseType(((ResourceErrorResponse) msg).errorType());
+                Runnable action = ()->{
+                    ClientResourceResponse.ResponseType responseType = null;
+                    if (msg instanceof ResourceErrorResponse) {
+                        responseType = decodeResponseType(((ResourceErrorResponse) msg).errorType());
+                    } else {
+                        responseType = ClientResourceResponse.ResponseType.OK;
+                    }
+                    encode(responseType, ((ResourceResponse) msg).inReplyTo().requestContext(), ((ResourceResponse)msg).inReplyTo().resourcePath(),((ResourceResponse) msg).resource(), handler);
+                };
+                if ( ((ResourceResponse) msg).resource() instanceof BlockingResource ) {
+                    this.executor.execute( action );
                 } else {
-                    responseType = ClientResourceResponse.ResponseType.OK;
+                    action.run();
                 }
-                ClientResourceResponse response = null;
-                try {
-                    response = new ClientResourceResponseImpl(
-                            responseType,
-                            ((ResourceResponse) msg).inReplyTo().resourcePath().toString(),
-                            encode(((ResourceResponse) msg).inReplyTo().requestContext(), ((ResourceResponse) msg).resource()));
-                } catch (Exception e) {
-                    response = new ClientResourceResponseImpl(
-                            ClientResourceResponse.ResponseType.NOT_ACCEPTABLE,
-                            ((ResourceResponse) msg).inReplyTo().resourcePath().toString(),
-                            null);
-                }
-                handler.accept(response);
             }
         } else {
             super.channelRead(ctx, msg);
@@ -100,26 +105,38 @@ public class LocalResponseHandler extends ChannelDuplexHandler {
     /**
      * Encode (for some cheap value of 'encode') a resulting resource into a ResourceState.
      *
-     * @param context  The request context (for expansion/fields).
-     * @param resource The resource to encode.
-     * @return The encoded resource state.
+     *
+     * @param responseType
+     * @param context      The request context (for expansion/fields).
+     * @param resourcePath
+     *@param resource     The resource to encode.  @return The encoded resource state.
      * @throws Exception
      */
-    protected ResourceState encode(RequestContext context, Resource resource) throws Exception {
+    protected void encode(ClientResourceResponse.ResponseType responseType, RequestContext context, ResourcePath resourcePath, Resource resource, Consumer<ClientResourceResponse> handler) {
         if (resource == null) {
-            return null;
+            ClientResourceResponse response = new ClientResourceResponseImpl(responseType, resourcePath.toString(), null);
+            handler.accept(response);
+            return;
         }
-        final CompletableFuture<ResourceState> state = new CompletableFuture<>();
 
         final ResourceStateEncoder encoder = new ResourceStateEncoder();
         RootEncodingDriver driver = new RootEncodingDriver(context, encoder, resource, () -> {
-            state.complete(encoder.root());
+            ResourceState state = encoder.root();
+            ClientResourceResponse response = new ClientResourceResponseImpl(responseType, resourcePath.toString(), state);
+            handler.accept(response);
         });
 
-        driver.encode();
-
-        return state.get();
+        try {
+            driver.encode();
+        } catch (Exception e) {
+            ClientResourceResponse response = new ClientResourceResponseImpl(
+                    ClientResourceResponse.ResponseType.NOT_ACCEPTABLE,
+                    resourcePath.toString(),
+                    null);
+            handler.accept( response );
+        }
     }
 
+    private Executor executor;
     private Map<ResourceRequest, Consumer<ClientResourceResponse>> handlers = new ConcurrentHashMap<>();
 }
