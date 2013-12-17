@@ -180,14 +180,14 @@ public class MongoConfigTest extends BaseMongoDBTest {
             //expected
         }
 
-        configResult.putProperty("port", null);
-
-        try {
-            client.update(new RequestContext.Builder().build(), BASEPATH + ";config", configResult);
-            fail();
-        } catch (ResourceException e) {
-            //expected
-        }
+//        configResult.putProperty("port", null);
+//
+//        try {
+//            client.update(new RequestContext.Builder().build(), BASEPATH + ";config", configResult);
+//            fail();
+//        } catch (ResourceException e) {
+//            //expected
+//        }
 
         configResult.putProperty("port", "helloworld");
 
@@ -235,14 +235,14 @@ public class MongoConfigTest extends BaseMongoDBTest {
             //expected
         }
 
-        configResult.putProperty("host", null);
-
-        try {
-            client.update(new RequestContext.Builder().build(), BASEPATH + ";config", configResult);
-            fail();
-        } catch (ResourceException e) {
-            //expected
-        }
+//        configResult.putProperty("host", null);
+//
+//        try {
+//            client.update(new RequestContext.Builder().build(), BASEPATH + ";config", configResult);
+//            fail();
+//        } catch (ResourceException e) {
+//            //expected
+//        }
 
         configResult.putProperty("host", "helloworld");
 
