@@ -38,6 +38,7 @@ import io.liveoak.stomp.server.protocol.ConnectHandler;
 import io.liveoak.stomp.server.protocol.DisconnectHandler;
 import io.liveoak.stomp.server.protocol.ReceiptHandler;
 import io.liveoak.stomp.server.protocol.SendHandler;
+import io.liveoak.stomp.server.protocol.StompErrorHandler;
 import io.liveoak.stomp.server.protocol.SubscribeHandler;
 import io.liveoak.stomp.server.protocol.UnsubscribeHandler;
 import io.netty.channel.ChannelPipeline;
@@ -129,7 +130,7 @@ public class PipelineConfigurator {
         // handle messages
         pipeline.addLast(new SendHandler(serverContext));
         // catch errors, return an ERROR message.
-        pipeline.addLast(new ErrorHandler());
+        pipeline.addLast(new StompErrorHandler() );
 
     }
 
@@ -161,7 +162,7 @@ public class PipelineConfigurator {
         // handle messages
         pipeline.addLast(new SendHandler(serverContext));
         // catch errors, return an ERROR message.
-        pipeline.addLast(new ErrorHandler());
+        pipeline.addLast(new StompErrorHandler() );
     }
 
     public void switchToPlainHttp(ChannelPipeline pipeline) {
@@ -178,7 +179,6 @@ public class PipelineConfigurator {
             pipeline.addLast("authz-handler", new AuthzHandler(this.client));
         }
 
-        //pipeline.addLast( new DebugHandler( "networkServer-2" ) );
         if (this.deploymentManager != null) {
             pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));
         }
@@ -188,10 +188,8 @@ public class PipelineConfigurator {
     }
 
     public void setupLocal(ChannelPipeline pipeline) {
-        //pipeline.addLast( new DebugHandler( "local-server-head" ) );
         pipeline.addLast( new LocalResourceResponseEncoder( this.workerPool) );
         pipeline.addLast("interceptor", new InterceptorHandler( this.interceptorManager ) );
-        //pipeline.addLast( new DebugHandler( "upstream-from-interceptor" ) );
         pipeline.addLast(new SubscriptionWatcher(this.subscriptionManager));
         if (this.deploymentManager != null) {
             pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));

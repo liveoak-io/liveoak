@@ -1,5 +1,6 @@
 package io.liveoak.container.interceptor;
 
+import io.liveoak.container.protocols.RequestCompleteEvent;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
 import io.netty.channel.ChannelDuplexHandler;
@@ -31,6 +32,14 @@ public class InterceptorHandler extends ChannelDuplexHandler {
         } else {
             super.channelRead(ctx, msg);
         }
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if ( evt instanceof RequestCompleteEvent) {
+            this.manager.fireComplete( ((RequestCompleteEvent) evt).requestId() );
+        }
+        super.userEventTriggered(ctx, evt);
     }
 
     private final InterceptorManager manager;

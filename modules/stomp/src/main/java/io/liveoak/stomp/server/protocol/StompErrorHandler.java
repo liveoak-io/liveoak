@@ -15,9 +15,9 @@ import io.netty.channel.ChannelHandlerContext;
 /**
  * @author Bob McWhirter
  */
-public class ErrorHandler extends ChannelDuplexHandler {
+public class StompErrorHandler extends ChannelDuplexHandler {
 
-    public ErrorHandler() {
+    public StompErrorHandler() {
 
     }
 

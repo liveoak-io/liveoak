@@ -230,16 +230,22 @@ public class LiveOakFactory {
 
     private static void installInterceptor(ServiceContainer serviceContainer, String name, Interceptor interceptor) {
         ServiceName serviceName = interceptor(name);
-        InterceptorRegistrationService registration = new InterceptorRegistrationService();
 
-        serviceContainer.addService(serviceName, new ValueService<Interceptor>(new ImmediateValue<Interceptor>(interceptor)))
+        ServiceController<Interceptor> controller = serviceContainer.addService(serviceName, new ValueService<Interceptor>(new ImmediateValue<Interceptor>(interceptor)))
                 .install();
 
+        installInterceptor( serviceContainer, controller );
+    }
+
+    private static void installInterceptor(ServiceContainer serviceContainer, ServiceController<Interceptor> interceptor) {
+        ServiceName serviceName = interceptor.getName();
+        InterceptorRegistrationService registration = new InterceptorRegistrationService();
         serviceContainer.addService(serviceName.append("register"), registration)
                 .addDependency(INTERCEPTOR_MANAGER, InterceptorManager.class, registration.interceptorManagerInjector())
                 .addDependency(serviceName, Interceptor.class, registration.interceptorInjector())
                 .install();
     }
+
 
     private static void installCodec(ServiceContainer serviceContainer, MediaType mediaType, Class<? extends Encoder> encoderClass, ResourceDecoder decoder) {
         ServiceName name = codec(mediaType.toString());

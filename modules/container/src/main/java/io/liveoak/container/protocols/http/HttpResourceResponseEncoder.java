@@ -10,6 +10,7 @@ import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.common.codec.EncodingResult;
 import io.liveoak.common.codec.IncompatibleMediaTypeException;
 import io.liveoak.common.codec.ResourceCodecManager;
+import io.liveoak.container.protocols.RequestCompleteEvent;
 import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceErrorResponse;
@@ -153,6 +154,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
         }
 
         out.add(response);
+        ctx.fireUserEventTriggered( new RequestCompleteEvent( msg.requestId() ) );
     }
 
     protected EncodingResult encodeState(RequestContext ctx, MediaTypeMatcher mediaTypeMatcher, Resource resource) throws Exception {

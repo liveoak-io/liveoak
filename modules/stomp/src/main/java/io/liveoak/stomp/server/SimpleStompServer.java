@@ -11,7 +11,7 @@ import io.liveoak.stomp.common.StompMessageDecoder;
 import io.liveoak.stomp.common.StompMessageEncoder;
 import io.liveoak.stomp.server.protocol.ConnectHandler;
 import io.liveoak.stomp.server.protocol.DisconnectHandler;
-import io.liveoak.stomp.server.protocol.ErrorHandler;
+import io.liveoak.stomp.server.protocol.StompErrorHandler;
 import io.liveoak.stomp.server.protocol.ReceiptHandler;
 import io.liveoak.stomp.server.protocol.SendHandler;
 import io.liveoak.stomp.server.protocol.SubscribeHandler;
@@ -68,7 +68,7 @@ public class SimpleStompServer {
                 // handle messages
                 ch.pipeline().addLast(new SendHandler(SimpleStompServer.this.serverContext));
                 // catch errors, return an ERROR message.
-                ch.pipeline().addLast(new ErrorHandler());
+                ch.pipeline().addLast(new StompErrorHandler());
             }
         };
     }

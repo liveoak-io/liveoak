@@ -1,26 +1,19 @@
 package io.liveoak.container.protocols.local;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 
 import io.liveoak.client.impl.ClientResourceResponseImpl;
 import io.liveoak.common.codec.driver.RootEncodingDriver;
 import io.liveoak.common.codec.state.ResourceStateEncoder;
-import io.liveoak.spi.RequestContext;
+import io.liveoak.container.protocols.RequestCompleteEvent;
 import io.liveoak.spi.ResourceErrorResponse;
-import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.resource.BlockingResource;
-import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
-import io.netty.handler.codec.MessageToMessageEncoder;
 
 /**
  * @author Bob McWhirter
@@ -93,6 +86,7 @@ public class LocalResourceResponseEncoder extends ChannelOutboundHandlerAdapter 
         final ClientResourceResponse.ResponseType responseType = ClientResourceResponse.ResponseType.OK;
         if (response.resource() == null) {
             ctx.writeAndFlush( new ClientResourceResponseImpl(response.inReplyTo(), responseType, response.inReplyTo().resourcePath().toString(), null ));
+            ctx.fireUserEventTriggered(new RequestCompleteEvent(response.requestId()));
             return;
         }
 
@@ -100,12 +94,14 @@ public class LocalResourceResponseEncoder extends ChannelOutboundHandlerAdapter 
         RootEncodingDriver driver = new RootEncodingDriver(response.inReplyTo().requestContext(), encoder, response.resource(), () -> {
             ResourceState state = encoder.root();
             ctx.writeAndFlush( new ClientResourceResponseImpl(response.inReplyTo(), responseType, response.inReplyTo().resourcePath().toString(), state));
+            ctx.fireUserEventTriggered(new RequestCompleteEvent(response.requestId()));
         });
 
         try {
             driver.encode();
         } catch (Exception e) {
             ctx.writeAndFlush( new ClientResourceResponseImpl(response.inReplyTo(), ClientResourceResponse.ResponseType.NOT_ACCEPTABLE, response.inReplyTo().resourcePath().toString(), null ));
+            ctx.fireUserEventTriggered(new RequestCompleteEvent(response.requestId()));
         }
 
     }

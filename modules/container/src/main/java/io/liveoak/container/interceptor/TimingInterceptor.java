@@ -24,13 +24,9 @@ public class TimingInterceptor extends DefaultInterceptor {
     }
 
     @Override
-    public void onOutbound(OutboundInterceptorContext context) throws Exception {
-        UUID requestId = context.request().requestId();
-        Long start = this.timings.remove(requestId);
-        if (start != null) {
-            System.err.println("Request took: " + (System.currentTimeMillis() - start) + "ms");
-        }
-        super.onOutbound(context);
+    public void onComplete(UUID requestId) {
+        long start = this.timings.remove(requestId);
+        System.err.println("Request took: " + (System.currentTimeMillis() - start) + "ms");
     }
 
     private Map<UUID, Long> timings = new ConcurrentHashMap<>();
