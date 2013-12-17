@@ -51,6 +51,11 @@ public class RequestContextDecorator implements RequestContext {
         return new ResourceParamsDecorator(delegate.resourceParams());
     }
 
+    // Needs to be added because Drools are looking for method resourceParams() declared on superclass, which returns just ResourceParams type
+    public ResourceParamsDecorator getResourceParams() {
+        return resourceParams();
+    }
+
     @Override
     public RequestAttributes requestAttributes() {
         return delegate.requestAttributes();

@@ -5,73 +5,45 @@
  */
 package io.liveoak.spi;
 
-import java.security.Principal;
-import java.util.Collections;
 import java.util.Set;
 
 /**
  * Holds info about authenticated user and his roles
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
+ * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
 public interface SecurityContext {
 
     /**
-     * @return principal associated with current user or null if user is anonymous
+     * @return true if authenticated
      */
-    Principal getPrincipal();
+    boolean isAuthenticated();
 
     /**
-     * @return username associated with current user or null if user is anonymous
+     * @return the realm used to authenticate current user or null if not authenticated
      */
-    default String getUsername() {
-        Principal principal = getPrincipal();
-        return principal == null ? null : principal.getName();
-    }
+    String getRealm();
 
     /**
-     * @return list of realm roles, which are assigned to current user (Realm role is something like global role of user for all applications)
-     *         or empty set if not realm roles available. Never returns null
+     * @return the username of the authenticated user or null if not authenticated
      */
-    Set<String> getRealmRoles();
+    String getSubject();
 
     /**
-     * @return list of application roles for current application, which are assigned to current user
-     *         or empty set if not application roles availablefor current application. Never returns null.
-     */
-    Set<String> getApplicationRoles();
+     * @return date when credentials was last verified or -1 if not authenticated
+     * */
+    long lastVerified();
 
     /**
-     * @param roleName
-     * @return true if user is member of role roleName
+     * @return roles assigned to current user or null if not authenticated
      */
-    default boolean isUserInRealmRole(String roleName) {
-        return getRealmRoles().contains(roleName);
-    }
+    Set<String> getRoles();
 
     /**
-     * @param roleName
-     * @return true if user is member of role roleName
+     * @param role the role
+     * @return if the authenticated user is assigned the specified role
      */
-    default boolean isUserInApplicationRole(String roleName) {
-        return getApplicationRoles().contains(roleName);
-    }
+    boolean hasRole(String role);
 
-    public static final SecurityContext ANONYMOUS = new SecurityContext() {
-
-        @Override
-        public Principal getPrincipal() {
-            return null;
-        }
-
-        @Override
-        public Set<String> getRealmRoles() {
-            return Collections.EMPTY_SET;
-        }
-
-        @Override
-        public Set<String> getApplicationRoles() {
-            return Collections.EMPTY_SET;
-        }
-    };
 }

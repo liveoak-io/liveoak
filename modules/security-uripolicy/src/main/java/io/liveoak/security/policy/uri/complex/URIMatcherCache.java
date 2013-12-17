@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Holds info about all processed URIMatcher by all URIPolicyEntry rules
+ * Holds info about all processed URIMatcher by all URIPolicyRule rules
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */

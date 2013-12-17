@@ -21,7 +21,7 @@ import org.vertx.java.core.Vertx;
  */
 public abstract class AbstractResourceTestCase extends AbstractTestCase {
 
-    private LiveOakSystem system;
+    protected LiveOakSystem system;
 
     protected Client client;
     protected RootResource resource;

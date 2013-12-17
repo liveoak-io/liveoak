@@ -3,14 +3,16 @@ package io.liveoak.security.policy.uri.complex;
 import io.liveoak.security.policy.uri.complex.RulesProcessingResult;
 import io.liveoak.security.policy.uri.complex.URIMatcher;
 import io.liveoak.security.policy.uri.complex.RequestContextDecorator;
-import io.liveoak.security.spi.AuthorizationDecision;
-import io.liveoak.security.spi.AuthToken;
+import io.liveoak.security.spi.AuthzDecision;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.container.auth.SimpleLogger;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+
+import static io.liveoak.security.policy.uri.complex.LoggerHelper.logger;
 
 dialect "mvel"
 
@@ -34,23 +36,30 @@ function boolean uriMatches(String ruleName, String regex, ResourcePath resource
   }
 
   uriMatcher.setProcessed(true);
-  System.out.println("Checking URI regex for rule " + ruleName + ". regex: " + regex + ", textToMatch: " + textToMatch
-      + ", result: " + uriMatcher);
+  if (logger().isTraceEnabled()) {
+    logger().trace("Checking URI regex for rule " + ruleName + ". regex: " + regex + ", textToMatch: " + textToMatch
+        + ", result: " + uriMatcher);
+  }
 
   return uriMatcher.isMatched();
 }
 
 
 function boolean requestConditionsMatches(String ruleName, boolean result) {
-  System.out.println("Checking params condition for rule: " + ruleName + ", result: " + result);
+  if (logger().isTraceEnabled()) {
+    logger().trace("Checking params condition for rule: " + ruleName + ", result: " + result);
+  }
   return result;
 }
 
 
 function boolean requestTypeMatches(String ruleName, RequestType reqType, String allowedTypes) {
   boolean result = allowedTypes.contains(reqType.name());
-  System.out.println("Checking requestType for rule " + ruleName + ". Incoming requestType: " + reqType
-      + ", allowedTypes: " + allowedTypes + ", result: " + result);
+
+  if (logger().isTraceEnabled()) {
+    logger().trace("Checking requestType for rule " + ruleName + ". Incoming requestType: " + reqType
+        + ", allowedTypes: " + allowedTypes + ", result: " + result);
+  }
 
   return result;
 }

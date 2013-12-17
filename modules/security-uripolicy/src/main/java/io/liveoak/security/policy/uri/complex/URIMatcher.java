@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Encapsulates info about processing of URI string with one single rule of URIPolicyEntry
+ * Encapsulates info about processing of URI string with one single rule of URIPolicyRule
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */

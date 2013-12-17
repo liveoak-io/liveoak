@@ -73,6 +73,11 @@ public class DefaultContainer implements Container, Resource {
         resource.destroy();
     }
 
+    @Override
+    public boolean hasResource(String id) {
+        return this.resources.containsKey(id);
+    }
+
     // ----------------------------------------
     // CollectionResource
     // ----------------------------------------

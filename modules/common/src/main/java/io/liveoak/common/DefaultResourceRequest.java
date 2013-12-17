@@ -180,7 +180,7 @@ public class DefaultResourceRequest implements ResourceRequest {
                 }
 
                 // TODO: introduce Sorting.NONE to be in line with others
-                obj.requestContext = new DefaultRequestContext(SecurityContext.ANONYMOUS, pagination, returnFields, params,
+                obj.requestContext = new DefaultRequestContext(new DefaultSecurityContext(), pagination, returnFields, params,
                         obj.resourcePath, obj.requestType, requestAttributes, sorting);
             }
             return obj;

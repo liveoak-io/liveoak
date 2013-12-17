@@ -1,0 +1,28 @@
+{ 
+    "uriRules": [
+        {
+            "priority": 1,
+            "uriPattern": "/public*",
+            "requestType": "*",
+            "allowedUsers": "'*'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/storage*",            
+            "requestType": "*",
+            "allowedRoles": "'test-app/admin','test-app/user'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/app*",
+            "requestType": "CREATE,UPDATE,DELETE",
+            "allowedRoles": "'test-app/admin'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/app*",
+            "requestType": "READ",
+            "allowedRoles": "'test-app/user'"
+        }
+    ]
+}

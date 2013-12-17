@@ -7,10 +7,12 @@ package io.liveoak.container.protocols;
 
 import java.util.concurrent.Executor;
 
+import io.liveoak.client.DefaultClient;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.ErrorHandler;
 import io.liveoak.container.ResourceHandler;
-import io.liveoak.container.auth.AuthorizationHandler;
+import io.liveoak.container.auth.AuthHandler;
+import io.liveoak.container.auth.AuthzHandler;
 import io.liveoak.container.deploy.ConfigurationWatcher;
 import io.liveoak.container.deploy.DirectoryDeploymentManager;
 import io.liveoak.container.interceptor.InterceptorHandler;
@@ -37,6 +39,7 @@ import io.liveoak.stomp.server.protocol.SendHandler;
 import io.liveoak.stomp.server.protocol.SubscribeHandler;
 import io.liveoak.stomp.server.protocol.UnsubscribeHandler;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.local.LocalAddress;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
@@ -157,7 +160,23 @@ public class PipelineConfigurator {
         pipeline.addLast("http-resourceRead-decoder", new HttpResourceRequestDecoder(this.codecManager));
         pipeline.addLast("http-resourceRead-encoder", new HttpResourceResponseEncoder(this.codecManager));
         pipeline.addLast("interceptor", new InterceptorHandler( this.interceptorManager ) );
-        pipeline.addLast("auth-handler", new AuthorizationHandler());
+
+        // TODO Inject
+        DefaultClient defaultClient = new DefaultClient();
+        try {
+            defaultClient.connect(new LocalAddress("liveoak"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (container.hasResource("auth")) {
+            pipeline.addLast("auth-handler", new AuthHandler(defaultClient));
+        }
+
+        if (container.hasResource("authz")) {
+            pipeline.addLast("authz-handler", new AuthzHandler(defaultClient));
+        }
+
         //pipeline.addLast( new DebugHandler( "networkServer-2" ) );
         if (this.deploymentManager != null) {
             pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));

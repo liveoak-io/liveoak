@@ -28,6 +28,11 @@
         </dependency>
         <dependency>
             <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-container</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
             <artifactId>liveoak-security</artifactId>
             <scope>provided</scope>
         </dependency>
@@ -50,6 +55,10 @@
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-test-tools</artifactId>
         </dependency>
     </dependencies>
 

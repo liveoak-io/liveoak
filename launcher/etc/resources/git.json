@@ -1,8 +1,0 @@
-{
-    type: 'jboss-module',
-    module-id:   'io.liveoak.git',
-    class-name:  'io.liveoak.git.GitRepoResource',
-    config: {
-        repoPath: '${user.dir}'
-    }
-}

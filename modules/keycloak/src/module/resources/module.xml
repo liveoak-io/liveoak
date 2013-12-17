@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module xmlns="urn:jboss:module:1.1" name="io.liveoak.keycloak">
+    <resources>
+        <resource-root path="liveoak-keycloak.jar"/>
+    </resources>
+
+    <dependencies>
+        <module name="com.fasterxml.jackson.core"/>
+        <module name="io.liveoak.spi"/>
+        <module name="org.keycloak" services="import">
+            <imports>
+                <include path="META-INF**" />
+            </imports>
+        </module>
+        <module name="org.hibernate" services="import"/>
+        <module name="com.h2database.h2"/>
+        <module name="org.undertow"/>
+        <module name="org.slf4j"/>
+    </dependencies>
+</module>

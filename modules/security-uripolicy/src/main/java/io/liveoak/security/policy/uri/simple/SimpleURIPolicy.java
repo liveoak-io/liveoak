@@ -6,65 +6,44 @@
 package io.liveoak.security.policy.uri.simple;
 
 
-import io.liveoak.security.impl.AuthServicesHolder;
 import io.liveoak.security.policy.uri.RolesContainer;
-import io.liveoak.security.spi.AuthorizationDecision;
-import io.liveoak.security.spi.AuthorizationPolicy;
-import io.liveoak.security.spi.AuthorizationRequestContext;
+import io.liveoak.security.spi.AuthzDecision;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
+ * TODO: To be removed later (probably)
+ *
  * Simple URI policy, which allows just wildcards (no custom patterns) in ResourcePath segments. Doesn't check request parameters
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class SimpleURIPolicy implements AuthorizationPolicy {
+public class SimpleURIPolicy {
 
     public static final String WILDCARD = "*";
 
     public static final RolesContainer ALLOW_ALL_ROLES_CONTAINER = new RolesContainer() {
 
         @Override
-        public AuthorizationDecision isRealmRoleAllowed(String roleName) {
-            return AuthorizationDecision.ACCEPT;
+        public AuthzDecision isRoleAllowed(String roleName) {
+            return AuthzDecision.ACCEPT;
         }
 
         @Override
-        public AuthorizationDecision isApplicationRoleAllowed(String roleName) {
-            return AuthorizationDecision.ACCEPT;
+        public AuthzDecision isUserAllowed(String username) {
+            return AuthzDecision.ACCEPT;
         }
 
-        @Override
-        public AuthorizationDecision isRealmRolesAllowed(Collection<String> roles) {
-            return AuthorizationDecision.ACCEPT;
-        }
-
-        @Override
-        public AuthorizationDecision isApplicationRolesAllowed(Collection<String> roles) {
-            return AuthorizationDecision.ACCEPT;
-        }
     };
 
     private RecursiveHashMap permissions = new RecursiveHashMap(null);
 
-
-    @Override
-    public void init() {
-        // Empty by default
-    }
-
-    @Override
-    public AuthorizationDecision isAuthorized(AuthorizationRequestContext authRequestContext) {
-        RequestContext req = authRequestContext.getRequestContext();
+    public AuthzDecision isAuthorized(RequestContext req) {
         List<ResourcePath.Segment> segments = req.resourcePath().segments();
         int segmentsSize = segments.size();
 
@@ -86,11 +65,7 @@ public class SimpleURIPolicy implements AuthorizationPolicy {
         // Look for best RolesContainer
         RolesContainer rolesContainer = permissions.recursiveGet(keys);
 
-        // Find applicationName from persister, so we can obtain applicationRoles for correct application from token
-        String appId = AuthServicesHolder.getInstance().getApplicationIdResolver().resolveAppId(req);
-        String appName = AuthServicesHolder.getInstance().getAuthPersister().getApplicationMetadata(appId).getApplicationName();
-
-        AuthorizationDecision authDecision = checkPermissions(rolesContainer, authRequestContext, appName);
+        AuthzDecision authDecision = checkPermissions(rolesContainer, req);
         return authDecision;
     }
 
@@ -103,31 +78,15 @@ public class SimpleURIPolicy implements AuthorizationPolicy {
         permissions.recursivePut(keys, policy);
     }
 
-    protected AuthorizationDecision checkPermissions(RolesContainer rolesContainer, AuthorizationRequestContext authRequestContext, String applicationName) {
+    protected AuthzDecision checkPermissions(RolesContainer rolesContainer, RequestContext reqCtx) {
+        Set<String> roles = getRoles(reqCtx);
 
-        Set<String> realmRoles = getRealmRoles(authRequestContext);
-        Set<String> appRoles = getAppRoles(authRequestContext, applicationName);
+        AuthzDecision rolesAuthDecision = rolesContainer.isRolesAllowed(roles);
 
-        AuthorizationDecision realmRolesAuthDecision = rolesContainer.isRealmRolesAllowed(realmRoles);
-        AuthorizationDecision appRolesDecision = rolesContainer.isApplicationRolesAllowed(appRoles);
-
-        return realmRolesAuthDecision.mergeDecision(appRolesDecision);
+        return rolesAuthDecision;
     }
 
-    private Set<String> getRealmRoles(AuthorizationRequestContext authRequestContext) {
-        return authRequestContext.getAuthToken().getRealmRoles();
-    }
-
-    private Set<String> getAppRoles(AuthorizationRequestContext authRequestContext, String appName) {
-        if (!authRequestContext.isRequestAuthenticated()) {
-            return Collections.emptySet();
-        }
-
-        Map<String, Set<String>> appAccess = authRequestContext.getAuthToken().getApplicationRolesMap();
-        if (appAccess.containsKey(appName)) {
-            return appAccess.get(appName);
-        } else {
-            return Collections.EMPTY_SET;
-        }
+    private Set<String> getRoles(RequestContext reqCtx) {
+        return reqCtx.securityContext().getRoles();
     }
 }

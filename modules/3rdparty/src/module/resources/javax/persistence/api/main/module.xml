@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright 2013 Red Hat, Inc. and/or its affiliates.
+  ~
+  ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+  -->
+<module xmlns="urn:jboss:module:1.1" name="javax.persistence.api">
+    <resources>
+        <artifact name="org.hibernate.javax.persistence:hibernate-jpa-2.1-api:${hibernate.jpa.version}"/>
+    </resources>
+
+    <dependencies>
+        <module name="javax.api" export="true"/>
+    </dependencies>
+</module>
