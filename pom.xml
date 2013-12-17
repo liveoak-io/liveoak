@@ -748,6 +748,10 @@
             <id>jboss</id>
             <url>http://repository.jboss.org/nexus/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>jboss-thirdparty</id>
+            <url>https://repository.jboss.org/nexus/service/local/repositories/thirdparty-releases</url>
+        </repository>
     </repositories>
 
 </project>
