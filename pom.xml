@@ -750,7 +750,7 @@
         </repository>
         <repository>
             <id>jboss-thirdparty</id>
-            <url>https://repository.jboss.org/nexus/service/local/repositories/thirdparty-releases</url>
+            <url>https://repository.jboss.org/nexus/service/local/repositories/thirdparty-releases/content</url>
         </repository>
     </repositories>
 
