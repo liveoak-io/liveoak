@@ -49,22 +49,24 @@ public class RootMongoResource extends MongoResource implements RootResource {
     @ConfigMapping({@ConfigProperty("host"), @ConfigProperty("port"), @ConfigProperty("db")})
     private void updateConfig(Object... values) throws Exception {
 
-         Object hostObject = values[0];
-        if (!(hostObject instanceof String) || ((String)(hostObject)).isEmpty()) {
-            throw new InitializationException("Configuration value for 'host' invalid. Requires a string value. Received : " + hostObject);
-        }
-        String host = (String) hostObject;
-        if (host == null) {
+        String host;
+        Object hostObject = values[0];
+        if (hostObject == null) {
             host = "localhost";
+        } else if (!(hostObject instanceof String) || ((String)(hostObject)).isEmpty()) {
+            throw new InitializationException("Configuration value for 'host' invalid. Requires a string value. Received : " + hostObject);
+        } else {
+            host = (String) hostObject;
         }
 
+        Integer port;
         Object portObject = values[1];
-        if (portObject == null || !(portObject instanceof Integer)) {
-            throw new InitializationException("Configuration value for 'port' invalid. Requires an integer value. Received : " + portObject);
-        }
-        Integer port = (Integer) portObject;
-        if (port == null) {
+        if (portObject == null) {
             port = 27017;
+        } else if (!(portObject instanceof Integer)) {
+            throw new InitializationException("Configuration value for 'port' invalid. Requires an integer value. Received : " + portObject);
+        } else {
+            port = (Integer) portObject;
         }
 
         String dbName = (String)values[2];
