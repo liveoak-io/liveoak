@@ -1,5 +1,7 @@
 package io.liveoak.spi;
 
+import java.util.UUID;
+
 import io.liveoak.spi.resource.async.Resource;
 
 /**
@@ -20,5 +22,5 @@ public interface ResourceResponse {
 
     ResourceRequest inReplyTo();
 
-
+    UUID requestId();
 }

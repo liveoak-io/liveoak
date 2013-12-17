@@ -9,6 +9,7 @@ import java.util.concurrent.Executor;
 
 import io.liveoak.client.DefaultClient;
 import io.liveoak.common.codec.ResourceCodecManager;
+import io.liveoak.common.protocol.DebugHandler;
 import io.liveoak.container.ErrorHandler;
 import io.liveoak.container.ResourceHandler;
 import io.liveoak.container.auth.AuthHandler;
@@ -156,7 +157,6 @@ public class PipelineConfigurator {
 
     public void switchToPlainHttp(ChannelPipeline pipeline) {
         pipeline.remove(WebSocketHandshakerHandler.class);
-        //pipeline.addLast( new DebugHandler( "networkServer-1" ) );
         pipeline.addLast("http-resourceRead-decoder", new HttpResourceRequestDecoder(this.codecManager));
         pipeline.addLast("http-resourceRead-encoder", new HttpResourceResponseEncoder(this.codecManager));
         pipeline.addLast("interceptor", new InterceptorHandler( this.interceptorManager ) );
@@ -190,6 +190,7 @@ public class PipelineConfigurator {
         //pipeline.addLast( new DebugHandler( "local-server-head" ) );
         pipeline.addLast( new LocalResourceResponseEncoder( this.workerPool) );
         pipeline.addLast("interceptor", new InterceptorHandler( this.interceptorManager ) );
+        //pipeline.addLast( new DebugHandler( "upstream-from-interceptor" ) );
         pipeline.addLast(new SubscriptionWatcher(this.subscriptionManager));
         if (this.deploymentManager != null) {
             pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));

@@ -5,13 +5,16 @@ import java.util.List;
 
 import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.common.DefaultResourceRequest;
+import io.liveoak.common.DefaultResourceResponse;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
+import io.liveoak.spi.container.interceptor.DefaultInterceptor;
 import io.liveoak.spi.container.interceptor.InboundInterceptorContext;
 import io.liveoak.spi.container.interceptor.Interceptor;
+import io.liveoak.spi.container.interceptor.OutboundInterceptorContext;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -141,5 +144,64 @@ public class InterceptorChainTest {
         assertThat(interceptor2.responses()).contains(response);
         assertThat(interceptor1.responses()).hasSize(1);
         assertThat(interceptor1.responses()).contains(response);
+    }
+
+    @Test
+    public void testCorrelationWithRequestReplacement() throws Exception {
+
+        List<Interceptor> interceptors = new ArrayList<>();
+
+
+        MockInterceptor interceptor1 = new MockInterceptor();
+        DefaultInterceptor interceptor2 = new DefaultInterceptor() {
+            @Override
+            public void onInbound(InboundInterceptorContext context) throws Exception {
+                ResourceRequest replacement = new DefaultResourceRequest.Builder(context.request()).build();
+                context.forward(replacement);
+            }
+
+            @Override
+            public void onOutbound(OutboundInterceptorContext context) throws Exception {
+                ResourceResponse replacement = new DefaultResourceResponse( context.request(), ResourceResponse.ResponseType.ERROR );
+                context.forward( replacement );
+            }
+        };
+        MockInterceptor interceptor3 = new MockInterceptor();
+
+        interceptors.add(interceptor1);
+        interceptors.add(interceptor2);
+        interceptors.add(interceptor3);
+
+        EmbeddedChannel channel = new EmbeddedChannel(
+                new ChannelDuplexHandler() {
+                    @Override
+                    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+                        InterceptorChain chain = new InterceptorChain(ctx, interceptors, (ResourceResponse) msg);
+                        chain.fireOutbound();
+                    }
+
+                    @Override
+                    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+                        InterceptorChain chain = new InterceptorChain(ctx, interceptors, (ResourceRequest) msg);
+                        chain.fireInbound();
+                    }
+                }
+        );
+
+        ResourceRequest request = new DefaultResourceRequest.Builder(RequestType.READ, new ResourcePath("/foo/bar")).build();
+        channel.writeInbound( request );
+        ResourceRequest endRequest = (ResourceRequest) channel.readInbound();
+
+        assertThat( request ).isNotSameAs( endRequest );
+        assertThat( request.requestId() ).isEqualTo( endRequest.requestId() );
+
+        ResourceResponse response = new DefaultResourceResponse( endRequest, ResourceResponse.ResponseType.READ );
+        channel.writeAndFlush( response );
+        ResourceResponse endResponse = (ResourceResponse) channel.readOutbound();
+
+        assertThat( response ).isNotSameAs( endResponse );
+        assertThat( response.inReplyTo() ).isNotSameAs( request );
+        assertThat( response.requestId() ).isEqualTo( request.requestId() );
+
     }
 }

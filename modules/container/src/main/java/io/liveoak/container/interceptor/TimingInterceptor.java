@@ -3,6 +3,7 @@ package io.liveoak.container.interceptor;
 import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.liveoak.spi.ResourceRequest;
@@ -17,16 +18,20 @@ public class TimingInterceptor extends DefaultInterceptor {
 
     @Override
     public void onInbound(InboundInterceptorContext context) throws Exception {
-        this.timings.put(context.request(), System.currentTimeMillis());
+        UUID requestId = context.request().requestId();
+        this.timings.put(requestId, System.currentTimeMillis());
         super.onInbound(context);
     }
 
     @Override
     public void onOutbound(OutboundInterceptorContext context) throws Exception {
-        long start = this.timings.remove(context.request());
-        System.err.println("Request took: " + (System.currentTimeMillis() - start) + "ms");
+        UUID requestId = context.request().requestId();
+        Long start = this.timings.remove(requestId);
+        if (start != null) {
+            System.err.println("Request took: " + (System.currentTimeMillis() - start) + "ms");
+        }
         super.onOutbound(context);
     }
 
-    private Map<ResourceRequest, Long> timings = new ConcurrentHashMap<>();
+    private Map<UUID, Long> timings = new ConcurrentHashMap<>();
 }

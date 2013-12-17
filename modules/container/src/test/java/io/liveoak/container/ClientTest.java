@@ -12,7 +12,6 @@ import io.liveoak.spi.Container;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceContext;
-import io.liveoak.spi.ResourceException;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.BlockingResource;

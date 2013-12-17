@@ -5,6 +5,8 @@
  */
 package io.liveoak.common;
 
+import java.util.UUID;
+
 import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
@@ -25,6 +27,11 @@ public class DefaultResourceResponse implements ResourceResponse {
         this.inReplyTo = inReplyTo;
         this.responseType = responseType;
         this.resource = resource;
+    }
+
+    @Override
+    public UUID requestId() {
+        return this.inReplyTo.requestId();
     }
 
     public MediaTypeMatcher mediaTypeMatcher() {

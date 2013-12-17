@@ -5,6 +5,8 @@
  */
 package io.liveoak.common;
 
+import java.util.UUID;
+
 import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestAttributes;
@@ -32,6 +34,17 @@ public class DefaultResourceRequest implements ResourceRequest {
         }
         this.requestType = type;
         this.resourcePath = path;
+        this.requestId = UUID.randomUUID();
+    }
+
+    private DefaultResourceRequest(ResourceRequest original) {
+        this.requestType = original.requestType();
+        this.resourcePath = original.resourcePath();
+        this.requestId = original.requestId();
+    }
+
+    public UUID requestId() {
+        return this.requestId;
     }
 
     public RequestType requestType() {
@@ -58,6 +71,7 @@ public class DefaultResourceRequest implements ResourceRequest {
         return "[DefaultResourceRequest: type=" + this.requestType() + "; path=" + this.resourcePath + "]";
     }
 
+    private UUID requestId;
     private RequestType requestType;
     private ResourcePath resourcePath;
     private MediaTypeMatcher mediaTypeMatcher;
@@ -76,6 +90,13 @@ public class DefaultResourceRequest implements ResourceRequest {
 
         public Builder(RequestType type, ResourcePath path) {
             obj = new DefaultResourceRequest(type, path);
+        }
+
+        public Builder(ResourceRequest original) {
+            obj = new DefaultResourceRequest( original );
+            mediaTypeMatcher( original.mediaTypeMatcher() );
+            pagination( original.requestContext().pagination() );
+            resourceState( original.state() );
         }
 
         public Builder resourceParams(ResourceParams params) {
