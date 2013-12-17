@@ -10,6 +10,7 @@ import java.net.InetAddress;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
+import io.liveoak.client.DefaultClient;
 import io.liveoak.common.codec.Encoder;
 import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.common.codec.ResourceCodecManager;
@@ -26,6 +27,7 @@ import io.liveoak.container.interceptor.InterceptorManager;
 import io.liveoak.container.interceptor.TimingInterceptor;
 import io.liveoak.container.protocols.PipelineConfigurator;
 import io.liveoak.container.server.LocalServer;
+import io.liveoak.container.service.ClientConnectorService;
 import io.liveoak.container.service.ClientService;
 import io.liveoak.container.service.CodecInstallationService;
 import io.liveoak.container.service.CodecManagerService;
@@ -47,6 +49,7 @@ import io.liveoak.container.service.VertxService;
 import io.liveoak.container.service.WorkerPoolService;
 import io.liveoak.spi.Container;
 import io.liveoak.spi.MediaType;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.Deployer;
 import io.liveoak.spi.container.RootResourceFactory;
 import io.liveoak.spi.container.SubscriptionManager;
@@ -115,7 +118,12 @@ public class LiveOakFactory {
 
         ClientService client = new ClientService();
         serviceContainer.addService(CLIENT, client)
-                .addDependency(server("local", false), LocalServer.class, client.serverInjector())
+                .install();
+
+        ClientConnectorService clientConnector = new ClientConnectorService();
+        serviceContainer.addService(CLIENT.append( "connect" ), clientConnector )
+                .addDependency( CLIENT, DefaultClient.class, clientConnector.clientInjector() )
+                .addDependency(server("local", false))
                 .install();
 
         ContainerService container = new ContainerService();
@@ -153,6 +161,7 @@ public class LiveOakFactory {
                 .addDependency(INTERCEPTOR_MANAGER, InterceptorManager.class, pipelineConfigurator.interceptorManagerInjector())
                 .addDependency(CONTAINER, Container.class, pipelineConfigurator.containerInjector())
                 .addDependency(CODEC_MANAGER, ResourceCodecManager.class, pipelineConfigurator.codecManagerInjector())
+                .addDependency(CLIENT, Client.class, pipelineConfigurator.clientInjector())
                 .addDependency(WORKER_POOL, Executor.class, pipelineConfigurator.workerPoolInjector());
 
         if (configDir != null) {

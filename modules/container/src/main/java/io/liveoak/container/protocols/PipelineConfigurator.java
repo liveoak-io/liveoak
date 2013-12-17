@@ -27,6 +27,7 @@ import io.liveoak.container.protocols.websocket.WebSocketStompFrameEncoder;
 import io.liveoak.container.subscriptions.ContainerStompServerContext;
 import io.liveoak.container.subscriptions.SubscriptionWatcher;
 import io.liveoak.spi.Container;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.stomp.common.StompFrameDecoder;
 import io.liveoak.stomp.common.StompFrameEncoder;
@@ -51,6 +52,14 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 public class PipelineConfigurator {
 
     public PipelineConfigurator() {
+    }
+
+    public void client(Client client) {
+        this.client = client;
+    }
+
+    public Client client() {
+        return this.client;
     }
 
     public void codecManager(ResourceCodecManager codecManager) {
@@ -161,20 +170,12 @@ public class PipelineConfigurator {
         pipeline.addLast("http-resourceRead-encoder", new HttpResourceResponseEncoder(this.codecManager));
         pipeline.addLast("interceptor", new InterceptorHandler( this.interceptorManager ) );
 
-        // TODO Inject
-        DefaultClient defaultClient = new DefaultClient();
-        try {
-            defaultClient.connect(new LocalAddress("liveoak"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         if (container.hasResource("auth")) {
-            pipeline.addLast("auth-handler", new AuthHandler(defaultClient));
+            pipeline.addLast("auth-handler", new AuthHandler(this.client));
         }
 
         if (container.hasResource("authz")) {
-            pipeline.addLast("authz-handler", new AuthzHandler(defaultClient));
+            pipeline.addLast("authz-handler", new AuthzHandler(this.client));
         }
 
         //pipeline.addLast( new DebugHandler( "networkServer-2" ) );
@@ -198,6 +199,7 @@ public class PipelineConfigurator {
         pipeline.addLast(new ResourceHandler(this.container, this.workerPool));
     }
 
+    private Client client;
     private ResourceCodecManager codecManager;
     private SubscriptionManager subscriptionManager;
     private DirectoryDeploymentManager deploymentManager;

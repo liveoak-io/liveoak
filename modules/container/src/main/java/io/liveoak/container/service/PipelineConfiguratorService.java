@@ -7,6 +7,7 @@ import io.liveoak.container.interceptor.InterceptorManager;
 import io.liveoak.container.protocols.PipelineConfigurator;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.spi.Container;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.SubscriptionManager;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -23,11 +24,12 @@ public class PipelineConfiguratorService implements Service<PipelineConfigurator
     public void start(StartContext context) throws StartException {
         this.pipelineConfigurator = new PipelineConfigurator();
         this.pipelineConfigurator.codecManager( this.codecManagerInjector.getValue() );
-        this.pipelineConfigurator.subscriptionManager( this.subscriptionManagerInjector.getValue() );
-        this.pipelineConfigurator.workerPool( this.workerPoolInjector.getValue() );
-        this.pipelineConfigurator.container( this.containerInjector.getValue() );
+        this.pipelineConfigurator.subscriptionManager(this.subscriptionManagerInjector.getValue());
+        this.pipelineConfigurator.workerPool(this.workerPoolInjector.getValue());
+        this.pipelineConfigurator.container(this.containerInjector.getValue());
         this.pipelineConfigurator.interceptorManager( this.interceptorManagerInjector.getValue() );
         this.pipelineConfigurator.deploymentManager( this.deploymentManagerInjector.getOptionalValue() );
+        this.pipelineConfigurator.client( this.clientInjector.getValue() );
     }
 
     @Override
@@ -64,6 +66,10 @@ public class PipelineConfiguratorService implements Service<PipelineConfigurator
         return this.interceptorManagerInjector;
     }
 
+    public Injector<Client> clientInjector() {
+        return this.clientInjector;
+    }
+
     private PipelineConfigurator pipelineConfigurator;
 
     private InjectedValue<Container> containerInjector = new InjectedValue<>();
@@ -72,6 +78,7 @@ public class PipelineConfiguratorService implements Service<PipelineConfigurator
     private InjectedValue<Executor> workerPoolInjector = new InjectedValue<>();
     private InjectedValue<DirectoryDeploymentManager> deploymentManagerInjector = new InjectedValue<>();
     private InjectedValue<InterceptorManager> interceptorManagerInjector = new InjectedValue<>();
+    private InjectedValue<Client> clientInjector = new InjectedValue<>();
 
 
 }

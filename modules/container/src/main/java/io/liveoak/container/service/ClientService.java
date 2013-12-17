@@ -13,16 +13,11 @@ import org.jboss.msc.value.InjectedValue;
 /**
  * @author Bob McWhirter
  */
-public class ClientService implements Service<Client> {
+public class ClientService implements Service<DefaultClient> {
 
     @Override
     public void start(StartContext context) throws StartException {
         this.client = new DefaultClient();
-        try {
-            this.client.connect( this.serverInjector.getValue().localAddress() );
-        } catch (Exception e) {
-            throw new StartException( e );
-        }
     }
 
     @Override
@@ -31,7 +26,7 @@ public class ClientService implements Service<Client> {
     }
 
     @Override
-    public Client getValue() throws IllegalStateException, IllegalArgumentException {
+    public DefaultClient getValue() throws IllegalStateException, IllegalArgumentException {
         return this.client;
     }
 
