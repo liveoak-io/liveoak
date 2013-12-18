@@ -7,10 +7,24 @@
             "allowedUsers": "'*'"
         },
         {
-            "priority": 1,
+            "priority": 2,
             "uriPattern": "/storage*",            
             "requestType": "*",
-            "allowedRoles": "'test-app/admin','test-app/user'"
+            "allowedRoles": "'test-app/admin'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/storage*",
+            "requestType": "READ",
+            "queryParamsCondition": "resourceParams.value('q') != null && resourceParams.value('q').contains('\\\"user\\\":\\\"' + $securityContext.subject + '\\\"')",
+            "allowedRoles": "'test-app/user'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/storage*",
+            "requestType": "CREATE,UPDATE",
+            "queryParamsCondition": "$requestState.getProperty('user') ==  $securityContext.subject",
+            "allowedRoles": "'test-app/user'"
         },
         {
             "priority": 1,
@@ -22,7 +36,7 @@
             "priority": 1,
             "uriPattern": "/app*",
             "requestType": "READ",
-            "allowedRoles": "'test-app/user'"
+            "allowedRoles": "'test-app/admin','test-app/user'"
         }
     ]
 }

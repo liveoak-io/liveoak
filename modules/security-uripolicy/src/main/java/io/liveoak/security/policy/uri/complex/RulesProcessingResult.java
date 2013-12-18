@@ -5,8 +5,8 @@
  */
 package io.liveoak.security.policy.uri.complex;
 
-import io.liveoak.container.auth.SimpleLogger;
-import io.liveoak.security.spi.AuthzDecision;
+import io.liveoak.common.security.AuthzDecision;
+import org.jboss.logging.Logger;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,7 +19,7 @@ import java.util.Set;
  */
 public class RulesProcessingResult {
 
-    private static final SimpleLogger log = new SimpleLogger(RulesProcessingResult.class);
+    private static final Logger log = Logger.getLogger(RulesProcessingResult.class);
 
     private AuthzDecision current = null;
     private Set<String> processedRules = new HashSet<String>();

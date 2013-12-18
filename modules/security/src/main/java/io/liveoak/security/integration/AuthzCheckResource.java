@@ -7,9 +7,8 @@
 package io.liveoak.security.integration;
 
 import io.liveoak.common.DefaultRequestAttributes;
-import io.liveoak.container.auth.AuthzConstants;
-import io.liveoak.container.auth.SimpleLogger;
-import io.liveoak.security.spi.AuthzDecision;
+import io.liveoak.common.security.AuthzConstants;
+import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.security.spi.AuthzPolicyEntry;
 import io.liveoak.spi.RequestAttributes;
 import io.liveoak.spi.RequestContext;
@@ -18,6 +17,7 @@ import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 
 import java.util.LinkedList;
@@ -55,12 +55,20 @@ public class AuthzCheckResource implements Resource {
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         try {
-            PolicyHandler handler = new PolicyHandler(ctx, sink);
+            RequestContext ctxToAuthorize = ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, RequestContext.class);
+            ResourceState resStateToAuthorize = ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, ResourceState.class);
+            if (ctxToAuthorize == null) {
+                if (log.isTraceEnabled()) {
+                    log.trace("Request to authorize is null. Rejecting");
+                }
+                writeAuthzResponse(sink, false);
+                return;
+            }
+            PolicyHandler handler = new PolicyHandler(ctxToAuthorize, resStateToAuthorize, sink);
             handler.next();
         } catch (Throwable t) {
             log.error("Failed to authorize request", t);
-            sink.accept(AuthzConstants.ATTR_AUTHZ_RESULT, false);
-            sink.close();
+            writeAuthzResponse(sink, false);
         }
     }
 
@@ -71,14 +79,16 @@ public class AuthzCheckResource implements Resource {
 
         private PropertySink sink;
         private RequestContext ctxToAuthorize;
+        private ResourceState stateToAuthorize;
 
         private AuthzDecision decision = AuthzDecision.IGNORE;
 
-        public PolicyHandler(RequestContext ctx, PropertySink sink) {
+        public PolicyHandler(RequestContext ctxToAuthorize, ResourceState stateToAuthorize, PropertySink sink) {
             this.client = parent.getClient();
             this.sink = sink;
 
-            ctxToAuthorize = ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, RequestContext.class);
+            this.ctxToAuthorize = ctxToAuthorize;
+            this.stateToAuthorize = stateToAuthorize;
             queue = getPolicies(ctxToAuthorize.resourcePath());
 
             if (queue.isEmpty()) {
@@ -88,6 +98,12 @@ public class AuthzCheckResource implements Resource {
 
         @Override
         public void accept(ClientResourceResponse response) {
+            if (response.state() == null || response.state().getProperty(AuthzConstants.ATTR_AUTHZ_POLICY_RESULT) == null) {
+                log.warn("State or policy result not available in response: " + response + ", path: " + response.path());
+                authorized(false);
+                return;
+            }
+
             AuthzDecision result = AuthzDecision.valueOf((String) response.state().getProperty(AuthzConstants.ATTR_AUTHZ_POLICY_RESULT));
             decision = decision.mergeDecision(result);
 
@@ -119,6 +135,7 @@ public class AuthzCheckResource implements Resource {
         private RequestContext createPolicyReq() {
             RequestAttributes attribs = new DefaultRequestAttributes();
             attribs.setAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, ctxToAuthorize);
+            attribs.setAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, stateToAuthorize);
             return new RequestContext.Builder().requestAttributes(attribs).build();
         }
 
@@ -127,12 +144,7 @@ public class AuthzCheckResource implements Resource {
                 log.trace("Completed for " + ctxToAuthorize.hashCode() + ", merged = " + decision);
             }
 
-            sink.accept(AuthzConstants.ATTR_AUTHZ_RESULT, accepted);
-            try {
-                sink.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            writeAuthzResponse(sink, accepted);
         }
 
         private Queue<AuthzPolicyEntry> getPolicies(ResourcePath resPath) {
@@ -147,6 +159,15 @@ public class AuthzCheckResource implements Resource {
             return l;
         }
 
+    }
+
+    private void writeAuthzResponse(PropertySink sink, boolean accepted) {
+        sink.accept(AuthzConstants.ATTR_AUTHZ_RESULT, accepted);
+        try {
+            sink.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

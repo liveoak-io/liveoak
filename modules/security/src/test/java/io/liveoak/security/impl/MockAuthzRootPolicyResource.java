@@ -1,13 +1,11 @@
 package io.liveoak.security.impl;
 
-import io.liveoak.container.auth.AuthzConstants;
-import io.liveoak.security.spi.AuthzDecision;
-import io.liveoak.security.spi.AuthzPolicy;
+import io.liveoak.common.security.AuthzConstants;
+import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 
-import java.net.URI;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;

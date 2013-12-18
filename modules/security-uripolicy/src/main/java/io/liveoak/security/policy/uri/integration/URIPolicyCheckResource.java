@@ -6,20 +6,21 @@
 
 package io.liveoak.security.policy.uri.integration;
 
-import io.liveoak.container.auth.AuthzConstants;
-import io.liveoak.container.auth.SimpleLogger;
+import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.security.policy.uri.complex.URIPolicy;
-import io.liveoak.security.spi.AuthzDecision;
+import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public class URIPolicyCheckResource implements Resource {
 
-    private static final SimpleLogger log = new SimpleLogger(URIPolicyCheckResource.class);
+    private static final Logger log = Logger.getLogger(URIPolicyCheckResource.class);
 
     private final String id;
     private final URIPolicyRootResource parent;
@@ -47,12 +48,18 @@ public class URIPolicyCheckResource implements Resource {
             URIPolicy uriPolicy = parent.getUriPolicy();
             if (uriPolicy != null) {
                 RequestContext reqCtxToAuthorize = ctx.requestAttributes() != null ? ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, RequestContext.class) : null;
+                ResourceState reqResourceState = ctx.requestAttributes() != null ? ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, ResourceState.class) : null;
                 if (reqCtxToAuthorize == null) {
-                    throw new NullPointerException();
+                    if (log.isTraceEnabled()) {
+                        log.trace("Request is null. Rejecting");
+                    }
+                    decision = AuthzDecision.REJECT;
+                } else {
+                    decision = uriPolicy.isAuthorized(reqCtxToAuthorize, reqResourceState);
                 }
-                decision = uriPolicy.isAuthorized(reqCtxToAuthorize);
             }
         } catch (Throwable t) {
+            log.error("Error during authz check", t);
             decision = AuthzDecision.REJECT;
         }
 

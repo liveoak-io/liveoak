@@ -16,6 +16,7 @@ import io.liveoak.spi.state.ResourceState;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.HttpHeaders;
+import org.jboss.logging.Logger;
 
 import java.util.Collection;
 import java.util.Date;
@@ -28,10 +29,8 @@ import java.util.function.Consumer;
  */
 public class AuthHandler extends SimpleChannelInboundHandler<ResourceRequest> {
 
-    // TODO: replace with real logging
-    private static final SimpleLogger log = new SimpleLogger(AuthHandler.class);
-
     public static final String AUTH_TYPE = "bearer";
+    private static final Logger log = Logger.getLogger(AuthHandler.class);
 
     private Client client;
 
@@ -60,6 +59,7 @@ public class AuthHandler extends SimpleChannelInboundHandler<ResourceRequest> {
                     try {
                         ResourceState state = resourceResponse.state();
                         if (state.getProperty("error") != null) {
+                            log.warn("Authentication failed. Request: " + req + ", error: " + state.getProperty("error"));
                             ctx.writeAndFlush(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.NOT_AUTHORIZED));
                         } else {
                             securityContext.setRealm((String) state.getProperty("realm"));

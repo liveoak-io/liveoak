@@ -7,7 +7,7 @@ package io.liveoak.security.policy.uri.simple;
 
 
 import io.liveoak.security.policy.uri.RolesContainer;
-import io.liveoak.security.spi.AuthzDecision;
+import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
 

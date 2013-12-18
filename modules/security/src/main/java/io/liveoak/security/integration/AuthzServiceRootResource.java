@@ -1,7 +1,6 @@
 package io.liveoak.security.integration;
 
-import io.liveoak.container.auth.AuthzConstants;
-import io.liveoak.container.auth.SimpleLogger;
+import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.security.spi.AuthzPolicyEntry;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
@@ -11,6 +10,7 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
+import org.jboss.logging.Logger;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class AuthzServiceRootResource implements RootResource {
 
-    private static final SimpleLogger log = new SimpleLogger(AuthzServiceRootResource.class);
+    private static final Logger log = Logger.getLogger(AuthzServiceRootResource.class);
 
     private String id;
 

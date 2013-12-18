@@ -107,5 +107,6 @@
         <module>keycloak</module>
         <module>security</module>
         <module>security-uripolicy</module>
+        <module>security-aclpolicy</module>
     </modules>
 </project>

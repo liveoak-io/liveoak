@@ -7,31 +7,24 @@
 package io.liveoak.security.impl;
 
 import io.liveoak.common.DefaultRequestAttributes;
-import io.liveoak.container.auth.AuthzConstants;
+import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.security.integration.AuthzServiceRootResource;
-import io.liveoak.security.spi.AuthzDecision;
+import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.security.spi.AuthzPolicyEntry;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestAttributes;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
-import io.liveoak.spi.ResourceException;
-import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.ResourcePath;
-import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -81,6 +74,16 @@ public class AuthzServiceRootResourceTest extends AbstractResourceTestCase {
     public void testAuthzCheckNoPolicies() throws Exception {
         RequestContext reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/storage/some"));
         Assert.assertTrue(getAuthzResult(reqCtxToCheck));
+    }
+
+    @Test
+    public void testInvalidPolicyEndpoint() throws Exception {
+        AuthzPolicyEntry policyEntry = new AuthzPolicyEntry();
+        policyEntry.setPolicyName("Mock Policy");
+        policyEntry.setPolicyResourceEndpoint("/invalid");
+        authzService.setPolicies(Collections.singletonList(policyEntry));
+        RequestContext reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/storage/some"));
+        Assert.assertFalse(getAuthzResult(reqCtxToCheck));
     }
 
     @Test

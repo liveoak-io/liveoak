@@ -6,7 +6,7 @@
 
 package io.liveoak.security.policy.uri.integration;
 
-import io.liveoak.container.auth.AuthzConstants;
+import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.security.policy.uri.complex.URIPolicy;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
