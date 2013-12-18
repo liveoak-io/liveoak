@@ -66,7 +66,7 @@ public class KeycloakRootResource implements RootResource {
         try {
             // TODO Remove once fixed in Keycloak
             Thread.currentThread().setContextClassLoader(KeycloakServer.class.getClassLoader());
-            undertow = new UndertowServer("localhost", 8081);
+            undertow = new UndertowServer("localhost", 8383);
             server = new KeycloakServer(undertow);
             try {
                 undertow.start();
