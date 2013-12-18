@@ -9,6 +9,7 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 import org.keycloak.representations.idm.ApplicationRepresentation;
 
 import java.io.File;
@@ -21,6 +22,8 @@ public class KeycloakConfigResource implements ConfigResource {
 
     public static final String REALM = "realm";
     public static final String APP_CONFIG = "app-config";
+    public static final String KEYCLOAK_HOST = "keycloak-host";
+    public static final String KEYCLOAK_PORT = "keycloak-port";
 
     private KeycloakRootResource keycloak;
 
@@ -38,6 +41,8 @@ public class KeycloakConfigResource implements ConfigResource {
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept(REALM, keycloak.getRealm());
+        sink.accept(KEYCLOAK_HOST, keycloak.getHost());
+        sink.accept(KEYCLOAK_PORT, keycloak.getPort());
         if (appConfig != null) {
             sink.accept(APP_CONFIG, appConfig);
         }
@@ -50,6 +55,15 @@ public class KeycloakConfigResource implements ConfigResource {
             String realm = (String) state.getProperty(REALM);
             if (realm != null && !realm.equals(keycloak.getRealm())) {
                 keycloak.setRealm(realm);
+            }
+
+            String host = (String) state.getProperty(KEYCLOAK_HOST);
+            if (host != null && !host.equals(keycloak.getHost())) {
+                keycloak.setHost(host);
+            }
+            Integer port = (Integer) state.getProperty(KEYCLOAK_PORT);
+            if (port != null && port != keycloak.getPort()) {
+                keycloak.setPort(port);
             }
 
             String appConfig = (String) state.getProperty(APP_CONFIG);

@@ -50,7 +50,7 @@ var LiveOak = function( options ) {
             options.auth.host = options.host;
         }
         if (!options.auth.port) {
-            options.auth.port = options.port ? options.port + 1 : 8081;
+            options.auth.port = options.port ? options.port + 303 : 8383;
         }
         if (!options.auth.secure) {
             options.auth.secure = options.secure;

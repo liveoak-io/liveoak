@@ -9,6 +9,7 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 
 import java.io.File;
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.List;
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
 public class AuthzServiceConfigResource implements ConfigResource {
+
+    private static final Logger log = Logger.getLogger(AuthzServiceConfigResource.class);
 
     private AuthzServiceRootResource authzService;
 
@@ -57,8 +60,7 @@ public class AuthzServiceConfigResource implements ConfigResource {
                     ObjectMapper om = new ObjectMapper();
                     config = om.readValue(file, AuthzServiceConfig.class);
                 } else {
-                    // TODO LOG
-                    System.out.println(configFile + " not found");
+                    log.warn(configFile + " not found");
                     this.config = null;
                 }
             }

@@ -1,14 +1,12 @@
 package io.liveoak.keycloak;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
+import org.jboss.logging.Logger;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.representations.idm.ApplicationRepresentation;
@@ -16,8 +14,6 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.services.managers.ApplicationManager;
 import org.keycloak.services.managers.RealmManager;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.security.PublicKey;
 
@@ -26,8 +22,12 @@ import java.security.PublicKey;
  */
 public class KeycloakRootResource implements RootResource {
 
+    private static final Logger log = Logger.getLogger(KeycloakRootResource.class);
+
     private String id;
     private UndertowServer undertow;
+    private String host = "localhost";
+    private int port = 8383;
     private KeycloakServer server;
     private String realm;
     private PublicKey publicKey;
@@ -56,6 +56,22 @@ public class KeycloakRootResource implements RootResource {
         this.publicKey = publicKey;
     }
 
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
     public KeycloakSession createSession() {
         return server.getKeycloakSessionFactory().createSession();
     }
@@ -66,7 +82,8 @@ public class KeycloakRootResource implements RootResource {
         try {
             // TODO Remove once fixed in Keycloak
             Thread.currentThread().setContextClassLoader(KeycloakServer.class.getClassLoader());
-            undertow = new UndertowServer("localhost", 8383);
+            log.info("Going to bootstrap undertow on " + host + ":" + port);
+            undertow = new UndertowServer(host, port);
             server = new KeycloakServer(undertow);
             try {
                 undertow.start();

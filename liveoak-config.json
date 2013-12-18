@@ -59,6 +59,8 @@ resources: {
         class-name: 'io.liveoak.keycloak.KeycloakRootResource',
         config: {
             realm: 'default',
+            keycloak-host: 'localhost',
+            keycloak-port: 8383,
             app-config: '${user.dir}/keycloak-config.json'
         }
     },
