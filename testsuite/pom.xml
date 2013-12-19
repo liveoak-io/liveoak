@@ -1,0 +1,309 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright 2013 Red Hat, Inc. and/or its affiliates.
+  ~
+  ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0          http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>io.liveoak</groupId>
+        <artifactId>liveoak</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>liveoak-testsuite</artifactId>
+    <name>liveoak-testsuite</name>
+    <packaging>jar</packaging>
+
+    <properties>
+        <liveoak-exec>liveoak</liveoak-exec>
+        <phantomjs.version>1.9.2</phantomjs.version>
+
+        <!-- test config -->
+        <liveoak.remote>false</liveoak.remote>
+        <liveoak.url>http://localhost:8080</liveoak.url>
+        <liveoak.showOutput>false</liveoak.showOutput>
+
+        <browser>phantomjs</browser>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-chrome-driver</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.detro.ghostdriver</groupId>
+            <artifactId>phantomjsdriver</artifactId>
+            <version>1.0.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-launcher</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-modules</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.16</version>
+                <executions>
+                    <execution>
+                        <phase>integration-test</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>**/*IT.java</include>
+                    </includes>
+                    <systemPropertyVariables>
+                        <phantomjs.binary.path>${phantomjs.binary.path}</phantomjs.binary.path>
+
+                        <liveoak.remote>${liveoak.remote}</liveoak.remote>
+                        <liveoak.url>${liveoak.url}</liveoak.url>
+                        <liveoak.showOutput>${liveoak.showOutput}</liveoak.showOutput>
+
+                        <browser>${browser}</browser>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>phantomjs-linux-32</id>
+            <activation>
+                <os>
+                    <name>Linux</name>
+                    <arch>x86</arch>
+                </os>
+            </activation>
+            <properties>
+                <phantomjs.binary.path>${project.build.directory}/bin/phantomjs</phantomjs.binary.path>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.arquillian.extension</groupId>
+                    <artifactId>arquillian-phantom-binary</artifactId>
+                    <version>${phantomjs.version}</version>
+                    <classifier>linux-32</classifier>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>build</id>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <target>
+                                        <unzip src="${org.jboss.arquillian.extension:arquillian-phantom-binary:jar:linux-32}"
+                                               dest="${project.build.directory}">
+                                            <patternset>
+                                                <include name="bin/phantomjs"/>
+                                            </patternset>
+                                        </unzip>
+                                        <chmod file="${project.build.directory}/bin/phantomjs" perm="755"></chmod>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>phantomjs-linux-64</id>
+            <activation>
+                <os>
+                    <name>Linux</name>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <properties>
+                <phantomjs.binary.path>${project.build.directory}/bin/phantomjs</phantomjs.binary.path>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.arquillian.extension</groupId>
+                    <artifactId>arquillian-phantom-binary</artifactId>
+                    <version>${phantomjs.version}</version>
+                    <classifier>linux-64</classifier>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>build</id>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <target>
+                                        <unzip src="${org.jboss.arquillian.extension:arquillian-phantom-binary:jar:linux-64}"
+                                               dest="${project.build.directory}">
+                                            <patternset>
+                                                <include name="bin/phantomjs"/>
+                                            </patternset>
+                                        </unzip>
+                                        <chmod file="${project.build.directory}/bin/phantomjs" perm="755"></chmod>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>phantomjs-macosx</id>
+            <activation>
+                <os>
+                    <name>mac</name>
+                </os>
+            </activation>
+            <properties>
+                <phantomjs.binary.path>${project.build.directory}/bin/phantomjs</phantomjs.binary.path>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.arquillian.extension</groupId>
+                    <artifactId>arquillian-phantom-binary</artifactId>
+                    <version>${phantomjs.version}</version>
+                    <classifier>macosx</classifier>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>build</id>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <target>
+                                        <unzip src="${org.jboss.arquillian.extension:arquillian-phantom-binary:jar:macosx}"
+                                               dest="${project.build.directory}">
+                                            <patternset>
+                                                <include name="bin/phantomjs"/>
+                                            </patternset>
+                                        </unzip>
+                                        <chmod file="${project.build.directory}/bin/phantomjs" perm="755"></chmod>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>phantomjs-windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <phantomjs.binary.path>${project.build.directory}/phantomjs.exe</phantomjs.binary.path>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.arquillian.extension</groupId>
+                    <artifactId>arquillian-phantom-binary</artifactId>
+                    <version>${phantomjs.version}</version>
+                    <classifier>macosx</classifier>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>build</id>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <target>
+                                        <unzip src="${org.jboss.arquillian.extension:arquillian-phantom-binary:jar:macosx}"
+                                               dest="${project.build.directory}">
+                                            <patternset>
+                                                <include name="phantomjs.exe"/>
+                                            </patternset>
+                                        </unzip>
+                                        <chmod file="${project.build.directory}/bin/phantomjs" perm="755"></chmod>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
