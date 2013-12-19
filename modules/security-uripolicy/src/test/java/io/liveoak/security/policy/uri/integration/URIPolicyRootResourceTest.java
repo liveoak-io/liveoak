@@ -84,25 +84,40 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
         user.setSubject("john");
         user.setRoles(s2);
 
-        // request to /app/some should be IGNORED for anonymous user, but allowed for user or admin
+        // Request to 'client' page
+        RequestContext.Builder clientReq = new RequestContext.Builder().requestType(RequestType.READ)
+                .resourcePath(new ResourcePath("/client/some"));
+        assertAuthzDecision(clientReq.securityContext(anonymous), AuthzDecision.IGNORE);
+        assertAuthzDecision(clientReq.securityContext(admin), AuthzDecision.ACCEPT);
+        assertAuthzDecision(clientReq.securityContext(user), AuthzDecision.IGNORE);
+
+        // Other requests to 'client' page by john.
+        assertAuthzDecision(clientReq.resourcePath(new ResourcePath("/client/somejs")), AuthzDecision.IGNORE);
+        assertAuthzDecision(clientReq.resourcePath(new ResourcePath("/client/some.jsk")), AuthzDecision.IGNORE);
+        assertAuthzDecision(clientReq.resourcePath(new ResourcePath("/client/some.js")), AuthzDecision.ACCEPT);
+        assertAuthzDecision(clientReq.resourcePath(new ResourcePath("/client/auth/some.js")), AuthzDecision.ACCEPT);
+
+        // request to /app/some
         RequestContext.Builder appReq = new RequestContext.Builder().requestType(RequestType.READ)
                 .resourcePath(new ResourcePath("/app/some"));
         assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.IGNORE);
         assertAuthzDecision(appReq.securityContext(admin), AuthzDecision.ACCEPT);
-        assertAuthzDecision(appReq.securityContext(user), AuthzDecision.ACCEPT);
+        assertAuthzDecision(appReq.securityContext(user), AuthzDecision.IGNORE);
+
+        // Other requests to 'app' page by john.
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/app/somehtml")), AuthzDecision.IGNORE);
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/app/some.htmll")), AuthzDecision.IGNORE);
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/app/some.html")), AuthzDecision.ACCEPT);
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/app/some.css")), AuthzDecision.ACCEPT);
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/app/some.js")), AuthzDecision.ACCEPT);
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/app/some.png")), AuthzDecision.ACCEPT);
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/app/some.json")), AuthzDecision.IGNORE);
 
         // CREATE request to app should be ACCEPT just for admin
         appReq.requestType(RequestType.CREATE);
         assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.IGNORE);
         assertAuthzDecision(appReq.securityContext(admin), AuthzDecision.ACCEPT);
         assertAuthzDecision(appReq.securityContext(user), AuthzDecision.IGNORE);
-
-        // Request to public page allowed for everyone
-        RequestContext.Builder publicReq = new RequestContext.Builder().requestType(RequestType.READ)
-                .resourcePath(new ResourcePath("/public/some"));
-        assertAuthzDecision(publicReq.securityContext(anonymous), AuthzDecision.ACCEPT);
-        assertAuthzDecision(publicReq.securityContext(admin), AuthzDecision.ACCEPT);
-        assertAuthzDecision(publicReq.securityContext(user), AuthzDecision.ACCEPT);
 
         // Request to /storage/some should be IGNORED for anonymous user, but allowed for user or admin in case that query contains username
         RequestContext.Builder storageReq = new RequestContext.Builder().requestType(RequestType.READ)
@@ -119,32 +134,32 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
         storageReq.resourceParams(DefaultResourceParams.instance(params));
         assertAuthzDecision(storageReq.securityContext(user), AuthzDecision.IGNORE);
 
-        // CREATE request is IGNORED for anonymous and allowed for admin. It's allowed for user if "user" from createState equals username
+        // CREATE request is REJECT for anonymous and allowed for admin. It's allowed for user if "user" from createState equals username
         storageReq = new RequestContext.Builder().requestType(RequestType.CREATE).resourcePath(new ResourcePath("/storage/some"));
         ResourceState createState = new DefaultResourceState();
         createState.putProperty("user", "john");
         createState.putProperty("something", "something-which-does-not-matter");
-        assertAuthzDecision(storageReq.securityContext(anonymous), createState, AuthzDecision.IGNORE);
+        assertAuthzDecision(storageReq.securityContext(anonymous), createState, AuthzDecision.REJECT);
         assertAuthzDecision(storageReq.securityContext(admin), createState, AuthzDecision.ACCEPT);
         assertAuthzDecision(storageReq.securityContext(user), createState, AuthzDecision.ACCEPT);
 
         // CREATE not allowed for user without createState
-        assertAuthzDecision(storageReq.securityContext(user), AuthzDecision.IGNORE);
+        assertAuthzDecision(storageReq.securityContext(user), AuthzDecision.REJECT);
 
         // CREATE request not allowed for user if "user" from createState doesn't equal username
         createState.putProperty("user", "otherUser");
         assertAuthzDecision(storageReq.securityContext(admin), createState, AuthzDecision.ACCEPT);
-        assertAuthzDecision(storageReq.securityContext(user), createState, AuthzDecision.IGNORE);
+        assertAuthzDecision(storageReq.securityContext(user), createState, AuthzDecision.REJECT);
 
-        // UPDATE to storage conforms same rules like CREATE
+        // UPDATE to storage also REJECTS if user from createState is different from current user
         createState.putProperty("user", "john");
-        storageReq = new RequestContext.Builder().requestType(RequestType.UPDATE).resourcePath(new ResourcePath("/storage/some"));
-        assertAuthzDecision(storageReq.securityContext(anonymous), createState, AuthzDecision.IGNORE);
+        storageReq = new RequestContext.Builder().requestType(RequestType.UPDATE).resourcePath(new ResourcePath("/storage/some/123"));
+        assertAuthzDecision(storageReq.securityContext(anonymous), createState, AuthzDecision.REJECT);
         assertAuthzDecision(storageReq.securityContext(admin), createState, AuthzDecision.ACCEPT);
-        assertAuthzDecision(storageReq.securityContext(user), createState, AuthzDecision.ACCEPT);
+        assertAuthzDecision(storageReq.securityContext(user), createState, AuthzDecision.IGNORE);
         createState.putProperty("user", "otherUser");
         assertAuthzDecision(storageReq.securityContext(admin), createState, AuthzDecision.ACCEPT);
-        assertAuthzDecision(storageReq.securityContext(user), createState, AuthzDecision.IGNORE);
+        assertAuthzDecision(storageReq.securityContext(user), createState, AuthzDecision.REJECT);
 
     }
 

@@ -107,10 +107,10 @@ public class AclPolicyCheckResource implements Resource, BlockingResource {
                     }
                 }
 
-                // If rule exists, but neither allowedUser or allowedRoles passed, we will reject
-                if (decision == AuthzDecision.IGNORE) {
+                // If rule exists, but neither allowedUser or allowedRoles passed, we will ignore (TODO: configurable? Or have some clever voter's based mechanism?)
+                /*if (decision == AuthzDecision.IGNORE) {
                     decision = AuthzDecision.REJECT;
-                }
+                } */
 
                 return decision;
             } catch (Exception e) {
@@ -138,7 +138,7 @@ public class AclPolicyCheckResource implements Resource, BlockingResource {
 
     protected AuthzDecision verifyProperty(Object property, String expectedValue) {
         if (property == null) {
-            return AuthzDecision.REJECT;
+            return AuthzDecision.IGNORE;
         } else if (property instanceof String) {
             String propValue = (String)property;
             if (propValue.equals(expectedValue)) {
