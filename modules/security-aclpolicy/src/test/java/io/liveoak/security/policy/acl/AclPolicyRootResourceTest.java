@@ -94,23 +94,23 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
         // UPDATE request to /mock/1 should be ALLOWED for john thanks to allowedUserAttribute and for admin thanks to allowedRolesAttribute
         appReq = new RequestContext.Builder().requestType(RequestType.UPDATE)
                 .resourcePath(new ResourcePath("/mock/1"));
-        assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.REJECT);
+        assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.IGNORE);
         assertAuthzDecision(appReq.securityContext(admin), AuthzDecision.ACCEPT);
         assertAuthzDecision(appReq.securityContext(user), AuthzDecision.ACCEPT);
 
         // DELETE request to /mock/1 should be ALLOWED just for john
         appReq = new RequestContext.Builder().requestType(RequestType.DELETE)
                 .resourcePath(new ResourcePath("/mock/1"));
-        assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.REJECT);
-        assertAuthzDecision(appReq.securityContext(admin), AuthzDecision.REJECT);
+        assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.IGNORE);
+        assertAuthzDecision(appReq.securityContext(admin), AuthzDecision.IGNORE);
         assertAuthzDecision(appReq.securityContext(user), AuthzDecision.ACCEPT);
 
-        // UPDATE request to /mock/2 should be REJECTED for all users as property with username can't be obtained
+        // UPDATE request to /mock/2 should be IGNORED for all users as property with username can't be obtained
         appReq = new RequestContext.Builder().requestType(RequestType.UPDATE)
                 .resourcePath(new ResourcePath("/mock/2"));
-        assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.REJECT);
-        assertAuthzDecision(appReq.securityContext(admin), AuthzDecision.REJECT);
-        assertAuthzDecision(appReq.securityContext(user), AuthzDecision.REJECT);
+        assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.IGNORE);
+        assertAuthzDecision(appReq.securityContext(admin), AuthzDecision.IGNORE);
+        assertAuthzDecision(appReq.securityContext(user), AuthzDecision.IGNORE);
 
         // UPDATE request to /mock/notFound should be IGNORED for all users as resource doesn't exist
         appReq = new RequestContext.Builder().requestType(RequestType.UPDATE)
