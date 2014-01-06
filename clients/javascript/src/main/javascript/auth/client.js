@@ -17,8 +17,6 @@ window.oauth = (function () {
         }
     }
 
-    oauth.callback = (oauth.code && oauth.state) || (oauth.error && oauth.state);
-
     if (oauth.state && oauth.state == sessionStorage.oauthState) {
         oauth.callback = true;
         delete sessionStorage.oauthState;
@@ -96,7 +94,7 @@ var Keycloak = function (options) {
     }
 
     this.hasResourceRole = function (role, resource) {
-        var access = this.resourceAccess[resource || this._clientId];
+        var access = this.resourceAccess[resource || options.clientId];
         return access && access.roles.indexOf(role) >= 0 || false;
     }
 
@@ -152,7 +150,7 @@ var Keycloak = function (options) {
                         setToken(JSON.parse(req.responseText)['access_token']);
                     } else {
                         if (options.error) {
-                            options.error({  authenticated: false, status: req.status, statusText: req.status });
+                            options.error({  authenticated: false, status: req.status, statusText: req.statusText });
                         }
                     }
                 }
@@ -169,10 +167,6 @@ var Keycloak = function (options) {
     }
 
     function setToken(token) {
-        sessionStorage.oauthToken = token;
-        window.oauth.token = token;
-        instance.token = token;
-
         if (token) {
             sessionStorage.oauthToken = token;
             window.oauth.token = token;
