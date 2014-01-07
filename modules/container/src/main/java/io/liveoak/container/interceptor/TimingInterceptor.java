@@ -1,15 +1,12 @@
 package io.liveoak.container.interceptor;
 
-import java.sql.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.container.interceptor.DefaultInterceptor;
 import io.liveoak.spi.container.interceptor.InboundInterceptorContext;
-import io.liveoak.spi.container.interceptor.OutboundInterceptorContext;
+import org.jboss.logging.Logger;
 
 /**
  * @author Bob McWhirter
@@ -26,8 +23,10 @@ public class TimingInterceptor extends DefaultInterceptor {
     @Override
     public void onComplete(UUID requestId) {
         long start = this.timings.remove(requestId);
-        System.err.println("Request took: " + (System.currentTimeMillis() - start) + "ms");
+        log.infof("Request took: %d ms", (System.currentTimeMillis() - start));
     }
 
     private Map<UUID, Long> timings = new ConcurrentHashMap<>();
+
+    private static final Logger log = Logger.getLogger(TimingInterceptor.class);
 }

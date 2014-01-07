@@ -2,6 +2,7 @@
 
 bindir=$(dirname $0)
 etcdir=$bindir/../etc
+logdir=$bindir/../logs
 
 . $bindir/installation.conf
 
@@ -15,6 +16,8 @@ fi
 java $JAVA_OPTS \
   -Djs.client.dir=$js_client_dir \
   -Dcss.dir=$css_dir \
+  -Dio.liveoak.log=$logdir \
+  -Dlogging.configuration=file:$etcdir/logging.properties \
   $M2_REPO_CLAUSE \
   -jar $jboss_modules_jar \
   -modulepath $modulepath \

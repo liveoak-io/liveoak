@@ -166,7 +166,7 @@ public class AuthzCheckResource implements Resource {
         try {
             sink.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("", e);
         }
     }
 

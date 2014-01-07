@@ -7,6 +7,8 @@ package io.liveoak.container;
 
 import java.io.File;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
@@ -55,6 +57,7 @@ import io.liveoak.spi.container.RootResourceFactory;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.spi.container.interceptor.Interceptor;
 import io.liveoak.spi.resource.RootResource;
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.AbstractServiceListener;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceContainer;
@@ -74,6 +77,8 @@ import static io.liveoak.container.LiveOak.*;
  * @author Bob McWhirter
  */
 public class LiveOakFactory {
+
+    private static final Logger log = Logger.getLogger(LiveOakFactory.class);
 
     public static LiveOakSystem create() throws Exception {
         return create(null, null);
@@ -95,8 +100,7 @@ public class LiveOakFactory {
             @Override
             public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
                 if (transition.getAfter().equals(ServiceController.Substate.START_FAILED)) {
-                    System.err.println("Unable to start service: " + controller.getName());
-                    controller.getStartException().printStackTrace();
+                    log.errorf(controller.getStartException(), "Unable to start service: %s", controller.getName());
                 }
             }
         });

@@ -4,6 +4,7 @@ import io.liveoak.container.protocols.PipelineConfigurator;
 import io.liveoak.container.server.AbstractNetworkServer;
 import io.liveoak.container.server.LocalServer;
 import io.liveoak.container.server.UnsecureServer;
+import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -23,7 +24,7 @@ public class LocalServerService implements Service<LocalServer> {
         try {
             this.server.start();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("", e);
             throw new StartException(e);
         }
     }
@@ -33,7 +34,7 @@ public class LocalServerService implements Service<LocalServer> {
         try {
             this.server.stop();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("", e);
         }
     }
 
@@ -50,4 +51,5 @@ public class LocalServerService implements Service<LocalServer> {
 
     private LocalServer server;
 
+    private static final Logger log = Logger.getLogger(LocalServerService.class);
 }

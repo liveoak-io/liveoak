@@ -10,6 +10,7 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
@@ -51,7 +52,7 @@ public class VertxCollectionResource extends AbstractVertxResource implements Re
             if (status == 200) {
                 String type = payload.getString("type");
                 if (type.equals("collection")) {
-                    System.err.println("GOT: " + payload);
+                    log.infof("GOT: %s", payload);
                     JsonArray records = payload.getArray("content");
                     Iterator<Object> iterator = records.iterator();
                     while (iterator.hasNext()) {
@@ -71,7 +72,7 @@ public class VertxCollectionResource extends AbstractVertxResource implements Re
         JsonObject request = RequestBuilder.newReadRequest(id);
         vertx().eventBus().send(address(), request, (Message<JsonObject> response) -> {
             JsonObject payload = response.body();
-            System.err.println("payload: " + payload);
+            log.infof("payload: %s", payload);
             int status = payload.getInteger("status-code");
             if (status == 200) {
                 String type = payload.getString("type");
@@ -89,4 +90,6 @@ public class VertxCollectionResource extends AbstractVertxResource implements Re
     }
 
     private String address;
+
+    private static final Logger log = Logger.getLogger(VertxCollectionResource.class);
 }

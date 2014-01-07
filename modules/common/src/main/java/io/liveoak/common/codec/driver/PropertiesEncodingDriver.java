@@ -8,6 +8,7 @@ package io.liveoak.common.codec.driver;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
+import org.jboss.logging.Logger;
 
 import java.util.Collection;
 import java.util.List;
@@ -46,7 +47,7 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
                 try {
                     encoder().startProperties();
                 } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    log.error("", e);
                 }
                 hasProperties = true;
             }
@@ -75,5 +76,7 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
     }
 
     private boolean hasProperties;
+
+    private static final Logger log = Logger.getLogger(PropertiesEncodingDriver.class);
 
 }

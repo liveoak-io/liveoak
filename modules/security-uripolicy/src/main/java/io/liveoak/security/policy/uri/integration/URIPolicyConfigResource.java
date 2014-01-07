@@ -63,7 +63,7 @@ public class URIPolicyConfigResource implements ConfigResource {
             }
             responder.resourceUpdated(this);
         } catch (Throwable t) {
-            t.printStackTrace();
+            log.error("", t);
             responder.internalError(t);
         }
     }

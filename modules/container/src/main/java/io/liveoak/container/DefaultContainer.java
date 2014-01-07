@@ -18,6 +18,7 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 
 
 /**
@@ -57,7 +58,6 @@ public class DefaultContainer implements Container, Resource {
 
     @Override
     public void shutdown() {
-
     }
 
 
@@ -121,7 +121,7 @@ public class DefaultContainer implements Container, Resource {
                         try {
                             this.deploymentManager.addConfiguration(state.id(), state);
                         } catch (Exception e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                            log.errorf(e, "An error occurred adding configuration for id %s", state.id());
                         }
                     }
                     responder.resourceCreated(result.rootResource());
@@ -148,6 +148,8 @@ public class DefaultContainer implements Container, Resource {
 
     private Deployer deployer;
     private DirectoryDeploymentManager deploymentManager;
+
+    private static final Logger log = Logger.getLogger("io.liveoak.container");
 }
 
 

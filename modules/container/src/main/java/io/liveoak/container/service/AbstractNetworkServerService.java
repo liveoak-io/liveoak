@@ -8,6 +8,7 @@ import io.liveoak.container.server.AbstractServer;
 import io.liveoak.spi.container.NetworkServer;
 import io.liveoak.spi.container.Server;
 import io.liveoak.spi.Container;
+import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -43,7 +44,7 @@ public abstract class AbstractNetworkServerService implements Service<NetworkSer
         try {
             this.server.stop();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("", e);
         }
     }
 
@@ -69,4 +70,6 @@ public abstract class AbstractNetworkServerService implements Service<NetworkSer
     private InjectedValue<InetAddress> hostInjector = new InjectedValue<>();
     private InjectedValue<Integer> portInjector = new InjectedValue<>();
     private InjectedValue<PipelineConfigurator> pipelineConfiguratorInjector = new InjectedValue<>();
+
+    private static final Logger log = Logger.getLogger(AbstractNetworkServerService.class);
 }
