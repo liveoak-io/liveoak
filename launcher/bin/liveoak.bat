@@ -51,7 +51,7 @@ set JAVA_OPTS=%JAVA_OPTS%
  "-Djs.client.dir=%JS_CLIENT_DIR%" ^
  "-Dcss.dir=%CSS_DIR%" ^
  "-Dio.liveoak.log=%LOGDIR%" ^
- "-Dlogging.configuration=file:%LOGDIR%\logging.properties" ^
+ "-Dlogging.configuration=file:%ETCDIR%\logging.properties" ^
  %M2_REPO_CLAUSE% ^
     -jar "%JBOSS_MODULES_JAR%" ^
     -modulepath "%MODULEPATH%" ^
