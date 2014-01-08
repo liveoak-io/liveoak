@@ -14,7 +14,7 @@ var Http = function (options) {
     }
 
     this.readMembers = function (path, options) {
-        var url = createUrl(path, { expand: '*',  query: options.query });
+        var url = createUrl(path, { expand: '*',  query: options.query, sort: options.sort });
         request('GET', url, null, function (data) {
             var members = data._members || [];
             options.success(members);
@@ -67,7 +67,7 @@ var Http = function (options) {
                     }
                 } else {
                     if (error) {
-                        var response = { status: req.status, statusText: req.status };
+                        var response = { status: req.status, statusText: req.statusText };
                         if (req.responseText) {
                             response.data = JSON.parse(req.responseText);
                         }
@@ -107,6 +107,12 @@ var Http = function (options) {
                 query += '&';
             }
             query += 'q=' + encodeURIComponent(JSON.stringify(params.query));
+        }
+        if (params.sort) {
+            if (query) {
+                query += '&';
+            }
+            query += 'sort=' + params.sort;
         }
 
         if (query != '') {
