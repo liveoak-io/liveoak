@@ -11,6 +11,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.representations.idm.ApplicationRepresentation;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.services.managers.ApplicationManager;
 import org.keycloak.services.managers.RealmManager;
 
@@ -32,7 +33,7 @@ public class KeycloakRootResource implements RootResource {
     private String realm;
     private PublicKey publicKey;
     private final KeycloakConfigResource configuration;
-    private ApplicationRepresentation app;
+    private RealmRepresentation realmRepresentation;
 
     public KeycloakRootResource(String id) {
         this.id = id;
@@ -44,16 +45,8 @@ public class KeycloakRootResource implements RootResource {
         return realm;
     }
 
-    public void setRealm(String realm) {
-        this.realm = realm;
-    }
-
     public PublicKey getPublicKey() {
         return publicKey;
-    }
-
-    public void setPublicKey(PublicKey publicKey) {
-        this.publicKey = publicKey;
     }
 
     public String getHost() {
@@ -70,6 +63,14 @@ public class KeycloakRootResource implements RootResource {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public RealmRepresentation getRealmRepresentation() {
+        return realmRepresentation;
+    }
+
+    public void setRealmRepresentation(RealmRepresentation realmRepresentation) {
+        this.realmRepresentation = realmRepresentation;
     }
 
     public KeycloakSession createSession() {
@@ -92,14 +93,14 @@ public class KeycloakRootResource implements RootResource {
                 throw new InitializationException(t);
             }
 
-            try {
-                initRealm(realm);
-            } catch (Exception e) {
-                throw new InitializationException(e);
-            }
-
-            if (app != null) {
-                initApp(app);
+            if (realmRepresentation == null) {
+                throw new InitializationException("realmRepresentation is null");
+            } else {
+                try {
+                    initRealm();
+                } catch (Exception e) {
+                    throw new InitializationException(e);
+                }
             }
         } finally {
             Thread.currentThread().setContextClassLoader(cl);
@@ -133,38 +134,25 @@ public class KeycloakRootResource implements RootResource {
         return configuration;
     }
 
-
-    private RealmModel initRealm(String name) throws Exception {
+    private RealmModel initRealm() throws Exception {
         KeycloakSession session = createSession();
         session.getTransaction().begin();
 
         try {
             RealmManager realmManager = new RealmManager(session);
 
-            RealmModel realmModel = realmManager.getRealm(name);
+            String realmName = realmRepresentation.getRealm();
+            RealmModel realmModel = realmManager.getRealm(realmName);
             if (realmModel == null) {
-                realmModel = realmManager.createRealm(name);
-                realmModel.setEnabled(true);
-                realmModel.setAccessCodeLifespan(10);
-                realmModel.setAccessCodeLifespanUserAction(600);
-                realmModel.setTokenLifespan(3600); // Refresh tokens are not supported atm so need long lifespan on tokens
-                realmModel.setCookieLoginAllowed(true);
-                realmModel.setSslNotRequired(true);
-                realmModel.setRegistrationAllowed(true);
-                realmModel.setResetPasswordAllowed(true);
-
-                realmManager.generateRealmKeys(realmModel);
-
-                realmModel.addRequiredCredential(CredentialRepresentation.PASSWORD);
-                realmModel.addRequiredResourceCredential(CredentialRepresentation.PASSWORD);
-
-                // TODO Fix when KC is updated (RealmManager.enableAccountManagement is public in master)
-                Method enableAccountManagement = RealmManager.class.getDeclaredMethod("enableAccountManagement", new Class[]{RealmModel.class});
-                enableAccountManagement.setAccessible(true);
-                enableAccountManagement.invoke(realmManager, realmModel);
+                realmModel = realmManager.createRealm(realmName);
+                realmManager.importRealm(realmRepresentation, realmModel);
+                logger().infof("Realm %s imported successfully", realmName);
+            } else {
+                logger().infof("Realm %s already exists. Import skipped", realmName);
             }
 
-            this.publicKey  = realmModel.getPublicKey();
+            this.realm = realmName;
+            this.publicKey = realmModel.getPublicKey();
 
             session.getTransaction().commit();
 
@@ -175,37 +163,6 @@ public class KeycloakRootResource implements RootResource {
         } finally {
             session.close();
         }
-    }
-
-    private void initApp(ApplicationRepresentation appRep) {
-        KeycloakSession session = createSession();
-        session.getTransaction().begin();
-
-        try {
-            RealmManager realmManager = new RealmManager(session);
-            RealmModel realmModel = realmManager.getRealm(realm);
-
-            ApplicationManager appManager = new ApplicationManager(realmManager);
-
-            if (!realmModel.getApplicationNameMap().containsKey(appRep.getName())) {
-                appManager.createApplication(realmModel, appRep);
-            }
-
-            session.getTransaction().commit();
-        } catch (Throwable t) {
-            session.getTransaction().rollback();
-            throw t;
-        } finally {
-            session.close();
-        }
-    }
-
-    public void setApp(ApplicationRepresentation app) {
-        this.app = app;
-    }
-
-    public ApplicationRepresentation getApp() {
-        return app;
     }
 
     public Logger logger() {
