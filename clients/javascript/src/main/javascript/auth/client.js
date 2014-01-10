@@ -94,6 +94,10 @@ var Keycloak = function (options) {
     }
 
     this.hasResourceRole = function (role, resource) {
+        if (!this.resourceAccess) {
+            return false;
+        }
+
         var access = this.resourceAccess[resource || options.clientId];
         return access && access.roles.indexOf(role) >= 0 || false;
     }
