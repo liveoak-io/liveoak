@@ -11,6 +11,7 @@ import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 import org.keycloak.representations.idm.ApplicationRepresentation;
+import org.keycloak.representations.idm.RealmRepresentation;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,14 +21,14 @@ import java.io.IOException;
  */
 public class KeycloakConfigResource implements ConfigResource {
 
-    public static final String REALM = "realm";
-    public static final String APP_CONFIG = "app-config";
     public static final String KEYCLOAK_HOST = "keycloak-host";
     public static final String KEYCLOAK_PORT = "keycloak-port";
 
+    public static final String REALM_CONFIG = "realm-config";
+
     private KeycloakRootResource keycloak;
 
-    private String appConfig;
+    private String realmConfig;
 
     public KeycloakConfigResource(KeycloakRootResource keycloak) {
         this.keycloak = keycloak;
@@ -40,11 +41,10 @@ public class KeycloakConfigResource implements ConfigResource {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept(REALM, keycloak.getRealm());
         sink.accept(KEYCLOAK_HOST, keycloak.getHost());
         sink.accept(KEYCLOAK_PORT, keycloak.getPort());
-        if (appConfig != null) {
-            sink.accept(APP_CONFIG, appConfig);
+        if (realmConfig != null) {
+            sink.accept(REALM_CONFIG, realmConfig);
         }
         sink.close();
     }
@@ -52,10 +52,6 @@ public class KeycloakConfigResource implements ConfigResource {
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         try {
-            String realm = (String) state.getProperty(REALM);
-            if (realm != null && !realm.equals(keycloak.getRealm())) {
-                keycloak.setRealm(realm);
-            }
 
             String host = (String) state.getProperty(KEYCLOAK_HOST);
             if (host != null && !host.equals(keycloak.getHost())) {
@@ -66,16 +62,16 @@ public class KeycloakConfigResource implements ConfigResource {
                 keycloak.setPort(port);
             }
 
-            String appConfig = (String) state.getProperty(APP_CONFIG);
-            if (appConfig != null && !appConfig.equals(this.appConfig)) {
-                File file = new File(appConfig);
+            String realmConfig = (String) state.getProperty(REALM_CONFIG);
+            if (realmConfig != null && !realmConfig.equals(this.realmConfig)) {
+                File file = new File(realmConfig);
                 if (file.isFile()) {
-                    ApplicationRepresentation appRep = loadJson(file, ApplicationRepresentation.class);
-                    keycloak.setApp(appRep);
+                    RealmRepresentation realmRep = loadJson(file, RealmRepresentation.class);
+                    keycloak.setRealmRepresentation(realmRep);
                 } else {
-                    keycloak.logger().warnf("%s not found", appConfig);
+                    keycloak.logger().warnf("%s not found", realmConfig);
                 }
-                this.appConfig = appConfig;
+                this.realmConfig = realmConfig;
             }
 
             responder.resourceUpdated(this);

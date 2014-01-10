@@ -53,7 +53,7 @@ public class AuthHandlerTest extends AbstractResourceTestCase {
     @Override
     public ResourceState createConfig() {
         ResourceState config =  super.createConfig();
-        config.putProperty(KeycloakConfigResource.REALM, "default");
+        config.putProperty(KeycloakConfigResource.REALM_CONFIG, System.getProperty("user.dir") + "/src/test/resources/keycloak-config.json");
         return config;
     }
 
