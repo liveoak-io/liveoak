@@ -14,7 +14,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.common.codec.driver.RootEncodingDriver;
+import io.liveoak.common.codec.driver.StateEncodingDriver;
 import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.common.codec.json.JSONEncoder;
 import io.liveoak.spi.RequestContext;
@@ -95,18 +95,19 @@ public class DirectoryDeploymentManager {
         JSONEncoder encoder = new JSONEncoder();
         encoder.initialize(configBuffer);
 
-        CountDownLatch latch = new CountDownLatch(1);
-
-        RootEncodingDriver driver = new RootEncodingDriver(requestContext, encoder, new ResourceStateResource( configuration ), () -> {
-            latch.countDown();
-        });
-
+//        CountDownLatch latch = new CountDownLatch(1);
+//
+        StateEncodingDriver driver = new StateEncodingDriver(new RequestContext.Builder().build(), encoder, configuration);
         driver.encode();
+        driver.close();
+//
+//        latch.countDown();
 
         File configFile = new File(this.configDir, id + ".json" );
         FileOutputStream out = new FileOutputStream( configFile );
 
         configBuffer.readBytes( out, configBuffer.readableBytes() );
+
     }
 
     public void deleteConfiguration(String id) {
@@ -116,10 +117,11 @@ public class DirectoryDeploymentManager {
         }
     }
 
-    public void updateConfiguration(RootResource rootResource, ConfigResource configResource) throws Exception {
-        if (configResource.parent() != rootResource) {
-            throw new Exception("fancy configuration not yet supported");
-        }
+    public void updateConfiguration(RootResource rootResource, ResourceState configResource) throws Exception {
+
+//        if (configResource.parent() != rootResource) {
+//            throw new Exception("fancy configuration not yet supported");
+//        }
 
         File configFile = new File(this.configDir, rootResource.id() + ".json");
 
@@ -131,15 +133,18 @@ public class DirectoryDeploymentManager {
         JSONEncoder encoder = new JSONEncoder(true);
         encoder.initialize(configBuffer);
 
-        CountDownLatch latch = new CountDownLatch(1);
 
-        RootEncodingDriver driver = new RootEncodingDriver(requestContext, encoder, configResource, () -> {
-            latch.countDown();
-        });
+//        CountDownLatch latch = new CountDownLatch(1);
+
+
+        StateEncodingDriver driver = new StateEncodingDriver(new RequestContext.Builder().build(), encoder, configResource);
 
         driver.encode();
-
-        latch.await();
+        driver.close();
+//
+//        latch.countDown();
+//
+//        latch.await();
 
         ObjectNode configTree = (ObjectNode) mapper.readTree(configBuffer.toString(Charset.forName("UTF-8")));
         tree.replace("config", configTree);

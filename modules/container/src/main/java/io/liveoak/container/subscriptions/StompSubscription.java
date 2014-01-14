@@ -85,7 +85,9 @@ public class StompSubscription implements Subscription {
         message.headers().put("status", "" + status);
         message.headers().put("location", resource.uri().toString());
         RequestContext requestContext = new RequestContext.Builder().build();
-        message.content(this.codec.encode(requestContext, resource));
+        
+        //TODO: fix this
+        //message.content(this.codec.encode(requestContext, resource));
         return message;
     }
 

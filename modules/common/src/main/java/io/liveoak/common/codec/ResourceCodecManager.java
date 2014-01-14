@@ -10,6 +10,7 @@ import io.liveoak.common.codec.binary.DefaultBinaryResourceState;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.resource.async.BinaryContentSink;
 import io.liveoak.spi.resource.async.BinaryResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -45,8 +46,8 @@ public class ResourceCodecManager {
         return codec.decode(buf);
     }
 
-    public EncodingResult encode(RequestContext ctx, MediaTypeMatcher mediaTypeMatcher, Resource resource) throws Exception {
-
+    public EncodingResult encode(RequestContext ctx, MediaTypeMatcher mediaTypeMatcher, ResourceResponse response) throws Exception {
+        Resource resource = response.resource();
         if (resource instanceof BinaryResource) {
             MediaType match = mediaTypeMatcher.findBestMatch(Collections.singletonList(((BinaryResource) resource).mediaType()));
             ;
@@ -78,7 +79,7 @@ public class ResourceCodecManager {
             throw new UnsupportedMediaTypeException(mediaTypeMatcher);
         }
 
-        return new EncodingResult(bestMatch, codec.encode(ctx, resource));
+        return new EncodingResult(bestMatch, codec.encode(ctx, response.state()));
     }
 
     public ResourceCodec getResourceCodec(MediaType mediaType) {

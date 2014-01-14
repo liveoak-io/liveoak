@@ -8,9 +8,9 @@ package io.liveoak.common.codec.json;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import io.liveoak.common.codec.Encoder;
 import io.liveoak.common.codec.NonEncodableValueException;
-import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.common.codec.StateEncoder;
+import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 
@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * @author Bob McWhirter
  */
-public class JSONEncoder implements Encoder {
+public class JSONEncoder implements StateEncoder {
 
     public JSONEncoder() {
     }
@@ -47,21 +47,23 @@ public class JSONEncoder implements Encoder {
     // ----------------------------------------
 
     @Override
-    public void startResource(Resource resource) throws Exception {
+    public void startResource( ResourceState resourceState ) throws Exception {
         this.generator.writeStartObject();
-        if (resource.id() != null && ! this.inhibitIds) {
-            this.generator.writeFieldName("id");
-            this.generator.writeString(resource.id());
-            this.generator.writeFieldName("self");
-            this.generator.writeStartObject();
-            this.generator.writeFieldName("href");
-            this.generator.writeString(resource.uri().toString());
-            this.generator.writeEndObject();
+        if ( resourceState.id() != null && !this.inhibitIds ) {
+            this.generator.writeFieldName( "id" );
+            this.generator.writeString( resourceState.id() );
+            if ( resourceState.uri() != null ) {
+                this.generator.writeFieldName( "self" );
+                this.generator.writeStartObject();
+                this.generator.writeFieldName( "href" );
+                this.generator.writeString( resourceState.uri().toString() );
+                this.generator.writeEndObject();
+            }
         }
     }
 
     @Override
-    public void endResource(Resource resource) throws IOException {
+    public void endResource(ResourceState resourceState) throws IOException {
         this.generator.writeEndObject();
     }
 
@@ -170,12 +172,13 @@ public class JSONEncoder implements Encoder {
         this.generator.writeEndObject();
     }
 
-    public void writeLink(Resource resource) throws Exception {
+    @Override
+    public void writeLink(ResourceState resourceState) throws Exception {
         this.generator.writeStartObject();
         this.generator.writeFieldName("id");
-        this.generator.writeString(resource.id());
+        this.generator.writeString(resourceState.id());
         this.generator.writeFieldName("href");
-        this.generator.writeString(resource.uri().toString());
+        this.generator.writeString(resourceState.uri().toString());
         this.generator.writeEndObject();
 
     }

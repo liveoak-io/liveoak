@@ -5,8 +5,8 @@
  */
 package io.liveoak.common.codec.html;
 
-import io.liveoak.common.codec.Encoder;
-import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.common.codec.StateEncoder;
+import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 
@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author Bob McWhirter
  */
-public class HTMLEncoder implements Encoder {
+public class HTMLEncoder implements StateEncoder {
 
     @Override
     public void initialize(ByteBuf buffer) throws Exception {
@@ -84,50 +84,27 @@ public class HTMLEncoder implements Encoder {
     }
 
     @Override
-    public void startResource(Resource resource) throws Exception {
+    public void startResource(ResourceState resourcestate) throws Exception {
         startTag("div");
         attribute("class", "resource");
 
 
-        resourceLink(resource);
+        resourceLink(resourcestate);
     }
 
-    protected void resourceLink(Resource resource) throws XMLStreamException {
-        List<Resource> lineage = new ArrayList<>();
-
-        Resource current = resource;
-
-        while (current != null) {
-            lineage.add(0, current);
-            current = current.parent();
-        }
-
-        if (!lineage.get(0).id().equals("")) {
-            startTag("a");
-            attribute("href", "/");
-            text("ROOT");
-            endTag("a");
-            text(" / ");
-        }
-
-        for (Resource each : lineage) {
-            startTag("a");
-            attribute("href", each.uri().toString());
-
-            String id = each.id();
-            if ("".equals(id)) {
-                id = "ROOT";
-            }
-
-            text(id);
-            endTag("a");
-            text(" / ");
-        }
+    protected void resourceLink(ResourceState resourcestate) throws XMLStreamException {
+          if ( resourcestate.uri() != null) {
+              startTag("a");
+              attribute("href", resourcestate.uri().toString());
+              text(resourcestate.id());
+              endTag("a");
+              text(" / ");
+          }
     }
 
 
     @Override
-    public void endResource(Resource resource) throws Exception {
+    public void endResource(ResourceState resourcestate) throws Exception {
         endTag("div");
     }
 
@@ -237,12 +214,12 @@ public class HTMLEncoder implements Encoder {
     }
 
     @Override
-    public void writeLink(Resource resource) throws Exception {
+    public void writeLink(ResourceState resourcestate) throws Exception {
         startTag("div");
         attribute("class", "resource");
         startTag("a");
-        attribute("href", resource.uri().toString());
-        text(resource.id());
+        attribute( "href", resourcestate.uri().toString() );
+        text( resourcestate.id() );
         endTag("a");
         endTag("div");
     }

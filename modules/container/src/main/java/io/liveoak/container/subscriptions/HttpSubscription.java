@@ -78,8 +78,9 @@ public class HttpSubscription implements Subscription {
         request.setChunked(true);
 
         RequestContext requestContext = new RequestContext.Builder().build();
-        ByteBuf encoded = codec.encode(requestContext, resource);
-        request.write(new Buffer(encoded));
+        //TODO: fix this
+        //ByteBuf encoded = codec.encode(requestContext, resource);
+        //request.write(new Buffer(encoded));
         request.end();
     }
 
@@ -92,8 +93,9 @@ public class HttpSubscription implements Subscription {
         request.setChunked(true);
 
         RequestContext requestContext = new RequestContext.Builder().build();
-        ByteBuf encoded = codec.encode(requestContext, resource);
-        request.write(new Buffer(encoded));
+        //TODO: fix this
+        //ByteBuf encoded = codec.encode(requestContext, resource);
+        //request.write(new Buffer(encoded));
         request.end();
     }
 

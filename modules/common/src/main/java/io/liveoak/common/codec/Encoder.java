@@ -5,7 +5,6 @@
  */
 package io.liveoak.common.codec;
 
-import io.liveoak.spi.resource.async.Resource;
 import io.netty.buffer.ByteBuf;
 
 import java.util.Date;
@@ -14,17 +13,17 @@ import java.util.Map;
 /**
  * @author Bob McWhirter
  */
-public interface Encoder extends AutoCloseable {
+public interface Encoder<Obj> extends AutoCloseable {
 
     void initialize(ByteBuf buffer) throws Exception;
 
     void close() throws Exception;
 
-    void startResource(Resource resource) throws Exception;
+    void startResource(Obj resource) throws Exception;
 
-    void endResource(Resource resource) throws Exception;
+    void endResource(Obj resource) throws Exception;
 
-    void writeLink(Resource link) throws Exception;
+    void writeLink(Obj link) throws Exception;
 
     void startProperties() throws Exception;
 

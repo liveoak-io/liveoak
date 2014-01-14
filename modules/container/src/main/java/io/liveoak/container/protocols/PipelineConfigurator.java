@@ -181,6 +181,7 @@ public class PipelineConfigurator {
             pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));
         }
         pipeline.addLast("subscription-watcher", new SubscriptionWatcher(this.subscriptionManager));
+        pipeline.addLast("resource-state-handler", new ResourceStateHandler( this.container, this.workerPool));
         pipeline.addLast("object-handler", new ResourceHandler(this.container, this.workerPool));
         pipeline.addLast("error-handler", new ErrorHandler());
     }

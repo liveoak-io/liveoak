@@ -3,6 +3,7 @@ package io.liveoak.container.service;
 import io.liveoak.common.codec.Encoder;
 import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.common.codec.ResourceDecoder;
+import io.liveoak.common.codec.StateEncoder;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -13,7 +14,7 @@ import org.jboss.msc.service.StopContext;
  */
 public class CodecService implements Service<ResourceCodec> {
 
-    public CodecService(Class<? extends Encoder> encoderClass, ResourceDecoder decoder) {
+    public CodecService(Class<? extends StateEncoder> encoderClass, ResourceDecoder decoder) {
         this.codec = new ResourceCodec( encoderClass, decoder );
     }
 
