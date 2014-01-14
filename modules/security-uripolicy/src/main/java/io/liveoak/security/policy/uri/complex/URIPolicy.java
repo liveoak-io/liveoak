@@ -7,6 +7,7 @@ package io.liveoak.security.policy.uri.complex;
 
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.security.policy.uri.JsonParsingUtils;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import org.drools.RuleBase;
@@ -23,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Map;
 
 /**
  * Policy for authorization of resources based on resource URI. Policy implementation is based on drools engine
@@ -63,7 +65,6 @@ public class URIPolicy {
         DataProviderCompiler converter = new DataProviderCompiler();
         String drl = converter.compile(tdp, templateStream);
 
-        // TODO:Logging
         if (log.isDebugEnabled()) {
             log.debug("------------ ADDING NEW POLICY RULE INTO DROOLS ENGINE ----------------------");
             log.debug(drl);
@@ -101,6 +102,7 @@ public class URIPolicy {
             RequestContextDecorator reqContextDecorator = new RequestContextDecorator(reqContext);
             workingMemory.insert(reqContextDecorator);
             workingMemory.insert(reqContextDecorator.securityContext());
+            workingMemory.insert(reqContextDecorator.resourceParams());
 
             // TODO: this is temporary
             if (reqResourceState == null) {

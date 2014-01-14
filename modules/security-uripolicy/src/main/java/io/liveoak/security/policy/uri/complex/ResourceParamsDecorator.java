@@ -49,6 +49,17 @@ public class ResourceParamsDecorator implements ResourceParams {
     }
 
     /**
+     * return parameter value if parameter exists. Otherwise return empty string. Never returns null
+     *
+     * @param name
+     * @return parameter value
+     */
+    public String safeValue(String name) {
+        String val = value(name);
+        return val == null ? "" : val;
+    }
+
+    /**
      * Return intValue if param exists and if param could be converted to int. Otherwise returns null. Never throws NumberFormatException
      *
      * @param name

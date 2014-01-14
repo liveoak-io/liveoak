@@ -25,7 +25,7 @@ public class DemoURIPolicyWorker implements InitializationWorker {
                 "READ", "\"role1\", \"role2\"", null, null, null);
 
         // Rule specifies that requests to '/droolsTest/*' are accepted if params condition matched as well
-        URIPolicyRule rule2 = URIPolicyRule.createRule(9, "/droolsTest/*", "resourceParams.value(\"param1\") == \"foo\" && resourceParams.intValue(\"param2\") >= 10",
+        URIPolicyRule rule2 = URIPolicyRule.createRule(9, "/droolsTest/*", "$resourceParams.value(\"param1\") == \"foo\" && $resourceParams.intValue(\"param2\") >= 10",
                 "*", null, null, "\"*\"", null);
 
         // Rule specifies that requests, which permits everything if URI matches regex and all params condition matched as well
@@ -41,7 +41,7 @@ public class DemoURIPolicyWorker implements InitializationWorker {
         URIPolicyRule rule5 = URIPolicyRule.createRule(10, "/droolsTest/{ any($securityContext.roles) }", null,
                 "*", null, null, "\"*\"", null);
 
-        // Rule specifies that all requests to '/droolsTest/foo' are accepted for members of realm roles "role3" (similar to rule1, but this is for all requests)
+        // Rule specifies that all requests to '/droolsTest/foo' are accepted for members of realm roles "role1" (similar to rule1, but this is for all requests)
         // NOTE: Read requests to /droolsTest/foo will be preferably processed by rule1 because it has bigger priority
         URIPolicyRule rule6 = URIPolicyRule.createRule(5, "/droolsTest/foo", null,
                 "*", null, "\"role1\"", "\"*\"", null);
@@ -51,6 +51,14 @@ public class DemoURIPolicyWorker implements InitializationWorker {
         URIPolicyRule rule7 = URIPolicyRule.createRule(20, "/droolsTest/*", null,
                 "*", null, "\"evilRole\"", null, null);
 
+        // Rule for some predefined liveoak parameters (q, expand, fields, sort)
+        URIPolicyRule rule8 = URIPolicyRule.createRule(5, "/droolsTest/*", "$sort == \"user,name\" || $limit == 5 || $q.contains(\"\\\"completed\\\":false\")",
+                "*", null, null, "\"*\"", null);
+
+        // Rule for "q" parameter parsed to JSON
+        URIPolicyRule rule9 = URIPolicyRule.createRule(5, "/droolsTest/*", "parseJson($q).get(\"completed\") == true",
+                "*", null, null, "\"*\"", null);
+
         uriPolicy.addURIPolicyRule(rule1);
         uriPolicy.addURIPolicyRule(rule2);
         uriPolicy.addURIPolicyRule(rule3);
@@ -58,5 +66,7 @@ public class DemoURIPolicyWorker implements InitializationWorker {
         uriPolicy.addURIPolicyRule(rule5);
         uriPolicy.addURIPolicyRule(rule6);
         uriPolicy.addURIPolicyRule(rule7);
+        uriPolicy.addURIPolicyRule(rule8);
+        uriPolicy.addURIPolicyRule(rule9);
     }
 }
