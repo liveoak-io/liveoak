@@ -94,7 +94,7 @@ public class KeycloakRootResource implements RootResource {
             }
 
             if (realmRepresentation == null) {
-                throw new InitializationException("realmRepresentation is null");
+                log.infof("Realm representation is null. Skiping realm initialization");
             } else {
                 try {
                     initRealm();
