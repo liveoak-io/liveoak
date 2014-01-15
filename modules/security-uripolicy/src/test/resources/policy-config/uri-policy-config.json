@@ -22,7 +22,7 @@
             "priority": 1,
             "uriPattern": "/storage*",
             "requestType": "READ",
-            "queryParamsCondition": "resourceParams.value('q') != null && resourceParams.value('q').contains('\\\"user\\\":\\\"' + $securityContext.subject + '\\\"')",
+            "queryParamsCondition": "parseJson($q).get('user') == $securityContext.subject",
             "allowedRoles": "'test-app/user'"
         },
         {

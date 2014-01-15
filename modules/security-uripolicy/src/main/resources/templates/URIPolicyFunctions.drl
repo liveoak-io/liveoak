@@ -3,12 +3,14 @@ package io.liveoak.security.policy.uri.complex;
 import io.liveoak.security.policy.uri.complex.RulesProcessingResult;
 import io.liveoak.security.policy.uri.complex.URIMatcher;
 import io.liveoak.security.policy.uri.complex.RequestContextDecorator;
+import io.liveoak.security.policy.uri.JsonParsingUtils;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
 import org.jboss.logging.Logger;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -79,4 +81,8 @@ function String any(Collection items) {
       }
   }
   return rulesProcessingResult;
+}
+
+function Map parseJson(String jsonString) {
+  return JsonParsingUtils.parseJsonStringAsMap(jsonString);
 }

@@ -137,5 +137,36 @@ public class URIPolicyTest {
         Assert.assertEquals(AuthzDecision.REJECT, uriPolicy.isAuthorized(request12.securityContext(john)));
         Assert.assertEquals(AuthzDecision.REJECT, uriPolicy.isAuthorized(request12.securityContext(evil)));
 
+
+        // Request allowed thanks to rule8 and sort parameter
+        Map<String, List<String>> req13params = new HashMap<>();
+        req13params.put("sort", Arrays.asList(new String[]{"user,name"}));
+        req13params.put("limit", Arrays.asList(new String[]{"10"}));
+        RequestContext.Builder request13 = new RequestContext.Builder().requestType(RequestType.READ)
+                .resourcePath(new ResourcePath("/droolsTest/bar")).resourceParams(DefaultResourceParams.instance(req13params));
+        Assert.assertEquals(AuthzDecision.ACCEPT, uriPolicy.isAuthorized(request13.securityContext(john)));
+        Assert.assertEquals(AuthzDecision.REJECT, uriPolicy.isAuthorized(request13.securityContext(evil)));
+
+        // Should pass because of limit==5
+        req13params.put("sort", Arrays.asList(new String[]{"user,namee"}));
+        req13params.put("limit", Arrays.asList(new String[]{"5"}));
+        Assert.assertEquals(AuthzDecision.ACCEPT, uriPolicy.isAuthorized(request13.securityContext(john)));
+
+
+        // Should pass because of q
+        req13params.put("sort", Arrays.asList(new String[]{"user,namee"}));
+        req13params.put("limit", Arrays.asList(new String[]{"10"}));
+        req13params.put("q", Arrays.asList(new String[]{"{\"completed\":false}"}));
+        Assert.assertEquals(AuthzDecision.ACCEPT, uriPolicy.isAuthorized(request13.securityContext(john)));
+
+        // Shouldn't pass because anything from sort,limit or q can be applied
+        req13params.put("sort", Arrays.asList(new String[]{"user,namee"}));
+        req13params.put("limit", Arrays.asList(new String[]{"10"}));
+        req13params.put("q", Arrays.asList(new String[]{"{\"completed\":\"kokos\"}"}));
+        Assert.assertEquals(AuthzDecision.IGNORE, uriPolicy.isAuthorized(request13.securityContext(john)));
+
+        // This is passing thanks to rule9
+        req13params.put("q", Arrays.asList(new String[]{"{\"completed\":true}"}));
+        Assert.assertEquals(AuthzDecision.ACCEPT, uriPolicy.isAuthorized(request13.securityContext(john)));
     }
 }
