@@ -28,16 +28,16 @@ public class SubscriptionWatcher extends ChannelOutboundHandlerAdapter {
 
             switch (response.responseType()) {
                 case CREATED:
-                    this.subscriptionManager.resourceCreated(response.resource());
+                    this.subscriptionManager.resourceCreated(response);
                     break;
                 case READ:
                     // no notification
                     break;
                 case UPDATED:
-                    this.subscriptionManager.resourceUpdated(response.resource());
+                    this.subscriptionManager.resourceUpdated(response);
                     break;
                 case DELETED:
-                    this.subscriptionManager.resourceDeleted(response.resource());
+                    this.subscriptionManager.resourceDeleted(response);
                     break;
             }
         }

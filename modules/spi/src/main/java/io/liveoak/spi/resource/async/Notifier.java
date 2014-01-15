@@ -1,5 +1,7 @@
 package io.liveoak.spi.resource.async;
 
+import io.liveoak.spi.ResourceResponse;
+
 /**
  * Notifier to allow resources to information the container
  * of changes that occur outside of a request/response cycle.
@@ -12,22 +14,22 @@ public interface Notifier {
     /**
      * Notify the container of a newly-created resource.
      *
-     * @param resource The created resource.
+     * @param resourceResponse The response from the created resource.
      */
-    void resourceCreated(Resource resource);
+    void resourceCreated(ResourceResponse resourceResponse);
 
     /**
      * Notify the container of a deleted resource.
      *
-     * @param resource The deleted resource.
+     * @param resourceResponse The response from the deleted resource.
      */
-    void resourceDeleted(Resource resource);
+    void resourceDeleted(ResourceResponse resourceResponse);
 
     /**
      * Notify the container of an updated resource.
      *
-     * @param resource The updated resource.
+     * @param resourceResponse The response from updated resource.
      */
-    void resourceUpdated(Resource resource);
+    void resourceUpdated(ResourceResponse resourceResponse);
 
 }

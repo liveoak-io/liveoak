@@ -6,6 +6,7 @@
 package io.liveoak.spi.container;
 
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.resource.async.Resource;
 
 /**
@@ -17,10 +18,10 @@ public interface Subscription extends Resource {
 
     ResourcePath resourcePath();
 
-    void resourceCreated(Resource resource) throws Exception;
+    void resourceCreated(ResourceResponse resourceResponse) throws Exception;
 
-    void resourceUpdated(Resource resource) throws Exception;
+    void resourceUpdated(ResourceResponse resourceResponse) throws Exception;
 
-    void resourceDeleted(Resource resource) throws Exception;
+    void resourceDeleted(ResourceResponse resourceResponse) throws Exception;
 
 }

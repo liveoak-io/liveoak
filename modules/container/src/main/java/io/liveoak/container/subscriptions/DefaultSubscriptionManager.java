@@ -113,30 +113,36 @@ public class DefaultSubscriptionManager implements SubscriptionManager, RootReso
     // ----------------------------------------------------------------------
     // ----------------------------------------------------------------------
 
-    public void resourceCreated(Resource resource) {
+    @Override
+    public void resourceCreated(ResourceResponse resourceResponse) {
+        Resource resource = resourceResponse.resource();
         getSubscriptions(resource).forEach((e) -> {
             try {
-                e.resourceCreated(resource);
+                e.resourceCreated(resourceResponse);
             } catch (Exception e1) {
                 log.error("", e1);
             }
         });
     }
 
-    public void resourceUpdated(Resource resource) {
+    @Override
+    public void resourceUpdated(ResourceResponse resourceResponse) {
+        Resource resource = resourceResponse.resource();
         getSubscriptions(resource).forEach((e) -> {
             try {
-                e.resourceUpdated(resource);
+                e.resourceUpdated(resourceResponse);
             } catch (Exception e1) {
                 log.error("", e1);
             }
         });
     }
 
-    public void resourceDeleted(Resource resource) {
+    @Override
+    public void resourceDeleted(ResourceResponse resourceResponse) {
+        Resource resource = resourceResponse.resource();
         getSubscriptions(resource).forEach((e) -> {
             try {
-                e.resourceDeleted(resource);
+                e.resourceDeleted(resourceResponse);
             } catch (Exception e1) {
                 log.error("", e1);
             }

@@ -3,6 +3,7 @@ package io.liveoak.container.subscriptions;
 import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.container.Subscription;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
@@ -65,37 +66,35 @@ public class HttpSubscription implements Subscription {
     }
 
     @Override
-    public void resourceCreated(Resource resource) throws Exception {
-        resourceUpdated(resource);
+    public void resourceCreated(ResourceResponse resourceResponse) throws Exception {
+        resourceUpdated(resourceResponse);
     }
 
     @Override
-    public void resourceUpdated(Resource resource) throws Exception {
-        URI uri = destinationUri(resource);
+    public void resourceUpdated(ResourceResponse resourceResponse) throws Exception {
+        URI uri = destinationUri(resourceResponse.resource());
         HttpClientRequest request = this.httpClient.put(uri.getPath(), (response) -> {
         });
 
         request.setChunked(true);
 
         RequestContext requestContext = new RequestContext.Builder().build();
-        //TODO: fix this
-        //ByteBuf encoded = codec.encode(requestContext, resource);
-        //request.write(new Buffer(encoded));
+        ByteBuf encoded = codec.encode(requestContext, resourceResponse.state());
+        request.write(new Buffer(encoded));
         request.end();
     }
 
     @Override
-    public void resourceDeleted(Resource resource) throws Exception {
-        URI uri = destinationUri(resource);
+    public void resourceDeleted(ResourceResponse resourceResponse) throws Exception {
+        URI uri = destinationUri(resourceResponse.resource());
         HttpClientRequest request = this.httpClient.delete(uri.getPath(), (response) -> {
         });
 
         request.setChunked(true);
 
         RequestContext requestContext = new RequestContext.Builder().build();
-        //TODO: fix this
-        //ByteBuf encoded = codec.encode(requestContext, resource);
-        //request.write(new Buffer(encoded));
+        ByteBuf encoded = codec.encode(requestContext, resourceResponse.state());
+        request.write(new Buffer(encoded));
         request.end();
     }
 

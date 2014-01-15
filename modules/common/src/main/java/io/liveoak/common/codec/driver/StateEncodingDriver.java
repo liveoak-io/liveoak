@@ -57,7 +57,6 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
         if ( !resourceState.getPropertyNames().isEmpty() ) {
             encoder().startProperties();
             for ( String propertyName : resourceState.getPropertyNames() ) {
-                System.out.println("PROPERTY : " + propertyName);
                 encodeProperty( propertyName, resourceState.getProperty( propertyName ) );
             }
             encoder().endProperties();
@@ -84,6 +83,7 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
             encoder().writeValue( ( Long ) value );
         } else if (value instanceof Date ) {
             encoder().writeValue( ( Date ) value );
+       //TODO: figure out when writing a link should be used....
 //        } else if (property instanceof ResourceState) {
 //            encoder().writeLink((ResourceState) property);
         } else if (value instanceof Boolean) {
@@ -104,6 +104,7 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
     protected void encodeState(ResourceState resourceState) throws Exception {
         encoder().startResource( resourceState );
         encodeProperties( resourceState );
+        encodeMembers( resourceState );
         encoder().endResource( resourceState );
 
     }

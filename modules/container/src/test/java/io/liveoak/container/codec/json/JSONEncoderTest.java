@@ -107,6 +107,7 @@ public class JSONEncoderTest {
     @Test
     public void testObjectWithResourceStateProperty() throws Exception {
         DefaultResourceState mosesState = new DefaultResourceState("moses");
+        mosesState.uri(new URI("/moses"));
         mosesState.putProperty("name", "Moses");
         mosesState.putProperty("breed", "German Shepherd");
 
@@ -132,8 +133,10 @@ public class JSONEncoderTest {
 
     @Test
     public void testObjectWithResourceStatePropertyWithURI() throws Exception {
+        //TODO: figure out how resourceStates of resourceStates should behave with regards to link encoding or resource encoding
         DefaultResourceState mosesState = new DefaultResourceState("moses");
-        mosesState.uri( new URI("/moses") );
+        //mosesState.uri( new URI("/moses") );
+        mosesState.putProperty( "href", "/moses" );
         //mosesState.putProperty("name", "Moses");
         //mosesState.putProperty("breed", "German Shepherd");
 
@@ -165,10 +168,12 @@ public class JSONEncoderTest {
         DefaultResourceState mosesState = new DefaultResourceState("moses");
         mosesState.putProperty("name", "Moses");
         mosesState.putProperty("breed", "German Shepherd");
+        mosesState.uri( new URI("/moses") );
 
         DefaultResourceState onlyState = new DefaultResourceState("only");
         onlyState.putProperty("name", "Only");
         onlyState.putProperty("breed", "Lab/Huskie Mix");
+        onlyState.uri(new URI("/Only"));
 
         DefaultResourceState bobState = new DefaultResourceState("bob");
         bobState.putProperty("name", "Bob McWhirter");
