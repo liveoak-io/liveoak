@@ -14,6 +14,7 @@ import io.liveoak.container.protocols.RequestCompleteEvent;
 import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceErrorResponse;
+import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.resource.async.Resource;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -123,7 +124,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
         if (shouldEncodeState) {
             MediaTypeMatcher matcher = msg.inReplyTo().mediaTypeMatcher();
             try {
-                encodingResult = encodeState(msg.inReplyTo().requestContext(), matcher, msg.resource());
+                encodingResult = encodeState(msg.inReplyTo().requestContext(), matcher, msg);
             } catch (IncompatibleMediaTypeException e) {
                 log.error("Incompatible media type", e);
                 responseStatus = new HttpResponseStatus(HttpResponseStatus.NOT_ACCEPTABLE.code(), e.getMessage());
@@ -158,8 +159,8 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
         ctx.fireUserEventTriggered( new RequestCompleteEvent( msg.requestId() ) );
     }
 
-    protected EncodingResult encodeState(RequestContext ctx, MediaTypeMatcher mediaTypeMatcher, Resource resource) throws Exception {
-        return this.codecManager.encode(ctx, mediaTypeMatcher, resource);
+    protected EncodingResult encodeState(RequestContext ctx, MediaTypeMatcher mediaTypeMatcher, ResourceResponse response) throws Exception {
+        return this.codecManager.encode(ctx, mediaTypeMatcher, response);
     }
 
     private ResourceCodecManager codecManager;

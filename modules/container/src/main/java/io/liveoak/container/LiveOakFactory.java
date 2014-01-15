@@ -17,6 +17,7 @@ import io.liveoak.common.codec.Encoder;
 import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.common.codec.ResourceDecoder;
+import io.liveoak.common.codec.StateEncoder;
 import io.liveoak.common.codec.html.HTMLEncoder;
 import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.common.codec.json.JSONEncoder;
@@ -251,7 +252,7 @@ public class LiveOakFactory {
     }
 
 
-    private static void installCodec(ServiceContainer serviceContainer, MediaType mediaType, Class<? extends Encoder> encoderClass, ResourceDecoder decoder) {
+    private static void installCodec(ServiceContainer serviceContainer, MediaType mediaType, Class<? extends StateEncoder> encoderClass, ResourceDecoder decoder) {
         ServiceName name = codec(mediaType.toString());
 
         CodecService codec = new CodecService(encoderClass, decoder);

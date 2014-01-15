@@ -12,8 +12,15 @@ if [ -n "$m2_repo_dir" ]; then
   M2_REPO_CLAUSE=-Dlocal.maven.repo.path=$m2_repo_dir
 fi
 
+if [ "x$JAVA" = "x" ]; then
+  if [ "x$JAVA_HOME" != "x" ]; then
+    JAVA="$JAVA_HOME/bin/java"
+  else 
+    JAVA="java"
+  fi
+fi
 
-java $JAVA_OPTS \
+$JAVA $JAVA_OPTS \
   -Djs.client.dir=$js_client_dir \
   -Dcss.dir=$css_dir \
   -Dio.liveoak.log=$logdir \

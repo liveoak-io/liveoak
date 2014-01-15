@@ -17,7 +17,7 @@
     </properties>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>liveoak-common</artifactId>
-    <name>liveoak-container</name>
+    <name>liveoak-common</name>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

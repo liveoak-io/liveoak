@@ -6,6 +6,7 @@
 package io.liveoak.common.codec.driver;
 
 import io.liveoak.common.codec.Encoder;
+import io.liveoak.common.codec.ResourceEncoder;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
 
@@ -14,7 +15,7 @@ import io.liveoak.spi.resource.async.Resource;
  */
 public class RootEncodingDriver extends ResourceEncodingDriver {
 
-    public RootEncodingDriver(RequestContext requestContext, Encoder encoder, Resource resource, Runnable completionHandler) {
+    public RootEncodingDriver(RequestContext requestContext, ResourceEncoder encoder, Resource resource, Runnable completionHandler) {
         super(resource, requestContext.returnFields());
         this.requestContext = requestContext;
         this.encoder = encoder;
@@ -22,7 +23,7 @@ public class RootEncodingDriver extends ResourceEncodingDriver {
     }
 
     @Override
-    public Encoder encoder() {
+    public ResourceEncoder encoder() {
         return this.encoder;
     }
 
@@ -40,7 +41,7 @@ public class RootEncodingDriver extends ResourceEncodingDriver {
     }
 
     private RequestContext requestContext;
-    private Encoder encoder;
+    private ResourceEncoder encoder;
     private Runnable completionHandler;
 
 }

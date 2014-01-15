@@ -3,14 +3,10 @@ package io.liveoak.container.protocols.local;
 import java.util.concurrent.Executor;
 
 import io.liveoak.client.impl.ClientResourceResponseImpl;
-import io.liveoak.common.codec.driver.RootEncodingDriver;
-import io.liveoak.common.codec.state.ResourceStateEncoder;
 import io.liveoak.container.protocols.RequestCompleteEvent;
 import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.client.ClientResourceResponse;
-import io.liveoak.spi.resource.BlockingResource;
-import io.liveoak.spi.state.ResourceState;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -28,21 +24,11 @@ public class LocalResourceResponseEncoder extends ChannelOutboundHandlerAdapter 
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         if (msg instanceof ResourceResponse ) {
             ResourceResponse response = (ResourceResponse) msg;
-            ResourceState state = null;
             if (msg instanceof ResourceErrorResponse) {
                 ClientResourceResponse.ResponseType responseType = decodeResponseType(((ResourceErrorResponse) msg).errorType());
                 ctx.writeAndFlush( new ClientResourceResponseImpl(response.inReplyTo(), responseType, response.inReplyTo().resourcePath().toString(), null));
             } else {
-
-                Runnable action = ()->{
-                    encode(ctx, response );
-                };
-
-                if ( response.resource() instanceof BlockingResource ) {
-                    this.workerPool.execute( action );
-                } else {
-                    action.run();
-                }
+                encode(ctx, response);
             }
         } else {
             super.write( ctx, msg, promise );
@@ -90,19 +76,8 @@ public class LocalResourceResponseEncoder extends ChannelOutboundHandlerAdapter 
             return;
         }
 
-        final ResourceStateEncoder encoder = new ResourceStateEncoder();
-        RootEncodingDriver driver = new RootEncodingDriver(response.inReplyTo().requestContext(), encoder, response.resource(), () -> {
-            ResourceState state = encoder.root();
-            ctx.writeAndFlush( new ClientResourceResponseImpl(response.inReplyTo(), responseType, response.inReplyTo().resourcePath().toString(), state));
-            ctx.fireUserEventTriggered(new RequestCompleteEvent(response.requestId()));
-        });
-
-        try {
-            driver.encode();
-        } catch (Exception e) {
-            ctx.writeAndFlush( new ClientResourceResponseImpl(response.inReplyTo(), ClientResourceResponse.ResponseType.NOT_ACCEPTABLE, response.inReplyTo().resourcePath().toString(), null ));
-            ctx.fireUserEventTriggered(new RequestCompleteEvent(response.requestId()));
-        }
+        ctx.writeAndFlush( new ClientResourceResponseImpl( response.inReplyTo(), responseType, response.inReplyTo().resourcePath().toString(), response.state() ) );
+        ctx.fireUserEventTriggered(new RequestCompleteEvent(response.requestId()));
 
     }
 

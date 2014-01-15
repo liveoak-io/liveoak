@@ -7,6 +7,7 @@ package io.liveoak.common.codec;
 
 import io.liveoak.common.codec.driver.EncodingDriver;
 import io.liveoak.common.codec.driver.RootEncodingDriver;
+import io.liveoak.common.codec.driver.StateEncodingDriver;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
@@ -21,7 +22,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public class ResourceCodec {
 
-    public ResourceCodec(Class<? extends Encoder> encoderClass, ResourceDecoder decoder) {
+    public ResourceCodec(Class<? extends StateEncoder> encoderClass, ResourceDecoder decoder) {
         this.encoderClass = encoderClass;
         this.decoder = decoder;
     }
@@ -34,29 +35,21 @@ public class ResourceCodec {
         return this.decoder != null;
     }
 
-    public ByteBuf encode(RequestContext ctx, Resource resource) throws Exception {
-        CompletableFuture<ByteBuf> future = new CompletableFuture<>();
-        newEncodingDriver(ctx, resource, future).encode();
-        ByteBuf result = future.get();
-        return result;
+    public ByteBuf encode(RequestContext ctx, ResourceState resourceState) throws Exception {
+        ByteBuf buffer = Unpooled.buffer();
+        StateEncoder encoder = this.encoderClass.newInstance();
+        encoder.initialize(buffer);
+        StateEncodingDriver driver = new StateEncodingDriver(ctx,encoder, resourceState );
+        driver.encode();
+        driver.close();
+        return buffer;
     }
 
     public ResourceState decode(ByteBuf resource) throws Exception {
         return this.decoder.decode(resource);
     }
 
-    protected EncodingDriver newEncodingDriver(RequestContext ctx, Resource resource, CompletableFuture<ByteBuf> future) throws Exception {
-        ByteBuf buffer = Unpooled.buffer();
-        Encoder encoder = this.encoderClass.newInstance();
-        encoder.initialize(buffer);
-        RootEncodingDriver driver = new RootEncodingDriver(ctx, encoder, resource, () -> {
-            future.complete(buffer);
-        });
-        return driver;
-    }
-
-
-    private final Class<? extends Encoder> encoderClass;
+    private final Class<? extends StateEncoder> encoderClass;
     private final ResourceDecoder decoder;
 
 }

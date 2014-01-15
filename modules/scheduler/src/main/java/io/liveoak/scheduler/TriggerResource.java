@@ -1,6 +1,8 @@
 package io.liveoak.scheduler;
 
+import io.liveoak.common.DefaultResourceResponse;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
@@ -55,7 +57,11 @@ public class TriggerResource implements Resource {
     public void createFire(JobExecutionContext context) {
         FireResource fireResource = new FireResource(this, context);
         this.fires.add(fireResource);
-        this.parent.notifier().resourceCreated(fireResource);
+
+        //TODO: maybe using ResourceResponse isn't the best solution here....
+        ResourceResponse response = new DefaultResourceResponse(null, ResourceResponse.ResponseType.CREATED, fireResource);
+        //response.setState();
+        this.parent.notifier().resourceCreated(response);
     }
 
 

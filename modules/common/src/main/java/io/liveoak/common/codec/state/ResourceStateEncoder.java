@@ -7,6 +7,7 @@ package io.liveoak.common.codec.state;
 
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.codec.Encoder;
+import io.liveoak.common.codec.ResourceEncoder;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
@@ -20,7 +21,7 @@ import java.util.Stack;
 /**
  * @author Bob McWhirter
  */
-public class ResourceStateEncoder implements Encoder {
+public class ResourceStateEncoder implements ResourceEncoder {
 
     private Stack<Object> stack = new Stack<>();
     private ResourceState root;

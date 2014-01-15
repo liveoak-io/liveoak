@@ -4,6 +4,7 @@ import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.resource.config.ConfigResource;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceState;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -23,12 +24,12 @@ public class ConfigurationWatcher extends ChannelOutboundHandlerAdapter {
         if ( msg instanceof ResourceResponse) {
             if ( ((ResourceResponse) msg).responseType().equals( ResourceResponse.ResponseType.UPDATED ) ) {
                 Resource current = ((ResourceResponse) msg).resource();
-                ConfigResource configResource = null;
+                ResourceState configResourceState = null;
                 RootResource rootResource = null;
 
                 while ( current != null ) {
                     if ( current instanceof ConfigResource) {
-                        configResource = (ConfigResource) current;
+                        configResourceState = ((ResourceResponse)msg).state();
                         break;
                     }
                     current = current.parent();
@@ -42,8 +43,8 @@ public class ConfigurationWatcher extends ChannelOutboundHandlerAdapter {
                     current = current.parent();
                 }
 
-                if ( configResource != null ) {
-                    this.deploymentManager.updateConfiguration( rootResource, configResource );
+                if ( configResourceState != null ) {
+                    this.deploymentManager.updateConfiguration(rootResource, configResourceState);
                 }
             }
         }

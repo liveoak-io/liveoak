@@ -11,6 +11,7 @@ import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
@@ -49,6 +50,17 @@ public class DefaultResourceResponse implements ResourceResponse {
     }
 
     @Override
+    public ResourceState state() {
+        return this.state;
+    }
+
+    @Override
+    public void setState(ResourceState state) {
+        this.state = state;
+    }
+
+
+    @Override
     public Resource resource() {
         return this.resource;
     }
@@ -59,5 +71,6 @@ public class DefaultResourceResponse implements ResourceResponse {
 
     private ResourceRequest inReplyTo;
     private ResponseType responseType;
+    private ResourceState state;
     private Resource resource;
 }

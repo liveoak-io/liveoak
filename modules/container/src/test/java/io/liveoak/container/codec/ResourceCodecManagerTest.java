@@ -6,6 +6,7 @@
 package io.liveoak.container.codec;
 
 import io.liveoak.common.DefaultMediaTypeMatcher;
+import io.liveoak.common.DefaultResourceResponse;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.common.codec.ResourceCodecManager;
@@ -14,6 +15,7 @@ import io.liveoak.container.InMemoryObjectResource;
 import io.liveoak.common.codec.html.HTMLEncoder;
 import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.spi.MediaType;
+import io.liveoak.spi.ResourceResponse;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.junit.Test;
@@ -42,6 +44,8 @@ public class ResourceCodecManagerTest {
         DefaultResourceState state = new DefaultResourceState();
         InMemoryObjectResource resource = new InMemoryObjectResource(null, "gary", state);
 
-        manager.encode(null, mediaTypeMatcher, resource);
+        DefaultResourceResponse resourceResponse = new DefaultResourceResponse(null, ResourceResponse.ResponseType.READ, resource);
+        resourceResponse.setState( state );
+        manager.encode(null, mediaTypeMatcher, resourceResponse);
     }
 }
