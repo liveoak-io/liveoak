@@ -1,0 +1,8 @@
+{
+    "policies": [
+        {
+            "policyName" : "URIPolicy",
+            "policyResourceEndpoint": "uriPolicy/authzCheck"
+        } 
+    ]
+}
