@@ -1,0 +1,28 @@
+{ 
+    "uriRules": [
+        {
+            "priority": 1,
+            "uriPattern": "/app/*",
+            "requestType": "*",
+            "allowedUsers": "'*'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/console/*",
+            "requestType": "*",
+            "allowedUsers": "'*'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/client/*",
+            "requestType": "*",
+            "allowedUsers": "'*'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/storage*",            
+            "requestType": "READ",
+            "allowedRoles": "'console/user'"
+        }
+    ]
+}
