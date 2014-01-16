@@ -81,5 +81,7 @@ public class TraversalPlan {
         ResourceState state();
 
         Responder responder();
+
+        Runnable invocation();
     }
 }

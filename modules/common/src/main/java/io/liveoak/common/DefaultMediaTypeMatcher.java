@@ -102,4 +102,9 @@ public class DefaultMediaTypeMatcher implements MediaTypeMatcher {
     }
 
     private List<MediaType> mediaTypes = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "[DefaultMediaTypeMatcher: mediaTypes=" + mediaTypes + "]";
+    }
 }

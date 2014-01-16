@@ -52,6 +52,16 @@ public interface RequestContext {
             return this;
         }
 
+        public Builder sorting(Sorting sorting) {
+            this.sorting = sorting;
+            return this;
+        }
+
+        public Builder application(Application application) {
+            this.application = application;
+            return this;
+        }
+
         public Builder resourcePath(ResourcePath resourcePath) {
             this.resourcePath = resourcePath;
             return this;
@@ -67,33 +77,28 @@ public interface RequestContext {
             return this;
         }
 
-        public Builder sorting(Sorting sorting) {
-            this.sorting = sorting;
-            return this;
-        }
-
         public RequestContext build() {
             return this;
         }
 
         @Override
         public Application application() {
-            return null;
+            return application;
         }
 
         @Override
         public SecurityContext securityContext() {
-            return this.securityContext;
+            return securityContext;
         }
 
         @Override
         public Pagination pagination() {
-            return this.pagination;
+            return pagination;
         }
 
         @Override
         public ResourceParams resourceParams() {
-            return this.resourceParams;
+            return resourceParams;
         }
 
         @Override
@@ -126,6 +131,7 @@ public interface RequestContext {
         private Pagination pagination = Pagination.NONE;
         private ResourceParams resourceParams = ResourceParams.NONE;
         private ReturnFields returnFields = ReturnFields.ALL;
+        private Application application;
         private ResourcePath resourcePath;
         private RequestAttributes requestAttributes;
         private RequestType requestType;

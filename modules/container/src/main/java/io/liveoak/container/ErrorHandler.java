@@ -11,14 +11,18 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import org.jboss.logging.Logger;
 
 public class ErrorHandler extends ChannelDuplexHandler {
+
+    private static Logger log = Logger.getLogger(ErrorHandler.class);
 
     public ErrorHandler() {
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("Internal error: ", cause);
         DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR);
         response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
     }

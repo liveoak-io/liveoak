@@ -37,7 +37,11 @@ public class ResourcePath {
         }
     }
 
-    ResourcePath(List<Segment> segments) {
+    public ResourcePath(ResourcePath path) {
+        this.segments = new ArrayList(path.segments);
+    }
+
+    public ResourcePath(List<Segment> segments) {
         this.segments = segments;
     }
 
@@ -61,6 +65,13 @@ public class ResourcePath {
             return segments.get(segments.size()-1);
         }
         return null;
+    }
+
+    public ResourcePath parent() {
+        if (this.segments.isEmpty()) {
+            return new ResourcePath();
+        }
+        return new ResourcePath(segments.subList(0, segments.size() - 1));
     }
 
     public ResourcePath subPath() {

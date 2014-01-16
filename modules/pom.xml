@@ -98,6 +98,7 @@
         <module>stomp</module>
         <module>container</module>
         <module>mongo</module>
+        <module>mongo-gridfs</module>
         <module>filesystem</module>
         <module>aggregating-filesystem</module>
         <module>scheduler</module>

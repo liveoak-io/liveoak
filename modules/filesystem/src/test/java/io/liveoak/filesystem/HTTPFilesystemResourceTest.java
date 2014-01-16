@@ -15,6 +15,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -33,6 +35,15 @@ public class HTTPFilesystemResourceTest extends AbstractHTTPResourceTestCase {
         File dataDir = new File(this.projectRoot, "/target/test-data/one");
         if (!dataDir.exists()) {
             dataDir.mkdirs();
+        }
+
+        // create a file in there
+        try {
+            FileWriter out = new FileWriter(new File(dataDir, "file.txt"));
+            out.write("0123456789");
+            out.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create a test file: ", e);
         }
 
         ResourceState config = new DefaultResourceState();
@@ -65,4 +76,28 @@ public class HTTPFilesystemResourceTest extends AbstractHTTPResourceTestCase {
         }
 
     }
+
+    @Test
+    public void testReadChild() throws Exception {
+        HttpGet get = new HttpGet("http://localhost:8080/files/file.txt");
+        get.addHeader("Accept", "text/*");
+
+        try {
+            System.err.println("DO GET");
+            CloseableHttpResponse result = httpClient.execute(get);
+            System.err.println("=============>>>");
+            System.err.println(result);
+
+            HttpEntity entity = result.getEntity();
+            if (entity.getContentLength() > 0) {
+                entity.writeTo(System.err);
+            }
+            System.err.println("\n<<<=============");
+            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(200);
+
+        } finally {
+            httpClient.close();
+        }
+    }
+
 }
