@@ -2,7 +2,7 @@
 
 
 // Declare app level module which depends on filters, and services
-var module = angular.module('loApp', [
+var loMod = angular.module('loApp', [
   'ngRoute',
   'loApp.filters',
   'loApp.services',
@@ -39,7 +39,6 @@ angular.element(document).ready(function () {
     });
 
     liveOak.auth.init();
-    console.log(liveOak.auth);
 });
 
 // -- Loading Interceptor ----------------------------
@@ -47,7 +46,7 @@ angular.element(document).ready(function () {
 var resourceRequests = 0;
 var loadingTimer = -1;
 
-module.factory('spinnerInterceptor', function($q, $window, $rootScope, $location) {
+loMod.factory('spinnerInterceptor', function($q, $window, $rootScope, $location) {
     return function(promise) {
         return promise.then(function(response) {
             resourceRequests--;
@@ -74,7 +73,7 @@ module.factory('spinnerInterceptor', function($q, $window, $rootScope, $location
     };
 });
 
-module.config(function($httpProvider) {
+loMod.config(function($httpProvider) {
     var spinnerFunction = function(data, headersGetter) {
         if (resourceRequests == 0) {
             loadingTimer = window.setTimeout(function() {
