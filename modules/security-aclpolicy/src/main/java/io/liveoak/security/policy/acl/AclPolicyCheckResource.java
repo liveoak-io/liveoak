@@ -5,17 +5,20 @@ import java.util.Set;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.client.Client;
+import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class AclPolicyCheckResource implements Resource, BlockingResource {
+public class AclPolicyCheckResource implements Resource {
 
     private static final Logger log = Logger.getLogger(AclPolicyCheckResource.class);
 
@@ -41,8 +44,6 @@ public class AclPolicyCheckResource implements Resource, BlockingResource {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        AuthzDecision decision = null;
-
         try {
             AclPolicyConfig aclPolicyConfig = parent.getPolicyConfig();
             if (aclPolicyConfig != null) {
@@ -52,71 +53,34 @@ public class AclPolicyCheckResource implements Resource, BlockingResource {
                     if (log.isTraceEnabled()) {
                         log.trace("Request is null. Rejecting");
                     }
-                    decision = AuthzDecision.REJECT;
+                    sendDecision(AuthzDecision.REJECT, sink);
                 } else {
-                    decision = isAuthorized(reqCtxToAuthorize, aclPolicyConfig);
+                    checkAuthorized(reqCtxToAuthorize, aclPolicyConfig, sink);
                 }
             } else {
                 log.warn("Configuration not available. Ignoring");
+                sendDecision(AuthzDecision.IGNORE, sink);
             }
         } catch (Throwable t) {
             log.error("Error during authz check", t);
-            decision = AuthzDecision.REJECT;
+            sendDecision(AuthzDecision.REJECT, sink);
         }
-
-        if (decision == null) {
-            decision = AuthzDecision.IGNORE;
-        }
-
-        sink.accept(AuthzConstants.ATTR_AUTHZ_POLICY_RESULT, decision.toString());
-        sink.close();
     }
 
-    protected AuthzDecision isAuthorized(RequestContext reqCtxToAuthorize, AclPolicyConfig aclPolicyConfig) {
+    protected void checkAuthorized(RequestContext reqCtxToAuthorize, AclPolicyConfig aclPolicyConfig, PropertySink sink) throws Exception {
         AclPolicyConfigRule configRule = getBestRule(reqCtxToAuthorize, aclPolicyConfig);
         if (configRule == null) {
             if (log.isTraceEnabled()) {
                 log.trace("No rule found for request " + reqCtxToAuthorize + ". Ignoring");
             }
-            return AuthzDecision.IGNORE;
+            sendDecision(AuthzDecision.IGNORE, sink);
         } else {
             String targetResourcePath = configRule.getTargetResourceURI()!=null ? configRule.getTargetResourceURI() : reqCtxToAuthorize.resourcePath().toString();
 
-            try {
-                AuthzDecision decision = AuthzDecision.IGNORE;
-
-                // TODO: use async if possible and makes sense. Don't forget to remove BlockingResource in that case!
-                ResourceState resourceState = client.read(reqCtxToAuthorize, targetResourcePath);
-
-                // allowedUser check
-                if (configRule.getAllowedUserAttribute() != null) {
-                    Object usernameProperty = resourceState.getProperty(configRule.getAllowedUserAttribute());
-                    AuthzDecision usernameDecision = verifyProperty(usernameProperty, reqCtxToAuthorize.securityContext().getSubject());
-                    decision = decision.mergeDecision(usernameDecision);
-                }
-
-                // allowedRoles check
-                if (configRule.getAllowedRolesAttribute() != null) {
-                    Set<String> userRoles = reqCtxToAuthorize.securityContext().getRoles();
-                    Object roleProperty = resourceState.getProperty(configRule.getAllowedRolesAttribute());
-                    if (userRoles != null) {
-                        for (String userRole : userRoles) {
-                            AuthzDecision currentRoleDecision = verifyProperty(roleProperty, userRole);
-                            decision = decision.mergeDecision(currentRoleDecision);
-                        }
-                    }
-                }
-
-                // If rule exists, but neither allowedUser or allowedRoles passed, we will ignore (TODO: configurable? Or have some clever voter's based mechanism?)
-                /*if (decision == AuthzDecision.IGNORE) {
-                    decision = AuthzDecision.REJECT;
-                } */
-
-                return decision;
-            } catch (Exception e) {
-                log.warn("Error occured during aclPolicy authz check. Details: " + e.getMessage());
-                return AuthzDecision.IGNORE;
-            }
+            // Async call to retrieve target resource
+            client.read(reqCtxToAuthorize, targetResourcePath, (resourceResponse) -> {
+                authzCallback(reqCtxToAuthorize, resourceResponse, configRule, sink);
+            });
         }
     }
 
@@ -136,26 +100,71 @@ public class AclPolicyCheckResource implements Resource, BlockingResource {
         return wildcardRule;
     }
 
-    protected AuthzDecision verifyProperty(Object property, String expectedValue) {
-        if (property == null) {
+    protected void authzCallback(RequestContext reqCtxToAuthorize, ClientResourceResponse response, AclPolicyConfigRule configRule, PropertySink sink) {
+        ResourceState resourceState = response.state();
+        AuthzDecision decision = AuthzDecision.IGNORE;
+
+        if (response.responseType() != ClientResourceResponse.ResponseType.OK || resourceState == null) {
+            if (log.isTraceEnabled()) {
+                log.trace("Incorrect responseType or resourceState is null. responseType: " + response.responseType() + ", resourceState: " + resourceState);
+            }
+        } else {
+
+            // allowedUser check
+            if (configRule.getAllowedUserAttribute() != null) {
+                Object usernameProperty = resourceState.getProperty(configRule.getAllowedUserAttribute());
+                AuthzDecision usernameDecision = verifyProperty(usernameProperty, reqCtxToAuthorize.securityContext().getSubject());
+                decision = decision.mergeDecision(usernameDecision);
+            }
+
+            // allowedRoles check
+            if (configRule.getAllowedRolesAttribute() != null) {
+                Set<String> userRoles = reqCtxToAuthorize.securityContext().getRoles();
+                Object roleProperty = resourceState.getProperty(configRule.getAllowedRolesAttribute());
+                if (userRoles != null) {
+                    for (String userRole : userRoles) {
+                        AuthzDecision currentRoleDecision = verifyProperty(roleProperty, userRole);
+                        decision = decision.mergeDecision(currentRoleDecision);
+                    }
+                }
+            }
+        }
+
+        // If rule exists, but neither allowedUser or allowedRoles passed, we will ignore (TODO: configurable? Or have some clever voter's based mechanism?)
+        /*if (decision == AuthzDecision.IGNORE) {
+            decision = AuthzDecision.REJECT;
+        } */
+        try {
+            sendDecision(decision, sink);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected AuthzDecision verifyProperty(Object propertyValue, String expectedValue) {
+        if (propertyValue == null) {
             return AuthzDecision.IGNORE;
-        } else if (property instanceof String) {
-            String propValue = (String)property;
+        } else if (propertyValue instanceof String) {
+            String propValue = (String)propertyValue;
             if (propValue.equals(expectedValue)) {
                 return AuthzDecision.ACCEPT;
             }
-        } else if (property instanceof Iterable) {
-            Iterable<String> iterableValue = (Iterable<String>)property;
+        } else if (propertyValue instanceof Iterable) {
+            Iterable<String> iterableValue = (Iterable<String>)propertyValue;
             for (String propValue : iterableValue) {
                 if (propValue.equals(expectedValue)) {
                     return AuthzDecision.ACCEPT;
                 }
             }
         } else {
-            log.warn("Unsupported type of property: " + property);
+            log.warn("Unsupported type of property: " + propertyValue);
         }
 
         return AuthzDecision.IGNORE;
     }
 
+    protected void sendDecision(AuthzDecision decision, PropertySink sink) throws Exception {
+        sink.accept(AuthzConstants.ATTR_AUTHZ_POLICY_RESULT, decision.toString());
+        sink.close();
+    }
 }
