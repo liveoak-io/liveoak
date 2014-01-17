@@ -12,6 +12,7 @@
     </resources>
 
     <dependencies>
+        <module name="io.netty" />
         <module name="io.vertx" services="export" export="true"/>
         <module name="org.jboss.logging" export="true"/>
     </dependencies>
