@@ -1,0 +1,8 @@
+{
+    type: 'jboss-module',
+    module-id:   'io.liveoak.filesystem.aggregating',
+    class-name:  'io.liveoak.filesystem.aggregating.AggregatingFilesystemResource',
+    config: {
+        root: '${console.dir}'
+    }
+}
