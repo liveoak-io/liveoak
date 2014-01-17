@@ -14,9 +14,58 @@
     </parent>
     <properties>
         <module-name/>
+        <console.app.res>${project.basedir}/src/main/resources/</console.app.res>
+        <html.unit.version>2.13</html.unit.version>
+        <version.jasmine.plugin>1.3.1.3</version.jasmine.plugin>
     </properties>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>liveoak-console</artifactId>
     <name>liveoak-console</name>
     <packaging>pom</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.searls</groupId>
+                <artifactId>jasmine-maven-plugin</artifactId>
+                <version>${version.jasmine.plugin}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sourceforge.htmlunit</groupId>
+                        <artifactId>htmlunit</artifactId>
+                        <version>${html.unit.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <preloadSources>
+                        <source>${console.app.res}/app/lib/jquery/jquery-1.10.2.js</source>
+                        <source>${console.app.res}/app/lib/angular/angular.js</source>
+                        <source>${console.app.res}/app/lib/angular/angular-cookies.js</source>
+                        <source>${console.app.res}/app/lib/angular/angular-loader.js</source>
+                        <source>${console.app.res}/app/lib/angular/angular-resource.js</source>
+                        <source>${console.app.res}/app/lib/angular/angular-sanitize.js</source>
+                        <source>${console.app.res}/test/lib/angular/angular-mocks.js</source>
+                        <source>${console.app.res}/test/lib/liveoak/liveoak-mocks.js</source>
+                    </preloadSources>
+                    <jsSrcDir>${console.app.res}/app/js/</jsSrcDir>
+                    <sourceIncludes>
+                        <include>*.js</include>
+                        <include>controllers/*.js</include>
+                    </sourceIncludes>
+                    <jsTestSrcDir>${console.app.res}/test/unit</jsTestSrcDir>
+                    <specIncludes>
+                        <include>*Spec.js</include>
+                    </specIncludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
