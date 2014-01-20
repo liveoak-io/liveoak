@@ -42,6 +42,11 @@ public class GridFSBlobResource extends GridFSResource implements BlockingResour
     }
 
     @Override
+    public long contentLength() {
+        return fileInfo().getLong("length");
+    }
+
+    @Override
     public void readContent(RequestContext ctx, BinaryContentSink sink) throws Exception {
 
         GridFS gridfs = getUserspace().getGridFS();

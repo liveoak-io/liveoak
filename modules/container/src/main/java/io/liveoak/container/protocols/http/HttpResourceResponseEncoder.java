@@ -15,14 +15,23 @@ import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourceResponse;
+import io.liveoak.spi.resource.async.BinaryContentSink;
+import io.liveoak.spi.resource.async.BinaryResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.DefaultHttpContent;
+import io.netty.handler.codec.http.DefaultHttpResponse;
+import io.netty.handler.codec.http.DefaultLastHttpContent;
+import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.LastHttpContent;
 import org.jboss.logging.Logger;
 
 import java.util.List;
@@ -117,7 +126,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
                 break;
         }
 
-        DefaultFullHttpResponse response = null;
+        DefaultHttpResponse response = null;
         HttpResponseStatus responseStatus = null;
 
         EncodingResult encodingResult = null;
@@ -145,11 +154,41 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
         responseStatus = new HttpResponseStatus(responseStatusCode, responseMessage);
 
         if (encodingResult != null) {
-            ByteBuf content = encodingResult.encoded();
-            response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus, content);
-            response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes());
-            response.headers().add(HttpHeaders.Names.LOCATION, msg.resource().uri().toString());
-            response.headers().add(HttpHeaders.Names.CONTENT_TYPE, encodingResult.mediaType());
+
+            if (msg.resource() instanceof BinaryResource) {
+                BinaryResource bin = (BinaryResource) msg.resource();
+                response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, responseStatus);
+                response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, bin.contentLength());
+                response.headers().add(HttpHeaders.Names.LOCATION, msg.resource().uri().toString());
+                response.headers().add(HttpHeaders.Names.CONTENT_TYPE, bin.mediaType());
+
+                final HttpResponse res = response;
+                bin.readContent(msg.inReplyTo().requestContext(), new BinaryContentSink() {
+                    {
+                        ctx.writeAndFlush(res);
+                    }
+
+                    @Override
+                    public void close() {
+                        ctx.writeAndFlush(new DefaultLastHttpContent(Unpooled.EMPTY_BUFFER));
+                        ctx.fireUserEventTriggered( new RequestCompleteEvent( msg.requestId() ) );
+                    }
+
+                    @Override
+                    public void accept(ByteBuf byteBuf) {
+                        ctx.writeAndFlush(new DefaultHttpContent(byteBuf));
+                    }
+                });
+                return;
+
+            } else {
+                ByteBuf content = encodingResult.encoded();
+
+                response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus, content);
+                response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes());
+                response.headers().add(HttpHeaders.Names.LOCATION, msg.resource().uri().toString());
+                response.headers().add(HttpHeaders.Names.CONTENT_TYPE, encodingResult.mediaType());
+            }
         } else {
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus);
             response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);

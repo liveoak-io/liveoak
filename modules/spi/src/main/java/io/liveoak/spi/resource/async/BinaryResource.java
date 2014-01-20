@@ -23,6 +23,13 @@ public interface BinaryResource extends Resource {
     MediaType mediaType();
 
     /**
+     * Retreive the content length produced by readContent()
+     *
+     * @return Content length in bytes
+     */
+    long contentLength();
+
+    /**
      * Write the content of this object to the provided sink.
      *
      * @param sink The sink to stream content to.

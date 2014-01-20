@@ -55,6 +55,11 @@ public class FileResource implements FSResource, BinaryResource {
     }
 
     @Override
+    public long contentLength() {
+        return this.file.length();
+    }
+
+    @Override
     public String id() {
         return this.file.getName();
     }

@@ -39,6 +39,19 @@ public class GridFSDBObject {
         return val == null ? null : val.toString();
     }
 
+    public Long getLong(String name) {
+        Object val = obj.get(name);
+        if (val instanceof Number) {
+            return ((Number) val).longValue();
+        } else if (val instanceof String) {
+            return Long.parseLong((String) val);
+        } else if (val == null) {
+            return null;
+        } else {
+            throw new NumberFormatException("Not a Long (for key '" + name + "'): " + val);
+        }
+    }
+
     public boolean isTrue(String name) {
         Object val = obj.get(name);
         if (val == null) {
