@@ -27,7 +27,7 @@ angular.element(document).ready(function () {
             clientSecret: 'password',
             onload: 'login-required',
             success: function () {
-                module.factory('LiveOak', function () {
+                loMod.factory('LiveOak', function () {
                     return liveOak;
                 });
                 angular.bootstrap(document, ["loApp"]);
