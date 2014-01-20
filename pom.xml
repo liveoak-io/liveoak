@@ -86,6 +86,7 @@
         <module>modules</module>
         <module>vertx-test-tools</module>
         <module>vertx-modules</module>
+        <module>console</module>
         <module>dist</module>
     </modules>
     <developers>
