@@ -55,9 +55,7 @@ public class ResourceCodecManager {
             MediaType match = mediaTypeMatcher.findBestMatch(Collections.singletonList(((BinaryResource) resource).mediaType()));
 
             if (match != null) {
-                CompletableFuture<ByteBuf> future = new CompletableFuture<>();
-                ((BinaryResource) resource).readContent(ctx, new MyBinaryContentSink(future));
-                return new EncodingResult(match, future.get());
+                return new EncodingResult(match, null);
             } else {
                 throw new IncompatibleMediaTypeException(mediaTypeMatcher, (BinaryResource) resource);
             }
@@ -127,25 +125,4 @@ public class ResourceCodecManager {
             return "[CodecRegistration: mediaType=" + mediaType + ", codec=" + codec + "]";
         }
     }
-
-    private static class MyBinaryContentSink implements BinaryContentSink {
-
-        private ByteBuf buffer = Unpooled.buffer();
-        private CompletableFuture<ByteBuf> future;
-
-        MyBinaryContentSink(CompletableFuture<ByteBuf> future) {
-            this.future = future;
-        }
-
-        @Override
-        public void close() {
-            future.complete(this.buffer);
-        }
-
-        @Override
-        public void accept(ByteBuf byteBuf) {
-            buffer.writeBytes(byteBuf);
-        }
-    }
-
 }

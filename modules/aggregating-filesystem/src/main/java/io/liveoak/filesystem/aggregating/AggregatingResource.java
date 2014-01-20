@@ -12,13 +12,14 @@ import io.liveoak.spi.resource.async.BinaryContentSink;
 import io.liveoak.spi.resource.async.BinaryResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
+import org.jboss.logging.Logger;
 import org.vertx.java.core.buffer.Buffer;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Bob McWhirter
@@ -39,32 +40,56 @@ public class AggregatingResource implements BinaryResource {
     }
 
     @Override
-    public void readContent(RequestContext ctx, BinaryContentSink sink) {
-        File file = this.manifest.file();
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+    public long contentLength() {
+        List<File> files = getFilesList();
+        long total = 0;
+        for (File file: files) {
+            total += file.length();
+        }
+        return total;
+    }
 
-            String line = null;
 
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.equals("") || line.startsWith("//")) {
-                    continue;
+    private List<File> getFilesList() {
+        if (filesList == null) {
+            List<File> list = new LinkedList<>();
+
+            File file = this.manifest.file();
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    line = line.trim();
+                    if (line.equals("") || line.startsWith("//")) {
+                        continue;
+                    }
+                    if (line.startsWith("require")) {
+                        String rest = line.substring("require".length()).trim();
+                        File sub = new File(file.getParent(), rest);
+                        list.add(sub);
+                    }
                 }
-                if (line.startsWith("require")) {
-                    String rest = line.substring("require".length()).trim();
-                    File sub = new File(file.getParent(), rest);
-
-                    Buffer buffer = manifest.vertx().fileSystem().readFileSync(sub.getPath());
-                    sink.accept(buffer.getByteBuf());
-                }
+            } catch (Exception e) {
+                log.debug("Failed to parse aggregating resource file: " + file, e);
             }
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {
+        }
+
+        return filesList;
+    }
+
+    @Override
+    public void readContent(RequestContext ctx, BinaryContentSink sink) {
+        try {
+            for (File file: getFilesList()) {
+                Buffer buffer = manifest.vertx().fileSystem().readFileSync(file.getPath());
+                sink.accept(buffer.getByteBuf());
+            }
+        } catch (Exception e) {
+            log.debug("Failed to serve content: " + ctx.resourcePath(), e);
         } finally {
             sink.close();
         }
-
     }
 
     @Override
@@ -85,5 +110,7 @@ public class AggregatingResource implements BinaryResource {
     private Resource parent;
     private String id;
     private FileResource manifest;
+    private List<File> filesList;
 
+    private static final Logger log = Logger.getLogger(AggregatingResource.class);
 }
