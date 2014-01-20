@@ -21,12 +21,14 @@ public class MediaType {
     public static final MediaType TEXT = new MediaType("text/plain");
 
     public static final MediaType PNG = new MediaType("image/png");
-    public static final MediaType JPG = new MediaType("text/jpeg");
-    public static final MediaType GIF = new MediaType("text/gif");
+    public static final MediaType JPG = new MediaType("image/jpeg");
+    public static final MediaType GIF = new MediaType("image/gif");
+    public static final MediaType SVG = new MediaType("image/svg+xml");
 
     public static final MediaType JAVASCRIPT = new MediaType("application/javascript");
     public static final MediaType ECMASCRIPT = new MediaType("application/ecmascript");
     public static final MediaType CSS = new MediaType("text/css");
+    public static final MediaType LESS = new MediaType("text/css");
 
     public static final MediaType OCTET_STREAM = new MediaType("application/octet-stream");
     public static final MediaType PDF = new MediaType("application/pdf");
@@ -56,9 +58,11 @@ public class MediaType {
         registerExtensions(PNG, "png");
         registerExtensions(JPG, "jpg", "jpeg");
         registerExtensions(GIF, "gif");
+        registerExtensions(SVG, "svg");
 
         registerExtensions(JAVASCRIPT, "js");
         registerExtensions(CSS, "css");
+        registerExtensions(LESS, "less");
 
         registerExtensions(PDF, "pdf");
 
