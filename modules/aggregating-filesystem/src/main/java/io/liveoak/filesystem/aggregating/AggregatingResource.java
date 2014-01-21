@@ -73,6 +73,7 @@ public class AggregatingResource implements BinaryResource {
             } catch (Exception e) {
                 log.debug("Failed to parse aggregating resource file: " + file, e);
             }
+            filesList = list;
         }
 
         return filesList;
