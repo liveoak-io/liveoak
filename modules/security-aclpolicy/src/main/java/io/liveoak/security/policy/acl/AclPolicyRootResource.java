@@ -9,6 +9,7 @@ import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceContext;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
@@ -26,48 +27,27 @@ public class AclPolicyRootResource implements RootResource {
 
     private static final Logger log = Logger.getLogger(AclPolicyRootResource.class);
 
+    private Resource parent;
     private String id;
 
-    private final Map<String, Resource> childResources = new HashMap<>();
+    private AclPolicyCheckResource checkResource;
 
     private String configFile;
     private AclPolicyConfig policyConfig;
 
-    public AclPolicyRootResource(String id) {
+    public AclPolicyRootResource(String id, AclPolicyConfig policy, Client client) {
         this.id = id;
-    }
-
-    private void updateConfig(@ConfigProperty("policy-config") String configFile) throws Exception {
-        if (configFile == null && configFile != null) {
-            log.warn("No policy-config specified");
-        } else if (configFile != null && !configFile.equals(this.configFile)) {
-            File file = new File(configFile);
-            if (file.isFile()) {
-                ObjectMapper om = new ObjectMapper();
-                this.policyConfig = om.readValue(file, AclPolicyConfig.class);
-            } else {
-                log.warn(configFile + " not found");
-            }
-            this.configFile = configFile;
-        }
-    }
-
-    @ConfigMappingExporter
-    public void getConfigFile(HashMap<String, Object> config) {
-        config.put("policy-config", configFile);
+        this.checkResource = new AclPolicyCheckResource(this, AuthzConstants.AUTHZ_CHECK_RESOURCE_ID, policy, client);
     }
 
     @Override
-    public void initialize(ResourceContext context) throws InitializationException {
-        registerChildrenResources(context);
+    public void parent(Resource parent) {
+        this.parent = parent;
     }
 
-    protected void registerChildrenResources(ResourceContext context) {
-        this.childResources.put(AuthzConstants.AUTHZ_CHECK_RESOURCE_ID, new AclPolicyCheckResource(AuthzConstants.AUTHZ_CHECK_RESOURCE_ID, this, context.client()));
-    }
-
-    public AclPolicyConfig getPolicyConfig() {
-        return policyConfig;
+    @Override
+    public Resource parent() {
+        return this.parent;
     }
 
     @Override
@@ -77,25 +57,16 @@ public class AclPolicyRootResource implements RootResource {
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
-        try {
-            if (!this.childResources.containsKey(id)) {
-                responder.noSuchResource(id);
-                return;
-            }
-
-            responder.resourceRead(this.childResources.get(id));
-
-        } catch (Throwable t) {
-            responder.internalError(t.getMessage());
+        if (id.equals(this.checkResource.id())) {
+            responder.resourceRead(this.checkResource);
+        } else {
+            responder.noSuchResource(id);
         }
     }
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
-        this.childResources.values().forEach((e) -> {
-            sink.accept(e);
-        });
-
+        sink.accept(this.checkResource);
         sink.close();
     }
 }

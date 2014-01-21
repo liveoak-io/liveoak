@@ -5,16 +5,14 @@
  */
 package io.liveoak.container.protocols;
 
-import java.util.concurrent.Executor;
-
 import io.liveoak.common.codec.ResourceCodecManager;
+import io.liveoak.common.protocol.DebugHandler;
 import io.liveoak.container.ErrorHandler;
 import io.liveoak.container.ResourceHandler;
 import io.liveoak.container.ResourceStateHandler;
 import io.liveoak.container.auth.AuthHandler;
 import io.liveoak.container.auth.AuthzHandler;
-import io.liveoak.container.deploy.ConfigurationWatcher;
-import io.liveoak.container.deploy.DirectoryDeploymentManager;
+import io.liveoak.container.tenancy.GlobalContext;
 import io.liveoak.container.interceptor.InterceptorHandler;
 import io.liveoak.container.interceptor.InterceptorManager;
 import io.liveoak.container.protocols.http.HttpRequestBodyHandler;
@@ -26,7 +24,6 @@ import io.liveoak.container.protocols.websocket.WebSocketStompFrameDecoder;
 import io.liveoak.container.protocols.websocket.WebSocketStompFrameEncoder;
 import io.liveoak.container.subscriptions.ContainerStompServerContext;
 import io.liveoak.container.subscriptions.SubscriptionWatcher;
-import io.liveoak.spi.Container;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.stomp.common.StompFrameDecoder;
@@ -34,17 +31,13 @@ import io.liveoak.stomp.common.StompFrameEncoder;
 import io.liveoak.stomp.common.StompMessageDecoder;
 import io.liveoak.stomp.common.StompMessageEncoder;
 import io.liveoak.stomp.server.StompServerContext;
-import io.liveoak.stomp.server.protocol.ConnectHandler;
-import io.liveoak.stomp.server.protocol.DisconnectHandler;
-import io.liveoak.stomp.server.protocol.ReceiptHandler;
-import io.liveoak.stomp.server.protocol.SendHandler;
-import io.liveoak.stomp.server.protocol.StompErrorHandler;
-import io.liveoak.stomp.server.protocol.SubscribeHandler;
-import io.liveoak.stomp.server.protocol.UnsubscribeHandler;
+import io.liveoak.stomp.server.protocol.*;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
+
+import java.util.concurrent.Executor;
 
 /**
  * @author Bob McWhirter
@@ -60,6 +53,14 @@ public class PipelineConfigurator {
 
     public Client client() {
         return this.client;
+    }
+
+    public void globalContext(GlobalContext globalContext) {
+        this.globalContext = globalContext;
+    }
+
+    public GlobalContext globalContext() {
+        return this.globalContext;
     }
 
     public void codecManager(ResourceCodecManager codecManager) {
@@ -86,24 +87,8 @@ public class PipelineConfigurator {
         return this.workerPool;
     }
 
-    public void container(Container container) {
-        this.container = container;
-    }
-
-    public Container container() {
-        return this.container;
-    }
-
-    public void deploymentManager(DirectoryDeploymentManager deploymentManager) {
-        this.deploymentManager = deploymentManager;
-    }
-
-    public DirectoryDeploymentManager deploymentManager() {
-        return this.deploymentManager;
-    }
-
     public void interceptorManager(InterceptorManager interceptorManager) {
-        this.interceptorManager  = interceptorManager;
+        this.interceptorManager = interceptorManager;
     }
 
     public InterceptorManager interceptorManager() {
@@ -133,7 +118,7 @@ public class PipelineConfigurator {
         // handle messages
         pipeline.addLast(new SendHandler(serverContext));
         // catch errors, return an ERROR message.
-        pipeline.addLast(new StompErrorHandler() );
+        pipeline.addLast(new StompErrorHandler());
 
     }
 
@@ -169,52 +154,43 @@ public class PipelineConfigurator {
         // handle messages
         pipeline.addLast(new SendHandler(serverContext));
         // catch errors, return an ERROR message.
-        pipeline.addLast(new StompErrorHandler() );
+        pipeline.addLast(new StompErrorHandler());
     }
 
     public void switchToPlainHttp(ChannelPipeline pipeline) {
         // turn off automatic socket read for better http body read control
         pipeline.channel().config().setAutoRead(false);
         pipeline.remove(WebSocketHandshakerHandler.class);
-        pipeline.addLast("http-resourceRead-decoder", new HttpResourceRequestDecoder(this.codecManager));
-        pipeline.addLast("http-resourceRead-encoder", new HttpResourceResponseEncoder(this.codecManager));
-        pipeline.addLast("http-requestBody-handler", new HttpRequestBodyHandler());
+        pipeline.addLast("http-resource-decoder", new HttpResourceRequestDecoder(this.codecManager));
+        pipeline.addLast("http-resource-encoder", new HttpResourceResponseEncoder(this.codecManager));
+        pipeline.addLast("http-request-body-handler", new HttpRequestBodyHandler());
         pipeline.addLast("interceptor", new InterceptorHandler( this.interceptorManager ) );
 
-        if (container.hasResource("auth")) {
-            pipeline.addLast("auth-handler", new AuthHandler(this.client));
-        }
+        pipeline.addLast("auth-handler", new AuthHandler(this.client));
+        pipeline.addLast("authz-handler", new AuthzHandler(this.client));
 
-        if (container.hasResource("authz")) {
-            pipeline.addLast("authz-handler", new AuthzHandler(this.client));
-        }
-
-        if (this.deploymentManager != null) {
-            pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));
-        }
         pipeline.addLast("subscription-watcher", new SubscriptionWatcher(this.subscriptionManager));
-        pipeline.addLast("resource-state-handler", new ResourceStateHandler( this.container, this.workerPool));
-        pipeline.addLast("object-handler", new ResourceHandler(this.container, this.workerPool));
+        //pipeline.addLast( new DebugHandler( "server-debug" ) );
+        pipeline.addLast("resource-state-handler", new ResourceStateHandler(this.workerPool));
+        pipeline.addLast("object-handler", new ResourceHandler(this.globalContext, this.workerPool));
         pipeline.addLast("error-handler", new ErrorHandler());
     }
 
     public void setupLocal(ChannelPipeline pipeline) {
-        pipeline.addLast( new LocalResourceResponseEncoder( this.workerPool) );
-        pipeline.addLast("interceptor", new InterceptorHandler( this.interceptorManager ) );
+        //pipeline.addLast( new DebugHandler( "local-head" ) );
+        pipeline.addLast(new LocalResourceResponseEncoder(this.workerPool));
+        pipeline.addLast("interceptor", new InterceptorHandler(this.interceptorManager));
         pipeline.addLast(new SubscriptionWatcher(this.subscriptionManager));
-        if (this.deploymentManager != null) {
-            pipeline.addLast("configuration-watcher", new ConfigurationWatcher(this.deploymentManager));
-        }
-        pipeline.addLast(new ResourceStateHandler( this.container, this.workerPool));
-        pipeline.addLast(new ResourceHandler(this.container, this.workerPool));
+        pipeline.addLast(new ResourceStateHandler(this.workerPool));
+        pipeline.addLast(new ResourceHandler(this.globalContext, this.workerPool));
+        //pipeline.addLast( new DebugHandler( "local-tail" ) );
     }
 
     private Client client;
+    private GlobalContext globalContext;
     private ResourceCodecManager codecManager;
     private SubscriptionManager subscriptionManager;
-    private DirectoryDeploymentManager deploymentManager;
     private InterceptorManager interceptorManager;
     private Executor workerPool;
-    private Container container;
 
 }

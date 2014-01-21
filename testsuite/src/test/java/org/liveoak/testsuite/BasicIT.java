@@ -37,7 +37,7 @@ public class BasicIT {
 
     @Test
     public void testClientJS() throws Exception {
-        String js = getResource(client, new URL(url, "/client/liveoak.js"));
+        String js = getResource(client, new URL(url, "/liveoak/zero/client/liveoak.js"));
 
         Assert.assertTrue(js.contains("var LiveOak = function"));
         Assert.assertTrue(js.contains("var Keycloak = function"));

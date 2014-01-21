@@ -8,24 +8,24 @@ package io.liveoak.container;
 import java.util.concurrent.Executor;
 
 import io.liveoak.common.DefaultResourceRequest;
+import io.liveoak.container.tenancy.GlobalContext;
 import io.liveoak.container.traversal.TraversingResponder;
-import io.liveoak.spi.Container;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 public class ResourceHandler extends SimpleChannelInboundHandler<DefaultResourceRequest> {
 
-    public ResourceHandler(Container container, Executor workerPool) {
-        this.container = container;
+    public ResourceHandler(GlobalContext globalContext, Executor workerPool) {
+        this.globalContext = globalContext;
         this.workerPool = workerPool;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DefaultResourceRequest msg) throws Exception {
-        new TraversingResponder( this.workerPool, container, msg, ctx ).resourceRead(container);
+        new TraversingResponder( this.workerPool, this.globalContext, msg, ctx ).resourceRead(globalContext);
     }
 
-    private Container container;
+    private GlobalContext globalContext;
     private Executor workerPool;
 
 }

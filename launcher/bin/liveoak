@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 bindir=$(dirname $0)
-etcdir=$bindir/../etc
+liveoakdir=$bindir/../
 logdir=$bindir/../logs
 
 . $bindir/installation.conf
@@ -21,12 +21,12 @@ if [ "x$JAVA" = "x" ]; then
 fi
 
 $JAVA $JAVA_OPTS \
-  -Djs.client.dir=$js_client_dir \
+  -Dio.liveoak.js.dir=$js_client_dir \
   -Dcss.dir=$css_dir \
   -Dconsole.dir=$console_dir \
   -Dio.liveoak.log=$logdir \
-  -Dlogging.configuration=file:$etcdir/logging.properties \
+  -Dlogging.configuration=file:$liveoakdir/etc/logging.properties \
   $M2_REPO_CLAUSE \
   -jar $jboss_modules_jar \
   -modulepath $modulepath \
-  io.liveoak.bootstrap:main $etcdir $*
+  io.liveoak.bootstrap:main $liveoakdir $*

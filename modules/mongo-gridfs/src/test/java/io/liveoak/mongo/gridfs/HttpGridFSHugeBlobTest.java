@@ -14,6 +14,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -27,7 +28,7 @@ public class HttpGridFSHugeBlobTest extends AbstractGridFSTest {
 
     @Test
     public void testReadWriteHugeBlob() throws Exception {
-        HttpPut put = new HttpPut("http://localhost:8080/gridfs/john/vacation/mars_2038/beach.jpg");
+        HttpPut put = new HttpPut("http://localhost:8080/testOrg/testApp/gridfs/john/vacation/mars_2038/beach.jpg");
 
         put.setHeader(HttpHeaders.Names.CONTENT_TYPE, "image/jpeg");
         put.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
@@ -62,7 +63,7 @@ public class HttpGridFSHugeBlobTest extends AbstractGridFSTest {
             assertThat(resultEntity.getContentType().getValue()).isEqualTo(APPLICATION_JSON);
 
             // do some more assertions on the response
-            assertThat(json.getObject("self").getString("href")).startsWith("/gridfs/john/.files/");
+            assertThat(json.getObject("self").getString("href")).startsWith("/testOrg/testApp/gridfs/john/.files/");
             assertThat(json.getString("filename")).isEqualTo("beach.jpg");
             String blobId = json.getString("id");
             assertThat(blobId).isNotEqualTo("beach.jpg");
@@ -71,14 +72,14 @@ public class HttpGridFSHugeBlobTest extends AbstractGridFSTest {
             JsonArray links = json.getArray("links");
             assertThat(links).isNotNull();
             assertThat(links.size()).isEqualTo(3);
-            assertLink(links.get(0), "self", "/gridfs/john/vacation/mars_2038/beach.jpg;meta");
-            assertLink(links.get(1), "parent", "/gridfs/john/vacation/mars_2038");
-            assertLink(links.get(2), "blob", "/gridfs/john/vacation/mars_2038/beach.jpg");
+            assertLink(links.get(0), "self", "/testOrg/testApp/gridfs/john/vacation/mars_2038/beach.jpg;meta");
+            assertLink(links.get(1), "parent", "/testOrg/testApp/gridfs/john/vacation/mars_2038");
+            assertLink(links.get(2), "blob", "/testOrg/testApp/gridfs/john/vacation/mars_2038/beach.jpg");
 
 
 
             // now read the blob
-            HttpGet get = new HttpGet("http://localhost:8080/gridfs/john/vacation/mars_2038/beach.jpg");
+            HttpGet get = new HttpGet("http://localhost:8080/testOrg/testApp/gridfs/john/vacation/mars_2038/beach.jpg");
             get.setHeader(HttpHeaders.Names.ACCEPT, ALL);
 
             System.err.println("DO GET - " + get.getURI());

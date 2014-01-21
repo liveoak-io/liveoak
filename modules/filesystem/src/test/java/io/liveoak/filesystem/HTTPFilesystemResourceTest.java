@@ -6,7 +6,9 @@
 package io.liveoak.filesystem;
 
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.filesystem.extension.FilesystemExtension;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
 import org.apache.http.HttpEntity;
@@ -25,37 +27,22 @@ import static org.fest.assertions.Assertions.assertThat;
  */
 public class HTTPFilesystemResourceTest extends AbstractHTTPResourceTestCase {
 
+
     @Override
-    public RootResource createRootResource() {
-        return new FilesystemResource("files");
+    protected File applicationDirectory() {
+        return this.projectRoot;
     }
 
     @Override
-    public ResourceState createConfig() {
-        File dataDir = new File(this.projectRoot, "/target/test-data/one");
-        if (!dataDir.exists()) {
-            dataDir.mkdirs();
-        }
-
-        // create a file in there
-        try {
-            FileWriter out = new FileWriter(new File(dataDir, "file.txt"));
-            out.write("0123456789");
-            out.close();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create a test file: ", e);
-        }
-
-        ResourceState config = new DefaultResourceState();
-        config.putProperty("root", dataDir.getAbsolutePath());
-        return config;
+    public void loadExtensions() throws Exception {
+        loadExtension( "files", new FilesystemExtension());
     }
 
 
     @Test
     public void testEnumerateRoot() throws Exception {
 
-        HttpGet get = new HttpGet("http://localhost:8080/files");
+        HttpGet get = new HttpGet("http://localhost:8080/testOrg/testApp/files");
         get.addHeader("Accept", "application/json");
 
         try {
@@ -79,7 +66,7 @@ public class HTTPFilesystemResourceTest extends AbstractHTTPResourceTestCase {
 
     @Test
     public void testReadChild() throws Exception {
-        HttpGet get = new HttpGet("http://localhost:8080/files/file.txt");
+        HttpGet get = new HttpGet("http://localhost:8080/testOrg/testApp/files/test-file1.txt");
         get.addHeader("Accept", "text/*");
 
         try {

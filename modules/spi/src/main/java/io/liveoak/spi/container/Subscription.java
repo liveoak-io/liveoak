@@ -12,7 +12,7 @@ import io.liveoak.spi.resource.async.Resource;
 /**
  * @author Bob McWhirter
  */
-public interface Subscription extends Resource {
+public interface Subscription {
 
     String id();
 

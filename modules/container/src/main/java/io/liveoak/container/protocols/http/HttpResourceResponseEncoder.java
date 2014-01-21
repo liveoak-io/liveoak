@@ -165,7 +165,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
                 final HttpResponse res = response;
                 bin.readContent(msg.inReplyTo().requestContext(), new BinaryContentSink() {
                     {
-                        ctx.writeAndFlush(res);
+                        ctx.write(res);
                     }
 
                     @Override
@@ -176,7 +176,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
 
                     @Override
                     public void accept(ByteBuf byteBuf) {
-                        ctx.writeAndFlush(new DefaultHttpContent(byteBuf));
+                        ctx.write(new DefaultHttpContent(byteBuf));
                     }
                 });
                 return;

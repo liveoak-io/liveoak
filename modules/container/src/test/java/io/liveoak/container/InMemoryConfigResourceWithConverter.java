@@ -2,6 +2,7 @@ package io.liveoak.container;
 
 import java.io.File;
 
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.config.ConfigProperty;
 import io.liveoak.spi.resource.config.ConfigPropertyConverter;
 import io.liveoak.spi.resource.config.Configurable;
@@ -13,19 +14,32 @@ import io.liveoak.spi.resource.RootResource;
 @Configurable
 public class InMemoryConfigResourceWithConverter implements RootResource {
 
+    private Resource parent;
     String id;
+
+    @ConfigProperty(converter = FileConverter.class)
+    private File file;
 
     public InMemoryConfigResourceWithConverter(String id) {
         this.id = id;
     }
 
-    @ConfigProperty(converter = FileConverter.class)
-    private File file;
+
+    @Override
+    public void parent(Resource parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public Resource parent() {
+        return this.parent;
+    }
 
     @Override
     public String id() {
         return id;
     }
+
 
     public static class FileConverter implements ConfigPropertyConverter<File> {
         @Override

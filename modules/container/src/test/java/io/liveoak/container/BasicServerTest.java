@@ -5,7 +5,8 @@
  */
 package io.liveoak.container;
 
-import io.liveoak.spi.Container;
+import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.container.tenancy.InternalOrganization;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.container.Server;
 import io.liveoak.spi.state.ResourceState;
@@ -38,19 +39,23 @@ import static org.fest.assertions.Assertions.assertThat;
 public class BasicServerTest {
 
     private LiveOakSystem system;
-    private Container container;
     private Server server;
 
     protected CloseableHttpClient httpClient;
+    private InternalOrganization organization;
+    private InternalApplication application;
 
     @Before
     public void setUpServer() throws Exception {
         this.system = LiveOakFactory.create();
-        this.container = this.system.container();
-        InMemoryDBResource resource = new InMemoryDBResource("memory");
-        this.system.directDeployer().deploy( resource );
+        this.organization = this.system.organizationRegistry().createOrganization( "testOrg", "Test Organization" );
+        this.application = this.organization.createApplication( "testApp", "Test Application" );
 
-        this.server = this.system.networkServer("unsecure");
+        this.system.extensionInstaller().load( "memory", new InMemoryDBExtension() );
+
+        this.application.extend( "memory" );
+
+        this.system.awaitStability();
     }
 
     @Before
@@ -99,9 +104,10 @@ public class BasicServerTest {
         CountDownLatch subscriptionLatch = new CountDownLatch(1);
 
         stompClient.connect("localhost", 8080, (client) -> {
-            stompClient.subscribe("/memory/people/*", (subscription) -> {
+            stompClient.subscribe("/testOrg/testApp/memory/people/*", (subscription) -> {
                 subscription.onMessage((msg) -> {
-                    if (msg.headers().get("location").equals("/memory/people")) {
+                    System.err.println( "******* MESSAGE: "+ msg );
+                    if (msg.headers().get("location").equals("/testOrg/testApp/memory/people")) {
                         peopleCreationNotification.complete(msg);
                     } else {
                         bobCreationNotification.complete(msg);
@@ -124,7 +130,7 @@ public class BasicServerTest {
 
         System.err.println("TEST #1");
         // Root object should exist.
-        getRequest = new HttpGet("http://localhost:8080/memory");
+        getRequest = new HttpGet("http://localhost:8080/testOrg/testApp/memory");
         getRequest.addHeader(header);
 
         response = this.httpClient.execute(getRequest);
@@ -149,7 +155,7 @@ public class BasicServerTest {
         System.err.println("TEST #2");
         // people collection should not exist.
 
-        getRequest = new HttpGet("http://localhost:8080/memory/people");
+        getRequest = new HttpGet("http://localhost:8080/testOrg/testApp/memory/people");
 
         response = this.httpClient.execute(getRequest);
         assertThat(response).isNotNull();
@@ -160,7 +166,7 @@ public class BasicServerTest {
         System.err.println("TEST #3");
         // create people collection with direct PUT
 
-        putRequest = new HttpPut("http://localhost:8080/memory/people");
+        putRequest = new HttpPut("http://localhost:8080/testOrg/testApp/memory/people");
         putRequest.setEntity(new StringEntity("{ \"type\": \"collection\" }"));
         putRequest.setHeader("Content-Type", "application/json");
         response = this.httpClient.execute(putRequest);
@@ -173,7 +179,7 @@ public class BasicServerTest {
         System.err.println("TEST #4");
         // people collection should exist now.
 
-        getRequest = new HttpGet("http://localhost:8080/memory/people");
+        getRequest = new HttpGet("http://localhost:8080/testOrg/testApp/memory/people");
 
         response = this.httpClient.execute(getRequest);
         assertThat(response).isNotNull();
@@ -187,7 +193,7 @@ public class BasicServerTest {
         // people collection should be enumerable from the root
 
 
-        getRequest = new HttpGet("http://localhost:8080/memory?expand=members");
+        getRequest = new HttpGet("http://localhost:8080/testOrg/testApp/memory?expand=members");
         getRequest.addHeader(header);
 
         response = this.httpClient.execute(getRequest);
@@ -214,15 +220,15 @@ public class BasicServerTest {
         assertThat(state.members().size()).isEqualTo(1);
 
         ResourceState memoryCollection = state.members().get(0);
-        assertThat(memoryCollection.getProperty("id")).isEqualTo("people");
+        assertThat(memoryCollection.id()).isEqualTo("people");
 
         ResourceState selfObj = (ResourceState) memoryCollection.getProperty("self");
-        assertThat(selfObj.getProperty("href")).isEqualTo("/memory/people");
+        assertThat(selfObj.getProperty("href")).isEqualTo("/testOrg/testApp/memory/people");
 
         System.err.println("TEST #6");
         // Post a person
 
-        postRequest = new HttpPost("http://localhost:8080/memory/people");
+        postRequest = new HttpPost("http://localhost:8080/testOrg/testApp/memory/people");
         postRequest.setEntity(new StringEntity("{ \"name\": \"bob\" }"));
         postRequest.setHeader("Content-Type", "application/json");
 
@@ -234,7 +240,7 @@ public class BasicServerTest {
         assertThat(state).isNotNull();
         assertThat(state).isInstanceOf(ResourceState.class);
 
-        assertThat(state.getProperty("id")).isNotNull();
+        assertThat(state.id()).isNotNull();
         assertThat(state.getProperty("name")).isEqualTo("bob");
 
 

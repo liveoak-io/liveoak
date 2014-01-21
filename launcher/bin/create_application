@@ -1,0 +1,11 @@
+#!/bin/sh
+
+org_id=$1
+app_id=$2
+
+payload="{ id: '$app_id', name: '$app_id', dir: '$PWD' }"
+curl -X POST \
+  --header "Content-Type:application/json" \
+  http://localhost:8080/liveoak/zero/organizations/$org_id/applications \
+  --data "$payload"
+

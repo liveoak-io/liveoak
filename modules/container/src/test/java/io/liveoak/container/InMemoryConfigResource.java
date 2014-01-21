@@ -1,5 +1,6 @@
 package io.liveoak.container;
 
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.config.ConfigProperty;
 import io.liveoak.spi.resource.config.Configurable;
 import io.liveoak.spi.resource.RootResource;
@@ -10,6 +11,7 @@ import io.liveoak.spi.resource.RootResource;
 @Configurable
 public class InMemoryConfigResource implements RootResource {
 
+    private Resource parent;
     String id;
 
     public InMemoryConfigResource(String id) {
@@ -23,7 +25,18 @@ public class InMemoryConfigResource implements RootResource {
     private String path2;
 
     @Override
+    public Resource parent() {
+        return this.parent;
+    }
+
+    @Override
+    public void parent(Resource parent) {
+        this.parent = parent;
+    }
+
+    @Override
     public String id() {
         return id;
     }
+
 }

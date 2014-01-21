@@ -24,29 +24,24 @@ import java.util.Map;
  */
 public class URIPolicyRootResource implements RootResource {
 
+    private Resource parent;
     private String id;
-    private URIPolicy uriPolicy;
 
-    private final Map<String, Resource> childResources = new HashMap<>();
+    private final URIPolicyCheckResource policyCheckResource;
 
-    private URIPolicyConfigResource config = new URIPolicyConfigResource(this);
-
-    public URIPolicyRootResource(String id) {
+    public URIPolicyRootResource(String id, URIPolicy policy) {
         this.id = id;
+        this.policyCheckResource = new URIPolicyCheckResource(this, AuthzConstants.AUTHZ_CHECK_RESOURCE_ID, policy);
     }
 
     @Override
-    public void initialize(ResourceContext context) throws InitializationException {
-        registerChildrenResources();
-    }
-
-    protected void registerChildrenResources() {
-        this.childResources.put(AuthzConstants.AUTHZ_CHECK_RESOURCE_ID, new URIPolicyCheckResource(AuthzConstants.AUTHZ_CHECK_RESOURCE_ID, this));
+    public void parent(Resource parent) {
+        this.parent = parent;
     }
 
     @Override
-    public void destroy() {
-        // Nothing here for now
+    public Resource parent() {
+        return this.parent;
     }
 
     @Override
@@ -54,41 +49,19 @@ public class URIPolicyRootResource implements RootResource {
         return id;
     }
 
-    public URIPolicy getUriPolicy() {
-        return uriPolicy;
-    }
-
-    public void setUriPolicy(URIPolicy uriPolicy) {
-        this.uriPolicy = uriPolicy;
-    }
-
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
-        try {
-            if (!this.childResources.containsKey(id)) {
-                responder.noSuchResource(id);
-                return;
-            }
-
-            responder.resourceRead(this.childResources.get(id));
-
-        } catch (Throwable t) {
-            responder.internalError(t.getMessage());
+        if (id.equals(this.policyCheckResource.id())) {
+            responder.resourceRead(this.policyCheckResource);
+        } else {
+            responder.noSuchResource(id);
         }
     }
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
-        this.childResources.values().forEach((e) -> {
-            sink.accept(e);
-        });
-
+        sink.accept(this.policyCheckResource);
         sink.close();
-    }
-
-    @Override
-    public Resource configuration() {
-        return config;
     }
 
 }

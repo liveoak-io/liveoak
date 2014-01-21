@@ -1,6 +1,5 @@
 package io.liveoak.container;
 
-import io.liveoak.spi.Container;
 import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.async.Notifier;
@@ -11,8 +10,7 @@ import org.vertx.java.core.Vertx;
  */
 public class DefaultResourceContext implements ResourceContext {
 
-    public DefaultResourceContext(Container container, Client client, Vertx vertx, Notifier notifier) {
-        this.container = container;
+    public DefaultResourceContext(Client client, Vertx vertx, Notifier notifier) {
         this.client = client;
         this.vertx = vertx;
         this.notifier = notifier;
@@ -21,11 +19,6 @@ public class DefaultResourceContext implements ResourceContext {
     @Override
     public Vertx vertx() {
         return this.vertx;
-    }
-
-    @Override
-    public Container container() {
-        return this.container;
     }
 
     @Override
@@ -38,7 +31,6 @@ public class DefaultResourceContext implements ResourceContext {
         return this.client;
     }
 
-    private Container container;
     private Client client;
     private Vertx vertx;
     private Notifier notifier;

@@ -3,6 +3,7 @@ package io.liveoak.container;
 import java.util.HashMap;
 
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.config.ConfigMappingExporter;
 import io.liveoak.spi.resource.config.ConfigProperty;
 import io.liveoak.spi.resource.config.Configurable;
@@ -13,10 +14,21 @@ import io.liveoak.spi.resource.config.Configurable;
 @Configurable
 public class InMemoryConfigResourceMultiConvert implements RootResource {
 
+    private Resource parent;
     String id;
 
     public InMemoryConfigResourceMultiConvert(String id) {
         this.id = id;
+    }
+
+    @Override
+    public void parent(Resource parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public Resource parent() {
+        return this.parent;
     }
 
     private Thing thing;

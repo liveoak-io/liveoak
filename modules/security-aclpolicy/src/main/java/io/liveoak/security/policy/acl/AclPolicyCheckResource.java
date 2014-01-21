@@ -23,12 +23,14 @@ public class AclPolicyCheckResource implements Resource {
     private static final Logger log = Logger.getLogger(AclPolicyCheckResource.class);
 
     private final String id;
-    private final AclPolicyRootResource parent;
+    private final Resource parent;
+    private final AclPolicyConfig policy;
     private final Client client;
 
-    public AclPolicyCheckResource(String id, AclPolicyRootResource parent, Client client) {
+    public AclPolicyCheckResource(AclPolicyRootResource parent, String id, AclPolicyConfig policy, Client client) {
         this.id = id;
         this.parent = parent;
+        this.policy = policy;
         this.client = client;
     }
 
@@ -45,8 +47,7 @@ public class AclPolicyCheckResource implements Resource {
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         try {
-            AclPolicyConfig aclPolicyConfig = parent.getPolicyConfig();
-            if (aclPolicyConfig != null) {
+            if (this.policy != null) {
                 RequestContext reqCtxToAuthorize = ctx.requestAttributes() != null ? ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, RequestContext.class) : null;
 
                 if (reqCtxToAuthorize == null) {
@@ -55,7 +56,7 @@ public class AclPolicyCheckResource implements Resource {
                     }
                     sendDecision(AuthzDecision.REJECT, sink);
                 } else {
-                    checkAuthorized(reqCtxToAuthorize, aclPolicyConfig, sink);
+                    checkAuthorized(reqCtxToAuthorize, this.policy, sink);
                 }
             } else {
                 log.warn("Configuration not available. Ignoring");

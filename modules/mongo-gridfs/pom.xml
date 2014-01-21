@@ -111,7 +111,7 @@
             </activation>
             <properties>
                 <mongo.db>test</mongo.db>
-                <mongo.port>27019</mongo.port>
+                <mongo.port>27018</mongo.port>
                 <mongo.host>localhost</mongo.host>
             </properties>
             <build>

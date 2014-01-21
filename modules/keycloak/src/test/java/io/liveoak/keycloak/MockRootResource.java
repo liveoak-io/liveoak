@@ -3,6 +3,7 @@ package io.liveoak.keycloak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.async.Resource;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -13,6 +14,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class MockRootResource implements RootResource {
 
+    private Resource parent;
     private String id;
 
     private BlockingQueue<RequestContext> requests = new LinkedBlockingDeque<>();
@@ -24,6 +26,16 @@ public class MockRootResource implements RootResource {
     @Override
     public String id() {
         return id;
+    }
+
+    @Override
+    public Resource parent() {
+        return this.parent;
+    }
+
+    @Override
+    public void parent(Resource parent) {
+        this.parent = parent;
     }
 
     @Override

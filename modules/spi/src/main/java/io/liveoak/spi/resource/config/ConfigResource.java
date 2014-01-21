@@ -105,6 +105,7 @@ public interface ConfigResource extends Resource {
     }
 
     default void updateConfigProperties(RequestContext ctx, ResourceState state, Responder responder, Resource resource) throws Exception {
+        System.err.println( "UPDATE CONFIG" );
         for (Field field : getFields(resource.getClass(), ConfigProperty.class)) {
             ConfigProperty configProperty = field.getAnnotation(ConfigProperty.class);
 

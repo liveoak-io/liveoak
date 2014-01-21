@@ -17,6 +17,7 @@ import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
 
 import io.liveoak.spi.InitializationException;
+import com.mongodb.*;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceProcessingException;
@@ -30,6 +31,9 @@ import io.liveoak.spi.resource.config.ConfigProperty;
 import io.liveoak.spi.resource.config.Configurable;
 import io.liveoak.spi.state.ResourceState;
 
+import java.util.UUID;
+import java.util.stream.Stream;
+
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -37,59 +41,14 @@ import io.liveoak.spi.state.ResourceState;
 @Configurable
 public class RootMongoResource extends MongoResource implements RootResource {
 
-    private MongoClient mongo;
+    private Resource parent;
     protected DB db;
     private String id;
 
-    public RootMongoResource(String id) {
+    public RootMongoResource(String id, DB db) {
         super(null);
-        this.id = id;
-    }
-
-    private void updateConfig(@ConfigProperty("host") String host, @ConfigProperty("port") Integer port, @ConfigProperty("db") String dbName) throws Exception {
-
-        if (host == null) {
-            host = "localhost";
-        } else if (host.isEmpty()) {
-            throw new InitializationException("Configuration value for 'host' invalid. Requires a string value. Received : " + host);
-        }
-
-        if (port == null) {
-            port = 27017;
-        }
-
-        if (dbName == null || dbName.isEmpty()) {
-            throw new InitializationException("String configuration value required for 'db'");
-        }
-
-        MongoClient mongo = new MongoClient(host, port);
-        DB db = mongo.getDB(dbName);
-        if (db == null) {
-            throw new InitializationException("Unknown database " + dbName);
-        }
-
-        this.configure(mongo, db);
-    }
-
-    @ConfigMappingExporter
-    public void exportConfig(HashMap<String, Object> config) {
-        config.put("host", client().getAddress().getHost());
-        config.put("port", client().getAddress().getPort());
-        config.put("db", db().getName());
-    }
-
-    protected void configure(MongoClient mongo, DB db) {
-        MongoClient oldMongo = this.mongo;
-        this.mongo = mongo;
         this.db = db;
-
-        if (oldMongo != null) {
-            oldMongo.close();
-        }
-    }
-
-    MongoClient client() {
-        return this.mongo;
+        this.id = id;
     }
 
     DB db() {
@@ -98,19 +57,17 @@ public class RootMongoResource extends MongoResource implements RootResource {
 
     @Override
     public Resource parent() {
-        return null;
+        return this.parent;
+    }
+
+    @Override
+    public void parent(Resource parent) {
+        this.parent = parent;
     }
 
     @Override
     public String id() {
         return this.id;
-    }
-
-    @Override
-    public void destroy() {
-        if (mongo != null) {
-            mongo.close();
-        }
     }
 
     @Override
@@ -227,4 +184,5 @@ public class RootMongoResource extends MongoResource implements RootResource {
             throw new ResourceProcessingException("$DBRefs must be URL, they cannot be null.");
         }
     }
+
 }

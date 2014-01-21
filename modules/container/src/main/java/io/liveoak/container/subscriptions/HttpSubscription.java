@@ -21,8 +21,7 @@ import java.util.UUID;
  */
 public class HttpSubscription implements Subscription {
 
-    public HttpSubscription(DefaultSubscriptionManager subscriptionManager, HttpClient httpClient, String path, URI destination, ResourceCodec codec) {
-        this.subscriptionManager = subscriptionManager;
+    public HttpSubscription(HttpClient httpClient, String path, URI destination, ResourceCodec codec) {
         this.id = UUID.randomUUID().toString();
         this.httpClient = httpClient;
         this.resourcePath = new ResourcePath(path);
@@ -31,30 +30,12 @@ public class HttpSubscription implements Subscription {
     }
 
     @Override
-    public Resource parent() {
-        return this.subscriptionManager;
-    }
-
-    @Override
     public String id() {
         return this.id;
     }
 
-    // ----------------------------------------------------------------------
-    // ----------------------------------------------------------------------
-
-    @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("type", "http");
-        sink.accept("path", this.resourcePath.toString());
-        sink.accept("destination", this.destination.toString());
-        sink.close();
-    }
-
-    @Override
-    public void delete(RequestContext ctx, Responder responder) {
-        this.subscriptionManager.removeSubscription(this);
-        responder.resourceDeleted(this);
+    public URI destination() {
+        return this.destination;
     }
 
     // ----------------------------------------------------------------------
@@ -103,7 +84,6 @@ public class HttpSubscription implements Subscription {
         return uri;
     }
 
-    private DefaultSubscriptionManager subscriptionManager;
     private String id;
     private HttpClient httpClient;
     private ResourcePath resourcePath;

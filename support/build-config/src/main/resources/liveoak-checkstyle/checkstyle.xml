@@ -58,7 +58,7 @@
         <!-- Checks that classes that override equals() also override hashCode(). -->
         <!--<module name="EqualsHashCode"/>-->
 
-        <!-- Checks for illegal instantiations where a factory method is preferred -->
+        <!-- Checks for illegal instantiations where a extension method is preferred -->
         <module name="IllegalInstantiation"/>
 
         <!-- Checks for redundant exceptions declared in throws clause such as duplicates, unchecked exceptions or subclasses of

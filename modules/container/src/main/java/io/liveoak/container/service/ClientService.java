@@ -30,10 +30,5 @@ public class ClientService implements Service<DefaultClient> {
         return this.client;
     }
 
-    public Injector<LocalServer> serverInjector() {
-        return this.serverInjector;
-    }
-
     private DefaultClient client;
-    private InjectedValue<LocalServer> serverInjector = new InjectedValue<>();
 }

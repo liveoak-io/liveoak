@@ -7,6 +7,7 @@ package io.liveoak.container.auth;
 
 import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.common.DefaultSecurityContext;
+import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.ResourceErrorResponse;
@@ -50,10 +51,16 @@ public class AuthHandler extends SimpleChannelInboundHandler<ResourceRequest> {
         }
     }
 
+    private String getPrefix(ResourcePath path) {
+        String prefix = "/" + path.head().name() + "/" + path.subPath().head().name();
+        return prefix;
+    }
+
     private void initSecurityContext(final ChannelHandlerContext ctx, final ResourceRequest req, final DefaultSecurityContext securityContext, String token) {
         final RequestContext tokenRequestContext = new RequestContext.Builder().build();
+        String prefix = getPrefix( req.resourcePath() );
         try {
-            client.read(tokenRequestContext, "/auth/token-info/" + token, new Consumer<ClientResourceResponse>() {
+            client.read(tokenRequestContext, prefix + "/auth/token-info/" + token, new Consumer<ClientResourceResponse>() {
                 @Override
                 public void accept(ClientResourceResponse resourceResponse) {
                     try {
@@ -72,11 +79,13 @@ public class AuthHandler extends SimpleChannelInboundHandler<ResourceRequest> {
                             ctx.fireChannelRead(req);
                         }
                     } catch (Throwable t) {
+                        t.printStackTrace();
                         ctx.writeAndFlush(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
                     }
                 }
             });
         } catch (Throwable t) {
+            t.printStackTrace();
             ctx.writeAndFlush(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
         }
     }

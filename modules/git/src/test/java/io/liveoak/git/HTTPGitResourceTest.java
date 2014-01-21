@@ -5,8 +5,10 @@
  */
 package io.liveoak.git;
 
+import io.liveoak.git.extension.GitExtension;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
 import org.apache.http.HttpEntity;
@@ -22,27 +24,21 @@ import static org.fest.assertions.Assertions.assertThat;
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
 public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
+
     @Override
-    public RootResource createRootResource() {
-        return new GitRepoResource("git");
+    protected File applicationDirectory() {
+        return new File( this.projectRoot, "target/test-app" );
     }
 
     @Override
-    public ResourceState createConfig() {
-        File repoDir = new File(this.projectRoot, "/target/repo_http");
-        if (!repoDir.exists()) {
-            repoDir.mkdirs();
-        }
-
-        ResourceState config = super.createConfig();
-        config.putProperty("repoPath", repoDir.getAbsolutePath());
-        config.putProperty("createIfMissing", Boolean.TRUE );
-        return config;
+    public void loadExtensions() throws Exception {
+        new File( applicationDirectory(), "git" ).mkdirs();
+        loadExtension( "git", new GitExtension() );
     }
 
     @Test
     public void enumerateRoot() throws Exception {
-        HttpGet get = new HttpGet("http://localhost:8080/git");
+        HttpGet get = new HttpGet("http://localhost:8080/testOrg/testApp/git");
         get.addHeader("Accept", "application/json");
 
         try {
@@ -61,4 +57,5 @@ public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
             httpClient.close();
         }
     }
+
 }

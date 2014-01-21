@@ -24,8 +24,7 @@ import io.liveoak.stomp.server.StompConnection;
  */
 public class StompSubscription implements Subscription {
 
-    public StompSubscription(SubscriptionManager subscriptionManager, StompConnection connection, String destination, String subscriptionId, MediaType mediaType, ResourceCodec codec) {
-        this.subscriptionManager = subscriptionManager;
+    public StompSubscription(StompConnection connection, String destination, String subscriptionId, MediaType mediaType, ResourceCodec codec) {
         this.connection = connection;
         this.destination = destination;
         this.subscriptionId = subscriptionId;
@@ -34,27 +33,9 @@ public class StompSubscription implements Subscription {
         this.resourcePath = new ResourcePath(destination);
     }
 
-    @Override
-    public Resource parent() {
-        return this.subscriptionManager;
-    }
-
     public String id() {
         return this.connection.getConnectionId() + "-" + subscriptionId;
     }
-
-    // ----------------------------------------------------------------------
-    // ----------------------------------------------------------------------
-
-    @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("type", "stomp");
-        sink.accept("path", this.resourcePath.toString());
-        sink.accept("subscription-id", this.subscriptionId);
-        sink.accept("media-type", this.mediaType.toString());
-        sink.close();
-    }
-
 
     // ----------------------------------------------------------------------
     // ----------------------------------------------------------------------
@@ -93,7 +74,6 @@ public class StompSubscription implements Subscription {
         return message;
     }
 
-    private SubscriptionManager subscriptionManager;
     private StompConnection connection;
     private String destination;
     private String subscriptionId;

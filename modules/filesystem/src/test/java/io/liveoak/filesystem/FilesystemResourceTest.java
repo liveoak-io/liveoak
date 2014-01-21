@@ -5,12 +5,21 @@
  */
 package io.liveoak.filesystem;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.filesystem.extension.FilesystemExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.junit.Test;
+
+import java.io.File;
+import java.nio.charset.Charset;
+import java.util.concurrent.CountDownLatch;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -20,53 +29,28 @@ import static org.fest.assertions.Assertions.assertThat;
 public class FilesystemResourceTest extends AbstractResourceTestCase {
 
     @Override
-    public RootResource createRootResource() {
-        return new FilesystemResource("files");
+    protected File applicationDirectory() {
+        return this.projectRoot;
     }
 
     @Override
-    public ResourceState createConfig() {
-        ResourceState config = new DefaultResourceState();
-        config.putProperty("root", this.projectRoot.getAbsolutePath());
-        return config;
+    public void loadExtensions() throws Exception {
+        loadExtension("files", new FilesystemExtension());
     }
 
     @Test
     public void testRoot() throws Exception {
-        ResourceState result = client.read(new RequestContext.Builder().build(), "/files");
-
+        ResourceState result = client.read(new RequestContext.Builder().build(), "/testOrg/testApp/files");
         assertThat(result).isNotNull();
+        assertThat(result.members()).hasSize(1);
+        ResourceState file = result.members().get(0);
+        assertThat(file.id()).isEqualTo("test-file1.txt");
     }
 
     @Test
     public void testChild() throws Exception {
-        ResourceState result = client.read(new RequestContext.Builder().build(), "/files/pom.xml");
+        ResourceState result = client.read(new RequestContext.Builder().build(), "/testOrg/testApp/files/test-file1.txt");
         assertThat(result).isNotNull();
     }
-
-    /*
-    @Test
-    public void testEncoding() throws Exception {
-        ByteBuf output = Unpooled.buffer();
-        JsonEncoder encoder = new JsonEncoder();
-
-        JsonGenerator generator = encoder.createEncodingAttachment(output);
-
-        EncodingContext<JsonGenerator> context = new EncodingContext<JsonGenerator>(encoder, generator, this.resource);
-
-        System.err.println("ROOT CONTEXT: " + context);
-
-        CountDownLatch latch = new CountDownLatch(1);
-
-        context.encode(() -> {
-            latch.countDown();
-            return null;
-        });
-
-        latch.await();
-
-        System.err.println(output.toString(Charset.defaultCharset()));
-    }
-    */
 
 }

@@ -12,7 +12,6 @@ public class LiveOakJob implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         TriggerResource trigger = (TriggerResource) context.getMergedJobDataMap().get("resource");
-
         trigger.createFire(context);
     }
 }

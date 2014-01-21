@@ -11,7 +11,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.filesystem.aggregating.extension.AggregatingFilesystemExtension;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
 import org.apache.http.HttpEntity;
@@ -28,21 +30,20 @@ import static org.fest.assertions.Assertions.assertThat;
  */
 public class HTTPAggregatingFilesystemResourceTest extends AbstractHTTPResourceTestCase {
 
+
     @Override
-    public RootResource createRootResource() {
-        return new AggregatingFilesystemResource("aggr");
+    public void loadExtensions() throws Exception {
+        loadExtension( "aggr", new AggregatingFilesystemExtension() );
     }
 
     @Override
-    public ResourceState createConfig() {
-        ResourceState config = new DefaultResourceState();
-        config.putProperty("root", this.projectRoot.getAbsolutePath());
-        return config;
+    protected File applicationDirectory() {
+        return this.projectRoot;
     }
 
     @Before
     public void before() {
-        File dataDir = this.projectRoot;
+        File dataDir = new File( this.projectRoot, "aggr" );
 
         // create some files in there
         try {
@@ -65,15 +66,16 @@ public class HTTPAggregatingFilesystemResourceTest extends AbstractHTTPResourceT
 
     @After
     public void after() {
-        new File(this.projectRoot, "aggregate.js.aggr").delete();
-        new File(this.projectRoot, "first.js").delete();
-        new File(this.projectRoot, "second.js").delete();
+        File dataDir = new File( this.projectRoot, "aggr" );
+        new File(dataDir, "aggregate.js.aggr").delete();
+        new File(dataDir, "first.js").delete();
+        new File(dataDir, "second.js").delete();
     }
 
     @Test
     public void testReadAggregate() throws Exception {
 
-        HttpGet get = new HttpGet("http://localhost:8080/aggr/aggregate.js");
+        HttpGet get = new HttpGet("http://localhost:8080/testOrg/testApp/aggr/aggregate.js");
         get.addHeader("Accept", "*/*");
 
         try {

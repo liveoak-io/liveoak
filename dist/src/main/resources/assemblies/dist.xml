@@ -33,6 +33,8 @@
             <includes>
                 <include>liveoak</include>
                 <include>liveoak.bat</include>
+                <include>create_organization</include>
+                <include>create_application</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -42,6 +44,10 @@
         <fileSet>
             <directory>../launcher/etc</directory>
             <outputDirectory>/etc</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../launcher/conf</directory>
+            <outputDirectory>/conf</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>../launcher/target</directory>

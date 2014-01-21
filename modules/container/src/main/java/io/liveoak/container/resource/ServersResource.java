@@ -2,11 +2,10 @@ package io.liveoak.container.resource;
 
 import java.util.List;
 
-import io.liveoak.container.LiveOak;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.container.server.LocalServer;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.container.NetworkServer;
-import io.liveoak.spi.container.Server;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import org.jboss.msc.service.ServiceContainer;

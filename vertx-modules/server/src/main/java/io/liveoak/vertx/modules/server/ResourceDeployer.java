@@ -21,7 +21,7 @@ public class ResourceDeployer {
             if (action.equals("register")) {
                 String id = message.body().getString("id");
                 String resourceAddress = message.body().getString("address");
-                system.container().registerResource(new RootVertxCollectionResource(id, resourceAddress));
+                //system.container().registerResource(new RootVertxCollectionResource(id, resourceAddress));
             } else if (action.equals("unregister")) {
 
             } else {

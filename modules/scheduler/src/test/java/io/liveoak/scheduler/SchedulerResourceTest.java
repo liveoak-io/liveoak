@@ -2,8 +2,10 @@ package io.liveoak.scheduler;
 
 import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.scheduler.extension.SchedulerExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
 import org.junit.After;
@@ -15,14 +17,11 @@ import static org.fest.assertions.Assertions.assertThat;
  * @author Bob McWhirter
  */
 public class SchedulerResourceTest extends AbstractResourceTestCase {
-    @Override
-    public RootResource createRootResource() {
-        return new SchedulerResource("scheduler");
-    }
 
-    @After
-    public void stopScheduler() {
-        //this.resource.destroy();
+
+    @Override
+    public void loadExtensions() throws Exception {
+        loadExtension( "scheduler", new SchedulerExtension() );
     }
 
     @Test
@@ -32,7 +31,7 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
         ResourceState triggerState = new DefaultResourceState();
         triggerState.putProperty("cron", "* * * * * ?");
         System.err.println( "creating a trigger" );
-        ResourceState returnedState = client.create(requestContext, "/scheduler", triggerState);
+        ResourceState returnedState = client.create(requestContext, "/testOrg/testApp/scheduler", triggerState);
         System.err.println( "created a trigger: " + returnedState );
 
         String id = returnedState.id();
@@ -43,7 +42,7 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
 
         System.err.println( "Fetching firings" );
 
-        ResourceState fromCollection = client.read(requestContext, "/scheduler/" + id);
+        ResourceState fromCollection = client.read(requestContext, "/testOrg/testApp/scheduler/" + id);
 
         System.err.println( "Fetched: " + fromCollection );
 
@@ -54,5 +53,4 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
 
         assertThat(fromCollection.members().size()).isGreaterThanOrEqualTo(2);
     }
-
 }

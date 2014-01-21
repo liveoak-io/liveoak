@@ -5,9 +5,6 @@
  */
 package io.liveoak.mongo.gridfs;
 
-import java.io.ByteArrayOutputStream;
-import java.net.URLEncoder;
-
 import io.netty.handler.codec.http.HttpHeaders;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -15,9 +12,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
+
+import java.io.ByteArrayOutputStream;
+import java.net.URLEncoder;
+import java.util.Arrays;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -31,7 +33,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
     @Test
     public void testCreateReadBlob() throws Exception {
 
-        HttpPut put = new HttpPut("http://localhost:8080/gridfs/john/vacation/italy_2013/beach.jpg");
+        HttpPut put = new HttpPut("http://localhost:8080/testOrg/testApp/gridfs/john/vacation/italy_2013/beach.jpg");
         put.setHeader(HttpHeaders.Names.CONTENT_TYPE, BLOB_CONTENT_TYPE);
         put.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
@@ -64,7 +66,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
             assertThat(resultEntity.getContentType().getValue()).isEqualTo(APPLICATION_JSON);
 
             // do some more assertions on the response
-            assertThat(json.getObject("self").getString("href")).startsWith("/gridfs/john/.files/");
+            assertThat(json.getObject("self").getString("href")).startsWith("/testOrg/testApp/gridfs/john/.files/");
             assertThat(json.getString("filename")).isEqualTo("beach.jpg");
             String blobId = json.getString("id");
             assertThat(blobId).isNotEqualTo("beach.jpg");
@@ -73,14 +75,14 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
             JsonArray links = json.getArray("links");
             assertThat(links).isNotNull();
             assertThat(links.size()).isEqualTo(3);
-            assertLink(links.get(0), "self", "/gridfs/john/vacation/italy_2013/beach.jpg;meta");
-            assertLink(links.get(1), "parent", "/gridfs/john/vacation/italy_2013");
-            assertLink(links.get(2), "blob", "/gridfs/john/vacation/italy_2013/beach.jpg");
+            assertLink(links.get(0), "self", "/testOrg/testApp/gridfs/john/vacation/italy_2013/beach.jpg;meta");
+            assertLink(links.get(1), "parent", "/testOrg/testApp/gridfs/john/vacation/italy_2013");
+            assertLink(links.get(2), "blob", "/testOrg/testApp/gridfs/john/vacation/italy_2013/beach.jpg");
 
 
 
             // get blobs root for john
-            HttpGet get = new HttpGet("http://localhost:8080/gridfs/john/.files?fields=" + URLEncoder.encode("*(*(*))", "utf-8"));
+            HttpGet get = new HttpGet("http://localhost:8080/testOrg/testApp/gridfs/john/.files?fields=" + URLEncoder.encode("*(*(*))", "utf-8"));
             get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
             System.err.println("DO GET - " + get.getURI());
@@ -102,7 +104,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
             assertThat(resultEntity.getContentType().getValue()).isEqualTo(APPLICATION_JSON);
 
             // do some more assertions on the response
-            assertThat(json.getObject("self").getString("href")).isEqualTo("/gridfs/john/.files");
+            assertThat(json.getObject("self").getString("href")).isEqualTo("/testOrg/testApp/gridfs/john/.files");
             assertThat(json.getString("id")).isNotEqualTo(".blobs");
             assertThat(json.getBoolean("dir")).isEqualTo(true);
             // TODO add owner, and createDate
@@ -110,8 +112,8 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
             links = json.getArray("links");
             assertThat(links).isNotNull();
             assertThat(links.size()).isEqualTo(2);
-            assertLink(links.get(0), "self", "/gridfs/john/.files");
-            assertLink(links.get(1), "parent", "/gridfs/john");
+            assertLink(links.get(0), "self", "/testOrg/testApp/gridfs/john/.files");
+            assertLink(links.get(1), "parent", "/testOrg/testApp/gridfs/john");
 
             JsonArray members = json.getArray("_members");
             assertThat(members).isNotNull();
@@ -122,7 +124,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
 
 
             // get files root for john
-            get = new HttpGet("http://localhost:8080/gridfs/john/.files?fields=" + URLEncoder.encode("*(*(*))", "utf-8"));
+            get = new HttpGet("http://localhost:8080/testOrg/testApp/gridfs/john/.files?fields=" + URLEncoder.encode("*(*(*))", "utf-8"));
             get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
             System.err.println("DO GET - " + get.getURI());
@@ -141,7 +143,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
 
 
             // get gridfs root - it returns name and version
-            get = new HttpGet("http://localhost:8080/gridfs");
+            get = new HttpGet("http://localhost:8080/testOrg/testApp/gridfs");
             get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
             System.err.println("DO GET - " + get.getURI());
@@ -160,7 +162,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
 
 
             // get root root for john
-            get = new HttpGet("http://localhost:8080/gridfs/john?fields=" + URLEncoder.encode("*(*(*))", "utf-8"));
+            get = new HttpGet("http://localhost:8080/testOrg/testApp/gridfs/john?fields=" + URLEncoder.encode("*(*(*))", "utf-8"));
             get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
             System.err.println("DO GET - " + get.getURI());
@@ -179,7 +181,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
 
 
             // now read the blob
-            get = new HttpGet("http://localhost:8080/gridfs/john/vacation/italy_2013/beach.jpg");
+            get = new HttpGet("http://localhost:8080/testOrg/testApp/gridfs/john/vacation/italy_2013/beach.jpg");
             get.setHeader(HttpHeaders.Names.ACCEPT, ALL);
 
             System.err.println("DO GET - " + get.getURI());
@@ -217,7 +219,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
 
 
             // get file meta info directly
-            get = new HttpGet("http://localhost:8080/gridfs/john/vacation/italy_2013/beach.jpg;meta");
+            get = new HttpGet("http://localhost:8080/testOrg/testApp/gridfs/john/vacation/italy_2013/beach.jpg;meta");
             get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
             System.err.println("DO GET - " + get.getURI());
@@ -236,7 +238,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
 
 
             // get files in directory
-            get = new HttpGet("http://localhost:8080/gridfs/john/vacation/italy_2013");
+            get = new HttpGet("http://localhost:8080/testOrg/testApp/gridfs/john/vacation/italy_2013");
             get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
             System.err.println("DO GET - " + get.getURI());
@@ -255,7 +257,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
 
 
             // get expanded file infos of directory children
-            get = new HttpGet("http://localhost:8080/gridfs/john/vacation/italy_2013?fields=" + URLEncoder.encode("*(*(*))", "utf-8"));
+            get = new HttpGet("http://localhost:8080/testOrg/testApp/gridfs/john/vacation/italy_2013?fields=" + URLEncoder.encode("*(*(*))", "utf-8"));
             get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
             System.err.println("DO GET - " + get.getURI());
@@ -279,7 +281,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
         assertThat(item).isInstanceOf(JsonObject.class);
         JsonObject obj = (JsonObject) item;
         assertThat(obj.getString("id")).isEqualTo(id);
-        assertThat(obj.getObject("self").getString("href")).isEqualTo("/gridfs/john/.files/" + id);
+        assertThat(obj.getObject("self").getString("href")).isEqualTo("/testOrg/testApp/gridfs/john/.files/" + id);
         assertThat(obj.getString("filename")).isEqualTo("beach.jpg");
     }
 }

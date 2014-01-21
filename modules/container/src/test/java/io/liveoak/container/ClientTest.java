@@ -5,22 +5,20 @@
  */
 package io.liveoak.container;
 
-import java.util.List;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.spi.Container;
-import io.liveoak.spi.InitializationException;
+import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.container.tenancy.InternalApplicationExtension;
+import io.liveoak.container.tenancy.InternalOrganization;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.client.Client;
-import io.liveoak.spi.resource.BlockingResource;
-import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -30,21 +28,27 @@ import static org.fest.assertions.Assertions.assertThat;
 public class ClientTest {
 
     private LiveOakSystem system;
-    private Container container;
     private Client client;
+    private InternalOrganization organization;
+    private InternalApplication application;
 
 
     @Before
     public void setUp() throws Exception {
         this.system = LiveOakFactory.create();
-        this.container = this.system.container();
         this.client = this.system.client();
 
-        InMemoryDBResource db = new InMemoryDBResource("db");
+        this.organization = this.system.organizationRegistry().createOrganization( "testOrg", "Test Organization" );
+        this.application = this.organization.createApplication( "testApp", "Test Application" );
+
+        this.system.extensionInstaller().load( "db", new InMemoryDBExtension() );
+        this.application.extend( "db" );
+        this.system.awaitStability();
+
+        InMemoryDBResource db = (InMemoryDBResource) this.system.service( InMemoryDBExtension.resource( "testOrg", "testApp", "db") );
         db.addMember(new InMemoryCollectionResource(db, "people"));
         db.addMember(new InMemoryCollectionResource(db, "dogs"));
 
-        this.container.registerResource(db);
     }
 
     @After
@@ -58,7 +62,7 @@ public class ClientTest {
         ReturnFields fields = new ReturnFieldsImpl("*,members(*,members(*))");
 
         RequestContext requestContext = new RequestContext.Builder().returnFields(fields).build();
-        ResourceState result = this.client.read(requestContext, "/");
+        ResourceState result = this.client.read(requestContext, "/testOrg/testApp");
         assertThat(result).isNotNull();
 
         System.err.println("result: " + result);
@@ -86,12 +90,12 @@ public class ClientTest {
         ResourceState bob = new DefaultResourceState("bob");
         bob.putProperty("name", "Bob McWhirter");
 
-        ResourceState result = this.client.create(requestContext, "/db/people", bob);
+        ResourceState result = this.client.create(requestContext, "/testOrg/testApp/db/people", bob);
 
         assertThat(result).isNotNull();
         assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");
 
-        ResourceState people = this.client.read(requestContext, "/db/people");
+        ResourceState people = this.client.read(requestContext, "/testOrg/testApp/db/people");
 
         assertThat(people).isNotNull();
 
@@ -102,7 +106,7 @@ public class ClientTest {
         assertThat(foundBob.id()).isEqualTo("bob");
         assertThat(foundBob.getPropertyNames()).hasSize(0);
 
-        foundBob = this.client.read(requestContext, "/db/people/bob");
+        foundBob = this.client.read(requestContext, "/testOrg/testApp/db/people/bob");
 
         assertThat(foundBob).isNotNull();
         assertThat(foundBob.getProperty("name")).isEqualTo("Bob McWhirter");
@@ -114,23 +118,23 @@ public class ClientTest {
         ResourceState bob = new DefaultResourceState("bob");
         bob.putProperty("name", "Bob McWhirter");
 
-        ResourceState result = this.client.create(requestContext, "/db/people", bob);
+        ResourceState result = this.client.create(requestContext, "/testOrg/testApp/db/people", bob);
 
         assertThat(result).isNotNull();
         assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");
 
-        ResourceState foundBob = this.client.read(requestContext, "/db/people/bob");
+        ResourceState foundBob = this.client.read(requestContext, "/testOrg/testApp/db/people/bob");
         assertThat(foundBob).isNotNull();
         assertThat(foundBob.getProperty("name")).isEqualTo("Bob McWhirter");
 
         bob = new DefaultResourceState("bob");
         bob.putProperty("name", "Robert McWhirter");
 
-        result = this.client.update(requestContext, "/db/people/bob", bob);
+        result = this.client.update(requestContext, "/testOrg/testApp/db/people/bob", bob);
         assertThat(result).isNotNull();
         assertThat(result.getProperty("name")).isEqualTo("Robert McWhirter");
 
-        foundBob = this.client.read(requestContext, "/db/people/bob");
+        foundBob = this.client.read(requestContext, "/testOrg/testApp/db/people/bob");
         assertThat(foundBob).isNotNull();
         assertThat(foundBob.getProperty("name")).isEqualTo("Robert McWhirter");
     }
@@ -142,52 +146,21 @@ public class ClientTest {
         ResourceState bob = new DefaultResourceState("proxybob");
         bob.putProperty("name", "Bob McWhirter");
 
-        ResourceState createdBob = this.client.create(requestContext, "/db/people", bob);
+        ResourceState createdBob = this.client.create(requestContext, "/testOrg/testApp/db/people", bob);
 
         assertThat(createdBob).isNotNull();
 
-        RootResource proxy = new ProxyResource();
-        system.directDeployer().deploy(proxy);
+        this.system.extensionInstaller().load( "proxy", new ProxyExtension() );
+        InternalApplicationExtension ext = this.application.extend("proxy", JsonNodeFactory.instance.objectNode().put("blocking", false));
+        this.system.awaitStability();
 
-        ResourceState result = this.client.read(requestContext, "/proxy");
+        ResourceState result = this.client.read(requestContext, "/testOrg/testApp/proxy");
         assertThat(result.getPropertyNames()).contains("name");
         assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");
 
-        system.directDeployer().undeploy(proxy);
+        ext.remove();
     }
 
-
-
-    private static class ProxyResource implements RootResource {
-
-        private Client client;
-
-        @Override
-        public void initialize(ResourceContext context) throws InitializationException {
-            this.client = context.client();
-        }
-
-        @Override
-        public String id() {
-            return "proxy";
-        }
-
-        @Override
-        public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-            RequestContext requestContext = new RequestContext.Builder().build();
-            client.read(requestContext, "/db/people/proxybob", (r) -> {
-                ResourceState result = r.state();
-                for (String n : result.getPropertyNames()) {
-                    sink.accept(n, result.getProperty(n));
-                }
-                try {
-                    sink.close();
-                } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-            });
-        }
-    }
 
     @Test(timeout = 10000)
     public void testReadFromBlockingResource() throws Exception {
@@ -196,48 +169,24 @@ public class ClientTest {
         ResourceState bob = new DefaultResourceState("blockingproxybob");
         bob.putProperty("name", "Bob McWhirter");
 
-        ResourceState createdBob = this.client.create(requestContext, "/db/people", bob);
+        ResourceState createdBob = this.client.create(requestContext, "/testOrg/testApp/db/people", bob);
 
         assertThat(createdBob).isNotNull();
 
-        RootResource proxy = new BlockingProxyResource();
-        system.directDeployer().deploy(proxy);
+        System.err.println( "A" );
+        this.system.extensionInstaller().load( "proxy", new ProxyExtension() );
+        InternalApplicationExtension ext = this.application.extend("proxy", JsonNodeFactory.instance.objectNode().put("blocking", true));
+        this.system.awaitStability();
+        System.err.println( "B" );
 
-        ResourceState result = this.client.read(requestContext, "/proxy");
+        ResourceState result = this.client.read(requestContext, "/testOrg/testApp/proxy");
+        System.err.println( "C" );
         assertThat(result.getPropertyNames()).contains("name");
         assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");
 
-        system.directDeployer().undeploy(proxy);
+        ext.remove();
     }
 
-    private static class BlockingProxyResource implements RootResource, BlockingResource {
-
-        private Client client;
-
-        @Override
-        public void initialize(ResourceContext context) throws InitializationException {
-            this.client = context.client();
-        }
-
-        @Override
-        public String id() {
-            return "proxy";
-        }
-
-        @Override
-        public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-            RequestContext requestContext = new RequestContext.Builder().build();
-            ResourceState result = client.read(requestContext, "/db/people/blockingproxybob");
-            for (String n : result.getPropertyNames()) {
-                sink.accept(n, result.getProperty(n));
-            }
-            try {
-                sink.close();
-            } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
-    }
     /*
 
     @Test

@@ -32,6 +32,7 @@ var LiveOak = function( options ) {
         stomp_client.connect( callback );
     };
 
+    this.create = http.create;
     this.read = http.read;
     this.readMembers = http.readMembers;
     this.save = http.save;

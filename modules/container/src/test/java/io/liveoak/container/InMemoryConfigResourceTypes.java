@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URL;
 
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.config.ConfigProperty;
 import io.liveoak.spi.resource.config.Configurable;
 
@@ -19,6 +20,23 @@ public class InMemoryConfigResourceTypes implements RootResource {
     public InMemoryConfigResourceTypes(String id) {
         this.id = id;
     }
+
+    @Override
+    public String id() {
+        return id;
+    }
+
+    @Override
+    public void parent(Resource parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public Resource parent() {
+        return this.parent;
+    }
+
+    private Resource parent;
 
     @ConfigProperty
     private File file;
@@ -38,8 +56,6 @@ public class InMemoryConfigResourceTypes implements RootResource {
     @ConfigProperty
     private Integer integer;
 
-    @Override
-    public String id() {
-        return id;
-    }
+
+
 }

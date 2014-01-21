@@ -24,10 +24,12 @@ public class URIPolicyCheckResource implements Resource {
 
     private final String id;
     private final URIPolicyRootResource parent;
+    private final URIPolicy policy;
 
-    public URIPolicyCheckResource(String id, URIPolicyRootResource parent) {
+    public URIPolicyCheckResource(URIPolicyRootResource parent, String id, URIPolicy policy) {
         this.id = id;
         this.parent = parent;
+        this.policy = policy;
     }
 
     @Override
@@ -45,8 +47,7 @@ public class URIPolicyCheckResource implements Resource {
         AuthzDecision decision = null;
 
         try {
-            URIPolicy uriPolicy = parent.getUriPolicy();
-            if (uriPolicy != null) {
+            if (policy != null) {
                 RequestContext reqCtxToAuthorize = ctx.requestAttributes() != null ? ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, RequestContext.class) : null;
                 ResourceState reqResourceState = ctx.requestAttributes() != null ? ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, ResourceState.class) : null;
                 if (reqCtxToAuthorize == null) {
@@ -55,7 +56,7 @@ public class URIPolicyCheckResource implements Resource {
                     }
                     decision = AuthzDecision.REJECT;
                 } else {
-                    decision = uriPolicy.isAuthorized(reqCtxToAuthorize, reqResourceState);
+                    decision = policy.isAuthorized(reqCtxToAuthorize, reqResourceState);
                 }
             }
         } catch (Throwable t) {

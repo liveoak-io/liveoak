@@ -13,6 +13,7 @@ import io.liveoak.spi.resource.async.Responder;
  */
 public class MockResource implements RootResource {
 
+    private Resource parent;
     private String id;
 
     public MockResource(String id) {
@@ -22,6 +23,16 @@ public class MockResource implements RootResource {
     @Override
     public String id() {
         return id;
+    }
+
+    @Override
+    public void parent(Resource parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public Resource parent() {
+        return this.parent;
     }
 
     @Override

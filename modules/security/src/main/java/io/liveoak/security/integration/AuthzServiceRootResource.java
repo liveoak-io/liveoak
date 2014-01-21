@@ -2,9 +2,8 @@ package io.liveoak.security.integration;
 
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.security.spi.AuthzPolicyEntry;
-import io.liveoak.spi.InitializationException;
+import io.liveoak.security.spi.AuthzPolicyGroup;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -23,26 +22,29 @@ public class AuthzServiceRootResource implements RootResource {
 
     private static final Logger log = Logger.getLogger(AuthzServiceRootResource.class);
 
+    private Resource parent;
+
     private String id;
 
     private AuthzCheckResource authzCheckResource;
-    private AuthzServiceConfigResource configResource = new AuthzServiceConfigResource(this);
 
-    private Client client;
-
-    public AuthzServiceRootResource(String id) {
+    public AuthzServiceRootResource(String id, AuthzPolicyGroup policies, Client client) {
         this.id = id;
+        this.authzCheckResource = new AuthzCheckResource(this, AuthzConstants.AUTHZ_CHECK_RESOURCE_ID, policies, client);
+    }
+
+    public void policies(List<AuthzPolicyEntry> entries) {
+        this.authzCheckResource.policies(entries);
     }
 
     @Override
-    public void initialize(ResourceContext context) throws InitializationException {
-        client = context.client();
-        setPolicies(configResource.getPolicies());
+    public void parent(Resource parent) {
+        this.parent = parent;
     }
 
     @Override
-    public void destroy() {
-        // Nothing here for now
+    public Resource parent() {
+        return this.parent;
     }
 
     @Override
@@ -52,14 +54,10 @@ public class AuthzServiceRootResource implements RootResource {
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
-        try {
-            if (id.equals(AuthzConstants.AUTHZ_CHECK_RESOURCE_ID)) {
-                responder.resourceRead(authzCheckResource);
-            } else {
-                responder.noSuchResource(id);
-            }
-        } catch (Throwable t) {
-            responder.internalError(t.getMessage());
+        if (id.equals(this.authzCheckResource.id())) {
+            responder.resourceRead(authzCheckResource);
+        } else {
+            responder.noSuchResource(id);
         }
     }
 
@@ -67,18 +65,5 @@ public class AuthzServiceRootResource implements RootResource {
     public void readMembers(RequestContext ctx, ResourceSink sink) {
         sink.accept(authzCheckResource);
         sink.close();
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    @Override
-    public Resource configuration() {
-        return configResource;
-    }
-
-    public void setPolicies(List<AuthzPolicyEntry> policies) {
-        authzCheckResource = new AuthzCheckResource(AuthzConstants.AUTHZ_CHECK_RESOURCE_ID, policies, this);
     }
 }

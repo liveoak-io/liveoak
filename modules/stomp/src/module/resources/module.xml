@@ -13,6 +13,7 @@
 
     <dependencies>
         <module name="io.netty"/>
+        <module name="org.jboss.logging"/>
     </dependencies>
 
 </module>

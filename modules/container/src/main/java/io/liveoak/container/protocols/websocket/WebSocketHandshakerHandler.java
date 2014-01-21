@@ -31,42 +31,18 @@ public class WebSocketHandshakerHandler extends SimpleChannelInboundHandler<Obje
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-        /*
-        FullHttpRequest req = (FullHttpRequest) msg;
-        String upgrade = req.headers().get(HttpHeaders.Names.UPGRADE);
-        if (HttpHeaders.Values.WEBSOCKET.equalsIgnoreCase(upgrade)) {
-            WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(req.getUri(), null, false);
-            WebSocketServerHandshaker handshaker = wsFactory.newHandshaker(req);
-            if (handshaker == null) {
-                WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
-            } else {
-                ChannelFuture future = handshaker.handshake(ctx.channel(), req);
-                future.addListener(f -> {
-                    this.configurator.switchToWebSockets(ctx.pipeline());
-                });
-            }
-        } else {
-            ReferenceCountUtil.retain(msg);
-            this.configurator.switchToPlainHttp(ctx.pipeline());
-            ChannelHandlerContext agg = ctx.pipeline().context(HttpObjectAggregator.class);
-            agg.fireChannelRead(msg);
-        }
-        */
-
-        if (msg instanceof FullHttpRequest == false) {
+        if ( ! ( msg instanceof FullHttpRequest ) ) {
             DefaultHttpRequest req = (DefaultHttpRequest) msg;
             String upgrade = req.headers().get(HttpHeaders.Names.UPGRADE);
             if (HttpHeaders.Values.WEBSOCKET.equalsIgnoreCase(upgrade)) {
                 // ensure FullHttpRequest by installing HttpObjectAggregator in front of this handler
                 ReferenceCountUtil.retain(msg);
                 this.configurator.switchToWebSocketsHandshake(ctx.pipeline());
-                ChannelHandlerContext agg = ctx.pipeline().context(HttpObjectAggregator.class); // sensitive to handler order!
-                agg.fireChannelRead(msg);
+                ctx.pipeline().fireChannelRead( msg );
             } else {
                 ReferenceCountUtil.retain(msg);
                 this.configurator.switchToPlainHttp(ctx.pipeline());
-                ChannelHandlerContext agg = ctx.pipeline().context(HttpRequestDecoder.class); // sensitive to handler order!
-                agg.fireChannelRead(msg);
+                ctx.pipeline().fireChannelRead( msg );
             }
         } else {
             // do the handshake

@@ -185,6 +185,18 @@ public class MongoCollectionResource extends MongoResource {
         sink.close();
     }
 
+    @Override
+    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        if ( state.id().equals( this.id() ) ) {
+            if ( state.getPropertyNames().isEmpty() || state.getPropertyNames().size() == 1 && state.getPropertyNames().contains( "id" )) {
+                responder.resourceUpdated( this );
+                return;
+            }
+        }
+        responder.updateNotSupported( this );
+
+    }
+
     public DBObject getChild(String id) {
         DBCursor cursor = getDBCollection().find();
         return getDBCollection().findOne(getMongoID(id));

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+org_id=$1
+app_id=$2
+
+curl -X DELETE \
+  http://localhost:8080/liveoak/zero/organizations/$org_id/applications/$app_id 
+

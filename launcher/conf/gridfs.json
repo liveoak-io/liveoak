@@ -1,0 +1,7 @@
+{
+    module-id:  'io.liveoak.mongo-gridfs',
+    config: {
+        host: 'localhost',
+        port: 27017
+    }
+}

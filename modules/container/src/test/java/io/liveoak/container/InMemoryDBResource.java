@@ -8,6 +8,7 @@ package io.liveoak.container;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 
 public class InMemoryDBResource extends InMemoryCollectionResource implements RootResource {
 
@@ -16,11 +17,7 @@ public class InMemoryDBResource extends InMemoryCollectionResource implements Ro
     }
 
     @Override
-    public void initialize(ResourceContext context) throws InitializationException {
+    public void parent(Resource parent) {
+        this.parent = parent;
     }
-
-    @Override
-    public void destroy() {
-    }
-
 }

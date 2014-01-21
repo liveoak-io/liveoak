@@ -2,6 +2,8 @@ package io.liveoak.keycloak;
 
 import org.keycloak.jose.jws.JWSBuilder;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.KeycloakSessionFactory;
+import org.keycloak.models.RealmModel;
 import org.keycloak.representations.SkeletonKeyToken;
 import org.keycloak.util.JsonSerialization;
 
@@ -15,18 +17,11 @@ import java.util.concurrent.TimeUnit;
 public class TokenUtil {
 
     private String realm;
-
     private PrivateKey privateKey;
 
-    public TokenUtil(KeycloakRootResource keycloak) {
-        realm = keycloak.getRealm();
-
-        KeycloakSession session = keycloak.createSession();
-        try {
-            privateKey = session.getRealm(keycloak.getRealm()).getPrivateKey();
-        } finally {
-            session.close();
-        }
+    public TokenUtil(RealmModel realmModel) {
+        privateKey = realmModel.getPrivateKey();
+        realm = realmModel.getName();
     }
 
     public SkeletonKeyToken createToken() {
@@ -48,6 +43,10 @@ public class TokenUtil {
     public String toString(SkeletonKeyToken token) throws Exception {
         byte[] tokenBytes = JsonSerialization.writeValueAsBytes(token);
         return new JWSBuilder().content(tokenBytes).rsa256(privateKey);
+    }
+
+    public String realm() {
+        return this.realm;
     }
 
 

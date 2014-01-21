@@ -97,13 +97,14 @@
         <module>spi</module>
         <module>stomp</module>
         <module>container</module>
+
+        <module>zero</module>
         <module>mongo</module>
         <module>mongo-gridfs</module>
         <module>filesystem</module>
         <module>aggregating-filesystem</module>
         <module>scheduler</module>
         <module>git</module>
-        <module>vertx</module>
         <module>3rdparty</module>
         <module>keycloak</module>
         <module>security</module>

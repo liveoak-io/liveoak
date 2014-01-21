@@ -10,7 +10,7 @@
         <module name="io.liveoak.spi"/>
         <module name="org.keycloak" services="import">
             <imports>
-                <include path="META-INF**" />
+                <include path="META-INF/**" />
             </imports>
         </module>
         <module name="org.keycloak.social.google" services="import"/>

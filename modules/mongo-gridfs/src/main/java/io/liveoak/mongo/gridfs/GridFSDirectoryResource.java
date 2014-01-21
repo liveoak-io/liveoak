@@ -53,12 +53,20 @@ public class GridFSDirectoryResource extends GridFSResource {
 
         GridFSResourcePath childPath = path().append(id);
 
+        System.err.println( "read: " + childPath );
+
         if (childPath.equals(ctx.resourcePath())) {
+
+            System.err.println( "create target file: " + childPath );
             // there are no more intermediary segments - this is the last parent,
             // here we lookup / generate the target GridFS file
 
             LinkedList<ResourcePath.Segment> segments = new LinkedList(ctx.resourcePath().segments());
-            // skip root
+            // skip org
+            segments.removeFirst();
+            // skip app
+            segments.removeFirst();
+            // skip gridfsroot
             segments.removeFirst();
             // init meta
             boolean meta = segments.getLast().matrixParameters().containsKey("meta");
@@ -118,6 +126,7 @@ public class GridFSDirectoryResource extends GridFSResource {
             // pass-through segment
             responder.resourceRead(new GridFSDirectoryResource(ctx, this, id, childPath));
         }
+
     }
 
     @Override

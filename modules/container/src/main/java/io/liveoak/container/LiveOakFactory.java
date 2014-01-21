@@ -5,15 +5,7 @@
  */
 package io.liveoak.container;
 
-import java.io.File;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
-
 import io.liveoak.client.DefaultClient;
-import io.liveoak.common.codec.Encoder;
 import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.common.codec.ResourceDecoder;
@@ -21,56 +13,35 @@ import io.liveoak.common.codec.StateEncoder;
 import io.liveoak.common.codec.html.HTMLEncoder;
 import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.common.codec.json.JSONEncoder;
-import io.liveoak.container.deploy.DefaultDeployer;
-import io.liveoak.container.deploy.DirectDeployer;
-import io.liveoak.container.deploy.DirectoryDeploymentManager;
-import io.liveoak.container.deploy.factory.ClasspathBasedResourceFactory;
-import io.liveoak.container.deploy.factory.ModuleBasedResourceFactory;
+import io.liveoak.container.extension.CommonExtensions;
+import io.liveoak.container.extension.ExtensionInstaller;
+import io.liveoak.container.extension.ExtensionLoader;
 import io.liveoak.container.interceptor.InterceptorManager;
 import io.liveoak.container.interceptor.TimingInterceptor;
 import io.liveoak.container.protocols.PipelineConfigurator;
-import io.liveoak.container.server.LocalServer;
-import io.liveoak.container.service.ClientConnectorService;
-import io.liveoak.container.service.ClientService;
-import io.liveoak.container.service.CodecInstallationService;
-import io.liveoak.container.service.CodecManagerService;
-import io.liveoak.container.service.CodecService;
-import io.liveoak.container.service.ContainerService;
-import io.liveoak.container.service.DeployerService;
-import io.liveoak.container.service.DeploymentManagerService;
-import io.liveoak.container.service.DirectDeployerService;
-import io.liveoak.container.service.InterceptorRegistrationService;
-import io.liveoak.container.service.InternalResourceDeploymentService;
-import io.liveoak.container.service.LocalServerService;
-import io.liveoak.container.service.NotifierService;
-import io.liveoak.container.service.PipelineConfiguratorService;
-import io.liveoak.container.service.PlatformManagerService;
-import io.liveoak.container.service.RootResourceFactoryRegistrationService;
-import io.liveoak.container.service.SubscriptionManagerService;
-import io.liveoak.container.service.UnsecureServerService;
-import io.liveoak.container.service.VertxService;
-import io.liveoak.container.service.WorkerPoolService;
-import io.liveoak.spi.Container;
+import io.liveoak.container.service.*;
+import io.liveoak.container.tenancy.GlobalContext;
+import io.liveoak.container.tenancy.service.ApplicationsDirectoryService;
+import io.liveoak.container.tenancy.service.OrganizationRegistryService;
+import io.liveoak.container.zero.extension.ZeroExtension;
+import io.liveoak.container.zero.service.ZeroBootstrapper;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.client.Client;
-import io.liveoak.spi.container.Deployer;
-import io.liveoak.spi.container.RootResourceFactory;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.spi.container.interceptor.Interceptor;
-import io.liveoak.spi.resource.RootResource;
 import org.jboss.logging.Logger;
-import org.jboss.msc.service.AbstractServiceListener;
-import org.jboss.msc.service.ServiceBuilder;
-import org.jboss.msc.service.ServiceContainer;
-import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceName;
-import org.jboss.msc.service.ValueService;
+import org.jboss.msc.service.*;
 import org.jboss.msc.value.ImmediateValue;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.platform.PlatformManager;
-import sun.misc.Service;
 
-import static io.liveoak.container.LiveOak.*;
+import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.Executor;
+
+import static io.liveoak.spi.LiveOak.*;
 
 /**
  * Bootstrapping <code>main()</code> method.
@@ -82,33 +53,111 @@ public class LiveOakFactory {
     private static final Logger log = Logger.getLogger(LiveOakFactory.class);
 
     public static LiveOakSystem create() throws Exception {
-        return create(null, null);
+        return create(null, null, null);
     }
 
     public static LiveOakSystem create(Vertx vertx) throws Exception {
-        return create(null, vertx);
+        return create(null, null, vertx);
     }
 
-    public static LiveOakSystem create(File configDir) throws Exception {
-        return create(configDir, null);
+    public static LiveOakSystem create(File configDir, File applicationsDir) throws Exception {
+        return create(configDir, applicationsDir, null);
     }
 
-    public static LiveOakSystem create(File configDir, Vertx vertx) throws Exception {
-        ServiceContainer serviceContainer = ServiceContainer.Factory.create();
-        LiveOakSystem system = new LiveOakSystem(serviceContainer);
+    public static LiveOakSystem create(File configDir, File applicationsDir, Vertx vertx) throws Exception {
+        return new LiveOakFactory(configDir, applicationsDir, vertx).createInternal();
+    }
 
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+
+    private LiveOakFactory(File configDir, File applicationsDir, Vertx vertx) {
+        this.configDir = configDir;
+        this.appsDir = applicationsDir;
+        this.vertx = vertx;
+        this.serviceContainer = ServiceContainer.Factory.create();
         serviceContainer.addListener(new AbstractServiceListener<Object>() {
             @Override
             public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
                 if (transition.getAfter().equals(ServiceController.Substate.START_FAILED)) {
                     log.errorf(controller.getStartException(), "Unable to start service: %s", controller.getName());
+                    controller.getStartException().printStackTrace();
                 }
             }
         });
+    }
 
-        serviceContainer.addService(LIVEOAK, new ValueService<>(new ImmediateValue<>(system)))
+    public LiveOakSystem createInternal() throws Exception {
+        prolog();
+        createTenancy();
+        createServers();
+        createClient();
+        createExtensions();
+        createVertx();
+        installCodecs();
+        serviceContainer.awaitStability();
+        return (LiveOakSystem) serviceContainer.getService(LIVEOAK).awaitValue();
+    }
+
+    protected void prolog() {
+        LiveOakSystem system = new LiveOakSystem(serviceContainer);
+        serviceContainer.addService(LIVEOAK, new ValueService<LiveOakSystem>(new ImmediateValue<>(system)))
                 .install();
 
+        serviceContainer.addService(SERVICE_REGISTRY,
+                new ValueService<ServiceRegistry>(
+                        new ImmediateValue<>(serviceContainer)
+                ))
+                .install();
+
+        serviceContainer.addService(SERVICE_CONTAINER,
+                new ValueService<ServiceRegistry>(
+                        new ImmediateValue<>(serviceContainer)
+                ))
+                .install();
+
+    }
+
+    protected void createTenancy() {
+        serviceContainer.addService( APPLICATIONS_DIR, new ApplicationsDirectoryService( this.appsDir ) )
+                .install();
+
+        serviceContainer.addService(ORGANIZATION_REGISTRY, new OrganizationRegistryService())
+                .install();
+
+        Service<GlobalContext> globalContext = new ValueService<GlobalContext>(new ImmediateValue<>(new GlobalContext()));
+        serviceContainer.addService(GLOBAL_CONTEXT, globalContext)
+                .install();
+    }
+
+    protected void createExtensions() {
+        ExtensionInstaller installer = new ExtensionInstaller(serviceContainer, LiveOak.applicationResource("liveoak", "zero", "system"));
+        serviceContainer.addService(EXTENSION_INSTALLER,
+                new ValueService<ExtensionInstaller>(
+                        new ImmediateValue<>(installer)
+                ))
+                .install();
+
+        serviceContainer.addService(COMMON_EXTENSIONS,
+                new ValueService<CommonExtensions>(
+                        new ImmediateValue<>(installer.commonExtensions())
+                ))
+                .install();
+
+        ExtensionLoader extensionLoader = new ExtensionLoader(configDir);
+
+        serviceContainer.addService(EXTENSION_LOADER, extensionLoader)
+                .addDependency(EXTENSION_INSTALLER, ExtensionInstaller.class, extensionLoader.extensionInstallerInjector())
+                .install();
+
+        ZeroBootstrapper zero = new ZeroBootstrapper();
+
+        serviceContainer.addService( LiveOak.LIVEOAK.append( "zero", "bootstrapper" ), zero )
+                .addDependency(EXTENSION_INSTALLER, ExtensionInstaller.class, zero.extensionInstallerInjector() )
+                .install();
+    }
+
+    protected void createServers() throws UnknownHostException {
         UnsecureServerService unsecureServer = new UnsecureServerService();
         serviceContainer.addService(server("unsecure", true), unsecureServer)
                 .addDependency(PIPELINE_CONFIGURATOR, PipelineConfigurator.class, unsecureServer.pipelineConfiguratorInjector())
@@ -121,31 +170,10 @@ public class LiveOakFactory {
                 .addDependency(PIPELINE_CONFIGURATOR, PipelineConfigurator.class, localServer.pipelineConfiguratorInjector())
                 .install();
 
-        ClientService client = new ClientService();
-        serviceContainer.addService(CLIENT, client)
-                .install();
-
-        ClientConnectorService clientConnector = new ClientConnectorService();
-        serviceContainer.addService(CLIENT.append( "connect" ), clientConnector )
-                .addDependency( CLIENT, DefaultClient.class, clientConnector.clientInjector() )
-                .addDependency(server("local", false))
-                .install();
-
-        ContainerService container = new ContainerService();
-        ServiceBuilder<Container> containerBuilder = serviceContainer.addService(CONTAINER, container)
-                .addDependency(DEPLOYER, Deployer.class, container.deployerInjector());
-
-        if (configDir != null) {
-            containerBuilder.addDependency(DEPLOYMENT_MANAGER, DirectoryDeploymentManager.class, container.deploymentManagerInjector());
-        }
-
-        containerBuilder.install();
 
         SubscriptionManagerService subscriptionManager = new SubscriptionManagerService();
 
         serviceContainer.addService(SUBSCRIPTION_MANAGER, subscriptionManager)
-                .addDependency(CODEC_MANAGER, ResourceCodecManager.class, subscriptionManager.codecManagerInjector())
-                .addInjection(subscriptionManager.idInjector(), "subscriptions")
                 .install();
 
         ValueService<InterceptorManager> interceptorManager = new ValueService<>(new ImmediateValue<InterceptorManager>(new InterceptorManager()));
@@ -164,40 +192,34 @@ public class LiveOakFactory {
         ServiceBuilder<PipelineConfigurator> pipelineBuilder = serviceContainer.addService(PIPELINE_CONFIGURATOR, pipelineConfigurator)
                 .addDependency(SUBSCRIPTION_MANAGER, SubscriptionManager.class, pipelineConfigurator.subscriptionManagerInjector())
                 .addDependency(INTERCEPTOR_MANAGER, InterceptorManager.class, pipelineConfigurator.interceptorManagerInjector())
-                .addDependency(CONTAINER, Container.class, pipelineConfigurator.containerInjector())
                 .addDependency(CODEC_MANAGER, ResourceCodecManager.class, pipelineConfigurator.codecManagerInjector())
                 .addDependency(CLIENT, Client.class, pipelineConfigurator.clientInjector())
+                .addDependency(GLOBAL_CONTEXT, GlobalContext.class, pipelineConfigurator.globalContextInjector())
                 .addDependency(WORKER_POOL, Executor.class, pipelineConfigurator.workerPoolInjector());
-
-        if (configDir != null) {
-            pipelineBuilder.addDependency(DEPLOYMENT_MANAGER, DirectoryDeploymentManager.class, pipelineConfigurator.deploymentManagerInjector());
-        }
 
         pipelineBuilder.install();
 
-
-        DeployerService deployer = new DeployerService();
-        serviceContainer.addService(DEPLOYER, deployer)
-                .install();
-
-        DirectDeployerService directDeployer = new DirectDeployerService();
-        serviceContainer.addService(DIRECT_DEPLOYER, directDeployer)
-                .install();
 
         NotifierService notifier = new NotifierService();
         serviceContainer.addService(NOTIFIER, notifier)
                 .addDependency(SUBSCRIPTION_MANAGER, SubscriptionManager.class, notifier.subscriptionManagerInjector())
                 .install();
 
-        if (configDir != null) {
-            DeploymentManagerService deploymentManager = new DeploymentManagerService();
-            serviceContainer.addService(DEPLOYMENT_MANAGER, deploymentManager)
-                    .addDependency(DEPLOYER, Deployer.class, deploymentManager.deployerInjector())
-                    .addInjection(deploymentManager.directoryInjector(), new File(configDir, "resources"))
-                    .install();
-        }
+    }
 
+    protected void createClient() {
+        ClientService client = new ClientService();
+        serviceContainer.addService(CLIENT, client)
+                .install();
 
+        ClientConnectorService clientConnector = new ClientConnectorService();
+        serviceContainer.addService(CLIENT.append("connect"), clientConnector)
+                .addDependency(CLIENT, DefaultClient.class, clientConnector.clientInjector())
+                .addDependency(server("local", false))
+                .install();
+    }
+
+    protected void createVertx() {
         if (vertx == null) {
             VertxService vertxSvc = new VertxService();
             serviceContainer.addService(VERTX, vertxSvc)
@@ -207,31 +229,20 @@ public class LiveOakFactory {
             serviceContainer.addService(VERTX_PLATFORM_MANAGER, new PlatformManagerService())
                     .install();
         } else {
-            serviceContainer.addService(VERTX, new ValueService<>(new ImmediateValue<>(vertx)))
+            serviceContainer.addService(VERTX, new ValueService<Vertx>(new ImmediateValue<>(vertx)))
                     .install();
         }
+    }
 
-        // ----------------------------------------
-        // ----------------------------------------
 
+    protected void installCodecs() {
         installInterceptor(serviceContainer, "timing", new TimingInterceptor());
 
         installCodec(serviceContainer, MediaType.JSON, JSONEncoder.class, new JSONDecoder());
+
         installCodec(serviceContainer, MediaType.HTML, HTMLEncoder.class, null);
-
-        installRootResourceFactory(serviceContainer, new ClasspathBasedResourceFactory());
-        installRootResourceFactory(serviceContainer, new ModuleBasedResourceFactory());
-
-        installInternalResource(serviceContainer, LiveOak.SUBSCRIPTION_MANAGER);
-        installInternalResource(serviceContainer, LiveOak.LIVEOAK);
-
-        // ----------------------------------------
-        // ----------------------------------------
-
-        serviceContainer.awaitStability();
-
-        return system;
     }
+
 
     private static void installInterceptor(ServiceContainer serviceContainer, String name, Interceptor interceptor) {
         ServiceName serviceName = interceptor(name);
@@ -239,7 +250,7 @@ public class LiveOakFactory {
         ServiceController<Interceptor> controller = serviceContainer.addService(serviceName, new ValueService<Interceptor>(new ImmediateValue<Interceptor>(interceptor)))
                 .install();
 
-        installInterceptor( serviceContainer, controller );
+        installInterceptor(serviceContainer, controller);
     }
 
     private static void installInterceptor(ServiceContainer serviceContainer, ServiceController<Interceptor> interceptor) {
@@ -266,25 +277,9 @@ public class LiveOakFactory {
                 .install();
     }
 
-    static protected void installRootResourceFactory(ServiceContainer serviceContainer, RootResourceFactory factory) {
-        ServiceName name = rootResourceFactory(factory.type());
-        serviceContainer.addService(name, new ValueService<RootResourceFactory>(new ImmediateValue<RootResourceFactory>(factory)))
-                .install();
+    private final File configDir;
+    private final File appsDir;
+    private final Vertx vertx;
+    private final ServiceContainer serviceContainer;
 
-        RootResourceFactoryRegistrationService registration = new RootResourceFactoryRegistrationService();
-        serviceContainer.addService(name.append("register"), registration)
-                .addDependency(name, RootResourceFactory.class, registration.factoryInjector())
-                .addDependency(DEPLOYER, DefaultDeployer.class, registration.deployerInjector())
-                .install();
-
-    }
-
-    static protected void installInternalResource(ServiceContainer serviceContainer, ServiceName resource) {
-        InternalResourceDeploymentService service = new InternalResourceDeploymentService();
-
-        serviceContainer.addService(resource.append("deploy"), service)
-                .addDependency(resource, RootResource.class, service.resourceInjector())
-                .addDependency(DIRECT_DEPLOYER, DirectDeployer.class, service.deployerInjector())
-                .install();
-    }
 }

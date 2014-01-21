@@ -8,12 +8,9 @@ package io.liveoak.container.auth;
 import io.liveoak.common.DefaultRequestAttributes;
 import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.common.security.AuthzConstants;
+import io.liveoak.spi.*;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
-import io.liveoak.spi.ResourceErrorResponse;
-import io.liveoak.spi.ResourceRequest;
-import io.liveoak.spi.RequestAttributes;
-import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -33,8 +30,21 @@ public class AuthzHandler extends SimpleChannelInboundHandler<ResourceRequest> {
         this.client = client;
     }
 
+    private String getPrefix(ResourcePath path) {
+        if (path.segments().size() < 2) {
+            return null;
+        }
+        String prefix = "/" + path.head().name() + "/" + path.subPath().head().name();
+        return prefix;
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResourceRequest req) throws Exception {
+        String prefix = getPrefix(req.resourcePath());
+        if (prefix == null) {
+            ctx.fireChannelRead(req);
+            return;
+        }
         try {
             // Put current request as attribute of the request, which will be sent to AuthzService
             RequestAttributes attribs = new DefaultRequestAttributes();
@@ -42,9 +52,13 @@ public class AuthzHandler extends SimpleChannelInboundHandler<ResourceRequest> {
             attribs.setAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, req.state());
             RequestContext authzRequest = new RequestContext.Builder().requestAttributes(attribs).build();
 
-            client.read(authzRequest, "/authz/authzCheck", new Consumer<ClientResourceResponse>() {
+            client.read(authzRequest, prefix + "/authz/authzCheck", new Consumer<ClientResourceResponse>() {
                 @Override
                 public void accept(ClientResourceResponse resourceResponse) {
+                    if (resourceResponse.responseType() == ClientResourceResponse.ResponseType.NO_SUCH_RESOURCE) {
+                        ctx.fireChannelRead(req);
+                        return;
+                    }
                     try {
                         ResourceState state = resourceResponse.state();
 

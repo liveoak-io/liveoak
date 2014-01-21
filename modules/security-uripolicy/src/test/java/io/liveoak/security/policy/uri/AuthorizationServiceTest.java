@@ -5,6 +5,7 @@
  */
 package io.liveoak.security.policy.uri;
 
+import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourceParams;
@@ -14,12 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * TODO: Should be tested with integration tests
@@ -29,8 +25,9 @@ import java.util.Set;
 // TODO Fix
 @Ignore
 public class AuthorizationServiceTest {
+    /*
 
-    /*private static AuthzService service;
+    private static AuthzService service;
 
     @BeforeClass
     public static void initAuthorizationService() {
@@ -135,5 +132,6 @@ public class AuthorizationServiceTest {
             set.add(item);
         }
         return set;
-    }   */
+    }
+    */
 }

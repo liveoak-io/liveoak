@@ -1,20 +1,15 @@
 package io.liveoak.container.server;
 
-import java.net.SocketAddress;
-
-import io.liveoak.container.ResourceHandler;
-import io.liveoak.container.deploy.ConfigurationWatcher;
-import io.liveoak.container.subscriptions.SubscriptionWatcher;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalChannel;
-import io.netty.channel.local.LocalEventLoopGroup;
 import io.netty.channel.local.LocalServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
+
+import java.net.SocketAddress;
 
 /**
  * @author Bob McWhirter

@@ -9,7 +9,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.liveoak.common.DefaultResourceRequest;
-import io.liveoak.spi.Container;
+import io.liveoak.container.tenancy.GlobalContext;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -22,11 +22,10 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public class TraversingResponder extends BaseResponder {
 
-    public TraversingResponder(Executor executor, Container container, DefaultResourceRequest inReplyTo, ChannelHandlerContext ctx) {
+    public TraversingResponder(Executor executor, GlobalContext globalContext, DefaultResourceRequest inReplyTo, ChannelHandlerContext ctx) {
         super(inReplyTo, ctx);
         this.executor = executor;
-        this.currentResource = container;
-        this.container = container;
+        this.currentResource = globalContext;
         this.plan = new TraversalPlan(inReplyTo.requestType(), inReplyTo.resourcePath());
     }
 
@@ -52,11 +51,6 @@ public class TraversingResponder extends BaseResponder {
         AtomicReference<Runnable> ref = new AtomicReference<>();
 
         TraversalPlan.StepContext stepContext = new TraversalPlan.StepContext() {
-            @Override
-            public Container container() {
-                return TraversingResponder.this.container();
-            }
-
             @Override
             public RequestContext requestContext() {
                 return inReplyTo().requestContext();
@@ -120,10 +114,6 @@ public class TraversingResponder extends BaseResponder {
         return this.currentResource;
     }
 
-    protected Container container() {
-        return this.container;
-    }
-
     protected TraversalPlan.Step currentStep() {
         return this.plan.steps().get(this.stepNumber);
     }
@@ -158,5 +148,4 @@ public class TraversingResponder extends BaseResponder {
     private Executor executor;
 
     private Resource currentResource;
-    private Container container;
 }

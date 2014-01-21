@@ -7,6 +7,7 @@ package io.liveoak.spi;
 
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.async.Notifier;
+import io.liveoak.spi.resource.async.Resource;
 import org.vertx.java.core.Vertx;
 
 /**
@@ -28,9 +29,9 @@ public interface ResourceContext {
      *
      * @return The container.
      */
-    Container container();
 
     Notifier notifier();
 
     Client client();
+
 }

@@ -66,7 +66,7 @@ public class JSONDecoder implements ResourceDecoder {
 
         if (token == JsonToken.VALUE_STRING) {
             value = parser.getValueAsString();
-            if ( this.replaceProperties) {
+            if (this.replaceProperties) {
                 value = StringPropertyReplacer.replaceProperties(value.toString(), System.getProperties());
             }
             parser.nextToken();

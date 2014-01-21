@@ -89,7 +89,10 @@
         <module>vertx-modules</module>
         <module>console</module>
         <module>dist</module>
+<!--
+        TODO: re-enable
         <module>testsuite</module>
+-->
     </modules>
     <developers>
         <developer>
@@ -467,6 +470,11 @@
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>async-http-servlet-3.0</artifactId>
+                <version>${resteasy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-multipart-provider</artifactId>
                 <version>${resteasy.version}</version>
             </dependency>
             <dependency>

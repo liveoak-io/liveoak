@@ -20,7 +20,7 @@ import org.jboss.logging.Logger;
  */
 public class BaseResponder implements Responder {
 
-    private static String RESOURCE_READ_DECODER = "http-resourceRead-decoder";
+    private static String RESOURCE_READ_DECODER = "http-resource-decoder";
 
     private static Logger log = Logger.getLogger(BaseResponder.class);
 
@@ -141,6 +141,8 @@ public class BaseResponder implements Responder {
         ChannelHandlerContext context = this.ctx.pipeline().context(RESOURCE_READ_DECODER);
         HttpRequestBodyHandler.Invocation completion = new HttpRequestBodyHandler.Invocation(invocation);
         context.fireChannelRead(completion);
+        // signal we're ready to read some more.
+        context.read();
     }
 
     protected void resumeRead() {

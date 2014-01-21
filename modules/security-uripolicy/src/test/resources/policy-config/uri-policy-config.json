@@ -8,33 +8,33 @@
         },
         {
             "priority": 1,
-            "uriPattern": "/app/(.*)[.](html|css|js|png)",
+            "uriPattern": "/testOrg/testApp/app/(.*)[.](html|css|js|png)",
             "requestType": "READ",
             "allowedUsers": "'*'"
         },
         {
             "priority": 1,
-            "uriPattern": "/client/(.*)[.]js",
+            "uriPattern": "/testOrg/testApp/client/(.*)[.]js",
             "requestType": "READ",
             "allowedUsers": "'*'"
         },
         {
             "priority": 1,
-            "uriPattern": "/storage*",
+            "uriPattern": "/testOrg/testApp/storage*",
             "requestType": "READ",
             "queryParamsCondition": "parseJson($q).get('user') == $securityContext.subject",
             "allowedRoles": "'test-app/user'"
         },
         {
             "priority": 1,
-            "uriPattern": "/storage*",
+            "uriPattern": "/testOrg/testApp/storage*",
             "requestType": "CREATE",
             "queryParamsCondition": "$requestState.getProperty('user') ==  $securityContext.subject",
             "allowedRoles": "'test-app/user'"
         },
         {
             "priority": 1,
-            "uriPattern": "/storage*",
+            "uriPattern": "/testOrg/testApp/storage*",
             "requestType": "CREATE,UPDATE",
             "queryParamsCondition": "$requestState.getProperty('user') !=  $securityContext.subject",
             "deniedUsers": "'*'"

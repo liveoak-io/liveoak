@@ -38,7 +38,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
 
         ResourceState state = new DefaultResourceState();
         state.putProperty("foo", "bar");
-        ResourceState result = client.create(new RequestContext.Builder().build(), BASEPATH + "/" + methodName, state);
+        ResourceState result = client.create(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName, state);
 
         // verify response
         assertThat(result).isNotNull();
@@ -61,7 +61,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
 
         ResourceState state = new DefaultResourceState("helloworld");
         state.putProperty("foo", "bar");
-        ResourceState result = client.create(new RequestContext.Builder().build(), BASEPATH + "/" + methodName, state);
+        ResourceState result = client.create(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName, state);
 
         // verify response
         assertThat(result).isNotNull();
@@ -106,7 +106,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         state.putProperty("arr", arr);
 
         RequestContext requestContext = new RequestContext.Builder().build();// .returnFields(new ReturnFieldsImpl("*(arr(*(*)))")).build();
-        ResourceState result = client.create(requestContext, BASEPATH + "/" + methodName, state);
+        ResourceState result = client.create(requestContext, "/testOrg/testApp/" + BASEPATH + "/" + methodName, state);
 
         // verify the result
         assertThat(result).isNotNull();
@@ -179,7 +179,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         state.putProperty("arr", arr);
 
         RequestContext requestContext = new RequestContext.Builder().build();
-        ResourceState result = client.create(requestContext, BASEPATH + "/" + methodName, state);
+        ResourceState result = client.create(requestContext, "/testOrg/testApp/" + BASEPATH + "/" + methodName, state);
 
         // verify the result
         assertThat(result).isNotNull();
@@ -251,7 +251,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         obj.putProperty("subobject", subObj);
         state.putProperty("obj", obj);
 
-        ResourceState result = client.create(new RequestContext.Builder().build(), BASEPATH + "/" + methodName, state);
+        ResourceState result = client.create(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName, state);
 
         // verify the result
         assertThat(result).isNotNull();

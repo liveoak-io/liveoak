@@ -20,16 +20,21 @@ public class Bootstrap {
     private static final Logger log = Logger.getLogger("io.liveoak.bootstrap");
 
     public static void main(String... args) throws Exception {
+        File liveOakDir = null;
         File configDir = null;
+        File appsDir = null;
 
-        if ( args.length == 1 ) {
-            configDir = new File( args[0] );
+        if (args.length == 1) {
+            liveOakDir = new File(args[0]);
+            configDir = new File(liveOakDir, "conf");
+            appsDir = new File(liveOakDir, "apps");
         }
+
 
         log.info("Booting up LiveOak BaaS");
         long start = System.currentTimeMillis();
 
-        LiveOakFactory.create(configDir);
+        LiveOakFactory.create(configDir, appsDir);
 
         log.infof("LiveOak booted in %d ms", (System.currentTimeMillis() - start));
     }

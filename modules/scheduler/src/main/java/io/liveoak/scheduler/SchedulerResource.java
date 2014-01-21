@@ -1,17 +1,11 @@
 package io.liveoak.scheduler;
 
-import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.Notifier;
-import io.liveoak.spi.resource.async.PropertySink;
-import io.liveoak.spi.resource.async.ResourceSink;
-import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.resource.async.*;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,8 +16,20 @@ import java.util.UUID;
  */
 public class SchedulerResource implements RootResource {
 
-    public SchedulerResource(String id) {
+    public SchedulerResource(String id, Scheduler scheduler, Notifier notifier) {
         this.id = id;
+        this.scheduler = scheduler;
+        this.notifier = notifier;
+    }
+
+    @Override
+    public void parent(Resource parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public Resource parent() {
+        return this.parent;
     }
 
     @Override
@@ -33,28 +39,6 @@ public class SchedulerResource implements RootResource {
 
     public Scheduler scheduler() {
         return this.scheduler;
-    }
-
-    @Override
-    public void initialize(ResourceContext context) throws InitializationException {
-        try {
-            StdSchedulerFactory factory = new StdSchedulerFactory();
-            this.scheduler = factory.getScheduler();
-            this.scheduler.start();
-        } catch (SchedulerException e) {
-            throw new InitializationException(e);
-        }
-
-        this.notifier = context.notifier();
-    }
-
-    @Override
-    public void destroy() {
-        try {
-            this.scheduler.shutdown();
-        } catch (SchedulerException e) {
-            log.error("", e);
-        }
     }
 
     @Override
@@ -123,10 +107,12 @@ public class SchedulerResource implements RootResource {
         return this.notifier;
     }
 
+    private Resource parent;
     private String id;
     private Scheduler scheduler;
     private Map<String, TriggerResource> children = new HashMap<>();
     private Notifier notifier;
 
     private static final Logger log = Logger.getLogger(SchedulerResource.class);
+
 }

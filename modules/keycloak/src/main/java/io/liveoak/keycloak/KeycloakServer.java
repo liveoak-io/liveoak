@@ -31,7 +31,7 @@ import static io.undertow.servlet.Servlets.servlet;
  */
 public class KeycloakServer {
 
-    private UndertowServer undertow;
+    private final UndertowServer undertow;
 
     private KeycloakSessionFactory factory;
 
@@ -72,7 +72,7 @@ public class KeycloakServer {
         DeploymentInfo deploymentInfo = new DeploymentInfo();
 
         deploymentInfo.setClassLoader(getClass().getClassLoader());
-        deploymentInfo.setContextPath("/auth");
+        deploymentInfo.setContextPath("/auth" );
         deploymentInfo.setDeploymentName("Keycloak");
         deploymentInfo.setResourceManager(new KeycloakResourceManager());
 
@@ -83,7 +83,7 @@ public class KeycloakServer {
                 .setAsyncSupported(true)
                 .setLoadOnStartup(1)
                 .addMapping("/rest/*");
-        resteasyServlet.addInitParam("resteasy.servlet.mapping.prefix", "/rest");
+        resteasyServlet.addInitParam("resteasy.servlet.mapping.prefix", "/rest" );
 
         deploymentInfo.addServletContextAttribute(ResteasyDeployment.class.getName(), deployment);
         deploymentInfo.addServlet(resteasyServlet);
@@ -107,7 +107,10 @@ public class KeycloakServer {
     public static class KeycloakResourceManager implements ResourceManager {
         @Override
         public Resource getResource(String path) throws IOException {
+            System.err.println( "GET RESOURCE: " + path );
             String realPath = "META-INF/resources" + path;
+            System.err.println( "REAL PATH: " + realPath );
+            System.err.println( "CL: " + getClass().getClassLoader() );
             URL url = getClass().getClassLoader().getResource(realPath);
             return new URLResource(url, url.openConnection(), path);
         }

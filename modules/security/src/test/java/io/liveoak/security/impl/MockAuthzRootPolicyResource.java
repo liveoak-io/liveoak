@@ -5,6 +5,7 @@ import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.async.Resource;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -15,12 +16,23 @@ import java.util.concurrent.TimeUnit;
  */
 public class MockAuthzRootPolicyResource implements RootResource {
 
+    private Resource parent;
     private String id;
     private BlockingQueue<RequestContext> requests = new LinkedBlockingDeque<>();
     private AuthzDecision authzDecision = AuthzDecision.IGNORE;
 
     public MockAuthzRootPolicyResource(String id) {
         this.id = id;
+    }
+
+    @Override
+    public void parent(Resource parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public Resource parent() {
+        return this.parent;
     }
 
     @Override

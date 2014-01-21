@@ -9,12 +9,14 @@ import java.io.File;
 import java.util.HashMap;
 
 import io.liveoak.spi.InitializationException;
-import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.config.ConfigMappingExporter;
 import io.liveoak.spi.resource.config.ConfigProperty;
 import io.liveoak.spi.resource.config.Configurable;
 import org.vertx.java.core.Vertx;
+
+import java.io.File;
 
 /**
  * @author Bob McWhirter
@@ -22,9 +24,21 @@ import org.vertx.java.core.Vertx;
 @Configurable
 public class FilesystemResource extends DirectoryResource implements RootResource, FSResource {
 
-    public FilesystemResource(String id) {
+    public FilesystemResource(String id, File root, Vertx vertx) {
         super(null, null);
         this.id = id;
+        this.vertx = vertx;
+        file( root );
+    }
+
+    @Override
+    public Resource parent() {
+        return this.parent;
+    }
+
+    @Override
+    public void parent(Resource parent) {
+        this.parent = parent;
     }
 
     @Override
@@ -33,38 +47,15 @@ public class FilesystemResource extends DirectoryResource implements RootResourc
     }
 
     @Override
-    public void initialize(ResourceContext context) throws InitializationException {
-        this.vertx = context.vertx();
-    }
-
-    @Override
     public String id() {
         return this.id;
-    }
-
-    private void updateConfig(@ConfigProperty("root") String rootStr) throws Exception {
-        if (rootStr == null) {
-            throw new InitializationException("no filesystem root specified");
-        }
-
-        File file = new File(rootStr);
-
-        if (!file.canRead()) {
-            throw new InitializationException("unable to readMember filesystem at: " + file.getAbsolutePath());
-        }
-
-        this.file(file);
-    }
-
-    @ConfigMappingExporter
-    public void exportConfig(HashMap<String, Object> config) throws Exception {
-        config.put("root", this.file().getAbsolutePath());
     }
 
     public String toString() {
         return "[FilesystemResource: root=" + this.file.getAbsolutePath() + "]";
     }
 
+    private Resource parent;
     private String id;
     private Vertx vertx;
 

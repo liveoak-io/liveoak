@@ -23,19 +23,25 @@ public interface RootResource extends Resource {
      * @throws io.liveoak.spi.InitializationException
      *          If an error occurs.
      */
-    default void initialize(ResourceContext context) throws InitializationException {
+    //default void initialize(ResourceContext context) throws InitializationException {
 
-    }
+    //}
 
     /**
      * Free resources used by the resource and shutdown.
      */
-    default void destroy() {
+    //default void destroy() {
+//
+    //}
 
-    }
 
+    //default Resource parent() {
+        //return null;
+    //}
 
-    default Resource parent() {
-        return null;
-    }
+    /** Called when the resource gets mounted.
+     *
+     * @param parent The mount-point parent.
+     */
+    void parent(Resource parent);
 }

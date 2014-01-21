@@ -1,22 +1,18 @@
 package io.liveoak.container.service;
 
-import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.subscriptions.DefaultSubscriptionManager;
-import io.liveoak.spi.container.SubscriptionManager;
-import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.jboss.msc.value.InjectedValue;
 
 /**
  * @author Bob McWhirter
  */
-public class SubscriptionManagerService implements Service<SubscriptionManager> {
+public class SubscriptionManagerService implements Service<DefaultSubscriptionManager> {
     @Override
     public void start(StartContext context) throws StartException {
-        this.subscriptionManager = new DefaultSubscriptionManager( this.idInjector.getValue(), this.codecManagerInjector.getValue() );
+        this.subscriptionManager = new DefaultSubscriptionManager();
     }
 
     @Override
@@ -25,20 +21,10 @@ public class SubscriptionManagerService implements Service<SubscriptionManager> 
     }
 
     @Override
-    public SubscriptionManager getValue() throws IllegalStateException, IllegalArgumentException {
+    public DefaultSubscriptionManager getValue() throws IllegalStateException, IllegalArgumentException {
         return this.subscriptionManager;
     }
 
-    public Injector<ResourceCodecManager> codecManagerInjector() {
-        return this.codecManagerInjector;
-    }
+    private DefaultSubscriptionManager subscriptionManager;
 
-    public Injector<String> idInjector() {
-        return this.idInjector;
-    }
-
-    private SubscriptionManager subscriptionManager;
-
-    private InjectedValue<String> idInjector = new InjectedValue<>();
-    private InjectedValue<ResourceCodecManager> codecManagerInjector = new InjectedValue<>();
 }

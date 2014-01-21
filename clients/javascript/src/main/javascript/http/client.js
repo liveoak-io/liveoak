@@ -6,6 +6,22 @@ var Http = function (options) {
         baseUrl += ':' + options.port;
     }
 
+    this.create = function (path, data, options) {
+        var url;
+        var method;
+
+        if ( typeof( data.id ) === 'undefined' ) {
+          url = createUrl( path, {} );
+          method = 'POST';
+        } else {
+          url = createUrl( path + '/' + data.id, {} );
+          method = 'PUT';
+        }
+        request(method, url, data, function (data) {
+            options.success(data);
+        }, options.error);
+    }
+
     this.read = function (path, options) {
         var url = createUrl(path, { query: options.query });
         request('GET', url, null, function (data) {

@@ -5,15 +5,16 @@
  */
 package io.liveoak.mongo.gridfs;
 
-import java.util.UUID;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.DB;
-import com.mongodb.MongoClient;
-import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.state.ResourceState;
+import com.mongodb.Mongo;
+import io.liveoak.mongo.MongoServices;
+import io.liveoak.mongo.gridfs.extension.GridFSExtension;
 import io.liveoak.testtools.AbstractResourceTestCase;
-import org.junit.After;
+import org.junit.Before;
+
+import java.util.UUID;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -22,37 +23,33 @@ public class BaseGridFSTest extends AbstractResourceTestCase {
 
     protected String BASEPATH = "gridfs";
 
-    protected static MongoClient mongoClient;
+    protected static Mongo mongoClient;
     protected static DB db;
 
     @Override
-    public RootResource createRootResource() {
-        return new GridFSRootResource(BASEPATH);
+    public void loadExtensions() throws Exception {
+        loadExtension("gridfs", new GridFSExtension(), createConfig());
     }
 
-    @Override
-    public ResourceState createConfig() {
-        String database = System.getProperty("mongo.db", "MongoGridFSTest_" + UUID.randomUUID());
-        Integer port = new Integer(System.getProperty("mongo.port", "27019"));
+    @Before
+    public void getAholdOfMongoThings() throws InterruptedException {
+        this.db = (DB) this.system.service(MongoServices.db("testOrg", "testApp", "gridfs"));
+        this.mongoClient = (Mongo) this.system.service(MongoServices.mongo("gridfs"));
+    }
+
+    public ObjectNode createConfig() {
+        String database = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
+        Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");
+        System.setProperty("mongo.db", database);
+        System.setProperty("mongo.host", host);
+        System.setProperty("mongo.port", "" + port);
 
-        ResourceState config = new DefaultResourceState();
-        config.putProperty("db", database);
-        config.putProperty("port", port);
-        config.putProperty("host", host);
+        ObjectNode config = JsonNodeFactory.instance.objectNode();
+        config.put("db", database);
+        config.put("port", port);
+        config.put("host", host);
 
-        try {
-            mongoClient = new MongoClient(host, port);
-            db = mongoClient.getDB(database);
-            db.dropDatabase();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return config;
-    }
-
-    @After
-    public void tearDownDB() throws Exception {
-        db.dropDatabase();
     }
 }

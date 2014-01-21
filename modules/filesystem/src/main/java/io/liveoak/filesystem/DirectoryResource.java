@@ -39,6 +39,7 @@ public class DirectoryResource implements FSResource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
+        System.err.println( "READ " + this.file.getAbsoluteFile() );
         vertx().fileSystem().readDir(this.file.getPath(), (result) -> {
             if (result.failed()) {
                 sink.close();

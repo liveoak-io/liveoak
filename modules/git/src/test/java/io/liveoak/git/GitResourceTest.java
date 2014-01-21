@@ -5,8 +5,10 @@
  */
 package io.liveoak.git;
 
+import io.liveoak.git.extension.GitExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
 import org.junit.Test;
@@ -19,29 +21,22 @@ import static org.fest.assertions.Assertions.assertThat;
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
 public class GitResourceTest extends AbstractResourceTestCase {
-
     @Override
-    public RootResource createRootResource() {
-        return new GitRepoResource("git");
+    protected File applicationDirectory() {
+        return new File( this.projectRoot, "target/test-app" );
     }
 
     @Override
-    public ResourceState createConfig() {
-        File repoDir = new File(this.projectRoot, "/target/repo");
-        if (!repoDir.exists()) {
-            repoDir.mkdirs();
-        }
-
-        ResourceState config = super.createConfig();
-        config.putProperty("repoPath", repoDir.getAbsolutePath());
-        config.putProperty("createIfMissing", Boolean.TRUE );
-        return config;
+    public void loadExtensions() throws Exception {
+        new File( applicationDirectory(), "git" ).mkdirs();
+        loadExtension( "git", new GitExtension() );
     }
 
     @Test
     public void testRoot() throws Exception {
-        ResourceState result = this.client.read(new RequestContext.Builder().build(), "/git");
+        ResourceState result = this.client.read(new RequestContext.Builder().build(), "/testOrg/testApp/git");
 
         assertThat(result).isNotNull();
     }
+
 }

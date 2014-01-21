@@ -5,18 +5,13 @@
  */
 package io.liveoak.keycloak;
 
+import io.liveoak.keycloak.extension.KeycloakExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.SecurityContext;
-import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
+import io.liveoak.testtools.MockExtension;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
@@ -24,8 +19,10 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.keycloak.models.RealmModel;
 import org.keycloak.representations.SkeletonKeyToken;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -35,29 +32,26 @@ public class AuthHandlerTest extends AbstractResourceTestCase {
 
     private static CloseableHttpClient httpClient;
     private static TokenUtil tokenUtil;
+
     private MockRootResource mock;
-    private static KeycloakRootResource keycloak;
 
     @Override
-    public RootResource createRootResource() {
-        keycloak = new KeycloakRootResource("auth");
-        return keycloak;
+    public void loadExtensions() throws Exception {
+        loadExtension( "auth", new KeycloakExtension() );
+        loadExtension( "auth-test", new MockExtension( MockRootResource.class ) );
     }
 
     @Override
-    public ResourceState createConfig() {
-        ResourceState config =  super.createConfig();
-        config.putProperty(KeycloakConfigResource.REALM_CONFIG, System.getProperty("user.dir") + "/src/test/resources/keycloak-config.json");
-        return config;
+    protected File applicationDirectory() {
+        return new File( this.projectRoot, "/src/test/resources" );
     }
 
     @Before
     public void before() throws Exception {
-        tokenUtil = new TokenUtil(keycloak);
+        tokenUtil = new TokenUtil((RealmModel) this.system.service( KeycloakServices.realmModel("testOrg", "testApp") ));
         httpClient = HttpClientBuilder.create().build();
 
-        mock = new MockRootResource("auth-test");
-        system.container().registerResource(mock);
+        mock = (MockRootResource) this.system.service( MockExtension.resource("testOrg", "testApp", MockRootResource.class) );
     }
 
     @After
@@ -67,7 +61,7 @@ public class AuthHandlerTest extends AbstractResourceTestCase {
 
     @Test(timeout = 10000)
     public void testNoAuth() throws Exception {
-        HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/auth-test");
+        HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/testOrg/testApp/auth-test");
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_OK);
 
         RequestContext context = mock.pollRequest(2, TimeUnit.SECONDS);
@@ -78,13 +72,13 @@ public class AuthHandlerTest extends AbstractResourceTestCase {
     public void testAuth() throws Exception {
         SkeletonKeyToken token = tokenUtil.createToken();
 
-        HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/auth-test");
+        HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/testOrg/testApp/auth-test");
         httpMethod.addHeader(new BasicHeader("Authorization", "bearer " + tokenUtil.toString(token)));
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_OK);
 
         SecurityContext context = mock.pollRequest(10, TimeUnit.SECONDS).securityContext();
         Assert.assertTrue(context.isAuthenticated());
-        Assert.assertEquals("default", context.getRealm());
+        Assert.assertEquals("testOrg-testApp", context.getRealm());
         Assert.assertEquals("user-id", context.getSubject());
         Assert.assertEquals(3, context.getRoles().size());
         Assert.assertEquals(token.getIssuedAt(), context.lastVerified());
@@ -95,14 +89,14 @@ public class AuthHandlerTest extends AbstractResourceTestCase {
         SkeletonKeyToken token = tokenUtil.createToken();
         token.expiration((System.currentTimeMillis() / 1000) - 10);
 
-        HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/auth-test");
+        HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/testOrg/testApp/auth-test");
         httpMethod.addHeader(new BasicHeader("Authorization", "bearer " + tokenUtil.toString(token)));
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_UNAUTHORIZED);
     }
 
     @Test(timeout = 10000)
     public void testInvalidAuth() throws Exception {
-        HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/auth-test");
+        HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/testOrg/testApp/auth-test");
         httpMethod.addHeader(new BasicHeader("Authorization", "bearer invalid-token"));
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_UNAUTHORIZED);
     }

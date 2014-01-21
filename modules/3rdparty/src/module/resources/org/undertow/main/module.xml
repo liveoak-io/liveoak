@@ -24,8 +24,8 @@
 
 <module xmlns="urn:jboss:module:1.1" name="org.undertow">
     <resources>
-        <artifact name="io.undertow:undertow-core:1.0.0.Beta26"/>
-        <artifact name="io.undertow:undertow-servlet:1.0.0.Beta26"/>
+        <artifact name="io.undertow:undertow-core:${undertow.version}"/>
+        <artifact name="io.undertow:undertow-servlet:${undertow.version}"/>
     </resources>
 
     <dependencies>

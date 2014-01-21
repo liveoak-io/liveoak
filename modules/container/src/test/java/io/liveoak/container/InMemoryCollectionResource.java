@@ -23,7 +23,7 @@ import java.util.stream.Stream;
  */
 public class InMemoryCollectionResource implements Resource {
 
-    public InMemoryCollectionResource(InMemoryCollectionResource parent, String id) {
+    public InMemoryCollectionResource(Resource parent, String id) {
         this.parent = parent;
         this.id = id;
     }
@@ -97,7 +97,9 @@ public class InMemoryCollectionResource implements Resource {
 
     @Override
     public void delete(RequestContext ctx, Responder responder) {
-        parent.delete(this.id);
+        if ( parent instanceof InMemoryCollectionResource ) {
+            ((InMemoryCollectionResource)parent).delete(this.id);
+        }
         responder.resourceDeleted(this);
     }
 
@@ -109,7 +111,7 @@ public class InMemoryCollectionResource implements Resource {
         this.collection.put(member.id(), member);
     }
 
-    private InMemoryCollectionResource parent;
+    protected Resource parent;
     private String id;
     private Map<String, Resource> collection = new LinkedHashMap<>();
 }

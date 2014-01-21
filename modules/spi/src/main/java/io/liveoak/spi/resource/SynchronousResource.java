@@ -16,7 +16,7 @@ import io.liveoak.spi.state.ResourceState;
  */
 public interface SynchronousResource extends Resource {
 
-    default Collection<Resource> members() {
+    default Collection<? extends Resource> members() {
         return null;
     }
 
@@ -24,17 +24,17 @@ public interface SynchronousResource extends Resource {
         return null;
     }
 
-    default ResourceState properties() {
+    default ResourceState properties() throws Exception {
         return null;
     }
 
-    default void properties(ResourceState props) {
+    default void properties(ResourceState props) throws Exception {
         // nothing
     }
 
     @Override
     default void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        Collection<Resource> members = members();
+        Collection<? extends Resource> members = members();
 
         if (members != null) {
             for (Resource each : members) {

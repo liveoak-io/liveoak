@@ -1,16 +1,14 @@
 package io.liveoak.container.traversal;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import io.liveoak.container.DefaultContainer;
-import io.liveoak.spi.Container;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Bob McWhirter
@@ -74,8 +72,6 @@ public class TraversalPlan {
     }
 
     public static interface StepContext {
-        Container container();
-
         RequestContext requestContext();
 
         ResourceState state();
