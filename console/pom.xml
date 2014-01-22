@@ -45,13 +45,9 @@
                 </dependencies>
                 <configuration>
                     <preloadSources>
-                        <source>${console.app.res}/app/lib/jquery/jquery-1.10.2.js</source>
+                        <source>${console.app.res}/app/lib/jquery/jquery.js</source>
                         <source>${console.app.res}/app/lib/angular/angular.js</source>
-                        <source>${console.app.res}/app/lib/angular/angular-cookies.js</source>
-                        <source>${console.app.res}/app/lib/angular/angular-loader.js</source>
-                        <source>${console.app.res}/app/lib/angular/angular-resource.js</source>
-                        <source>${console.app.res}/app/lib/angular/angular-sanitize.js</source>
-                        <source>${console.app.res}/test/lib/angular/angular-mocks.js</source>
+                        <source>${console.app.res}/app/lib/angular-mocks/angular-mocks.js</source>
                         <source>${console.app.res}/test/lib/liveoak/liveoak-mocks.js</source>
                     </preloadSources>
                     <jsSrcDir>${console.app.res}/app/js/</jsSrcDir>
