@@ -14,3 +14,4 @@ mods/
 epom
 log
 .DS_Store
+phantomjsdriver.log
