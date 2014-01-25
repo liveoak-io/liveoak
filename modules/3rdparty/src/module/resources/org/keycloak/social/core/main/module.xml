@@ -22,10 +22,11 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.1" name="org.keycloak.social.core">
+<module xmlns="urn:jboss:module:1.3" name="org.keycloak.social.core">
     <resources>
         <artifact name="org.keycloak:keycloak-social-core:${keycloak.version}"/>
-        <!-- TODO Remove once UriBuilder is removed from social-core -->
-        <artifact name="org.jboss.resteasy:jaxrs-api:${resteasy.version}"/>
     </resources>
+    <dependencies>
+        <module name="org.json" export="true"/>
+    </dependencies>
 </module>

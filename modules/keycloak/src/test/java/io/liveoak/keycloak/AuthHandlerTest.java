@@ -5,10 +5,6 @@
  */
 package io.liveoak.keycloak;
 
-import io.liveoak.container.DefaultContainer;
-import io.liveoak.container.LiveOakFactory;
-import io.liveoak.container.LiveOakSystem;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.resource.RootResource;
@@ -25,10 +21,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.keycloak.representations.SkeletonKeyToken;
 

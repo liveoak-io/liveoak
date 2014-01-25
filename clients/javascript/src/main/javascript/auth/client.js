@@ -132,7 +132,7 @@ var Keycloak = function (options) {
     }
 
     function getRealmUrl() {
-        return baseUrl + '/auth-server/rest/realms/' + encodeURIComponent(options.realm);
+        return baseUrl + '/auth/rest/realms/' + encodeURIComponent(options.realm);
     }
 
     function processCallback() {
@@ -178,7 +178,7 @@ var Keycloak = function (options) {
 
             instance.tokenParsed = JSON.parse(atob(token.split('.')[1]));
             instance.authenticated = true;
-            instance.username = instance.tokenParsed.prn;
+            instance.username = instance.tokenParsed.sub;
             instance.realmAccess = instance.tokenParsed.realm_access;
             instance.resourceAccess = instance.tokenParsed.resource_access;
 

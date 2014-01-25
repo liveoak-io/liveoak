@@ -72,7 +72,7 @@ public class KeycloakServer {
         DeploymentInfo deploymentInfo = new DeploymentInfo();
 
         deploymentInfo.setClassLoader(getClass().getClassLoader());
-        deploymentInfo.setContextPath("/auth-server");
+        deploymentInfo.setContextPath("/auth");
         deploymentInfo.setDeploymentName("Keycloak");
         deploymentInfo.setResourceManager(new KeycloakResourceManager());
 

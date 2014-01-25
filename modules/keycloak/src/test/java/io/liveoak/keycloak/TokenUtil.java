@@ -1,9 +1,9 @@
 package io.liveoak.keycloak;
 
-import org.jboss.resteasy.jose.jws.JWSBuilder;
-import org.jboss.resteasy.jwt.JsonSerialization;
+import org.keycloak.jose.jws.JWSBuilder;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.representations.SkeletonKeyToken;
+import org.keycloak.util.JsonSerialization;
 
 import java.security.PrivateKey;
 import java.util.Collections;
@@ -46,7 +46,7 @@ public class TokenUtil {
     }
 
     public String toString(SkeletonKeyToken token) throws Exception {
-        byte[] tokenBytes = JsonSerialization.toByteArray(token, false);
+        byte[] tokenBytes = JsonSerialization.writeValueAsBytes(token);
         return new JWSBuilder().content(tokenBytes).rsa256(privateKey);
     }
 

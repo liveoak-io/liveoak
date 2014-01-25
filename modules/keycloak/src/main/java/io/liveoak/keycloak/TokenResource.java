@@ -5,7 +5,6 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import org.keycloak.RSATokenVerifier;
-import org.keycloak.VerificationException;
 import org.keycloak.representations.SkeletonKeyToken;
 
 import java.util.Date;
@@ -52,7 +51,7 @@ public class TokenResource implements Resource {
                 try {
                     SkeletonKeyToken token = RSATokenVerifier.verifyToken(id, keycloak.getPublicKey(), keycloak.getRealm());
                     sink.accept("realm", token.getAudience());
-                    sink.accept("subject", token.getPrincipal());
+                    sink.accept("subject", token.getSubject());
                     sink.accept("issued-at", new Date(token.getIssuedAt()));
 
                     Set<String> roles = new HashSet<>();

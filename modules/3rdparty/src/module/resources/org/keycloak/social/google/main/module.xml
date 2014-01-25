@@ -22,22 +22,11 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.1" name="org.keycloak.social.google">
+<module xmlns="urn:jboss:module:1.3" name="org.keycloak.social.google">
     <resources>
         <artifact name="org.keycloak:keycloak-social-google:${keycloak.version}"/>
-
-        <artifact name="com.google.api-client:google-api-client:1.14.1-beta"/>
-        <artifact name="com.google.oauth-client:google-oauth-client:1.14.1-beta"/>
-        <artifact name="com.google.http-client:google-http-client-jackson:1.14.1-beta"/>
-        <artifact name="com.google.http-client:google-http-client:1.14.1-beta"/>
-        <artifact name="com.google.apis:google-api-services-oauth2:v2-rev35-1.14.1-beta"/>
-
-        <artifact name="xpp3:xpp3:1.1.4c"/>
-        <artifact name="org.codehaus.jackson:jackson-core-asl:1.9.12"/>
     </resources>
     <dependencies>
         <module name="org.keycloak.social.core"/>
-        <module name="javax.api"/>
-        <module name="org.apache.httpcomponents" slot="4.0"/>
     </dependencies>
 </module>

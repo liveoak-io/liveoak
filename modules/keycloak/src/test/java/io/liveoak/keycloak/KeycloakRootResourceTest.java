@@ -4,18 +4,12 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
-import org.jboss.resteasy.jose.jws.JWSBuilder;
-import org.jboss.resteasy.jwt.JsonSerialization;
 import org.junit.Before;
 import org.junit.Test;
-import org.keycloak.models.KeycloakSession;
 import org.keycloak.representations.SkeletonKeyToken;
 
-import java.security.PrivateKey;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

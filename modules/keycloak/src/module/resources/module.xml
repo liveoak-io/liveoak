@@ -13,6 +13,7 @@
                 <include path="META-INF**" />
             </imports>
         </module>
+        <module name="org.keycloak.social.google" services="import"/>
         <module name="org.hibernate" services="import"/>
         <module name="com.h2database.h2"/>
         <module name="org.undertow"/>
