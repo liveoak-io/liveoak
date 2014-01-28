@@ -1,0 +1,11 @@
+{
+  "name": "liveOak-console",
+  "description": "LiveOak console interface",
+  "repository": "https://github.com/liveoak-io/liveoak",
+  "devDependencies": {
+    "bower" : "@version.bower",
+    "grunt": "@version.grunt-main",
+    "grunt-cli": "@version.grunt-cli",
+    "grunt-bower-task": "@version.grunt-bower-task"
+  }
+}
