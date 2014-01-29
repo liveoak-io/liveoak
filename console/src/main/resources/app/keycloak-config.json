@@ -4,9 +4,7 @@
     "tokenLifespan": 3600,
     "accessCodeLifespan": 10,
     "accessCodeLifespanUserAction": 600,
-    "accountManagement": true,
     "sslNotRequired": true,
-    "cookieLoginAllowed": true,
     "registrationAllowed": true,
     "resetPasswordAllowed": true,
     "requiredCredentials": [ "password" ],
@@ -71,16 +69,6 @@
             {
                 "username": "bill",
                 "roles": [ "user", "admin" ]
-            }
-        ],
-        "Account": [
-            {
-                "username": "josh",
-                "roles": [ "view-profile", "manage-account" ]
-            },
-            {
-                "username": "bill",
-                "roles": [ "view-profile", "manage-account" ]
             }
         ]
     }
