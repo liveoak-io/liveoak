@@ -5,6 +5,7 @@
  */
 package io.liveoak.mongo;
 
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -24,7 +25,6 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
-import io.liveoak.spi.resource.config.ConfigMapping;
 import io.liveoak.spi.resource.config.ConfigMappingExporter;
 import io.liveoak.spi.resource.config.ConfigProperty;
 import io.liveoak.spi.resource.config.Configurable;
@@ -46,30 +46,18 @@ public class RootMongoResource extends MongoResource implements RootResource {
         this.id = id;
     }
 
-    @ConfigMapping({@ConfigProperty("host"), @ConfigProperty("port"), @ConfigProperty("db")})
-    private void updateConfig(Object... values) throws Exception {
+    private void updateConfig(@ConfigProperty("host") String host, @ConfigProperty("port") Integer port, @ConfigProperty("db") String dbName) throws Exception {
 
-        String host;
-        Object hostObject = values[0];
-        if (hostObject == null) {
+        if (host == null) {
             host = "localhost";
-        } else if (!(hostObject instanceof String) || ((String)(hostObject)).isEmpty()) {
-            throw new InitializationException("Configuration value for 'host' invalid. Requires a string value. Received : " + hostObject);
-        } else {
-            host = (String) hostObject;
+        } else if (host.isEmpty()) {
+            throw new InitializationException("Configuration value for 'host' invalid. Requires a string value. Received : " + host);
         }
 
-        Integer port;
-        Object portObject = values[1];
-        if (portObject == null) {
+        if (port == null) {
             port = 27017;
-        } else if (!(portObject instanceof Integer)) {
-            throw new InitializationException("Configuration value for 'port' invalid. Requires an integer value. Received : " + portObject);
-        } else {
-            port = (Integer) portObject;
         }
 
-        String dbName = (String)values[2];
         if (dbName == null || dbName.isEmpty()) {
             throw new InitializationException("String configuration value required for 'db'");
         }
@@ -83,19 +71,11 @@ public class RootMongoResource extends MongoResource implements RootResource {
         this.configure(mongo, db);
     }
 
-    @ConfigMappingExporter("host")
-    public Object configHost() {
-        return client().getAddress().getHost();
-    }
-
-    @ConfigMappingExporter("port")
-    public Object configPort() {
-        return client().getAddress().getPort();
-    }
-
-    @ConfigMappingExporter("db")
-    public Object configDb() {
-        return db().getName();
+    @ConfigMappingExporter
+    public void exportConfig(HashMap<String, Object> config) {
+        config.put("host", client().getAddress().getHost());
+        config.put("port", client().getAddress().getPort());
+        config.put("db", db().getName());
     }
 
     protected void configure(MongoClient mongo, DB db) {

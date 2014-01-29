@@ -1,8 +1,8 @@
 package io.liveoak.container;
 
 import java.io.File;
+import java.util.HashMap;
 
-import io.liveoak.spi.resource.config.ConfigMapping;
 import io.liveoak.spi.resource.config.ConfigProperty;
 import io.liveoak.spi.resource.config.ConfigPropertyConverter;
 import io.liveoak.spi.resource.config.ConfigMappingExporter;
@@ -26,19 +26,14 @@ public class InMemoryConfigResourceWithConverter implements RootResource {
 
     private Thing thing;
 
-    @ConfigMapping({@ConfigProperty("firstValue"), @ConfigProperty("secondValue")})
-    private void importConfig(Object... configValues) throws Exception {
-        thing = new Thing((String)configValues[0], (String)configValues[1]);
+    private void importConfig(@ConfigProperty("firstValue") String firstValue, @ConfigProperty("secondValue") String otherValue) throws Exception {
+        thing = new Thing(firstValue, otherValue);
     }
 
     @ConfigMappingExporter
-    public Object firstValue() throws Exception {
-        return thing.getVal1();
-    }
-
-    @ConfigMappingExporter("secondValue")
-    public Object convert() throws Exception {
-        return thing.getVal2();
+    public void exportConfig(HashMap<String, Object> config) throws Exception {
+        config.put("firstValue", thing.getVal1());
+        config.put("secondValue", thing.getVal2());
     }
 
     @Override

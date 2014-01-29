@@ -7,9 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates which methods on a {@link io.liveoak.spi.resource.RootResource} are used to convert an object into its
- * constituent configuration value parts. If <code>value</code> is not set, the default will be the method name to
- * which the annotation applies.
+ * Indicates which method on a {@link io.liveoak.spi.resource.RootResource} is invoked to convert an object into its
+ * constituent configuration value parts.
  *
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
@@ -17,5 +16,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface ConfigMappingExporter {
-    String value() default "";
 }

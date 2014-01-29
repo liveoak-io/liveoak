@@ -3,7 +3,9 @@ package io.liveoak.spi.resource.config;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,18 +66,18 @@ public interface ConfigResource extends Resource {
             ConfigMappingExporter configExporter = method.getAnnotation(ConfigMappingExporter.class);
 
             if (configExporter != null) {
-                String key = method.getName();
-                if (!"".equals(configExporter.value())) {
-                    key = configExporter.value();
-                }
+                HashMap<String, Object> values = new HashMap<>();
+                method.invoke(resource, values);
 
-                Object value = method.invoke(resource);
-
-                if (value != null) {
-                    // Add the value to the sink if it's not null
-                    sink.accept(key, value);
-                } else {
-                    System.err.println("Unable to get value for key: " + key);
+                if (values != null && !values.isEmpty()) {
+                    for (HashMap.Entry<String, Object> entry : values.entrySet()) {
+                        if (entry.getValue() != null) {
+                            // Add the value to the sink if it's not null
+                            sink.accept(entry.getKey(), entry.getValue());
+                        } else {
+                            System.err.println("Unable to get value for key: " + entry.getKey());
+                        }
+                    }
                 }
             }
         }
@@ -121,20 +123,26 @@ public interface ConfigResource extends Resource {
         }
 
         // Check methods
-        for (Method method : getMethods(resource.getClass(), ConfigMapping.class)) {
-            ConfigMapping configMapping = method.getAnnotation(ConfigMapping.class);
-            ConfigProperty[] mappingProperties = configMapping.value();
-            Object[] configValues = new Object[mappingProperties.length];
+        for (Method method : getMethodsWithParamAnnotation(resource.getClass(), ConfigProperty.class)) {
+            Parameter[] params = method.getParameters();
+
+            Object[] configValues = new Object[params.length];
             int count = 0;
 
             // Retrieve config values from state
-            for (ConfigProperty property : mappingProperties) {
-                configValues[count++] = state.getProperty(property.value());
+            for (Parameter methodParam : params) {
+                ConfigProperty methodParamProp = methodParam.getAnnotation(ConfigProperty.class);
+                String key = methodParamProp.value();
+                if (key == null || "".equals(key)) {
+                    throw new InitializationException("No value defined on @ConfigProperty of " + methodParam.getName()
+                            + " parameter on method " + method.getName() + "() in " + resource.getClass());
+                }
+                configValues[count++] = methodParam.getType().cast(state.getProperty(key));
             }
 
             // Create object from config state
             method.setAccessible(Boolean.TRUE);
-            method.invoke(resource, new Object[]{configValues});
+            method.invoke(resource, configValues);
         }
     }
 
@@ -153,6 +161,39 @@ public interface ConfigResource extends Resource {
 
                     if (!added) {
                         methods.add(m);
+                    }
+                }
+            }
+            c = c.getSuperclass();
+            if (c == Object.class) {
+                c = null;
+            }
+        }
+        return methods;
+    }
+
+    static Iterable<Method> getMethodsWithParamAnnotation(Class<?> c, Class<? extends Annotation> a) {
+        List<Method> methods = new LinkedList<>();
+        while (c != null) {
+            for (Method m : c.getDeclaredMethods()) {
+                Annotation[][] methodParameterAnnotations = m.getParameterAnnotations();
+                for (Annotation[] parameterAnnotations : methodParameterAnnotations) {
+                    for (int i = 0; i < parameterAnnotations.length; i++) {
+                        Annotation paramAnn = parameterAnnotations[i];
+                        if (paramAnn.annotationType().equals(a)) {
+                            boolean added = false;
+
+                            for (Method e : methods) {
+                                if (m.getName().equals(e.getName()) && Arrays.equals(m.getParameterTypes(), e.getParameterTypes())) {
+                                    added = true;
+                                }
+                            }
+
+                            if (!added) {
+                                methods.add(m);
+                            }
+                            break;
+                        }
                     }
                 }
             }

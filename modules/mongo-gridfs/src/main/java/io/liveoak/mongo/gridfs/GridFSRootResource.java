@@ -6,6 +6,7 @@
 package io.liveoak.mongo.gridfs;
 
 import java.io.File;
+import java.util.HashMap;
 
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
@@ -16,7 +17,6 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
-import io.liveoak.spi.resource.config.ConfigMapping;
 import io.liveoak.spi.resource.config.ConfigMappingExporter;
 import io.liveoak.spi.resource.config.ConfigProperty;
 import io.liveoak.spi.resource.config.Configurable;
@@ -73,30 +73,18 @@ public class GridFSRootResource extends GridFSDirectoryResource implements RootR
         responder.createNotSupported(this);
     }
 
-    @ConfigMapping({@ConfigProperty("host"), @ConfigProperty("port"),
-            @ConfigProperty("db"), @ConfigProperty("temp.dir")})
-    protected void updateConfiguration(Object... values) throws Exception {
-        String host;
-        Object hostObject = values[0];
-        if (hostObject == null) {
+    protected void updateConfiguration(@ConfigProperty("host") String host, @ConfigProperty("port") Integer port, @ConfigProperty("db") String dbName,
+                                       @ConfigProperty("temp.dir") String rootStr) throws Exception {
+        if (host == null) {
             host = "localhost";
-        } else if (!(hostObject instanceof String) || ((String) (hostObject)).isEmpty()) {
-            throw new InitializationException("Configuration value for 'host' invalid. Requires a string value. Received : " + hostObject);
-        } else {
-            host = (String) hostObject;
+        } else if (host.isEmpty()) {
+            throw new InitializationException("Configuration value for 'host' invalid. Requires a string value. Received : " + host);
         }
 
-        Integer port;
-        Object portObject = values[1];
-        if (portObject == null) {
+        if (port == null) {
             port = 27017;
-        } else if (!(portObject instanceof Integer)) {
-            throw new InitializationException("Configuration value for 'port' invalid. Requires an integer value. Received : " + portObject);
-        } else {
-            port = (Integer) portObject;
         }
 
-        String dbName = (String) values[2];
         if (dbName == null || dbName.isEmpty()) {
             throw new InitializationException("String configuration value required for 'db'");
         }
@@ -110,7 +98,6 @@ public class GridFSRootResource extends GridFSDirectoryResource implements RootR
         configure(mongo, db);
 
 
-        Object rootStr = values[3];
         if (rootStr != null && rootStr instanceof String == false) {
             throw new InitializationException("Configuration value for 'temp.dir' is invalid. Requires a string value. Received : " + rootStr);
         }
@@ -129,24 +116,12 @@ public class GridFSRootResource extends GridFSDirectoryResource implements RootR
         }
     }
 
-    @ConfigMappingExporter("host")
-    public String configHost() {
-        return mongoClient().getAddress().getHost();
-    }
-
-    @ConfigMappingExporter("port")
-    public Integer configPort() {
-        return mongoClient().getAddress().getPort();
-    }
-
-    @ConfigMappingExporter("db")
-    public String configDb() {
-        return getDB().getName();
-    }
-
-    @ConfigMappingExporter("temp.dir")
-    public String configTempDir() {
-        return this.tempDir.getAbsolutePath();
+    @ConfigMappingExporter
+    public void exportConfig(HashMap<String, Object> config) {
+        config.put("host", mongoClient().getAddress().getHost());
+        config.put("port", mongoClient().getAddress().getPort());
+        config.put("db", getDB().getName());
+        config.put("temp.dir", this.tempDir.getAbsolutePath());
     }
 
     protected void configure(MongoClient mongo, DB db) {

@@ -13,7 +13,6 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
-import io.liveoak.spi.resource.config.ConfigMapping;
 import io.liveoak.spi.resource.config.ConfigMappingExporter;
 import io.liveoak.spi.resource.config.ConfigProperty;
 import io.liveoak.spi.resource.config.Configurable;
@@ -38,9 +37,7 @@ public class AclPolicyRootResource implements RootResource {
         this.id = id;
     }
 
-    @ConfigMapping({@ConfigProperty("policy-config")})
-    private void updateConfig(Object... values) throws Exception {
-        String configFile = (String)values[0];
+    private void updateConfig(@ConfigProperty("policy-config") String configFile) throws Exception {
         if (configFile == null && configFile != null) {
             log.warn("No policy-config specified");
         } else if (configFile != null && !configFile.equals(this.configFile)) {
@@ -55,9 +52,9 @@ public class AclPolicyRootResource implements RootResource {
         }
     }
 
-    @ConfigMappingExporter("policy-config")
-    public Object getConfigFile() {
-        return configFile;
+    @ConfigMappingExporter
+    public void getConfigFile(HashMap<String, Object> config) {
+        config.put("policy-config", configFile);
     }
 
     @Override

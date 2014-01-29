@@ -6,12 +6,11 @@
 package io.liveoak.filesystem;
 
 import java.io.File;
+import java.util.HashMap;
 
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.config.ConfigMapping;
 import io.liveoak.spi.resource.config.ConfigMappingExporter;
 import io.liveoak.spi.resource.config.ConfigProperty;
 import io.liveoak.spi.resource.config.Configurable;
@@ -43,10 +42,7 @@ public class FilesystemResource extends DirectoryResource implements RootResourc
         return this.id;
     }
 
-    @ConfigMapping(@ConfigProperty("root"))
-    private void updateConfig(Object... configValues) throws InitializationException {
-        String rootStr = configValues[0].toString();
-
+    private void updateConfig(@ConfigProperty("root") String rootStr) throws Exception {
         if (rootStr == null) {
             throw new InitializationException("no filesystem root specified");
         }
@@ -60,9 +56,9 @@ public class FilesystemResource extends DirectoryResource implements RootResourc
         this.file(file);
     }
 
-    @ConfigMappingExporter("root")
-    public Object getPath() {
-        return this.file().getAbsolutePath();
+    @ConfigMappingExporter
+    public void exportConfig(HashMap<String, Object> config) throws Exception {
+        config.put("root", this.file().getAbsolutePath());
     }
 
     public String toString() {

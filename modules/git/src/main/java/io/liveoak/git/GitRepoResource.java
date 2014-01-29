@@ -6,11 +6,11 @@
 package io.liveoak.git;
 
 import java.io.File;
+import java.util.HashMap;
 
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.config.ConfigMapping;
 import io.liveoak.spi.resource.config.ConfigMappingExporter;
 import io.liveoak.spi.resource.config.ConfigProperty;
 import io.liveoak.spi.resource.config.Configurable;
@@ -35,10 +35,7 @@ public class GitRepoResource extends GitDirectoryResource implements RootResourc
         this.id = id;
     }
 
-    @ConfigMapping({@ConfigProperty("repoPath"), @ConfigProperty("createIfMissing")})
-    public void updateConfig(Object... values) throws Exception {
-        String repoPathStr = (String) values[0];
-
+    private void updateConfig(@ConfigProperty("repoPath") String repoPathStr, @ConfigProperty("createIfMissing") Boolean createRepo) throws Exception {
         if (repoPathStr == null) {
             throw new InitializationException("no git repo path specified");
         }
@@ -49,7 +46,6 @@ public class GitRepoResource extends GitDirectoryResource implements RootResourc
             throw new InitializationException("unable to readMember git repo at: " + file.getAbsolutePath());
         }
 
-        Boolean createRepo = (Boolean) values[1];
         if (createRepo == null) {
             createRepo = Boolean.FALSE;
         }
@@ -74,8 +70,8 @@ public class GitRepoResource extends GitDirectoryResource implements RootResourc
     }
 
     @ConfigMappingExporter
-    public Object repoPath() {
-        return this.git().getRepository().getDirectory().getAbsolutePath();
+    public void exportConfig(HashMap<String, Object> config) throws Exception {
+        config.put("repoPath", this.git().getRepository().getDirectory().getAbsolutePath());
     }
 
     @Override
