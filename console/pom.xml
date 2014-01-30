@@ -17,6 +17,7 @@
         <console.app.res>${project.basedir}/src/main/resources/</console.app.res>
         <html.unit.version>2.13</html.unit.version>
         <version.jasmine.plugin>1.3.1.3</version.jasmine.plugin>
+        <version.lesscss.plugin>1.3.3</version.lesscss.plugin>
 
         <!-- Node.js related versions -->
         <node.version.bower>~1.2.8</node.version.bower>
@@ -33,7 +34,6 @@
         <bower.version.select2>3.4.5</bower.version.select2>
         <bower.version.ui-bootstrap>0.10.0</bower.version.ui-bootstrap>
         <bower.version.angular-mocks>1.2.9</bower.version.angular-mocks>
-
     </properties>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>liveoak-console</artifactId>
@@ -42,6 +42,23 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.lesscss</groupId>
+                <artifactId>lesscss-maven-plugin</artifactId>
+                <version>${version.lesscss.plugin}</version>
+                <configuration>
+                    <sourceDirectory>${project.basedir}/src/main/resources/app/less</sourceDirectory>
+                    <outputDirectory>${project.basedir}/src/main/resources/app/css</outputDirectory>
+                    <compress>false</compress>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>com.github.searls</groupId>
                 <artifactId>jasmine-maven-plugin</artifactId>
