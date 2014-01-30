@@ -48,7 +48,7 @@
                 <version>${version.lesscss.plugin}</version>
                 <configuration>
                     <sourceDirectory>${project.basedir}/src/main/resources/app/less</sourceDirectory>
-                    <outputDirectory>${project.basedir}/src/main/resources/app/css</outputDirectory>
+                    <outputDirectory>${project.basedir}/target/app/css</outputDirectory>
                     <compress>false</compress>
                 </configuration>
                 <executions>
@@ -94,6 +94,36 @@
                         <include>*Spec.js</include>
                     </specIncludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <!-- here the phase you need -->
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/app</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/app</directory>
+                                    <excludes>
+                                        <exclude>less/</exclude>
+                                        <exclude>**/.git*</exclude>
+                                        <!--<exclude>**/bower.json</exclude>-->
+                                        <!--<exclude>**/.bower.json</exclude>-->
+                                        <exclude>**/*.md</exclude>
+                                        <exclude>%regex[.*/\.?bower\.json]</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
