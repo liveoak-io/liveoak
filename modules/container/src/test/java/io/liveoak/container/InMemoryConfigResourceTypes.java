@@ -1,0 +1,45 @@
+package io.liveoak.container;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
+
+import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.config.ConfigProperty;
+import io.liveoak.spi.resource.config.Configurable;
+
+/**
+ * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
+ */
+@Configurable
+public class InMemoryConfigResourceTypes implements RootResource {
+
+    String id;
+
+    public InMemoryConfigResourceTypes(String id) {
+        this.id = id;
+    }
+
+    @ConfigProperty
+    private File file;
+
+    @ConfigProperty
+    private Boolean flag;
+
+    @ConfigProperty
+    private URL url;
+
+    @ConfigProperty
+    private URI uri;
+
+    @ConfigProperty
+    private Double dbl;
+
+    @ConfigProperty
+    private Integer integer;
+
+    @Override
+    public String id() {
+        return id;
+    }
+}

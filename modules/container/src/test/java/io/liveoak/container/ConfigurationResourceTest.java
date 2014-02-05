@@ -24,7 +24,6 @@ public class ConfigurationResourceTest {
     private Client client;
 
     private static final String CONFIG_PARAM = ";config";
-    private static final String ROOT_WITH_CONFIG = "/" + CONFIG_PARAM;
     private static final String FIRST_KEY = "path1";
     private static final String FIRST_VALUE = "firstPath";
     private static final String SECOND_KEY = "other";
@@ -143,8 +142,6 @@ public class ConfigurationResourceTest {
         InMemoryConfigResourceWithConverter resource = new InMemoryConfigResourceWithConverter(RESOURCE + 5);
         DefaultResourceState state = new DefaultResourceState();
         state.putProperty("file", this.projectRoot.getAbsolutePath());
-        state.putProperty("firstValue", "firstValue");
-        state.putProperty("secondValue", "another");
         this.system.directDeployer().deploy(resource, state);
 
         RequestContext context = new RequestContext.Builder().build();
@@ -157,8 +154,23 @@ public class ConfigurationResourceTest {
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
         assertThat(value).toString().equals(this.projectRoot.getAbsolutePath());
+    }
 
-        value = configState.getProperty("firstValue");
+    @Test
+    public void testConfigMultiPropertyConversion() throws Exception {
+        InMemoryConfigResourceMultiConvert resource = new InMemoryConfigResourceMultiConvert(RESOURCE + 6);
+        DefaultResourceState state = new DefaultResourceState();
+        state.putProperty("firstValue", "firstValue");
+        state.putProperty("secondValue", "another");
+        this.system.directDeployer().deploy(resource, state);
+
+        RequestContext context = new RequestContext.Builder().build();
+
+        ResourceState configState = this.client.read(context, "/" + RESOURCE + 6 + CONFIG_PARAM);
+
+        assertThat(configState).isNotNull();
+
+        Object value = configState.getProperty("firstValue");
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
         assertThat(value).toString().equals("firstValue");
@@ -167,5 +179,54 @@ public class ConfigurationResourceTest {
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
         assertThat(value).toString().equals("another");
+    }
+
+    @Test
+    public void testConfigPropertyTypeConversion() throws Exception {
+        InMemoryConfigResourceTypes resource = new InMemoryConfigResourceTypes(RESOURCE + 7);
+        DefaultResourceState state = new DefaultResourceState();
+        state.putProperty("file", this.projectRoot.getAbsolutePath());
+        state.putProperty("flag", "true");
+        state.putProperty("url", "http://liveoak.io");
+        state.putProperty("uri", "urn:isbn:0451450523");
+        state.putProperty("dbl", "4.6");
+        state.putProperty("integer", "35");
+        this.system.directDeployer().deploy(resource, state);
+
+        RequestContext context = new RequestContext.Builder().build();
+
+        ResourceState configState = this.client.read(context, "/" + RESOURCE + 7 + CONFIG_PARAM);
+
+        assertThat(configState).isNotNull();
+
+        Object value = configState.getProperty("file");
+        assertThat(value).isNotNull();
+        assertThat(value).isInstanceOf(String.class);
+        assertThat(value).toString().equals(this.projectRoot.getAbsolutePath());
+
+        value = configState.getProperty("flag");
+        assertThat(value).isNotNull();
+        assertThat(value).isInstanceOf(Boolean.class);
+        assertThat(value).isEqualTo(Boolean.TRUE);
+
+        value = configState.getProperty("url");
+        assertThat(value).isNotNull();
+        assertThat(value).isInstanceOf(String.class);
+        assertThat(value).toString().equals("http://liveoak.io");
+
+        value = configState.getProperty("uri");
+        assertThat(value).isNotNull();
+        assertThat(value).isInstanceOf(String.class);
+        assertThat(value).toString().equals("urn:isbn:0451450523");
+
+        value = configState.getProperty("dbl");
+        assertThat(value).isNotNull();
+        assertThat(value).isInstanceOf(Double.class);
+        assertThat(value).toString().equals("4.6");
+
+        value = configState.getProperty("integer");
+        assertThat(value).isNotNull();
+        assertThat(value).isInstanceOf(Integer.class);
+        assertThat(value).toString().equals("35");
     }
 }

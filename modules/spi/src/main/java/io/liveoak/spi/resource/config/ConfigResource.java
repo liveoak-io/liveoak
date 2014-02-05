@@ -1,9 +1,12 @@
 package io.liveoak.spi.resource.config;
 
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -50,6 +53,19 @@ public interface ConfigResource extends Resource {
                     Class<? extends ConfigPropertyConverter> converterClass = configProperty.converter();
                     ConfigPropertyConverter converter = converterClass.getConstructor().newInstance();
                     value = converter.toConfigValue(value);
+                } else {
+                    // Convert some known types
+                    if (field.getType().equals(File.class)) {
+                        value = ((File)value).getAbsolutePath();
+                    } else if (field.getType().equals(URL.class)) {
+                        value = value.toString();
+                    } else if (field.getType().equals(URI.class)) {
+                        value = value.toString();
+                    } else if (field.getType().equals(Float.class)) {
+                        value = value.toString();
+                    } else if (field.getType().equals(Short.class)) {
+                        value = value.toString();
+                    }
                 }
             }
 
@@ -113,6 +129,27 @@ public interface ConfigResource extends Resource {
                 Class<? extends ConfigPropertyConverter> converterClass = configProperty.converter();
                 ConfigPropertyConverter converter = converterClass.getConstructor().newInstance();
                 value = converter.createFrom(value);
+            } else {
+                // Convert some known types
+                if (field.getType().equals(File.class)) {
+                    value = new File(value.toString());
+                } else if (field.getType().equals(Boolean.class)) {
+                    value = new Boolean(value.toString());
+                } else if (field.getType().equals(URL.class)) {
+                    value = new URL(value.toString());
+                } else if (field.getType().equals(URI.class)) {
+                    value = new URI(value.toString());
+                } else if (field.getType().equals(Integer.class)) {
+                    value = new Integer(value.toString());
+                } else if (field.getType().equals(Double.class)) {
+                    value = new Double(value.toString());
+                } else if (field.getType().equals(Float.class)) {
+                    value = new Float(value.toString());
+                } else if (field.getType().equals(Long.class)) {
+                    value = new Long(value.toString());
+                } else if (field.getType().equals(Short.class)) {
+                    value = new Short(value.toString());
+                }
             }
 
             // Set the value on the field
