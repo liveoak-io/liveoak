@@ -18,6 +18,7 @@ import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
+import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -29,6 +30,8 @@ public class BaseMongoDBTest extends AbstractResourceTestCase {
     protected static MongoClient mongoClient;
     protected static DB db;
 
+    protected final Logger log = Logger.getLogger(getClass());
+
     @Override
     public RootResource createRootResource() {
         return new RootMongoResource(BASEPATH);
@@ -39,6 +42,7 @@ public class BaseMongoDBTest extends AbstractResourceTestCase {
         String database = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
         Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");
+        log.debug("Using Mongo on " + host + ":" + port + ", database: " + database);
 
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", database);
