@@ -74,7 +74,7 @@ public class JSONDecoder implements ResourceDecoder {
         }
 
         if (token == JsonToken.VALUE_NUMBER_INT) {
-            value = parser.getValueAsInt();
+            value = parser.getValueAsLong();
             parser.nextToken();
             return value;
         }

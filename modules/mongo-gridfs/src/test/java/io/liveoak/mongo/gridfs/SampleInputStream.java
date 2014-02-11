@@ -7,6 +7,7 @@ package io.liveoak.mongo.gridfs;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.CRC32;
 
 /**
 * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -15,6 +16,7 @@ class SampleInputStream extends InputStream {
 
     private int size;
     private int count;
+    private CRC32 crc = new CRC32();
 
     public SampleInputStream(int size) {
         this.size = size;
@@ -25,6 +27,16 @@ class SampleInputStream extends InputStream {
         if (count == size)
             return -1;
 
-        return '0' + count++ % 10;
+        int val = '0' + count++ % 10;
+        crc.update(val);
+        return val;
+    }
+
+    public long getCrc32() {
+        return crc.getValue();
+    }
+
+    public int getSize() {
+        return size;
     }
 }

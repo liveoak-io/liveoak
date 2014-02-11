@@ -5,13 +5,31 @@
  */
 package io.liveoak.mongo.gridfs;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.mongodb.DBObject;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.ResourceState;
+import org.bson.types.ObjectId;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 public class GridFSResource implements Resource {
+
+    protected static Set<String> FILTERED = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            new String[]{"aliases", "chunkSize", "_id", "id"})));
+
+    protected static Set<String> NOT_UPDATABLE = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            new String[] {"aliases", "chunkSize", "md5", "_id", "id", "createDate", "length", "contentType", "self", "links", "_members", "dir"})));
+
 
     /* Parent that will end up in response as part of the uri() */
     private final GridFSDirectoryResource parent;
@@ -109,6 +127,48 @@ public class GridFSResource implements Resource {
             return (GridFSUserspaceResource) res;
         }
         return null;
+    }
+
+    public void updateFileInfo(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        // make sure to not update certain 'read-only' properties
+
+        for (String name: state.getPropertyNames()) {
+            if (!NOT_UPDATABLE.contains(name)) {
+                Object value = state.getProperty(name);
+                if (name.equals("parent") && value != null) {
+                    fileInfo().dbObject().put(name, new ObjectId(value.toString()));
+                } else {
+                    fileInfo().dbObject().put(name, value);
+                }
+            }
+        }
+        getUserspace().getFilesCollection().save(fileInfo().dbObject());
+        responder.resourceUpdated(this);
+    }
+
+    public void readFileInfo(RequestContext ctx, PropertySink sink) {
+        DBObject dbobj = fileInfo().dbObject();
+        for (String key: dbobj.keySet()) {
+            if (getFiltered().contains(key)) {
+                continue;
+            }
+            Object val = dbobj.get(key);
+            if (val instanceof Date) {
+                val = ((Date) val).getTime();
+            } else if (val instanceof ObjectId) {
+                val = val.toString();
+            }
+            if ("uploadDate".equals(key)) {
+                key = "createDate";
+            }
+            if (val != null) {
+                sink.accept(key, val);
+            }
+        }
+    }
+
+    protected Set<String> getFiltered() {
+        return FILTERED;
     }
 
     protected String getSelfUri() {

@@ -11,15 +11,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.DB;
 import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.mongo.MongoServices;
 import io.liveoak.mongo.gridfs.extension.GridFSExtension;
-import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
-import org.junit.After;
 import org.junit.Before;
 import org.vertx.java.core.json.JsonObject;
 
