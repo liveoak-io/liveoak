@@ -5,7 +5,6 @@
  */
 package io.liveoak.mongo;
 
-import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -16,7 +15,7 @@ import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
 
-import io.liveoak.spi.InitializationException;
+import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceProcessingException;
@@ -25,75 +24,34 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
-import io.liveoak.spi.resource.config.ConfigMappingExporter;
-import io.liveoak.spi.resource.config.ConfigProperty;
-import io.liveoak.spi.resource.config.Configurable;
 import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-@Configurable
 public class RootMongoResource extends MongoResource implements RootResource {
 
-    private MongoClient mongo;
-    protected DB db;
+    private RootMongoConfigResource mongoConfigResource;
     private String id;
 
     public RootMongoResource(String id) {
         super(null);
         this.id = id;
+        mongoConfigResource = new RootMongoConfigResource(this);
     }
 
-    private void updateConfig(@ConfigProperty("host") String host, @ConfigProperty("port") Integer port, @ConfigProperty("db") String dbName) throws Exception {
-
-        if (host == null) {
-            host = "localhost";
-        } else if (host.isEmpty()) {
-            throw new InitializationException("Configuration value for 'host' invalid. Requires a string value. Received : " + host);
-        }
-
-        if (port == null) {
-            port = 27017;
-        }
-
-        if (dbName == null || dbName.isEmpty()) {
-            throw new InitializationException("String configuration value required for 'db'");
-        }
-
-        MongoClient mongo = new MongoClient(host, port);
-        DB db = mongo.getDB(dbName);
-        if (db == null) {
-            throw new InitializationException("Unknown database " + dbName);
-        }
-
-        this.configure(mongo, db);
-    }
-
-    @ConfigMappingExporter
-    public void exportConfig(HashMap<String, Object> config) {
-        config.put("host", client().getAddress().getHost());
-        config.put("port", client().getAddress().getPort());
-        config.put("db", db().getName());
-    }
-
-    protected void configure(MongoClient mongo, DB db) {
-        MongoClient oldMongo = this.mongo;
-        this.mongo = mongo;
-        this.db = db;
-
-        if (oldMongo != null) {
-            oldMongo.close();
-        }
+    @Override
+    public Resource configuration() {
+        return mongoConfigResource;
     }
 
     MongoClient client() {
-        return this.mongo;
+        return this.mongoConfigResource.getMongoClient();
     }
 
     DB db() {
-        return this.db;
+        return this.mongoConfigResource.getDB();
     }
 
     @Override
@@ -108,15 +66,15 @@ public class RootMongoResource extends MongoResource implements RootResource {
 
     @Override
     public void destroy() {
-        if (mongo != null) {
-            mongo.close();
+        if (client() != null) {
+            client().close();
         }
     }
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
-        if (db.collectionExists(id)) {
-            responder.resourceRead(new MongoCollectionResource(this, db.getCollection(id)));
+        if (db().collectionExists(id)) {
+            responder.resourceRead(new MongoCollectionResource(this, db().getCollection(id)));
         } else {
             responder.noSuchResource(id);
         }
@@ -125,14 +83,14 @@ public class RootMongoResource extends MongoResource implements RootResource {
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
         Pagination pagination = ctx.pagination();
-        Stream<String> members = this.db.getCollectionNames().stream().skip(pagination.offset());
+        Stream<String> members = this.db().getCollectionNames().stream().skip(pagination.offset());
         if (pagination.limit() > 0) {
             members = members.limit(pagination.limit());
         }
 
         members.forEach((name) -> {
             if (!name.equals("system.indexes")) {
-                sink.accept(new MongoCollectionResource(this, db.getCollection(name)));
+                sink.accept(new MongoCollectionResource(this, db().getCollection(name)));
             }
         });
 
@@ -145,13 +103,13 @@ public class RootMongoResource extends MongoResource implements RootResource {
 
         String id = state.id();
 
-        if (id == null || !db.collectionExists(id)) {
+        if (id == null || !db().collectionExists(id)) {
 
             if (id == null) {
                 id = UUID.randomUUID().toString();
             }
 
-            DBCollection collection = db.createCollection(id, new BasicDBObject()); // send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
+            DBCollection collection = db().createCollection(id, new BasicDBObject()); // send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
 
             responder.resourceCreated(new MongoCollectionResource(this, collection));
         } else {
@@ -172,12 +130,12 @@ public class RootMongoResource extends MongoResource implements RootResource {
             if (dbRef.getDB() == null) {
                 throw new ResourceProcessingException("Invalid Reference. Reference Database is null.");
             }
-            if (dbRef.getDB().getName() != db.getName()) {
+            if (dbRef.getDB().getName() != db().getName()) {
                 throw new ResourceProcessingException("LiveOak only supports MongoResource objects within the same database.");
             }
 
             String collectionName = dbRef.getRef();
-            if (!db.collectionExists(collectionName)) {
+            if (!db().collectionExists(collectionName)) {
                 throw new ResourceProcessingException("Cannot find collection specified in a reference. No collection named '" + collectionName + "' found");
             }
 
@@ -215,7 +173,7 @@ public class RootMongoResource extends MongoResource implements RootResource {
                 } else {
                     String collectionName = paths[1];
                     String resourceID = paths[2];
-                    return new DBRef(this.db, collectionName, resourceID);
+                    return new DBRef(this.db(), collectionName, resourceID);
                 }
 
             } else {

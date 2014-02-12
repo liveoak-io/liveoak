@@ -163,6 +163,11 @@ public class ResourceStateEncoder implements ResourceEncoder {
         Object top = this.stack.peek();
 
         if (top instanceof Collection) {
+            // TODO: figure out the proper way to handle resources here
+            //ResourceState state = new DefaultResourceState();
+            //state.id(resource.id());
+            //state.uri(resource.uri());
+            //((Collection) top).add(state);
             ((Collection) top).add(resource.uri());
         } else if (top instanceof ResourceState) {
             DefaultResourceState state = new DefaultResourceState();
@@ -170,6 +175,11 @@ public class ResourceStateEncoder implements ResourceEncoder {
             state.uri(resource.uri());
             ((ResourceState) top).addMember(state);
         } else if (top instanceof PropertyCatcher) {
+            // TODO: figure out the proper way to handle resources here
+            //ResourceState state = new DefaultResourceState();
+            //state.id(resource.id());
+            //state.uri(resource.uri());
+            //((PropertyCatcher) top).value = state;
             ((PropertyCatcher) top).value = resource.uri();
         }
     }

@@ -6,19 +6,20 @@
 
 package io.liveoak.mongo;
 
-import java.util.UUID;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
-
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
 import org.jboss.logging.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -46,8 +47,13 @@ public class BaseMongoDBTest extends AbstractResourceTestCase {
 
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", database);
-        config.putProperty("port", port);
-        config.putProperty("host", host);
+
+        List<ResourceState> servers = new ArrayList<ResourceState>();
+        ResourceState server = new DefaultResourceState();
+        server.putProperty("port", port);
+        server.putProperty("host", host);
+        servers.add(server);
+        config.putProperty("servers", servers);
 
         try {
             mongoClient = new MongoClient(host, port);

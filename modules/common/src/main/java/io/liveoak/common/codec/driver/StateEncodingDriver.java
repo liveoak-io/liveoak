@@ -10,6 +10,7 @@ import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -84,8 +85,12 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
         } else if (value instanceof Date ) {
             encoder().writeValue( ( Date ) value );
        //TODO: figure out when writing a link should be used....
-//        } else if (property instanceof ResourceState) {
-//            encoder().writeLink((ResourceState) property);
+//        } else if (value instanceof URI ) {
+////        } else if (property instanceof ResourceState) {
+//            encoder().writeLink((URI) property);
+//        }
+        } else if (value instanceof URI) {
+            encoder().writeValue(((URI)value).getPath());
         } else if (value instanceof Boolean) {
             encoder().writeValue( ( Boolean ) value );
         } else if (value instanceof Map ) {

@@ -58,7 +58,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
 
         // get the non-expanded, default state
         ResourceState result = client.read(new RequestContext.Builder().build(), BASEPATH + "/" + methodName + "/john");
-        // verify the non-expaned state
+        // verify the non-expanded state
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("john");
         assertThat(result.uri()).isEqualTo(new URI("/" + BASEPATH + "/" + methodName + "/john"));

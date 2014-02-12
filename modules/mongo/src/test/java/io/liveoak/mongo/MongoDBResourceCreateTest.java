@@ -6,24 +6,24 @@
 
 package io.liveoak.mongo;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import de.flapdoodle.embed.process.collections.Collections;
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceAlreadyExistsException;
+import io.liveoak.spi.state.ResourceState;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
-
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
-import de.flapdoodle.embed.process.collections.Collections;
-import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.state.ResourceState;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -73,6 +73,24 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         assertEquals(1, db.getCollection(methodName).getCount());
         DBObject dbObject = db.getCollection(methodName).findOne(new BasicDBObject("_id", "helloworld"));
         assertEquals("bar", dbObject.get("foo"));
+    }
+
+    @Test
+    public void testCreateAlreadyExist() throws Exception {
+        String methodName = "testCreateAlreadyExist";
+        assertFalse(db.collectionExists(methodName));
+        db.createCollection(methodName, new BasicDBObject());
+        db.getCollection(methodName).insert(new BasicDBObject("_id", "helloworld"));
+
+        ResourceState state = new DefaultResourceState("helloworld");
+        state.putProperty("foo", "bar");
+
+        try {
+            ResourceState result = client.create(new RequestContext.Builder().build(), BASEPATH + "/" + methodName, state);
+            fail();
+        } catch (ResourceAlreadyExistsException e) {
+            // expected
+        }
     }
 
     @Test
