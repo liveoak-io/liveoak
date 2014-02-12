@@ -166,12 +166,19 @@ public class MongoCollectionResource extends MongoResource {
         BasicDBObject basicDBObject = null;
         try {
             basicDBObject = (BasicDBObject) createObject(state);
+            Object key = basicDBObject.get( MONGO_ID_FIELD );
+            if (key != null) {
+                if (getDBCollection().findOne (new BasicDBObject( MONGO_ID_FIELD, key )) != null) {
+                    responder.resourceAlreadyExists( key.toString() );
+                    return;
+                }
+            }
             WriteResult wResult = getDBCollection().insert(basicDBObject);
         } catch (Exception e) {
             logger().error("", e);
         }
 
-        DBObject newDBObject = getDBCollection().findOne(new BasicDBObject(MONGO_ID_FIELD, basicDBObject.get(MONGO_ID_FIELD)));
+        DBObject newDBObject = getDBCollection().findOne( new BasicDBObject( MONGO_ID_FIELD, basicDBObject.get( MONGO_ID_FIELD ) ) );
         responder.resourceCreated(new MongoBaseObjectResource(this, newDBObject));
     }
 
@@ -192,7 +199,7 @@ public class MongoCollectionResource extends MongoResource {
 
     protected DBCollection getDBCollection() {
         if (dbCollection == null) {
-            this.dbCollection = ((RootMongoResource) parent()).db.getCollection(collectionName);
+            this.dbCollection = ((RootMongoResource) parent()).db().getCollection(collectionName);
         }
 
         return this.dbCollection;
