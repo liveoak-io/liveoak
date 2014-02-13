@@ -85,8 +85,10 @@
         <module>launcher</module>
         <module>test-tools</module>
         <module>modules</module>
+<!--
         <module>vertx-test-tools</module>
         <module>vertx-modules</module>
+-->
         <module>console</module>
         <module>dist</module>
         <module>testsuite</module>
