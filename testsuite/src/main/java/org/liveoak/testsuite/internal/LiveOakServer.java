@@ -71,10 +71,16 @@ public class LiveOakServer {
         String configDir = path(testDir, "test-configurations", config);
         String appDir = path(testDir, "test-apps", app);
 
+        String logDir = path(liveoakDir, "launcher", "logs");
+        String loggingPropertiesPath = path(liveoakDir, "launcher", "etc", "logging.properties");
+
         List<String> cmd = new LinkedList<>();
         cmd.add(java);
         cmd.add("-Dio.liveoak.js.dir=" + jsClientDir);
         cmd.add("-Dcss.dir=" + cssDir);
+        cmd.add("-Dio.liveoak.log=" + logDir);
+        cmd.add("-Dlogging.configuration=file:" + loggingPropertiesPath);
+
         cmd.add("-jar");
         cmd.add(modulesJar);
         cmd.add("-modulepath");

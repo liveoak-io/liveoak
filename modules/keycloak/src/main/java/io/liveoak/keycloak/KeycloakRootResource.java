@@ -3,6 +3,7 @@ package io.liveoak.keycloak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import org.jboss.logging.Logger;
 import org.keycloak.models.RealmModel;
@@ -49,6 +50,13 @@ public class KeycloakRootResource implements RootResource {
         } else {
             responder.noSuchResource( id );
         }
+    }
+
+    @Override
+    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
+        sink.accept(this.tokensResource);
+        sink.accept(this.publicKeyResource);
+        sink.close();
     }
 
     public Logger logger() {

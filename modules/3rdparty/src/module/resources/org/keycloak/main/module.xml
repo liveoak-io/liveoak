@@ -27,11 +27,17 @@
         <artifact name="org.keycloak:keycloak-admin-ui-styles:${keycloak.version}"/>
         <artifact name="org.keycloak:keycloak-core:${keycloak.version}"/>
         <artifact name="org.keycloak:keycloak-core-jaxrs:${keycloak.version}"/>
-        <artifact name="org.keycloak:keycloak-forms:${keycloak.version}"/>
         <artifact name="org.keycloak:keycloak-model-api:${keycloak.version}"/>
         <artifact name="org.keycloak:keycloak-model-jpa:${keycloak.version}"/>
+        <artifact name="org.keycloak:keycloak-model-mongo:${keycloak.version}"/>
         <artifact name="org.keycloak:keycloak-services:${keycloak.version}"/>
         <artifact name="org.keycloak:keycloak-jaxrs-oauth-client:${keycloak.version}"/>
+        <artifact name="org.keycloak:keycloak-login-api:${keycloak.version}"/>
+        <artifact name="org.keycloak:keycloak-login-freemarker:${keycloak.version}"/>
+        <artifact name="org.keycloak:keycloak-forms-common-freemarker:${keycloak.version}"/>
+        <artifact name="org.keycloak:keycloak-forms-common-themes:${keycloak.version}"/>
+        <artifact name="org.keycloak:keycloak-account-api:${keycloak.version}"/>
+        <artifact name="org.keycloak:keycloak-account-freemarker:${keycloak.version}"/>
 
         <!-- Keycloak dependencies -->
         <artifact name="org.bouncycastle:bcprov-jdk16:1.46"/>
@@ -61,12 +67,21 @@
         <module name="org.keycloak.social.core"/>
 
         <module name="javax.api"/>
+        <module name="javax.activation.api"/>
         <module name="javax.xml.bind.api"/>
         <module name="javax.mail.api"/>
         <module name="org.apache.httpcomponents"/>
         <module name="org.apache.commons.io"/>
+
+        <!-- Needed for JPA model -->
         <module name="org.hibernate" services="import"/>
+
+        <!-- Needed for mongo model -->
+        <module name="org.mongodb"/>
+        <module name="org.picketlink.common"/>
+
         <module name="org.jboss.logging"/>
+        <module name="net.iharder"/>
         <module name="org.undertow"/>
         <module name="org.slf4j"/>
 

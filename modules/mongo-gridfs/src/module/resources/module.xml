@@ -9,14 +9,12 @@
 
     <resources>
         <resource-root path="${project.artifactId}.jar"/>
-<!--
-        <artifact name="org.mongodb:mongo-java-driver:${mongo.version}"/>
--->
     </resources>
 
     <dependencies>
         <module name="io.liveoak.spi"/>
         <module name="io.liveoak.mongo"/>
+        <module name="org.mongodb"/>
         <system>
             <paths>
                 <path name="javax/net"/>

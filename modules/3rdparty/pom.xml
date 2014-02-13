@@ -121,6 +121,12 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- net.iharder -->
+        <dependency>
+            <groupId>net.iharder</groupId>
+            <artifactId>base64</artifactId>
+        </dependency>
+
         <!-- org.apache.commons.codec -->
         <dependency>
             <groupId>commons-codec</groupId>
@@ -231,7 +237,31 @@
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-forms</artifactId>
+            <artifactId>keycloak-model-mongo</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-login-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-login-freemarker</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-forms-common-freemarker</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-forms-common-themes</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-account-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-account-freemarker</artifactId>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
@@ -270,6 +300,17 @@
             <artifactId>async-http-servlet-3.0</artifactId>
         </dependency>
 
+        <!-- org.mongodb -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+        </dependency>
+
+        <!-- org.picketlink.common -->
+        <dependency>
+            <groupId>org.picketlink</groupId>
+            <artifactId>picketlink-common</artifactId>
+        </dependency>
 
         <!-- org.undertow -->
         <dependency>

@@ -49,12 +49,14 @@
         <hibernate.version>4.2.7.SP1</hibernate.version>
         <hibernate.annotations.version>4.0.2.Final</hibernate.annotations.version>
         <hibernate.jpa.version>1.0.0.Final</hibernate.jpa.version>
+        <picketlink.version>2.5.0.Beta6</picketlink.version>
+        <net.iharder.base64.version>2.3.8</net.iharder.base64.version>
         <jboss.spec.javax.servlet.version>1.0.0.Final</jboss.spec.javax.servlet.version>
         <jboss.spec.javax.transaction.version>1.0.0.Final</jboss.spec.javax.transaction.version>
         <dom4j.version>1.6.1</dom4j.version>
         <javassist.version>3.18.1-GA</javassist.version>
         <antlr.version>2.7.7</antlr.version>
-        <keycloak.version>1.0-alpha-1</keycloak.version>
+        <keycloak.version>1.0-alpha-2</keycloak.version>
         <resteasy.version>3.0.6.Final</resteasy.version>
         <undertow.version>1.0.0.Beta30</undertow.version>
         <jboss.xnio.version>3.2.0.Beta3</jboss.xnio.version>
@@ -254,6 +256,16 @@
                 <version>${hibernate.jpa.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.picketlink</groupId>
+                <artifactId>picketlink-common</artifactId>
+                <version>${picketlink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.iharder</groupId>
+                <artifactId>base64</artifactId>
+                <version>${net.iharder.base64.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>${h2.version}</version>
@@ -408,17 +420,47 @@
             </dependency>
             <dependency>
                 <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-model-mongo</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-login-api</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-login-freemarker</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-forms-common-freemarker</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-forms-common-themes</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-account-api</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-account-freemarker</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-admin-ui</artifactId>
                 <version>${keycloak.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-admin-ui-styles</artifactId>
-                <version>${keycloak.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-forms</artifactId>
                 <version>${keycloak.version}</version>
             </dependency>
             <dependency>

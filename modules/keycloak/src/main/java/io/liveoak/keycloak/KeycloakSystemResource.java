@@ -12,6 +12,7 @@ import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceTarget;
+import org.keycloak.models.utils.ModelProviderUtils;
 
 import java.util.function.Consumer;
 
@@ -20,6 +21,9 @@ import java.util.function.Consumer;
  */
 public class KeycloakSystemResource implements RootResource, UndertowConfig {
 
+    public static final String HOST = "host";
+    public static final String PORT = "port";
+    public static final String MODEL = "model";
 
     public KeycloakSystemResource(ServiceTarget target, String id) {
         this.target = target;
@@ -43,6 +47,7 @@ public class KeycloakSystemResource implements RootResource, UndertowConfig {
 
     public void start() {
         startUndertow();
+        setupModelProvider();
         startKeycloak();
     }
 
@@ -53,9 +58,13 @@ public class KeycloakSystemResource implements RootResource, UndertowConfig {
                 .install();
     }
 
+    private void setupModelProvider() {
+        System.setProperty(ModelProviderUtils.MODEL_PROVIDER, model);
+    }
+
     private void startKeycloak() {
         KeycloakServerService keycloak = new KeycloakServerService();
-        this.target.addService(KeycloakServices.keycloak(this.id), keycloak)
+        this.keycloak = this.target.addService(KeycloakServices.keycloak(this.id), keycloak)
                 .addDependency(KeycloakServices.undertow(this.id), UndertowServer.class, keycloak.undertowServerInjector())
                 .install();
 
@@ -75,29 +84,55 @@ public class KeycloakSystemResource implements RootResource, UndertowConfig {
         return this.port;
     }
 
-    protected synchronized void restart(Consumer<ServiceController<?>> callback) {
-        ServiceRestarter.restart(this.undertow, callback);
+    protected synchronized void restart(ServiceController<?> controller, Consumer<ServiceController<?>> callback) {
+        ServiceRestarter.restart(controller, callback);
+    }
+
+    protected void restart(ServiceController<?> controller, Responder responder) {
+        restart(controller, new Consumer<ServiceController<?>>() {
+            @Override
+            public void accept(ServiceController<?> c) {
+                if (c.getState().equals(ServiceController.State.UP)) {
+                    responder.resourceUpdated(KeycloakSystemResource.this);
+                } else {
+                    responder.internalError(c.getStartException());
+                }
+            }
+        });
     }
 
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        if (state.getProperty("host") != null) {
-            this.host = (String) state.getProperty("host");
+        boolean undertowRestartNeeded = false;
+        boolean keycloakRestartNeeded = false;
+
+        if (state.getProperty(HOST) != null) {
+            String configHost = (String) state.getProperty(HOST);
+            if (!configHost.equals(this.host)) {
+                this.host = configHost;
+                undertowRestartNeeded = true;
+            }
         }
-        if (state.getProperty("port") != null) {
-            this.port = (int) state.getProperty("port");
+        if (state.getProperty(PORT) != null) {
+            int configPort = (int) state.getProperty(PORT);
+            if (configPort != this.port) {
+                this.port = configPort;
+                undertowRestartNeeded = true;
+            }
         }
-        if (this.undertow != null) {
-            restart(new Consumer<ServiceController<?>>() {
-                @Override
-                public void accept(ServiceController<?> c) {
-                    if (c.getState().equals(ServiceController.State.UP)) {
-                        responder.resourceUpdated(KeycloakSystemResource.this);
-                    } else {
-                        responder.internalError(c.getStartException());
-                    }
-                }
-            });
+        if (state.getProperty(MODEL) != null) {
+            String configModel = (String) state.getProperty(MODEL);
+            if (!configModel.equals(this.model)) {
+                this.model = configModel;
+                setupModelProvider();
+                keycloakRestartNeeded = true;
+            }
+        }
+
+        if (this.undertow != null && undertowRestartNeeded) {
+            restart(this.undertow, responder);
+        } else if (this.keycloak != null && keycloakRestartNeeded) {
+            restart(this.keycloak, responder);
         } else {
             responder.resourceUpdated(this);
         }
@@ -105,8 +140,8 @@ public class KeycloakSystemResource implements RootResource, UndertowConfig {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("host", this.host);
-        sink.accept("port", this.port);
+        sink.accept(HOST, this.host);
+        sink.accept(PORT, this.port);
         sink.close();
     }
 
@@ -117,5 +152,7 @@ public class KeycloakSystemResource implements RootResource, UndertowConfig {
 
     private String host = "localhost";
     private int port = 8383;
+    private String model = "mongo";
     private ServiceController<UndertowServer> undertow;
+    private ServiceController<KeycloakServer> keycloak;
 }

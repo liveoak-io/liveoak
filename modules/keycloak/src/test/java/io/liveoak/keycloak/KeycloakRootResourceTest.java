@@ -23,14 +23,14 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
-public class KeycloakRootResourceTest extends AbstractResourceTestCase {
+public class KeycloakRootResourceTest extends AbstractKeycloakTest {
 
     private KeycloakRootResource keycloak;
     private TokenUtil tokenUtil;
 
     @Override
     public void loadExtensions() throws Exception {
-        loadExtension( "auth", new KeycloakExtension() );
+        loadExtension( "auth", new KeycloakExtension(), createTestConfig());
         installResource( "auth", "auth", JsonNodeFactory.instance.objectNode() );
     }
 

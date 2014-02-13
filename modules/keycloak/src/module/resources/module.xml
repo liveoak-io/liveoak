@@ -11,11 +11,15 @@
         <module name="org.keycloak" services="import">
             <imports>
                 <include path="META-INF/**" />
+                <include path="META-INF" />
             </imports>
         </module>
         <module name="org.keycloak.social.google" services="import"/>
+
+        <!-- Needed for JPA model -->
         <module name="org.hibernate" services="import"/>
         <module name="com.h2database.h2"/>
+
         <module name="org.undertow"/>
     </dependencies>
 </module>

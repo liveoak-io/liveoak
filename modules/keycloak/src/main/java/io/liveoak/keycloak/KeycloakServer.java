@@ -11,24 +11,32 @@ import io.undertow.servlet.api.FilterInfo;
 import io.undertow.servlet.api.ServletInfo;
 import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 import org.jboss.resteasy.spi.ResteasyDeployment;
+import org.keycloak.models.ApplicationModel;
 import org.keycloak.models.Constants;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.RequiredCredentialModel;
+import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.representations.idm.ApplicationRepresentation;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.services.filters.KeycloakSessionServletFilter;
 import org.keycloak.services.managers.ApplianceBootstrap;
 import org.keycloak.services.managers.ApplicationManager;
 import org.keycloak.services.managers.RealmManager;
 import org.keycloak.services.resources.KeycloakApplication;
+import org.keycloak.services.tmp.TmpAdminRedirectServlet;
 
 import javax.servlet.DispatcherType;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static io.undertow.servlet.Servlets.servlet;
 
@@ -56,42 +64,29 @@ public class KeycloakServer {
         try {
             RealmManager manager = new RealmManager(session);
 
-            if (manager.getRealm(Constants.ADMIN_REALM) != null) {
-                return;
-            }
-
-            new ApplianceBootstrap().bootstrap(session);
-
             RealmModel adminRealm = manager.getRealm(Constants.ADMIN_REALM);
 
             // No need to require admin to change password as this server is for dev/test
             adminRealm.getUser("admin").removeRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
 
-            // Create Application in realm for console
-            ApplicationRepresentation consoleApp = new ApplicationRepresentation();
-            consoleApp.setName("console");
-            consoleApp.setEnabled(true);
-            consoleApp.credential("password", "password");
-            consoleApp.setDefaultRoles(new String[]{"user"});
+            if (adminRealm.getApplicationByName("console") == null) {
+                // Create Application in realm for console and initialize it
+                ApplicationModel consoleApp = new ApplicationManager(manager).createApplication(adminRealm, "console");
+                consoleApp.addDefaultRole("user");
+                consoleApp.addRole("admin");
 
-            List<RoleRepresentation> roles = new ArrayList<>();
-            RoleRepresentation role = new RoleRepresentation();
-            role.setName("user");
-            roles.add(role);
-            role = new RoleRepresentation();
-            role.setName("admin");
-            roles.add(role);
-            consoleApp.setRoles(roles);
+                UserModel consoleAppClient = consoleApp.getApplicationUser();
+                consoleAppClient.addRedirectUri("http://localhost:8080/admin");
+                consoleAppClient.addWebOrigin("http://localhost:8080");
 
-            List<String> redirect = new ArrayList<>();
-            redirect.add("http://localhost:8080/admin");
-            consoleApp.setRedirectUris(redirect);
+                // Likely a bug in ApplianceBootstrap as currently it requires 'password' TODO: Remove
+                adminRealm.updateRequiredApplicationCredentials(Collections.EMPTY_SET);
+                adminRealm.addRequiredResourceCredential(CredentialRepresentation.SECRET);
 
-            List<String> origin = new ArrayList<>();
-            origin.add("http://localhost:8080");
-            consoleApp.setWebOrigins(origin);
-
-            new ApplicationManager(manager).createApplication(adminRealm, consoleApp);
+                // Just for development to use hardcoded client_secret instead of generated TODO: Remove and find better solution
+                UserCredentialModel secret = UserCredentialModel.secret("password");
+                adminRealm.updateCredential(consoleAppClient, secret);
+            }
 
             session.getTransaction().commit();
         } finally {
@@ -126,9 +121,13 @@ public class KeycloakServer {
         deploymentInfo.addFilter(filter);
         deploymentInfo.addFilterUrlMapping("SessionFilter", "/rest/*", DispatcherType.REQUEST);
 
+        ServletInfo tmpAdminRedirectServlet = Servlets.servlet("TmpAdminRedirectServlet", TmpAdminRedirectServlet.class);
+        tmpAdminRedirectServlet.addMappings("/admin", "/admin/");
+        deploymentInfo.addServlet(tmpAdminRedirectServlet);
+
         undertow.deploy(deploymentInfo);
 
-        factory = KeycloakApplication.createSessionFactory();
+        factory = ((KeycloakApplication)deployment.getApplication()).getFactory();
 
         setupDefaultRealm();
     }

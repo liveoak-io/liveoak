@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 
-public class AuthHandlerTest extends AbstractResourceTestCase {
+public class AuthHandlerTest extends AbstractKeycloakTest {
 
     private static CloseableHttpClient httpClient;
     private static TokenUtil tokenUtil;
@@ -39,7 +39,7 @@ public class AuthHandlerTest extends AbstractResourceTestCase {
 
     @Override
     public void loadExtensions() throws Exception {
-        loadExtension("auth", new KeycloakExtension());
+        loadExtension("auth", new KeycloakExtension(), createTestConfig());
         loadExtension("auth-test", new MockExtension(MockRootResource.class));
         installResource("auth", "auth", JsonNodeFactory.instance.objectNode());
         installResource("auth-test", "auth-test", JsonNodeFactory.instance.objectNode());
