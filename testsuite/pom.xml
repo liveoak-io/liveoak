@@ -212,7 +212,7 @@
             <id>phantomjs-macosx</id>
             <activation>
                 <os>
-                    <name>mac</name>
+                    <family>mac</family>
                 </os>
             </activation>
             <properties>
