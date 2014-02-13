@@ -9,6 +9,8 @@ import java.io.File;
 
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
+import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.container.tenancy.InternalOrganization;
 import org.jboss.logging.Logger;
 
 /**
@@ -24,18 +26,24 @@ public class Bootstrap {
         File configDir = null;
         File appsDir = null;
 
-        if (args.length == 1) {
+        if (args.length >= 1) {
             liveOakDir = new File(args[0]);
             configDir = new File(liveOakDir, "conf");
             appsDir = new File(liveOakDir, "apps");
         }
 
-
         log.info("Booting up LiveOak BaaS");
         long start = System.currentTimeMillis();
 
-        LiveOakFactory.create(configDir, appsDir);
+        LiveOakSystem system = LiveOakFactory.create(configDir, appsDir);
 
         log.infof("LiveOak booted in %d ms", (System.currentTimeMillis() - start));
+
+        if ( args.length == 2 ) {
+            File appDir = new File( args[1] ).getAbsoluteFile();
+            InternalOrganization liveoakOrg = system.organizationRegistry().organization("liveoak");
+            InternalApplication deployedApp = liveoakOrg.createApplication(appDir.getName(), appDir.getName(), appDir);
+            system.awaitStability();
+        }
     }
 }

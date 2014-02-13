@@ -32,14 +32,15 @@ public class JsHttpIT {
 
     @Before
     public void before() throws IOException, JSONException {
-        driver.navigate().to(new URL(url, "/app/index.html"));
+        driver.navigate().to(new URL(url, "/liveoak/default/app/index.html"));
         js.execute("init-liveoak.js");
     }
 
     @Test
     public void testReadMembers() throws IOException, JSONException {
-        JSONArray result = (JSONArray) js.execute("read-members.js", "/app");
+        JSONArray result = (JSONArray) js.execute("read-members.js", "/liveoak/default/app");
 
+        System.err.println( "RESULT: " + result );
         Assert.assertTrue(result.length() > 0);
         Assert.assertEquals(1, result.length());
         Assert.assertEquals("index.html", result.getJSONObject(0).getString("id"));
@@ -47,10 +48,10 @@ public class JsHttpIT {
 
     @Test
     public void testRead() throws IOException, JSONException {
-        JSONObject result = (JSONObject) js.execute("read.js", "/app");
+        JSONObject result = (JSONObject) js.execute("read.js", "/liveoak/default");
 
-        Assert.assertEquals("app", result.getString("id"));
-        Assert.assertEquals("/app", result.getJSONObject("self").getString("href"));
+        Assert.assertEquals("default", result.getString("id"));
+        Assert.assertEquals("/liveoak/default", result.getJSONObject("self").getString("href"));
     }
 
 }

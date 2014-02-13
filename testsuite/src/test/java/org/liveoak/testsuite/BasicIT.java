@@ -28,7 +28,10 @@ public class BasicIT {
 
     @Test
     public void testAppIndexHtml() throws Exception {
-        String resource = getResource(client, new URL(url, "/app/index.html"));
+        String resource = getResource(client, new URL(url, "/liveoak/default/app/index.html"));
+
+        Assert.assertNotNull( resource );
+        resource = resource.trim();
 
         Assert.assertTrue(resource.startsWith("<!DOCTYPE html>"));
         Assert.assertTrue(resource.contains("<title>testsuite</title>"));

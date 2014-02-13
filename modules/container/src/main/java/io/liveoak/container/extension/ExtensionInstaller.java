@@ -12,6 +12,7 @@ import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoader;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StabilityMonitor;
 
 import java.io.File;
 import java.util.ServiceLoader;
@@ -26,7 +27,7 @@ public class ExtensionInstaller {
         this.target = target.subTarget();
         this.systemConfigMount = systemConfigMount;
         this.commonExtensions = new CommonExtensions();
-        this.target.addListener( this.commonExtensions );
+        this.target.addListener(this.commonExtensions);
     }
 
     public CommonExtensions commonExtensions() {
@@ -34,6 +35,8 @@ public class ExtensionInstaller {
     }
 
     public void load(File extensionDesc) throws Exception {
+        StabilityMonitor monitor = new StabilityMonitor();
+        this.target.addMonitor( monitor );
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true );
         mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true );
@@ -44,6 +47,8 @@ public class ExtensionInstaller {
             id = id.substring(0, id.length() - 5);
         }
         load( id, fullConfig );
+        monitor.awaitStability();
+        this.target.removeMonitor( monitor );
     }
 
     public void load(String id, ObjectNode fullConfig) throws Exception {

@@ -5,10 +5,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
-import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.*;
 import org.jboss.msc.value.ImmediateValue;
-import org.jboss.msc.value.InjectedValue;
 
 /**
  * @author Bob McWhirter

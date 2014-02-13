@@ -68,21 +68,23 @@ public class LiveOakServer {
 
         String testDir = path(liveoakDir, "testsuite", "src", "test");
 
-        String etcDir = path(testDir, "config", config);
-        String appDir = path(testDir, "app", app);
+        String configDir = path(testDir, "test-configurations", config);
+        String appDir = path(testDir, "test-apps", app);
 
         List<String> cmd = new LinkedList<>();
         cmd.add(java);
-        cmd.add("-Djs.client.dir=" + jsClientDir);
+        cmd.add("-Dio.liveoak.js.dir=" + jsClientDir);
         cmd.add("-Dcss.dir=" + cssDir);
         cmd.add("-jar");
         cmd.add(modulesJar);
         cmd.add("-modulepath");
         cmd.add(modulePath);
         cmd.add("io.liveoak.bootstrap:main");
-        cmd.add(etcDir);
+        cmd.add(configDir);
+        cmd.add(appDir);
 
-        ProcessBuilder pb = new ProcessBuilder().directory(new File(appDir)).command(cmd);
+        //ProcessBuilder pb = new ProcessBuilder().directory(new File(appDir)).command(cmd);
+        ProcessBuilder pb = new ProcessBuilder().command(cmd);
 
         if (Config.showOutput()) {
             pb.inheritIO();
@@ -95,6 +97,7 @@ public class LiveOakServer {
         //waitFor("http://localhost:8383/auth-server/rest/realms/default", Config.stopTimeout());
 
         log.info("Started LiveOakServer in " + (System.currentTimeMillis() - time) + " ms");
+
     }
 
     public void stop() {

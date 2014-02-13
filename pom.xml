@@ -89,10 +89,7 @@
         <module>vertx-modules</module>
         <module>console</module>
         <module>dist</module>
-<!--
-        TODO: re-enable
         <module>testsuite</module>
--->
     </modules>
     <developers>
         <developer>

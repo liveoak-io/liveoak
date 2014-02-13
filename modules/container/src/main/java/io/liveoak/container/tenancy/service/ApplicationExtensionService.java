@@ -30,6 +30,7 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
     @Override
     public void start(StartContext context) throws StartException {
 
+        System.err.println( "** Activate " + this.extensionId + " for " + this.applicationInjector.getValue().id() );
         ServiceTarget target = context.getChildTarget();
 
         this.appExtension = new InternalApplicationExtension(

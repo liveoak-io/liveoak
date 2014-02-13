@@ -1,0 +1,7 @@
+{
+    module-id:   'io.liveoak.filesystem.aggregating',
+    common: true,
+    app-config: {
+      dir: "${io.liveoak.js.dir}"
+    }
+}
