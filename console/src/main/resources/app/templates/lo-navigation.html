@@ -1,0 +1,19 @@
+<div>
+    <aside class="bs-sidebar col-md-2 clearfix">
+        <div class="dropdown">
+            <a data-toggle="dropdown" class="dropdown-toggle" href="#">My App<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                <li ng-repeat="app in loApps" ng-class="{active: app == loApp.name}"><a ng-href="#/applications/{{app}}/dashboard">{{ app }}</a></li>
+            </ul>
+        </div>
+
+        <ul class="side-nav">
+            <li ng-class="{active: loCurrent == 'dashboard'}" class="dashboard"><a href="#"><i class="fa fa-tachometer fa-3x"></i>Dashboard</a></li>
+            <li ng-class="{active: loCurrent == 'security'}" class="security"><a href="#"><i class="fa fa-lock fa-3x"></i>Security</a></li>
+            <li ng-class="{active: loCurrent == 'storage'}" class="storage"><a href="#"><i class="fa fa-cloud fa-3x"></i>Storage</a></li>
+            <li ng-class="{active: loCurrent == 'push'}" class="push"><a href="#"><i class="fa fa-mobile fa-4x"></i>Push</a></li>
+        </ul>
+    </aside>
+
+    <div class="aside-bg col-md-2 fixed"></div>
+</div>

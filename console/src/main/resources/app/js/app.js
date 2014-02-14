@@ -7,12 +7,22 @@ var loMod = angular.module('loApp', [
   'loApp.filters',
   'loApp.services',
   'loApp.directives',
-  'loApp.controllers'
-]).config(['$routeProvider', function($routeProvider) {
+  'loApp.controllers',
+  'services.breadcrumbs'
+]);
+
+loMod.config(['$routeProvider', function($routeProvider) {
   $routeProvider
       .when('/', {
-          templateUrl : 'partials/home.html',
-          controller : 'HomeCtrl'
+          templateUrl : 'partials/dashboard.html',
+          controller : 'DashboardCtrl'
+      })
+      .when('/applications/:appId', {
+          redirectTo: '/applications/:appId/dashboard'
+      })
+      .when('/applications/:appId/dashboard', {
+          templateUrl : 'partials/dashboard.html',
+          controller : 'DashboardCtrl'
       })
       .otherwise({
           templateUrl : 'partials/notfound.html'

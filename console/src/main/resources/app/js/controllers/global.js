@@ -1,8 +1,10 @@
-angular.module('loApp.controllers').controller('GlobalCtrl', function($scope, LiveOak) {
+loMod.controller('GlobalCtrl', function($scope, LiveOak, Current) {
     $scope.auth = LiveOak.auth;
     $scope.username = LiveOak.auth.username;
     $scope.isAdmin = LiveOak.auth.hasResourceRole("admin");
     $scope.authenticated = LiveOak.auth.authenticated;
+
+    $scope.curApp = Current;
 
     $scope.userLabel = function() {
         var role = "";
@@ -16,10 +18,11 @@ angular.module('loApp.controllers').controller('GlobalCtrl', function($scope, Li
 
 });
 
-angular.module('loApp.controllers').controller('AppDropdownCtrl', function($scope, LiveOak) {
+angular.module('loApp.controllers').controller('AppDropdownCtrl', function($scope, LiveOak, Current) {
 
     // FIXME: Get with REST
-    $scope.applications = ["Hardcoded One", "Hardcoded Two"];
+    $scope.applications = ["My App", "Other App"];
+    $scope.curApp = Current;
     $scope.showNav = function() {
         var show = $scope.applications.length > 0;
         return LiveOak.auth.authenticated && show;

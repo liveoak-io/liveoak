@@ -32,7 +32,7 @@
         <bower.version.bootstrap>3.0.3</bower.version.bootstrap>
         <bower.version.less>1.6.1</bower.version.less>
         <bower.version.select2>3.4.5</bower.version.select2>
-        <bower.version.ui-bootstrap>0.10.0</bower.version.ui-bootstrap>
+        <bower.version.angular-bootstrap>0.10.0</bower.version.angular-bootstrap>
         <bower.version.angular-mocks>1.2.9</bower.version.angular-mocks>
     </properties>
     <modelVersion>4.0.0</modelVersion>
