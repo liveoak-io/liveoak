@@ -1,0 +1,25 @@
+<header class="header rcue">
+    <div class="navbar utility">
+        <div class="navbar-inner clearfix">
+            <h1 class="pull-left"><a href="index.html">LiveOak</a></h1>
+            <ul class="nav pull-right">
+                <li class="dropdown">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <i class="fa fa-user"></i> {{username}} <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Manage Account</a></li>
+                        <li class="separator"><a href="#" ng-click="auth.logout()">Sign Out</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="navbar primary">
+        <ul class="nav col-md-2 fixed">
+            <li class="active">
+                <a href="#">Applications</a>
+            </li>
+        </ul>
+    </div>
+</header>

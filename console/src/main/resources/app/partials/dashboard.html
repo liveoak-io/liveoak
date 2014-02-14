@@ -1,0 +1,120 @@
+<div>
+    <lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="dashboard" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
+
+    <div class="content-area col-md-8">
+        <div class="content">
+            <ol class="breadcrumb">
+                <li><a href="#/applications">Applications</a></li>
+                <li><a href="#/applications/{{curApp.name}}">{{ curApp.name }}</a></li>
+                <li class="active">Dashboard</li>
+            </ol>
+            <!--
+            <ol class="breadcrumb">
+                <li ng-repeat="breadcrumb in breadcrumbs.getAll()" ng-class="active: $last" >
+                    <ng-switch on="$last">
+                        <span ng-switch-when="true">{{breadcrumb.name}}</span>
+                        <span ng-switch-default><a href="{{breadcrumb.path}}">{{breadcrumb.name}}</a></span>
+                    </ng-switch>
+                </li>
+            </ol>
+            -->
+            <section class="box">
+                <div class="box-header clearfix">
+                    <h2 class="pull-left"><span>{{ curApp.name }}</span> Dashboard</h2>
+                    <div class="btn-group pull-right">
+                        <button ng-repeat="period in dataPeriods" class="btn btn-default" type="button" ng-model="$parent.range" btn-radio="period">{{period}}</button>
+                    </div>
+                    <!--
+                    <div class="pull-right">
+                        <span class="hidden">Start Date</span>
+                        <input type="text" id="dpd1" value="" class="span2">
+                        <span class="date-separator"> - </span>
+                        <span class="hidden">End Date</span>
+                        <input type="text" id="dpd2" value="" class="span2">
+                    </div>
+                    -->
+                </div>
+                <div class="box-content clearfix">
+                    <div class="api highlight">
+                        <i class="fa fa-spinner"></i>
+                        <div>
+                            <em>{{data[range].requests}}</em>
+                            <span class="text">API requests / second</span>
+                        </div>
+                    </div>
+                    <div class="users">
+                        <i class="fa fa-users"></i>
+                        <div>
+                            <em>{{data[range].users}}</em>
+                            <span class="text">active users / second</span>
+                        </div>
+                    </div>
+                    <div class="push">
+                        <i class="fa fa-mobile"></i>
+                        <div>
+                            <em>{{data[range].notifications}}</em>
+                            <span class="text">push notifications / second</span>
+                        </div>
+                    </div>
+                    <div class="storage">
+                        <i class="fa fa-cloud"></i>
+                        <div>
+                            <em>{{data[range].storage}}</em>
+                            <span class="measure">GB</span>
+                            <span class="text">gigabytes / second</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tutorials">
+                <h3><span>LiveOak</span> Tutorials</h3>
+                <i class="fa fa-file-text-o fa-4x"></i>
+                <p>Explore LiveOak Documentation and learn how to set up Security, Data and Push.</p>
+                <a href="#">How to start building your app »</a>
+            </section>
+        </div>
+    </div>
+    <div class="content-area-bg col-md-8 col-md-offset-2"></div>
+
+    <div class="info-area col-md-2">
+        <section class="details">
+            <h3><span>{{ curApp.name }}</span> Details </h3>
+            <div class="security">
+                <div>
+                    <span class="label">App Status</span>
+                    <span class="field"><i class="circle"></i> Running</span>
+                </div>
+                <div>
+                    <span class="label">App Key</span>
+                    <span class="field">jieu89-eiW38oskj</span>
+                    <button class="icon" tooltip="Copy" tooltip-placement="bottom" tooltip-append-to-body="true"><i class="fa fa-copy"></i><span>Copy</span></button>
+                </div>
+                <div>
+                    <span class="label">App Secret</span>
+                    <span class="field">9iugjW39vnlz90ei9ejiDoi</span>
+                    <button class="icon" tooltip="Copy" tooltip-placement="bottom" tooltip-append-to-body="true"><i class="fa fa-copy"></i><span>Copy</span></button>
+                </div>
+                <a href="#">View <strong>Security Settings</strong> »</a>
+            </div>
+            <div class="storage">
+                <div>
+                    <span class="label">Storage</span>
+                    <ul>
+                        <li><span class="field">MyFirstStorage</span></li>
+                        <li><span class="field">MySecondStorage</span></li>
+                        <li><span class="field">MyThirdStorage</span></li>
+                    </ul>
+                </div>
+                <a href="#">View All <strong>Storage Resources</strong> »</a>
+            </div>
+            <div class="security">
+                <div>
+                    <span class="label">Push Notifications</span>
+                    <span class="field">Not Set Up</span>
+                </div>
+                <a href="#">View <strong>Push Settings</strong> »</a>
+            </div>
+        </section>
+    </div>
+</div>

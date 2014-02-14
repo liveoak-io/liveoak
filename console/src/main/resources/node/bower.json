@@ -19,7 +19,7 @@
         "bootstrap": "@version.bootstrap",
         "less": "@version.less",
         "select2": "@version.select2",
-        "ui-bootstrap": "@version.ui-bootstrap",
+        "angular-bootstrap": "@version.angular-bootstrap",
         "angular-mocks": "@version.angular-mocks"
     }
 }

@@ -1,98 +1,88 @@
 <!doctype html>
-<html lang="en" data-framework="angularjs">
+<html lang="en" data-framework="angularjs" ng-controller="GlobalCtrl" >
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-    <title>LiveOak // Console</title>
-
-    <link rel="icon" href="img/favicon.ico">
+    <title>{{ curApp.name }} Dashboard - LiveOak</title>
 
     <!-- Frameworks -->
-    <link rel="stylesheet" type="text/css" href="css/reset.css">
-    <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.css">
-    <link rel="stylesheet" href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800,800italic'>
+    <link rel="stylesheet" href="css/reset.css">
+    <!--<link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.css">-->
+    <link href='http://fonts.googleapis.com/css?family=Exo+2:300,300italic,400,400italic,600,600italic' rel='stylesheet' type='text/css'>
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
-    <!-- RCUE styles -->
-    <link rel="stylesheet" type="text/css" href="css/base.css">
-    <link rel="stylesheet" type="text/css" href="css/forms.css">
-    <link rel="stylesheet" type="text/css" href="css/header.css">
-    <link rel="stylesheet" type="text/css" href="css/tabs.css">
-    <link rel="stylesheet" type="text/css" href="css/icons.css">
-    <link rel="stylesheet" type="text/css" href="css/tables.css">
-    <link rel="stylesheet" type="text/css" href="css/sprites.css">
+    <!-- PatternFly/RCUE Styles -->
+    <link rel="stylesheet" href="lib/patternfly/dist/css/patternfly.css">
 
     <!-- Page styles -->
-    <link rel="stylesheet" type="text/css" href="css/admin-console.css" />
-    <link href="lib/select2/select2.css" rel="stylesheet">
-
-    <script src="lib/less/dist/less-1.6.1.js" type="text/javascript" ></script>
-
-    <style>[ng-cloak] { display: none; }</style>
-    <style>
-        #user {
-            position: absolute;
-            right: 20px;
-            font-size: 20px;
-            top: 20px;
-            color: #b3b3b3;
-        }
-
-        #user a {
-            color: #b3b3b3;
-            text-decoration: none;
-        }
-
-        #hack {
-            border: 1px solid #b3b3b3;
-            background-color: #fff;
-            position: absolute;
-            padding: 10px;
-            right: 20px;
-            font-size: 12px;
-            top: 50px;
-            color: #b3b3b3;
-        }
-    </style>
+    <link rel="stylesheet" href="css/console.css">
 </head>
 
-<body class="admin-console" ng-controller="GlobalCtrl" ng-cloak>
-<!--<h1>Welcome to LiveOak Console, <strong>{{username}}</strong>.</h1>-->
-<div id="wrap">
-    <div data-ng-include data-src="'partials/menu.html'"></div>
+<body class="app-dashboard" ng-cloak>
+    <lo-navbar></lo-navbar>
 
-    <div data-ng-view id="view"></div>
-
-    <div id="loading" class="loading-backdrop">
-        <div class="loading">
-            <span>Loading...</span>
-        </div>
+    <div data-ng-view id="view">
     </div>
-</div>
 
-<footer id="info">
-    <p>LiveOak © 2013-2014 Red Hat </p>
-</footer>
+    <script src="/client/liveoak.js" type="text/javascript"></script>
+    <script src="lib/jquery/jquery.js" type="text/javascript"></script>
+    <script src="lib/bootstrap/dist/js/bootstrap.js" type="text/javascript"></script>
+    <script src="lib/select2/select2.js" type="text/javascript"></script>
 
-<script src="/client/liveoak.js" type="text/javascript"></script>
-<script src="lib/jquery/jquery.js" type="text/javascript"></script>
-<script src="lib/bootstrap/dist/js/bootstrap.js" type="text/javascript"></script>
-<script src="lib/select2/select2.js" type="text/javascript"></script>
+    <script src="lib/angular/angular.js"></script>
+    <script src="lib/angular-route/angular-route.js"></script>
+    <script src="lib/angular-resource/angular-resource.js"></script>
+    <script src="lib/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
-<script src="lib/angular/angular.js"></script>
-<script src="lib/angular-route/angular-route.js"></script>
-<script src="lib/angular-resource/angular-resource.js"></script>
-<script src="lib/ui-bootstrap/ui-bootstrap-tpls.js"></script>
-
-<script src="js/app.js"></script>
-<script src="js/services.js"></script>
-<script src="js/controllers.js"></script>
-<script src="js/filters.js"></script>
-<script src="js/directives.js"></script>
-
-<script src="js/controllers/global.js"></script>
-<script src="js/controllers/home.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/controllers.js"></script>
+    <script src="js/controllers/global.js"></script>
+    <script src="js/controllers/dashboard.js"></script>
+    <script src="js/services.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/directives.js"></script>
 
 
 </body>
+
+<script>
+    /*
+     * Keyboard shortcut for style toggle is the "\" key
+     */
+
+    // Change this var whenever you add new custom css file
+    var myStyleFiles = ["console.css"]
+
+    //JS magic for turning our custom styles on/off
+    var myStyles = [];
+    for (var i=0; i<document.styleSheets.length; i++){
+        var style = document.styleSheets[i];
+        var styleHref = style.href;
+        if (!styleHref) {
+            continue;
+        }
+        var styleHrefArray = styleHref.split('/');
+        var styleName = styleHrefArray[styleHrefArray.length-1];
+
+        if (myStyleFiles.indexOf(styleName) > -1){
+            myStyles.push(style);
+        }
+    }
+
+    document.onkeyup = function(e){
+        if (e.keyCode == 220){
+            for (var i = 0; i < myStyles.length; i++){
+                var style = myStyles[i];
+                var status = style.disabled;
+                if (status){
+                    style.disabled = !status;
+                } else {
+                    style.disabled = true;
+                }
+            }
+        }
+    };
+</script>
+
+
+
 </html>
