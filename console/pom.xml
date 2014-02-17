@@ -81,6 +81,7 @@
                     <preloadSources>
                         <source>${console.app.res}/app/lib/jquery/jquery.js</source>
                         <source>${console.app.res}/app/lib/angular/angular.js</source>
+                        <source>${console.app.res}/app/lib/angular-bootstrap/ui-bootstrap-tpls.js</source>
                         <source>${console.app.res}/app/lib/angular-mocks/angular-mocks.js</source>
                         <source>${console.app.res}/test/lib/liveoak/liveoak-mocks.js</source>
                     </preloadSources>
