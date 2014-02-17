@@ -1,9 +1,9 @@
 'use strict';
 
 /* Directives */
-var module = angular.module('loApp.directives', []);
+var loDirectives = angular.module('loApp.directives', []);
 
-module.directive('loNavbar', function () {
+loDirectives.directive('loNavbar', function () {
     return {
         restrict: 'E',
         replace: true,
@@ -11,7 +11,7 @@ module.directive('loNavbar', function () {
     }
 });
 
-module.directive('loNavigation', function () {
+loDirectives.directive('loNavigation', function () {
     return {
         scope: {
             loCurrent: '@',
@@ -24,7 +24,7 @@ module.directive('loNavigation', function () {
     }
 });
 
-module.directive('appVersion', ['version', function(version) {
+loDirectives.directive('appVersion', ['version', function(version) {
     return function(scope, elm, attrs) {
         elm.text(version);
     };
