@@ -96,14 +96,20 @@ public class GridFSBlobResource extends GridFSResource implements BlockingResour
             responder.internalError("Expected state instanceof LazyResourceState, not " + state.getClass());
         }
 
-        // TODO: make sure to differentiate between create, and update. We could be updating the blob.
-        // TODO: does updating the blob create a new oid? Do we have to remove the old one manually?
+        GridFSDBObject blob = fileInfo();
+        boolean isNew = blob.getId() == null;
+
         LazyResourceState request = (LazyResourceState) state;
         if (request.hasBigContent()) {
             File tmpFile = request.contentAsFile();
             if (tmpFile != null) {
                 try {
-                    responder.resourceCreated(pushToDB(ctx, fileInfo(), () -> {return tmpFile;}));
+                    GridFSFilesPathItemResource response = pushToDB(ctx, request.getContentType(), blob, () -> { return tmpFile; });
+                    if (isNew) {
+                        responder.resourceCreated(response);
+                    } else {
+                        responder.resourceUpdated(response);
+                    }
                 } catch (Exception e) {
                     responder.internalError(e);
                 }
@@ -114,7 +120,12 @@ public class GridFSBlobResource extends GridFSResource implements BlockingResour
             InputStream stream = request.contentAsStream();
             if (stream != null) {
                 try {
-                    responder.resourceCreated(pushToDB(ctx, fileInfo(), () -> {return stream;}));
+                    GridFSFilesPathItemResource response = pushToDB(ctx, request.getContentType(), fileInfo(), () -> { return stream; });
+                    if (isNew) {
+                        responder.resourceCreated(response);
+                    } else {
+                        responder.resourceUpdated(response);
+                    }
                 } catch (Exception e) {
                     responder.internalError(e);
                 }
@@ -124,7 +135,22 @@ public class GridFSBlobResource extends GridFSResource implements BlockingResour
         }
     }
 
-    private GridFSFilesPathItemResource pushToDB(RequestContext ctx, GridFSDBObject fileInfo, Supplier contentProvider) throws IOException {
+    public void delete(RequestContext ctx, Responder responder) throws Exception {
+        System.err.println( "DELETE CONTENT" );
+
+        GridFSDBObject info = fileInfo();
+        if (info.getId() == null) {
+            responder.noSuchResource(id());
+            return;
+        }
+        GridFS gridfs = getUserspace().getGridFS();
+        gridfs.remove(info.getId());
+        info.dbObject().put("length", 0L);
+        info.dbObject().put("contentType", null);
+        responder.resourceDeleted(this);
+    }
+
+    private GridFSFilesPathItemResource pushToDB(RequestContext ctx, MediaType contentType, GridFSDBObject fileInfo, Supplier contentProvider) throws IOException {
         ObjectId currentId = fileInfo.getId();
         boolean fileExists = currentId != null;
 
@@ -133,7 +159,15 @@ public class GridFSBlobResource extends GridFSResource implements BlockingResour
 
         Object content = contentProvider.get();
         GridFSInputFile blob;
-
+        if (fileExists) {
+            // here is a time gap when file doesn't exist for a while when being updated.
+            // making the switch instantaneous would require another layer of indirection
+            // - not using file_id as canonical id, but some other id, mapped to a file.
+            // there would still remain a moment between mapping from old file to new file
+            // involving two separate file items and a moment in time when during a switch
+            // no file would match a filename, nor file id.
+            gridfs.remove(currentId);
+        }
         if (content instanceof File) {
             blob = gridfs.createFile((File) content);
         } else if (content instanceof InputStream) {
@@ -149,7 +183,7 @@ public class GridFSBlobResource extends GridFSResource implements BlockingResour
             blob.setId(currentId);
         }
         blob.setFilename(fileInfo().getString("filename"));
-        blob.setContentType("application/octet-stream");
+        blob.setContentType(contentType != null ? contentType.toString() : "application/octet-stream");
         blob.put("parent", fileInfo().getParentId());
         blob.save();
 

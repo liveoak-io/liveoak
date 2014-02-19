@@ -5,11 +5,16 @@
  */
 package io.liveoak.mongo.gridfs;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.mongodb.DBObject;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.ResourceState;
+import org.bson.types.ObjectId;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -38,10 +43,8 @@ public class GridFSFileResource extends GridFSResource {
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         try {
-            sink.accept("filename", fileInfo().getString("filename"));
-            sink.accept("createDate", fileInfo().getDateAsMillis("uploadDate"));
-            sink.accept("contentType", fileInfo().getString("contentType"));
-            sink.accept("length", fileInfo().get("length"));
+
+            readFileInfo(ctx, sink);
 
             String blobPath = getBlobUri();
             String selfPath = getSelfUri();
@@ -66,6 +69,11 @@ public class GridFSFileResource extends GridFSResource {
         } finally {
             sink.close();
         }
+    }
+
+    @Override
+    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        updateFileInfo(ctx, state, responder);
     }
 
     @Override

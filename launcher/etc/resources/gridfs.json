@@ -1,0 +1,8 @@
+{
+    type: 'jboss-module',
+    module-id:  'io.liveoak.mongo-gridfs',
+    class-name: 'io.liveoak.mongo.gridfs.GridFSRootResource',
+    config: {
+        db: 'mboss-fs'
+    }
+}

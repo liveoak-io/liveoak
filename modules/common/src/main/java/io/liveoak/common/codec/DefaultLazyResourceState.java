@@ -146,6 +146,17 @@ public class DefaultLazyResourceState implements LazyResourceState {
     }
 
     /**
+     * Get content type.
+     *
+     * @return MediaType of posted / uploaded content.=
+     */
+    @Override
+    public MediaType getContentType() {
+        return mediaType;
+    }
+
+
+    /**
      * Find out if body content fit into memory or if it was cached to file on disk.
      *
      * @return true if content was written to disk, false if it fit into memory

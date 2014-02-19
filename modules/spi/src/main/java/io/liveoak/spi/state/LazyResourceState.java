@@ -3,6 +3,7 @@ package io.liveoak.spi.state;
 import java.io.File;
 import java.io.InputStream;
 
+import io.liveoak.spi.MediaType;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.multipart.FileUpload;
 
@@ -12,6 +13,8 @@ import io.netty.handler.codec.http.multipart.FileUpload;
 public interface LazyResourceState extends ResourceState {
 
     public long getContentLength();
+
+    public MediaType getContentType();
 
     public boolean hasBigContent();
 

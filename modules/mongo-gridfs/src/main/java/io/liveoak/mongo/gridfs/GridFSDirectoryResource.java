@@ -5,8 +5,12 @@
  */
 package io.liveoak.mongo.gridfs;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -18,12 +22,16 @@ import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.ResourceState;
 import org.bson.types.ObjectId;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 public class GridFSDirectoryResource extends GridFSResource {
+
+    protected static Set<String> FILTERED = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            new String[]{"aliases", "chunkSize", "_id", "id", "length", "contentType"})));
 
     public GridFSDirectoryResource(RequestContext ctx, GridFSDirectoryResource parent, String id, GridFSResourcePath path) {
         this(ctx, parent, id, path, null);
@@ -122,6 +130,8 @@ public class GridFSDirectoryResource extends GridFSResource {
                     responder.resourceRead(new GridFSBlobResource(ctx, this, id, last, childPath));
                 }
             }
+        } else if (childPath.segments().size() == ctx.resourcePath().segments().size()) {
+            responder.noSuchResource(id);
         } else {
             // pass-through segment
             responder.resourceRead(new GridFSDirectoryResource(ctx, this, id, childPath));
@@ -133,7 +143,7 @@ public class GridFSDirectoryResource extends GridFSResource {
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         try {
             if (fileInfo() != null) {
-                sink.accept("filename", fileInfo().getString("filename"));
+                readFileInfo(ctx, sink);
             }
             //sink.accept("owner", fileInfo.get("owner"));
             sink.accept("dir", true);
@@ -155,6 +165,15 @@ public class GridFSDirectoryResource extends GridFSResource {
         } finally {
             sink.close();
         }
+    }
+
+    protected Set<String> getFiltered() {
+        return FILTERED;
+    }
+
+    @Override
+    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        updateFileInfo(ctx, state, responder);
     }
 
     protected GridFSDirectoryResource getChildParent() {
