@@ -43,7 +43,7 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         ResourceState resourceState = new DefaultResourceState();
         resourceState.putProperty("foo", "baz");
 
-        ResourceState result = client.update(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName + "/" + id, resourceState);
+        ResourceState result = client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + id, resourceState);
 
         // verify the result
         assertThat(result).isNotNull();
@@ -75,7 +75,7 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
 
         // should not be able to directly update a child object
         try {
-            ResourceState result = client.update(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName + "/" + id + "/foo", resourceState);
+            ResourceState result = client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + id + "/foo", resourceState);
             Fail.fail();
         } catch (CreateNotSupportedException e) {
             // expected
@@ -101,7 +101,7 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         resourceState.putProperty("baz", "XYZ");
 
         try {
-            ResourceState result = client.update(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName + "/" + id + "/foo/bar", resourceState);
+            ResourceState result = client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + id + "/foo/bar", resourceState);
             Fail.fail();
         } catch (ResourceNotFoundException e) {
             // expected

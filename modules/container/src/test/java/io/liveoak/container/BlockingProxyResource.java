@@ -39,7 +39,7 @@ public class BlockingProxyResource implements RootResource, BlockingResource {
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         RequestContext requestContext = new RequestContext.Builder().build();
-        ResourceState result = client.read(requestContext, "/testOrg/testApp/db/people/blockingproxybob");
+        ResourceState result = client.read(requestContext, "/testApp/db/people/blockingproxybob");
         for (String n : result.getPropertyNames()) {
             sink.accept(n, result.getProperty(n));
         }

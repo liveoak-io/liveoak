@@ -10,11 +10,7 @@ public class SecurityServices {
 
     private static final ServiceName SECURITY = LiveOak.LIVEOAK.append( "security" );
 
-    public static ServiceName resource(String orgId, String appId) {
-        return SECURITY.append( orgId, appId, "resource" );
-    }
-
-    public static ServiceName policyGroup(String orgId, String appId) {
-        return SECURITY.append( orgId, appId, "policy-group");
+    public static ServiceName policyGroup(String appId) {
+        return SECURITY.append( "policy-group", appId);
     }
 }

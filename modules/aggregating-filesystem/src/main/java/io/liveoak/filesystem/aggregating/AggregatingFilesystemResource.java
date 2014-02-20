@@ -6,6 +6,7 @@
 package io.liveoak.filesystem.aggregating;
 
 import io.liveoak.filesystem.FileResource;
+import io.liveoak.filesystem.FileSystemAdminResource;
 import io.liveoak.filesystem.FilesystemResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.DelegatingResponder;
@@ -20,8 +21,8 @@ import java.io.File;
  */
 public class AggregatingFilesystemResource extends FilesystemResource {
 
-    public AggregatingFilesystemResource(String id, File root, Vertx vertx) {
-        super( id, root, vertx );
+    public AggregatingFilesystemResource(FileSystemAdminResource adminResource, String id, Vertx vertx) {
+        super( adminResource, id, vertx );
     }
 
     @Override

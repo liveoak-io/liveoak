@@ -38,7 +38,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         String id = "_mOI:" + object.getObjectId("_id").toString();
 
         // now delete the object
-        ResourceState result = client.delete(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName + "/" + id);
+        ResourceState result = client.delete(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + id);
 
         // verify we are getting back the object which was deleted
         assertThat(result).isNotNull();
@@ -63,7 +63,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
 
         // we should not be able to directly delete a child property
         try {
-            ResourceState result = client.delete(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName + "/" + id + "/foo");
+            ResourceState result = client.delete(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + id + "/foo");
             Fail.fail("We should not be able to directly delete a property");
         } catch (ResourceNotFoundException e) {
             // expected
@@ -86,7 +86,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
 
         // we should not be able to directly delete a child object
         try {
-            ResourceState result = client.delete(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("bar(ABC(*))")).build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName
+            ResourceState result = client.delete(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("bar(ABC(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName
                     + "/" + id + "/foo");
             Fail.fail("We should not be able to directly delete a child object");
         } catch (ResourceNotFoundException e) {
@@ -110,7 +110,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
 
         // we should not be able to directly delete a child property
         try {
-            ResourceState result = client.delete(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName + "/" + id + "/foo/bar");
+            ResourceState result = client.delete(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + id + "/foo/bar");
             Fail.fail("We should not be able to directly delete a property on a child object");
         } catch (ResourceNotFoundException e) {
             // expected
@@ -133,7 +133,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
 
         // we should not be able to directly delete a child object
         try {
-            ResourceState result = client.delete(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("bar(ABC(*))")).build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName
+            ResourceState result = client.delete(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("bar(ABC(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName
                     + "/" + id + "/foo");
             Fail.fail();
         } catch (ResourceNotFoundException e) {
@@ -149,7 +149,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         assertThat(db.getCollectionNames().contains(methodName)).isFalse();
 
         try {
-            ResourceState result = client.delete(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName);
+            ResourceState result = client.delete(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName);
             Fail.fail("shouldn't get here");
         } catch (ResourceNotFoundException rnfe) {
             // expected
@@ -165,7 +165,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         db.createCollection(methodName, new BasicDBObject());
         assertThat(db.getCollectionNames().contains(methodName)).isTrue();
 
-        ResourceState result = client.delete(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName);
+        ResourceState result = client.delete(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName);
 
         // check that it was actually deleted
         assertThat(db.getCollectionNames().contains(methodName)).isFalse();
@@ -177,7 +177,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         assertThat(db.getCollectionNames().contains(methodName)).isFalse();
 
         try {
-            ResourceState result = client.delete(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/foobar123");
+            ResourceState result = client.delete(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/foobar123");
             Fail.fail("shouldn't get here");
         } catch (ResourceNotFoundException e) {
             // expected
@@ -192,7 +192,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         ObjectId id = new ObjectId();
 
         try {
-            ResourceState result = client.delete(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName + "/" + id.toString());
+            ResourceState result = client.delete(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + id.toString());
             Fail.fail("shouldn't get here");
         } catch (ResourceNotFoundException e) {
             // expected

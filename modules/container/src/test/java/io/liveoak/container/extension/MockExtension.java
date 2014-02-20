@@ -13,13 +13,33 @@ import org.jboss.msc.value.ImmediateValue;
  */
 public class MockExtension implements Extension {
 
+    public static ServiceName resource(String id) {
+        return ServiceName.of( "mock", "resource", id );
+    }
+
+    public static ServiceName adminResource(String id) {
+        return ServiceName.of( "mock", "admin-resource", id );
+    }
+
+    public static ServiceName adminResource(String appId, String id) {
+        return ServiceName.of( "mock", "app-admin-resource", appId, id );
+    }
+
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
+
+        MockAdminResource admin = new MockAdminResource( context.id(), "system" );
+        context.target().addService(adminResource( context.id() ), new ValueService<MockAdminResource>(new ImmediateValue<>(admin)))
+                .install();
+
+        context.mountPrivate( adminResource( context.id() ));
     }
 
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
-
+        MockAdminResource admin = new MockAdminResource( context.resourceId(), "application" );
+        context.target().addService(adminResource( context.application().id(), context.resourceId() ), new ValueService<MockAdminResource>(new ImmediateValue<>(admin)))
+                .install();
     }
 
     @Override

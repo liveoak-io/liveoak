@@ -20,7 +20,8 @@ public class ApplicationExtensionsResource extends SimpleResourceRegistry implem
 
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        InternalApplicationExtension ext = this.application.application().extend( state.id(), ConversionUtils.convert( state ));
+        String extensionId = (String) state.getProperty( "type" );
+        InternalApplicationExtension ext = this.application.application().extend( extensionId, state.id(), ConversionUtils.convert( state ));
         responder.resourceCreated( ext.adminResource() );
     }
 

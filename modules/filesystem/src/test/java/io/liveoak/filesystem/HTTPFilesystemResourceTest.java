@@ -5,6 +5,7 @@
  */
 package io.liveoak.filesystem;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.filesystem.extension.FilesystemExtension;
 import io.liveoak.spi.resource.RootResource;
@@ -35,14 +36,14 @@ public class HTTPFilesystemResourceTest extends AbstractHTTPResourceTestCase {
 
     @Override
     public void loadExtensions() throws Exception {
-        loadExtension( "files", new FilesystemExtension());
+        loadExtension( "fs", new FilesystemExtension());
+        installResource( "fs", "files", JsonNodeFactory.instance.objectNode() );
     }
-
 
     @Test
     public void testEnumerateRoot() throws Exception {
 
-        HttpGet get = new HttpGet("http://localhost:8080/testOrg/testApp/files");
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/files");
         get.addHeader("Accept", "application/json");
 
         try {
@@ -66,7 +67,7 @@ public class HTTPFilesystemResourceTest extends AbstractHTTPResourceTestCase {
 
     @Test
     public void testReadChild() throws Exception {
-        HttpGet get = new HttpGet("http://localhost:8080/testOrg/testApp/files/test-file1.txt");
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/files/test-file1.txt");
         get.addHeader("Accept", "text/*");
 
         try {

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
-import io.liveoak.container.tenancy.InternalOrganization;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.client.Client;
@@ -29,7 +28,6 @@ public class ClientTest {
 
     private LiveOakSystem system;
     private Client client;
-    private InternalOrganization organization;
     private InternalApplication application;
 
 
@@ -38,14 +36,13 @@ public class ClientTest {
         this.system = LiveOakFactory.create();
         this.client = this.system.client();
 
-        this.organization = this.system.organizationRegistry().createOrganization( "testOrg", "Test Organization" );
-        this.application = this.organization.createApplication( "testApp", "Test Application" );
+        this.application = this.system.applicationRegistry().createApplication( "testApp", "Test Application" );
 
         this.system.extensionInstaller().load( "db", new InMemoryDBExtension() );
         this.application.extend( "db" );
         this.system.awaitStability();
 
-        InMemoryDBResource db = (InMemoryDBResource) this.system.service( InMemoryDBExtension.resource( "testOrg", "testApp", "db") );
+        InMemoryDBResource db = (InMemoryDBResource) this.system.service( InMemoryDBExtension.resource( "testApp", "db") );
         db.addMember(new InMemoryCollectionResource(db, "people"));
         db.addMember(new InMemoryCollectionResource(db, "dogs"));
 
@@ -62,7 +59,7 @@ public class ClientTest {
         ReturnFields fields = new ReturnFieldsImpl("*,members(*,members(*))");
 
         RequestContext requestContext = new RequestContext.Builder().returnFields(fields).build();
-        ResourceState result = this.client.read(requestContext, "/testOrg/testApp");
+        ResourceState result = this.client.read(requestContext, "/testApp");
         assertThat(result).isNotNull();
 
         System.err.println("result: " + result);
@@ -90,12 +87,12 @@ public class ClientTest {
         ResourceState bob = new DefaultResourceState("bob");
         bob.putProperty("name", "Bob McWhirter");
 
-        ResourceState result = this.client.create(requestContext, "/testOrg/testApp/db/people", bob);
+        ResourceState result = this.client.create(requestContext, "/testApp/db/people", bob);
 
         assertThat(result).isNotNull();
         assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");
 
-        ResourceState people = this.client.read(requestContext, "/testOrg/testApp/db/people");
+        ResourceState people = this.client.read(requestContext, "/testApp/db/people");
 
         assertThat(people).isNotNull();
 
@@ -106,7 +103,7 @@ public class ClientTest {
         assertThat(foundBob.id()).isEqualTo("bob");
         assertThat(foundBob.getPropertyNames()).hasSize(0);
 
-        foundBob = this.client.read(requestContext, "/testOrg/testApp/db/people/bob");
+        foundBob = this.client.read(requestContext, "/testApp/db/people/bob");
 
         assertThat(foundBob).isNotNull();
         assertThat(foundBob.getProperty("name")).isEqualTo("Bob McWhirter");
@@ -118,23 +115,23 @@ public class ClientTest {
         ResourceState bob = new DefaultResourceState("bob");
         bob.putProperty("name", "Bob McWhirter");
 
-        ResourceState result = this.client.create(requestContext, "/testOrg/testApp/db/people", bob);
+        ResourceState result = this.client.create(requestContext, "/testApp/db/people", bob);
 
         assertThat(result).isNotNull();
         assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");
 
-        ResourceState foundBob = this.client.read(requestContext, "/testOrg/testApp/db/people/bob");
+        ResourceState foundBob = this.client.read(requestContext, "/testApp/db/people/bob");
         assertThat(foundBob).isNotNull();
         assertThat(foundBob.getProperty("name")).isEqualTo("Bob McWhirter");
 
         bob = new DefaultResourceState("bob");
         bob.putProperty("name", "Robert McWhirter");
 
-        result = this.client.update(requestContext, "/testOrg/testApp/db/people/bob", bob);
+        result = this.client.update(requestContext, "/testApp/db/people/bob", bob);
         assertThat(result).isNotNull();
         assertThat(result.getProperty("name")).isEqualTo("Robert McWhirter");
 
-        foundBob = this.client.read(requestContext, "/testOrg/testApp/db/people/bob");
+        foundBob = this.client.read(requestContext, "/testApp/db/people/bob");
         assertThat(foundBob).isNotNull();
         assertThat(foundBob.getProperty("name")).isEqualTo("Robert McWhirter");
     }
@@ -146,7 +143,7 @@ public class ClientTest {
         ResourceState bob = new DefaultResourceState("proxybob");
         bob.putProperty("name", "Bob McWhirter");
 
-        ResourceState createdBob = this.client.create(requestContext, "/testOrg/testApp/db/people", bob);
+        ResourceState createdBob = this.client.create(requestContext, "/testApp/db/people", bob);
 
         assertThat(createdBob).isNotNull();
 
@@ -154,7 +151,7 @@ public class ClientTest {
         InternalApplicationExtension ext = this.application.extend("proxy", JsonNodeFactory.instance.objectNode().put("blocking", false));
         this.system.awaitStability();
 
-        ResourceState result = this.client.read(requestContext, "/testOrg/testApp/proxy");
+        ResourceState result = this.client.read(requestContext, "/testApp/proxy");
         assertThat(result.getPropertyNames()).contains("name");
         assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");
 
@@ -169,7 +166,7 @@ public class ClientTest {
         ResourceState bob = new DefaultResourceState("blockingproxybob");
         bob.putProperty("name", "Bob McWhirter");
 
-        ResourceState createdBob = this.client.create(requestContext, "/testOrg/testApp/db/people", bob);
+        ResourceState createdBob = this.client.create(requestContext, "/testApp/db/people", bob);
 
         assertThat(createdBob).isNotNull();
 
@@ -179,7 +176,7 @@ public class ClientTest {
         this.system.awaitStability();
         System.err.println( "B" );
 
-        ResourceState result = this.client.read(requestContext, "/testOrg/testApp/proxy");
+        ResourceState result = this.client.read(requestContext, "/testApp/proxy");
         System.err.println( "C" );
         assertThat(result.getPropertyNames()).contains("name");
         assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");

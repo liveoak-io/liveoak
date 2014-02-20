@@ -52,13 +52,14 @@ public class AuthHandler extends SimpleChannelInboundHandler<ResourceRequest> {
     }
 
     private String getPrefix(ResourcePath path) {
-        String prefix = "/" + path.head().name() + "/" + path.subPath().head().name();
+        String prefix = "/" + path.head().name();
         return prefix;
     }
 
     private void initSecurityContext(final ChannelHandlerContext ctx, final ResourceRequest req, final DefaultSecurityContext securityContext, String token) {
         final RequestContext tokenRequestContext = new RequestContext.Builder().build();
         String prefix = getPrefix( req.resourcePath() );
+        System.err.println( "AUTH PREFIX: " + prefix );
         try {
             client.read(tokenRequestContext, prefix + "/auth/token-info/" + token, new Consumer<ClientResourceResponse>() {
                 @Override

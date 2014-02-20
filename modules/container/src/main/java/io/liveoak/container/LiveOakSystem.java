@@ -2,10 +2,9 @@ package io.liveoak.container;
 
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.extension.ExtensionInstaller;
-import io.liveoak.container.tenancy.InternalOrganizationRegistry;
-import io.liveoak.container.tenancy.OrganizationRegistry;
 import io.liveoak.container.resource.PropertiesResource;
 import io.liveoak.container.resource.ServersResource;
+import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
@@ -16,6 +15,9 @@ import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceName;
 import org.vertx.java.core.Vertx;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Bob McWhirter
@@ -57,16 +59,16 @@ public class LiveOakSystem implements Resource {
         return (Vertx) this.serviceContainer.getService(LiveOak.VERTX).getValue();
     }
 
-    public InternalOrganizationRegistry organizationRegistry() {
-        return (InternalOrganizationRegistry) this.serviceContainer.getService(LiveOak.ORGANIZATION_REGISTRY).getValue();
+    public InternalApplicationRegistry applicationRegistry() {
+        return (InternalApplicationRegistry) this.serviceContainer.getService(LiveOak.APPLICATION_REGISTRY).getValue();
     }
 
     public ExtensionInstaller extensionInstaller() {
         return (ExtensionInstaller) this.serviceContainer.getService(LiveOak.EXTENSION_INSTALLER).getValue();
     }
 
-    public Object service(ServiceName name) throws InterruptedException {
-        return this.serviceContainer.getService(name).awaitValue();
+    public Object service(ServiceName name) throws InterruptedException, TimeoutException {
+        return this.serviceContainer.getService(name).awaitValue(5, TimeUnit.SECONDS);
     }
 
     public void awaitStability() throws InterruptedException {

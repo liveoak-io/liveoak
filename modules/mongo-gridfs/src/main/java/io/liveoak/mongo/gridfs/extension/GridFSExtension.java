@@ -2,10 +2,11 @@ package io.liveoak.mongo.gridfs.extension;
 
 import com.mongodb.DB;
 import io.liveoak.mongo.MongoServices;
+import io.liveoak.mongo.RootMongoResource;
+import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.mongo.gridfs.service.GridFSResourceService;
 import io.liveoak.mongo.gridfs.service.TmpDirService;
-import io.liveoak.mongo.service.RootMongoResourceService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.SystemExtensionContext;
@@ -34,31 +35,17 @@ public class GridFSExtension extends MongoExtension {
 
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
-        super.extend( context );
-    }
+        RootMongoConfigResource privateResource = new RootMongoConfigResource( context.resourceId() );
+        context.mountPrivate( privateResource );
 
-    @Override
-    protected void setUpResource(ApplicationExtensionContext context) throws Exception {
-        String orgId = context.application().organization().id();
-        String appId = context.application().id();
-        String id = context.id();
-
-        ServiceTarget target = context.target();
-        ServiceName name = MongoServices.db(orgId, appId, id);
-
-        GridFSResourceService resource = new GridFSResourceService( context.id() );
-        target.addService( name.append( "resource" ), resource )
-                .addDependency(name, DB.class, resource.dbInjector())
-                .addDependency( TMP_DIR, File.class, resource.tmpDirInjector() )
-                .addDependency(LiveOak.VERTX, Vertx.class, resource.vertxInjector())
+        GridFSResourceService publicResource = new GridFSResourceService( context.resourceId() );
+        context.target().addService( LiveOak.resource( context.application().id(), context.resourceId() ), publicResource )
+                .addDependency( LiveOak.VERTX, Vertx.class, publicResource.vertxInjector() )
+                .addDependency( TMP_DIR, File.class, publicResource.tmpDirInjector() )
+                .addInjection( publicResource.configResourceInjector(), privateResource )
                 .install();
 
-        context.mountPublic(name.append("resource"));
+        context.mountPublic( LiveOak.resource( context.application().id(), context.resourceId() ));
     }
 
-    @Override
-    public void unextend(ApplicationExtensionContext context) throws Exception {
-        // destroy the underlying DB
-        super.unextend(context);
-    }
 }

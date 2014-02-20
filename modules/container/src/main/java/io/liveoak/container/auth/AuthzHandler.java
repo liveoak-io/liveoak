@@ -31,10 +31,10 @@ public class AuthzHandler extends SimpleChannelInboundHandler<ResourceRequest> {
     }
 
     private String getPrefix(ResourcePath path) {
-        if (path.segments().size() < 2) {
+        if (path.segments().size() < 1) {
             return null;
         }
-        String prefix = "/" + path.head().name() + "/" + path.subPath().head().name();
+        String prefix = "/" + path.head().name();
         return prefix;
     }
 

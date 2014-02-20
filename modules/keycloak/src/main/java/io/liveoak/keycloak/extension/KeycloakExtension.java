@@ -1,13 +1,17 @@
 package io.liveoak.keycloak.extension;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.keycloak.KeycloakServer;
 import io.liveoak.keycloak.KeycloakServices;
-import io.liveoak.keycloak.UndertowServer;
-import io.liveoak.keycloak.service.*;
+import io.liveoak.keycloak.service.KeycloakResourceService;
+import io.liveoak.keycloak.service.KeycloakSystemResourceService;
+import io.liveoak.keycloak.service.RealmModelService;
+import io.liveoak.keycloak.service.RealmRepresentationService;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
+import io.liveoak.spi.resource.async.DefaultRootResource;
+import org.jboss.msc.service.AbstractServiceListener;
+import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceTarget;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
@@ -25,50 +29,51 @@ public class KeycloakExtension implements Extension {
 
         ServiceTarget target = context.target();
 
-        UndertowServerService undertow = new UndertowServerService();
+        KeycloakSystemResourceService system = new KeycloakSystemResourceService( context.id() );
 
-        target.addService(KeycloakServices.UNDERTOW, undertow )
-                .addDependency( context.configurationServiceName(), ObjectNode.class, undertow.configurationInjector() )
+        target.addService(LiveOak.systemResource( context.id() ), system )
                 .install();
 
-        KeycloakServerService keycloak = new KeycloakServerService();
-
-        target.addService(KeycloakServices.KEYCLOAK, keycloak )
-                .addDependency(KeycloakServices.UNDERTOW, UndertowServer.class, keycloak.undertowServerInjector())
-                .install();
-
-        KeycloakSessionFactoryService sessionFactory = new KeycloakSessionFactoryService();
-        target.addService(KeycloakServices.SESSION_FACTORY, sessionFactory )
-                .addDependency(KeycloakServices.KEYCLOAK, KeycloakServer.class, sessionFactory.keycloakServerInjector() )
-                .install();
+        context.mountPrivate( LiveOak.systemResource( context.id() ));
     }
 
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
 
-        String orgId = context.application().organization().id();
         String appId = context.application().id();
 
         ServiceTarget target = context.target();
 
+        target.addListener( new AbstractServiceListener<Object>() {
+            @Override
+            public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
+                System.err.println( controller.getName() + " :: " + transition );
+            }
+        } );
+
+
         File realmConfig = new File( context.application().directory(), "keycloak-config.json" );
-        RealmRepresentationService realmRepresentation = new RealmRepresentationService( orgId, appId );
-        target.addService(KeycloakServices.realmRepresentation( orgId, appId ), realmRepresentation )
+        RealmRepresentationService realmRepresentation = new RealmRepresentationService( appId );
+        target.addService(KeycloakServices.realmRepresentation( appId ), realmRepresentation )
                 .addInjection(realmRepresentation.fileInjector(), realmConfig)
                 .install();
 
         RealmModelService realmModel = new RealmModelService();
-        target.addService(KeycloakServices.realmModel( orgId, appId ), realmModel )
-                .addDependency( KeycloakServices.realmRepresentation( orgId, appId ), RealmRepresentation.class, realmModel.realmRepresentationInjector() )
-                .addDependency( KeycloakServices.SESSION_FACTORY, KeycloakSessionFactory.class, realmModel.sessionFactoryInjector() )
+        target.addService(KeycloakServices.realmModel( appId ), realmModel )
+                .addDependency( KeycloakServices.realmRepresentation( appId ), RealmRepresentation.class, realmModel.realmRepresentationInjector() )
+                .addDependency( KeycloakServices.sessionFactory( context.extensionId() ), KeycloakSessionFactory.class, realmModel.sessionFactoryInjector() )
                 .install();
 
-        KeycloakResourceService resource = new KeycloakResourceService( context.id() );
-        target.addService( KeycloakServices.resource( orgId, appId ), resource )
-                .addDependency( KeycloakServices.realmModel( orgId, appId ), RealmModel.class, resource.realmModelInjector() )
+        KeycloakResourceService resource = new KeycloakResourceService( context.resourceId() );
+        target.addService( LiveOak.resource( appId, context.resourceId() ), resource )
+                .addDependency(KeycloakServices.realmModel(appId), RealmModel.class, resource.realmModelInjector())
                 .install();
 
-        context.mountPublic( KeycloakServices.resource( orgId, appId ) );
+        context.mountPublic();
+
+        context.mountPrivate( new DefaultRootResource( context.resourceId() ) );
+
+
     }
 
     @Override

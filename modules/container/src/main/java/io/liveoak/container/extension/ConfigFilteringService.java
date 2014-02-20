@@ -21,19 +21,25 @@ import java.util.Properties;
  */
 public class ConfigFilteringService implements Service<ObjectNode> {
 
+    public ConfigFilteringService() {
+        this(new Properties());
+    }
+
     public ConfigFilteringService(Properties props) {
-        this.props = new Properties( props );
+        this.props = new Properties(props);
         Properties sysProps = System.getProperties();
-        for ( String name : sysProps.stringPropertyNames() ) {
-            if ( name.startsWith( "io.liveoak" ) ) {
-                this.props.setProperty( name, sysProps.getProperty( name ) );
+        for (String name : sysProps.stringPropertyNames()) {
+            if (name.startsWith("io.liveoak")) {
+                this.props.setProperty(name, sysProps.getProperty(name));
             }
         }
     }
 
     @Override
     public void start(StartContext context) throws StartException {
+        System.err.println( "filter inbound: " + this.configurationInjector.getValue() );
         this.config = filter(this.configurationInjector.getValue());
+        System.err.println( "filter outbound: " + this.config );
     }
 
     @Override
@@ -66,8 +72,10 @@ public class ConfigFilteringService implements Service<ObjectNode> {
         if (src instanceof ArrayNode) {
             ArrayNode dest = JsonNodeFactory.instance.arrayNode();
 
-            Iterator<JsonNode> elements = dest.elements();
-            dest.add(filter(elements.next()));
+            Iterator<JsonNode> elements = src.elements();
+            while (elements.hasNext()) {
+                dest.add(filter(elements.next()));
+            }
             return dest;
         }
 

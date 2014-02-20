@@ -59,12 +59,6 @@ public class ApplicationResource implements RootResource, SynchronousResource {
     }
 
     @Override
-    public void delete(RequestContext ctx, Responder responder) throws Exception {
-        this.app.organization().destroyApplication( this.app );
-        responder.resourceDeleted( this );
-    }
-
-    @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept( "id", this.app.id() );
         sink.accept( "name", this.app.name() );

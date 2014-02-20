@@ -117,7 +117,6 @@ public class ApplicationSubscriptionsResource implements SynchronousResource, Ro
     protected ResourcePath applicationResourcePath() {
         ResourcePath path = new ResourcePath();
         path.prependSegment(this.parent().id());
-        path.prependSegment(this.parent().parent().id());
         return path;
     }
 

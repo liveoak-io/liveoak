@@ -2,22 +2,21 @@ package io.liveoak.container.extension;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
 import org.jboss.msc.service.*;
-import org.jboss.msc.value.ImmediateValue;
 
 /**
  * @author Bob McWhirter
  */
 public class ExtensionService implements Service<Extension> {
 
-    public ExtensionService(String id, Extension extension, ObjectNode fullConfig, ServiceName systemConfigMount) {
+    public ExtensionService(String id, Extension extension, ObjectNode fullConfig) {
         this.id = id;
         this.extension = extension;
         this.fullConfig = fullConfig;
-        this.systemConfigMount = systemConfigMount;
         this.common = false;
         if ( fullConfig.has( "common" ) ) {
             this.common = fullConfig.get( "common" ).asBoolean();
@@ -35,16 +34,7 @@ public class ExtensionService implements Service<Extension> {
             extConfig = JsonNodeFactory.instance.objectNode();
         }
 
-        target.addService(name.append("config"), new ValueService<ObjectNode>(new ImmediateValue<>(extConfig)))
-                .install();
-
-        ExtensionConfigResourceService configResource = new ExtensionConfigResourceService( this.id, this.systemConfigMount, name.append( "config" ) );
-
-        target.addService( LiveOak.extension(this.id).append( "admin" ), configResource )
-                .addDependency( LiveOak.SERVICE_CONTAINER, ServiceContainer.class, configResource.serviceContainerInjector() )
-                .install();
-
-        SystemExtensionContext extContext = new SystemExtensionContextImpl(target, this.id, LiveOak.extension(this.id).append("config"));
+        SystemExtensionContext extContext = new SystemExtensionContextImpl(target, this.id, LiveOak.resource(ZeroExtension.APPLICATION_ID, "system"), extConfig );
 
         try {
             this.extension.extend(extContext);
@@ -84,7 +74,6 @@ public class ExtensionService implements Service<Extension> {
     private final String id;
     private final Extension extension;
     private final ObjectNode fullConfig;
-    private final ServiceName systemConfigMount;
     private boolean common;
 
 }

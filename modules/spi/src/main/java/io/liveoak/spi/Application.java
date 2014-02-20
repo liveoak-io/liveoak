@@ -9,7 +9,6 @@ public interface Application {
 
     String id();
     String name();
-    Organization organization();
     File directory();
 
 }

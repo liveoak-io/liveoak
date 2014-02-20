@@ -10,6 +10,7 @@ import java.util.HashMap;
 
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
+import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
@@ -33,15 +34,15 @@ public class GridFSRootResource extends GridFSDirectoryResource implements RootR
 
     private Resource parent;
 
-    private DB db;
     private File tempDir;
     private Vertx vertx;
+    private final RootMongoConfigResource mongoConfigResource;
 
-    public GridFSRootResource(String id, DB db, File tempDir, Vertx vertx) {
+    public GridFSRootResource(String id, RootMongoConfigResource configResource, File tempDir, Vertx vertx) {
         super(null, null, id, null);
-        this.db  = db;
         this.tempDir = tempDir;
         this.vertx = vertx;
+        this.mongoConfigResource = configResource;
     }
 
     @Override
@@ -61,8 +62,9 @@ public class GridFSRootResource extends GridFSDirectoryResource implements RootR
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
         // here id always has the value of userspace which we use to map to appropriate db collection name
+        System.err.println( " === " + ctx.resourcePath() );
         responder.resourceRead(
-                new GridFSUserspaceResource(ctx, this, id, new GridFSResourcePath(ctx.resourcePath()).top(4)));
+                new GridFSUserspaceResource(ctx, this, id, new GridFSResourcePath(ctx.resourcePath()).top(3)));
     }
 
 
@@ -84,7 +86,7 @@ public class GridFSRootResource extends GridFSDirectoryResource implements RootR
     }
 
     protected DB getDB() {
-        return this.db;
+        return this.mongoConfigResource.getDB();
     }
 
     protected File tempDir() {

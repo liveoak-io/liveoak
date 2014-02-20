@@ -1,9 +1,11 @@
 package io.liveoak.container.tenancy.service;
 
-import io.liveoak.container.extension.CommonExtensions;
+import io.liveoak.container.extension.MountService;
+import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.tenancy.InternalOrganization;
-import io.liveoak.container.zero.OrganizationResource;
+import io.liveoak.container.tenancy.MountPointResource;
+import io.liveoak.container.zero.ApplicationResource;
+import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.*;
@@ -26,32 +28,43 @@ public class ApplicationService implements Service<InternalApplication> {
     public void start(StartContext context) throws StartException {
         ServiceTarget target = context.getChildTarget();
 
-        String orgId = this.organizationInjector.getValue().id();
-
         File appDir = this.directory;
 
         if (appDir == null) {
-            appDir = new File(new File(this.applicationsDirectoryInjector.getValue(), orgId), this.id);
+            appDir = new File(this.applicationsDirectoryInjector.getValue(), this.id);
             appDir.mkdirs();
         }
 
-        InternalOrganization org = this.organizationInjector.getValue();
-        this.app = new InternalApplication(target, org, this.id, this.name, appDir);
+        this.app = new InternalApplication(target, this.id, this.name, appDir);
 
+        // context resource
+
+        ServiceName appContextName = LiveOak.applicationContext(this.id);
         ApplicationContextService appContext = new ApplicationContextService(this.app);
-        this.app.contextController(target.addService(LiveOak.applicationContext(orgId, this.id), appContext)
+        target.addService(appContextName, appContext)
+                .install();
+        MountService<ApplicationContext> appContextMount = new MountService<>();
+        this.app.contextController(target.addService(appContextName.append("mount"), appContextMount)
+                .addDependency(LiveOak.GLOBAL_CONTEXT, MountPointResource.class, appContextMount.mountPointInjector())
+                .addDependency(appContextName, ApplicationContext.class, appContextMount.resourceInjector())
                 .install());
 
+        // admin resource
+
+        ServiceName appResourceName = LiveOak.applicationAdminResource(this.id);
         ApplicationResourceService appResource = new ApplicationResourceService(this.app);
-        this.app.resourceController(target.addService(LiveOak.applicationAdminResource(orgId, this.id), appResource)
-                .addDependency(LiveOak.organizationAdminResource(orgId), OrganizationResource.class, appResource.organizationResourceInjector())
+        target.addService(appResourceName, appResource)
+                .install();
+        MountService<ApplicationResource> appResourceMount = new MountService<>();
+        this.app.resourceController(target.addService(appResourceName.append("mount"), appResourceMount)
+                .addDependency(LiveOak.resource(ZeroExtension.APPLICATION_ID, "applications"), MountPointResource.class, appResourceMount.mountPointInjector())
+                .addDependency(appResourceName, ApplicationResource.class, appResourceMount.resourceInjector())
                 .install());
 
-        CommonApplicationExtensionsService common = new CommonApplicationExtensionsService();
-        target.addService(LiveOak.application(orgId, this.id).append("common-extensions"), common)
-                .addDependency(ServiceBuilder.DependencyType.OPTIONAL, LiveOak.COMMON_EXTENSIONS, CommonExtensions.class, common.commonExtensionsInjector())
-                .addInjectionValue(common.applicationInjector(), this)
-                .addDependencies(LiveOak.EXTENSION_LOADER)
+        ApplicationResourcesService resources = new ApplicationResourcesService();
+
+        target.addService( LiveOak.application( this.id).append( "resources" ), resources )
+                .addInjectionValue(resources.applicationInjector(), this)
                 .install();
     }
 
@@ -65,10 +78,6 @@ public class ApplicationService implements Service<InternalApplication> {
         return this.app;
     }
 
-    public Injector<InternalOrganization> organizationInjector() {
-        return this.organizationInjector;
-    }
-
     public Injector<File> applicationsDirectoryInjector() {
         return this.applicationsDirectoryInjector;
     }
@@ -76,7 +85,6 @@ public class ApplicationService implements Service<InternalApplication> {
     private String id;
     private String name;
     private File directory;
-    private InjectedValue<InternalOrganization> organizationInjector = new InjectedValue<>();
     private InjectedValue<File> applicationsDirectoryInjector = new InjectedValue<>();
     private InternalApplication app;
 }

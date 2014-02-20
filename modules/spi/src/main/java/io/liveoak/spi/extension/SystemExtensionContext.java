@@ -11,7 +11,7 @@ public interface SystemExtensionContext {
 
     String id();
     ServiceTarget target();
-    ServiceName configurationServiceName();
+    void mountPrivate(ServiceName adminResourceName);
 
     //void mount(ServiceName name);
 }

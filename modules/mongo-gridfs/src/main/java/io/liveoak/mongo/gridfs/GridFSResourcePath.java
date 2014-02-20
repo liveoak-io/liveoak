@@ -6,6 +6,7 @@
 package io.liveoak.mongo.gridfs;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 
 import io.liveoak.spi.RequestContext;
@@ -18,10 +19,12 @@ public class GridFSResourcePath extends ResourcePath {
 
     public GridFSResourcePath(ResourcePath path) {
         super(path);
+        System.err.println("GRIDFS_PATH: " + path);
     }
 
     public GridFSResourcePath(String... segments) {
         super(segments);
+        System.err.println("GRIDFS_PATH: " + Arrays.asList( segments) );
     }
 
     public static GridFSResourcePath fromContext(RequestContext ctx) {

@@ -1,5 +1,8 @@
 package io.liveoak.container.tenancy;
 
+import io.liveoak.spi.Application;
+
+import java.io.File;
 import java.util.Collection;
 
 /**
@@ -7,6 +10,6 @@ import java.util.Collection;
  */
 public interface ApplicationRegistry {
 
-    Collection<InternalApplication> applications();
-    InternalApplication application(String id);
+    public Collection<? extends Application> applications();
+    public Application application(String id) throws InterruptedException;
 }

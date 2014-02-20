@@ -13,7 +13,6 @@ import io.liveoak.common.codec.StateEncoder;
 import io.liveoak.common.codec.html.HTMLEncoder;
 import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.common.codec.json.JSONEncoder;
-import io.liveoak.container.extension.CommonExtensions;
 import io.liveoak.container.extension.ExtensionInstaller;
 import io.liveoak.container.extension.ExtensionLoader;
 import io.liveoak.container.interceptor.InterceptorManager;
@@ -21,8 +20,8 @@ import io.liveoak.container.interceptor.TimingInterceptor;
 import io.liveoak.container.protocols.PipelineConfigurator;
 import io.liveoak.container.service.*;
 import io.liveoak.container.tenancy.GlobalContext;
+import io.liveoak.container.tenancy.service.ApplicationRegistryService;
 import io.liveoak.container.tenancy.service.ApplicationsDirectoryService;
-import io.liveoak.container.tenancy.service.OrganizationRegistryService;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.container.zero.service.ZeroBootstrapper;
 import io.liveoak.spi.LiveOak;
@@ -122,7 +121,7 @@ public class LiveOakFactory {
         serviceContainer.addService( APPLICATIONS_DIR, new ApplicationsDirectoryService( this.appsDir ) )
                 .install();
 
-        serviceContainer.addService(ORGANIZATION_REGISTRY, new OrganizationRegistryService())
+        serviceContainer.addService(APPLICATION_REGISTRY, new ApplicationRegistryService())
                 .install();
 
         Service<GlobalContext> globalContext = new ValueService<GlobalContext>(new ImmediateValue<>(new GlobalContext()));
@@ -131,20 +130,14 @@ public class LiveOakFactory {
     }
 
     protected void createExtensions() {
-        ExtensionInstaller installer = new ExtensionInstaller(serviceContainer, LiveOak.applicationResource("liveoak", "zero", "system"));
+        ExtensionInstaller installer = new ExtensionInstaller(serviceContainer, LiveOak.resource(ZeroExtension.APPLICATION_ID, "system"));
         serviceContainer.addService(EXTENSION_INSTALLER,
                 new ValueService<ExtensionInstaller>(
                         new ImmediateValue<>(installer)
                 ))
                 .install();
 
-        serviceContainer.addService(COMMON_EXTENSIONS,
-                new ValueService<CommonExtensions>(
-                        new ImmediateValue<>(installer.commonExtensions())
-                ))
-                .install();
-
-        ExtensionLoader extensionLoader = new ExtensionLoader(configDir);
+        ExtensionLoader extensionLoader = new ExtensionLoader(new File( configDir, "extensions" ).getAbsoluteFile() );
 
         serviceContainer.addService(EXTENSION_LOADER, extensionLoader)
                 .addDependency(EXTENSION_INSTALLER, ExtensionInstaller.class, extensionLoader.extensionInstallerInjector())

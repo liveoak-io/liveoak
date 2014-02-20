@@ -2,6 +2,7 @@ package io.liveoak.spi.extension;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.spi.Application;
+import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 
@@ -10,13 +11,19 @@ import org.jboss.msc.service.ServiceTarget;
  */
 public interface ApplicationExtensionContext {
 
-    String id();
+    String extensionId();
+    String resourceId();
+
     Application application();
+
     ServiceTarget target();
 
-    ServiceName configurationServiceName();
-
+    void mountPublic();
     void mountPublic(ServiceName publicName);
+    void mountPublic(RootResource publicResource);
+
+    void mountPrivate();
     void mountPrivate(ServiceName privateName);
+    void mountPrivate(RootResource privateResource);
 
 }

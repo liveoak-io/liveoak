@@ -1,5 +1,6 @@
 package io.liveoak.filesystem.service;
 
+import io.liveoak.filesystem.FileSystemAdminResource;
 import io.liveoak.filesystem.FilesystemResource;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -23,8 +24,8 @@ public class FilesystemResourceService implements Service<FilesystemResource> {
     @Override
     public void start(StartContext context) throws StartException {
         this.resource = new FilesystemResource(
+                this.adminResourceInjector.getValue(),
                 this.id,
-                this.directoryInjector.getValue(),
                 this.vertxInjector.getValue() );
     }
 
@@ -42,14 +43,14 @@ public class FilesystemResourceService implements Service<FilesystemResource> {
         return this.vertxInjector;
     }
 
-    public Injector<File> directoryInjector() {
-        return this.directoryInjector;
+    public Injector<FileSystemAdminResource> adminResourceInjector() {
+        return this.adminResourceInjector;
 
     }
 
     protected String id;
 
     protected InjectedValue<Vertx> vertxInjector = new InjectedValue<>();
-    protected InjectedValue<File> directoryInjector = new InjectedValue<>();
+    protected InjectedValue<FileSystemAdminResource> adminResourceInjector = new InjectedValue<>();
     protected FilesystemResource resource;
 }

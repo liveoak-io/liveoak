@@ -39,8 +39,7 @@ public class DirectoryResource implements FSResource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
-        System.err.println( "READ " + this.file.getAbsoluteFile() );
-        vertx().fileSystem().readDir(this.file.getPath(), (result) -> {
+        vertx().fileSystem().readDir(file().getPath(), (result) -> {
             if (result.failed()) {
                 sink.close();
             } else {
@@ -96,15 +95,19 @@ public class DirectoryResource implements FSResource {
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
-        File path = new File(this.file, id);
+        File path = new File(file(), id);
+        System.err.println( "read member: " + path );
         vertx().fileSystem().exists(path.getPath(), (existResult) -> {
+            System.err.println( "exist-result: " + existResult.result() );
             if (existResult.succeeded() && existResult.result()) {
                 if (path.isDirectory()) {
                     responder.resourceRead(createDirectoryResource(path));
                 } else {
+                    System.err.println( "OKAY! " + path );
                     responder.resourceRead(createFileResource(path));
                 }
             } else {
+                System.err.println( "no-such" );
                 responder.noSuchResource(id);
             }
         });

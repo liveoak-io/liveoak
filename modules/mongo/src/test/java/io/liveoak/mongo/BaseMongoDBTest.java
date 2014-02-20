@@ -12,11 +12,20 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.mongo.extension.MongoExtension;
+import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.state.ResourceState;
 import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.testtools.AbstractResourceTestCase;
 import org.jboss.logging.Logger;
 import org.junit.Before;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import java.util.UUID;
 
@@ -34,16 +43,11 @@ public class BaseMongoDBTest extends AbstractResourceTestCase {
 
     @Override
     public void loadExtensions() throws Exception {
-        loadExtension("storage", new MongoExtension(), createConfig());
+        loadExtension( "mongo", new MongoExtension() );
+        installResource( "mongo", BASEPATH, createConfig() );
     }
 
-    @Before
-    public void getAholdOfMongoThings() throws InterruptedException {
-        this.db = (DB) this.system.service(MongoServices.db("testOrg", "testApp", "storage"));
-        this.mongoClient = (Mongo) this.system.service(MongoServices.mongo("storage"));
-    }
-
-    public ObjectNode createConfig() {
+    public ResourceState createConfig() {
         String database = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
         Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");
@@ -52,11 +56,25 @@ public class BaseMongoDBTest extends AbstractResourceTestCase {
         System.setProperty("mongo.host", host);
         System.setProperty("mongo.port", "" + port);
 
-        ObjectNode config = JsonNodeFactory.instance.objectNode();
-        config.put("db", database);
-        config.put("port", port);
-        config.put("host", host);
+        ResourceState config = new DefaultResourceState();
+        config.putProperty("db", database);
 
+        List<ResourceState> servers = new ArrayList<ResourceState>();
+        ResourceState server = new DefaultResourceState();
+        server.putProperty("port", port);
+        server.putProperty("host", host);
+        servers.add(server);
+        config.putProperty("servers", servers);
+
+        try {
+            mongoClient = new MongoClient(host, port);
+            db = mongoClient.getDB(database);
+            db.dropDatabase();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.err.println( "TEST CONFIG: " + config );
         return config;
     }
 
@@ -80,4 +98,5 @@ public class BaseMongoDBTest extends AbstractResourceTestCase {
             collection.insert(obj);
         }
     }
+
 }

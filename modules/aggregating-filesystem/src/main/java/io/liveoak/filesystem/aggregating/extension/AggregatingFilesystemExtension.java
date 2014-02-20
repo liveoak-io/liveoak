@@ -1,8 +1,10 @@
 package io.liveoak.filesystem.aggregating.extension;
 
+import io.liveoak.filesystem.FileSystemAdminResource;
 import io.liveoak.filesystem.FilesystemServices;
 import io.liveoak.filesystem.aggregating.service.AggregatingFilesystemResourceService;
 import io.liveoak.filesystem.extension.FilesystemExtension;
+import io.liveoak.filesystem.service.FilesystemResourceService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import org.jboss.msc.service.ServiceName;
@@ -17,21 +19,18 @@ import java.io.File;
 public class AggregatingFilesystemExtension extends FilesystemExtension {
 
     @Override
-    protected void setUpResource(ApplicationExtensionContext context) throws Exception {
-        String orgId = context.application().organization().id();
-        String appId = context.application().id();
+    public void extend(ApplicationExtensionContext context) throws Exception {
+        File initialDir = new File(context.application().directory(), context.resourceId());
+        FileSystemAdminResource privateResource = new FileSystemAdminResource(context.resourceId(), initialDir);
 
-        ServiceTarget target = context.target();
+        context.mountPrivate(privateResource);
 
-        ServiceName name = FilesystemServices.directory(orgId, appId, context.id());
-
-        AggregatingFilesystemResourceService resource = new AggregatingFilesystemResourceService( context.id() );
-
-        target.addService(name.append("resource"), resource)
-                .addDependency(LiveOak.VERTX, Vertx.class, resource.vertxInjector())
-                .addDependency(name, File.class, resource.directoryInjector())
+        AggregatingFilesystemResourceService publicResource = new AggregatingFilesystemResourceService(context.resourceId());
+        context.target().addService(LiveOak.resource(context.application().id(), context.resourceId()), publicResource)
+                .addDependency(LiveOak.VERTX, Vertx.class, publicResource.vertxInjector())
+                .addInjection(publicResource.adminResourceInjector(), privateResource)
                 .install();
 
-        context.mountPublic( name.append( "resource" ) );
+        context.mountPublic(LiveOak.resource(context.application().id(), context.resourceId()));
     }
 }

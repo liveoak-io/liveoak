@@ -1,6 +1,7 @@
 package io.liveoak.scheduler.extension;
 
 import io.liveoak.scheduler.SchedulerServices;
+import io.liveoak.scheduler.service.SchedulerAdminResourceService;
 import io.liveoak.scheduler.service.SchedulerResourceService;
 import io.liveoak.scheduler.service.SchedulerService;
 import io.liveoak.spi.LiveOak;
@@ -24,25 +25,34 @@ public class SchedulerExtension implements Extension {
 
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
-        String orgId = context.application().organization().id();
         String appId = context.application().id();
 
         ServiceTarget target = context.target();
-        ServiceName name = SchedulerServices.scheduler(orgId, appId);
-        SchedulerService scheduler = new SchedulerService(orgId + "/" + appId);
+        ServiceName name = SchedulerServices.scheduler(appId, context.resourceId());
+        SchedulerService scheduler = new SchedulerService(appId + "/" + context.resourceId() );
 
         target.addService(name, scheduler)
                 .install();
 
-        SchedulerResourceService resource = new SchedulerResourceService();
+        SchedulerResourceService publicResource = new SchedulerResourceService( context.resourceId() );
 
-        target.addService(name.append("resource"), resource)
-                .addDependency(LiveOak.NOTIFIER, Notifier.class, resource.notifierInjector())
-                .addDependency(name, Scheduler.class, resource.schedulerInjector())
+        target.addService(LiveOak.resource( appId, context.resourceId() ), publicResource)
+                .addDependency(LiveOak.NOTIFIER, Notifier.class, publicResource.notifierInjector())
+                .addDependency(name, Scheduler.class, publicResource.schedulerInjector())
                 .install();
 
-        context.mountPublic(name.append("resource"));
+        context.mountPublic();
+
+        SchedulerAdminResourceService privateResource = new SchedulerAdminResourceService( context.resourceId() );
+
+        target.addService(LiveOak.adminResource( appId, context.resourceId() ), privateResource)
+                .addDependency(name, Scheduler.class, privateResource.schedulerInjector())
+                .install();
+
+        context.mountPrivate();
     }
+
+
 
     @Override
     public void unextend(ApplicationExtensionContext context) throws Exception {

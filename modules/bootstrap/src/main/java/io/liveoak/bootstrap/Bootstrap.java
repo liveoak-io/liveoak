@@ -5,13 +5,12 @@
  */
 package io.liveoak.bootstrap;
 
-import java.io.File;
-
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.tenancy.InternalOrganization;
 import org.jboss.logging.Logger;
+
+import java.io.File;
 
 /**
  * Bootstrapping <code>main()</code> method.
@@ -40,9 +39,8 @@ public class Bootstrap {
         log.infof("LiveOak booted in %d ms", (System.currentTimeMillis() - start));
 
         if ( args.length == 2 ) {
-            File appDir = new File( args[1] ).getAbsoluteFile();
-            InternalOrganization liveoakOrg = system.organizationRegistry().organization("liveoak");
-            InternalApplication deployedApp = liveoakOrg.createApplication(appDir.getName(), appDir.getName(), appDir);
+            File appDir = new File( args[1] ).getCanonicalFile();
+            InternalApplication deployedApp = system.applicationRegistry().createApplication(appDir.getName(), appDir.getName(), appDir);
             system.awaitStability();
         }
     }

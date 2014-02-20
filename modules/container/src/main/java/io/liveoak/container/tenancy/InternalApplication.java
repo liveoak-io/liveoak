@@ -2,9 +2,9 @@ package io.liveoak.container.tenancy;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.container.tenancy.service.ApplicationExtensionResourceService;
 import io.liveoak.container.tenancy.service.ApplicationExtensionService;
 import io.liveoak.container.zero.ApplicationResource;
+import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
@@ -17,9 +17,8 @@ import java.io.File;
  */
 public class InternalApplication implements Application {
 
-    public InternalApplication(ServiceTarget target, InternalOrganization org, String id, String name, File directory) {
+    public InternalApplication(ServiceTarget target, String id, String name, File directory) {
         this.target = target;
-        this.org = org;
         this.id = id;
         this.name = name;
         this.directory = directory;
@@ -40,37 +39,31 @@ public class InternalApplication implements Application {
         return this.directory;
     }
 
-    @Override
-    public InternalOrganization organization() {
-        return this.org;
-    }
-
     public InternalApplicationExtension extend(String extensionId) throws InterruptedException {
         return extend(extensionId, JsonNodeFactory.instance.objectNode());
     }
 
     public InternalApplicationExtension extend(String extensionId, ObjectNode configuration) throws InterruptedException {
-        ServiceName name = LiveOak.applicationExtension(this.organization().id(), this.id, extensionId);
-        ApplicationExtensionService appExt = new ApplicationExtensionService(extensionId, configuration);
-        ServiceController<InternalApplicationExtension> controller = this.target.addService(name, appExt)
-                .addDependency(LiveOak.application(this.org.id(), this.id), InternalApplication.class, appExt.applicationInjector())
-                .addDependency(LiveOak.extension(extensionId), Extension.class, appExt.extensionInjector())
-                .addDependency(LiveOak.SERVICE_REGISTRY, ServiceRegistry.class, appExt.serviceRegistryInjector())
-                .addDependency(LiveOak.SERVICE_CONTAINER, ServiceContainer.class, appExt.serviceContainerInjector())
-                .install();
-
-        return controller.awaitValue();
+        return extend(extensionId, extensionId, configuration);
     }
 
-    public InternalApplicationExtension extend(String extensionId, Extension extension, ObjectNode configuration) throws InterruptedException {
-        ServiceName name = LiveOak.applicationExtension(this.organization().id(), this.id, extensionId);
-        ApplicationExtensionService appExt = new ApplicationExtensionService(extensionId, configuration);
-        ServiceController<InternalApplicationExtension> controller = this.target.addService(name, appExt)
-                .addDependency(LiveOak.application(this.org.id(), this.id), InternalApplication.class, appExt.applicationInjector())
-                .addInjection( appExt.extensionInjector(), extension )
+    public InternalApplicationExtension extend(String extensionId, String resourceId, ObjectNode configuration) throws InterruptedException {
+
+        ServiceTarget target = this.target.subTarget();
+        StabilityMonitor monitor = new StabilityMonitor();
+        target.addMonitor( monitor );
+
+        ServiceName name = LiveOak.applicationExtension(this.id, resourceId);
+        ApplicationExtensionService appExt = new ApplicationExtensionService(extensionId, resourceId, configuration);
+
+        ServiceController<InternalApplicationExtension> controller = target.addService(name, appExt)
+                .addDependency(LiveOak.extension(extensionId), Extension.class, appExt.extensionInjector())
+                .addDependency(LiveOak.application(this.id ), InternalApplication.class, appExt.applicationInjector())
                 .addDependency(LiveOak.SERVICE_REGISTRY, ServiceRegistry.class, appExt.serviceRegistryInjector())
                 .addDependency(LiveOak.SERVICE_CONTAINER, ServiceContainer.class, appExt.serviceContainerInjector())
                 .install();
+
+        monitor.awaitStability();
 
         return controller.awaitValue();
     }
@@ -96,10 +89,8 @@ public class InternalApplication implements Application {
     private ServiceController<ApplicationResource> resourceController;
 
     private ServiceTarget target;
-    private InternalOrganization org;
     private String id;
     private String name;
     private File directory;
-    private ApplicationContext context;
 
 }

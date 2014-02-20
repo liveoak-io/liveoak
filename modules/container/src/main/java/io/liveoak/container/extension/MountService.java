@@ -29,6 +29,8 @@ public class MountService<T extends RootResource> implements Service<T> {
                 throw new StartException( "Invalid ID for resource '" + this.resourceInjector.getValue().id() + "' must be '" + this.verifyId + "'" );
             }
         }
+
+
         this.mountableInjector.getValue().registerResource( this.resourceInjector.getValue() );
         this.resourceInjector.getValue().parent(this.mountableInjector.getValue());
     }

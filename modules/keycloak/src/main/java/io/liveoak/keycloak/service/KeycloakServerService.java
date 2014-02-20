@@ -47,6 +47,7 @@ public class KeycloakServerService implements Service<KeycloakServer> {
 
     @Override
     public void stop(StopContext context) {
+        System.err.println( "STOP KEYCLOAK" );
         this.server.stop();
     }
 

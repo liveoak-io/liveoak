@@ -12,7 +12,7 @@ public class FilesystemServices {
 
     public static final ServiceName DIR = FILESYSTEM.append( "dir" );
 
-    public static ServiceName directory(String orgId, String appId, String id) {
-        return DIR.append( orgId, appId, id );
+    public static ServiceName directory(String appId, String id) {
+        return DIR.append( appId, id );
     }
 }

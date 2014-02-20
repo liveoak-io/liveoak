@@ -5,6 +5,7 @@
  */
 package io.liveoak.git;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.git.extension.GitExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
@@ -30,11 +31,12 @@ public class GitResourceTest extends AbstractResourceTestCase {
     public void loadExtensions() throws Exception {
         new File( applicationDirectory(), "git" ).mkdirs();
         loadExtension( "git", new GitExtension() );
+        installResource( "git", "git", JsonNodeFactory.instance.objectNode() );
     }
 
     @Test
     public void testRoot() throws Exception {
-        ResourceState result = this.client.read(new RequestContext.Builder().build(), "/testOrg/testApp/git");
+        ResourceState result = this.client.read(new RequestContext.Builder().build(), "/testApp/git");
 
         assertThat(result).isNotNull();
     }

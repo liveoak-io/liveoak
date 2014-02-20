@@ -1,5 +1,6 @@
 package io.liveoak.git.service;
 
+import io.liveoak.git.GitRepoAdminResource;
 import io.liveoak.git.GitRepoResource;
 import org.eclipse.jgit.lib.Repository;
 import org.jboss.msc.inject.Injector;
@@ -15,15 +16,16 @@ import org.vertx.java.core.Vertx;
  */
 public class GitRepoResourceService implements Service<GitRepoResource> {
 
-    public GitRepoResourceService(String id) {
+    public GitRepoResourceService(GitRepoAdminResource adminResource, String id) {
+        this.adminResource = adminResource;
         this.id = id;
     }
 
     @Override
     public void start(StartContext context) throws StartException {
         this.resource = new GitRepoResource(
+                this.adminResource,
                 this.id,
-                this.repositoryInjector.getValue(),
                 this.vertxInjector.getValue()
         );
     }
@@ -42,12 +44,9 @@ public class GitRepoResourceService implements Service<GitRepoResource> {
         return this.vertxInjector;
     }
 
-    public Injector<Repository> repositoryInjector() {
-        return this.repositoryInjector;
-    }
-
     private String id;
     private InjectedValue<Vertx> vertxInjector = new InjectedValue<>();
-    private InjectedValue<Repository> repositoryInjector = new InjectedValue<>();
     private GitRepoResource resource;
+    private final GitRepoAdminResource adminResource;
+
 }

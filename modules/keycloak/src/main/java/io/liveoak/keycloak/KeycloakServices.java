@@ -8,21 +8,28 @@ import org.jboss.msc.service.ServiceName;
  */
 public class KeycloakServices {
 
-    public static final ServiceName KEYCLOAK = LiveOak.LIVEOAK.append( "keycloak" );
+    private static final ServiceName KEYCLOAK = LiveOak.LIVEOAK.append( "keycloak" );
 
-    public static final ServiceName UNDERTOW = KEYCLOAK.append( "undertow" );
+    private static final ServiceName UNDERTOW = KEYCLOAK.append( "undertow" );
 
-    public static final ServiceName SESSION_FACTORY = KEYCLOAK.append( "session-factory" );
-
-    public static final ServiceName realmRepresentation(String orgId, String appId) {
-        return KEYCLOAK.append( orgId, appId ).append( "realm-representation" );
+    public static final ServiceName undertow(String id) {
+        return UNDERTOW.append( "server", id );
     }
 
-    public static final ServiceName realmModel(String orgId, String appId) {
-        return KEYCLOAK.append( orgId, appId ).append( "realm-model" );
+    public static final ServiceName keycloak(String id) {
+        return KEYCLOAK.append( "server", id );
     }
 
-    public static final ServiceName resource(String orgId, String appId) {
-        return KEYCLOAK.append( orgId, appId ).append( "resource" );
+    public static final ServiceName sessionFactory(String id) {
+        return keycloak( id ).append( "session-factory" );
     }
+
+    public static final ServiceName realmRepresentation(String appId) {
+        return KEYCLOAK.append("realm-representation", appId);
+    }
+
+    public static final ServiceName realmModel(String appId) {
+        return KEYCLOAK.append("realm-model", appId);
+    }
+
 }

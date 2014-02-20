@@ -65,7 +65,7 @@ public class KeycloakServer {
         }
     }
 
-    public void start() throws Throwable {
+    public void start() throws Exception {
         ResteasyDeployment deployment = new ResteasyDeployment();
         deployment.setApplicationClass(KeycloakApplication.class.getName());
 
@@ -107,11 +107,11 @@ public class KeycloakServer {
     public static class KeycloakResourceManager implements ResourceManager {
         @Override
         public Resource getResource(String path) throws IOException {
-            System.err.println( "GET RESOURCE: " + path );
             String realPath = "META-INF/resources" + path;
-            System.err.println( "REAL PATH: " + realPath );
-            System.err.println( "CL: " + getClass().getClassLoader() );
             URL url = getClass().getClassLoader().getResource(realPath);
+            if ( url == null ) {
+                return null;
+            }
             return new URLResource(url, url.openConnection(), path);
         }
 

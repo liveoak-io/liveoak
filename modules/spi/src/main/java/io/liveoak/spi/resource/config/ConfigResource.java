@@ -25,10 +25,6 @@ import io.liveoak.spi.state.ResourceState;
 public interface ConfigResource extends Resource {
 
     @Override
-    default String id() {
-        return ";config";
-    }
-
     default void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         readConfigProperties(ctx, sink, this.parent());
         sink.close();
@@ -99,6 +95,7 @@ public interface ConfigResource extends Resource {
         }
     }
 
+    @Override
     default void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         updateConfigProperties(ctx, state, responder, this.parent());
         responder.resourceUpdated(this);

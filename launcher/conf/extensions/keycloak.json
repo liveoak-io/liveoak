@@ -1,0 +1,7 @@
+{
+    module-id: 'io.liveoak.keycloak',
+    config: {
+        keycloak-host: 'localhost',
+        keycloak-port: 8383
+    }
+}

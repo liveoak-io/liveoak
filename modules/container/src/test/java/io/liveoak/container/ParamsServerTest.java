@@ -39,7 +39,7 @@ public class ParamsServerTest extends BasicServerTest {
         // create people collection with direct PUT
         System.err.println("CREATE /people collection");
 
-        putRequest = new HttpPut("http://localhost:8080/testOrg/testApp/memory/people");
+        putRequest = new HttpPut("http://localhost:8080/testApp/memory/people");
         putRequest.setEntity(new StringEntity("{ \"type\": \"collection\" }"));
         putRequest.setHeader("Content-Type", "application/json");
         response = this.httpClient.execute(putRequest);
@@ -52,7 +52,7 @@ public class ParamsServerTest extends BasicServerTest {
         System.err.println("PREPARE 2 people ...");
         // Post a person
 
-        postRequest = new HttpPost("http://localhost:8080/testOrg/testApp/memory/people");
+        postRequest = new HttpPost("http://localhost:8080/testApp/memory/people");
         postRequest.setEntity(new StringEntity("{ \"name\": \"bob\" }"));
         postRequest.setHeader("Content-Type", "application/json");
 
@@ -71,7 +71,7 @@ public class ParamsServerTest extends BasicServerTest {
         response.close();
 
 
-        postRequest = new HttpPost("http://localhost:8080/testOrg/testApp/memory/people");
+        postRequest = new HttpPost("http://localhost:8080/testApp/memory/people");
         postRequest.setEntity(new StringEntity("{ \"name\": \"krusty\" }"));
         postRequest.setHeader("Content-Type", "application/json");
 
@@ -95,7 +95,7 @@ public class ParamsServerTest extends BasicServerTest {
 
         // Retrieve first people resource, ensuring only the first one is returned
         // Assumption: unsorted GET on collection returns items in the order they were added to collection
-        getRequest = new HttpGet("http://localhost:8080/testOrg/testApp/memory/people?limit=1");
+        getRequest = new HttpGet("http://localhost:8080/testApp/memory/people?limit=1");
         getRequest.addHeader(header);
         response = httpClient.execute(getRequest);
 
@@ -118,7 +118,7 @@ public class ParamsServerTest extends BasicServerTest {
 
         // Retrieve second people resource, ensuring only the second one is returned
         // Assumption: unsorted GET on collection returns items in the order they were added to collection
-        getRequest = new HttpGet("http://localhost:8080/testOrg/testApp/memory/people?offset=1&limit=1");
+        getRequest = new HttpGet("http://localhost:8080/testApp/memory/people?offset=1&limit=1");
         getRequest.addHeader(header);
         response = httpClient.execute(getRequest);
 
@@ -143,7 +143,7 @@ public class ParamsServerTest extends BasicServerTest {
         System.err.println("TEST #2");
         // test specifying fields to return
 
-        getRequest = new HttpGet("http://localhost:8080/testOrg/testApp/memory/people/" + krustyState.getProperty("id") + "?fields=id");
+        getRequest = new HttpGet("http://localhost:8080/testApp/memory/people/" + krustyState.getProperty("id") + "?fields=id");
         getRequest.addHeader(header);
         response = httpClient.execute(getRequest);
 

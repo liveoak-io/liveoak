@@ -6,6 +6,7 @@
 
 package io.liveoak.security.policy.uri.integration;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultRequestAttributes;
 import io.liveoak.common.DefaultResourceParams;
 import io.liveoak.common.DefaultSecurityContext;
@@ -30,6 +31,7 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
     @Override
     public void loadExtensions() throws Exception {
         loadExtension( "uriPolicy", new SecurityURIPolicyExtension() );
+        installResource( "uriPolicy", "uriPolicy", JsonNodeFactory.instance.objectNode() );
     }
 
     @Override
@@ -40,7 +42,7 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
     @Test
     public void testURIPolicyServiceRequest() throws Exception {
         RequestContext reqCtx = new RequestContext.Builder().build();
-        ResourceState state = client.read(reqCtx, "/testOrg/testApp/uriPolicy");
+        ResourceState state = client.read(reqCtx, "/testApp/uriPolicy");
         boolean authzCheckFound = false;
         for (ResourceState member : state.members()) {
             if (member.id().equals("authzCheck")) {
@@ -76,16 +78,16 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
 
         // Request to 'client' page
         RequestContext.Builder clientReq = new RequestContext.Builder().requestType(RequestType.READ)
-                .resourcePath(new ResourcePath("/testOrg/testApp/client/some"));
+                .resourcePath(new ResourcePath("/testApp/client/some"));
         assertAuthzDecision(clientReq.securityContext(anonymous), AuthzDecision.IGNORE);
         assertAuthzDecision(clientReq.securityContext(admin), AuthzDecision.ACCEPT);
         assertAuthzDecision(clientReq.securityContext(user), AuthzDecision.IGNORE);
 
         // Other requests to 'client' page by john.
-        assertAuthzDecision(clientReq.resourcePath(new ResourcePath("/testOrg/testApp/client/somejs")), AuthzDecision.IGNORE);
-        assertAuthzDecision(clientReq.resourcePath(new ResourcePath("/testOrg/testApp/client/some.jsk")), AuthzDecision.IGNORE);
-        assertAuthzDecision(clientReq.resourcePath(new ResourcePath("/testOrg/testApp/client/some.js")), AuthzDecision.ACCEPT);
-        assertAuthzDecision(clientReq.resourcePath(new ResourcePath("/testOrg/testApp/client/auth/some.js")), AuthzDecision.ACCEPT);
+        assertAuthzDecision(clientReq.resourcePath(new ResourcePath("/testApp/client/somejs")), AuthzDecision.IGNORE);
+        assertAuthzDecision(clientReq.resourcePath(new ResourcePath("/testApp/client/some.jsk")), AuthzDecision.IGNORE);
+        assertAuthzDecision(clientReq.resourcePath(new ResourcePath("/testApp/client/some.js")), AuthzDecision.ACCEPT);
+        assertAuthzDecision(clientReq.resourcePath(new ResourcePath("/testApp/client/auth/some.js")), AuthzDecision.ACCEPT);
 
         // request to /app/some
         RequestContext.Builder appReq = new RequestContext.Builder().requestType(RequestType.READ)
@@ -95,13 +97,13 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
         assertAuthzDecision(appReq.securityContext(user), AuthzDecision.IGNORE);
 
         // Other requests to 'app' page by john.
-        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testOrg/testApp/app/somehtml")), AuthzDecision.IGNORE);
-        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testOrg/testApp/app/some.htmll")), AuthzDecision.IGNORE);
-        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testOrg/testApp/app/some.html")), AuthzDecision.ACCEPT);
-        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testOrg/testApp/app/some.css")), AuthzDecision.ACCEPT);
-        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testOrg/testApp/app/some.js")), AuthzDecision.ACCEPT);
-        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testOrg/testApp/app/some.png")), AuthzDecision.ACCEPT);
-        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testOrg/testApp/app/some.json")), AuthzDecision.IGNORE);
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testApp/app/somehtml")), AuthzDecision.IGNORE);
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testApp/app/some.htmll")), AuthzDecision.IGNORE);
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testApp/app/some.html")), AuthzDecision.ACCEPT);
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testApp/app/some.css")), AuthzDecision.ACCEPT);
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testApp/app/some.js")), AuthzDecision.ACCEPT);
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testApp/app/some.png")), AuthzDecision.ACCEPT);
+        assertAuthzDecision(appReq.resourcePath(new ResourcePath("/testApp/app/some.json")), AuthzDecision.IGNORE);
 
         // CREATE request to app should be ACCEPT just for admin
         appReq.requestType(RequestType.CREATE);
@@ -111,7 +113,7 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
 
         // Request to /storage/some should be IGNORED for anonymous user, but allowed for user or admin in case that query contains username
         RequestContext.Builder storageReq = new RequestContext.Builder().requestType(RequestType.READ)
-                .resourcePath(new ResourcePath("/testOrg/testApp/storage/some"));
+                .resourcePath(new ResourcePath("/testApp/storage/some"));
         Map<String, List<String>> params = new HashMap<>();
         params.put("q", Arrays.asList("{\"completed\":\"false\",\"user\":\"john\"}"));
         storageReq.resourceParams(DefaultResourceParams.instance(params));
@@ -125,7 +127,7 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
         assertAuthzDecision(storageReq.securityContext(user), AuthzDecision.IGNORE);
 
         // CREATE request is REJECT for anonymous and allowed for admin. It's allowed for user if "user" from createState equals username
-        storageReq = new RequestContext.Builder().requestType(RequestType.CREATE).resourcePath(new ResourcePath("/testOrg/testApp/storage/some"));
+        storageReq = new RequestContext.Builder().requestType(RequestType.CREATE).resourcePath(new ResourcePath("/testApp/storage/some"));
         ResourceState createState = new DefaultResourceState();
         createState.putProperty("user", "john");
         createState.putProperty("something", "something-which-does-not-matter");
@@ -143,7 +145,7 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
 
         // UPDATE to storage also REJECTS if user from createState is different from current user
         createState.putProperty("user", "john");
-        storageReq = new RequestContext.Builder().requestType(RequestType.UPDATE).resourcePath(new ResourcePath("/testOrg/testApp/storage/some/123"));
+        storageReq = new RequestContext.Builder().requestType(RequestType.UPDATE).resourcePath(new ResourcePath("/testApp/storage/some/123"));
         assertAuthzDecision(storageReq.securityContext(anonymous), createState, AuthzDecision.REJECT);
         assertAuthzDecision(storageReq.securityContext(admin), createState, AuthzDecision.ACCEPT);
         assertAuthzDecision(storageReq.securityContext(user), createState, AuthzDecision.IGNORE);
@@ -162,7 +164,7 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
         attribs.setAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, reqCtxToCheck);
         attribs.setAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, reqResourceState);
         RequestContext reqCtx = new RequestContext.Builder().requestAttributes(attribs).build();
-        ResourceState state = client.read(reqCtx, "/testOrg/testApp/uriPolicy/authzCheck");
+        ResourceState state = client.read(reqCtx, "/testApp/uriPolicy/authzCheck");
         String decision = (String) state.getProperty(AuthzConstants.ATTR_AUTHZ_POLICY_RESULT);
         Assert.assertNotNull(decision);
         Assert.assertEquals(expectedDecision, Enum.valueOf(AuthzDecision.class, decision));

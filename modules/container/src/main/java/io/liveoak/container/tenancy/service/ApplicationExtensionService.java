@@ -2,16 +2,12 @@ package io.liveoak.container.tenancy.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.extension.ApplicationExtensionContextImpl;
-import io.liveoak.container.extension.ConfigFilteringService;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
-import io.liveoak.container.tenancy.InternalOrganization;
-import io.liveoak.container.zero.ApplicationResource;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.*;
-import org.jboss.msc.value.ImmediateValue;
 import org.jboss.msc.value.InjectedValue;
 
 import java.util.Properties;
@@ -22,57 +18,41 @@ import java.util.Properties;
 public class ApplicationExtensionService implements Service<InternalApplicationExtension> {
 
 
-    public ApplicationExtensionService(String extensionId, ObjectNode configuration) {
+    public ApplicationExtensionService(String extensionId, String resourceId, ObjectNode configuration) {
         this.extensionId = extensionId;
+        this.resourceId = resourceId;
         this.configuration = configuration;
     }
 
     @Override
     public void start(StartContext context) throws StartException {
 
-        System.err.println( "** Activate " + this.extensionId + " for " + this.applicationInjector.getValue().id() );
+        System.err.println( "** Activate " + this.extensionId + " as " + resourceId + " for " + this.applicationInjector.getValue().id() );
+
         ServiceTarget target = context.getChildTarget();
 
         this.appExtension = new InternalApplicationExtension(
                 this.serviceRegistryInjector.getValue(),
                 this.applicationInjector.getValue(),
-                this.extensionId
+                this.extensionId,
+                this.resourceId
         );
 
-        ServiceName configName = context.getController().getName().append( "config" );
-        target.addService( configName, new ValueService<ObjectNode>( new ImmediateValue<>( this.configuration ) ) )
-                .install();
 
-        ServiceName filteredConfigName = configName.append( "filtered" );
-        ConfigFilteringService filteredConfig = new ConfigFilteringService( properties() );
-        target.addService( filteredConfigName, filteredConfig )
-                .addDependency( configName, ObjectNode.class, filteredConfig.configurationInjector() )
-                .install();
-
-        String orgId = this.appExtension.application().organization().id();
         String appId = this.appExtension.application().id();
 
-        ServiceName adminMountName = LiveOak.applicationExtensionAdminResource(orgId, appId, this.extensionId );
-
         this.extensionContext = new ApplicationExtensionContextImpl(
-                context.getChildTarget(),
+                target,
                 this.appExtension,
-                this.appExtension.id(),
-                filteredConfigName,
-                LiveOak.applicationContext(orgId, appId),
-                adminMountName );
+                LiveOak.applicationContext(appId),
+                LiveOak.applicationAdminResource(appId).append( "extensions" ),
+                this.configuration );
 
         try {
             this.extensionInjector.getValue().extend(extensionContext);
         } catch (Exception e) {
             throw new StartException(e);
         }
-
-        ApplicationExtensionResourceService resource = new ApplicationExtensionResourceService( this.appExtension, configName );
-
-        context.getChildTarget().addService( adminMountName, resource )
-                .addDependency(LiveOak.applicationAdminResource(orgId, appId), ApplicationResource.class, resource.applicationResourceInjector())
-                .install();
     }
 
     @Override
@@ -102,17 +82,11 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
 
     protected Properties properties() {
         InternalApplication app = this.applicationInjector.getValue();
-        InternalOrganization org = app.organization();
 
         Properties props = new Properties();
-
-        props.put( "organization.name", org.name() );
-        props.put( "organization.id", org.id() );
-        props.put( "organization.url",  "/" + org.id() );
-
         props.put( "application.name", app.name() );
         props.put( "application.id", app.id() );
-        props.put( "application.url",  "/" + org.id() + "/" + app.id() );
+        props.put( "application.url",  "/" + app.id() );
 
         props.put( "application.dir", app.directory().getAbsolutePath() );
 
@@ -120,8 +94,9 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
     }
 
 
-    private String extensionId;
-    private boolean remove;
+    private final String extensionId;
+    private final String resourceId;
+
 
     private ApplicationExtensionContextImpl extensionContext;
 

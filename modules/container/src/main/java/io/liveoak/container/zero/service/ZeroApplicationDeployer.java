@@ -1,7 +1,8 @@
 package io.liveoak.container.zero.service;
 
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.tenancy.InternalOrganization;
+import io.liveoak.container.tenancy.InternalApplicationRegistry;
+import io.liveoak.container.zero.extension.ZeroExtension;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -16,8 +17,8 @@ public class ZeroApplicationDeployer implements Service<InternalApplication> {
     @Override
     public void start(StartContext context) throws StartException {
         try {
-            this.application = this.organizationInjector.getValue().createApplication( "zero", "Zero" );
-            System.err.println( "** Zero application deployed" );
+            System.err.println( "START APP: " + ZeroExtension.APPLICATION_ID );
+            this.application = this.registryInjector.getValue().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME );
         } catch (InterruptedException e) {
             throw new StartException(e);
         }
@@ -32,10 +33,10 @@ public class ZeroApplicationDeployer implements Service<InternalApplication> {
         return this.application;
     }
 
-    public Injector<InternalOrganization> organizationInjector() {
-        return this.organizationInjector;
+    public Injector<InternalApplicationRegistry> applicationRegistryInjector() {
+        return this.registryInjector;
     }
 
-    private InjectedValue<InternalOrganization> organizationInjector = new InjectedValue<>();
+    private InjectedValue<InternalApplicationRegistry> registryInjector = new InjectedValue<>();
     private InternalApplication application;
 }

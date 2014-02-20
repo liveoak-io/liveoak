@@ -20,8 +20,8 @@ public class AggregatingFilesystemResourceService extends FilesystemResourceServ
     @Override
     public void start(StartContext context) throws StartException {
         this.resource = new AggregatingFilesystemResource(
+                this.adminResourceInjector.getValue(),
                 this.id,
-                this.directoryInjector.getValue(),
                 this.vertxInjector.getValue() );
     }
 }

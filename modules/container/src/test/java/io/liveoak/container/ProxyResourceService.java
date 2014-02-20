@@ -21,16 +21,7 @@ public class ProxyResourceService implements Service<RootResource> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        boolean blocking = false;
-        ObjectNode config = this.configurationInjector.getValue();
-        if ( config.has( "blocking" ) ) {
-            System.err.println( "-" + config.get( "blocking" ) );
-            blocking = config.get( "blocking" ).asBoolean();
-        }
-
-        System.err.println( "start: " + blocking );
-
-        if ( blocking ) {
+        if ( this.configurationInjector.getValue().blocking() ) {
             this.resource = new BlockingProxyResource( this.id, this.clientInjector.getValue()  );
         } else {
             this.resource = new NonBlockingProxyResource( this.id, this.clientInjector.getValue() );
@@ -47,7 +38,7 @@ public class ProxyResourceService implements Service<RootResource> {
         return this.resource;
     }
 
-    public Injector<ObjectNode> configurationInjector() {
+    public Injector<ProxyConfig> configurationInjector() {
         return this.configurationInjector;
     }
 
@@ -57,7 +48,7 @@ public class ProxyResourceService implements Service<RootResource> {
 
     private String id;
 
-    private InjectedValue<ObjectNode> configurationInjector = new InjectedValue<>();
+    private InjectedValue<ProxyConfig> configurationInjector = new InjectedValue<>();
     private InjectedValue<Client> clientInjector = new InjectedValue<>();
 
     private RootResource resource;

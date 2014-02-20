@@ -29,9 +29,9 @@ import static org.fest.assertions.Assertions.assertThat;
  */
 public class HttpGridFSHugeBlobTest extends AbstractGridFSTest {
 
-    private static final String USER_ROOT_URL = "http://localhost:8080/testOrg/testApp/gridfs/john";
+    private static final String USER_ROOT_URL = "http://localhost:8080/testApp/gridfs/john";
     private static final String ROOT_URL = "http://localhost:8080";
-    private static final String FILES_URI_ROOT = "/testOrg/testApp/gridfs/john/.files/";
+    private static final String FILES_URI_ROOT = "/testApp/gridfs/john/.files/";
 
     private JsonObject putBlob(String url, InputStream is, int size, boolean expectCreated) throws IOException {
 
@@ -69,7 +69,7 @@ public class HttpGridFSHugeBlobTest extends AbstractGridFSTest {
             assertThat(resultEntity.getContentType().getValue()).isEqualTo(APPLICATION_JSON);
 
             // do some more assertions on the response
-            assertThat(json.getObject("self").getString("href")).startsWith("/testOrg/testApp/gridfs/john/.files/");
+            assertThat(json.getObject("self").getString("href")).startsWith("/testApp/gridfs/john/.files/");
 
             String [] urlSegments = url.split("/");
             String lastSegment = urlSegments[urlSegments.length-1];
@@ -143,7 +143,7 @@ public class HttpGridFSHugeBlobTest extends AbstractGridFSTest {
     }
 
     private void deleteBlob() throws IOException {
-        HttpDelete get = new HttpDelete("http://localhost:8080/testOrg/testApp/gridfs/john/vacation/mars_2038/beach.jpg");
+        HttpDelete get = new HttpDelete("http://localhost:8080/testApp/gridfs/john/vacation/mars_2038/beach.jpg");
         try {
             get.setHeader(HttpHeaders.Names.ACCEPT, ALL);
 

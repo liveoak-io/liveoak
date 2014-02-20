@@ -3,7 +3,6 @@ package io.liveoak.container.subscriptions;
 import io.liveoak.container.*;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.tenancy.InternalOrganization;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.client.Client;
@@ -22,20 +21,18 @@ public class HttpSubscriptionTest {
 
     protected LiveOakSystem system;
     protected Client client;
-    private InternalOrganization organization;
     private InternalApplication application;
 
     @Before
     public void setUp() throws Exception {
         this.system = LiveOakFactory.create();
-        this.organization = this.system.organizationRegistry().createOrganization( "testOrg", "Test Organization" );
-        this.application = this.organization.createApplication( "testApp", "Test Application" );
+        this.application = this.system.applicationRegistry().createApplication( "testApp", "Test Application" );
 
         this.system.extensionInstaller().load("memory", new InMemoryDBExtension());
         this.application.extend("memory");
         this.system.awaitStability();
 
-        InMemoryDBResource resource = (InMemoryDBResource) this.system.service( InMemoryDBExtension.resource("testOrg", "testApp", "memory") );
+        InMemoryDBResource resource = (InMemoryDBResource) this.system.service( InMemoryDBExtension.resource("testApp", "memory") );
         resource.addMember(new InMemoryCollectionResource(resource, "data"));
         resource.addMember(new InMemoryCollectionResource(resource, "notifications"));
 
@@ -55,19 +52,19 @@ public class HttpSubscriptionTest {
         // Create a subscription
 
         DefaultResourceState subscriptionState = new DefaultResourceState();
-        subscriptionState.putProperty("path", "/testOrg/testApp/memory/data/*");
-        subscriptionState.putProperty("destination", "http://localhost:8080/testOrg/testApp/memory/notifications/");
-        ResourceState createdSubscription = this.client.create(requestContext, "/testOrg/testApp/subscriptions", subscriptionState);
+        subscriptionState.putProperty("path", "/testApp/memory/data/*");
+        subscriptionState.putProperty("destination", "http://localhost:8080/testApp/memory/notifications/");
+        ResourceState createdSubscription = this.client.create(requestContext, "/testApp/subscriptions", subscriptionState);
 
         assertThat(createdSubscription).isNotNull();
-        assertThat(createdSubscription.getProperty("path")).isEqualTo("/testOrg/testApp/memory/data/*");
-        assertThat(createdSubscription.getProperty("destination")).isEqualTo("http://localhost:8080/testOrg/testApp/memory/notifications/");
+        assertThat(createdSubscription.getProperty("path")).isEqualTo("/testApp/memory/data/*");
+        assertThat(createdSubscription.getProperty("destination")).isEqualTo("http://localhost:8080/testApp/memory/notifications/");
 
         // Create an item that is subscribed to
 
         DefaultResourceState bobState = new DefaultResourceState();
         bobState.putProperty("name", "Bob McWhirter");
-        ResourceState createdBob = this.client.create(requestContext, "/testOrg/testApp/memory/data", bobState);
+        ResourceState createdBob = this.client.create(requestContext, "/testApp/memory/data", bobState);
 
         String bobId = createdBob.id();
         assertThat(bobId).isNotEmpty();
@@ -75,15 +72,15 @@ public class HttpSubscriptionTest {
         // Give subscription time to deliver
 
         Thread.sleep(1000);
-        assertThat(createdBob.uri().toString()).isEqualTo("/testOrg/testApp/memory/data/" + bobId);
+        assertThat(createdBob.uri().toString()).isEqualTo("/testApp/memory/data/" + bobId);
 
         // Check that subscription fired, creating target
 
-        ResourceState notifiedBob = this.client.read(requestContext, "/testOrg/testApp/memory/notifications/" + bobId);
+        ResourceState notifiedBob = this.client.read(requestContext, "/testApp/memory/notifications/" + bobId);
 
         assertThat(notifiedBob).isNotNull();
         assertThat(notifiedBob.id()).isEqualTo(bobId);
-        assertThat(notifiedBob.uri().toString()).isEqualTo("/testOrg/testApp/memory/notifications/" + bobId);
+        assertThat(notifiedBob.uri().toString()).isEqualTo("/testApp/memory/notifications/" + bobId);
         assertThat(notifiedBob.getPropertyNames()).hasSize(1);
         assertThat(notifiedBob.getProperty("name")).isEqualTo("Bob McWhirter");
 
@@ -113,7 +110,7 @@ public class HttpSubscriptionTest {
 
         DefaultResourceState kenState = new DefaultResourceState();
         kenState.putProperty("name", "Ken Finnigan");
-        ResourceState createdKen = this.client.create(requestContext, "/testOrg/testApp/memory/data", kenState);
+        ResourceState createdKen = this.client.create(requestContext, "/testApp/memory/data", kenState);
 
         String kenId = createdKen.id();
         assertThat(kenId).isNotEmpty();
@@ -121,7 +118,7 @@ public class HttpSubscriptionTest {
         Thread.sleep(2000);
 
         try {
-            this.client.read(requestContext, "/testOrg/testApp/memory/notifications/" + kenId);
+            this.client.read(requestContext, "/testApp/memory/notifications/" + kenId);
             fail("should have thrown ResourceNotFoundException");
         } catch (ResourceNotFoundException e) {
             // expected and corret

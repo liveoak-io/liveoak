@@ -9,11 +9,7 @@ import org.jboss.msc.service.ServiceName;
 public class SecurityACLPolicyServices {
     private static final ServiceName ACL_POLICY = LiveOak.LIVEOAK.append( "acl-policy" );
 
-    public static ServiceName policy(String orgId, String appId ) {
-        return ACL_POLICY.append( orgId, appId, "policy" );
-    }
-
-    public static ServiceName resource(String orgId, String appId) {
-        return ACL_POLICY.append( orgId, appId, "resource" );
+    public static ServiceName policy(String appId, String resourceId ) {
+        return ACL_POLICY.append( "policy", appId, resourceId );
     }
 }

@@ -1,47 +1,73 @@
 package io.liveoak.container.tenancy;
 
 import io.liveoak.container.tenancy.service.ApplicationExtensionRemovalService;
-import io.liveoak.container.tenancy.service.ApplicationExtensionService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.resource.async.Resource;
+import org.jboss.msc.service.AbstractServiceListener;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ServiceTarget;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
+
 /**
  * @author Bob McWhirter
  */
-public class InternalApplicationExtension {
+public class InternalApplicationExtension implements Consumer<Exception> {
 
-    public InternalApplicationExtension(ServiceRegistry registry, InternalApplication app, String extensionId) {
+    public InternalApplicationExtension(ServiceRegistry registry, InternalApplication app, String extensionId, String resourceId) {
         this.registry = registry;
         this.app = app;
-        this.id = extensionId;
+        this.extensionId = extensionId;
+        this.resourceId = resourceId;
     }
 
     public InternalApplication application() {
         return this.app;
     }
 
-    public String id() {
-        return this.id;
+    public String extensionId() {
+        return this.extensionId;
+    }
+
+    public String resourceId() {
+        return this.resourceId;
     }
 
     public void remove() {
         // unmount them first
-        this.adminResourceController.setMode(ServiceController.Mode.REMOVE );
-        this.publicResourceController.setMode(ServiceController.Mode.REMOVE );
+        this.adminResourceController.setMode(ServiceController.Mode.REMOVE);
+        this.publicResourceController.setMode(ServiceController.Mode.REMOVE);
 
-        String orgId = this.app.organization().id();
         String appId = this.app.id();
-        ServiceController<InternalApplicationExtension> extController = (ServiceController<InternalApplicationExtension>) this.registry.getService(LiveOak.applicationExtension(orgId, appId, this.id));
+        ServiceController<InternalApplicationExtension> extController = (ServiceController<InternalApplicationExtension>) this.registry.getService(LiveOak.applicationExtension(appId, this.resourceId));
 
-        ApplicationExtensionRemovalService removal = new ApplicationExtensionRemovalService( extController );
+        ApplicationExtensionRemovalService removal = new ApplicationExtensionRemovalService(extController);
 
-        extController.getServiceContainer().addService( extController.getName().append( "remove" ), removal )
-                .addDependency( LiveOak.extension( this.id ), Extension.class, removal.extensionInjector() )
+        ServiceTarget target = extController.getServiceContainer().subTarget();
+
+        CountDownLatch latch = new CountDownLatch( 1 );
+
+        target.addListener( new AbstractServiceListener<Object>() {
+            @Override
+            public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
+                if ( transition.getAfter().equals(ServiceController.Substate.REMOVED ) ) {
+                    latch.countDown();
+                }
+            }
+        });
+
+        target.addService(extController.getName().append("remove"), removal)
+                .addDependency(LiveOak.extension(this.extensionId), Extension.class, removal.extensionInjector())
                 .install();
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void adminResourceController(ServiceController<? extends Resource> controller) {
@@ -60,10 +86,24 @@ public class InternalApplicationExtension {
         return this.publicResourceController.awaitValue();
     }
 
+    @Override
+    public void accept(Exception e) {
+        this.exception = e;
+    }
+
+    public Exception exception() {
+        return this.exception;
+    }
+
+    private final String extensionId;
+    private final String resourceId;
+
     private ServiceRegistry registry;
     private InternalApplication app;
-    private String id;
 
     private ServiceController<? extends Resource> adminResourceController;
     private ServiceController<? extends Resource> publicResourceController;
+
+    private Exception exception;
+
 }

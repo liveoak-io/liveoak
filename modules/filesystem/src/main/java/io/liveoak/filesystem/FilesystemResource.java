@@ -24,11 +24,17 @@ import java.io.File;
 @Configurable
 public class FilesystemResource extends DirectoryResource implements RootResource, FSResource {
 
-    public FilesystemResource(String id, File root, Vertx vertx) {
+    public FilesystemResource(FileSystemAdminResource adminResource, String id, Vertx vertx) {
         super(null, null);
         this.id = id;
         this.vertx = vertx;
-        file( root );
+        this.adminResource = adminResource;
+    }
+
+
+    @Override
+    public File file() {
+        return this.adminResource.directory();
     }
 
     @Override
@@ -52,9 +58,10 @@ public class FilesystemResource extends DirectoryResource implements RootResourc
     }
 
     public String toString() {
-        return "[FilesystemResource: root=" + this.file.getAbsolutePath() + "]";
+        return "[FilesystemResource: dir=" + this.adminResource.directory() + "]";
     }
 
+    private final FileSystemAdminResource adminResource;
     private Resource parent;
     private String id;
     private Vertx vertx;

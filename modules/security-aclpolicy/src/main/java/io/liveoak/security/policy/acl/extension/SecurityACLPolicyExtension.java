@@ -10,6 +10,7 @@ import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
+import io.liveoak.spi.resource.async.DefaultRootResource;
 import org.jboss.msc.service.ServiceTarget;
 
 import java.io.File;
@@ -26,7 +27,6 @@ public class SecurityACLPolicyExtension implements Extension {
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
 
-        String orgId = context.application().organization().id();
         String appId = context.application().id();
 
         ServiceTarget target = context.target();
@@ -34,17 +34,19 @@ public class SecurityACLPolicyExtension implements Extension {
         AclPolicyConfigService policy = new AclPolicyConfigService();
         File file = new File( context.application().directory(), "acl-policy-config.json" );
 
-        target.addService(SecurityACLPolicyServices.policy( orgId, appId ), policy )
+        target.addService(SecurityACLPolicyServices.policy( appId, context.resourceId() ), policy )
                 .addInjection( policy.fileInjector(), file )
                 .install();
 
-        AclPolicyRootResourceService resource = new AclPolicyRootResourceService( context.id() );
-        target.addService(SecurityACLPolicyServices.resource( orgId, appId ), resource )
-                .addDependency( SecurityACLPolicyServices.policy( orgId, appId ), AclPolicyConfig.class, resource.policyInjector() )
+        AclPolicyRootResourceService resource = new AclPolicyRootResourceService( context.resourceId() );
+        target.addService(LiveOak.resource( appId, context.resourceId() ), resource )
+                .addDependency(SecurityACLPolicyServices.policy(appId, context.resourceId()), AclPolicyConfig.class, resource.policyInjector())
                 .addDependency(LiveOak.CLIENT, Client.class, resource.clientInjector() )
                 .install();
 
-        context.mountPublic( SecurityACLPolicyServices.resource( orgId, appId ) );
+        context.mountPublic();
+
+        context.mountPrivate( new DefaultRootResource( context.resourceId() ));
 
     }
 

@@ -2,6 +2,7 @@ package io.liveoak.container.extension;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.container.tenancy.SimpleResourceRegistry;
+import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
@@ -26,7 +27,7 @@ public class ExtensionLoaderTest {
     public void setUpServiceContainer() {
         this.serviceContainer = ServiceContainer.Factory.create();
         this.systemAdminMount = new SimpleResourceRegistry("admin" );
-        this.serviceContainer.addService( ServiceName.of("admin-mount"), new ValueService<MountPointResource>( new ImmediateValue<>( this.systemAdminMount )))
+        this.serviceContainer.addService( LiveOak.resource(ZeroExtension.APPLICATION_ID, "system"), new ValueService<MountPointResource>( new ImmediateValue<>( this.systemAdminMount )))
                 .install();
         this.serviceContainer.addService( LiveOak.SERVICE_CONTAINER, new ValueService<ServiceContainer>( new ImmediateValue<>( this.serviceContainer ) ) )
                 .install();
@@ -44,11 +45,12 @@ public class ExtensionLoaderTest {
 
         this.serviceContainer.awaitStability();
 
-        ServiceController<?> adminResource = this.serviceContainer.getService(LiveOak.extension( "mock" ).append( "admin" ) );
+        ServiceController<?> adminResource = this.serviceContainer.getService(MockExtension.adminResource( "mock" ) );
 
         assertThat( adminResource ).isNotNull();
         assertThat( adminResource.getValue() ).isNotNull();
-        assertThat( adminResource.getValue() ).isInstanceOf( ExtensionConfigResource.class );
+        assertThat( adminResource.getValue() ).isInstanceOf( MockAdminResource.class );
+        assertThat( ((MockAdminResource)adminResource.getValue()).flavor() ).isEqualTo( "system" );
 
         assertThat( this.systemAdminMount.member( "mock" ) ).isSameAs( adminResource.getValue() );
     }

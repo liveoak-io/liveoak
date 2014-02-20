@@ -5,6 +5,7 @@
  */
 package io.liveoak.spi.resource.async;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.config.ConfigResource;
 import io.liveoak.spi.resource.config.Configurable;
@@ -159,6 +160,11 @@ public interface Resource {
     default Resource configuration() {
         if (this.getClass().isAnnotationPresent(Configurable.class)) {
             return new ConfigResource() {
+                @Override
+                public String id() {
+                    return Resource.this.id();
+                }
+
                 @Override
                 public Resource parent() {
                     return Resource.this;

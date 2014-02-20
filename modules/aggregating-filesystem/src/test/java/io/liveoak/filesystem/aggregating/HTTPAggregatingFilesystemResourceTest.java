@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.filesystem.aggregating.extension.AggregatingFilesystemExtension;
 import io.liveoak.spi.resource.RootResource;
@@ -33,7 +34,8 @@ public class HTTPAggregatingFilesystemResourceTest extends AbstractHTTPResourceT
 
     @Override
     public void loadExtensions() throws Exception {
-        loadExtension( "aggr", new AggregatingFilesystemExtension() );
+        loadExtension( "aggr-fs", new AggregatingFilesystemExtension() );
+        installResource( "aggr-fs", "aggr", JsonNodeFactory.instance.objectNode() );
     }
 
     @Override
@@ -75,7 +77,7 @@ public class HTTPAggregatingFilesystemResourceTest extends AbstractHTTPResourceT
     @Test
     public void testReadAggregate() throws Exception {
 
-        HttpGet get = new HttpGet("http://localhost:8080/testOrg/testApp/aggr/aggregate.js");
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/aggr/aggregate.js");
         get.addHeader("Accept", "*/*");
 
         try {

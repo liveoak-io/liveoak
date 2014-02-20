@@ -1,6 +1,7 @@
 package io.liveoak.mongo.gridfs.service;
 
 import com.mongodb.DB;
+import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.mongo.gridfs.GridFSResource;
 import io.liveoak.mongo.gridfs.GridFSRootResource;
 import org.jboss.msc.inject.Injector;
@@ -27,7 +28,7 @@ public class GridFSResourceService implements Service<GridFSRootResource> {
     public void start(StartContext context) throws StartException {
         this.resource = new GridFSRootResource(
                 this.id,
-                this.dbInjector.getValue(),
+                this.configResourceInjector.getValue(),
                 this.tmpDirInjector.getValue(),
                 this.vertxInjector.getValue() );
     }
@@ -42,8 +43,8 @@ public class GridFSResourceService implements Service<GridFSRootResource> {
         return this.resource;
     }
 
-    public Injector<DB> dbInjector() {
-        return this.dbInjector;
+    public InjectedValue<RootMongoConfigResource> configResourceInjector() {
+        return this.configResourceInjector;
     }
 
     public Injector<File> tmpDirInjector() {
@@ -56,7 +57,7 @@ public class GridFSResourceService implements Service<GridFSRootResource> {
 
     private final String id;
 
-    private InjectedValue<DB> dbInjector = new InjectedValue<>();
+    private InjectedValue<RootMongoConfigResource> configResourceInjector = new InjectedValue<>();
     private InjectedValue<File> tmpDirInjector = new InjectedValue<>();
     private InjectedValue<Vertx> vertxInjector = new InjectedValue<>();
     private GridFSRootResource resource;

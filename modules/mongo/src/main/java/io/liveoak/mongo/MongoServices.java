@@ -9,13 +9,14 @@ import org.jboss.msc.service.ServiceName;
 public class MongoServices {
 
     private static ServiceName MONGO = LiveOak.LIVEOAK.append("mongo");
+    private static ServiceName CLIENT = MONGO.append("client");
     private static ServiceName DB = MONGO.append("db");
 
-    public static ServiceName mongo(String extensionId) {
-        return MONGO.append( extensionId );
+    public static ServiceName mongo(String appId, String resourceId) {
+        return CLIENT.append( appId, resourceId );
     }
-    public static ServiceName db(String orgId, String appId, String id) {
-        return DB.append(orgId, appId, id );
+    public static ServiceName db(String appId, String resourceId) {
+        return DB.append( appId, resourceId );
     }
 
 }

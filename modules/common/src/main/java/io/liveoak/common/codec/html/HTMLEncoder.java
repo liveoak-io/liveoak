@@ -47,7 +47,7 @@ public class HTMLEncoder implements StateEncoder {
         startTag("link");
         attribute("rel", "stylesheet");
         attribute("type", "text/css");
-        attribute("href", "/liveoak/zero/css/liveoak.css");
+        attribute("href", "/admin/css/liveoak.css");
         endTag("link");
 
 

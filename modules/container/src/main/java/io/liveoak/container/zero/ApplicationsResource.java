@@ -1,6 +1,7 @@
 package io.liveoak.container.zero;
 
 import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.container.tenancy.SimpleResourceRegistry;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
@@ -14,9 +15,9 @@ import java.io.File;
  */
 public class ApplicationsResource extends SimpleResourceRegistry {
 
-    public ApplicationsResource(OrganizationResource parent) {
-        super(parent, "applications" );
-        this.organization = parent;
+    public ApplicationsResource(InternalApplicationRegistry applicationRegistry) {
+        super("applications" );
+        this.applicationRegistry = applicationRegistry;
     }
 
     @Override
@@ -27,10 +28,11 @@ public class ApplicationsResource extends SimpleResourceRegistry {
             dir = new File( dirPath );
         }
 
-        InternalApplication app = this.organization.organization().createApplication(state.id(), (String) state.getProperty("name"), dir);
+        InternalApplication app = this.applicationRegistry.createApplication(state.id(), (String) state.getProperty("name"), dir);
         responder.resourceCreated( app.resource() );
     }
 
-     private final OrganizationResource organization;
+    private final InternalApplicationRegistry applicationRegistry;
+
 
 }

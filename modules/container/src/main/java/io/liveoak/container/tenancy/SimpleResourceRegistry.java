@@ -55,7 +55,7 @@ public class SimpleResourceRegistry implements MountPointResource, RootResource,
     }
 
     public String toString() {
-        return "[SimpleResourceRegistry: parent=" + this.parent + "; id=" + this.id + "; registry=" + this.registry.keySet() + "]";
+        return "[" + getClass().getSimpleName() + ": parent=" + this.parent + "; id=" + this.id + "; registry=" + this.registry.keySet() + "]";
     }
 
     private Resource parent;

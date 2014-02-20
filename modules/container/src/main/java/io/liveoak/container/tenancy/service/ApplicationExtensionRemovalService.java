@@ -1,19 +1,19 @@
 package io.liveoak.container.tenancy.service;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.container.extension.ApplicationExtensionContextImpl;
-import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
-import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.*;
 import org.jboss.msc.value.InjectedValue;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * @author Bob McWhirter
  */
 public class ApplicationExtensionRemovalService implements Service<Void> {
-
 
 
     public ApplicationExtensionRemovalService(ServiceController<InternalApplicationExtension> appExtensionServiceController) {
@@ -27,19 +27,15 @@ public class ApplicationExtensionRemovalService implements Service<Void> {
 
         InternalApplicationExtension appExtension = this.appExtensionServiceController.getValue();
 
-        String orgId = appExtension.application().organization().id();
-        String appId = appExtension.application().id();
-
         ApplicationExtensionContextImpl extensionContext = new ApplicationExtensionContextImpl(
                 target,
                 appExtension,
-                appExtension.id(),
                 null,
                 null,
-                null);
+                JsonNodeFactory.instance.objectNode());
 
         StabilityMonitor monitor = new StabilityMonitor();
-        target.addMonitor( monitor );
+        target.addMonitor(monitor);
 
         try {
             this.extensionInjector.getValue().unextend(extensionContext);
@@ -49,8 +45,9 @@ public class ApplicationExtensionRemovalService implements Service<Void> {
             throw new StartException(e);
         }
 
-        context.getController().setMode(ServiceController.Mode.REMOVE );
-        this.appExtensionServiceController.setMode( ServiceController.Mode.REMOVE );
+        // remove ourselves
+        context.getController().setMode(ServiceController.Mode.REMOVE);
+        this.appExtensionServiceController.setMode(ServiceController.Mode.REMOVE);
     }
 
     @Override
@@ -68,5 +65,7 @@ public class ApplicationExtensionRemovalService implements Service<Void> {
 
     private final ServiceController<InternalApplicationExtension> appExtensionServiceController;
     private final InjectedValue<Extension> extensionInjector = new InjectedValue<>();
+
+    private final CountDownLatch latch = new CountDownLatch(1);
 
 }

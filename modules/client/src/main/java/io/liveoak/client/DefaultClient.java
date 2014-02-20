@@ -86,6 +86,7 @@ public class DefaultClient implements Client {
         try {
             return future.get();
         } catch (ExecutionException e) {
+            e.getCause().fillInStackTrace();
             if (e.getCause() instanceof ResourceException) {
                 throw (ResourceException) e.getCause();
             }
@@ -133,6 +134,7 @@ public class DefaultClient implements Client {
         try {
             return future.get();
         } catch (ExecutionException e) {
+            e.getCause().fillInStackTrace();
             if (e.getCause() instanceof ResourceException) {
                 throw (ResourceException) e.getCause();
             }
@@ -142,7 +144,7 @@ public class DefaultClient implements Client {
 
     /**
      * Perform an asynchronous UPDATE action.
-     *
+     * <p>
      * <p>UPDATE has UPSERT semantics, in that if an attempt to
      * update a non-existant resource fails, an attempt is made
      * to create a resource at that location in the implied parent
@@ -164,7 +166,7 @@ public class DefaultClient implements Client {
 
     /**
      * Perform a synchronous UPDATE action.
-     *
+     * <p>
      * <p>UPDATE has UPSERT semantics, in that if an attempt to
      * update a non-existant resource fails, an attempt is made
      * to create a resource at that location in the implied parent
@@ -193,6 +195,7 @@ public class DefaultClient implements Client {
         try {
             return future.get();
         } catch (ExecutionException e) {
+            e.getCause().fillInStackTrace();
             if (e.getCause() instanceof ResourceException) {
                 throw (ResourceException) e.getCause();
             }
@@ -240,12 +243,12 @@ public class DefaultClient implements Client {
         try {
             return future.get();
         } catch (ExecutionException e) {
+            e.getCause().fillInStackTrace();
             if (e.getCause() instanceof ResourceException) {
                 throw (ResourceException) e.getCause();
             }
             throw e;
         }
-
     }
 
     void handleError(ClientResourceResponse response, CompletableFuture<?> future) {

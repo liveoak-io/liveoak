@@ -9,6 +9,7 @@ import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
+import io.liveoak.spi.resource.async.DefaultRootResource;
 import org.jboss.msc.service.ServiceTarget;
 
 import java.io.File;
@@ -24,7 +25,6 @@ public class SecurityExtension implements Extension {
 
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
-        String orgId = context.application().organization().id();
         String appId = context.application().id();
 
         ServiceTarget target = context.target();
@@ -34,18 +34,20 @@ public class SecurityExtension implements Extension {
 
         AuthzPolicyGroupService policyGroup = new AuthzPolicyGroupService();
 
-        target.addService( SecurityServices.policyGroup( orgId, appId ), policyGroup )
+        target.addService( SecurityServices.policyGroup( appId ), policyGroup )
                 .addInjection( policyGroup.fileInjector(), authzConfig )
                 .install();
 
-        AuthzResourceService resource = new AuthzResourceService(context.id());
+        AuthzResourceService resource = new AuthzResourceService(context.resourceId());
 
-        target.addService(SecurityServices.resource(orgId, appId), resource)
-                .addDependency(LiveOak.CLIENT, Client.class, resource.clientInjector() )
-                .addDependency(SecurityServices.policyGroup( orgId, appId ), AuthzPolicyGroup.class, resource.policyGroupInjector() )
+        target.addService(LiveOak.resource(appId, context.resourceId()), resource)
+                .addDependency(LiveOak.CLIENT, Client.class, resource.clientInjector())
+                .addDependency(SecurityServices.policyGroup( appId ), AuthzPolicyGroup.class, resource.policyGroupInjector() )
                 .install();
 
-        context.mountPublic( SecurityServices.resource( orgId, appId ) );
+        context.mountPublic(LiveOak.resource(appId, context.resourceId()));
+
+        context.mountPrivate( new DefaultRootResource( context.resourceId() ));
     }
 
     @Override

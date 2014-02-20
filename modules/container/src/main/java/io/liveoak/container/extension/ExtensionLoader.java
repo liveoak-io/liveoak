@@ -21,8 +21,7 @@ public class ExtensionLoader implements Service<Void> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        System.err.println( "CONFIG DIR: " + this.configDir );
-        if ( this.configDir != null ) {
+        if ( this.configDir != null && this.configDir.exists()) {
             File[] configs = this.configDir.listFiles();
             for ( File config : configs ) {
                 try {

@@ -24,12 +24,22 @@ public class TmpDirService implements Service<File> {
         } catch (IOException e) {
             throw new StartException(e);
         }
-
     }
 
     @Override
     public void stop(StopContext context) {
+        delete( this.dir );
+    }
 
+    protected void delete(File file) {
+        if ( file.isDirectory() ) {
+            File[] children = file.listFiles();
+            for ( File child : children ) {
+                delete( child );
+            }
+        }
+
+        file.delete();
     }
 
     @Override

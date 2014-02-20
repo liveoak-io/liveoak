@@ -1,5 +1,6 @@
 package io.liveoak.scheduler;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.scheduler.extension.SchedulerExtension;
@@ -22,6 +23,7 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
     @Override
     public void loadExtensions() throws Exception {
         loadExtension( "scheduler", new SchedulerExtension() );
+        installResource( "scheduler", "scheduler", JsonNodeFactory.instance.objectNode() );
     }
 
     @Test
@@ -31,7 +33,7 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
         ResourceState triggerState = new DefaultResourceState();
         triggerState.putProperty("cron", "* * * * * ?");
         System.err.println( "creating a trigger" );
-        ResourceState returnedState = client.create(requestContext, "/testOrg/testApp/scheduler", triggerState);
+        ResourceState returnedState = client.create(requestContext, "/testApp/scheduler", triggerState);
         System.err.println( "created a trigger: " + returnedState );
 
         String id = returnedState.id();
@@ -42,7 +44,7 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
 
         System.err.println( "Fetching firings" );
 
-        ResourceState fromCollection = client.read(requestContext, "/testOrg/testApp/scheduler/" + id);
+        ResourceState fromCollection = client.read(requestContext, "/testApp/scheduler/" + id);
 
         System.err.println( "Fetched: " + fromCollection );
 

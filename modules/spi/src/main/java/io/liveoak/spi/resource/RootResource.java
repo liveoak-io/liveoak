@@ -16,32 +16,17 @@ import io.liveoak.spi.resource.async.Resource;
  */
 public interface RootResource extends Resource {
 
-    /**
-     * Initialize the resource.
-     *
-     * @param context The initialization context.
-     * @throws io.liveoak.spi.InitializationException
-     *          If an error occurs.
-     */
-    //default void initialize(ResourceContext context) throws InitializationException {
-
-    //}
-
-    /**
-     * Free resources used by the resource and shutdown.
-     */
-    //default void destroy() {
-//
-    //}
-
-
-    //default Resource parent() {
-        //return null;
-    //}
-
     /** Called when the resource gets mounted.
      *
      * @param parent The mount-point parent.
      */
     void parent(Resource parent);
+
+    default void start() throws Exception {
+
+    }
+
+    default void stop() {
+
+    }
 }

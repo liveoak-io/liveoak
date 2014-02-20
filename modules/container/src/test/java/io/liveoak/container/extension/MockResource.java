@@ -1,12 +1,13 @@
 package io.liveoak.container.extension;
 
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 
 /**
  * @author Bob McWhirter
  */
-public class MockResource implements RootResource {
+public class MockResource implements RootResource, SynchronousResource {
 
     public MockResource(String id) {
         this.id = id;

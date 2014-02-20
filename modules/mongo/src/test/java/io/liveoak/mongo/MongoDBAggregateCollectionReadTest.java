@@ -49,7 +49,7 @@ public class MongoDBAggregateCollectionReadTest extends BaseMongoDBTest {
                 .build();
 
 
-        ResourceState result = client.read(requestContext, "/testOrg/testApp/" + BASEPATH + "/testQueryCollection/_aggregate");
+        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection/_aggregate");
 
         // verify response
         assertThat(result).isNotNull();

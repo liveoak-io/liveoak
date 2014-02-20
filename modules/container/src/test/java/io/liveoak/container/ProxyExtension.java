@@ -1,21 +1,24 @@
 package io.liveoak.container;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
-import org.jboss.msc.service.ServiceName;
-import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.*;
+import org.jboss.msc.value.ImmediateValue;
 
 /**
  * @author Bob McWhirter
  */
 public class ProxyExtension implements Extension {
 
-    public static ServiceName resource(String orgId, String appId, String id) {
-        return ServiceName.of( "proxy", "resource", orgId, appId, id );
+    public static ServiceName resource(String appId, String id) {
+        return ServiceName.of("proxy", "resource", appId, id);
+    }
+
+    public static ServiceName adminResource(String appId, String id) {
+        return ServiceName.of("proxy", "admin-resource", appId, id);
     }
 
     @Override
@@ -26,19 +29,32 @@ public class ProxyExtension implements Extension {
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
 
-        String orgId = context.application().organization().id();
         String appId = context.application().id();
 
         ServiceTarget target = context.target();
 
-        ProxyResourceService proxy = new ProxyResourceService( context.id() );
+        ServiceName configName = adminResource(appId, context.resourceId() ).append( "config" );
 
-        target.addService( resource( orgId, appId, context.id() ),  proxy )
-                .addDependency(LiveOak.CLIENT, Client.class, proxy.clientInjector() )
-                .addDependency( context.configurationServiceName(), ObjectNode.class, proxy.configurationInjector() )
+        ProxyResourceService proxy = new ProxyResourceService(context.resourceId());
+
+        target.addService(resource(appId, context.resourceId()), proxy)
+                .addDependency(LiveOak.CLIENT, Client.class, proxy.clientInjector())
+                .addDependency(configName, ProxyConfig.class, proxy.configurationInjector())
                 .install();
 
-        context.mountPublic( resource( orgId, appId, context.id() ));
+        context.mountPublic(resource(appId, context.resourceId()));
+
+        ValueInjectionService<ProxyConfig> config = new ValueInjectionService<>();
+
+        ServiceController<ProxyConfig> configController = target.addService(configName, config )
+                .addDependency( adminResource( appId, context.resourceId() ), ProxyConfig.class, config.getInjector() )
+                .install();
+
+        ProxyAdminResource admin = new ProxyAdminResource(context.resourceId(), configController);
+        target.addService(adminResource(appId, context.resourceId()), new ValueService<ProxyAdminResource>(new ImmediateValue<>(admin)))
+                .install();
+
+        context.mountPrivate(adminResource(appId, context.resourceId()));
     }
 
     @Override

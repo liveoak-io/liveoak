@@ -10,8 +10,8 @@ public class SchedulerServices {
 
     private static ServiceName SCHEDULER = LiveOak.LIVEOAK.append( "scheduler" );
 
-    public static ServiceName scheduler(String orgId, String appId) {
-        return SCHEDULER.append( orgId ).append( appId );
+    public static ServiceName scheduler(String appId, String resourceId) {
+        return SCHEDULER.append( appId, resourceId );
     }
 
 }

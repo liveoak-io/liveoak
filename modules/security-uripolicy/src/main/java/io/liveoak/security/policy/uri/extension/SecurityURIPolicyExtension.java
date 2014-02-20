@@ -5,9 +5,11 @@ import io.liveoak.security.policy.uri.complex.URIPolicy;
 import io.liveoak.security.policy.uri.integration.URIPolicyRootResource;
 import io.liveoak.security.policy.uri.service.URIPolicyResourceService;
 import io.liveoak.security.policy.uri.service.URIPolicyService;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
+import io.liveoak.spi.resource.async.DefaultRootResource;
 import org.jboss.msc.service.ServiceTarget;
 
 import java.io.File;
@@ -24,25 +26,26 @@ public class SecurityURIPolicyExtension implements Extension {
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
 
-        String orgId = context.application().organization().id();
         String appId = context.application().id();
 
         ServiceTarget target = context.target();
 
         URIPolicyService policy = new URIPolicyService();
-        File file = new File( context.application().directory(), "uri-policy-config.json" );
+        File file = new File(context.application().directory(), "uri-policy-config.json");
 
-        target.addService(SecurityURIPolicyServices.policy( orgId, appId ), policy )
+        target.addService(SecurityURIPolicyServices.policy(appId, context.resourceId()), policy)
                 .addInjection(policy.fileInjector(), file)
                 .install();
 
-        URIPolicyResourceService resource = new URIPolicyResourceService( context.id() );
+        URIPolicyResourceService resource = new URIPolicyResourceService(context.resourceId());
 
-        target.addService( SecurityURIPolicyServices.resource( orgId, appId ), resource )
-                .addDependency( SecurityURIPolicyServices.policy( orgId, appId ), URIPolicy.class, resource.policyInjector() )
+        target.addService(LiveOak.resource(appId, context.resourceId()), resource)
+                .addDependency(SecurityURIPolicyServices.policy(appId, context.resourceId()), URIPolicy.class, resource.policyInjector())
                 .install();
 
-        context.mountPublic( SecurityURIPolicyServices.resource( orgId, appId ) );
+        context.mountPublic();
+
+        context.mountPrivate(new DefaultRootResource(context.resourceId()));
     }
 
     @Override

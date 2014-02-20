@@ -2,8 +2,6 @@ package io.liveoak.container.subscriptions.resource;
 
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.extension.MountService;
-import io.liveoak.container.subscriptions.ApplicationSubscriptions;
-import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.subscriptions.DefaultSubscriptionManager;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.MountPointResource;
@@ -25,6 +23,7 @@ public class ApplicationSubscriptionsResourceService implements Service<Applicat
 
     @Override
     public void start(StartContext context) throws StartException {
+
         this.resource = new ApplicationSubscriptionsResource(
                 this.subscriptionManagerInjector.getValue(),
                 this.vertxInjector.getValue(),
@@ -33,11 +32,10 @@ public class ApplicationSubscriptionsResourceService implements Service<Applicat
         MountService<ApplicationSubscriptionsResource> mount = new MountService<>();
 
         ServiceTarget target = context.getChildTarget();
-        String orgId = this.app.organization().id();
         String appId = this.app.id();
 
         target.addService(context.getController().getName().append("mount"), mount)
-                .addDependency(LiveOak.applicationContext(orgId, appId), MountPointResource.class, mount.mountPointInjector())
+                .addDependency(LiveOak.applicationContext(appId), MountPointResource.class, mount.mountPointInjector())
                 .addInjectionValue(mount.resourceInjector(), this)
                 .install();
     }

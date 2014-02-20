@@ -14,8 +14,8 @@ import org.jboss.msc.value.ImmediateValue;
  */
 public class InMemoryDBExtension implements Extension{
 
-    public static ServiceName resource(String orgId, String appId, String id) {
-        return ServiceName.of("in-memory", "resource", orgId, appId, id);
+    public static ServiceName resource(String appId, String id) {
+        return ServiceName.of("in-memory", "resource", appId, id);
     }
 
     @Override
@@ -26,17 +26,16 @@ public class InMemoryDBExtension implements Extension{
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
 
-        String orgId = context.application().organization().id();
         String appId = context.application().id();
 
-        InMemoryDBResource resource = new InMemoryDBResource( context.id() );
+        InMemoryDBResource resource = new InMemoryDBResource( context.resourceId() );
 
         ServiceTarget target = context.target();
 
-        target.addService( resource( orgId, appId, context.id() ), new ValueService<RootResource>( new ImmediateValue<>( resource ) ) )
+        target.addService( resource( appId, context.resourceId() ), new ValueService<RootResource>( new ImmediateValue<>( resource ) ) )
                 .install();
 
-        context.mountPublic( resource( orgId, appId, context.id() ) );
+        context.mountPublic( resource( appId, context.resourceId() ) );
     }
 
     @Override

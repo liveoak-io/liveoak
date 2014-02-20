@@ -28,7 +28,7 @@ public class BasicIT {
 
     @Test
     public void testAppIndexHtml() throws Exception {
-        String resource = getResource(client, new URL(url, "/liveoak/default/app/index.html"));
+        String resource = getResource(client, new URL(url, "/default/app/index.html"));
 
         Assert.assertNotNull( resource );
         resource = resource.trim();
@@ -40,7 +40,7 @@ public class BasicIT {
 
     @Test
     public void testClientJS() throws Exception {
-        String js = getResource(client, new URL(url, "/liveoak/zero/client/liveoak.js"));
+        String js = getResource(client, new URL(url, "/default/client/liveoak.js"));
 
         Assert.assertTrue(js.contains("var LiveOak = function"));
         Assert.assertTrue(js.contains("var Keycloak = function"));
@@ -49,8 +49,10 @@ public class BasicIT {
     }
 
     private String getResource(HttpClient client, URL resource) throws IOException, URISyntaxException {
+        System.err.println( "GET: " + resource );
         HttpGet appGet = new HttpGet(resource.toURI());
         HttpResponse response = client.execute(appGet);
+        System.err.println( "RESPONSE: " + response );
         Assert.assertEquals(200, response.getStatusLine().getStatusCode());
         return IOUtils.toString(response.getEntity().getContent());
     }

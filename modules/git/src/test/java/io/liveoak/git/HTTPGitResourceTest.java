@@ -5,6 +5,7 @@
  */
 package io.liveoak.git;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.git.extension.GitExtension;
 import io.liveoak.spi.Config;
 import io.liveoak.spi.resource.RootResource;
@@ -34,11 +35,12 @@ public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
     public void loadExtensions() throws Exception {
         new File( applicationDirectory(), "git" ).mkdirs();
         loadExtension( "git", new GitExtension() );
+        installResource( "git", "git", JsonNodeFactory.instance.objectNode() );
     }
 
     @Test
     public void enumerateRoot() throws Exception {
-        HttpGet get = new HttpGet("http://localhost:8080/testOrg/testApp/git");
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/git");
         get.addHeader("Accept", "application/json");
 
         try {

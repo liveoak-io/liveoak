@@ -11,8 +11,9 @@ import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
-import io.liveoak.container.tenancy.InternalOrganization;
+import io.liveoak.container.util.ConversionUtils;
 import io.liveoak.spi.extension.Extension;
+import io.liveoak.spi.state.ResourceState;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -32,7 +33,6 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
 
     protected LiveOakSystem system;
     protected CloseableHttpClient httpClient;
-    protected InternalOrganization organization;
     protected InternalApplication application;
 
     private Set<String> extensionIds = new HashSet<>();
@@ -57,19 +57,23 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
         this.extensionIds.add(id);
     }
 
+    protected InternalApplicationExtension installResource(String extId, String resourceId, ObjectNode resourceConfig) throws Exception {
+        InternalApplicationExtension appExt = this.application.extend(extId, resourceId, resourceConfig);
+        this.extensions.add(appExt);
+        return appExt;
+    }
+
+    protected InternalApplicationExtension installResource(String extId, String resourceId, ResourceState resourceConfig) throws Exception {
+        return installResource( extId, resourceId, ConversionUtils.convert(resourceConfig) );
+    }
+
     @Before
     public void setUpSystem() throws Exception {
         try {
             this.system = LiveOakFactory.create();
-            this.organization = this.system.organizationRegistry().createOrganization("testOrg", "Test Organization");
-            this.application = this.organization.createApplication("testApp", "Test Application", applicationDirectory());
+            this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application", applicationDirectory());
 
             loadExtensions();
-
-            for (String extId : this.extensionIds) {
-                InternalApplicationExtension ext = this.application.extend(extId, JsonNodeFactory.instance.objectNode());
-                this.extensions.add( ext );
-            }
 
             this.vertx = this.system.vertx();
 
@@ -81,12 +85,20 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
 
     @After
     public void tearDownSystem() throws Exception {
+        removeAllResources();
+
+        this.system.awaitStability();
+        this.system.stop();
+    }
+
+    public void removeAllResources() throws InterruptedException {
         for (InternalApplicationExtension extension : this.extensions) {
             extension.remove();
         }
 
+        this.extensions.clear();
+
         this.system.awaitStability();
-        this.system.stop();
     }
 
     @Before

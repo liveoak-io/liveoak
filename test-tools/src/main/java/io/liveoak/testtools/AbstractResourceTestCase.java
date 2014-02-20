@@ -7,19 +7,15 @@ package io.liveoak.testtools;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
-import io.liveoak.container.tenancy.InternalOrganization;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.container.util.ConversionUtils;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
-import org.jboss.msc.service.ServiceContainer;
 import org.junit.After;
 import org.junit.Before;
 import org.vertx.java.core.Vertx;
@@ -39,7 +35,6 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
     protected Client client;
     protected RootResource resource;
     protected Vertx vertx;
-    protected InternalOrganization organization;
     protected InternalApplication application;
 
     private Set<String> extensionIds = new HashSet<>();
@@ -53,11 +48,21 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
         this.extensionIds.add(id);
     }
 
-    protected void loadExtension(String id, Extension ext, ObjectNode config) throws Exception {
+    protected void loadExtension(String id, Extension ext, ObjectNode extConfig) throws Exception {
         ObjectNode fullConfig = JsonNodeFactory.instance.objectNode();
-        fullConfig.put( "config", config );
+        fullConfig.put( "config", extConfig );
         this.system.extensionInstaller().load(id, ext, fullConfig);
         this.extensionIds.add(id);
+    }
+
+    protected InternalApplicationExtension installResource(String extId, String resourceId, ObjectNode resourceConfig) throws Exception {
+        InternalApplicationExtension appExt = this.application.extend(extId, resourceId, resourceConfig);
+        this.extensions.add(appExt);
+        return appExt;
+    }
+
+    protected InternalApplicationExtension installResource(String extId, String resourceId, ResourceState resourceConfig) throws Exception {
+        return installResource( extId, resourceId, ConversionUtils.convert( resourceConfig ) );
     }
 
     protected File applicationDirectory() {
@@ -68,15 +73,9 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
     public void setUpSystem() throws Exception {
         try {
             this.system = LiveOakFactory.create();
-            this.organization = this.system.organizationRegistry().createOrganization("testOrg", "Test Organization");
-            this.application = this.organization.createApplication("testApp", "Test Application", applicationDirectory());
+            this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application", applicationDirectory());
 
             loadExtensions();
-
-            for (String extId : this.extensionIds) {
-                InternalApplicationExtension ext = this.application.extend(extId, JsonNodeFactory.instance.objectNode());
-                this.extensions.add( ext );
-            }
 
             this.client = this.system.client();
             this.vertx = this.system.vertx();
@@ -87,13 +86,19 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
         }
     }
 
-    @After
-    public void tearDownSystem() throws Exception {
+    public void removeAllResources() throws InterruptedException {
         for (InternalApplicationExtension extension : this.extensions) {
             extension.remove();
         }
 
+        this.extensions.clear();
+
         this.system.awaitStability();
+    }
+
+    @After
+    public void tearDownSystem() throws Exception {
+        removeAllResources();
         this.system.stop();
     }
 

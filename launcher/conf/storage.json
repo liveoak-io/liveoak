@@ -1,8 +1,0 @@
-{
-    module-id:  'io.liveoak.mongo',
-    common: true,
-    config: {
-        host: 'localhost',
-        port: 27017
-    }
-}

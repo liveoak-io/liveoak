@@ -34,7 +34,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
     @Test
     public void testRootFound() throws Exception {
-        ResourceState result = client.read(new RequestContext.Builder().build(), "/testOrg/testApp/storage");
+        ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/storage");
         assertThat(result).isNotNull();
     }
 
@@ -53,7 +53,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one
         assertThat(db.getCollectionNames()).hasSize(0);
 
-        ResourceState result = client.read(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH);
+        ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH);
 
         // verify response
         assertThat(result).isNotNull();
@@ -76,7 +76,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
         assertThat(db.getCollectionNames()).hasSize(4);
 
-        ResourceState result = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).build(), "/testOrg/testApp/" + BASEPATH);
+        ResourceState result = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).build(), "/testApp/" + BASEPATH);
 
         // verify response
         assertThat(result).isNotNull();
@@ -100,7 +100,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertFalse(db.collectionExists(methodName));
 
         try {
-            ResourceState result = client.read(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName);
+            ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName);
             Fail.fail();
         } catch (ResourceNotFoundException e) {
             // expected
@@ -108,7 +108,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         db.createCollection(methodName, new BasicDBObject());
 
-        ResourceState result = client.read(new RequestContext.Builder().build(), "/testOrg/testApp/" + BASEPATH + "/" + methodName);
+        ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName);
 
         // verify the result
         assertThat(result.id()).isEqualTo(methodName);
@@ -135,7 +135,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // This should return 23 collections
         RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members"))
                 .pagination(new SimplePagination(11, 23)).build();
-        ResourceState result = client.read(requestContext, "/testOrg/testApp/" + BASEPATH);
+        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH);
 
         // verify the result
         assertThat(result.id()).isEqualTo(BASEPATH);
@@ -153,7 +153,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         // This should return 3 collections as a total number of them is 1013
         requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).pagination(new SimplePagination(1010, 20)).build();
-        result = client.read(requestContext, "/testOrg/testApp/" + BASEPATH);
+        result = client.read(requestContext, "/testApp/" + BASEPATH);
 
         // verify the result
         assertThat(result.id()).isEqualTo(BASEPATH);
@@ -187,7 +187,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         SimpleResourceParams resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
         RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
-        ResourceState result = client.read(requestContext, "/testOrg/testApp/" + BASEPATH + "/testQueryCollection");
+        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
 
         // verify response
         assertThat(result).isNotNull();
@@ -203,7 +203,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:'Doe'}");
         requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
-        result = client.read(requestContext, "/testOrg/testApp/" + BASEPATH + "/testQueryCollection");
+        result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
 
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("testQueryCollection");
@@ -231,7 +231,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         SimpleResourceParams resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:\"foo\"}");
         RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
-        ResourceState result = client.read(requestContext, "/testOrg/testApp/" + BASEPATH + "/testQueryCollectionNoResults");
+        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollectionNoResults");
 
         // verify response
         assertThat(result).isNotNull();
@@ -259,7 +259,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
 
         try {
-            ResourceState result = client.read(requestContext, "/testOrg/testApp/" + BASEPATH + "/testQueryCollectionInvalid");
+            ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollectionInvalid");
             Fail.fail();
         } catch (NotAcceptableException iee) {
             // TODO fix me
@@ -287,7 +287,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         resourceParams.put("hint", "_id_");
 
         RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
-        ResourceState result = client.read(requestContext, "/testOrg/testApp/" + BASEPATH + "/testQueryCollection");
+        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
 
         // verify response
         assertThat(result).isNotNull();
@@ -303,7 +303,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:'Doe'}");
         requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
-        result = client.read(requestContext, "/testOrg/testApp/" + BASEPATH + "/testQueryCollection");
+        result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
 
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("testQueryCollection");
@@ -336,7 +336,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
 
         try {
-            client.read(requestContext, "/testOrg/testApp/" + BASEPATH + "/testQueryCollection");
+            client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
             Fail.fail();
         } catch (NotAcceptableException iee) {
             // TODO fix me
@@ -370,7 +370,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
 
         try {
-            client.read(requestContext, "/testOrg/testApp/" + BASEPATH + "/testQueryCollection");
+            client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
             Fail.fail();
         } catch (NotAcceptableException iee) {
             // TODO fix this
@@ -401,7 +401,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
                 .returnFields(new ReturnFieldsImpl("*").withExpand("members"))
                 .sorting(new Sorting("lastName,-name"))
                 .resourceParams(resourceParams).build();
-        ResourceState result = client.read(requestContext, "/testOrg/testApp/" + BASEPATH + "/testSortCollection");
+        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testSortCollection");
 
         String[] expected = { "Jacqueline", "John", "Jane", "Hans", "Francois", "Helga" };
         assertThat(expected).isEqualTo(getNames(result));
@@ -430,7 +430,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
                 .returnFields(new ReturnFieldsImpl("*").withExpand("members"))
                 .sorting(new Sorting("-lastName,name"))
                 .resourceParams(resourceParams).build();
-        ResourceState result = client.read(requestContext, "/testOrg/testApp/" + BASEPATH + "/testQuerySortCollection");
+        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQuerySortCollection");
 
         String[] expected = { "Helga", "Hans", "Jane", "John" };
         assertThat(expected).isEqualTo(getNames(result));
@@ -457,7 +457,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
                 .resourceParams(resourceParams)
                 .build();
 
-        ResourceState result = client.read(requestContext, "/testOrg/testApp/" + BASEPATH + "/testExpandQueryCollection");
+        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testExpandQueryCollection");
 
         // verify response
         assertThat(result).isNotNull();

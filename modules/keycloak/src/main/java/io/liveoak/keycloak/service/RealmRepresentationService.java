@@ -18,8 +18,7 @@ import java.io.IOException;
  * @author Bob McWhirter
  */
 public class RealmRepresentationService implements Service<RealmRepresentation> {
-    public RealmRepresentationService(String orgId, String appId) {
-        this.orgId = orgId;
+    public RealmRepresentationService(String appId) {
         this.appId = appId;
     }
 
@@ -39,7 +38,7 @@ public class RealmRepresentationService implements Service<RealmRepresentation> 
         } else {
             this.realmRepresentation = new RealmRepresentation();
         }
-        this.realmRepresentation.setRealm( this.orgId + "-" + this.appId );
+        this.realmRepresentation.setRealm( this.appId );
     }
 
     @Override
@@ -56,7 +55,6 @@ public class RealmRepresentationService implements Service<RealmRepresentation> 
         return this.fileInjector;
     }
 
-    private String orgId;
     private String appId;
     private InjectedValue<File> fileInjector = new InjectedValue<>();
 

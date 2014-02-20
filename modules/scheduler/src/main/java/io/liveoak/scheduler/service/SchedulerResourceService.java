@@ -15,10 +15,14 @@ import org.quartz.Scheduler;
  */
 public class SchedulerResourceService implements Service<SchedulerResource> {
 
+    public SchedulerResourceService(String id) {
+        this.id = id;
+    }
+
     @Override
     public void start(StartContext context) throws StartException {
         this.resource = new SchedulerResource(
-                "scheduler",
+                this.id,
                 this.schedulerInjector.getValue(),
                 this.notifierInjector.getValue() );
     }
@@ -40,6 +44,8 @@ public class SchedulerResourceService implements Service<SchedulerResource> {
     public Injector<Notifier> notifierInjector() {
         return this.notifierInjector;
     }
+
+    private String id;
 
     private InjectedValue<Scheduler> schedulerInjector = new InjectedValue<>();
     private InjectedValue<Notifier> notifierInjector = new InjectedValue<>();

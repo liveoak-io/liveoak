@@ -26,17 +26,9 @@ public class ExtensionInstaller {
     public ExtensionInstaller(ServiceTarget target, ServiceName systemConfigMount) {
         this.target = target.subTarget();
         this.systemConfigMount = systemConfigMount;
-        this.commonExtensions = new CommonExtensions();
-        this.target.addListener(this.commonExtensions);
-    }
-
-    public CommonExtensions commonExtensions() {
-        return this.commonExtensions;
     }
 
     public void load(File extensionDesc) throws Exception {
-        StabilityMonitor monitor = new StabilityMonitor();
-        this.target.addMonitor( monitor );
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true );
         mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true );
@@ -46,9 +38,7 @@ public class ExtensionInstaller {
         if (id.endsWith(".json")) {
             id = id.substring(0, id.length() - 5);
         }
-        load( id, fullConfig );
-        monitor.awaitStability();
-        this.target.removeMonitor( monitor );
+        load(id, fullConfig);
     }
 
     public void load(String id, ObjectNode fullConfig) throws Exception {
@@ -82,13 +72,15 @@ public class ExtensionInstaller {
     }
 
     public void load(String id, Extension extension, ObjectNode config) throws Exception {
+        StabilityMonitor monitor = new StabilityMonitor();
         ServiceTarget target = this.target.subTarget();
-        target.addService(LiveOak.extension( id ), new ExtensionService( id, extension, config, systemConfigMount ) )
+        target.addMonitor( monitor );
+        target.addService(LiveOak.extension( id ), new ExtensionService( id, extension, config ) )
                 .install();
+         monitor.awaitStability();
     }
 
     private ServiceTarget target;
     private final ServiceName systemConfigMount;
-    private final CommonExtensions commonExtensions;
 
 }

@@ -1,11 +1,13 @@
 package io.liveoak.keycloak;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.keycloak.extension.KeycloakExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.keycloak.models.RealmModel;
@@ -29,6 +31,7 @@ public class KeycloakRootResourceTest extends AbstractResourceTestCase {
     @Override
     public void loadExtensions() throws Exception {
         loadExtension( "auth", new KeycloakExtension() );
+        installResource( "auth", "auth", JsonNodeFactory.instance.objectNode() );
     }
 
     @Override
@@ -38,7 +41,7 @@ public class KeycloakRootResourceTest extends AbstractResourceTestCase {
 
     @Before
     public void before() throws Exception {
-        tokenUtil = new TokenUtil((RealmModel) this.system.service( KeycloakServices.realmModel("testOrg", "testApp") ));
+        tokenUtil = new TokenUtil((RealmModel) this.system.service( KeycloakServices.realmModel("testApp") ));
     }
 
     @Test
@@ -47,7 +50,7 @@ public class KeycloakRootResourceTest extends AbstractResourceTestCase {
 
         SkeletonKeyToken token = tokenUtil.createToken();
 
-        ResourceState returnedState = client.read(requestContext, "/testOrg/testApp/auth/token-info/" + tokenUtil.toString(token));
+        ResourceState returnedState = client.read(requestContext, "/testApp/auth/token-info/" + tokenUtil.toString(token));
 
         assertEquals(tokenUtil.realm(), returnedState.getProperty("realm"));
         assertEquals("user-id", returnedState.getProperty("subject"));

@@ -70,8 +70,6 @@ public class GridFSDirectoryResource extends GridFSResource {
             // here we lookup / generate the target GridFS file
 
             LinkedList<ResourcePath.Segment> segments = new LinkedList(ctx.resourcePath().segments());
-            // skip org
-            segments.removeFirst();
             // skip app
             segments.removeFirst();
             // skip gridfsroot

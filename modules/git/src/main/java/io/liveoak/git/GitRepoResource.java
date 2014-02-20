@@ -18,15 +18,15 @@ import org.vertx.java.core.Vertx;
 @Configurable
 public class GitRepoResource extends GitDirectoryResource implements RootResource, GitResource {
 
+    private final GitRepoAdminResource adminResource;
     private Resource parent;
     private final String id;
     private final Vertx vertx;
-    private final Repository repo;
 
-    public GitRepoResource(String id, Repository repo, Vertx vertx) {
-        super(null, repo.getWorkTree());
+    public GitRepoResource(GitRepoAdminResource adminResource, String id, Vertx vertx) {
+        super(null, adminResource.repository().getWorkTree());
         this.id = id;
-        this.repo = repo;
+        this.adminResource = adminResource;
         this.vertx = vertx;
     }
 

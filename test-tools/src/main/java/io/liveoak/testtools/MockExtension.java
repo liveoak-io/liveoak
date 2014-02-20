@@ -1,9 +1,11 @@
 package io.liveoak.testtools;
 
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.DefaultRootResource;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.ValueService;
@@ -16,11 +18,11 @@ import java.lang.reflect.Constructor;
  */
 public class MockExtension implements Extension {
 
-    public static ServiceName resource(String orgId, String appId, Class<? extends RootResource> resourceClass) {
-        return ServiceName.of( "mock-ext", orgId, appId, resourceClass.getName().toString(), "resource" );
-    }
-
     private final Class<? extends RootResource> resourceClass;
+
+    public static ServiceName resource(String appId, Class<? extends RootResource> cls) {
+        return LiveOak.resource( appId, cls.getName() );
+    }
 
     public MockExtension(Class<? extends RootResource> resourceClass) {
         this.resourceClass = resourceClass;
@@ -37,13 +39,15 @@ public class MockExtension implements Extension {
 
         Constructor<? extends RootResource> ctor = this.resourceClass.getConstructor(String.class);
 
-        RootResource resource = ctor.newInstance(context.id());
-        ServiceName name = resource( context.application().organization().id(), context.application().id(), this.resourceClass );
+        RootResource resource = ctor.newInstance(context.resourceId());
+        ServiceName name = LiveOak.resource(context.application().id(), context.resourceId());
 
         target.addService(name, new ValueService<RootResource>(new ImmediateValue<>(resource)))
                 .install();
 
         context.mountPublic(name);
+
+        context.mountPrivate( new DefaultRootResource( context.resourceId()));
     }
 
     @Override

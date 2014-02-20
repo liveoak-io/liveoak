@@ -86,9 +86,9 @@ public class LiveOakServer {
         //ProcessBuilder pb = new ProcessBuilder().directory(new File(appDir)).command(cmd);
         ProcessBuilder pb = new ProcessBuilder().command(cmd);
 
-        if (Config.showOutput()) {
+        //if (Config.showOutput()) {
             pb.inheritIO();
-        }
+        //}
 
         liveoak = pb.start();
 

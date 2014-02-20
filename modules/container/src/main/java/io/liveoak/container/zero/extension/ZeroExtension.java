@@ -1,10 +1,8 @@
 package io.liveoak.container.zero.extension;
 
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.tenancy.InternalOrganization;
-import io.liveoak.container.tenancy.InternalOrganizationRegistry;
+import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.container.zero.ZeroServices;
-import io.liveoak.container.zero.service.LiveOakOrganizationDeployer;
 import io.liveoak.container.zero.service.ZeroApplicationDeployer;
 import io.liveoak.container.zero.service.ZeroExtendingService;
 import io.liveoak.container.zero.service.ZeroResourcesService;
@@ -19,33 +17,31 @@ import org.jboss.msc.service.ServiceTarget;
  */
 public class ZeroExtension implements Extension {
 
+    public static String EXTENSION_ID = "admin";
+    public static String APPLICATION_ID = "admin";
+    public static String APPLICATION_NAME = "LiveOak Administration";
+
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
         ServiceTarget target = context.target();
 
-        LiveOakOrganizationDeployer orgDeployer = new LiveOakOrganizationDeployer();
-
-        target.addService(ZeroServices.ZERO.append( "organization" ), orgDeployer )
-                .addDependency(LiveOak.ORGANIZATION_REGISTRY, InternalOrganizationRegistry.class, orgDeployer.organizationRegistryInjector() )
-                .install();
-
         ZeroApplicationDeployer appDeployer = new ZeroApplicationDeployer();
 
-        target.addService( ZeroServices.ZERO.append( "application" ), appDeployer )
-                .addDependency(LiveOak.organization("liveoak"), InternalOrganization.class, appDeployer.organizationInjector() )
+        target.addService(ZeroServices.BOOTSTRAP.append("application"), appDeployer)
+                .addDependency( LiveOak.APPLICATION_REGISTRY, InternalApplicationRegistry.class, appDeployer.applicationRegistryInjector() )
                 .install();
 
         ZeroResourcesService appResources = new ZeroResourcesService();
 
-        target.addService( ZeroServices.ZERO.append( "resources" ), appResources )
-                .addDependency( LiveOak.application( "liveoak", "zero" ), InternalApplication.class, appResources.applicationInjector() )
+        target.addService( ZeroServices.BOOTSTRAP.append( "resources" ), appResources )
+                .addDependency(LiveOak.application(APPLICATION_ID), InternalApplication.class, appResources.applicationInjector())
                 .install();
 
         ZeroExtendingService appExtender = new ZeroExtendingService();
 
-        target.addService( ZeroServices.ZERO.append( "extensions" ), appExtender )
-                .addDependency( LiveOak.application( "liveoak", "zero" ), InternalApplication.class, appExtender.applicationInjector() )
-                .addDependency( LiveOak.extension( "css" ) )
+        target.addService( ZeroServices.BOOTSTRAP.append( "extensions" ), appExtender )
+                .addDependency( LiveOak.application(APPLICATION_ID), InternalApplication.class, appExtender.applicationInjector() )
+                .addDependency(LiveOak.extension("filesystem"))
                 .install();
     }
 
