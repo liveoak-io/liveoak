@@ -272,7 +272,7 @@
                     <groupId>org.jboss.arquillian.extension</groupId>
                     <artifactId>arquillian-phantom-binary</artifactId>
                     <version>${phantomjs.version}</version>
-                    <classifier>macosx</classifier>
+                    <classifier>windows</classifier>
                 </dependency>
             </dependencies>
             <build>
@@ -287,7 +287,7 @@
                                 <phase>compile</phase>
                                 <configuration>
                                     <target>
-                                        <unzip src="${org.jboss.arquillian.extension:arquillian-phantom-binary:jar:macosx}"
+                                        <unzip src="${org.jboss.arquillian.extension:arquillian-phantom-binary:jar:windows}"
                                                dest="${project.build.directory}">
                                             <patternset>
                                                 <include name="phantomjs.exe"/>
