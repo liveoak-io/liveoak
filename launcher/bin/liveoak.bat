@@ -16,6 +16,10 @@ set "ETCDIR=%CD%\etc"
 popd
 
 pushd %DIRNAME%..
+set "LIVEOAK=%CD%"
+popd
+
+pushd %DIRNAME%..
 set "LOGDIR=%CD%\logs"
 popd
 
@@ -48,14 +52,15 @@ set JAVA_OPTS=%JAVA_OPTS%
 
 :RESTART
 "%JAVA%" %JAVA_OPTS% ^
- "-Djs.client.dir=%JS_CLIENT_DIR%" ^
+ "-Dio.liveoak.js.dir=%JS_CLIENT_DIR%" ^
+ "-Dconsole.dir=%CONSOLE_DIR%" ^
  "-Dcss.dir=%CSS_DIR%" ^
  "-Dio.liveoak.log=%LOGDIR%" ^
  "-Dlogging.configuration=file:%ETCDIR%\logging.properties" ^
  %M2_REPO_CLAUSE% ^
     -jar "%JBOSS_MODULES_JAR%" ^
     -modulepath "%MODULEPATH%" ^
-     io.liveoak.bootstrap:main "%ETCDIR%" ^
+     io.liveoak.bootstrap:main "%LIVEOAK%" ^
      %*
 
 if ERRORLEVEL 10 goto RESTART
