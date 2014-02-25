@@ -47,6 +47,8 @@ public class HTTPAggregatingFilesystemResourceTest extends AbstractHTTPResourceT
     public void before() {
         File dataDir = new File( this.projectRoot, "aggr" );
 
+        System.err.println( "ATTEMPT TO CREATE TEST FILES IN: " + dataDir );
+
         // create some files in there
         try {
             FileWriter out = new FileWriter(new File(dataDir, "aggregate.js.aggr"));
