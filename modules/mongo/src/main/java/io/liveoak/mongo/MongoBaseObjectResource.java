@@ -112,9 +112,9 @@ public class MongoBaseObjectResource extends MongoObjectResource {
                         else {
                             value = createObject( (ResourceState) value );
                         }
-                    }catch (Exception e)  {
+                    } catch (Exception e) {
                         responder.invalidRequest( "Could not update Property");
-                        logger().error("", e);
+                        throw new RuntimeException("Could not update property!", e);
                     }
                 }
                 if (value == null) {
@@ -128,12 +128,11 @@ public class MongoBaseObjectResource extends MongoObjectResource {
                             if (valueDBObject.get( MONGO_ID_FIELD ) != null)
                             {
                                 responder.invalidRequest("Cannot update a DBRef directly");
-                                return;
+                                throw new RuntimeException("Invalid request: Cannot update a DBRef directly!");
                             }
                         }
                     }
-                        dbObject.put(name, value);
-
+                    dbObject.put(name, value);
                 }
             }
         });

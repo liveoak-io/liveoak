@@ -5,18 +5,15 @@
  */
 package io.liveoak.mongo.gridfs;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.mongo.MongoServices;
+import com.mongodb.WriteConcern;
 import io.liveoak.mongo.gridfs.extension.GridFSExtension;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
 import org.jboss.logging.Logger;
-import org.junit.Before;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +55,7 @@ public class BaseGridFSTest extends AbstractResourceTestCase {
         try {
             mongoClient = new MongoClient(host, port);
             db = mongoClient.getDB(database);
+            db.setWriteConcern(WriteConcern.ACKNOWLEDGED);
             db.dropDatabase();
         } catch (Exception e) {
             e.printStackTrace();
