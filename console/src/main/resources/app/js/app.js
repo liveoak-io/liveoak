@@ -32,7 +32,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
 angular.element(document).ready(function () {
     var liveOak = LiveOak({
         auth: {
-            realm: 'LiveOak',
+            realm: 'keycloak-admin',
             clientId: 'console',
             clientSecret: 'password',
             onload: 'login-required',
