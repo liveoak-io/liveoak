@@ -2,7 +2,7 @@ loMod.controller('DashboardCtrl', function($scope, $routeParams, Current, breadc
 
     $scope.breadcrumbs = breadcrumbs;
     $scope.dataPeriods = [ "Hour", "Day", "Week", "Month" ];
-    $scope.range = "Week";
+    $scope.range = "Hour";
 
     // FIXME: Fetch from rest. Mock data.
     $scope.data = {

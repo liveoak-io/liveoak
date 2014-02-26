@@ -1,25 +1,40 @@
-<header class="header rcue">
-    <div class="navbar utility">
-        <div class="navbar-inner clearfix">
-            <h1 class="pull-left"><a href="index.html">LiveOak</a></h1>
-            <ul class="nav pull-right">
-                <li class="dropdown">
-                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                        <i class="fa fa-user"></i> {{username}} <b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">Manage Account</a></li>
-                        <li class="separator"><a href="#" ng-click="auth.logout()">Sign Out</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-    <div class="navbar primary">
-        <ul class="nav col-md-2 fixed">
-            <li class="active">
-                <a href="#">Applications</a>
-            </li>
-        </ul>
-    </div>
-</header>
+    <header>
+        <nav class="navbar navbar-default navbar-pf">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">
+                    <h1>LiveOak</h1>
+                </a>
+            </div>
+            <div class="collapse navbar-collapse navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-utility">
+                    <li class="dropdown">
+                        <a href="#" class="lo-user dropdown-toggle" data-toggle="dropdown">
+                            <span class="pficon pficon-user"></span>
+                            {{username}} <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="#">Manage Account</a>
+                            </li>
+                            <li class="separator">
+                                <a href="#" ng-click="auth.logout()">Sign Out</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-primary">
+                    <li class="dropdown context col-md-2">
+                        <a href="app.html">
+                            Applications
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
