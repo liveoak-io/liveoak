@@ -4,7 +4,6 @@ import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.container.zero.ZeroServices;
 import io.liveoak.container.zero.service.ZeroApplicationDeployer;
-import io.liveoak.container.zero.service.ZeroExtendingService;
 import io.liveoak.container.zero.service.ZeroResourcesService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
@@ -35,14 +34,6 @@ public class ZeroExtension implements Extension {
 
         target.addService( ZeroServices.BOOTSTRAP.append( "resources" ), appResources )
                 .addDependency(LiveOak.application(APPLICATION_ID), InternalApplication.class, appResources.applicationInjector())
-                .install();
-
-        ZeroExtendingService appExtender = new ZeroExtendingService();
-
-        target.addService( ZeroServices.BOOTSTRAP.append( "extensions" ), appExtender )
-                .addDependency( LiveOak.application(APPLICATION_ID), InternalApplication.class, appExtender.applicationInjector() )
-                .addDependency(LiveOak.extension("filesystem"))
-                .addDependency(LiveOak.extension("aggregating-filesystem"))
                 .install();
     }
 

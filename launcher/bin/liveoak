@@ -22,8 +22,8 @@ fi
 
 $JAVA $JAVA_OPTS \
   -Dio.liveoak.js.dir=$js_client_dir \
-  -Dcss.dir=$css_dir \
-  -Dconsole.dir=$console_dir \
+  -Dio.liveoak.css.dir=$css_dir \
+  -Dio.liveoak.console.dir=$console_dir \
   -Dio.liveoak.log=$logdir \
   -Dlogging.configuration=file:$liveoakdir/etc/logging.properties \
   $M2_REPO_CLAUSE \

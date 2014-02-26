@@ -1,0 +1,23 @@
+
+{
+  console: {
+    type: 'filesystem',
+    config: {
+      directory: "${io.liveoak.console.dir}"
+    }
+  },
+
+  client: {
+    type: 'aggregating-filesystem',
+    config: {
+      directory: "${io.liveoak.js.dir}"
+    }
+  },
+
+  css: {
+    type: 'filesystem',
+    config: {
+      directory: "${io.liveoak.css.dir}"
+    }
+  }
+}
