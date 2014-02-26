@@ -14,15 +14,21 @@ import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.keycloak.models.Constants;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
+import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.representations.idm.ApplicationRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.services.filters.KeycloakSessionServletFilter;
 import org.keycloak.services.managers.ApplianceBootstrap;
+import org.keycloak.services.managers.ApplicationManager;
 import org.keycloak.services.managers.RealmManager;
 import org.keycloak.services.resources.KeycloakApplication;
 
 import javax.servlet.DispatcherType;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.undertow.servlet.Servlets.servlet;
 
@@ -56,8 +62,36 @@ public class KeycloakServer {
 
             new ApplianceBootstrap().bootstrap(session);
 
+            RealmModel adminRealm = manager.getRealm(Constants.ADMIN_REALM);
+
             // No need to require admin to change password as this server is for dev/test
-            manager.getRealm(Constants.ADMIN_REALM).getUser("admin").removeRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
+            adminRealm.getUser("admin").removeRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
+
+            // Create Application in realm for console
+            ApplicationRepresentation consoleApp = new ApplicationRepresentation();
+            consoleApp.setName("console");
+            consoleApp.setEnabled(true);
+            consoleApp.credential("password", "password");
+            consoleApp.setDefaultRoles(new String[]{"user"});
+
+            List<RoleRepresentation> roles = new ArrayList<>();
+            RoleRepresentation role = new RoleRepresentation();
+            role.setName("user");
+            roles.add(role);
+            role = new RoleRepresentation();
+            role.setName("admin");
+            roles.add(role);
+            consoleApp.setRoles(roles);
+
+            List<String> redirect = new ArrayList<>();
+            redirect.add("http://localhost:8080/admin/console/index.html");
+            consoleApp.setRedirectUris(redirect);
+
+            List<String> origin = new ArrayList<>();
+            origin.add("http://localhost:8080");
+            consoleApp.setWebOrigins(origin);
+
+            new ApplicationManager(manager).createApplication(adminRealm, consoleApp);
 
             session.getTransaction().commit();
         } finally {

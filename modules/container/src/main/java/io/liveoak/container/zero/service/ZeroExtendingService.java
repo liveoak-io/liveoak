@@ -11,18 +11,37 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 
 /**
- * @author Bob McWhirter
+ * @author Bob McWhirter, <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
 public class ZeroExtendingService implements Service<Void> {
 
     @Override
     public void start(StartContext context) throws StartException {
         System.err.println( "EXTENDING APP-ZERO" );
+
         ObjectNode cssConfig = JsonNodeFactory.instance.objectNode();
         cssConfig.put("directory", System.getProperty("css.dir"));
 
         try {
             this.applicationInjector.getValue().extend("filesystem", "css", cssConfig);
+        } catch (InterruptedException e) {
+            throw new StartException(e);
+        }
+
+        ObjectNode consoleConfig = JsonNodeFactory.instance.objectNode();
+        consoleConfig.put("directory", System.getProperty("console.dir"));
+
+        try {
+            this.applicationInjector.getValue().extend("filesystem", "console", consoleConfig);
+        } catch (InterruptedException e) {
+            throw new StartException(e);
+        }
+
+        ObjectNode clientConfig = JsonNodeFactory.instance.objectNode();
+        clientConfig.put("directory", System.getProperty("io.liveoak.js.dir"));
+
+        try {
+            this.applicationInjector.getValue().extend("aggregating-filesystem", "client", clientConfig);
         } catch (InterruptedException e) {
             throw new StartException(e);
         }

@@ -42,6 +42,7 @@ public class ZeroExtension implements Extension {
         target.addService( ZeroServices.BOOTSTRAP.append( "extensions" ), appExtender )
                 .addDependency( LiveOak.application(APPLICATION_ID), InternalApplication.class, appExtender.applicationInjector() )
                 .addDependency(LiveOak.extension("filesystem"))
+                .addDependency(LiveOak.extension("aggregating-filesystem"))
                 .install();
     }
 
