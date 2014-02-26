@@ -18,10 +18,13 @@
 </head>
 
 <body class="app-dashboard" ng-cloak>
-    <lo-navbar></lo-navbar>
 
-    <div data-ng-view id="view">
+    <div class="row">
+        <lo-navbar></lo-navbar>
     </div>
+
+        <div data-ng-view id="lo-content-row" class="row">
+        </div>
 
     <script src="../client/liveoak.js" type="text/javascript"></script>
     <script src="lib/jquery/jquery.js" type="text/javascript"></script>
