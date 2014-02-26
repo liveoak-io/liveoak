@@ -6,27 +6,21 @@
 
 package io.liveoak.mongo;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+import com.mongodb.WriteConcern;
 import com.mongodb.util.JSON;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.mongo.extension.MongoExtension;
-import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.testtools.AbstractResourceTestCase;
 import org.jboss.logging.Logger;
-import org.junit.Before;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-
 import java.util.UUID;
 
 /**
@@ -69,6 +63,7 @@ public class BaseMongoDBTest extends AbstractResourceTestCase {
         try {
             mongoClient = new MongoClient(host, port);
             db = mongoClient.getDB(database);
+            db.setWriteConcern(WriteConcern.ACKNOWLEDGED);
             db.dropDatabase();
         } catch (Exception e) {
             e.printStackTrace();
