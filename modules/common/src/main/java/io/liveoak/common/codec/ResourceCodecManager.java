@@ -18,6 +18,7 @@ import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -81,6 +82,10 @@ public class ResourceCodecManager {
         }
 
         return new EncodingResult(bestMatch, codec.encode(ctx, response.state()));
+    }
+
+    public List<MediaType> mediaTypes() {
+        return this.codecs.stream().map(e->  e.mediaType ).collect(Collectors.toList());
     }
 
     public ResourceCodec getResourceCodec(MediaType mediaType) {

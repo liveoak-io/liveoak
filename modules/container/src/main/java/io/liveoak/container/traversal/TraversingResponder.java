@@ -46,7 +46,6 @@ public class TraversingResponder extends BaseResponder {
     }
 
     protected void doStep(TraversalPlan.Step step, Resource resource) {
-        System.err.println( "STEP: " + step + " against " + resource );
         Responder nextResponder = nextResponder();
 
         AtomicReference<Runnable> ref = new AtomicReference<>();

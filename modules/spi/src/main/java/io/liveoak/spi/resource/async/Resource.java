@@ -6,6 +6,7 @@
 package io.liveoak.spi.resource.async;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.spi.Application;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.config.ConfigResource;
 import io.liveoak.spi.resource.config.Configurable;

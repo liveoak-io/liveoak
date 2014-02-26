@@ -19,7 +19,7 @@ public class ApplicationContextService implements Service<ApplicationContext> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.context = new ApplicationContext(this.app.id());
+        this.context = new ApplicationContext(this.app);
 
         ServiceTarget target = context.getChildTarget();
         ServiceName name = context.getController().getName();

@@ -5,12 +5,19 @@ package io.liveoak.container.tenancy;
  */
 public class ApplicationContext extends SimpleResourceRegistry {
 
-    public ApplicationContext(String id) {
-        super(id);
+    public ApplicationContext(InternalApplication application) {
+        super(application.id());
+        this.application = application;
+    }
+
+    public InternalApplication application() {
+        return this.application;
     }
 
     public String toString() {
         return "[ApplicationContext: " + id() + "]";
     }
+
+    private InternalApplication application;
 
 }

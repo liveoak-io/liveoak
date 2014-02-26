@@ -7,7 +7,7 @@ loDirectives.directive('loNavbar', function () {
     return {
         restrict: 'E',
         replace: true,
-        templateUrl: 'templates/lo-navbar.html',
+        templateUrl: '/admin/console/templates/lo-navbar.html',
     }
 });
 
@@ -20,7 +20,7 @@ loDirectives.directive('loNavigation', function () {
         },
         restrict: 'E',
         replace: true,
-        templateUrl: 'templates/lo-navigation.html',
+        templateUrl: '/admin/console/templates/lo-navigation.html',
     }
 });
 

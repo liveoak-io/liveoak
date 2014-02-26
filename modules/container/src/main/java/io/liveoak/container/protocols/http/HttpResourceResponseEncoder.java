@@ -5,18 +5,19 @@
  */
 package io.liveoak.container.protocols.http;
 
+import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.common.DefaultResourceResponse;
 import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.common.codec.EncodingResult;
 import io.liveoak.common.codec.IncompatibleMediaTypeException;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.protocols.RequestCompleteEvent;
-import io.liveoak.spi.MediaTypeMatcher;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceErrorResponse;
-import io.liveoak.spi.ResourceResponse;
+import io.liveoak.container.tenancy.ApplicationContext;
+import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.spi.*;
 import io.liveoak.spi.resource.async.BinaryContentSink;
 import io.liveoak.spi.resource.async.BinaryResource;
+import io.liveoak.spi.resource.async.Resource;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -31,6 +32,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import org.jboss.logging.Logger;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -129,6 +131,21 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
         EncodingResult encodingResult = null;
         if (shouldEncodeState) {
             MediaTypeMatcher matcher = msg.inReplyTo().mediaTypeMatcher();
+
+            InternalApplication app = findApplication(msg.resource());
+            if (app != null) {
+                ResourcePath htmlAppPath = app.htmlApplicationResourcePath();
+                if ((!(msg.resource() instanceof BinaryResource)) && (htmlAppPath != null)) {
+                    MediaType bestMatch = matcher.findBestMatch(this.codecManager.mediaTypes());
+                    if (bestMatch == MediaType.HTML) {
+                        // HTML was requested and we have an HTML app
+                        ResourceRequest htmlAppRequest = new DefaultResourceRequest.Builder(RequestType.READ, htmlAppPath).mediaTypeMatcher(msg.inReplyTo().mediaTypeMatcher()).build();
+                        ctx.channel().pipeline().fireChannelRead(htmlAppRequest);
+                        return;
+                    }
+                }
+            }
+
             try {
                 encodingResult = encodeState(msg.inReplyTo().requestContext(), matcher, msg);
             } catch (IncompatibleMediaTypeException e) {
@@ -172,7 +189,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
                         @Override
                         public void close() {
                             ctx.writeAndFlush(new DefaultLastHttpContent(Unpooled.EMPTY_BUFFER));
-                            ctx.fireUserEventTriggered( new RequestCompleteEvent( msg.requestId() ) );
+                            ctx.fireUserEventTriggered(new RequestCompleteEvent(msg.requestId()));
                         }
 
                         @Override
@@ -196,11 +213,22 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
         }
 
         out.add(response);
-        ctx.fireUserEventTriggered( new RequestCompleteEvent( msg.requestId() ) );
+        ctx.fireUserEventTriggered(new RequestCompleteEvent(msg.requestId()));
     }
 
     protected EncodingResult encodeState(RequestContext ctx, MediaTypeMatcher mediaTypeMatcher, ResourceResponse response) throws Exception {
         return this.codecManager.encode(ctx, mediaTypeMatcher, response);
+    }
+
+    protected InternalApplication findApplication(Resource resource) {
+        Resource current = resource;
+        while (current != null) {
+            if (current instanceof ApplicationContext) {
+                return ((ApplicationContext) current).application();
+            }
+            current = current.parent();
+        }
+        return null;
     }
 
     private ResourceCodecManager codecManager;

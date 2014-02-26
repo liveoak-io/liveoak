@@ -1,5 +1,8 @@
 package io.liveoak.container.tenancy.service;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.tenancy.InternalApplication;
@@ -7,11 +10,13 @@ import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.container.zero.ApplicationResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.ResourcePath;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.*;
 import org.jboss.msc.value.InjectedValue;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author Bob McWhirter
@@ -35,7 +40,34 @@ public class ApplicationService implements Service<InternalApplication> {
             appDir.mkdirs();
         }
 
-        this.app = new InternalApplication(target, this.id, this.name, appDir);
+        File applicationJson = new File(appDir, "application.json");
+
+        String appName = this.id;
+        ResourcePath htmlApp = null;
+
+        if (applicationJson.exists()) {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+            mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+            mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+            try {
+                JsonNode tree = mapper.readTree(applicationJson);
+                System.err.println( "TREE: " + tree );
+                if ( tree.has( "name" ) ) {
+                    appName = tree.get( "name" ).asText();
+                }
+                if ( tree.has( "html-app" ) ) {
+                    htmlApp = new ResourcePath( tree.get( "html-app" ).asText() );
+                    htmlApp.prependSegment( this.id );
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.err.println( "application.json says: " + htmlApp );
+
+        this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp);
 
         // context resource
 
@@ -63,7 +95,7 @@ public class ApplicationService implements Service<InternalApplication> {
 
         ApplicationResourcesService resources = new ApplicationResourcesService();
 
-        target.addService( LiveOak.application( this.id).append( "resources" ), resources )
+        target.addService(LiveOak.application(this.id).append("resources"), resources)
                 .addInjectionValue(resources.applicationInjector(), this)
                 .install();
     }

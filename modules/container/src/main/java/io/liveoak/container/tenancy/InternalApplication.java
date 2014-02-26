@@ -7,6 +7,7 @@ import io.liveoak.container.zero.ApplicationResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.msc.service.*;
 
@@ -17,11 +18,12 @@ import java.io.File;
  */
 public class InternalApplication implements Application {
 
-    public InternalApplication(ServiceTarget target, String id, String name, File directory) {
+    public InternalApplication(ServiceTarget target, String id, String name, File directory, ResourcePath htmlAppPath) {
         this.target = target;
         this.id = id;
         this.name = name;
         this.directory = directory;
+        this.htmlAppPath = htmlAppPath;
     }
 
     @Override
@@ -37,6 +39,10 @@ public class InternalApplication implements Application {
     @Override
     public File directory() {
         return this.directory;
+    }
+
+    public ResourcePath htmlApplicationResourcePath() {
+        return this.htmlAppPath;
     }
 
     public InternalApplicationExtension extend(String extensionId) throws InterruptedException {
@@ -92,5 +98,6 @@ public class InternalApplication implements Application {
     private String id;
     private String name;
     private File directory;
+    private final ResourcePath htmlAppPath;
 
 }

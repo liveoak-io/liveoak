@@ -84,7 +84,7 @@ public class KeycloakServer {
             consoleApp.setRoles(roles);
 
             List<String> redirect = new ArrayList<>();
-            redirect.add("http://localhost:8080/admin/console/index.html");
+            redirect.add("http://localhost:8080/admin");
             consoleApp.setRedirectUris(redirect);
 
             List<String> origin = new ArrayList<>();

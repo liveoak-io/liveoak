@@ -14,18 +14,18 @@ var loMod = angular.module('loApp', [
 loMod.config(['$routeProvider', function($routeProvider) {
   $routeProvider
       .when('/', {
-          templateUrl : 'partials/dashboard.html',
+          templateUrl : '/admin/console/partials/dashboard.html',
           controller : 'DashboardCtrl'
       })
       .when('/applications/:appId', {
           redirectTo: '/applications/:appId/dashboard'
       })
       .when('/applications/:appId/dashboard', {
-          templateUrl : 'partials/dashboard.html',
+          templateUrl : '/admin/console/partials/dashboard.html',
           controller : 'DashboardCtrl'
       })
       .otherwise({
-          templateUrl : 'partials/notfound.html'
+          templateUrl : '/admin/console/partials/notfound.html'
       });
 }]);
 

@@ -1,0 +1,5 @@
+
+{
+  name: 'LiveOak Admin Console',
+  html-app: '/console/index.html'
+}
