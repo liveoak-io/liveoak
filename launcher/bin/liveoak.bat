@@ -53,8 +53,8 @@ set JAVA_OPTS=%JAVA_OPTS%
 :RESTART
 "%JAVA%" %JAVA_OPTS% ^
  "-Dio.liveoak.js.dir=%JS_CLIENT_DIR%" ^
- "-Dconsole.dir=%CONSOLE_DIR%" ^
- "-Dcss.dir=%CSS_DIR%" ^
+ "-Dio.liveoak.console.dir=%CONSOLE_DIR%" ^
+ "-Dio.liveoak.css.dir=%CSS_DIR%" ^
  "-Dio.liveoak.log=%LOGDIR%" ^
  "-Dlogging.configuration=file:%ETCDIR%\logging.properties" ^
  %M2_REPO_CLAUSE% ^

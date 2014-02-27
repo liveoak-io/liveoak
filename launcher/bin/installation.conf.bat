@@ -25,6 +25,13 @@ pushd %BINDIR%..
 set "CSS_DIR=%CD%\src\main\css"
 popd
 
+REM %CONSOLE_DIR% should point to where CSS files are kept for HTML encoding
+
+pushd %BINDIR%..\..
+set "CONSOLE_DIR=%CD%\console\target\app"
+popd
+
+
 REM %M2_REPO_DIR% should point to a local m2 repository else it will 
 REM default to the user's local m2-repo.
 
