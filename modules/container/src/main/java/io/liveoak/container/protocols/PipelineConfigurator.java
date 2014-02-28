@@ -12,18 +12,16 @@ import io.liveoak.container.ResourceHandler;
 import io.liveoak.container.ResourceStateHandler;
 import io.liveoak.container.auth.AuthHandler;
 import io.liveoak.container.auth.AuthzHandler;
-import io.liveoak.container.tenancy.GlobalContext;
 import io.liveoak.container.interceptor.InterceptorHandler;
 import io.liveoak.container.interceptor.InterceptorManager;
-import io.liveoak.container.protocols.http.HttpRequestBodyHandler;
-import io.liveoak.container.protocols.http.HttpResourceRequestDecoder;
-import io.liveoak.container.protocols.http.HttpResourceResponseEncoder;
+import io.liveoak.container.protocols.http.*;
 import io.liveoak.container.protocols.local.LocalResourceResponseEncoder;
 import io.liveoak.container.protocols.websocket.WebSocketHandshakerHandler;
 import io.liveoak.container.protocols.websocket.WebSocketStompFrameDecoder;
 import io.liveoak.container.protocols.websocket.WebSocketStompFrameEncoder;
 import io.liveoak.container.subscriptions.ContainerStompServerContext;
 import io.liveoak.container.subscriptions.SubscriptionWatcher;
+import io.liveoak.container.tenancy.GlobalContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.stomp.common.StompFrameDecoder;
@@ -124,8 +122,10 @@ public class PipelineConfigurator {
 
     public void switchToHttpWebSockets(ChannelPipeline pipeline) {
         pipeline.remove(ProtocolDetector.class);
+        //pipeline.addLast(new DebugHandler("server-pre-http"));
         pipeline.addLast(new HttpRequestDecoder());
         pipeline.addLast(new HttpResponseEncoder());
+        //pipeline.addLast( new DebugHandler( "server-post-http" ) );
         //pipeline.addLast(new HttpObjectAggregator(1024 * 1024)); //TODO: Remove this to support chunked http
         pipeline.addLast("ws-handshake", new WebSocketHandshakerHandler(this));
     }
@@ -161,6 +161,10 @@ public class PipelineConfigurator {
         // turn off automatic socket read for better http body read control
         pipeline.channel().config().setAutoRead(false);
         pipeline.remove(WebSocketHandshakerHandler.class);
+        //pipeline.addLast(new DebugHandler("server-pre-cors"));
+        pipeline.addLast("cors-origin-handler", new CORSHandler() );
+        pipeline.addLast("cors-preflight-handler", new CORSPreflightOptionsHandler());
+        //pipeline.addLast( new DebugHandler( "server-post-cors" ) );
         pipeline.addLast("http-resource-decoder", new HttpResourceRequestDecoder(this.codecManager));
         pipeline.addLast("http-resource-encoder", new HttpResourceResponseEncoder(this.codecManager));
         pipeline.addLast("http-request-body-handler", new HttpRequestBodyHandler());
