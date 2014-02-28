@@ -1,6 +1,5 @@
 'use strict';
 
-
 // Declare app level module which depends on filters, and services
 var loMod = angular.module('loApp', [
   'ngRoute',
@@ -13,42 +12,44 @@ var loMod = angular.module('loApp', [
 
 loMod.config(['$routeProvider', function($routeProvider) {
   $routeProvider
-      .when('/', {
-          templateUrl : '/admin/console/partials/dashboard.html',
-          controller : 'DashboardCtrl'
-      })
-      .when('/applications/:appId', {
-          redirectTo: '/applications/:appId/dashboard'
-      })
-      .when('/applications/:appId/dashboard', {
-          templateUrl : '/admin/console/partials/dashboard.html',
-          controller : 'DashboardCtrl'
-      })
-      .otherwise({
-          templateUrl : '/admin/console/partials/notfound.html'
-      });
+    .when('/', {
+      templateUrl : '/admin/console/partials/dashboard.html',
+      controller : 'DashboardCtrl'
+    })
+    .when('/applications/:appId', {
+      redirectTo: '/applications/:appId/dashboard'
+    })
+    .when('/applications/:appId/dashboard', {
+      templateUrl : '/admin/console/partials/dashboard.html',
+      controller : 'DashboardCtrl'
+    })
+    .otherwise({
+      templateUrl : '/admin/console/partials/notfound.html'
+    });
 }]);
 
 angular.element(document).ready(function () {
-    var liveOak = LiveOak({
-        auth: {
-            realm: 'keycloak-admin',
-            clientId: 'console',
-            clientSecret: 'password',
-            onload: 'login-required',
-            success: function () {
-                loMod.factory('LiveOak', function () {
-                    return liveOak;
-                });
-                angular.bootstrap(document, ["loApp"]);
-            },
-            error: function () {
-                alert('authentication failed');
-            }
-        }
-    });
+  /* jshint ignore:start */
+  var liveOak = new LiveOak({
+    auth: {
+      realm: 'keycloak-admin',
+      clientId: 'console',
+      clientSecret: 'password',
+      onload: 'login-required',
+      success: function () {
+        loMod.factory('LiveOak', function () {
+          return liveOak;
+        });
+        angular.bootstrap(document, ['loApp']);
+      },
+      error: function () {
+        alert('authentication failed');
+      }
+    }
+  });
 
-    liveOak.auth.init();
+  liveOak.auth.init();
+  /* jshint ignore:end */
 });
 
 // -- Loading Interceptor ----------------------------
@@ -56,46 +57,46 @@ angular.element(document).ready(function () {
 var resourceRequests = 0;
 var loadingTimer = -1;
 
-loMod.factory('spinnerInterceptor', function($q, $window, $rootScope, $location) {
-    return function(promise) {
-        return promise.then(function(response) {
-            resourceRequests--;
-            if (resourceRequests == 0) {
-                if(loadingTimer != -1) {
-                    window.clearTimeout(loadingTimer);
-                    loadingTimer = -1;
-                }
-                $('#loading').hide();
-            }
-            return response;
-        }, function(response) {
-            resourceRequests--;
-            if (resourceRequests == 0) {
-                if(loadingTimer != -1) {
-                    window.clearTimeout(loadingTimer);
-                    loadingTimer = -1;
-                }
-                $('#loading').hide();
-            }
+loMod.factory('spinnerInterceptor', function($q) {
+  return function(promise) {
+    return promise.then(function(response) {
+      resourceRequests--;
+      if (resourceRequests === 0) {
+        if(loadingTimer !== -1) {
+          window.clearTimeout(loadingTimer);
+          loadingTimer = -1;
+        }
+        $('#loading').hide();
+      }
+      return response;
+    }, function(response) {
+      resourceRequests--;
+      if (resourceRequests === 0) {
+        if(loadingTimer !== -1) {
+          window.clearTimeout(loadingTimer);
+          loadingTimer = -1;
+        }
+        $('#loading').hide();
+      }
 
-            return $q.reject(response);
-        });
-    };
+      return $q.reject(response);
+    });
+  };
 });
 
 loMod.config(function($httpProvider) {
-    var spinnerFunction = function(data, headersGetter) {
-        if (resourceRequests == 0) {
-            loadingTimer = window.setTimeout(function() {
-                $('#loading').show();
-                loadingTimer = -1;
-            }, 500);
-        }
-        resourceRequests++;
-        return data;
-    };
-    $httpProvider.defaults.transformRequest.push(spinnerFunction);
+  var spinnerFunction = function(data) {
+    if (resourceRequests === 0) {
+      loadingTimer = window.setTimeout(function() {
+        $('#loading').show();
+        loadingTimer = -1;
+      }, 500);
+    }
+    resourceRequests++;
+    return data;
+  };
+  $httpProvider.defaults.transformRequest.push(spinnerFunction);
 
-    $httpProvider.responseInterceptors.push('spinnerInterceptor');
+  $httpProvider.responseInterceptors.push('spinnerInterceptor');
 
 });
