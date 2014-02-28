@@ -4,7 +4,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
@@ -14,9 +13,11 @@ import org.junit.runners.model.InitializationError;
 import org.liveoak.testsuite.annotations.LiveOakConfig;
 import org.liveoak.testsuite.internal.BasicInjector;
 import org.liveoak.testsuite.internal.LazyResource;
-import org.liveoak.testsuite.internal.LiveOakServer;
+import org.liveoak.testsuite.internal.server.EmbeddedLiveOakServer;
+import org.liveoak.testsuite.internal.server.LiveOakServer;
 import org.liveoak.testsuite.internal.WebDriverFactory;
 import org.liveoak.testsuite.internal.Config;
+import org.liveoak.testsuite.internal.server.ProcessLiveOakServer;
 import org.liveoak.testsuite.utils.JsExecutor;
 import org.openqa.selenium.WebDriver;
 
@@ -75,11 +76,11 @@ public class LiveOak extends BlockJUnit4ClassRunner {
 
             try {
                 if (server == null) {
+                    server = createServer(Config.testMode());
+
                     LiveOakConfig liveOakConfig = testClass.getAnnotation(LiveOakConfig.class);
                     if (liveOakConfig != null) {
-                        server = new LiveOakServer(liveOakConfig);
-                    } else {
-                        server = new LiveOakServer();
+                        server.setConfig(liveOakConfig);
                     }
 
                     server.start();
@@ -102,6 +103,14 @@ public class LiveOak extends BlockJUnit4ClassRunner {
         }
 
         super.run(notifier);
+    }
+
+    private static LiveOakServer createServer(String testMode) {
+        switch (testMode) {
+            case "process": return new ProcessLiveOakServer();
+            case "embedded": return new EmbeddedLiveOakServer();
+            default: throw new IllegalArgumentException("Unsupported mode: " + testMode);
+        }
     }
 
     public class HttpClientResource implements LazyResource<HttpClient> {

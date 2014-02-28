@@ -30,4 +30,8 @@ public class Config {
         return Long.parseLong(System.getProperty("liveoak.stopTimeout", "10000"));
     }
 
+    public static String testMode() {
+        return System.getProperty("liveoak.testMode", "process");
+    }
+
 }
