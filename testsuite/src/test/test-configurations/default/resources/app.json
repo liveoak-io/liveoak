@@ -1,8 +1,0 @@
-{
-    type: 'jboss-module',
-    module-id:   'io.liveoak.filesystem',
-    class-name:  'io.liveoak.filesystem.FilesystemResource',
-    config: {
-        root: '${user.dir}'
-    }
-}

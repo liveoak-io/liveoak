@@ -12,5 +12,12 @@
     config: {
       directory: "${io.liveoak.js.dir}"
     }
+  },
+
+  css: {
+    type: 'aggregating-filesystem',
+    config: {
+      directory: "${io.liveoak.css.dir}"
+    }
   }
 }
