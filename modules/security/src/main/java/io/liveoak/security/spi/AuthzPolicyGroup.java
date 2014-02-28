@@ -3,6 +3,8 @@ package io.liveoak.security.spi;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author Bob McWhirter
  */
@@ -24,6 +26,7 @@ public class AuthzPolicyGroup {
         this.entries = entries;
     }
 
+    @JsonProperty("policies")
     private List<AuthzPolicyEntry> entries;
 
 }
