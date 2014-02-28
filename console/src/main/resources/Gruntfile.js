@@ -1,11 +1,5 @@
 'use strict';
 
-/*global module,require*/
-var lrSnippet = require('connect-livereload')();
-var mountFolder = function (connect, dir) {
-  return connect.static(require('path').resolve(dir));
-};
-
 module.exports = function (grunt) {
   // load all grunt tasks
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
