@@ -42,7 +42,6 @@ public class FileSystemAdminResource implements RootResource {
 
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        System.err.println("Aggregating FS: " + this.id + " // " + state);
         String directory = (String) state.getProperty("directory");
         if (this.directory == null && (directory == null || directory.trim().equals(""))) {
             responder.invalidRequest("'directory' may not be empty");

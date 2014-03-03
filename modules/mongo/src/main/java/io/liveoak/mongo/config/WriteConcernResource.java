@@ -50,7 +50,6 @@ public class WriteConcernResource implements Resource{
     }
 
     public void updateWriteConcern(ResourceState state) throws Exception {
-        System.err.println( "IN: " + state ) ;
         Object w = state.getProperty(Options.W.propertyName);
 
         if (w == null) {

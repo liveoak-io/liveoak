@@ -52,7 +52,6 @@ public class ApplicationService implements Service<InternalApplication> {
             mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
             try {
                 JsonNode tree = mapper.readTree(applicationJson);
-                System.err.println( "TREE: " + tree );
                 if ( tree.has( "name" ) ) {
                     appName = tree.get( "name" ).asText();
                 }
@@ -64,8 +63,6 @@ public class ApplicationService implements Service<InternalApplication> {
                 e.printStackTrace();
             }
         }
-
-        System.err.println( "application.json says: " + htmlApp );
 
         this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp);
 

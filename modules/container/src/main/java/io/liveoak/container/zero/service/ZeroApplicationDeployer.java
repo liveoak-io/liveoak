@@ -17,7 +17,6 @@ public class ZeroApplicationDeployer implements Service<InternalApplication> {
     @Override
     public void start(StartContext context) throws StartException {
         try {
-            System.err.println( "START APP: " + ZeroExtension.APPLICATION_ID );
             this.application = this.registryInjector.getValue().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME );
         } catch (InterruptedException e) {
             throw new StartException(e);

@@ -62,8 +62,6 @@ public class ClientTest {
         ResourceState result = this.client.read(requestContext, "/testApp");
         assertThat(result).isNotNull();
 
-        System.err.println("result: " + result);
-
         List<ResourceState> members = result.members();
 
         assertThat(members).isNotEmpty();
@@ -95,8 +93,6 @@ public class ClientTest {
         ResourceState people = this.client.read(requestContext, "/testApp/db/people");
 
         assertThat(people).isNotNull();
-
-        System.err.println(people);
 
         ResourceState foundBob = people.members().stream().filter((e) -> e.id().equals("bob")).findFirst().get();
         assertThat(foundBob).isNotNull();
@@ -170,14 +166,11 @@ public class ClientTest {
 
         assertThat(createdBob).isNotNull();
 
-        System.err.println( "A" );
         this.system.extensionInstaller().load( "proxy", new ProxyExtension() );
         InternalApplicationExtension ext = this.application.extend("proxy", JsonNodeFactory.instance.objectNode().put("blocking", true));
         this.system.awaitStability();
-        System.err.println( "B" );
 
         ResourceState result = this.client.read(requestContext, "/testApp/proxy");
-        System.err.println( "C" );
         assertThat(result.getPropertyNames()).contains("name");
         assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");
 

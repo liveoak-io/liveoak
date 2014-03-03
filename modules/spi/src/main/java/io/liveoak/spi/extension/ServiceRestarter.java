@@ -46,7 +46,6 @@ public class ServiceRestarter extends AbstractServiceListener {
 
     @Override
     public void transition(ServiceController controller, ServiceController.Transition transition) {
-        System.err.println(transition);
         if (this.direction == Direction.DOWNWARDS) {
             if (transition.getAfter().equals(ServiceController.Substate.DOWN)) {
                 this.direction = Direction.UPWARDS;

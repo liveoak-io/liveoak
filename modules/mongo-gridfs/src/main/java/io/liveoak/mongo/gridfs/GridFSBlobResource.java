@@ -91,7 +91,6 @@ public class GridFSBlobResource extends GridFSResource implements BlockingResour
     }
 
     public void updateContent(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        System.err.println( "UPDATE CONTENT" );
         if (state instanceof LazyResourceState == false) {
             responder.internalError("Expected state instanceof LazyResourceState, not " + state.getClass());
         }
@@ -136,8 +135,6 @@ public class GridFSBlobResource extends GridFSResource implements BlockingResour
     }
 
     public void delete(RequestContext ctx, Responder responder) throws Exception {
-        System.err.println( "DELETE CONTENT" );
-
         GridFSDBObject info = fileInfo();
         if (info.getId() == null) {
             responder.noSuchResource(id());

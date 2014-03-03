@@ -55,7 +55,6 @@ public class TriggerResource implements Resource {
     }
 
     public void createFire(JobExecutionContext context) {
-        System.err.println( "created firing" );
         FireResource fireResource = new FireResource(this, context);
         this.fires.add(fireResource);
 

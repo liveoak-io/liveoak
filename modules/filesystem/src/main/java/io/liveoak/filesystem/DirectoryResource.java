@@ -96,18 +96,14 @@ public class DirectoryResource implements FSResource {
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
         File path = new File(file(), id);
-        System.err.println( "read member: " + path );
         vertx().fileSystem().exists(path.getPath(), (existResult) -> {
-            System.err.println( "exist-result: " + existResult.result() );
             if (existResult.succeeded() && existResult.result()) {
                 if (path.isDirectory()) {
                     responder.resourceRead(createDirectoryResource(path));
                 } else {
-                    System.err.println( "OKAY! " + path );
                     responder.resourceRead(createFileResource(path));
                 }
             } else {
-                System.err.println( "no-such" );
                 responder.noSuchResource(id);
             }
         });

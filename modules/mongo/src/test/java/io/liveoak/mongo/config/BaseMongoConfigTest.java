@@ -22,7 +22,6 @@ public abstract class BaseMongoConfigTest extends AbstractResourceTestCase {
     protected void setUpSystem(ResourceState config) throws Exception {
         InternalApplicationExtension appExt = installResource("mongo", BASEPATH, config);
         if (appExt.exception() != null) {
-            System.err.println("throw init exception: " + appExt.exception());
             appExt.exception().printStackTrace();
             throw appExt.exception();
         }

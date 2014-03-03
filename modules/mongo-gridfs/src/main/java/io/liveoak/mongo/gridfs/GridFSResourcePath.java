@@ -19,12 +19,10 @@ public class GridFSResourcePath extends ResourcePath {
 
     public GridFSResourcePath(ResourcePath path) {
         super(path);
-        System.err.println("GRIDFS_PATH: " + path);
     }
 
     public GridFSResourcePath(String... segments) {
         super(segments);
-        System.err.println("GRIDFS_PATH: " + Arrays.asList( segments) );
     }
 
     public static GridFSResourcePath fromContext(RequestContext ctx) {

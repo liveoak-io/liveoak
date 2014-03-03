@@ -69,7 +69,6 @@ public class BaseMongoDBTest extends AbstractResourceTestCase {
             e.printStackTrace();
         }
 
-        System.err.println( "TEST CONFIG: " + config );
         return config;
     }
 

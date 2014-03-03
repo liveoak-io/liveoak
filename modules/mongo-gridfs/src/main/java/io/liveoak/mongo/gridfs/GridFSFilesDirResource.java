@@ -85,7 +85,6 @@ public class GridFSFilesDirResource extends GridFSDirectoryResource {
 
         while (result.hasNext()) {
             DBObject child = result.next();
-            System.err.println( "** CHILD: " + child );
             sink.accept(wrapDBObject(path(), new GridFSDBObject(child)));
         }
 

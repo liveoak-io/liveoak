@@ -66,7 +66,6 @@ public class AbstractGridFSTest extends AbstractHTTPResourceTestCase {
             e.printStackTrace();
         }
 
-        System.err.println("TEST CONFIG: " + config);
         return config;
     }
 

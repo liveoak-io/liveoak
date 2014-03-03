@@ -61,11 +61,8 @@ public class GridFSDirectoryResource extends GridFSResource {
 
         GridFSResourcePath childPath = path().append(id);
 
-        System.err.println( "read: " + childPath );
-
         if (childPath.equals(ctx.resourcePath())) {
 
-            System.err.println( "create target file: " + childPath );
             // there are no more intermediary segments - this is the last parent,
             // here we lookup / generate the target GridFS file
 

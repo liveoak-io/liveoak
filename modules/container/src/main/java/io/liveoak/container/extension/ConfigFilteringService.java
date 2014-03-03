@@ -37,9 +37,7 @@ public class ConfigFilteringService implements Service<ObjectNode> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        System.err.println( "filter inbound: " + this.configurationInjector.getValue() );
         this.config = filter(this.configurationInjector.getValue());
-        System.err.println( "filter outbound: " + this.config );
     }
 
     @Override

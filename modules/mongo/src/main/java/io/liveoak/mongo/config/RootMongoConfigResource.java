@@ -74,7 +74,6 @@ public class RootMongoConfigResource implements ConfigResource, RootResource {
     @Override
     public void updateConfigProperties(RequestContext ctx, ResourceState state, Responder responder, Resource resource) throws Exception {
         //required values: 'db' only
-        System.err.println( "CONFIG MONGO: " + state );
         String dbName = getPropertyAsString(state,"db");
         if (this.db == null && (dbName == null || dbName.isEmpty())) {
             throw new InitializationException("String configuration value required for 'db'");
@@ -113,7 +112,6 @@ public class RootMongoConfigResource implements ConfigResource, RootResource {
             this.mongoClient.setWriteConcern( currentWriteConcern );
         }
 
-        System.err.println( "client: " + this.mongoClient );
         Object writeConcernState = state.getProperty(WriteConcernResource.ID);
         if (writeConcernState != null) {
             if (writeConcernState instanceof ResourceState) {

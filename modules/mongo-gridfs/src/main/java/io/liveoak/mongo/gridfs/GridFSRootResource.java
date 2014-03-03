@@ -62,7 +62,6 @@ public class GridFSRootResource extends GridFSDirectoryResource implements RootR
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
         // here id always has the value of userspace which we use to map to appropriate db collection name
-        System.err.println( " === " + ctx.resourcePath() );
         responder.resourceRead(
                 new GridFSUserspaceResource(ctx, this, id, new GridFSResourcePath(ctx.resourcePath()).top(3)));
     }
