@@ -12,7 +12,9 @@ public class CORSHandler extends ChannelOutboundHandlerAdapter {
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         if ( msg instanceof HttpResponse) {
-            ((HttpResponse) msg).headers().add( "Access-Control-Allow-Origin", "*" );
+            if ( ! ((HttpResponse) msg).headers().contains( "Access-Control-Allow-Origin" ) ) {
+                ((HttpResponse) msg).headers().add( "Access-Control-Allow-Origin", "*" );
+            }
         }
         super.write( ctx, msg, promise );
     }

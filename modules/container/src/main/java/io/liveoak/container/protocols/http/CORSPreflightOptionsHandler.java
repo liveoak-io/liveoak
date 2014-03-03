@@ -14,12 +14,13 @@ public class CORSPreflightOptionsHandler extends SimpleChannelInboundHandler<Htt
         if (msg.getMethod().equals(HttpMethod.OPTIONS)) {
             DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
             response.headers().add("Access-Control-Allow-Headers", msg.headers().getAll("Access-Control-Request-Headers"));
-            //response.headers().add("Access-Control-Allow-Methods", msg.headers().getAll("Access-Control-Request-Method"));
-            response.headers().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD" );
+            response.headers().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+            response.headers().add("Access-Control-Allow-Origin", msg.headers().get("Origin"));
             response.headers().add("Content-Length", 0);
             ctx.writeAndFlush(response);
+            ctx.read();
             return;
         }
-        ctx.fireChannelRead( msg );
+        ctx.fireChannelRead(msg);
     }
 }
