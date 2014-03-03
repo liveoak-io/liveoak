@@ -7,21 +7,14 @@
   -->
 <module xmlns="urn:jboss:module:1.3" name="${module-name}">
 
-    <main-class name="io.liveoak.bootstrap.Bootstrap"/>
-
     <resources>
         <resource-root path="${project.artifactId}.jar"/>
     </resources>
 
     <dependencies>
-        <module name="io.liveoak.autosetup"/>
-        <module name="io.liveoak.spi" services="import"/>
-        <module name="io.liveoak.container"/>
+        <module name="io.liveoak.mongo-launcher"/>
         <module name="org.jboss.logging"/>
         <module name="org.jboss.logmanager" services="import"/>
-        <module name="com.fasterxml.jackson.core"/>
-        <module name="io.vertx"/>
-        <module name="io.netty"/>
         <system>
             <paths>
                 <path name="org/jboss/modules"/>

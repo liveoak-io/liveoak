@@ -5,6 +5,7 @@
  */
 package io.liveoak.bootstrap;
 
+import io.liveoak.autosetup.LiveOakAutoSetup;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.tenancy.InternalApplication;
@@ -30,6 +31,9 @@ public class Bootstrap {
             configDir = new File(liveOakDir, "conf");
             appsDir = new File(liveOakDir, "apps");
         }
+
+        log.info("LiveOak BaaS auto-setup");
+        LiveOakAutoSetup.run(liveOakDir, configDir);
 
         log.info("Booting up LiveOak BaaS");
         long start = System.currentTimeMillis();
