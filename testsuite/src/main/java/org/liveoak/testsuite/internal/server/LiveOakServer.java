@@ -7,10 +7,6 @@
 package org.liveoak.testsuite.internal.server;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,9 +23,6 @@ public abstract class LiveOakServer {
     protected String config;
     protected String app;
 
-    protected Map<String, String> jvmProperties = new HashMap<>();
-    protected String[] jvmArguments;
-
     public LiveOakServer() {
         config = "default";
         app = "default";
@@ -41,11 +34,7 @@ public abstract class LiveOakServer {
     }
 
     public void start() throws Throwable {
-        File t = new File("").getAbsoluteFile();
-        if (t.getName().equals("testsuite")) {
-            t = t.getParentFile();
-        }
-        String liveoakDir = t.getAbsolutePath();
+        String liveoakDir = getLiveOakDir();
 
         String jsClientDir = path(liveoakDir, "clients", "javascript", "src", "main", "javascript");
         String cssDir = path(liveoakDir, "launcher", "src", "main", "css");
@@ -60,17 +49,26 @@ public abstract class LiveOakServer {
         String logDir = path(liveoakDir, "launcher", "logs");
         String loggingPropertiesPath = path(liveoakDir, "launcher", "etc", "logging.properties");
 
+        Map<String, String> jvmProperties = new HashMap<>();
         jvmProperties.put("io.liveoak.js.dir", jsClientDir);
         jvmProperties.put("io.liveoak.css.dir", cssDir);
         jvmProperties.put("io.liveoak.log", logDir);
         jvmProperties.put("logging.configuration", loggingPropertiesPath);
 
-        jvmArguments = new String[] { "-modulepath", modulePath, "io.liveoak.bootstrap:main", configDir, appDir };
+        String[] jvmArguments = new String[] { "-modulepath", modulePath, "io.liveoak.bootstrap:main", configDir, appDir };
 
-        startImpl();
+        startImpl(jvmProperties, jvmArguments);
     }
 
-    protected abstract void startImpl() throws Throwable;
+    protected String getLiveOakDir() {
+        File t = new File("").getAbsoluteFile();
+        if (t.getName().equals("testsuite")) {
+            t = t.getParentFile();
+        }
+        return t.getAbsolutePath();
+    }
+
+    protected abstract void startImpl(Map<String, String> jvmProperties, String[] jvmArguments) throws Throwable;
 
     public abstract void stop() throws Exception;
 
@@ -83,22 +81,4 @@ public abstract class LiveOakServer {
         return sb.toString();
     }
 
-    protected static void waitFor(String url, long timeout) throws MalformedURLException, InterruptedException {
-        long end = System.currentTimeMillis() + timeout;
-        while (System.currentTimeMillis() < end) {
-            try {
-                HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-                connection.setConnectTimeout(500);
-                connection.setReadTimeout(500);
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("Accept", "application/json");
-                if (connection.getResponseCode() == 200) {
-                    return;
-                }
-            } catch (IOException e) {
-            }
-            Thread.sleep(500);
-        }
-        throw new RuntimeException("LiveOakServer did not start within timeout");
-    }
 }

@@ -17,7 +17,7 @@ import org.liveoak.testsuite.internal.server.EmbeddedLiveOakServer;
 import org.liveoak.testsuite.internal.server.LiveOakServer;
 import org.liveoak.testsuite.internal.WebDriverFactory;
 import org.liveoak.testsuite.internal.Config;
-import org.liveoak.testsuite.internal.server.ProcessLiveOakServer;
+import org.liveoak.testsuite.internal.server.StandaloneProcessLiveOakServer;
 import org.liveoak.testsuite.utils.JsExecutor;
 import org.openqa.selenium.WebDriver;
 
@@ -107,7 +107,7 @@ public class LiveOak extends BlockJUnit4ClassRunner {
 
     private static LiveOakServer createServer(String testMode) {
         switch (testMode) {
-            case "process": return new ProcessLiveOakServer();
+            case "process": return new StandaloneProcessLiveOakServer();
             case "embedded": return new EmbeddedLiveOakServer();
             default: throw new IllegalArgumentException("Unsupported mode: " + testMode);
         }
