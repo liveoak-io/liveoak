@@ -5,6 +5,7 @@ import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
+import io.liveoak.spi.resource.async.DefaultRootResource;
 import org.jboss.msc.service.*;
 import org.jboss.msc.value.ImmediateValue;
 
@@ -23,7 +24,7 @@ public class ProxyExtension implements Extension {
 
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
-
+        context.mountPrivate( new DefaultRootResource( context.id() ));
     }
 
     @Override

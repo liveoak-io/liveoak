@@ -6,6 +6,7 @@ import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
+import io.liveoak.spi.resource.async.DefaultRootResource;
 import org.vertx.java.core.Vertx;
 
 import java.io.File;
@@ -17,6 +18,7 @@ public class FilesystemExtension implements Extension {
 
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
+        context.mountPrivate( new DefaultRootResource( context.id() ));
     }
 
     @Override

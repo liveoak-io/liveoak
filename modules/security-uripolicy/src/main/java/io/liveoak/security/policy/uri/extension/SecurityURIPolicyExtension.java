@@ -20,7 +20,7 @@ import java.io.File;
 public class SecurityURIPolicyExtension implements Extension {
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
-
+        context.mountPrivate(new DefaultRootResource(context.id()));
     }
 
     @Override

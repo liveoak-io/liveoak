@@ -21,7 +21,7 @@ import java.io.File;
 public class SecurityACLPolicyExtension implements Extension {
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
-
+        context.mountPrivate( new DefaultRootResource( context.id() ));
     }
 
     @Override

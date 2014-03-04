@@ -35,6 +35,8 @@ public class ZeroExtension implements Extension {
         target.addService( ZeroServices.BOOTSTRAP.append( "resources" ), appResources )
                 .addDependency(LiveOak.application(APPLICATION_ID), InternalApplication.class, appResources.applicationInjector())
                 .install();
+
+        // DO NOT mountPrivate, since this isn't exposed as a valid extension.
     }
 
     @Override

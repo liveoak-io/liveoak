@@ -8,6 +8,7 @@ import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
+import io.liveoak.spi.resource.async.DefaultRootResource;
 import io.liveoak.spi.resource.async.Notifier;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
@@ -20,7 +21,7 @@ public class SchedulerExtension implements Extension {
 
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
-
+        context.mountPrivate( new DefaultRootResource( context.id() ));
     }
 
     @Override

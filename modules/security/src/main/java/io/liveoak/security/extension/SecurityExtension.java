@@ -20,7 +20,7 @@ import java.io.File;
 public class SecurityExtension implements Extension {
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
-
+        context.mountPrivate(new DefaultRootResource(context.id()));
     }
 
     @Override
@@ -30,24 +30,24 @@ public class SecurityExtension implements Extension {
         ServiceTarget target = context.target();
 
 
-        File authzConfig = new File( context.application().directory(), "authz-config.json" );
+        File authzConfig = new File(context.application().directory(), "authz-config.json");
 
         AuthzPolicyGroupService policyGroup = new AuthzPolicyGroupService();
 
-        target.addService( SecurityServices.policyGroup( appId ), policyGroup )
-                .addInjection( policyGroup.fileInjector(), authzConfig )
+        target.addService(SecurityServices.policyGroup(appId), policyGroup)
+                .addInjection(policyGroup.fileInjector(), authzConfig)
                 .install();
 
         AuthzResourceService resource = new AuthzResourceService(context.resourceId());
 
         target.addService(LiveOak.resource(appId, context.resourceId()), resource)
                 .addDependency(LiveOak.CLIENT, Client.class, resource.clientInjector())
-                .addDependency(SecurityServices.policyGroup( appId ), AuthzPolicyGroup.class, resource.policyGroupInjector() )
+                .addDependency(SecurityServices.policyGroup(appId), AuthzPolicyGroup.class, resource.policyGroupInjector())
                 .install();
 
         context.mountPublic(LiveOak.resource(appId, context.resourceId()));
 
-        context.mountPrivate( new DefaultRootResource( context.resourceId() ));
+        context.mountPrivate(new DefaultRootResource(context.resourceId()));
     }
 
     @Override
