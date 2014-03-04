@@ -1,11 +1,12 @@
 <!doctype html>
-<html lang="en" data-framework="angularjs" ng-controller="GlobalCtrl" >
+<html lang="en" data-framework="angularjs" ng-controller="GlobalCtrl">
 <head>
     <meta charset="utf-8">
-    <title>{{ curApp.name }} Dashboard - LiveOak</title>
+    <title ng-bind-template="LiveOak - {{curApp.name}}">LiveOak Loading...</title>
 
     <!-- Frameworks -->
     <link rel="stylesheet" href="/admin/console/css/reset.css">
+
     <!--<link rel="stylesheet" href="/admin/console/lib/bootstrap/dist/css/bootstrap.css">-->
     <link href='http://fonts.googleapis.com/css?family=Exo+2:300,300italic,400,400italic,600,600italic' rel='stylesheet' type='text/css'>
     <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
@@ -15,16 +16,38 @@
 
     <!-- Page styles -->
     <link rel="stylesheet" href="/admin/console/css/console.css">
+
+    <style>
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body class="app-dashboard" ng-cloak>
+
+    <div class="feedback-aligner" data-ng-show="notification" data-ng-click="notification = null">
+        <div class="alert alert-{{notification.type}}">
+            <span class="pficon pficon-ok" ng-show="notification.type == 'success'"></span>
+            <span class="pficon pficon-info" ng-show="notification.type == 'info'"></span>
+            <span class="pficon-layered" ng-show="notification.type == 'danger'">
+                <span class="pficon pficon-error-octagon"></span>
+                <span class="pficon pficon-error-exclamation"></span>
+            </span>
+            <span class="pficon-layered" ng-show="notification.type == 'warning'">
+                <span class="pficon pficon-warning-triangle"></span>
+                <span class="pficon pficon-warning-exclamation"></span>
+            </span>
+            <strong>{{notification.header}}</strong> {{notification.message}}
+        </div>
+    </div>
 
     <div class="row">
         <lo-navbar></lo-navbar>
     </div>
 
-        <div data-ng-view id="lo-content-row" class="row">
-        </div>
+    <div data-ng-view id="lo-content-row" class="row">
+    </div>
 
     <script src="/admin/client/liveoak.js" type="text/javascript"></script>
     <script src="/admin/console/lib/jquery/jquery.js" type="text/javascript"></script>
@@ -40,10 +63,10 @@
     <script src="/admin/console/js/controllers.js"></script>
     <script src="/admin/console/js/controllers/global.js"></script>
     <script src="/admin/console/js/controllers/dashboard.js"></script>
+    <script src="/admin/console/js/controllers/storage.js"></script>
     <script src="/admin/console/js/services.js"></script>
     <script src="/admin/console/js/filters.js"></script>
     <script src="/admin/console/js/directives.js"></script>
-
 
 </body>
 

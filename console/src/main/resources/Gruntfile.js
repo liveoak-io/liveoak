@@ -31,12 +31,13 @@ module.exports = function (grunt) {
         tasks: ['less']
       },
       js: {
-        files: 'app/js/*.js',
+        files: ['app/js/*.js','app/js/controllers/*.js'],
         tasks: ['copy','jshint']
       },
       html: {
         files: ['app/partials/*.html',
-          'app/templates/*.html'],
+          'app/templates/*.html',
+          'app/*.html'],
         tasks: ['copy']
       },
       livereload: {
@@ -51,7 +52,7 @@ module.exports = function (grunt) {
     copy: {
       build: {
         cwd: '',
-        src: [ 'app/js/**', 'app/img/**', 'app/css/**', 'app/lib/**', 'app/partials/**', 'app/templates/**' ],
+        src: [ 'app/js/**', 'app/img/**', 'app/css/**', 'app/lib/**', 'app/partials/**', 'app/templates/**', 'app/*.html' ],
         dest: '../../../target/',
         expand: true
       }
