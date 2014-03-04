@@ -1,0 +1,65 @@
+/*
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+ */
+.resource {
+    padding: 1em;
+}
+
+.resource .self {
+    border: 1px solid black;
+    padding: 1ex;
+    margin-bottom: 1em;
+}
+
+.resource .content {
+    margin-left: 1em;
+}
+
+.resource .resource {
+    border-bottom: 1px solid #ccc;
+    padding: 0;
+    margin-bottom: .5ex;
+}
+
+.resource .resource .self {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.resource table {
+    border: 1px solid #ccc;
+    font-size: 90%;
+    margin-bottom: 1em;
+}
+
+.resource table tr {
+    border-bottom: 1px solid #666;
+}
+
+.resource table tr th {
+    padding: .5ex;
+    background-color: #ddd;
+    border: 1px solid #666;
+}
+
+.resource table tr td {
+    padding: .5ex;
+    border: 1px solid #666;
+}
+
+.resource .members {
+    padding: 1ex;
+    border: 1px solid #ccc;
+}
+
+.footer {
+    border-top: 1px solid #ddd;
+    padding-left: 1em;
+    color: #999;
+    font-size: 80%;
+}
+
+

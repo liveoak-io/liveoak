@@ -50,6 +50,14 @@
             <outputDirectory>/conf</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>../launcher/apps/admin</directory>
+            <outputDirectory>/apps/admin</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../console/target/app</directory>
+            <outputDirectory>/apps/admin/console</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>../launcher/target</directory>
             <outputDirectory>/lib</outputDirectory>
         </fileSet>
