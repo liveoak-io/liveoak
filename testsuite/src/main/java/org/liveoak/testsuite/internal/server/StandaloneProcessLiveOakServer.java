@@ -3,6 +3,10 @@ package org.liveoak.testsuite.internal.server;
 import org.liveoak.testsuite.internal.Config;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
-public class ProcessLiveOakServer extends LiveOakServer {
+public class StandaloneProcessLiveOakServer extends LiveOakServer {
 
     private static Process liveoak;
     static {
@@ -29,7 +33,7 @@ public class ProcessLiveOakServer extends LiveOakServer {
     }
 
     @Override
-    protected void startImpl() throws Exception {
+    protected void startImpl(Map<String, String> jvmProperties, String[] jvmArguments) throws Exception {
         if (liveoak != null) {
             throw new IllegalStateException("Already running");
         }
@@ -38,11 +42,7 @@ public class ProcessLiveOakServer extends LiveOakServer {
 
         String java = path(System.getProperty("java.home"), "bin", "java");
 
-        File t = new File("").getAbsoluteFile();
-        if (t.getName().equals("testsuite")) {
-            t = t.getParentFile();
-        }
-        String liveoakDir = t.getAbsolutePath();
+        String liveoakDir = getLiveOakDir();
 
         String modulesJar = path(liveoakDir, "launcher", "target", "jboss-modules.jar");
 
@@ -116,6 +116,25 @@ public class ProcessLiveOakServer extends LiveOakServer {
 
     private boolean isAlive() {
         return liveoak != null && liveoak.isAlive();
+    }
+
+    protected static void waitFor(String url, long timeout) throws MalformedURLException, InterruptedException {
+        long end = System.currentTimeMillis() + timeout;
+        while (System.currentTimeMillis() < end) {
+            try {
+                HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+                connection.setConnectTimeout(500);
+                connection.setReadTimeout(500);
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("Accept", "application/json");
+                if (connection.getResponseCode() == 200) {
+                    return;
+                }
+            } catch (IOException e) {
+            }
+            Thread.sleep(500);
+        }
+        throw new RuntimeException("LiveOakServer did not start within timeout");
     }
 
 }

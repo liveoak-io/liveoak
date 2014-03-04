@@ -10,7 +10,7 @@ import java.util.Map;
 public class EmbeddedLiveOakServer extends LiveOakServer {
 
     @Override
-    protected void startImpl() throws Throwable {
+    protected void startImpl(Map<String, String> jvmProperties, String[] jvmArguments) throws Throwable {
         long time = System.currentTimeMillis();
 
         for (Map.Entry<String, String> property : jvmProperties.entrySet()) {
@@ -19,7 +19,6 @@ public class EmbeddedLiveOakServer extends LiveOakServer {
 
         org.jboss.modules.Main.main(jvmArguments);
 
-        // waitFor("http://localhost:8080", Config.startTimeout());
         log.info("Started embedded LiveOakServer in " + (System.currentTimeMillis() - time) + " ms");
     }
 
