@@ -1,0 +1,124 @@
+<div id="lo-content-row" class="row">
+    <lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="storage" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
+
+    <div class="col-md-10 lo-main-pane">
+        <div class="row">
+            <div class="lo-content-area col-md-10">
+                <ol class="breadcrumb">
+                    <li><a href="#">Applications</a></li>
+                    <li><a href="#">MyApp</a></li>
+                    <li><a href="#">Storage</a></li>
+                    <li class="active">New Storage</li>
+                </ol>
+
+                <h2><span>MyApp</span> New Storage</h2>
+
+                <form class="lo-form-horizontal" name="realmForm" novalidate>
+
+                    <fieldset>
+                        <legend lo-collapse><span class="text">Data Resource</span></legend>
+                        <div class="form-group">
+                        <div class="lo-db-instances">
+                            <p>
+                                Doesnt' have it installed?
+                                <span ng-switch on="storageModel.dbtype">
+                                    <a ng-switch-when="mongo" href="http://www.mongodb.org/" >Get your MongoDB instance.</a>
+                                    <a ng-switch-when="mysql" href="http://www.mysql.com/" >Get your MySQL instance.</a>
+                                    <a ng-switch-when="plsql" href="http://www.postgresql.org/" >Get your PostgreSQL instance.</a>
+                                    <span ng-switch-default>No Database selected.</span>
+                                </span>
+                            </p>
+                            <div class="lo-db-mongo" ng-class="{active: storageModel.dbtype === 'mongo'}" ng-click="storageModel.dbtype = 'mongo'">MongoDB</div>
+                            <div class="lo-db-mysql" ng-class="{active: storageModel.dbtype === 'mysql'}" ng-click="storageModel.dbtype = 'mysql'">MySQL</div>
+                            <div class="lo-db-plsql" ng-class="{active: storageModel.dbtype === 'plsql'}" ng-click="storageModel.dbtype = 'plsql'">PostGres</div>
+                        </div>
+                            </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend lo-collapse><span class="text">Settings</span></legend>
+                        <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label" for="dbhost">Host <span class="required">*</span></label>
+
+                            <div class="col-sm-4">
+                                <input class="form-control" ng-model="storageModel.host" type="text" id="dbhost" required>
+                            </div>
+                        </div>
+                        <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label" for="dbport">Port <span class="required">*</span></label>
+
+                            <div class="col-sm-4">
+                                <input class="form-control" ng-model="storageModel.port" type="number" step="1" id="dbport" required>
+                            </div>
+                        </div>
+                        <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label" for="dbname">Database Name <span class="required">*</span></label>
+
+                            <div class="col-sm-4">
+                                <input class="form-control" ng-model="storageModel.name" type="text" id="dbname" required>
+                            </div>
+                        </div>
+                        <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label" for="dburl">URL Path <span class="required">*</span></label>
+
+                            <div class="col-sm-4">
+                                <input class="form-control" ng-model="storageModel.url" type="url" id="dburl" required>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend lo-collapse><span class="text">Security</span></legend>
+                        <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label" for="stuname">Username</label>
+
+                            <div class="col-sm-4">
+                                <input class="form-control" ng-model="storageModel.username" type="text" id="stuname">
+                            </div>
+                        </div>
+                        <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label" for="passwd">Password</label>
+
+                            <div class="col-sm-4">
+                                <input class="form-control" ng-model="storageModel.passwd" type="password" id="passwd">
+                            </div>
+                        </div>
+                        <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label" for="passwdConfirm">Password confirmation</label>
+
+                            <div class="col-sm-4">
+                                <input class="form-control" ng-model="passwdConfirm" type="password" id="passwdConfirm">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div class="pull-right form-actions">
+                        <button lo-button-clear="clear()">Clear changes</button>
+                        <button lo-button-save="save()">Save</button>
+                    </div>
+                </form>
+            </div>
+            <div class="lo-info-pane col-md-2">
+                <h3><span>All</span> Storage Resources</h3>
+                <section>
+                    <h4>MyFirstInstance</h4>
+                    <div>
+                        <span class="lo-label">Storage Provider</span>
+                        <span class="lo-field">MongoDB</span>
+                        <span class="lo-label">Database Name</span>
+                        <span class="lo-field">MyDB</span>
+                    </div>
+                </section>
+                <section>
+                    <h4>MyFirstInstance</h4>
+                    <div>
+                        <span class="lo-label">Storage Provider</span>
+                        <span class="lo-field">MongoDB</span>
+                        <span class="lo-label">Database Name</span>
+                        <span class="lo-field">MyDB</span>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

@@ -23,6 +23,15 @@ loMod.config(['$routeProvider', function($routeProvider) {
       templateUrl : '/admin/console/partials/dashboard.html',
       controller : 'DashboardCtrl'
     })
+    .when('/applications/:appId/storage/create', {
+      controller: 'StorageCtrl',
+      resolve: {
+        'loStorage' : function(LoStorageLoader) {
+          return new LoStorageLoader();
+        }
+      },
+      templateUrl: '/admin/console/partials/storage-create.html'
+    })
     .otherwise({
       templateUrl : '/admin/console/partials/notfound.html'
     });
