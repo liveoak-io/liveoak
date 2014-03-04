@@ -17,7 +17,7 @@
   css: {
     type: 'filesystem',
     config: {
-      directory: "${io.liveoak.css.dir}"
+      directory: "${application.dir}/css"
     }
   }
 }
