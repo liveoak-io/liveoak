@@ -21,7 +21,7 @@ public abstract class AbstractKeycloakTest extends AbstractResourceTestCase {
 
         String requestedModel = System.getProperty(ModelProviderUtils.MODEL_PROVIDER);
         if (requestedModel != null) {
-            config.put(KeycloakSystemResource.MODEL, System.getProperty(ModelProviderUtils.MODEL_PROVIDER));
+            config.put(KeycloakSystemResource.MODEL, requestedModel);
         }
 
         return config;
