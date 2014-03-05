@@ -1,0 +1,25 @@
+<div class="panel panel-default lo-panel lo-panel-storage">
+    <div class="panel-heading">
+        <h2 class="panel-title">{{storage.path}}</h2>
+
+        <div class="pull-right">
+            <div class="dropdown">
+                <a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="fa fa-trash-o"></i><b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Rename...</a></li>
+                    <li role="presentation" class="divider"></li>
+                    <li><a href="#">Delete...</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <ul class="lo-app-opts">
+            <li><a href="#"><i class="fa fa-briefcase"></i>{{storage.provider}}</a></li>
+            <li><a href="#"><i class="fa fa-link"></i>/{{storage.path}}</a></li>
+            <li><a href="#"><i class="fa fa-desktop"></i>{{storage.host}}</a></li>
+            <li><a href="#"><i class="fa fa-thumb-tack"></i>{{storage.port}}</a></li>
+        </ul>
+    </div>
+</div>

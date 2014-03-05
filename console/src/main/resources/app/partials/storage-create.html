@@ -5,13 +5,13 @@
         <div class="row">
             <div class="lo-content-area col-md-10">
                 <ol class="breadcrumb">
-                    <li><a href="#">Applications</a></li>
-                    <li><a href="#">MyApp</a></li>
-                    <li><a href="#">Storage</a></li>
+                    <li><a href="#/applications">Applications</a></li>
+                    <li><a href="#/applications/{{curApp.name}}">{{curApp.name}}</a></li>
+                    <li><a href="#/applications/{{curApp.name}}/storage">Storage</a></li>
                     <li class="active">New Storage</li>
                 </ol>
 
-                <h2><span>MyApp</span> New Storage</h2>
+                <h2><span>{{curApp.name}}</span> New Storage</h2>
 
                 <form class="lo-form-horizontal" name="realmForm" novalidate>
 
