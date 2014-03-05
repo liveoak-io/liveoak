@@ -1,4 +1,4 @@
-package io.liveoak.container.interceptor;
+package io.liveoak.interceptor.timing;
 
 import java.util.Map;
 import java.util.UUID;
@@ -13,6 +13,10 @@ import org.jboss.logging.Logger;
  */
 public class TimingInterceptor extends DefaultInterceptor {
 
+    public TimingInterceptor(String chainName) {
+        this.chainName = chainName;
+    }
+
     @Override
     public void onInbound(InboundInterceptorContext context) throws Exception {
         UUID requestId = context.request().requestId();
@@ -23,10 +27,11 @@ public class TimingInterceptor extends DefaultInterceptor {
     @Override
     public void onComplete(UUID requestId) {
         long start = this.timings.remove(requestId);
-        log.infof("Request took: %d ms", (System.currentTimeMillis() - start));
+        log.infof("%s request took: %d ms", chainName, (System.currentTimeMillis() - start));
     }
 
-    private Map<UUID, Long> timings = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> timings = new ConcurrentHashMap<>();
+    private final String chainName;
 
     private static final Logger log = Logger.getLogger(TimingInterceptor.class);
 }

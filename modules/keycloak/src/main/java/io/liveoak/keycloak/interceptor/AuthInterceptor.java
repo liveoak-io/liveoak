@@ -3,7 +3,7 @@
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-package io.liveoak.container.auth;
+package io.liveoak.keycloak.interceptor;
 
 import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.common.DefaultSecurityContext;
@@ -13,9 +13,9 @@ import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.container.interceptor.DefaultInterceptor;
+import io.liveoak.spi.container.interceptor.InboundInterceptorContext;
 import io.liveoak.spi.state.ResourceState;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.jboss.logging.Logger;
 
@@ -28,26 +28,27 @@ import java.util.function.Consumer;
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
-public class AuthHandler extends SimpleChannelInboundHandler<ResourceRequest> {
+public class AuthInterceptor extends DefaultInterceptor {
 
     public static final String AUTH_TYPE = "bearer";
-    private static final Logger log = Logger.getLogger(AuthHandler.class);
+    private static final Logger log = Logger.getLogger(AuthInterceptor.class);
 
     private Client client;
 
-    public AuthHandler(Client client) {
+    public AuthInterceptor(Client client) {
         this.client = client;
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ResourceRequest req) throws Exception {
+    public void onInbound(InboundInterceptorContext context) throws Exception {
+        ResourceRequest req = context.request();
         final RequestContext requestContext = req.requestContext();
         final DefaultSecurityContext securityContext = (DefaultSecurityContext) requestContext.securityContext();
         final String token = getBearerToken(requestContext);
         if (token != null) {
-            initSecurityContext(ctx, req, securityContext, token);
+            initSecurityContext(context, req, securityContext, token);
         } else {
-            ctx.fireChannelRead(req);
+            context.forward();
         }
     }
 
@@ -56,7 +57,7 @@ public class AuthHandler extends SimpleChannelInboundHandler<ResourceRequest> {
         return prefix;
     }
 
-    private void initSecurityContext(final ChannelHandlerContext ctx, final ResourceRequest req, final DefaultSecurityContext securityContext, String token) {
+    private void initSecurityContext(final InboundInterceptorContext context, final ResourceRequest req, final DefaultSecurityContext securityContext, String token) {
         final RequestContext tokenRequestContext = new RequestContext.Builder().build();
         String prefix = getPrefix( req.resourcePath() );
         try {
@@ -67,7 +68,7 @@ public class AuthHandler extends SimpleChannelInboundHandler<ResourceRequest> {
                         ResourceState state = resourceResponse.state();
                         if (state.getProperty("error") != null) {
                             log.warn("Authentication failed. Request: " + req + ", error: " + state.getProperty("error"));
-                            ctx.writeAndFlush(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.NOT_AUTHORIZED));
+                            context.replyWith(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.NOT_AUTHORIZED));
                         } else {
                             securityContext.setRealm((String) state.getProperty("realm"));
                             securityContext.setSubject((String) state.getProperty("subject"));
@@ -76,17 +77,17 @@ public class AuthHandler extends SimpleChannelInboundHandler<ResourceRequest> {
                             Set<String> roles = new HashSet<>();
                             roles.addAll((Collection<? extends String>) state.getProperty("roles"));
                             securityContext.setRoles(roles);
-                            ctx.fireChannelRead(req);
+                            context.forward();
                         }
                     } catch (Throwable t) {
                         t.printStackTrace();
-                        ctx.writeAndFlush(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
+                        context.replyWith(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
                     }
                 }
             });
         } catch (Throwable t) {
             t.printStackTrace();
-            ctx.writeAndFlush(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
+            context.replyWith(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
         }
     }
 

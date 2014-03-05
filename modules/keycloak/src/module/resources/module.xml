@@ -8,6 +8,8 @@
     <dependencies>
         <module name="com.fasterxml.jackson.core"/>
         <module name="io.liveoak.spi"/>
+        <module name="io.liveoak.common"/>
+        <module name="io.liveoak.interceptor"/>
         <module name="org.keycloak" services="import">
             <imports>
                 <include path="META-INF/**" />

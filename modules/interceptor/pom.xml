@@ -5,7 +5,7 @@
   ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0           http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>io.liveoak</groupId>
         <artifactId>liveoak-modules</artifactId>
@@ -13,19 +13,14 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <properties>
-        <module-name>io.liveoak.security</module-name>
+        <module-name>io.liveoak.interceptor</module-name>
     </properties>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>liveoak-security</artifactId>
-    <name>liveoak-security</name>
+    <artifactId>liveoak-interceptor</artifactId>
+    <name>liveoak-interceptor</name>
     <packaging>jar</packaging>
 
     <dependencies>
-        <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-common</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-spi</artifactId>
@@ -33,7 +28,7 @@
         </dependency>
         <dependency>
             <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-interceptor</artifactId>
+            <artifactId>liveoak-common</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -51,7 +46,6 @@
             <artifactId>liveoak-test-tools</artifactId>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -64,5 +58,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

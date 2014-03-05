@@ -96,6 +96,7 @@
         <module>bootstrap</module>
         <module>spi</module>
         <module>stomp</module>
+        <module>interceptor</module>
         <module>container</module>
         <module>autosetup</module>
 

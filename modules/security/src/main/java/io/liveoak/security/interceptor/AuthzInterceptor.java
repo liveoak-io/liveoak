@@ -3,7 +3,7 @@
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-package io.liveoak.container.auth;
+package io.liveoak.security.interceptor;
 
 import io.liveoak.common.DefaultRequestAttributes;
 import io.liveoak.common.DefaultResourceErrorResponse;
@@ -11,22 +11,22 @@ import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.spi.*;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
+import io.liveoak.spi.container.interceptor.DefaultInterceptor;
+import io.liveoak.spi.container.interceptor.InboundInterceptorContext;
 import io.liveoak.spi.state.ResourceState;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.util.function.Consumer;
 
 /**
- * Handler for checking authorization of current request. It's independent of protocol.
+ * Interceptor for checking authorization of current request. It's independent of protocol.
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class AuthzHandler extends SimpleChannelInboundHandler<ResourceRequest> {
+public class AuthzInterceptor extends DefaultInterceptor {
 
     private final Client client;
 
-    public AuthzHandler(Client client) {
+    public AuthzInterceptor(Client client) {
         this.client = client;
     }
 
@@ -39,10 +39,11 @@ public class AuthzHandler extends SimpleChannelInboundHandler<ResourceRequest> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ResourceRequest req) throws Exception {
+    public void onInbound(InboundInterceptorContext ctx) throws Exception {
+        ResourceRequest req = ctx.request();
         String prefix = getPrefix(req.resourcePath());
         if (prefix == null) {
-            ctx.fireChannelRead(req);
+            ctx.forward();
             return;
         }
         try {
@@ -56,7 +57,7 @@ public class AuthzHandler extends SimpleChannelInboundHandler<ResourceRequest> {
                 @Override
                 public void accept(ClientResourceResponse resourceResponse) {
                     if (resourceResponse.responseType() == ClientResourceResponse.ResponseType.NO_SUCH_RESOURCE) {
-                        ctx.fireChannelRead(req);
+                        ctx.forward();
                         return;
                     }
                     try {
@@ -65,19 +66,19 @@ public class AuthzHandler extends SimpleChannelInboundHandler<ResourceRequest> {
                         boolean authorized = (Boolean) state.getProperty(AuthzConstants.ATTR_AUTHZ_RESULT);
 
                         if (authorized) {
-                            ctx.fireChannelRead(req);
+                            ctx.forward();
                         } else {
                             boolean authenticated = req.requestContext().securityContext().isAuthenticated();
                             ResourceErrorResponse.ErrorType errorType = authenticated ? ResourceErrorResponse.ErrorType.FORBIDDEN : ResourceErrorResponse.ErrorType.NOT_AUTHORIZED;
-                            ctx.writeAndFlush(new DefaultResourceErrorResponse(req, errorType));
+                            ctx.replyWith(new DefaultResourceErrorResponse(req, errorType));
                         }
                     } catch (Throwable t) {
-                        ctx.writeAndFlush(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
+                        ctx.replyWith(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
                     }
                 }
             });
         } catch (Throwable t) {
-            ctx.writeAndFlush(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
+            ctx.replyWith(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
         }
     }
 

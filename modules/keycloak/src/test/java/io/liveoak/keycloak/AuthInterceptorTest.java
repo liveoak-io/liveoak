@@ -6,6 +6,8 @@
 package io.liveoak.keycloak;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.interceptor.extension.InterceptorExtension;
 import io.liveoak.keycloak.extension.KeycloakExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
@@ -34,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 
-public class AuthHandlerTest extends AbstractKeycloakTest {
+public class AuthInterceptorTest extends AbstractKeycloakTest {
 
     private static CloseableHttpClient httpClient;
     private static TokenUtil tokenUtil;
@@ -45,6 +47,7 @@ public class AuthHandlerTest extends AbstractKeycloakTest {
     public void loadExtensions() throws Exception {
         loadExtension("auth", new KeycloakExtension(), createTestConfig());
         loadExtension("auth-test", new MockExtension(MockRootResource.class));
+        setupAuthInterceptor();
         installResource("auth", "auth", JsonNodeFactory.instance.objectNode());
         installResource("auth-test", "auth-test", JsonNodeFactory.instance.objectNode());
     }
@@ -140,5 +143,13 @@ public class AuthHandlerTest extends AbstractKeycloakTest {
         CloseableHttpResponse resp = httpClient.execute(req);
         assertEquals(expectedStatusCode, resp.getStatusLine().getStatusCode());
         resp.close();
+    }
+
+    private void setupAuthInterceptor() throws Exception {
+        ObjectNode interceptorConfig = JsonNodeFactory.instance.objectNode();
+        ObjectNode httpChainConfig = JsonNodeFactory.instance.objectNode()
+                .put("interceptor-name", "auth");
+        interceptorConfig.putArray("http").add(httpChainConfig);
+        loadExtension("interceptor", new InterceptorExtension(), interceptorConfig);
     }
 }

@@ -1,8 +1,8 @@
 package io.liveoak.container.service;
 
 import io.liveoak.common.codec.ResourceCodecManager;
+import io.liveoak.container.interceptor.InterceptorManagerImpl;
 import io.liveoak.container.tenancy.GlobalContext;
-import io.liveoak.container.interceptor.InterceptorManager;
 import io.liveoak.container.protocols.PipelineConfigurator;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.SubscriptionManager;
@@ -52,7 +52,7 @@ public class PipelineConfiguratorService implements Service<PipelineConfigurator
         return this.workerPoolInjector;
     }
 
-    public Injector<InterceptorManager> interceptorManagerInjector() {
+    public Injector<InterceptorManagerImpl> interceptorManagerInjector() {
         return this.interceptorManagerInjector;
     }
 
@@ -70,7 +70,7 @@ public class PipelineConfiguratorService implements Service<PipelineConfigurator
     private InjectedValue<ResourceCodecManager> codecManagerInjector = new InjectedValue<>();
     private InjectedValue<SubscriptionManager> subscriptionManagerInjector = new InjectedValue<>();
     private InjectedValue<Executor> workerPoolInjector = new InjectedValue<>();
-    private InjectedValue<InterceptorManager> interceptorManagerInjector = new InjectedValue<>();
+    private InjectedValue<InterceptorManagerImpl> interceptorManagerInjector = new InjectedValue<>();
     private InjectedValue<Client> clientInjector = new InjectedValue<>();
 
 

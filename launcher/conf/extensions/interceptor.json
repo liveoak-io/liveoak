@@ -1,0 +1,23 @@
+{
+    module-id:  'io.liveoak.interceptor',
+    config: {
+            local: [
+                {
+                    interceptor-name: 'timing-local'
+                }
+            ],
+            http: [
+                {
+                    interceptor-name: 'timing-http'
+                },
+                {
+                    interceptor-name: 'auth'
+                },
+                {
+                    interceptor-name: 'authz',
+                    resource-path-prefix: '/',
+                    request-type-mapping: '*'
+                }
+            ]
+    }
+}

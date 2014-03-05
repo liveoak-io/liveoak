@@ -15,8 +15,7 @@ import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.common.codec.json.JSONEncoder;
 import io.liveoak.container.extension.ExtensionInstaller;
 import io.liveoak.container.extension.ExtensionLoader;
-import io.liveoak.container.interceptor.InterceptorManager;
-import io.liveoak.container.interceptor.TimingInterceptor;
+import io.liveoak.container.interceptor.InterceptorManagerImpl;
 import io.liveoak.container.protocols.PipelineConfigurator;
 import io.liveoak.container.service.*;
 import io.liveoak.container.tenancy.GlobalContext;
@@ -31,7 +30,6 @@ import io.liveoak.spi.MediaType;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.Address;
 import io.liveoak.spi.container.SubscriptionManager;
-import io.liveoak.spi.container.interceptor.Interceptor;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.*;
 import org.jboss.msc.value.ImmediateValue;
@@ -177,7 +175,7 @@ public class LiveOakFactory {
                 .addDependency(CLIENT, Client.class, subscriptionManager.clientInjector())
                 .install();
 
-        ValueService<InterceptorManager> interceptorManager = new ValueService<>(new ImmediateValue<InterceptorManager>(new InterceptorManager()));
+        ValueService<InterceptorManagerImpl> interceptorManager = new ValueService<>(new ImmediateValue<InterceptorManagerImpl>(new InterceptorManagerImpl()));
         serviceContainer.addService(INTERCEPTOR_MANAGER, interceptorManager)
                 .install();
 
@@ -192,7 +190,7 @@ public class LiveOakFactory {
         PipelineConfiguratorService pipelineConfigurator = new PipelineConfiguratorService();
         ServiceBuilder<PipelineConfigurator> pipelineBuilder = serviceContainer.addService(PIPELINE_CONFIGURATOR, pipelineConfigurator)
                 .addDependency(SUBSCRIPTION_MANAGER, SubscriptionManager.class, pipelineConfigurator.subscriptionManagerInjector())
-                .addDependency(INTERCEPTOR_MANAGER, InterceptorManager.class, pipelineConfigurator.interceptorManagerInjector())
+                .addDependency(INTERCEPTOR_MANAGER, InterceptorManagerImpl.class, pipelineConfigurator.interceptorManagerInjector())
                 .addDependency(CODEC_MANAGER, ResourceCodecManager.class, pipelineConfigurator.codecManagerInjector())
                 .addDependency(CLIENT, Client.class, pipelineConfigurator.clientInjector())
                 .addDependency(GLOBAL_CONTEXT, GlobalContext.class, pipelineConfigurator.globalContextInjector())
@@ -237,30 +235,9 @@ public class LiveOakFactory {
 
 
     protected void installCodecs() {
-        installInterceptor(serviceContainer, "timing", new TimingInterceptor());
-
         installCodec(serviceContainer, MediaType.JSON, JSONEncoder.class, new JSONDecoder());
 
         installCodec(serviceContainer, MediaType.HTML, HTMLEncoder.class, null);
-    }
-
-
-    private static void installInterceptor(ServiceContainer serviceContainer, String name, Interceptor interceptor) {
-        ServiceName serviceName = interceptor(name);
-
-        ServiceController<Interceptor> controller = serviceContainer.addService(serviceName, new ValueService<Interceptor>(new ImmediateValue<Interceptor>(interceptor)))
-                .install();
-
-        installInterceptor(serviceContainer, controller);
-    }
-
-    private static void installInterceptor(ServiceContainer serviceContainer, ServiceController<Interceptor> interceptor) {
-        ServiceName serviceName = interceptor.getName();
-        InterceptorRegistrationService registration = new InterceptorRegistrationService();
-        serviceContainer.addService(serviceName.append("register"), registration)
-                .addDependency(INTERCEPTOR_MANAGER, InterceptorManager.class, registration.interceptorManagerInjector())
-                .addDependency(serviceName, Interceptor.class, registration.interceptorInjector())
-                .install();
     }
 
 

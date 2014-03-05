@@ -7,19 +7,6 @@ import java.util.UUID;
  */
 public class DefaultInterceptor implements Interceptor {
 
-    public DefaultInterceptor() {
-        this( 0 );
-    }
-
-    public DefaultInterceptor(int priority) {
-        this.priority = priority;
-    }
-
-    @Override
-    public int priority() {
-        return this.priority;
-    }
-
     @Override
     public void onInbound(InboundInterceptorContext context) throws Exception {
         context.forward();
@@ -34,6 +21,4 @@ public class DefaultInterceptor implements Interceptor {
     public void onComplete(UUID requestId) {
         // nothing;
     }
-
-    private int priority;
 }

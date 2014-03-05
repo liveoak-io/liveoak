@@ -1,11 +1,15 @@
 package io.liveoak.keycloak.extension;
 
+import io.liveoak.interceptor.service.InterceptorRegistrationHelper;
 import io.liveoak.keycloak.KeycloakServices;
+import io.liveoak.keycloak.interceptor.AuthInterceptor;
+import io.liveoak.keycloak.interceptor.AuthInterceptorService;
 import io.liveoak.keycloak.service.KeycloakResourceService;
 import io.liveoak.keycloak.service.KeycloakSystemResourceService;
 import io.liveoak.keycloak.service.RealmModelService;
 import io.liveoak.keycloak.service.RealmRepresentationService;
 import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
@@ -35,6 +39,13 @@ public class KeycloakExtension implements Extension {
                 .install();
 
         context.mountPrivate( LiveOak.systemResource( context.id() ));
+
+        // Install AuthInterceptor
+        AuthInterceptorService authInterceptor = new AuthInterceptorService();
+        ServiceController<AuthInterceptor> authController = target.addService(LiveOak.interceptor("auth"), authInterceptor)
+                .addDependency(LiveOak.CLIENT, Client.class, authInterceptor.clientInjector())
+                .install();
+        InterceptorRegistrationHelper.installInterceptor(target, authController);
     }
 
     @Override

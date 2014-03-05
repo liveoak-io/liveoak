@@ -1,7 +1,7 @@
-package io.liveoak.container.service;
+package io.liveoak.interceptor.service;
 
-import io.liveoak.container.interceptor.InterceptorManager;
 import io.liveoak.spi.container.interceptor.Interceptor;
+import io.liveoak.spi.container.interceptor.InterceptorManager;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -14,13 +14,13 @@ import org.jboss.msc.value.InjectedValue;
  */
 public class InterceptorRegistrationService implements Service<Void> {
 
-    public InterceptorRegistrationService() {
-
+    public InterceptorRegistrationService(String interceptorName) {
+        this.interceptorName = interceptorName;
     }
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.interceptorManagerInjector.getValue().register(this.interceptorInjector.getValue());
+        this.interceptorManagerInjector.getValue().register(interceptorName, this.interceptorInjector.getValue());
     }
 
     @Override
@@ -41,7 +41,7 @@ public class InterceptorRegistrationService implements Service<Void> {
         return this.interceptorInjector;
     }
 
-
+    private final String interceptorName;
     private InjectedValue<InterceptorManager> interceptorManagerInjector = new InjectedValue<>();
     private InjectedValue<Interceptor> interceptorInjector = new InjectedValue<>();
 }
