@@ -1,0 +1,54 @@
+.login-pf body {
+    background: #3a7d49 url("../img/login-bg.png") top left no-repeat;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.login-pf .container {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.login-pf .container .details {
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.login-pf .btn-primary {
+    background-color: #63b474;
+    border-color: #459656;
+    background-image: linear-gradient(to bottom, #63b474 0%, #63b474 100%);
+}
+
+.login-pf .btn-primary:hover,
+.login-pf .btn-primary:focus,
+.login-pf .btn-primary:active,
+.login-pf .btn-primary.active,
+.login-pf .open .dropdown-toggle.btn-primary {
+    background-color: #459656;
+    border-color: #459656;
+    background-image: linear-gradient(to bottom, #5eaf6f 0%, #68b979 100%);
+}
+
+/* Forms */
+.login-pf .form-control:focus,
+.login-pf .form-control:hover {
+    border-color: #63b474;
+}
+.login-pf .form-control:focus {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 73, 0.6);
+}
+
+.login-pf a {
+    color: #63b474;
+}
+
+.login-pf #kc-logo {
+    background-image: none;
+}
+
+.login-pf #kc-logo:before {
+    content: "LiveOak";
+    font-family: fantasy;
+    font-size: 3.5em;
+}
