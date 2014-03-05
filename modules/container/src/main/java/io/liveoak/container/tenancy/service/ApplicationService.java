@@ -20,6 +20,7 @@ import java.io.IOException;
 
 /**
  * @author Bob McWhirter
+ * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
 public class ApplicationService implements Service<InternalApplication> {
 
@@ -44,6 +45,7 @@ public class ApplicationService implements Service<InternalApplication> {
 
         String appName = this.id;
         ResourcePath htmlApp = null;
+        JsonNode resourcesTree = null;
 
         if (applicationJson.exists()) {
             ObjectMapper mapper = new ObjectMapper();
@@ -52,12 +54,15 @@ public class ApplicationService implements Service<InternalApplication> {
             mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
             try {
                 JsonNode tree = mapper.readTree(applicationJson);
-                if ( tree.has( "name" ) ) {
-                    appName = tree.get( "name" ).asText();
+                if (tree.has("name")) {
+                    appName = tree.get("name").asText();
                 }
-                if ( tree.has( "html-app" ) ) {
-                    htmlApp = new ResourcePath( tree.get( "html-app" ).asText() );
-                    htmlApp.prependSegment( this.id );
+                if (tree.has("html-app")) {
+                    htmlApp = new ResourcePath(tree.get("html-app").asText());
+                    htmlApp.prependSegment(this.id);
+                }
+                if (tree.has("resources")) {
+                    resourcesTree = tree.get("resources");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -90,9 +95,10 @@ public class ApplicationService implements Service<InternalApplication> {
                 .addDependency(appResourceName, ApplicationResource.class, appResourceMount.resourceInjector())
                 .install());
 
-        ApplicationResourcesService resources = new ApplicationResourcesService();
+        ApplicationResourcesService resources = new ApplicationResourcesService(resourcesTree);
 
         target.addService(LiveOak.application(this.id).append("resources"), resources)
+                .addDependency(LiveOak.application(this.id))
                 .addInjectionValue(resources.applicationInjector(), this)
                 .install();
     }
