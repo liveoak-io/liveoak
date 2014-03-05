@@ -22,28 +22,28 @@
                         <div class="col-md-12 lo-measure-box api highlight">
                             <i class="fa fa-spinner"></i>
                             <div>
-                                <em>{{data[range].requests}}</em>
+                                <em>{{data[curApp.name].metrics[range].requests}}</em>
                                 <span class="text">API requests / second</span>
                             </div>
                         </div>
                         <div class="col-md-4 lo-measure-box users">
                             <i class="fa fa-users"></i>
                             <div>
-                                <em>{{data[range].users}}</em>
+                                <em>{{data[curApp.name].metrics[range].users}}</em>
                                 <span class="text">active users / second</span>
                             </div>
                         </div>
                         <div class="col-md-4 lo-measure-box push">
                             <i class="fa fa-mobile"></i>
                             <div>
-                                <em>{{data[range].notifications}}</em>
+                                <em>{{data[curApp.name].metrics[range].notifications}}</em>
                                 <span class="text">push notifications / second</span>
                             </div>
                         </div>
                         <div class="col-md-4 lo-measure-box storage">
                             <i class="fa fa-cloud"></i>
                             <div>
-                                <em>{{data[range].storage}}</em>
+                                <em>{{data[curApp.name].metrics[range].storage}}</em>
                                 <span class="measure">GB</span>
                                 <span class="text">gigabytes / second</span>
                             </div>
@@ -64,16 +64,16 @@
                     <section>
                         <div>
                             <span class="lo-label">App Status</span>
-                            <span class="lo-field"><i class="circle"></i> Running</span>
+                            <span class="lo-field"><i class="circle" ng-style="{'background-color': data[curApp.name].status != 'Running' ? '#b46374' : ''}"></i> {{data[curApp.name].status}}</span>
                         </div>
                         <div>
                             <span class="lo-label">App Key</span>
-                            <span class="lo-field">jieu89-eiW38oskj</span>
+                            <span class="lo-field">{{data[curApp.name].appKey}}</span>
                             <button class="lo-icon-button" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy"><i class="fa fa-copy"></i><span>Copy</span></button>
                         </div>
                         <div>
                             <span class="lo-label">App Secret</span>
-                            <span class="lo-field">9iugjW39vnlz90ei9ejiDoi</span>
+                            <span class="lo-field">{{data[curApp.name].appSecret}}</span>
                             <button class="lo-icon-button" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy"><i class="fa fa-copy"></i><span>Copy</span></button>
                         </div>
                         <a href="#">View <strong>Security Settings</strong> »</a>
@@ -82,17 +82,15 @@
                         <div>
                             <span class="lo-label">Storage</span>
                             <ul>
-                                <li><span class="lo-field">MyFirstStorage</span></li>
-                                <li><span class="lo-field">MySecondStorage</span></li>
-                                <li><span class="lo-field">MyThirdStorage</span></li>
+                                <li ng-repeat="storage in data[curApp.name].storage"><span class="lo-field">{{storage}}</span></li>
                             </ul>
                         </div>
-                        <a href="#">View All <strong>Storage Resources</strong> »</a>
+                        <a href="#/applications/{{curApp.name}}/storage">View All <strong>Storage Resources</strong> »</a>
                     </section>
                     <section>
                         <div>
                             <span class="lo-label">Push Notifications</span>
-                            <span class="lo-field">Not Set Up</span>
+                            <span class="lo-field">{{data[curApp.name].push ? 'Set Up' : 'Not Set Up'}}</span>
                         </div>
                         <a href="#">View <strong>Push Settings</strong> »</a>
                     </section>

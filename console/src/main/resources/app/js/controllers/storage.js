@@ -22,3 +22,38 @@ loMod.controller('StorageCtrl', function($scope, $log, loStorage, Notifications)
   };
 
 });
+
+loMod.controller('StorageListCtrl', function($scope, $log, $routeParams) {
+
+  $log.debug('StorageListCtrl');
+
+  $scope.curApp.name = $routeParams.appId;
+
+  $scope.applications =
+  {
+    'My App': { 'storage': [{
+      'provider': 'Mongo DB',
+      'path': 'storage',
+      'host': '10.20.50.100',
+      'port': '27017',
+      'database': 'my_app'
+    }]},
+    'Other App': { 'storage': [
+      {
+        'provider': 'H2',
+        'path': 'storage-h2',
+        'host': '10.21.51.81',
+        'port': '9092',
+        'database': 'other_app_cache'
+      },
+      {
+        'provider': 'MySQL',
+        'path': 'storage-mysql',
+        'host': '10.21.51.82',
+        'port': '3306',
+        'database': 'other_app'
+      }
+    ]}
+  };
+
+});

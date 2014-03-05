@@ -24,6 +24,28 @@ loDirectives.directive('loNavigation', function () {
   };
 });
 
+loDirectives.directive('loAppSummary', function () {
+  return {
+    scope: {
+      app: '=loApp'
+    },
+    restrict: 'E',
+    replace: true,
+    templateUrl: '/admin/console/templates/lo-app-summary.html'
+  };
+});
+
+loDirectives.directive('loStorageSummary', function () {
+  return {
+    scope: {
+      storage: '=loStorage'
+    },
+    restrict: 'E',
+    replace: true,
+    templateUrl: '/admin/console/templates/lo-storage-summary.html'
+  };
+});
+
 loDirectives.directive('appVersion', ['version', function(version) {
   return function(scope, elm) {
     elm.text(version);

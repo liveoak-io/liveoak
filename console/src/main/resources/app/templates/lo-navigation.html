@@ -2,16 +2,16 @@
     <div class="dropdown">
         <a data-toggle="dropdown" class="dropdown-toggle" href="#">{{ loApp.name }}<b class="caret"></b></a>
         <ul class="dropdown-menu">
-            <li ng-repeat="app in loApps" ng-class="{active: app == loApp.name}"><a ng-href="#/applications/{{app}}/dashboard">{{ app }}</a></li>
+            <li ng-repeat="app in loApps" ng-class="{active: app == loApp.name}"><a ng-href="#/applications/{{app}}/{{loCurrent}}">{{ app }}</a></li>
         </ul>
     </div>
 
     <nav class="navbar navbar-vertical" role="navigation">
         <div class="bs-sidebar">
             <ul>
-                <li ng-class="{active: loCurrent == 'dashboard'}" class="dashboard"><a href="#"><i class="fa fa-tachometer fa-3x"></i>Dashboard</a></li>
+                <li ng-class="{active: loCurrent == 'dashboard'}" class="dashboard"><a href="#/applications/{{loApp.name}}/dashboard"><i class="fa fa-tachometer fa-3x"></i>Dashboard</a></li>
                 <li ng-class="{active: loCurrent == 'security'}" class="security"><a href="#"><i class="fa fa-lock fa-3x"></i>Security</a></li>
-                <li ng-class="{active: loCurrent == 'storage'}" class="storage"><a href="#"><i class="fa fa-cloud fa-3x"></i>Storage</a></li>
+                <li ng-class="{active: loCurrent == 'storage'}" class="storage"><a href="#/applications/{{loApp.name}}/storage"><i class="fa fa-cloud fa-3x"></i>Storage</a></li>
                 <li ng-class="{active: loCurrent == 'push'}" class="push"><a href="#"><i class="fa fa-mobile fa-4x"></i>Push</a></li>
             </ul>
         </div>

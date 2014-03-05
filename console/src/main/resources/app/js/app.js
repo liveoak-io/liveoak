@@ -13,15 +13,27 @@ var loMod = angular.module('loApp', [
 loMod.config(['$routeProvider', function($routeProvider) {
   $routeProvider
     .when('/', {
-      templateUrl : '/admin/console/partials/dashboard.html',
-      controller : 'DashboardCtrl'
+      // templateUrl : '/admin/console/partials/dashboard.html',
+      // controller : 'DashboardCtrl'
+      redirectTo: '/applications/My App/dashboard' // FIXME hardcoded
+    })
+    .when('/applications', {
+      templateUrl : '/admin/console/partials/applications.html',
+      controller : 'AppListCtrl'
     })
     .when('/applications/:appId', {
       redirectTo: '/applications/:appId/dashboard'
     })
+    .when('/applications/dashboard', {
+      redirectTo: '#/applications/My App/dashboard' // FIXME hardcoded
+    })
     .when('/applications/:appId/dashboard', {
       templateUrl : '/admin/console/partials/dashboard.html',
       controller : 'DashboardCtrl'
+    })
+    .when('/applications/:appId/storage', {
+      controller: 'StorageListCtrl',
+      templateUrl: '/admin/console/partials/storage-list.html'
     })
     .when('/applications/:appId/storage/create', {
       controller: 'StorageCtrl',
