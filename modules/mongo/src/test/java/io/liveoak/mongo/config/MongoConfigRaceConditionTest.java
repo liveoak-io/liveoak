@@ -3,6 +3,7 @@ package io.liveoak.mongo.config;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class MongoConfigRaceConditionTest extends BaseMongoConfigTest {
 
     @Test
+    @Ignore
     public void testConfigureCredentialCR() throws Exception {
         for (int i = 0; i < 4000 ; ++i) {
             if ( i % 100 == 0 ) {
