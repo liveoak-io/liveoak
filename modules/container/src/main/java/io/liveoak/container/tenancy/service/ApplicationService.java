@@ -98,7 +98,6 @@ public class ApplicationService implements Service<InternalApplication> {
         ApplicationResourcesService resources = new ApplicationResourcesService(resourcesTree);
 
         target.addService(LiveOak.application(this.id).append("resources"), resources)
-                .addDependency(LiveOak.application(this.id))
                 .addInjectionValue(resources.applicationInjector(), this)
                 .install();
     }
