@@ -7,6 +7,7 @@ import io.liveoak.spi.resource.async.Resource;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Bob McWhirter
@@ -60,5 +61,5 @@ public class SimpleResourceRegistry implements MountPointResource, RootResource,
 
     private Resource parent;
     private String id;
-    private Map<String, Resource> registry = new HashMap<>();
+    private Map<String, Resource> registry = new ConcurrentHashMap<>();
 }

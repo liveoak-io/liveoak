@@ -62,6 +62,14 @@ public class RootMongoConfigResource implements ConfigResource, RootResource {
     }
 
     @Override
+    public void stop() {
+        if ( this.mongoClient != null ) {
+            this.mongoClient.close();
+        }
+        this.mongoClient = null;
+    }
+
+    @Override
     public void readConfigProperties(RequestContext ctx, PropertySink sink, Resource resource) throws Exception {
         sink.accept("db", db.getName());
         sink.accept("servers", getServerAddresses() );

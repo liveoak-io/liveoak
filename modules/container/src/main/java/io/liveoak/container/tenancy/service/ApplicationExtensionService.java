@@ -31,6 +31,18 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
 
         ServiceTarget target = context.getChildTarget();
 
+        /*
+        target.addListener( new AbstractServiceListener<Object>() {
+            @Override
+            public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
+                System.err.println( controller.getName() + " :: " + transition );
+                if ( controller.getStartException() != null ) {
+                    controller.getStartException().printStackTrace();
+                }
+            }
+        });
+        */
+
         this.appExtension = new InternalApplicationExtension(
                 this.serviceRegistryInjector.getValue(),
                 this.applicationInjector.getValue(),
