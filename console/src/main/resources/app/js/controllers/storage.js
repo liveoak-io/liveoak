@@ -6,18 +6,29 @@ loMod.controller('StorageCtrl', function($scope, $log, loStorage, Notifications)
 
   $log.debug('StorageCtrl');
 
+  $scope.changed = false;
+
   $scope.storageModel = loStorage;
-  var storageModelCopy = angular.copy(loStorage);
+  var storageModelBackup = angular.copy(loStorage);
 
   $scope.clear = function(){
-    $scope.storageModel = angular.copy(storageModelCopy);
+    $scope.storageModel = angular.copy(storageModelBackup);
+    $scope.changed = false;
   };
+
+  $scope.$watch('storageModel', function() {
+    if (!angular.equals($scope.storageModel, storageModelBackup)) {
+      $scope.changed = true;
+    }
+  }, true);
 
   $scope.save = function(){
     if(!angular.equals($scope.storageModel.passwd, $scope.passwdConfirm)){
       Notifications.error('Password does not match the password confirmation.');
     } else {
       Notifications.success('New storage successfully created.');
+      storageModelBackup = angular.copy($scope.storageModel);
+      $scope.changed = false;
     }
   };
 
