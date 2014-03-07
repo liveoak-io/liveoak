@@ -15,3 +15,5 @@ epom
 log
 .DS_Store
 phantomjsdriver.log
+/launcher/data
+/launcher/conf/extensions/mongoLauncher.json

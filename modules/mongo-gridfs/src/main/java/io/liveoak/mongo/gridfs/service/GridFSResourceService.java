@@ -1,8 +1,6 @@
 package io.liveoak.mongo.gridfs.service;
 
-import com.mongodb.DB;
 import io.liveoak.mongo.config.RootMongoConfigResource;
-import io.liveoak.mongo.gridfs.GridFSResource;
 import io.liveoak.mongo.gridfs.GridFSRootResource;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
