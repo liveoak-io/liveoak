@@ -2,7 +2,6 @@ package io.liveoak.container.subscriptions.resource;
 
 import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.common.codec.ResourceCodecManager;
-import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.subscriptions.DefaultSubscriptionManager;
 import io.liveoak.container.subscriptions.HttpSubscription;
 import io.liveoak.container.subscriptions.StompSubscription;
@@ -85,14 +84,17 @@ public class ApplicationSubscriptionsResource implements SynchronousResource, Ro
 
     @Override
     public Collection<? extends Resource> members() {
-        return subscriptionManager.treeFor(applicationResourcePath()).subscriptions().map((e) -> {
-            if (e instanceof StompSubscription) {
-                return new StompSubscriptionResource(this, (StompSubscription) e);
-            } else if (e instanceof HttpSubscription) {
-                return new HttpSubscriptionResource(this, (HttpSubscription) e);
+        return subscriptionManager.treeFor(applicationResourcePath()).subscriptions().map( ( e ) -> {
+            if ( e instanceof StompSubscription ) {
+                return new StompSubscriptionResource( this, ( StompSubscription ) e );
+            } else if ( e instanceof HttpSubscription ) {
+                return new HttpSubscriptionResource( this, ( HttpSubscription ) e );
+            } else if ( e instanceof Resource) {
+                return (Resource) e;
+            } else {
+                return new BasicSubscriptionResource( this, e );
             }
-            return null;
-        }).collect(Collectors.toList());
+        } ).collect( Collectors.toList() );
     }
 
     @Override
@@ -108,6 +110,10 @@ public class ApplicationSubscriptionsResource implements SynchronousResource, Ro
                 return new HttpSubscriptionResource( this, (HttpSubscription) subscription);
             } else if ( subscription instanceof StompSubscription ) {
                 return new StompSubscriptionResource( this, (StompSubscription) subscription);
+            } else if (subscription instanceof Resource) {
+                return (Resource) subscription;
+            }  else {
+                return new BasicSubscriptionResource( this, subscription);
             }
         }
 

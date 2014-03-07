@@ -14,10 +14,7 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -211,6 +208,12 @@ public class HTMLEncoder implements StateEncoder {
         }
 
         endTag("dl");
+    }
+
+
+    @Override
+    public void writeNullValue() throws Exception {
+        text(""); //Set the value to empty since a null value cannot be represented in html
     }
 
     @Override

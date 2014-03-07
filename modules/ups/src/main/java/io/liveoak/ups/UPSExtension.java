@@ -1,0 +1,42 @@
+package io.liveoak.ups;
+
+import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.container.SubscriptionManager;
+import io.liveoak.spi.extension.ApplicationExtensionContext;
+import io.liveoak.spi.extension.Extension;
+import io.liveoak.spi.extension.SystemExtensionContext;
+import io.liveoak.ups.resource.config.UPSRootConfigResource;
+
+/**
+ * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+ */
+public class UPSExtension implements Extension {
+
+    @Override
+    public void extend( SystemExtensionContext context ) throws Exception {
+        //Do nothing for now
+    }
+
+    @Override
+    public void extend( ApplicationExtensionContext context ) throws Exception {
+        // create the configuration resource for the UPSRootResource
+        UPSRootConfigResource upsRootConfigResource = new UPSRootConfigResource( context.resourceId() );
+        // making changes to the configuration is restricted and must be added under private
+        context.mountPrivate(upsRootConfigResource);
+
+        // setup the main UPSRootResource and add in its dependency on the SubscriptionManager
+        UPSResourceService upsResourceService = new UPSResourceService(context.resourceId());
+        context.target().addService( LiveOak.resource( context.application().id(), context.resourceId() ), upsResourceService )
+                .addDependency( LiveOak.SUBSCRIPTION_MANAGER, SubscriptionManager.class, upsResourceService.subscriptionManagerInjector )
+                .addInjection( upsResourceService.configResourceInjector, upsRootConfigResource )
+                .install();
+
+        context.mountPublic( LiveOak.resource( context.application().id(), context.resourceId() ));
+
+    }
+
+    @Override
+    public void unextend( ApplicationExtensionContext context ) throws Exception {
+        //Do nothing for now
+    }
+}
