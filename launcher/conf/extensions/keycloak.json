@@ -1,8 +1,6 @@
 {
     module-id: 'io.liveoak.keycloak',
     config: {
-        host: 'localhost',
-        port: 8383,
         model: 'jpa'
     }
 }

@@ -36,7 +36,7 @@ public class KeycloakRestartTest extends AbstractResourceTestCase {
 
     @Override
     public void loadExtensions() throws Exception {
-        loadExtension( "auth", new KeycloakExtension(), createKeycloakConfig("localhost", 8383, "mongo"));
+        loadExtension( "auth", new KeycloakExtension(), createKeycloakConfig("mongo"));
     }
 
     @Before
@@ -54,32 +54,25 @@ public class KeycloakRestartTest extends AbstractResourceTestCase {
         RequestContext requestContext = new RequestContext.Builder().build();
 
         // First check that Keycloak is available under localhost:8383 and KeycloakSessionFactory is instance of Mongo
-        UndertowServer undertow1 = (UndertowServer)system.service(KeycloakServices.undertow("auth"));
         KeycloakSessionFactory sessionFactory = (KeycloakSessionFactory)system.service(KeycloakServices.sessionFactory("auth"));
         Assert.assertTrue(sessionFactory instanceof MongoKeycloakSessionFactory);
         Assert.assertTrue(isUriAvailable("localhost", 8383));
 
         // Update keycloak configuration to use localhost:8384 and JPA
-        client.update(requestContext, "/admin/system/auth", ConversionUtils.convert(createKeycloakConfig("localhost", 8384, "jpa")));
+        client.update(requestContext, "/admin/system/auth", ConversionUtils.convert(createKeycloakConfig("jpa")));
 
-        // Verify that undertow is changed and KeycloakSessionFactory is now JPA. Verify that instance of UndertowServer is different as well
-        UndertowServer undertow2 = (UndertowServer)system.service(KeycloakServices.undertow("auth"));
         sessionFactory = (KeycloakSessionFactory)system.service(KeycloakServices.sessionFactory("auth"));
 
-        Assert.assertFalse(undertow1.equals(undertow2));
         Assert.assertTrue(sessionFactory instanceof JpaKeycloakSessionFactory);
-        Assert.assertFalse(isUriAvailable("localhost", 8383));
-        Assert.assertTrue(isUriAvailable("localhost", 8384));
+        Assert.assertTrue(isUriAvailable("localhost", 8383));
 
         // Update just model to be Mongo, but keep same host,port
-        client.update(requestContext, "/admin/system/auth", ConversionUtils.convert(createKeycloakConfig("localhost", 8384, "mongo")));
+        client.update(requestContext, "/admin/system/auth", ConversionUtils.convert(createKeycloakConfig("mongo")));
 
-        // Verify that undertow is not changed, just instance of KeycloakSessionFactory is changed to mongo
-        UndertowServer undertow3 = (UndertowServer)system.service(KeycloakServices.undertow("auth"));
+        // Verify instance of KeycloakSessionFactory is changed to mongo
         sessionFactory = (KeycloakSessionFactory)system.service(KeycloakServices.sessionFactory("auth"));
-        Assert.assertTrue(undertow3.equals(undertow2));
         Assert.assertTrue(sessionFactory instanceof MongoKeycloakSessionFactory);
-        Assert.assertTrue(isUriAvailable("localhost", 8384));
+        Assert.assertTrue(isUriAvailable("localhost", 8383));
     }
 
     private boolean isUriAvailable(String host, int port) throws IOException {
@@ -98,10 +91,8 @@ public class KeycloakRestartTest extends AbstractResourceTestCase {
         }
     }
 
-    private ObjectNode createKeycloakConfig(String host, int port, String model) {
+    private ObjectNode createKeycloakConfig(String model) {
         ObjectNode config = JsonNodeFactory.instance.objectNode();
-        config.put(KeycloakSystemResource.HOST, host);
-        config.put(KeycloakSystemResource.PORT, port);
         config.put(KeycloakSystemResource.MODEL, model);
         return config;
     }
