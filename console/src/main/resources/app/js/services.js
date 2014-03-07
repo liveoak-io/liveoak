@@ -53,52 +53,57 @@ angular.module('services.breadcrumbs').factory('breadcrumbs', ['$rootScope', '$l
   return breadcrumbsService;
 }]);
 
-loMod.factory('Notifications', function($rootScope, $timeout) {
+loMod.factory('Notifications', function($rootScope, $timeout, $log) {
   // time (in ms) the notifications are shown
   var delay = 5000;
 
   var notifications = {};
 
-  var scheduled = null;
-  var schedulePop = function() {
-    if (scheduled) {
-      $timeout.cancel(scheduled);
-    }
+  $rootScope.notifications = {};
+  $rootScope.notifications.data = [];
 
-    scheduled = $timeout(function() {
-      $rootScope.notification = null;
-      scheduled = null;
+  $rootScope.notifications.remove = function(index){
+    $rootScope.notifications.data.splice(index,1);
+  };
+
+  var scheduleMessagePop = function() {
+    $timeout(function() {
+      $rootScope.notifications.data.splice(0,1);
     }, delay);
   };
 
   if (!$rootScope.notifications) {
-    $rootScope.notifications = [];
+    $rootScope.notifications.data = [];
   }
 
   notifications.message = function(type, header, message) {
-    $rootScope.notification = {
+    $rootScope.notifications.data.push({
       type : type,
       header: header,
       message : message
-    };
+    });
 
-    schedulePop();
+    scheduleMessagePop();
   };
 
   notifications.info = function(message) {
     notifications.message('info', 'Info!', message);
+    $log.info(message);
   };
 
   notifications.success = function(message) {
     notifications.message('success', 'Success!', message);
+    $log.info(message);
   };
 
   notifications.error = function(message) {
     notifications.message('danger', 'Error!', message);
+    $log.error(message);
   };
 
   notifications.warn = function(message) {
     notifications.message('warning', 'Warning!', message);
+    $log.warn(message);
   };
 
   return notifications;
