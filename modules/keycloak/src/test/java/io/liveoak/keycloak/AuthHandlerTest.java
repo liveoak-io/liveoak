@@ -10,10 +10,14 @@ import io.liveoak.keycloak.extension.KeycloakExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.SecurityContext;
-import io.liveoak.testtools.AbstractResourceTestCase;
 import io.liveoak.testtools.MockExtension;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
@@ -22,7 +26,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.keycloak.models.RealmModel;
-import org.keycloak.representations.SkeletonKeyToken;
+import org.keycloak.representations.AccessToken;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,7 +82,7 @@ public class AuthHandlerTest extends AbstractKeycloakTest {
     @Test(timeout = 10000)
     public void testAuth() throws Exception {
         System.err.println("******************");
-        SkeletonKeyToken token = tokenUtil.createToken();
+        AccessToken token = tokenUtil.createToken();
 
         HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/testApp/auth-test");
         httpMethod.addHeader(new BasicHeader("Authorization", "bearer " + tokenUtil.toString(token)));
@@ -94,7 +98,7 @@ public class AuthHandlerTest extends AbstractKeycloakTest {
 
     @Test(timeout = 10000)
     public void testAuthExpired() throws Exception {
-        SkeletonKeyToken token = tokenUtil.createToken();
+        AccessToken token = tokenUtil.createToken();
         token.expiration((System.currentTimeMillis() / 1000) - 10);
 
         HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/testApp/auth-test");

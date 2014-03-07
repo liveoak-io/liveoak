@@ -57,7 +57,7 @@
         <dom4j.version>1.6.1</dom4j.version>
         <javassist.version>3.18.1-GA</javassist.version>
         <antlr.version>2.7.7</antlr.version>
-        <keycloak.version>1.0-alpha-2</keycloak.version>
+        <keycloak.version>1.0-alpha-3</keycloak.version>
         <resteasy.version>3.0.6.Final</resteasy.version>
         <undertow.version>1.0.0.Beta30</undertow.version>
         <jboss.xnio.version>3.2.0.Beta3</jboss.xnio.version>

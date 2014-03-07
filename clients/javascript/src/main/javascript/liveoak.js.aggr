@@ -1,4 +1,4 @@
-require auth/client.js
+require auth/keycloak.js
 require http/client.js
 require stomp/client.js
 require stomp/transport/websocket.js

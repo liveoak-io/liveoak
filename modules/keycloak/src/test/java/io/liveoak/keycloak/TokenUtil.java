@@ -1,10 +1,8 @@
 package io.liveoak.keycloak;
 
 import org.keycloak.jose.jws.JWSBuilder;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
-import org.keycloak.representations.SkeletonKeyToken;
+import org.keycloak.representations.AccessToken;
 import org.keycloak.util.JsonSerialization;
 
 import java.security.PrivateKey;
@@ -24,23 +22,23 @@ public class TokenUtil {
         realm = realmModel.getName();
     }
 
-    public SkeletonKeyToken createToken() {
-        SkeletonKeyToken token = new SkeletonKeyToken();
+    public AccessToken createToken() {
+        AccessToken token = new AccessToken();
         token.id("token-id");
-        token.principal("user-id");
+        token.subject("user-id");
         token.audience(realm);
         token.expiration(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(300));
         token.issuedFor("app-id");
         token.issuedNow();
 
-        token.setRealmAccess(new SkeletonKeyToken.Access().roles(Collections.singleton("realm-role")));
+        token.setRealmAccess(new AccessToken.Access().roles(Collections.singleton("realm-role")));
         token.addAccess("app-id").roles(Collections.singleton("app-role"));
         token.addAccess("app2-id").roles(Collections.singleton("app-role"));
 
         return token;
     }
 
-    public String toString(SkeletonKeyToken token) throws Exception {
+    public String toString(AccessToken token) throws Exception {
         byte[] tokenBytes = JsonSerialization.writeValueAsBytes(token);
         return new JWSBuilder().content(tokenBytes).rsa256(privateKey);
     }

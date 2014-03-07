@@ -7,7 +7,7 @@ import org.keycloak.RSATokenVerifier;
 import org.keycloak.VerificationException;
 import org.keycloak.models.RealmModel;
 import org.keycloak.representations.JsonWebToken;
-import org.keycloak.representations.SkeletonKeyToken;
+import org.keycloak.representations.AccessToken;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -40,7 +40,7 @@ public class TokenResource implements Resource {
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
 
         try {
-            SkeletonKeyToken token = RSATokenVerifier.verifyToken(id, realmModel.getPublicKey(), realmModel.getName());
+            AccessToken token = RSATokenVerifier.verifyToken(id, realmModel.getPublicKey(), realmModel.getName());
 
             sink.accept("realm", token.getAudience());
             sink.accept("subject", token.getSubject());
@@ -48,16 +48,16 @@ public class TokenResource implements Resource {
 
             Set<String> roles = new HashSet<>();
 
-            SkeletonKeyToken.Access realmAccess = token.getRealmAccess();
+            AccessToken.Access realmAccess = token.getRealmAccess();
             if (realmAccess != null && realmAccess.getRoles() != null) {
                 for (String r : realmAccess.getRoles()) {
                     roles.add(r);
                 }
             }
 
-            Map<String, SkeletonKeyToken.Access> resourceAccess = token.getResourceAccess();
+            Map<String, AccessToken.Access> resourceAccess = token.getResourceAccess();
             if (resourceAccess != null) {
-                for (Map.Entry<String, SkeletonKeyToken.Access> e : resourceAccess.entrySet()) {
+                for (Map.Entry<String, AccessToken.Access> e : resourceAccess.entrySet()) {
                     if (e.getValue().getRoles() != null) {
                         for (String r : e.getValue().getRoles()) {
                             roles.add(e.getKey().replace('/', '-') + "/" + r.replace('/', '-'));

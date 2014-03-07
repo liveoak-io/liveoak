@@ -47,14 +47,9 @@ var LiveOak = function( options ) {
     };
 
     if (options.auth) {
-        if (!options.auth.host) {
-            options.auth.host = options.host;
-        }
-        if (!options.auth.port) {
-            options.auth.port = options.port ? options.port + 303 : 8383;
-        }
-        if (!options.auth.secure) {
-            options.auth.secure = options.secure;
+        if (!options.auth.url) {
+            var port = options.port ? options.port + 303 : 8383;
+            options.auth.url = (options.secure ? 'https://' : 'http://') + options.host + ':' + port;
         }
 
         this.auth = new Keycloak(options.auth);

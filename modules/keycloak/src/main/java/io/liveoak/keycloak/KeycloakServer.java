@@ -12,6 +12,7 @@ import io.undertow.servlet.api.ServletInfo;
 import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.keycloak.models.ApplicationModel;
+import org.keycloak.models.Config;
 import org.keycloak.models.Constants;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
@@ -51,6 +52,13 @@ public class KeycloakServer {
 
     public KeycloakServer(UndertowServer undertow) {
         this.undertow = undertow;
+
+        Config.setAdminRealm("liveoak-admin");
+        Config.setThemeDefault("liveoak");
+
+        if (Config.getModelProvider() == null) {
+            Config.setModelProvider("mongo");
+        }
     }
 
     public KeycloakSessionFactory getKeycloakSessionFactory() {
@@ -64,7 +72,7 @@ public class KeycloakServer {
         try {
             RealmManager manager = new RealmManager(session);
 
-            RealmModel adminRealm = manager.getRealm(Constants.ADMIN_REALM);
+            RealmModel adminRealm = manager.getRealm(Config.getAdminRealm());
 
             // No need to require admin to change password as this server is for dev/test
             adminRealm.getUser("admin").removeRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
@@ -72,20 +80,13 @@ public class KeycloakServer {
             if (adminRealm.getApplicationByName("console") == null) {
                 // Create Application in realm for console and initialize it
                 ApplicationModel consoleApp = new ApplicationManager(manager).createApplication(adminRealm, "console");
+                consoleApp.setPublicClient(true);
+
                 consoleApp.addDefaultRole("user");
                 consoleApp.addRole("admin");
 
-                UserModel consoleAppClient = consoleApp.getApplicationUser();
-                consoleAppClient.addRedirectUri("http://localhost:8080/admin");
-                consoleAppClient.addWebOrigin("http://localhost:8080");
-
-                // Likely a bug in ApplianceBootstrap as currently it requires 'password' TODO: Remove
-                adminRealm.updateRequiredApplicationCredentials(Collections.EMPTY_SET);
-                adminRealm.addRequiredResourceCredential(CredentialRepresentation.SECRET);
-
-                // Just for development to use hardcoded client_secret instead of generated TODO: Remove and find better solution
-                UserCredentialModel secret = UserCredentialModel.secret("password");
-                adminRealm.updateCredential(consoleAppClient, secret);
+                consoleApp.addRedirectUri("http://localhost:8080/admin");
+                consoleApp.addWebOrigin("http://localhost:8080");
             }
 
             session.getTransaction().commit();

@@ -2,6 +2,7 @@ package io.liveoak.keycloak.theme;
 
 import org.keycloak.freemarker.Theme;
 import org.keycloak.freemarker.ThemeProvider;
+import org.keycloak.theme.ClassLoaderTheme;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -29,7 +30,7 @@ public class LiveOakLoginThemeProvider implements ThemeProvider {
     @Override
     public Theme createTheme(String name, Theme.Type type) throws IOException {
         if (hasTheme(name, type)) {
-            return new DummyClassLoaderTheme(name, type);
+            return new ClassLoaderTheme(name, type, getClass().getClassLoader());
         } else {
             return null;
         }
