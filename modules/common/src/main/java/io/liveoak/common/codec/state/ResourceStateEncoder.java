@@ -6,7 +6,6 @@
 package io.liveoak.common.codec.state;
 
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.common.codec.Encoder;
 import io.liveoak.common.codec.ResourceEncoder;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
@@ -156,6 +155,11 @@ public class ResourceStateEncoder implements ResourceEncoder {
     @Override
     public void writeValue(Map value) throws Exception {
         write(value);
+    }
+
+    @Override
+    public void writeNullValue() throws Exception {
+        write(null);
     }
 
     @Override

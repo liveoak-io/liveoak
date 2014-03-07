@@ -55,4 +55,6 @@ public interface Encoder<Obj> extends AutoCloseable {
 
     void writeValue(Map value) throws Exception;
 
+    void writeNullValue() throws Exception;
+
 }

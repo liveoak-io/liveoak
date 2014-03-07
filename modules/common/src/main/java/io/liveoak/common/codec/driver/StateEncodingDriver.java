@@ -1,13 +1,9 @@
 
 package io.liveoak.common.codec.driver;
 
-import io.liveoak.common.codec.Encoder;
 import io.liveoak.common.codec.NonEncodableValueException;
-import io.liveoak.common.codec.ResourceEncoder;
 import io.liveoak.common.codec.StateEncoder;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ReturnFields;
-import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 
 import java.net.URI;
@@ -97,12 +93,10 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
             encoder().writeValue( ( Map ) value );
         } else if (value instanceof Collection ) {
             encodeList((Collection)value);
+        } else if (value == null) {
+            encoder().writeNullValue();
         } else {
-            if (value == null) {
-                throw new NonEncodableValueException(value);
-            } else {
-                throw new NonEncodableValueException(value);
-            }
+            throw new NonEncodableValueException(value);
         }
     }
 

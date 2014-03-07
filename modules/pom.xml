@@ -110,5 +110,6 @@
         <module>security</module>
         <module>security-uripolicy</module>
         <module>security-aclpolicy</module>
+        <module>ups</module>
     </modules>
 </project>

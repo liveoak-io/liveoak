@@ -1,8 +1,5 @@
 package io.liveoak.mongo.gridfs.extension;
 
-import com.mongodb.DB;
-import io.liveoak.mongo.MongoServices;
-import io.liveoak.mongo.RootMongoResource;
 import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.mongo.gridfs.service.GridFSResourceService;

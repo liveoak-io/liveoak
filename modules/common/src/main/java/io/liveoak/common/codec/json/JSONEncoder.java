@@ -146,6 +146,11 @@ public class JSONEncoder implements StateEncoder {
         this.generator.writeNumber(value.getTime());
     }
 
+    @Override
+    public void writeNullValue() throws Exception {
+        this.generator.writeNull();
+    }
+
     protected void writeValue(Object value) throws Exception {
         if ( value instanceof String ) {
             writeValue( (String) value );

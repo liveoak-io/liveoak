@@ -50,6 +50,7 @@
         <hibernate.annotations.version>4.0.2.Final</hibernate.annotations.version>
         <hibernate.jpa.version>1.0.0.Final</hibernate.jpa.version>
         <picketlink.version>2.5.0.Beta6</picketlink.version>
+        <aerogear.ups.version>0.5.0</aerogear.ups.version>
         <net.iharder.base64.version>2.3.8</net.iharder.base64.version>
         <jboss.spec.javax.servlet.version>1.0.0.Final</jboss.spec.javax.servlet.version>
         <jboss.spec.javax.transaction.version>1.0.0.Final</jboss.spec.javax.transaction.version>
@@ -542,6 +543,11 @@
                 <groupId>org.jboss.spec.javax.servlet</groupId>
                 <artifactId>jboss-servlet-api_3.1_spec</artifactId>
                 <version>${jboss.spec.javax.servlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.aerogear</groupId>
+                <artifactId>unifiedpush-java-client</artifactId>
+                <version>${aerogear.ups.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>

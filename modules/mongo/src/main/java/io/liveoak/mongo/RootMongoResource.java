@@ -7,8 +7,6 @@ package io.liveoak.mongo;
 
 import com.mongodb.*;
 import io.liveoak.mongo.config.RootMongoConfigResource;
-import io.liveoak.spi.InitializationException;
-import com.mongodb.*;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceProcessingException;
@@ -18,9 +16,6 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-
-import java.util.UUID;
-import java.util.stream.Stream;
 
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -64,7 +59,6 @@ public class RootMongoResource extends MongoResource implements RootResource {
         this.parent = parent;
     }
 
-    //@Override
     @Override
     public String id() {
         return this.id;

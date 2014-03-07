@@ -40,12 +40,10 @@ public class ValueEncodingDriver extends AbstractEncodingDriver {
             encoder().writeValue((Boolean) o);
         } else if (o instanceof Map) {
             encoder().writeValue((Map) o);
+        } else if (o == null) {
+            encoder().writeNullValue();
         } else {
-            if (o == null) {
-                throw new NonEncodableValueException(o);
-            } else {
-                throw new NonEncodableValueException(o);
-            }
+            throw new NonEncodableValueException(o);
         }
         close();
     }
