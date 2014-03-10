@@ -59,7 +59,7 @@ public class MongoLauncherTest extends AbstractTestCase {
         mongo.startMongo();
 
         // give it a few seconds to start
-        checkPortReady(mongoPort, 10000);
+        checkPortReady(mongoPort, 120000);
 
         DBCollection collection = null;
         try {
