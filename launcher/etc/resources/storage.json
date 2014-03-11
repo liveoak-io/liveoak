@@ -1,8 +1,0 @@
-{
-    type: 'jboss-module',
-    module-id:  'io.liveoak.mongo',
-    class-name: 'io.liveoak.mongo.RootMongoResource',
-    config: {
-        db: 'mboss'
-    }
-}

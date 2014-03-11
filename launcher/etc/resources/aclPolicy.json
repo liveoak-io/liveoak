@@ -1,8 +1,0 @@
-{
-    type: 'jboss-module',
-    module-id: 'io.liveoak.security.aclpolicy',
-    class-name: 'io.liveoak.security.policy.acl.AclPolicyRootResource',
-    config: {
-        policy-config: '${user.dir}/acl-policy-config.json'
-    }
-}

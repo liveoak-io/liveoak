@@ -1,7 +1,0 @@
-{
-    type: 'jboss-module',
-    module-id:  'io.liveoak.scheduler',
-    class-name: 'io.liveoak.scheduler.SchedulerResource',
-    config: {
-    }
-}

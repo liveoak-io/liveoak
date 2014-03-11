@@ -1,8 +1,0 @@
-{
-    type: 'jboss-module',
-    module-id: 'io.liveoak.security',
-    class-name: 'io.liveoak.security.integration.AuthzServiceRootResource',
-    config: {
-        authz-config: '${user.dir}/authz-config.json'
-    }
-}
