@@ -99,7 +99,6 @@
         <module>container</module>
         <module>autosetup</module>
 
-        <module>zero</module>
         <module>mongo</module>
         <module>mongo-gridfs</module>
         <module>mongo-launcher</module>
