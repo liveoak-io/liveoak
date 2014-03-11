@@ -12,7 +12,7 @@
 
         <!-- Aerogear UPS Client Dependencies --> 
         <artifact name="org.jboss.aerogear:unifiedpush-java-client:${aerogear.ups.version}"/>
-        <artifact name="org.jboss.resteasy:resteasy-jackson-provider:2.3.2.Final"/> 
+        <artifact name="org.jboss.resteasy:resteasy-jackson-provider:3.0.6.Final"/>
         <artifact name="org.codehaus.jackson:jackson-core-asl:1.9.12"/> 
         <artifact name="org.codehaus.jackson:jackson-mapper-asl:1.9.12"/> 
         <artifact name="net.iharder:base64:2.3.8"/>
