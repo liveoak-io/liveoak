@@ -17,3 +17,5 @@ log
 phantomjsdriver.log
 /launcher/data
 /launcher/conf/extensions/mongoLauncher.json
+/testsuite/src/test/test-configurations/*/conf/extensions/mongoLauncher.json
+/testsuite/src/test/test-configurations/*/data
