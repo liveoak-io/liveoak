@@ -73,7 +73,6 @@ public class SimpleStompServer {
         };
     }
 
-
     public void stop() throws InterruptedException {
         Future<?> future = this.group.shutdownGracefully();
         future.sync();

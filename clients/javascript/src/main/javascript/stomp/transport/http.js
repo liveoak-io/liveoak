@@ -151,6 +151,11 @@ Stomp.Transport.HTTP.prototype = {
         request.send(data);
     },
 
+    setAuth: function(login, passcode) {
+      this._login = login;
+      this._passcode = passcode;
+    },
+
     _url: function () {
         if (this._secure) {
             return "https://" + this._host + ":" + this._port + "/";

@@ -41,4 +41,6 @@ public interface Headers {
     public static final String SERVER = "server";
     public static final String MESSAGE = "message";
     public static final String HEARTBEAT = "heart-beat";
+    public static final String LOGIN = "login";
+    public static final String PASSCODE = "passcode";
 }

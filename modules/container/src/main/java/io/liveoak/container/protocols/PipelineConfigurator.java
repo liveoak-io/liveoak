@@ -12,6 +12,7 @@ import io.liveoak.container.ResourceHandler;
 import io.liveoak.container.ResourceStateHandler;
 import io.liveoak.container.auth.AuthHandler;
 import io.liveoak.container.auth.AuthzHandler;
+import io.liveoak.container.auth.SecuredStompServerContext;
 import io.liveoak.container.interceptor.InterceptorHandler;
 import io.liveoak.container.interceptor.InterceptorManager;
 import io.liveoak.container.protocols.http.*;
@@ -100,7 +101,7 @@ public class PipelineConfigurator {
     public void switchToPureStomp(ChannelPipeline pipeline) {
         pipeline.remove(ProtocolDetector.class);
 
-        StompServerContext serverContext = new ContainerStompServerContext(this.codecManager, this.subscriptionManager);
+        StompServerContext serverContext = new SecuredStompServerContext(this.codecManager, this.subscriptionManager, this.client);
 
         pipeline.addLast(new StompFrameDecoder());
         pipeline.addLast(new StompFrameEncoder());
@@ -140,7 +141,7 @@ public class PipelineConfigurator {
         pipeline.addLast(new WebSocketStompFrameDecoder());
         pipeline.addLast(new WebSocketStompFrameEncoder());
 
-        StompServerContext serverContext = new ContainerStompServerContext(this.codecManager, this.subscriptionManager);
+        StompServerContext serverContext = new SecuredStompServerContext(this.codecManager, this.subscriptionManager, this.client);
 
         // handle frames
         pipeline.addLast(new ConnectHandler(serverContext));

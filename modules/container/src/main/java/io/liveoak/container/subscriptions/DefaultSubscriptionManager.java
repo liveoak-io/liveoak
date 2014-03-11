@@ -30,36 +30,48 @@ public class DefaultSubscriptionManager implements SubscriptionManager {
     public void resourceCreated(ResourceResponse resourceResponse) {
         ResourcePath path = resourcePathOf(resourceResponse.resource());
         this.tree.subscriptions(path).forEach((subscription) -> {
-            try {
-                subscription.resourceCreated(resourceResponse);
-            } catch (Exception e) {
-                log.error("", e);
-            }
+            subscribeResourceCreated(path, subscription, resourceResponse);
         });
+    }
+
+    protected void subscribeResourceCreated(ResourcePath path, Subscription subscription, ResourceResponse resourceResponse) {
+        try {
+            subscription.resourceCreated(resourceResponse);
+        } catch (Exception e) {
+            log.error("", e);
+        }
     }
 
     @Override
     public void resourceUpdated(ResourceResponse resourceResponse) {
         ResourcePath path = resourcePathOf(resourceResponse.resource());
         this.tree.subscriptions(path).forEach((subscription) -> {
-            try {
-                subscription.resourceUpdated(resourceResponse);
-            } catch (Exception e) {
-                log.error("", e);
-            }
+            subscribeResourceUpdated(path, subscription, resourceResponse);
         });
+    }
+
+    protected void subscribeResourceUpdated(ResourcePath path, Subscription subscription, ResourceResponse resourceResponse) {
+        try {
+            subscription.resourceUpdated(resourceResponse);
+        } catch (Exception e) {
+            log.error("", e);
+        }
     }
 
     @Override
     public void resourceDeleted(ResourceResponse resourceResponse) {
         ResourcePath path = resourcePathOf(resourceResponse.resource());
         this.tree.subscriptions(path).forEach((subscription) -> {
-            try {
-                subscription.resourceDeleted(resourceResponse);
-            } catch (Exception e) {
-                log.error("", e);
-            }
+            subscribeResourceDeleted(path, subscription, resourceResponse);
         });
+    }
+
+    protected void subscribeResourceDeleted(ResourcePath path, Subscription subscription, ResourceResponse resourceResponse) {
+        try {
+            subscription.resourceDeleted(resourceResponse);
+        } catch (Exception e) {
+            log.error("", e);
+        }
     }
 
     protected ResourcePath resourcePathOf(Resource resource) {

@@ -9,8 +9,10 @@ import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.StompMessage;
 import io.liveoak.stomp.common.DefaultStompMessage;
 import io.liveoak.stomp.server.StompServerException;
+import io.liveoak.stomp.server.StompServerSecurityException;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.logging.Logger;
 
 /**
@@ -26,10 +28,21 @@ public class StompErrorHandler extends ChannelDuplexHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.error("", cause);
+        int status = HttpResponseStatus.INTERNAL_SERVER_ERROR.code();
+
+        if (cause instanceof StompServerSecurityException) {
+            StompServerSecurityException securityException = (StompServerSecurityException) cause;
+            log.warn("Not authorized. status: " + securityException.getStatus() +
+                    ", command: " + securityException.getCommand() +
+                    ", receiptId: " + securityException.getReceiptId() +
+                    ", message: " + securityException.getMessage());
+            status = securityException.getStatus();
+        } else {
+            log.error("", cause);
+        }
         StompMessage errorMessage = new DefaultStompMessage(true);
 
-        errorMessage.headers().put("status", "500");
+        errorMessage.headers().put("status", String.valueOf(status));
 
         if (cause instanceof StompServerException) {
             errorMessage.content(cause.getMessage());

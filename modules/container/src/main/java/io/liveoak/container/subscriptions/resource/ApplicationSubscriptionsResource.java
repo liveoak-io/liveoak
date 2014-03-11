@@ -8,6 +8,7 @@ import io.liveoak.container.subscriptions.StompSubscription;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.container.Subscription;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
@@ -74,7 +75,8 @@ public class ApplicationSubscriptionsResource implements SynchronousResource, Ro
             httpClient.setHost(destinationUri.getHost());
             httpClient.setPort(destinationUri.getPort());
 
-            HttpSubscription sub = new HttpSubscription(httpClient, path, destinationUri, codec);
+            SecurityContext requestSecurityContext = ctx.securityContext();
+            HttpSubscription sub = new HttpSubscription(httpClient, path, destinationUri, codec, requestSecurityContext);
             this.subscriptionManager.addSubscription(sub);
             responder.resourceCreated(new HttpSubscriptionResource(this, sub));
         } catch (URISyntaxException e) {

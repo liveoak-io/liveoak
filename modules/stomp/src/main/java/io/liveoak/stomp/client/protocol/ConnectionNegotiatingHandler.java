@@ -37,6 +37,14 @@ public class ConnectionNegotiatingHandler extends AbstractControlFrameHandler {
         StompControlFrame connectFrame = new StompControlFrame(Stomp.Command.CONNECT);
         connectFrame.headers().put(Headers.HOST, this.clientContext.getHost());
         connectFrame.headers().put(Headers.ACCEPT_VERSION, Stomp.Version.supportedVersions());
+
+        if (this.clientContext.getLogin() != null) {
+            connectFrame.headers().put(Headers.LOGIN, this.clientContext.getLogin());
+        }
+        if (this.clientContext.getPasscode() != null) {
+            connectFrame.headers().put(Headers.PASSCODE, this.clientContext.getPasscode());
+        }
+
         ctx.writeAndFlush(connectFrame);
         super.channelActive(ctx);
     }

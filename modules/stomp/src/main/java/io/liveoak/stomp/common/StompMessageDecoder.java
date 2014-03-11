@@ -21,8 +21,10 @@ public class StompMessageDecoder extends MessageToMessageDecoder<StompFrame> {
     @Override
     protected void decode(ChannelHandlerContext ctx, StompFrame msg, List<Object> out) throws Exception {
         if (msg instanceof StompContentFrame) {
-            if (msg.command() == Stomp.Command.MESSAGE || msg.command() == Stomp.Command.SEND) {
-                StompMessage stompMessage = new DefaultStompMessage(msg.headers(), ((StompContentFrame) msg).content().retain());
+            if (msg.command() == Stomp.Command.MESSAGE || msg.command() == Stomp.Command.SEND || msg.command() == Stomp.Command.ERROR) {
+                StompMessage stompMessage = new DefaultStompMessage(msg.headers(),
+                        ((StompContentFrame) msg).content().retain(),
+                        msg.command() == Stomp.Command.ERROR);
                 out.add(stompMessage);
             } else {
                 ReferenceCountUtil.retain(msg);
