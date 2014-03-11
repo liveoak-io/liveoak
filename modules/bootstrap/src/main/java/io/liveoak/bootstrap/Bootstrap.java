@@ -12,6 +12,10 @@ import io.liveoak.container.tenancy.InternalApplication;
 import org.jboss.logging.Logger;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Bootstrapping <code>main()</code> method.
@@ -26,8 +30,29 @@ public class Bootstrap {
         File configDir = null;
         File appsDir = null;
 
-        if (args.length >= 1) {
-            liveOakDir = new File(args[0]);
+        String bindAddress = "localhost";
+
+        List<String> argsList = new LinkedList<>(Arrays.asList(args));
+        ListIterator<String> itr = argsList.listIterator();
+        while (itr.hasNext()) {
+            String a = itr.next();
+            if (a.equals("-b")) {
+                itr.remove();
+                bindAddress = itr.next();
+                itr.remove();
+
+                log.info("bind address: " + bindAddress);
+            } else if (a.startsWith("-D")) {
+                String[] prop = a.substring(2).split("=");
+                System.setProperty(prop[0], prop[1]);
+                itr.remove();
+            }
+        }
+
+        itr = argsList.listIterator();
+
+        if (itr.hasNext()) {
+            liveOakDir = new File(itr.next());
             configDir = new File(liveOakDir, "conf");
             appsDir = new File(liveOakDir, "apps");
         }
@@ -38,12 +63,13 @@ public class Bootstrap {
         log.info("Booting up LiveOak BaaS");
         long start = System.currentTimeMillis();
 
-        LiveOakSystem system = LiveOakFactory.create(configDir, appsDir);
+        LiveOakSystem system = LiveOakFactory.create(configDir, appsDir, null, bindAddress);
 
         log.infof("LiveOak booted in %d ms", (System.currentTimeMillis() - start));
 
-        if ( args.length == 2 ) {
-            File appDir = new File( args[1] ).getCanonicalFile();
+        while (itr.hasNext()) {
+            String app = itr.next();
+            File appDir = new File(app).getCanonicalFile();
             InternalApplication deployedApp = system.applicationRegistry().createApplication(appDir.getName(), appDir.getName(), appDir);
             system.awaitStability();
         }

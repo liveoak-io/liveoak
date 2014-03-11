@@ -3,7 +3,9 @@ package io.liveoak.keycloak;
 import io.liveoak.keycloak.service.KeycloakServerService;
 import io.liveoak.keycloak.service.KeycloakSessionFactoryService;
 import io.liveoak.keycloak.service.UndertowServerService;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.container.Address;
 import io.liveoak.spi.extension.ServiceRestarter;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -19,10 +21,8 @@ import java.util.function.Consumer;
 /**
  * @author Bob McWhirter
  */
-public class KeycloakSystemResource implements RootResource, UndertowConfig {
+public class KeycloakSystemResource implements RootResource {
 
-    public static final String HOST = "host";
-    public static final String PORT = "port";
     public static final String MODEL = "model";
 
     public KeycloakSystemResource(ServiceTarget target, String id) {
@@ -54,7 +54,7 @@ public class KeycloakSystemResource implements RootResource, UndertowConfig {
     private void startUndertow() {
         UndertowServerService undertow = new UndertowServerService();
         this.undertow = this.target.addService(KeycloakServices.undertow(this.id), undertow)
-                .addInjection(undertow.configurationInjector(), this)
+                .addDependency(LiveOak.ADDRESS, Address.class, undertow.addressInjector())
                 .install();
     }
 
@@ -72,16 +72,6 @@ public class KeycloakSystemResource implements RootResource, UndertowConfig {
         this.target.addService(KeycloakServices.sessionFactory(this.id), sessionFactory)
                 .addDependency(KeycloakServices.keycloak(this.id), KeycloakServer.class, sessionFactory.keycloakServerInjector())
                 .install();
-    }
-
-    @Override
-    public String host() {
-        return this.host;
-    }
-
-    @Override
-    public int port() {
-        return this.port;
     }
 
     protected synchronized void restart(ServiceController<?> controller, Consumer<ServiceController<?>> callback) {
@@ -106,20 +96,6 @@ public class KeycloakSystemResource implements RootResource, UndertowConfig {
         boolean undertowRestartNeeded = false;
         boolean keycloakRestartNeeded = false;
 
-        if (state.getProperty(HOST) != null) {
-            String configHost = (String) state.getProperty(HOST);
-            if (!configHost.equals(this.host)) {
-                this.host = configHost;
-                undertowRestartNeeded = true;
-            }
-        }
-        if (state.getProperty(PORT) != null) {
-            int configPort = (int) state.getProperty(PORT);
-            if (configPort != this.port) {
-                this.port = configPort;
-                undertowRestartNeeded = true;
-            }
-        }
         if (state.getProperty(MODEL) != null) {
             String configModel = (String) state.getProperty(MODEL);
             if (!configModel.equals(this.model)) {
@@ -140,8 +116,7 @@ public class KeycloakSystemResource implements RootResource, UndertowConfig {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept(HOST, this.host);
-        sink.accept(PORT, this.port);
+        sink.accept(MODEL, this.model);
         sink.close();
     }
 
@@ -150,8 +125,6 @@ public class KeycloakSystemResource implements RootResource, UndertowConfig {
     private Resource parent;
     private boolean initialized = false;
 
-    private String host = "localhost";
-    private int port = 8383;
     private String model = "mongo";
     private ServiceController<UndertowServer> undertow;
     private ServiceController<KeycloakServer> keycloak;

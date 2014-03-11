@@ -2,6 +2,7 @@ package io.liveoak.container.service;
 
 import io.liveoak.container.protocols.PipelineConfigurator;
 import io.liveoak.container.server.AbstractNetworkServer;
+import io.liveoak.spi.container.Address;
 import io.liveoak.spi.container.NetworkServer;
 import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
@@ -27,8 +28,8 @@ public abstract class AbstractNetworkServerService implements Service<NetworkSer
     public void start(StartContext context) throws StartException {
         this.server = newServer();
         try {
-            this.server.host( this.hostInjector.getValue() );
-            this.server.port( this.portInjector.getValue() );
+            this.server.host( this.addressInjector.getValue().host() );
+            this.server.port( this.addressInjector.getValue().port() );
             this.server.pipelineConfigurator( this.pipelineConfiguratorInjector.getValue() );
             this.server.start();
         } catch (Exception e) {
@@ -50,12 +51,8 @@ public abstract class AbstractNetworkServerService implements Service<NetworkSer
         return this.server;
     }
 
-    public Injector<InetAddress> hostInjector() {
-        return this.hostInjector;
-    }
-
-    public Injector<Integer> portInjector() {
-        return this.portInjector;
+    public Injector<Address> addressInjector() {
+        return this.addressInjector;
     }
 
     public Injector<PipelineConfigurator> pipelineConfiguratorInjector() {
@@ -64,8 +61,7 @@ public abstract class AbstractNetworkServerService implements Service<NetworkSer
 
     private AbstractNetworkServer server;
 
-    private InjectedValue<InetAddress> hostInjector = new InjectedValue<>();
-    private InjectedValue<Integer> portInjector = new InjectedValue<>();
+    private InjectedValue<Address> addressInjector = new InjectedValue<>();
     private InjectedValue<PipelineConfigurator> pipelineConfiguratorInjector = new InjectedValue<>();
 
     private static final Logger log = Logger.getLogger(AbstractNetworkServerService.class);

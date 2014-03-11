@@ -27,6 +27,7 @@ import io.liveoak.container.zero.service.ZeroBootstrapper;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.client.Client;
+import io.liveoak.spi.container.Address;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.spi.container.interceptor.Interceptor;
 import org.jboss.logging.Logger;
@@ -64,16 +65,21 @@ public class LiveOakFactory {
     }
 
     public static LiveOakSystem create(File configDir, File applicationsDir, Vertx vertx) throws Exception {
-        return new LiveOakFactory(configDir, applicationsDir, vertx).createInternal();
+        return new LiveOakFactory(configDir, applicationsDir, vertx, "localhost").createInternal();
+    }
+
+    public static LiveOakSystem create(File configDir, File applicationsDir, Vertx vertx, String bindAddress) throws Exception {
+        return new LiveOakFactory(configDir, applicationsDir, vertx, bindAddress).createInternal();
     }
 
     // ----------------------------------------------------------------------
     // ----------------------------------------------------------------------
 
-    private LiveOakFactory(File configDir, File applicationsDir, Vertx vertx) {
+    private LiveOakFactory(File configDir, File applicationsDir, Vertx vertx, String bindAddress) {
         this.configDir = configDir;
         this.appsDir = applicationsDir;
         this.vertx = vertx;
+        this.bindAddress = bindAddress;
         this.serviceContainer = ServiceContainer.Factory.create();
         serviceContainer.addListener(new AbstractServiceListener<Object>() {
             @Override
@@ -151,11 +157,13 @@ public class LiveOakFactory {
     }
 
     protected void createServers() throws UnknownHostException {
+        AddressService address = new AddressService(InetAddress.getByName(bindAddress), 8080, 8383);
+        serviceContainer.addService(ADDRESS, address).install();
+
         UnsecureServerService unsecureServer = new UnsecureServerService();
         serviceContainer.addService(server("unsecure", true), unsecureServer)
                 .addDependency(PIPELINE_CONFIGURATOR, PipelineConfigurator.class, unsecureServer.pipelineConfiguratorInjector())
-                .addInjection(unsecureServer.hostInjector(), InetAddress.getByName("localhost"))
-                .addInjection(unsecureServer.portInjector(), 8080)
+                .addDependency(ADDRESS, Address.class, unsecureServer.addressInjector())
                 .install();
 
         LocalServerService localServer = new LocalServerService();
@@ -273,6 +281,7 @@ public class LiveOakFactory {
     private final File configDir;
     private final File appsDir;
     private final Vertx vertx;
+    private final String bindAddress;
     private final ServiceContainer serviceContainer;
 
 }

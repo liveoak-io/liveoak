@@ -1,8 +1,7 @@
 package io.liveoak.keycloak.service;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.keycloak.UndertowConfig;
 import io.liveoak.keycloak.UndertowServer;
+import io.liveoak.spi.container.Address;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -17,8 +16,8 @@ public class UndertowServerService implements Service<UndertowServer> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        UndertowConfig config = this.configurationInjector.getValue();
-        this.server = new UndertowServer( config.host(), config.port() );
+        Address address = this.addressInjector.getValue();
+        this.server = new UndertowServer( address.host().getHostName(), address.portUndertow() );
         this.server.start();
     }
 
@@ -32,11 +31,11 @@ public class UndertowServerService implements Service<UndertowServer> {
         return this.server;
     }
 
-    public Injector<UndertowConfig> configurationInjector(){
-        return this.configurationInjector;
+    public Injector<Address> addressInjector(){
+        return this.addressInjector;
     }
 
-    private InjectedValue<UndertowConfig> configurationInjector = new InjectedValue<>();
+    private InjectedValue<Address> addressInjector = new InjectedValue<>();
 
     private UndertowServer server;
 }

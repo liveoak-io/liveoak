@@ -7,6 +7,7 @@ import org.jboss.msc.service.ServiceName;
  */
 public class LiveOak {
     public static final ServiceName LIVEOAK = ServiceName.of("liveoak");
+    public static final ServiceName ADDRESS = LIVEOAK.append("address");
     public static final ServiceName SUBSCRIPTION_MANAGER = LIVEOAK.append("subscription-manager");
     public static final ServiceName INTERCEPTOR_MANAGER = LIVEOAK.append("interceptor-manager");
     public static final ServiceName CODEC_MANAGER = LIVEOAK.append("codec-manager");
