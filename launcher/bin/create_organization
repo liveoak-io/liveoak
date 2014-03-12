@@ -1,8 +1,0 @@
-#!/bin/sh
-
-payload="{ id: '$1', name: '$1' }"
-curl -X POST \
-  --header "Content-Type:application/json" \
-  http://localhost:8080/liveoak/zero/organizations \
-  --data "$payload"
-

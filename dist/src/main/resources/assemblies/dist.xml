@@ -33,7 +33,6 @@
             <includes>
                 <include>liveoak</include>
                 <include>liveoak.bat</include>
-                <include>create_organization</include>
                 <include>create_application</include>
             </includes>
         </fileSet>
