@@ -109,33 +109,11 @@ loMod.factory('Notifications', function($rootScope, $timeout, $log) {
   return notifications;
 });
 
-/* TODO - This is only a mock service. The actual implementation would be created once the REST endpoints are known.*/
-loMod.factory('LoStorage', function() {
-//loMod.factory('LoStorage', function($resource) {
-  return {'get': function(){return {dbtype:'mongo', name:'asd', url:'http://www.url.com/path', host:'localhost', port: 1234.8};}};
-  /*
-  return $resource('/admin/applications/:appId/resources/storage', {
-    id : '@realm'
-  }, {
-    update : {
-      method : 'PUT'
-    },
-    create : {
-      method : 'POST',
-      params : { appId : ''}
-    }
-  });
-  */
-});
-
 /* Loaders - Loaders are used in the route configuration as resolve parameters */
 loMod.factory('Loader', function($q) {
   var loader = {};
   loader.get = function(service, id) {
     return function() {
-      /* TODO - This is only a mock method. Update with actual data loading from REST endpoints. */
-      return service.get(id);
-      /*
       var i = id && id();
       var delay = $q.defer();
       service.get(i, function(entry) {
@@ -144,7 +122,6 @@ loMod.factory('Loader', function($q) {
         delay.reject('Unable to fetch ' + i);
       });
       return delay.promise;
-      */
     };
   };
   loader.query = function(service, id) {
@@ -162,6 +139,74 @@ loMod.factory('Loader', function($q) {
   return loader;
 });
 
-loMod.factory('LoStorageLoader', function(Loader, LoStorage) {
-  return Loader.get(LoStorage);
+loMod.factory('LoStorage', function($resource) {
+  return $resource('/admin/applications/:appId/resources/:storageId', {
+    appId : '@appId',
+    storageId : '@storageId'
+  }, {
+    get : {
+      method : 'GET'
+    },
+    create : {
+      method : 'POST',
+      params : { appId : '@appId'}
+    },
+    update : {
+      method : 'PUT',
+      params : { appId : '@appId'}
+    }
+  });
+});
+
+loMod.factory('LoStorageList', function($resource) {
+  return $resource('/admin/applications/:appId/resources?expand=members', {
+    appId : '@appId'
+  }, {
+    get : {
+      method : 'GET'
+    }
+  });
+});
+
+loMod.factory('LoApp', function($resource) {
+  return $resource('/admin/applications/:appId', {
+    appId : '@appId'
+  }, {
+    get : {
+      method : 'GET'
+    }
+  });
+});
+
+loMod.factory('LoAppList', function($resource) {
+  return $resource('/admin/applications?expand=members');
+});
+
+loMod.factory('LoStorageLoader', function(Loader, LoStorage, $route) {
+  return Loader.get(LoStorage, function() {
+    return {
+      appId : $route.current.params.appId,
+      storageId: $route.current.params.storageId
+    };
+  });
+});
+
+loMod.factory('LoStorageListLoader', function(Loader, LoStorageList, $route) {
+  return Loader.get(LoStorageList, function() {
+    return {
+      appId : $route.current.params.appId
+    };
+  });
+});
+
+loMod.factory('LoAppLoader', function(Loader, LoApp, $route) {
+  return Loader.get(LoApp, function() {
+    return {
+      appId : $route.current.params.appId
+    };
+  });
+});
+
+loMod.factory('LoAppListLoader', function(Loader, LoAppList) {
+  return Loader.get(LoAppList);
 });
