@@ -45,6 +45,7 @@
 
 .login-pf #kc-logo-wrapper {
     background-image: none;
+    text-align: right;
 }
 
 .login-pf #kc-logo-wrapper:before {
