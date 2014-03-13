@@ -1,5 +1,6 @@
 package io.liveoak.container.zero;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.container.tenancy.SimpleResourceRegistry;
 import io.liveoak.container.util.ConversionUtils;
@@ -21,7 +22,15 @@ public class ApplicationExtensionsResource extends SimpleResourceRegistry implem
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         String extensionId = (String) state.getProperty( "type" );
-        InternalApplicationExtension ext = this.application.application().extend( extensionId, state.id(), ConversionUtils.convert( state ));
+
+        //get the 'config' value from the resource state
+        ResourceState configState = new DefaultResourceState();
+        Object configObject = state.getProperty("config");
+        if (configObject != null && configObject instanceof ResourceState) {
+            configState = (ResourceState) configObject;
+        }
+
+        InternalApplicationExtension ext = this.application.application().extend( extensionId, state.id(), ConversionUtils.convert( configState));
         responder.resourceCreated( ext.adminResource() );
     }
 
