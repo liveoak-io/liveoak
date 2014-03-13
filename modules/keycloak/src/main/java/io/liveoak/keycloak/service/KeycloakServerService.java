@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.keycloak.KeycloakServer;
 import io.liveoak.keycloak.UndertowServer;
 import io.liveoak.spi.InitializationException;
+import io.liveoak.spi.container.Address;
 import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -55,10 +56,15 @@ public class KeycloakServerService implements Service<KeycloakServer> {
         return this.server;
     }
 
+    public Injector<Address> addressInjector(){
+        return this.addressInjector;
+    }
+
     public Injector<UndertowServer> undertowServerInjector() {
         return this.undertowServerInjector;
     }
 
     private InjectedValue<UndertowServer> undertowServerInjector = new InjectedValue<>();
+    private InjectedValue<Address> addressInjector = new InjectedValue<>();
     private KeycloakServer server;
 }

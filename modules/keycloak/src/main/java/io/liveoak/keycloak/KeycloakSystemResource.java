@@ -14,6 +14,7 @@ import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceTarget;
+import org.keycloak.models.Config;
 import org.keycloak.models.utils.ModelProviderUtils;
 
 import java.util.function.Consumer;
@@ -59,13 +60,14 @@ public class KeycloakSystemResource implements RootResource {
     }
 
     private void setupModelProvider() {
-        System.setProperty(ModelProviderUtils.MODEL_PROVIDER, model);
+        Config.setModelProvider(model);
     }
 
     private void startKeycloak() {
         KeycloakServerService keycloak = new KeycloakServerService();
         this.keycloak = this.target.addService(KeycloakServices.keycloak(this.id), keycloak)
                 .addDependency(KeycloakServices.undertow(this.id), UndertowServer.class, keycloak.undertowServerInjector())
+                .addDependency(LiveOak.ADDRESS, Address.class, keycloak.addressInjector())
                 .install();
 
         KeycloakSessionFactoryService sessionFactory = new KeycloakSessionFactoryService();

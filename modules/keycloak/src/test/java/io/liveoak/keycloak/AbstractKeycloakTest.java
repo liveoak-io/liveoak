@@ -9,6 +9,7 @@ package io.liveoak.keycloak;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.testtools.AbstractResourceTestCase;
+import org.keycloak.models.Config;
 import org.keycloak.models.utils.ModelProviderUtils;
 
 /**
@@ -19,7 +20,7 @@ public abstract class AbstractKeycloakTest extends AbstractResourceTestCase {
     protected ObjectNode createTestConfig() {
         ObjectNode config = JsonNodeFactory.instance.objectNode();
 
-        String requestedModel = System.getProperty(ModelProviderUtils.MODEL_PROVIDER);
+        String requestedModel = Config.getModelProvider();
         if (requestedModel != null) {
             config.put(KeycloakSystemResource.MODEL, requestedModel);
         }

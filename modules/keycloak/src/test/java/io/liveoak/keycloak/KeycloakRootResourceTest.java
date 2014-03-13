@@ -3,15 +3,11 @@ package io.liveoak.keycloak;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.keycloak.extension.KeycloakExtension;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.testtools.AbstractResourceTestCase;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.keycloak.models.RealmModel;
-import org.keycloak.representations.SkeletonKeyToken;
+import org.keycloak.representations.AccessToken;
 
 import java.io.File;
 import java.util.Date;
@@ -48,7 +44,7 @@ public class KeycloakRootResourceTest extends AbstractKeycloakTest {
     public void testTokenInfo() throws Exception {
         RequestContext requestContext = new RequestContext.Builder().build();
 
-        SkeletonKeyToken token = tokenUtil.createToken();
+        AccessToken token = tokenUtil.createToken();
 
         ResourceState returnedState = client.read(requestContext, "/testApp/auth/token-info/" + tokenUtil.toString(token));
 
