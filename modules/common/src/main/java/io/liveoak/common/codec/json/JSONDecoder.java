@@ -74,7 +74,18 @@ public class JSONDecoder implements ResourceDecoder {
         }
 
         if (token == JsonToken.VALUE_NUMBER_INT) {
-            value = parser.getValueAsLong();
+            long valueLong = parser.getValueAsLong();
+
+            // Match the behaviour here to the Jackson ObjectMapper which is used elsewhere. Otherwise we end
+            // up with different values depending on where the JSON is coming from (web versus config files)
+            //
+            // if the value is within the integer range, then consider it an int, otherwise its a long.
+            if ( valueLong <= Integer.MAX_VALUE && valueLong >= Integer.MIN_VALUE ) {
+                value = parser.getValueAsInt();
+            } else {
+                value = valueLong;
+            }
+
             parser.nextToken();
             return value;
         }
