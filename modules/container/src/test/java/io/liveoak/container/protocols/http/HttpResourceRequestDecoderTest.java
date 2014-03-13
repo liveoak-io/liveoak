@@ -82,7 +82,7 @@ public class HttpResourceRequestDecoderTest {
 
     @Test
     public void testDecodePost() throws Exception {
-        DefaultResourceRequest decoded = decode(HttpMethod.POST, "/memory/people/bob", "{ name: 'bob' }");
+        DefaultResourceRequest decoded = decode(HttpMethod.POST, "/memory/people/bob", "{ name: 'bob', int: 1024, maxInt: 2147483647, minInt: -2147483648, longNeg: -2147483659, longPos: 2147483648 }");
 
         assertThat(decoded.requestType()).isEqualTo(RequestType.CREATE);
 
@@ -102,11 +102,16 @@ public class HttpResourceRequestDecoderTest {
         ResourceState state = decoded.state();
 
         assertThat(state.getProperty("name")).isEqualTo("bob");
+        assertThat(state.getProperty("int")).isEqualTo(1024);
+        assertThat(state.getProperty("maxInt")).isEqualTo(2147483647);
+        assertThat(state.getProperty("minInt")).isEqualTo(-2147483648);
+        assertThat(state.getProperty("longNeg")).isEqualTo(-2147483659L);
+        assertThat(state.getProperty("longPos")).isEqualTo(2147483648L);
     }
 
     @Test
     public void testDecodePut() throws Exception {
-        DefaultResourceRequest decoded = decode(HttpMethod.PUT, "/memory/people/bob", "{ name: 'bob' }");
+        DefaultResourceRequest decoded = decode(HttpMethod.PUT, "/memory/people/bob", "{ name: 'bob', int: 1024, maxInt: 2147483647, minInt: -2147483648, longNeg: -2147483659, longPos: 2147483648  }");
 
         assertThat(decoded.requestType()).isEqualTo(RequestType.UPDATE);
 
@@ -126,6 +131,11 @@ public class HttpResourceRequestDecoderTest {
         ResourceState state = decoded.state();
 
         assertThat(state.getProperty("name")).isEqualTo("bob");
+        assertThat(state.getProperty("int")).isEqualTo(1024);
+        assertThat(state.getProperty("maxInt")).isEqualTo(2147483647);
+        assertThat(state.getProperty("minInt")).isEqualTo(-2147483648);
+        assertThat(state.getProperty("longNeg")).isEqualTo(-2147483659L);
+        assertThat(state.getProperty("longPos")).isEqualTo(2147483648L);
     }
 
     protected DefaultResourceRequest decode(HttpMethod method, String uri) {
