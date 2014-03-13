@@ -53,23 +53,20 @@ angular.element(document).ready(function () {
   /* jshint ignore:start */
   var liveOak = new LiveOak({
     auth: {
-      realm: 'keycloak-admin',
+      realm: 'liveoak-admin',
       clientId: 'console',
-      clientSecret: 'password',
-      onload: 'login-required',
-      success: function () {
-        loMod.factory('LiveOak', function () {
-          return liveOak;
-        });
-        angular.bootstrap(document, ['loApp']);
-      },
-      error: function () {
-        alert('authentication failed');
-      }
+      onload: 'login-required'
     }
   });
 
-  liveOak.auth.init();
+  liveOak.auth.init(function () {
+      loMod.factory('LiveOak', function () {
+          return liveOak;
+      });
+      angular.bootstrap(document, ['loApp']);
+  }, function () {
+      alert('authentication failed');
+  });
   /* jshint ignore:end */
 });
 

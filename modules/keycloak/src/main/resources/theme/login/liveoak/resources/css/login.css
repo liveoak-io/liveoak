@@ -43,11 +43,11 @@
     color: #63b474;
 }
 
-.login-pf #kc-logo {
+.login-pf #kc-logo-wrapper {
     background-image: none;
 }
 
-.login-pf #kc-logo:before {
+.login-pf #kc-logo-wrapper:before {
     content: "LiveOak";
     font-family: fantasy;
     font-size: 3.5em;
