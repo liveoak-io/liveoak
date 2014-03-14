@@ -5,6 +5,7 @@
  */
 package io.liveoak.spi;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -45,5 +46,38 @@ public interface SecurityContext {
      * @return if the authenticated user is assigned the specified role
      */
     boolean hasRole(String role);
+
+    SecurityContext ANONYMOUS = new SecurityContext() {
+
+        @Override
+        public boolean isAuthenticated() {
+            return false;
+        }
+
+        @Override
+        public String getRealm() {
+            return null;
+        }
+
+        @Override
+        public String getSubject() {
+            return null;
+        }
+
+        @Override
+        public long lastVerified() {
+            return 0;
+        }
+
+        @Override
+        public Set<String> getRoles() {
+            return Collections.EMPTY_SET;
+        }
+
+        @Override
+        public boolean hasRole(String role) {
+            return false;
+        }
+    };
 
 }

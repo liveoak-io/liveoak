@@ -29,8 +29,24 @@ var LiveOak = function( options ) {
     var stomp_client = new Stomp.Client( options.host, options.port, options.secure );
 
     this.connect = function( callback ) {
-        stomp_client.connect( callback );
+      // TODO: Better way to do this...
+      if (arguments.length == 1) {
+         stomp_client.connect( arguments[0] );
+      }
+      if (arguments.length == 2) {
+        stomp_client.connect( arguments[0], arguments[1] );
+      }
+      if (arguments.length == 3) {
+        stomp_client.connect( arguments[0], arguments[1], arguments[2] );
+      }
+      if (arguments.length == 4) {
+        stomp_client.connect( arguments[0], arguments[1], arguments[2], arguments[3] );
+      }
     };
+
+    this.onStompError = function( callback ) {
+        stomp_client.onerror = callback;
+    }
 
     this.create = http.create;
     this.read = http.read;

@@ -5,9 +5,11 @@
  */
 package io.liveoak.container.subscriptions;
 
+import io.liveoak.common.DefaultSecurityContext;
 import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.spi.MediaType;
+import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.StompMessage;
@@ -34,6 +36,13 @@ public class ContainerStompServerContext implements StompServerContext {
 
     @Override
     public void handleSubscribe(StompConnection connection, String destination, String subscriptionId, Headers headers) {
+        // Just use anonymous context in this impl
+        SecurityContext securityContext = new DefaultSecurityContext();
+
+        handleSubscribeSecured(connection, destination, subscriptionId, headers, securityContext);
+    }
+
+    protected void handleSubscribeSecured(StompConnection connection, String destination, String subscriptionId, Headers headers, SecurityContext securityContext) {
         String acceptMediaType = headers.get("accept");
         if (acceptMediaType == null) {
             acceptMediaType = "application/json";
@@ -44,7 +53,7 @@ public class ContainerStompServerContext implements StompServerContext {
         }
 
         ResourceCodec codec = this.codecManager.getResourceCodec(mediaType);
-        StompSubscription subscription = new StompSubscription(connection, destination, subscriptionId, mediaType, codec);
+        StompSubscription subscription = new StompSubscription(connection, destination, subscriptionId, mediaType, codec, securityContext);
         this.subscriptionManager.addSubscription(subscription);
     }
 

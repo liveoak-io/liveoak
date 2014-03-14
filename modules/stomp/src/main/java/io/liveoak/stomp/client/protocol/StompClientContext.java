@@ -24,5 +24,9 @@ public interface StompClientContext {
 
     String getHost();
 
+    String getLogin();
+
+    String getPasscode();
+
     StompClient getClient();
 }

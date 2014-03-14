@@ -3,6 +3,7 @@ package io.liveoak.ups.resource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceResponse;
+import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.container.Subscription;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
@@ -133,6 +134,23 @@ public class UPSSubscription implements Subscription, Resource {
     @Override
     public ResourcePath resourcePath() {
         return this.resourcePath;
+    }
+
+    @Override
+    public boolean isSecure() {
+        // Right now, UPS is sending just resource URI and not whole resources, so it's not secured
+        return false;
+    }
+
+    @Override
+    public SecurityContext securityContext() {
+        // Using anonymous for now
+        return SecurityContext.ANONYMOUS;
+    }
+
+    @Override
+    public void sendAuthzError(ResourceState errorState, Resource resource, int status) throws Exception {
+        throw new IllegalStateException("Authorization error not expected for UPSSubscription");
     }
 
     /** Subscription Methods **/

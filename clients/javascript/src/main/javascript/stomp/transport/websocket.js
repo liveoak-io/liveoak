@@ -43,6 +43,11 @@ Stomp.Transport.WebSocket.prototype = {
         this._ws.send(data);
     },
 
+    setAuth: function(login, passcode) {
+      this._login = login;
+      this._passcode = passcode;
+    },
+
     _issueConnect: function () {
         console.log("issuing connect");
         var headers = {};

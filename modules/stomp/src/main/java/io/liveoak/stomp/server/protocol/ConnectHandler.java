@@ -37,10 +37,13 @@ public class ConnectHandler extends AbstractControlFrameHandler {
         Stomp.Version version = checkVersion(frame);
         Heartbeat hb = checkHeartbeat(frame, version);
         Headers headers = frame.headers();
-        String hostHeader = headers.get(Headers.HOST);
 
         checkHost(frame, headers, version);
-        StompConnection stompConnection = new StompConnection(ctx.channel());
+
+        String login = headers.get(Headers.LOGIN);
+        String passcode = headers.get(Headers.PASSCODE);
+
+        StompConnection stompConnection = new StompConnection(ctx.channel(), login, passcode);
         StompFrame connected = StompFrame.newConnectedFrame(stompConnection.getConnectionId(), version);
         if (hb != null) {
             connected.headers().put(Headers.HEARTBEAT, hb.getServerSend() + "," + hb.getServerReceive());

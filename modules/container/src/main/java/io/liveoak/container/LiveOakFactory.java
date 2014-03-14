@@ -175,6 +175,7 @@ public class LiveOakFactory {
         SubscriptionManagerService subscriptionManager = new SubscriptionManagerService();
 
         serviceContainer.addService(SUBSCRIPTION_MANAGER, subscriptionManager)
+                .addDependency(CLIENT, Client.class, subscriptionManager.clientInjector())
                 .install();
 
         ValueService<InterceptorManager> interceptorManager = new ValueService<>(new ImmediateValue<InterceptorManager>(new InterceptorManager()));

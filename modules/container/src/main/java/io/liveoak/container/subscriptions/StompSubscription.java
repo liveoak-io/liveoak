@@ -10,10 +10,12 @@ import io.liveoak.spi.MediaType;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceResponse;
+import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.container.Subscription;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceState;
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.StompMessage;
 import io.liveoak.stomp.common.DefaultStompMessage;
@@ -24,15 +26,17 @@ import io.liveoak.stomp.server.StompConnection;
  */
 public class StompSubscription implements Subscription {
 
-    public StompSubscription(StompConnection connection, String destination, String subscriptionId, MediaType mediaType, ResourceCodec codec) {
+    public StompSubscription(StompConnection connection, String destination, String subscriptionId, MediaType mediaType, ResourceCodec codec, SecurityContext securityContext) {
         this.connection = connection;
         this.destination = destination;
         this.subscriptionId = subscriptionId;
         this.mediaType = mediaType;
         this.codec = codec;
         this.resourcePath = new ResourcePath(destination);
+        this.securityContext = securityContext;
     }
 
+    @Override
     public String id() {
         return this.connection.getConnectionId() + "-" + subscriptionId;
     }
@@ -40,8 +44,32 @@ public class StompSubscription implements Subscription {
     // ----------------------------------------------------------------------
     // ----------------------------------------------------------------------
 
+    @Override
     public ResourcePath resourcePath() {
         return this.resourcePath;
+    }
+
+    @Override
+    public boolean isSecure() {
+        return true;
+    }
+
+    @Override
+    public SecurityContext securityContext() {
+        return this.securityContext;
+    }
+
+    @Override
+    public void sendAuthzError(ResourceState errorState, Resource resource, int status) throws Exception {
+        StompMessage message = new DefaultStompMessage(true);
+        message.headers().put(Headers.SUBSCRIPTION, this.subscriptionId);
+        message.headers().put(Headers.CONTENT_TYPE, this.mediaType.toString());
+        message.headers().put("status", "" + status);
+
+        RequestContext requestContext = new RequestContext.Builder().build();
+        message.content(this.codec.encode(requestContext, errorState));
+
+        this.connection.send(message);
     }
 
     @Override
@@ -81,5 +109,6 @@ public class StompSubscription implements Subscription {
     private ResourceCodec codec;
 
     private final ResourcePath resourcePath;
+    private final SecurityContext securityContext;
 
 }

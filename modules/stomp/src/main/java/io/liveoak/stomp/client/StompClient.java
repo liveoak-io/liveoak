@@ -14,6 +14,7 @@ import io.liveoak.stomp.client.protocol.DisconnectionNegotiatingHandler;
 import io.liveoak.stomp.client.protocol.MessageHandler;
 import io.liveoak.stomp.client.protocol.ReceiptHandler;
 import io.liveoak.stomp.client.protocol.StompClientContext;
+import io.liveoak.stomp.client.protocol.StompErrorClientHandler;
 import io.liveoak.stomp.client.protocol.SubscriptionEncoder;
 import io.liveoak.stomp.common.DefaultStompMessage;
 import io.liveoak.stomp.common.HeadersImpl;
@@ -29,6 +30,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.jboss.logging.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,11 +57,17 @@ public class StompClient {
         DISCONNECTING;
     }
 
+    public StompClient() {
+        this.errorCallback = (StompMessage error) -> {
+            log.warn("Unexpected stomp error: " + error.utf8Content());
+        };
+    }
+
     /**
      * Construct a new client.
      */
-    public StompClient() {
-
+    public StompClient(Consumer<StompMessage> errorCallback) {
+        this.errorCallback = errorCallback;
     }
 
     private Bootstrap createBootstrap(String host, Consumer<StompClient> callback) {
@@ -84,6 +92,7 @@ public class StompClient {
                 ch.pipeline().addLast(new StompMessageEncoder(false));
                 ch.pipeline().addLast(new StompMessageDecoder());
                 ch.pipeline().addLast(new MessageHandler(executor));
+                ch.pipeline().addLast(new StompErrorClientHandler(errorCallback));
             }
         });
 
@@ -127,6 +136,37 @@ public class StompClient {
         this.host = host;
         Bootstrap bootstrap = createBootstrap(host, callback);
         bootstrap.connect(host, port);
+    }
+
+    /**
+     * Connect synchronously with credentials included
+     *
+     * @param host Host to connect to.
+     * @param port Port to connect to.
+     * @param login Login (username) to use for secured connection.
+     * @param passcode Passcode (password) to use for secured connection.
+     * @throws InterruptedException If the connection times out.
+     * @throws StompException If an error occurs during connection.
+     */
+    public void connectSync(String host, int port, String login, String passcode) throws InterruptedException, StompException {
+        this.login = login;
+        this.passcode = passcode;
+        this.connectSync(host, port);
+    }
+
+    /**
+     * Connect asynchronously with credentials included
+     *
+     * @param host Host to connect to.
+     * @param port Port to connect to.
+     * @param login Login (username) to use for secured connection.
+     * @param passcode Passcode (password) to use for secured connection.
+     * @param callback Callback to fire after successfully connecting.
+     */
+    public void connect(String host, int port, String login, String passcode, Consumer<StompClient> callback) {
+        this.login = login;
+        this.passcode = passcode;
+        this.connect(host, port, callback);
     }
 
     /**
@@ -249,11 +289,16 @@ public class StompClient {
     }
 
     private String host;
+    private String login;
+    private String passcode;
     private ConnectionState connectionState;
     private Stomp.Version version = Stomp.Version.VERSION_1_2;
     private Channel channel;
+    private final Consumer<StompMessage> errorCallback;
     private AtomicInteger subscriptionCounter = new AtomicInteger();
     private Map<String, Consumer<StompMessage>> subscriptions = new HashMap<>();
+
+    private static final Logger log = Logger.getLogger(StompClient.class);
 
     class ContextImplStomp implements StompClientContext {
 
@@ -263,6 +308,16 @@ public class StompClient {
 
         public String getHost() {
             return StompClient.this.host;
+        }
+
+        @Override
+        public String getLogin() {
+            return login;
+        }
+
+        @Override
+        public String getPasscode() {
+            return passcode;
         }
 
         public void setChannel(Channel channel) {

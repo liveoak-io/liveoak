@@ -131,7 +131,7 @@ Stomp.Client.prototype = {
         return "1.0,1.1";
     },
 
-    connect: function (callback) {
+    connect: function () {
         if (arguments.length == 1) {
             this._connectCallback = arguments[0];
         }
@@ -151,7 +151,7 @@ Stomp.Client.prototype = {
             this._errorCallback = arguments[3];
         }
 
-        this._connectTransport(callback);
+        this._connectTransport(this._connectCallback);
 
     },
 
@@ -160,6 +160,9 @@ Stomp.Client.prototype = {
         for (i = 0; i < Stomp.Transports.length; ++i) {
             var t = new Stomp.Transports[i](this._host, this._port, this._secure);
             t.client = this;
+            if (this._login && this._passcode) {
+              t.setAuth(this._login, this._passcode);
+            }
             transports.push(t);
         }
 

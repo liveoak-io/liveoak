@@ -4,10 +4,10 @@ import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceResponse;
+import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.container.Subscription;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpClient;
@@ -21,12 +21,13 @@ import java.util.UUID;
  */
 public class HttpSubscription implements Subscription {
 
-    public HttpSubscription(HttpClient httpClient, String path, URI destination, ResourceCodec codec) {
+    public HttpSubscription(HttpClient httpClient, String path, URI destination, ResourceCodec codec, SecurityContext securityContext) {
         this.id = UUID.randomUUID().toString();
         this.httpClient = httpClient;
         this.resourcePath = new ResourcePath(path);
         this.destination = destination;
         this.codec = codec;
+        this.securityContext = securityContext;
     }
 
     @Override
@@ -44,6 +45,30 @@ public class HttpSubscription implements Subscription {
     @Override
     public ResourcePath resourcePath() {
         return this.resourcePath;
+    }
+
+    @Override
+    public boolean isSecure() {
+        return true;
+    }
+
+    @Override
+    public SecurityContext securityContext() {
+        return this.securityContext;
+    }
+
+    @Override
+    public void sendAuthzError(ResourceState errorState, Resource resource, int status) throws Exception {
+        URI uri = this.destination.resolve(resource.id());
+        HttpClientRequest request = this.httpClient.put(uri.getPath(), (response) -> {
+        });
+
+        request.setChunked(true);
+
+        RequestContext requestContext = new RequestContext.Builder().build();
+        ByteBuf encoded = codec.encode(requestContext, errorState);
+        request.write(new Buffer(encoded));
+        request.end();
     }
 
     @Override
@@ -89,5 +114,6 @@ public class HttpSubscription implements Subscription {
     private ResourcePath resourcePath;
     private final URI destination;
     private ResourceCodec codec;
+    private final SecurityContext securityContext;
 
 }

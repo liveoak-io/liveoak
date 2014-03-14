@@ -15,8 +15,10 @@ import java.util.UUID;
  */
 public class StompConnection {
 
-    public StompConnection(Channel channel) {
+    public StompConnection(Channel channel, String login, String passcode) {
         this.channel = channel;
+        this.login = login;
+        this.passcode = passcode;
         this.connectionId = UUID.randomUUID().toString();
     }
 
@@ -24,11 +26,21 @@ public class StompConnection {
         return this.connectionId;
     }
 
+    public String getLogin() {
+        return login;
+    }
+
+    public String getPasscode() {
+        return passcode;
+    }
+
     public void send(StompMessage message) {
         this.channel.writeAndFlush(message);
     }
 
     private String connectionId;
-    private Channel channel;
+    private final Channel channel;
+    private final String login;
+    private final String passcode;
 
 }

@@ -48,6 +48,8 @@ public class MessageHandler extends ChannelDuplexHandler {
                         onMessage.accept( stompMessage );
                     }
                 });
+            } else {
+                super.channelRead(ctx, msg);
             }
         } else {
             super.channelRead(ctx, msg);

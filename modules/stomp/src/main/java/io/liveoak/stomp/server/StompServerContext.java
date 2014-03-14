@@ -13,14 +13,14 @@ import io.liveoak.stomp.StompMessage;
  */
 public interface StompServerContext {
 
-    void handleConnect(StompConnection connection);
+    void handleConnect(StompConnection connection) throws StompServerException;
 
-    void handleDisconnect(StompConnection connection);
+    void handleDisconnect(StompConnection connection) throws StompServerException;
 
-    void handleSubscribe(StompConnection connection, String destination, String subscriptionId, Headers header);
+    void handleSubscribe(StompConnection connection, String destination, String subscriptionId, Headers header) throws StompServerException;
 
-    void handleUnsubscribe(StompConnection connection, String subscriptionId);
+    void handleUnsubscribe(StompConnection connection, String subscriptionId) throws StompServerException;
 
-    void handleSend(StompConnection connection, StompMessage message);
+    void handleSend(StompConnection connection, StompMessage message) throws StompServerException;
 
 }
