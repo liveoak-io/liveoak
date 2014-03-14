@@ -40,3 +40,6 @@ REM in development, we rely on a user's own .m2 repo
 REM pushd %BINDIR%..\..
 REM set "M2_REPO_DIR=%CD%\modules\target\m2-repo"
 REM popd
+
+REM Sample JPDA settings for remote socket debugging
+REM set "JAVA_OPTS=%JAVA_OPTS% -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n"
