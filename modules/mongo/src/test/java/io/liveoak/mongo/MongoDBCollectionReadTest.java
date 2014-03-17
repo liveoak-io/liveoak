@@ -58,8 +58,9 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // verify response
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(BASEPATH);
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
-        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.getPropertyNames().size()).isEqualTo(2);
+        assertThat(result.getProperty("type")).isEqualTo("database");
+        assertThat(result.getProperty("count")).isEqualTo(0);
         assertThat(result.members()).isEmpty();
     }
 
@@ -81,13 +82,13 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // verify response
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(BASEPATH);
-        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.getProperty("type")).isEqualTo("database");
         assertThat(result.members().size()).isEqualTo(3);
 
         for (int i = 0; i < result.members().size(); i++) {
             ResourceState member = result.members().get(i);
             assertThat(member.id()).isEqualTo("collection" + (i + 1));
-            assertThat(member.getPropertyNames().size()).isEqualTo(1);
+            assertThat(member.getPropertyNames().size()).isEqualTo(5);
             assertThat(member.getProperty("type")).isEqualTo("collection");
             assertThat(member.members()).isEmpty();
         }
@@ -112,7 +113,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         // verify the result
         assertThat(result.id()).isEqualTo(methodName);
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getPropertyNames().size()).isEqualTo(5);
         assertThat(result.getProperty("type")).isEqualTo("collection");
         assertThat(result.members()).isEmpty();
 
@@ -139,14 +140,14 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         // verify the result
         assertThat(result.id()).isEqualTo(BASEPATH);
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
-        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.getPropertyNames().size()).isEqualTo(2);
+        assertThat(result.getProperty("type")).isEqualTo("database");
         assertThat(result.members().size()).isEqualTo(23);
 
         for (int i = 0; i < result.members().size(); i++) {
             ResourceState member = result.members().get(i);
             assertThat(member.id()).isEqualTo(String.format("collection%1$04d", i + 11));
-            assertThat(member.getPropertyNames().size()).isEqualTo(1);
+            assertThat(member.getPropertyNames().size()).isEqualTo(5);
             assertThat(member.getProperty("type")).isEqualTo("collection");
             assertThat(member.members()).isEmpty();
         }
@@ -157,14 +158,14 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         // verify the result
         assertThat(result.id()).isEqualTo(BASEPATH);
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
-        assertThat(result.getProperty("type")).isEqualTo("collection");
+        assertThat(result.getPropertyNames().size()).isEqualTo(2);
+        assertThat(result.getProperty("type")).isEqualTo("database");
         assertThat(result.members().size()).isEqualTo(3);
 
         for (int i = 0; i < result.members().size(); i++) {
             ResourceState member = result.members().get(i);
             assertThat(member.id()).isEqualTo(String.format("collection%1$04d", i + 1010));
-            assertThat(member.getPropertyNames().size()).isEqualTo(1);
+            assertThat(member.getPropertyNames().size()).isEqualTo(5);
             assertThat(member.getProperty("type")).isEqualTo("collection");
             assertThat(member.members()).isEmpty();
         }
@@ -192,7 +193,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // verify response
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("testQueryCollection");
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getPropertyNames().size()).isEqualTo(5);
         assertThat(result.getProperty("type")).isEqualTo("collection");
         assertThat(result.members().size()).isEqualTo(2);
 
@@ -207,7 +208,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("testQueryCollection");
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getPropertyNames().size()).isEqualTo(5);
         assertThat(result.getProperty("type")).isEqualTo("collection");
         assertThat(result.members().size()).isEqualTo(2);
 
@@ -236,7 +237,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // verify response
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("testQueryCollectionNoResults");
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getPropertyNames().size()).isEqualTo(5);
         assertThat(result.getProperty("type")).isEqualTo("collection");
         assertThat(result.members().size()).isEqualTo(0);
     }
@@ -292,7 +293,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // verify response
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("testQueryCollection");
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getPropertyNames().size()).isEqualTo(5);
         assertThat(result.getProperty("type")).isEqualTo("collection");
         assertThat(result.members().size()).isEqualTo(2);
 
@@ -307,7 +308,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("testQueryCollection");
-        assertThat(result.getPropertyNames().size()).isEqualTo(1);
+        assertThat(result.getPropertyNames().size()).isEqualTo(5);
         assertThat(result.getProperty("type")).isEqualTo("collection");
         assertThat(result.members().size()).isEqualTo(2);
 
