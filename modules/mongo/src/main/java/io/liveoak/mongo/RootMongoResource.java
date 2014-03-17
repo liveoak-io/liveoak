@@ -108,7 +108,29 @@ public class RootMongoResource extends MongoResource implements RootResource {
                 id = UUID.randomUUID().toString();
             }
 
-            DBCollection collection = db().createCollection(id, new BasicDBObject()); // send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
+            BasicDBObject options = new BasicDBObject();
+
+            Object capped = state.getProperty( "capped" );
+            if ( capped != null) {
+                options.put( "capped", capped);
+            }
+
+            Object autoIndexId = state.getProperty( "autoIndexId" );
+            if ( autoIndexId != null) {
+                options.put( "autoIndexId", autoIndexId);
+            }
+
+            Object size = state.getProperty( "size" );
+            if ( size != null) {
+                options.put( "size", size);
+            }
+
+            Object max = state.getProperty( "max" );
+            if ( max != null) {
+                options.put( "max", max);
+            }
+
+            DBCollection collection = db().createCollection(id,options); // send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
 
             responder.resourceCreated(new MongoCollectionResource(this, collection));
         } else {
@@ -118,7 +140,12 @@ public class RootMongoResource extends MongoResource implements RootResource {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("type", "collection");
+        sink.accept("type", "database");
+        int count = this.db().getCollectionNames().size();
+        if (count >= 1) {
+            count = count - 1; // -1 due to not showing internal 'system.index' collection, which exists if another collection exists
+        }
+        sink.accept("count", count);
         sink.close();
     }
 

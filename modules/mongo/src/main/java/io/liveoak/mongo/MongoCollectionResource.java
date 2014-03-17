@@ -189,6 +189,17 @@ public class MongoCollectionResource extends MongoResource {
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("type", "collection");
+        sink.accept("count", dbCollection.getCount());
+        sink.accept( "capped", dbCollection.isCapped());
+
+        DBObject collectionDBObject = getDBCollection().getDB().getCollection( "system" ).getCollection( "namespaces" ).findOne( new BasicDBObject ( "name", this.getDBCollection().getFullName()));
+
+        if (collectionDBObject != null && collectionDBObject.get("options") != null) {
+            DBObject collectionOptions = (DBObject) collectionDBObject.get( "options" );
+            sink.accept("max", collectionOptions.get( "max" ));
+            sink.accept("size", collectionOptions.get("size"));
+        }
+
         sink.close();
     }
 

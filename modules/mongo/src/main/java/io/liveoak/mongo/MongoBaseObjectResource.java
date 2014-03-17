@@ -144,8 +144,13 @@ public class MongoBaseObjectResource extends MongoObjectResource {
 
     @Override
     public void delete(RequestContext ctx, Responder responder) {
-        getParent().deleteChild(ctx, id());
-        responder.resourceDeleted(this);
+        if (getParent().getDBCollection().isCapped()) {
+            responder.deleteNotSupported(this);
+        } else {
+            getParent().deleteChild(ctx, id());
+            responder.resourceDeleted(this);
+
+        }
     }
 
     protected MongoCollectionResource getParent() {
