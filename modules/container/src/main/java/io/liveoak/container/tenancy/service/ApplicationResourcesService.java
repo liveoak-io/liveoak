@@ -41,7 +41,7 @@ public class ApplicationResourcesService implements Service<Void> {
                 }
                 this.applicationInjector.getValue().extend(extensionId, resourceId, config);
             }
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             throw new StartException(e);
         }
     }

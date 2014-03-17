@@ -1,20 +1,27 @@
 package io.liveoak.container.tenancy;
 
+import java.io.File;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.tenancy.service.ApplicationExtensionService;
 import io.liveoak.container.zero.ApplicationResource;
-import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.Application;
+import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.extension.Extension;
-import org.jboss.msc.service.*;
-
-import java.io.File;
+import io.liveoak.spi.extension.SystemExtensionContext;
+import org.jboss.msc.service.ServiceContainer;
+import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceRegistry;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StabilityMonitor;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class InternalApplication implements Application {
 
@@ -45,33 +52,43 @@ public class InternalApplication implements Application {
         return this.htmlAppPath;
     }
 
-    public InternalApplicationExtension extend(String extensionId) throws InterruptedException {
+    public InternalApplicationExtension extend(String extensionId) throws Exception {
         return extend(extensionId, JsonNodeFactory.instance.objectNode());
     }
 
-    public InternalApplicationExtension extend(String extensionId, ObjectNode configuration) throws InterruptedException {
+    public InternalApplicationExtension extend(String extensionId, ObjectNode configuration) throws Exception {
         return extend(extensionId, extensionId, configuration);
     }
 
-    public InternalApplicationExtension extend(String extensionId, String resourceId, ObjectNode configuration) throws InterruptedException {
+    public InternalApplicationExtension extend(String extensionId, String resourceId, ObjectNode configuration) throws Exception {
 
         ServiceTarget target = this.target.subTarget();
         StabilityMonitor monitor = new StabilityMonitor();
-        target.addMonitor( monitor );
+        target.addMonitor(monitor);
 
         ServiceName name = LiveOak.applicationExtension(this.id, resourceId);
         ApplicationExtensionService appExt = new ApplicationExtensionService(extensionId, resourceId, configuration);
 
         ServiceController<InternalApplicationExtension> controller = target.addService(name, appExt)
                 .addDependency(LiveOak.extension(extensionId), Extension.class, appExt.extensionInjector())
-                .addDependency(LiveOak.application(this.id ), InternalApplication.class, appExt.applicationInjector())
+                .addDependency(LiveOak.application(this.id), InternalApplication.class, appExt.applicationInjector())
                 .addDependency(LiveOak.SERVICE_REGISTRY, ServiceRegistry.class, appExt.serviceRegistryInjector())
                 .addDependency(LiveOak.SERVICE_CONTAINER, ServiceContainer.class, appExt.serviceContainerInjector())
                 .install();
 
         monitor.awaitStability();
 
-        return controller.awaitValue();
+        InternalApplicationExtension intAppExt = controller.awaitValue();
+
+        if (intAppExt.exception() != null) {
+            intAppExt.remove();
+            //TODO Log this better?
+            intAppExt.exception().printStackTrace(System.err);
+            throw intAppExt.exception();
+        }
+
+        target.removeMonitor(monitor);
+        return intAppExt;
     }
 
     public void contextController(ServiceController<ApplicationContext> contextController) {

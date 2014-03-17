@@ -1,6 +1,5 @@
 package io.liveoak.mongo.config;
 
-import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.spi.state.ResourceState;
@@ -20,11 +19,7 @@ public abstract class BaseMongoConfigTest extends AbstractResourceTestCase {
     }
 
     protected void setUpSystem(ResourceState config) throws Exception {
-        InternalApplicationExtension appExt = installResource("mongo", BASEPATH, config);
-        if (appExt.exception() != null) {
-            appExt.exception().printStackTrace();
-            throw appExt.exception();
-        }
+        installResource("mongo", BASEPATH, config);
     }
 
 

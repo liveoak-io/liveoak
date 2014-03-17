@@ -106,7 +106,6 @@ public class BaseResponder implements Responder {
 
     @Override
     public void internalError(Throwable cause) {
-        cause.printStackTrace();
         log.error("Internal error: ", cause);
         this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, DefaultResourceErrorResponse.ErrorType.INTERNAL_ERROR, cause));
         resumeRead();

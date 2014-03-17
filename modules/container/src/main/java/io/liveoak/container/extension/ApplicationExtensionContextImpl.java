@@ -11,7 +11,6 @@ import io.liveoak.spi.resource.async.Resource;
 import org.jboss.msc.service.*;
 import org.jboss.msc.value.ImmediateValue;
 
-import java.io.IOException;
 import java.util.Properties;
 
 /**
