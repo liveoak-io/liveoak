@@ -2,9 +2,19 @@
 
 var loMod = angular.module('loApp');
 
-loMod.controller('DashboardCtrl', function($scope, $routeParams, Current, breadcrumbs) {
+loMod.controller('DashboardCtrl', function($scope, $routeParams, Current, breadcrumbs, LoAppList, currentApp) {
 
-  $scope.curApp.name = $routeParams.appId;
+  if(!currentApp){
+    Current.getCurrent().then(function(result){
+      $scope.curApp = result;
+    });
+  } else {
+    $scope.curApp = currentApp;
+  }
+
+  LoAppList.get(function(data){
+    $scope.applications = data._members;
+  });
 
   $scope.breadcrumbs = breadcrumbs;
   $scope.dataPeriods = [ 'Hour', 'Day', 'Week', 'Month' ];
@@ -12,7 +22,7 @@ loMod.controller('DashboardCtrl', function($scope, $routeParams, Current, breadc
 
   // FIXME: Fetch from rest. Mock data.
   $scope.data = {
-    'My App': {
+    'LiveOak Admin Console': {
       status: 'Running',
       appKey: 'jieu89-eiW38oskj',
       appSecret: '9iugjW39vnlz90ei9ejiDoi',
@@ -25,7 +35,7 @@ loMod.controller('DashboardCtrl', function($scope, $routeParams, Current, breadc
         'Month': {requests: 172, users: 18, notifications: 51, storage: 1.8}
       }
     },
-    'Other App': {
+    'chat': {
       status: 'Stopped',
       appKey: 'amvr14-rhG02loak',
       appSecret: 'r6rnt41fiima9vu6icsxp1e',

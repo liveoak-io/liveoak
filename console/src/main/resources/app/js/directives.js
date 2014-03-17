@@ -38,7 +38,8 @@ loDirectives.directive('loAppSummary', function () {
 loDirectives.directive('loStorageSummary', function () {
   return {
     scope: {
-      storage: '=loStorage'
+      storage: '=loStorage',
+      loApp: '='
     },
     restrict: 'E',
     replace: true,

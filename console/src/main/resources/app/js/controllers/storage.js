@@ -2,11 +2,13 @@
 
 var loMod = angular.module('loApp');
 
-loMod.controller('StorageCtrl', function($scope, $log, LoStorage, loStorage, Notifications, currentApp) {
+loMod.controller('StorageCtrl', function($scope, $log, LoStorage, loStorage, Notifications, Current) {
 
   $log.debug('StorageCtrl');
 
-  var currentAppId = currentApp;
+  Current.getCurrent().then(function(result){
+    $scope.curApp = result;
+  });
 
   $scope.changed = false;
 
@@ -59,10 +61,10 @@ loMod.controller('StorageCtrl', function($scope, $log, LoStorage, loStorage, Not
       $log.debug(''+data);
       if (create){
         $log.debug('Creating new storage resource: ' + data.id);
-        LoStorage.create({appId: currentAppId}, data);
+        LoStorage.create({appId: $scope.curApp.id}, data);
       } else {
         $log.debug('Updating storage resource: ' + data.id);
-        LoStorage.update({appId: currentAppId}, data);
+        LoStorage.update({appId: $scope.curApp.id}, data);
       }
       Notifications.success('New storage successfully created.');
       storageModelBackup = angular.copy($scope.storageModel);
@@ -72,41 +74,37 @@ loMod.controller('StorageCtrl', function($scope, $log, LoStorage, loStorage, Not
 
 });
 
-loMod.controller('StorageListCtrl', function($scope, $log, $routeParams, loStorageList) {
+loMod.controller('StorageListCtrl', function($scope, $log, $routeParams, LoAppList, loStorageList, Current, currentApp) {
 
   $log.debug('StorageListCtrl');
 
-  // TODO: Resources are stored here, but we use mock data since we don't know how to distinguish storage from other
-  // resources right now
-  $log.debug(loStorageList._members);
+  $scope.curApp=currentApp;
+  LoAppList.get(function(data){
+    $scope.applications = data._members;
+  });
 
-  $scope.curApp.name = $routeParams.appId;
+  $scope.loStorageList=loStorageList;
 
-  $scope.applications =
-  {
-    'My App': { 'storage': [{
-      'provider': 'Mongo DB',
-      'path': 'storage',
-      'host': '10.20.50.100',
-      'port': '27017',
-      'database': 'my_app'
-    }]},
-    'Other App': { 'storage': [
-      {
-        'provider': 'H2',
-        'path': 'storage-h2',
-        'host': '10.21.51.81',
-        'port': '9092',
-        'database': 'other_app_cache'
-      },
-      {
-        'provider': 'MySQL',
-        'path': 'storage-mysql',
-        'host': '10.21.51.82',
-        'port': '3306',
-        'database': 'other_app'
-      }
-    ]}
-  };
+  $scope.resources = [];
+
+  for(var i =0; i < loStorageList._members.length; i++){
+
+    var resource = loStorageList._members[i];
+
+
+    if (resource.hasOwnProperty('db')){
+      $scope.resources.push({
+        provider: 'Mongo DB',
+        path: resource.id,
+        host: resource.servers[0].host,
+        port: resource.servers[0].port,
+        database: resource.db
+      });
+    }
+  }
+
+  Current.getCurrent().then(function(result){
+    $scope.curApp = result;
+  });
 
 });

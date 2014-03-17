@@ -2,14 +2,19 @@
 
 var loMod = angular.module('loApp');
 
-loMod.controller('AppListCtrl', function($scope, $routeParams, Current, breadcrumbs, loAppList) {
+loMod.controller('AppListCtrl', function($scope, $routeParams, Current, breadcrumbs, loAppList, LoStorageList) {
 
   $scope.breadcrumbs = breadcrumbs;
 
-  $scope.applications = loAppList._members;
+  $scope.applications = [];
 
-  // FIXME: Mock data
-  $scope.applications.push({ 'name': 'Mock My App', 'storage': ['Mongo DB'], 'push': false, 'secured': false });
-  $scope.applications.push({ 'name': 'Mock Other App', 'storage': ['H2', 'MySQL'], 'push': true, 'secured': true });
+  for (var i = 0; i < loAppList._members.length; i++) {
+    var app = {
+      id: loAppList._members[i].id,
+      name: loAppList._members[i].name
+    };
+    app.storage = LoStorageList.get({appId: app.id});
+    $scope.applications.push(app);
+  }
 
 });

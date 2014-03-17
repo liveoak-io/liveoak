@@ -3,15 +3,41 @@
 var loMod = angular.module('loApp');
 
 /* Services */
-loMod.factory('Current', function() {
-  var appName = 'My App';
+loMod.factory('Current', function($log, $q, $routeParams, LoAppList) {
 
-  return {
-    setApp: function(app){
-      appName = app;
-    },
-    name: appName
+  $log.debug('Current service');
+
+  var current = {};
+  var app = $q.defer();
+
+  current.getCurrent = function() {
+    LoAppList.get(function(data) {
+      var appList = data._members;
+      if ($routeParams.appId) {
+        $log.debug('Looking for ' + $routeParams.appId);
+        for (var i = 0; i < appList.length; i++) {
+          if (appList[i].id === $routeParams.appId) {
+            $log.debug('Current app found: ' + appList[i].id);
+            current =  {id: appList[i].id, name: appList[i].name};
+          }
+        }
+      }
+      // If not found, fallback to the 1st app in the list
+      if(!current) {
+        current =  {id: appList[0].id, name: appList[0].name};
+      }
+
+      $log.debug('Resolving: ' + JSON.stringify(current));
+      app.resolve(current);
+    }, function(){
+      $log.debug('Rejecting');
+      app.reject('Unable to load current app.');
+    });
+
+    return app.promise;
   };
+
+  return current;
 });
 
 // Demonstrate how to register services
