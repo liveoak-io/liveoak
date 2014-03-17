@@ -85,6 +85,8 @@ public class SecuredServerTest {
         subscriptionLatch4.await(10000, TimeUnit.MILLISECONDS);
         Assert.assertTrue(errorConsumer.error);
         Assert.assertNull(serverContext.getLastConnectedLogin());
+
+        server.stop();
     }
 
     private class MockErrorConsumer implements Consumer<StompMessage> {

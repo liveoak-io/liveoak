@@ -63,6 +63,8 @@ public class SimpleServerTest {
 
         assertEquals("/people/bob", msg.destination());
         assertEquals("howdy!", msg.utf8Content());
+
+        server.stop();
     }
 
     @Test
@@ -93,5 +95,7 @@ public class SimpleServerTest {
 
         assertEquals("/people/bob", msg.destination());
         assertEquals("dude...", msg.utf8Content());
+
+        server.stop();
     }
 }
