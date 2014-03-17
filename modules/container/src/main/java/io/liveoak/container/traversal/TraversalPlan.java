@@ -12,6 +12,7 @@ import java.util.List;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class TraversalPlan {
 
@@ -21,9 +22,6 @@ public class TraversalPlan {
         for (ResourcePath.Segment segment : segments) {
             if (!segment.name().equals("")) {
                 this.steps.add(new ReadStep(segment.name()));
-            }
-            if (segment.matrixParameters().containsKey("config")) {
-                this.steps.add(new ConfigurationStep());
             }
         }
         switch (requestType) {

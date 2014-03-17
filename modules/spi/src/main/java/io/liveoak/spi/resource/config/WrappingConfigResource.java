@@ -1,24 +1,11 @@
 package io.liveoak.spi.resource.config;
 
-import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-
-import java.io.File;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.net.URI;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
@@ -49,13 +36,15 @@ public class WrappingConfigResource implements RootResource, ConfigResource {
         return this.id;
     }
 
+    @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        readConfigProperties(ctx, sink, this.configurable );
+        readConfigProperties(ctx, sink, this.configurable);
         sink.close();
     }
 
+    @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        updateConfigProperties(ctx, state, responder, this.configurable );
+        updateConfigProperties(ctx, state, responder, this.configurable);
         responder.resourceUpdated(this);
     }
 

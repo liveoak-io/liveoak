@@ -1,15 +1,11 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
 package io.liveoak.spi.resource.async;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.spi.Application;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.config.ConfigResource;
-import io.liveoak.spi.resource.config.Configurable;
 import io.liveoak.spi.state.ResourceState;
 
 import java.net.URI;
@@ -30,6 +26,7 @@ import java.util.List;
  * reference to its parent</p>
  *
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public interface Resource {
 
@@ -156,23 +153,5 @@ public interface Resource {
      */
     default void delete(RequestContext ctx, Responder responder) throws Exception {
         responder.deleteNotSupported(this);
-    }
-
-    default Resource configuration() {
-        if (this.getClass().isAnnotationPresent(Configurable.class)) {
-            return new ConfigResource() {
-                @Override
-                public String id() {
-                    return Resource.this.id();
-                }
-
-                @Override
-                public Resource parent() {
-                    return Resource.this;
-                }
-            };
-        } else {
-            return null;
-        }
     }
 }

@@ -61,7 +61,6 @@ public class UPSRootResource implements RootResource {
         }
     }
 
-    @Override
     public UPSRootConfigResource configuration() {
         return this.configResource;
     }

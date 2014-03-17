@@ -36,7 +36,6 @@ public class RootMongoResource extends MongoResource implements RootResource {
         mongoConfigResource = new RootMongoConfigResource(id);
     }
 
-    @Override
     public RootMongoConfigResource configuration() {
         return mongoConfigResource;
     }

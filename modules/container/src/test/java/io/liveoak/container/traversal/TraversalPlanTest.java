@@ -29,17 +29,6 @@ public class TraversalPlanTest {
     }
 
     @Test
-    public void testSimpleReadConfiguration() {
-        TraversalPlan plan = new TraversalPlan( RequestType.READ, new ResourcePath("/foo/bar;config/baz" ) );
-
-        assertThat( plan.steps() ).hasSize( 4 );
-        assertThat( plan.steps().get(0)).isInstanceOf(ReadStep.class);
-        assertThat( plan.steps().get(1)).isInstanceOf( ReadStep.class );
-        assertThat( plan.steps().get(2)).isInstanceOf( ConfigurationStep.class );
-        assertThat( plan.steps().get(3)).isInstanceOf( ReadStep.class );
-    }
-
-    @Test
     public void testSimpleDelete() {
         TraversalPlan plan = new TraversalPlan( RequestType.DELETE, new ResourcePath("/foo/bar/baz" ) );
 

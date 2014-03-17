@@ -19,7 +19,7 @@ public class WrappingConfigResourceService implements Service<WrappingConfigReso
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.resource = new WrappingConfigResource( this.id, this.configurableInjector.getValue() );
+        this.resource = new WrappingConfigResource(this.id, this.configurableInjector.getValue());
     }
 
     @Override
