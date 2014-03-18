@@ -58,8 +58,9 @@ loMod.config(['$routeProvider', function($routeProvider) {
         loStorage : function() {
           return {'type':'mongo','servers':[{}],'credentials':[{'mechanism':'MONGODB-CR'}]};
         },
-        // TODO - always creating storage for the admin app (for showcase reasons)
-        currentApp: function() { return 'admin'; }
+        currentApp: function(LoAppLoader){
+          return new LoAppLoader();
+        }
       },
       templateUrl: '/admin/console/partials/storage-create.html'
     })
@@ -69,8 +70,8 @@ loMod.config(['$routeProvider', function($routeProvider) {
         loStorage: function(LoStorageLoader) {
           return new LoStorageLoader();
         },
-        currentApp: function($route) {
-          return $route.current.params.appId;
+        currentApp: function(LoAppLoader){
+          return new LoAppLoader();
         }
       },
       templateUrl: '/admin/console/partials/storage-create.html'

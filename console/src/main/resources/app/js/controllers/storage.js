@@ -2,12 +2,14 @@
 
 var loMod = angular.module('loApp');
 
-loMod.controller('StorageCtrl', function($scope, $log, LoStorage, loStorage, Notifications, Current) {
+loMod.controller('StorageCtrl', function($scope, $rootScope, $log, LoStorage, loStorage, LoAppList, Notifications, currentApp) {
 
   $log.debug('StorageCtrl');
 
-  Current.getCurrent().then(function(result){
-    $scope.curApp = result;
+  $rootScope.curApp = currentApp;
+
+  LoAppList.get(function(data){
+    $scope.applications = data._members;
   });
 
   $scope.changed = false;
@@ -74,11 +76,12 @@ loMod.controller('StorageCtrl', function($scope, $log, LoStorage, loStorage, Not
 
 });
 
-loMod.controller('StorageListCtrl', function($scope, $log, $routeParams, LoAppList, loStorageList, Current, currentApp) {
+loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routeParams, LoAppList, loStorageList, currentApp) {
 
   $log.debug('StorageListCtrl');
 
-  $scope.curApp=currentApp;
+  $rootScope.curApp = currentApp;
+
   LoAppList.get(function(data){
     $scope.applications = data._members;
   });
@@ -91,7 +94,6 @@ loMod.controller('StorageListCtrl', function($scope, $log, $routeParams, LoAppLi
 
     var resource = loStorageList._members[i];
 
-
     if (resource.hasOwnProperty('db')){
       $scope.resources.push({
         provider: 'Mongo DB',
@@ -102,9 +104,5 @@ loMod.controller('StorageListCtrl', function($scope, $log, $routeParams, LoAppLi
       });
     }
   }
-
-  Current.getCurrent().then(function(result){
-    $scope.curApp = result;
-  });
 
 });

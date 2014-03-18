@@ -2,19 +2,16 @@
 
 var loMod = angular.module('loApp');
 
-loMod.controller('GlobalCtrl', function($log, $scope, LiveOak) {
+loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, LiveOak) {
 
-  $log.debug('GlobalCtrl');
+  $log.debug('GlobalCtrl' + LiveOak);
 
+  /* jshint ignore:start */
   $scope.auth = LiveOak.auth;
   $scope.username = LiveOak.auth.idToken && LiveOak.auth.idToken.preferred_username;
   $scope.isAdmin = LiveOak.auth.hasResourceRole('admin');
   $scope.authenticated = LiveOak.auth.authenticated;
-  /*
-  Current.getCurrent(function(data){
-    $scope.curApp = data;
-  });
-  */
+  /* jshint ignore:end */
 
   $scope.userLabel = function() {
     var role = '';

@@ -2,15 +2,9 @@
 
 var loMod = angular.module('loApp');
 
-loMod.controller('DashboardCtrl', function($scope, $routeParams, Current, breadcrumbs, LoAppList, currentApp) {
+loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, breadcrumbs, LoAppList, currentApp) {
 
-  if(!currentApp){
-    Current.getCurrent().then(function(result){
-      $scope.curApp = result;
-    });
-  } else {
-    $scope.curApp = currentApp;
-  }
+  $rootScope.curApp = currentApp;
 
   LoAppList.get(function(data){
     $scope.applications = data._members;

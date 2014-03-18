@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp');
 
-loMod.controller('AppListCtrl', function($scope, $routeParams, Current, breadcrumbs, loAppList, LoStorageList) {
+loMod.controller('AppListCtrl', function($scope, $routeParams, breadcrumbs, loAppList, LoStorageList) {
 
   $scope.breadcrumbs = breadcrumbs;
 
