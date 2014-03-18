@@ -281,6 +281,7 @@ public class UPSSubscription implements Subscription, Resource {
             this.upsMessageResource.setAttributes( attributes );
         }
 
+        this.parent.updateSubscription(this);
         responder.resourceUpdated( this );
     }
 
@@ -292,6 +293,12 @@ public class UPSSubscription implements Subscription, Resource {
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
         responder.noSuchResource( id );
+    }
+
+    @Override
+    public void delete(RequestContext ctx, Responder responder) throws Exception {
+        this.parent.deleteSubscription(this);
+        responder.resourceDeleted( this );
     }
 
 }
