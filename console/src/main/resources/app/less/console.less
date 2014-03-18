@@ -21,9 +21,8 @@
 /* Basic color palette */
 @c_white:           #fff;
 
-@c_graylight:       @c_gray + @inc;
+@c_graylight:       #aaa;
 @c_gray:            #666;
-@c_graydark:        @c_gray - @inc;
 
 @c_greenlight:      @c_green + @inc;
 @c_green:           #63b474;
@@ -45,7 +44,7 @@ html {
   body {
     line-height: 1.909em;
     font-family: @exo;
-    color: @c_graydark;
+    color: @c_gray;
   }
 }
 
@@ -60,6 +59,7 @@ html, body,
 /* Basic elements */
 h1, h2, h3, h4, h5, h6 {
   font-family: @exo;
+  line-height: 1.3em;
 
   span {
     color: @c_graylight;
@@ -114,6 +114,7 @@ p {
 }
 
 /* Top Menu */
+
 .navbar-pf {
   background-color: @c_green;
   border: none;
@@ -124,12 +125,17 @@ p {
 
   .navbar-utility {
     padding-right: 15px;
+    
+    li.dropdown > .dropdown-toggle {
+	    padding-left: 10px;
+    }
 
     a.lo-user {
       border: none;
       color: @c_white !important;
       font-size: @fsizebig;
       line-height: 22px;
+      font-size: 13px;
 
       &:hover {
         background-color: @c_greendark;
@@ -146,13 +152,19 @@ p {
     border-width: 1px 0;
 
     > li.dropdown.context {
-      background: @c_nav;
+    	padding: 0;
+    	margin-top: 1px;
 
       a, a:hover {
         border: none;
-        background: none;
+        background-color: @c_nav;
+        background-image: none;
         color: @c_navdark;
         text-align: center;
+        
+        &:hover {
+	    	  background-color: #d6d4d4;
+        }
       }
     }
   }
@@ -162,7 +174,7 @@ p {
     padding: 0 20px;
 
     h1 {
-      font-size: 18px;
+      font-size: 20px;
       margin: 0;
       line-height: 36px;
       color: @c_white;
@@ -204,6 +216,7 @@ p {
       .caret {
         float: right;
         margin-top: 3px;
+        margin-left: 15px;
       }
     }
 
@@ -227,12 +240,17 @@ p {
 
       a {
         font-size: 14px;
-        color: @c_snavfont;
+        color: @c_white;
         font-weight: bold;
+        opacity: 0.5;
+        -webkit-transition: opacity 0.25s ease-in-out;
+			  -moz-transition: opacity 0.25s ease-in-out;
+			  -o-transition: opacity 0.25s ease-in-out;
+			  transition: opacity 0.25s ease-in-out;
 
         &:hover, &:focus {
-          color: @c_white;
           text-decoration: none;
+          opacity: 1;
         }
 
         .fa {
@@ -241,10 +259,10 @@ p {
       }
 
       &.active {
-        background: url(../css/img/sidebar-active.svg) no-repeat right 14px;
+        background: url(../css/img/sidebar-active.svg) no-repeat right 22px;
 
         a {
-          color: @c_white;
+          opacity: 1;
           background-color: transparent;
           border: none;
 
@@ -262,12 +280,11 @@ p {
   padding: 0;
   background: @c_mainpane;
 
-  > .row > div, .lo-content-area {
+  .lo-content-area {
     padding: 0 3em;
   }
 
   .lo-content-area {
-    border-right: 1px solid @c_border;
 
     > h2 {
       margin-bottom: 1em;
@@ -286,7 +303,7 @@ p {
 
       .panel-title {
         display: inline-block;
-        color: @c_graydark;
+        color: @c_gray;
         font-size: 2.1em;
         font-weight: 500;
       }
@@ -294,7 +311,7 @@ p {
   }
 
   .panel-body {
-    padding: 36px 30px 32px;
+    padding: 36px 15px 32px;
   }
 }
 
@@ -342,7 +359,7 @@ p {
         font-size: 1.2em;
 
         a {
-          color: @c_graydark + 30;
+          color: @c_gray + 30;
 
           i {
             font-size: 1.25em;
@@ -350,7 +367,7 @@ p {
           }
 
           &:hover {
-            color: @c_graydark;
+            color: @c_gray;
             text-decoration: none;
           }
 
@@ -385,7 +402,7 @@ p {
     display: table;
 
     > i {
-      padding-right: 25px;
+      padding-right: 0.2734375em;
       display: table-cell;
       font-size: 10.54545454545455em;
       text-align: right;
@@ -399,10 +416,12 @@ p {
         font-size: 11.63636363636364em;
         font-weight: 300;
         line-height: 0.6em;
+        margin-bottom: -0.078125em;
       }
 
       .measure {
         font-size: 2.5em;
+        line-height: 0.5em;
       }
 
       .text {
@@ -419,14 +438,27 @@ p {
 
     &.users {
       color: #e9b356;
+      
+      i {
+				font-size: 9.84848484848485em;
+			}
     }
 
     &.push {
       color: #e39090;
+      
+      i {
+				padding-right: 0.24691358024691em;
+				padding-left: 0.24691358024691em;
+			}
     }
 
     &.storage {
       color: #6ab1ad;
+      
+      i {
+				padding-right: 0.23188405797101em;
+			}
     }
 
     &.highlight {
@@ -477,6 +509,8 @@ p {
 .lo-info-pane {
   font-size: @fsize;
   background: @c_white;
+  padding: 0 20px;
+  line-height: 1.3em;
 
   a {
     font-size: @fsize;
@@ -496,13 +530,8 @@ p {
     margin-bottom: 2.5em;
 
     > div {
-      /*margin-bottom: 1em;*/
-      margin-top: 8px;
+      margin-bottom: 12px;
       font-size: @fsize;
-
-      &:first-child {
-        margin-top: 0;
-      }
 
       .lo-label {
         color: @c_graylight;
@@ -514,7 +543,7 @@ p {
 
       .lo-field {
         display: inline-block;
-        margin-top: 2px;
+        margin-top: 4px;
       }
 
       .field + button {
@@ -561,6 +590,15 @@ p {
     margin-right: 15px;
     color: @c_graylight;
   }
+  
+  p {
+	  color: @c_gray;
+  }
+  
+  &.tutorials {
+	  padding: 0 15px;
+	  margin-top: 25px;
+  }
 }
 
 /* Bevel-less button with an icon */
@@ -585,7 +623,7 @@ button.lo-icon-button {
   }
 
   &:active i {
-    color: @c_graydark;
+    color: @c_gray;
     text-shadow: 0 0 10px rgba(0,0,0,0.3);
   }
 }
