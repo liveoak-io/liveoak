@@ -1,11 +1,9 @@
 package io.liveoak.container.tenancy.service;
 
-import java.util.Iterator;
+import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.spi.state.ResourceState;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -19,7 +17,7 @@ import org.jboss.msc.value.InjectedValue;
  */
 public class ApplicationResourcesService implements Service<Void> {
 
-    public ApplicationResourcesService(JsonNode resourcesTree) {
+    public ApplicationResourcesService(ResourceState resourcesTree) {
         this.resourcesTree = resourcesTree;
     }
 
@@ -30,16 +28,10 @@ public class ApplicationResourcesService implements Service<Void> {
         }
 
         try {
-            Iterator<String> fields = this.resourcesTree.fieldNames();
-            while (fields.hasNext()) {
-                String resourceId = fields.next();
-                JsonNode value = this.resourcesTree.get(resourceId);
-                String extensionId = value.get("type").asText();
-                ObjectNode config = (ObjectNode) value.get("config");
-                if (config == null) {
-                    config = JsonNodeFactory.instance.objectNode();
-                }
-                this.applicationInjector.getValue().extend(extensionId, resourceId, config);
+            Set<String> fields = this.resourcesTree.getPropertyNames();
+            for (String resourceId : fields) {
+                ResourceState resourceState = (ResourceState) this.resourcesTree.getProperty(resourceId);
+                this.applicationInjector.getValue().extend(resourceId, resourceState);
             }
         } catch (Exception e) {
             throw new StartException(e);
@@ -60,6 +52,6 @@ public class ApplicationResourcesService implements Service<Void> {
         return this.applicationInjector;
     }
 
-    private JsonNode resourcesTree;
+    private ResourceState resourcesTree;
     private InjectedValue<InternalApplication> applicationInjector = new InjectedValue<>();
 }

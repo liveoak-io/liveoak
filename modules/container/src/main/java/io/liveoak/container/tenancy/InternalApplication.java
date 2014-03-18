@@ -5,13 +5,13 @@ import java.io.File;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.tenancy.service.ApplicationExtensionService;
+import io.liveoak.container.util.ConversionUtils;
 import io.liveoak.container.zero.ApplicationResource;
 import io.liveoak.spi.Application;
-import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.extension.Extension;
-import io.liveoak.spi.extension.SystemExtensionContext;
+import io.liveoak.spi.state.ResourceState;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
@@ -50,6 +50,11 @@ public class InternalApplication implements Application {
 
     public ResourcePath htmlApplicationResourcePath() {
         return this.htmlAppPath;
+    }
+
+    public InternalApplicationExtension extend(String resourceId, ResourceState resourceDefinition) throws Exception {
+        String extensionId = (String) resourceDefinition.getProperty("type");
+        return extend(extensionId, resourceId, ConversionUtils.convert((ResourceState) resourceDefinition.getProperty("config")));
     }
 
     public InternalApplicationExtension extend(String extensionId) throws Exception {

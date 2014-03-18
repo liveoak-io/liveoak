@@ -1,8 +1,9 @@
 package io.liveoak.container.tenancy.service;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
+
+import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.tenancy.InternalApplication;
@@ -11,12 +12,15 @@ import io.liveoak.container.zero.ApplicationResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.state.ResourceState;
 import org.jboss.msc.inject.Injector;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * @author Bob McWhirter
@@ -45,24 +49,22 @@ public class ApplicationService implements Service<InternalApplication> {
 
         String appName = this.id;
         ResourcePath htmlApp = null;
-        JsonNode resourcesTree = null;
+        ResourceState resourcesTree = null;
 
         if (applicationJson.exists()) {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-            mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-            mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+            JSONDecoder decoder = new JSONDecoder();
             try {
-                JsonNode tree = mapper.readTree(applicationJson);
-                if (tree.has("name")) {
-                    appName = tree.get("name").asText();
+                ResourceState state = decoder.decode(applicationJson);
+                Object value;
+                if ((value = state.getProperty("name")) != null) {
+                    appName = (String) value;
                 }
-                if (tree.has("html-app")) {
-                    htmlApp = new ResourcePath(tree.get("html-app").asText());
+                if ((value = state.getProperty("html-app")) != null) {
+                    htmlApp = new ResourcePath((String) value);
                     htmlApp.prependSegment(this.id);
                 }
-                if (tree.has("resources")) {
-                    resourcesTree = tree.get("resources");
+                if ((value = state.getProperty("resources")) != null) {
+                    resourcesTree = (ResourceState) value;
                 }
             } catch (IOException e) {
                 e.printStackTrace();

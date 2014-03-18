@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -15,12 +15,15 @@ import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.Callable;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class JSONDecoder implements ResourceDecoder {
 
@@ -33,11 +36,28 @@ public class JSONDecoder implements ResourceDecoder {
 
     @Override
     public ResourceState decode(ByteBuf resource) throws IOException {
+        return decode(() -> factory().createParser(new ByteBufInputStream(resource)));
+    }
+
+    public ResourceState decode(File resource) throws IOException {
+        return decode(() -> factory().configure(JsonParser.Feature.ALLOW_COMMENTS, true).createParser(resource));
+    }
+
+    private JsonFactory factory() {
         JsonFactory factory = new JsonFactory();
         factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
         factory.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-        ByteBufInputStream in = new ByteBufInputStream(resource);
-        JsonParser parser = factory.createParser(in);
+        return factory;
+    }
+
+    private ResourceState decode(Callable<JsonParser> parserCallable) throws IOException {
+        JsonParser parser;
+        try {
+            parser = parserCallable.call();
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+
         parser.nextToken();
 
         ResourceState result = decode(parser);
@@ -48,7 +68,6 @@ public class JSONDecoder implements ResourceDecoder {
 
         return result;
     }
-
 
     protected ResourceState decode(JsonParser parser) throws IOException {
         Object value = decodeValue(parser);
@@ -153,9 +172,7 @@ public class JSONDecoder implements ResourceDecoder {
         Object value = decodeValue(parser);
 
         if (name.equals("_members") && value instanceof Collection) {
-            ((Collection) value).stream().forEach((e) -> {
-                state.addMember((ResourceState) e);
-            });
+            ((Collection) value).stream().forEach((e) -> state.addMember((ResourceState) e));
         } else {
             state.putProperty(name, value);
         }
