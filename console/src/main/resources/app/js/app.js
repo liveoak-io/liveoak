@@ -76,6 +76,15 @@ loMod.config(['$routeProvider', function($routeProvider) {
       },
       templateUrl: '/admin/console/partials/storage-create.html'
     })
+    .when('/applications/:appId/storage/:storageId/push', {
+      controller: 'PushCtrl',
+      resolve : {
+        currentApp: function(LoAppLoader){
+          return new LoAppLoader();
+        }
+      },
+      templateUrl: '/admin/console/partials/push.html'
+    })
     .otherwise({
       templateUrl : '/admin/console/partials/notfound.html'
     });

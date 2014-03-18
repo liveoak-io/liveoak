@@ -1,0 +1,44 @@
+<!-- Mock page for Push - TODO actual implementation -->
+<lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="push" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
+
+<div class="col-md-10 lo-main-pane">
+    <div class="row">
+        <div class="lo-content-area col-md-10">
+            <ol class="breadcrumb">
+                <li><a href="#/applications">Applications</a></li>
+                <li><a href="#/applications/{{curApp.id}}">{{ curApp.name }}</a></li>
+                <li><a href="#">MyFirstStorage</a></li>
+                <li class="active">Collections</li>
+            </ol>
+
+            <h2><span>{{curApp.name}}</span> Push Notifications</h2>
+
+            <hr>
+            <form class="lo-form-horizontal clearfix">
+                <div class="form-group clearfix">
+                    <label class="col-sm-2 control-label" for="push-url">AeroGear UnifiedPush URL <span class="required">*</span></label>
+                    <div class="col-sm-4">
+                        <input class="form-control" type="text" id="push-url" required>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-sm-2 control-label" for="app-id">Application ID <span class="required">*</span></label>
+                    <div class="col-sm-4">
+                        <input class="form-control" type="text" id="app-id" required>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-sm-2 control-label" for="secret">Master Secret <span class="required">*</span></label>
+                    <div class="col-sm-4">
+                        <input class="form-control" type="text" id="secret" required>
+                    </div>
+                </div>
+
+                <div class="pull-right form-actions">
+                    <button class="btn btn-default btn-lg">Clear changes</button>
+                    <button class="btn btn-primary btn-lg">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
