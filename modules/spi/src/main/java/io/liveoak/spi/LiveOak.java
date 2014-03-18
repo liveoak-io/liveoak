@@ -52,6 +52,10 @@ public class LiveOak {
         return LIVEOAK.append( "application", appId );
     }
 
+    public static ServiceName applicationConfigurationManager(String appId) {
+        return LIVEOAK.append( "application-config-managers", appId );
+    }
+
     public static ServiceName applicationContext(String appId) {
         return LIVEOAK.append( "application-context", appId );
     }

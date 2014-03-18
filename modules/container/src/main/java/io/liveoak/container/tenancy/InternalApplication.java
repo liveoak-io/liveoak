@@ -48,6 +48,10 @@ public class InternalApplication implements Application {
         return this.directory;
     }
 
+    public File configurationFile() {
+        return new File( this.directory, "application.json" );
+    }
+
     public ResourcePath htmlApplicationResourcePath() {
         return this.htmlAppPath;
     }

@@ -97,6 +97,11 @@ public class ApplicationService implements Service<InternalApplication> {
                 .addDependency(appResourceName, ApplicationResource.class, appResourceMount.resourceInjector())
                 .install());
 
+        ServiceName configManagerName = LiveOak.applicationConfigurationManager( this.id );
+        ApplicationConfigurationService configManager = new ApplicationConfigurationService( applicationJson );
+        target.addService( configManagerName, configManager )
+                .install();
+
         ApplicationResourcesService resources = new ApplicationResourcesService(resourcesTree);
 
         target.addService(LiveOak.application(this.id).append("resources"), resources)
