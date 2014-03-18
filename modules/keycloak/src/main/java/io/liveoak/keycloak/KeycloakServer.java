@@ -12,6 +12,7 @@ import io.undertow.servlet.api.ServletInfo;
 import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.keycloak.models.ApplicationModel;
+import org.keycloak.models.ClaimMask;
 import org.keycloak.models.Config;
 import org.keycloak.models.Constants;
 import org.keycloak.models.KeycloakSession;
@@ -84,6 +85,8 @@ public class KeycloakServer {
 
                 consoleApp.addDefaultRole("user");
                 consoleApp.addRole("admin");
+
+                consoleApp.setAllowedClaimsMask(ClaimMask.USERNAME);
 
                 consoleApp.addRedirectUri("http://localhost:8080/admin");
                 consoleApp.addWebOrigin("http://localhost:8080");

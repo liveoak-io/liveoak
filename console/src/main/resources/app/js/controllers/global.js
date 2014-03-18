@@ -4,7 +4,7 @@ var loMod = angular.module('loApp');
 
 loMod.controller('GlobalCtrl', function($scope, LiveOak, Current) {
   $scope.auth = LiveOak.auth;
-  $scope.username = LiveOak.auth.username;
+  $scope.username = LiveOak.auth.idToken && LiveOak.auth.idToken.preferred_username;
   $scope.isAdmin = LiveOak.auth.hasResourceRole('admin');
   $scope.authenticated = LiveOak.auth.authenticated;
 
