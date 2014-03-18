@@ -4,6 +4,15 @@
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
+    font-family: "Exo 2";
+}
+
+#kc-header-wrapper {
+	margin-bottom: 10px;
+}
+
+#kc-header-wrapper strong {
+	font-weight: 600;
 }
 
 .login-pf .container {
@@ -12,6 +21,10 @@
 
 .login-pf .container .details {
     border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.login-pf .container .form-horizontal .control-label {
+	font-size: 13px;
 }
 
 .login-pf .btn-primary {
@@ -50,6 +63,6 @@
 
 .login-pf #kc-logo-wrapper:before {
     content: "LiveOak";
-    font-family: fantasy;
-    font-size: 3.5em;
+    font-family: "Exo 2";
+    font-size: 30px;
 }
