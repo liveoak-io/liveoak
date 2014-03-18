@@ -2,7 +2,9 @@ package io.liveoak.ups;
 
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
+import org.fest.assertions.Fail;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -70,6 +72,33 @@ public class UPSSubscriptionTestCase extends BaseUPSTestCase {
         ResourceState messageResult = ( ResourceState ) result.getProperty( "message" );
         assertThat( messageResult.getProperty( "alert" ) ).isEqualTo( "Hello" );
         assertThat( messageResult.getProperty( "myCustomProp" ) ).isEqualTo( "foobar" );
+    }
+
+    @Test
+    public void testDeleteSubscription() throws Exception {
+        ResourceState subscription = new DefaultResourceState("testDelete");
+        // add the resource path
+        subscription.putProperty( "resourcePath", "/foo/bar" );
+
+        // add some aliases
+        List aliases = Arrays.asList( "myAliasA", "myAliasB" );
+        subscription.putProperty( "alias", aliases );
+
+        client.create( new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/subscriptions", subscription );
+
+        ResourceState readResult = client.read( new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/subscriptions/testDelete");
+        assertThat(readResult.id()).isEqualTo("testDelete");
+
+        ResourceState deleteResult = client.delete( new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/subscriptions/testDelete" );
+        assertThat(deleteResult).isNotNull();
+
+        try {
+            client.read( new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/subscriptions/testDelete");
+            Fail.fail();
+        } catch (ResourceNotFoundException e) {
+            //expected
+        }
+
     }
 
     @Test

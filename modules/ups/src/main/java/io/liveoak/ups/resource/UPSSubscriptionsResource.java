@@ -68,4 +68,16 @@ public class UPSSubscriptionsResource implements Resource {
         responder.resourceCreated(subscription);
     }
 
+    public void deleteSubscription(UPSSubscription subscription) {
+        subscriptionManager.removeSubscription( subscription );
+        subscriptions.remove(subscription.id());
+    }
+
+    public void updateSubscription(UPSSubscription subscription) {
+        subscriptionManager.removeSubscription( subscription );
+        subscriptionManager.addSubscription(subscription);
+        subscriptions.put(subscription.id(), subscription);
+    }
+
+
 }
