@@ -7,39 +7,71 @@ var loMod = angular.module('loApp', [
   'loApp.services',
   'loApp.directives',
   'loApp.controllers',
-  'services.breadcrumbs'
+  'services.breadcrumbs',
+  'ngResource'
 ]);
 
 loMod.config(['$routeProvider', function($routeProvider) {
   $routeProvider
     .when('/', {
-      // templateUrl : '/admin/console/partials/dashboard.html',
-      // controller : 'DashboardCtrl'
-      redirectTo: '/applications/My App/dashboard' // FIXME hardcoded
+      redirectTo: '/applications/admin/dashboard' // FIXME hardcoded
     })
     .when('/applications', {
       templateUrl : '/admin/console/partials/applications.html',
-      controller : 'AppListCtrl'
+      controller : 'AppListCtrl',
+      resolve: {
+        loAppList : function(LoAppListLoader) {
+          return new LoAppListLoader();
+        }
+      }
     })
     .when('/applications/:appId', {
       redirectTo: '/applications/:appId/dashboard'
     })
     .when('/applications/dashboard', {
-      redirectTo: '#/applications/My App/dashboard' // FIXME hardcoded
+      redirectTo: '#/applications/admin/dashboard' // FIXME hardcoded
     })
     .when('/applications/:appId/dashboard', {
       templateUrl : '/admin/console/partials/dashboard.html',
-      controller : 'DashboardCtrl'
+      controller : 'DashboardCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader){
+          return new LoAppLoader();
+        }
+      }
     })
     .when('/applications/:appId/storage', {
       controller: 'StorageListCtrl',
+      resolve: {
+        loStorageList : function(LoStorageListLoader) {
+          return new LoStorageListLoader();
+        },
+        currentApp: function(LoAppLoader){
+          return new LoAppLoader();
+        }
+      },
       templateUrl: '/admin/console/partials/storage-list.html'
     })
-    .when('/applications/:appId/storage/create', {
+    .when('/applications/:appId/create-storage', {
       controller: 'StorageCtrl',
       resolve: {
-        'loStorage' : function(LoStorageLoader) {
+        loStorage : function() {
+          return {'type':'mongo','servers':[{}],'credentials':[{'mechanism':'MONGODB-CR'}]};
+        },
+        currentApp: function(LoAppLoader){
+          return new LoAppLoader();
+        }
+      },
+      templateUrl: '/admin/console/partials/storage-create.html'
+    })
+    .when('/applications/:appId/storage/:storageId', {
+      controller: 'StorageCtrl',
+      resolve : {
+        loStorage: function(LoStorageLoader) {
           return new LoStorageLoader();
+        },
+        currentApp: function(LoAppLoader){
+          return new LoAppLoader();
         }
       },
       templateUrl: '/admin/console/partials/storage-create.html'

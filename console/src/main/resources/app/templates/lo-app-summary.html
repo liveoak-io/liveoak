@@ -1,6 +1,6 @@
 <div class="panel panel-default lo-panel lo-panel-app">
     <div class="panel-heading">
-        <a href="#/applications/{{app.name}}"><h2 class="panel-title">{{app.name}}</h2></a>
+        <a href="#/applications/{{app.id}}"><h2 class="panel-title">{{app.name}}</h2></a>
 
         <div class="pull-right">
             <div class="dropdown">
@@ -15,9 +15,11 @@
     </div>
     <div class="panel-body">
         <ul class="lo-app-opts">
-            <li ng-repeat="s in app.storage"><a href=""><i class="fa fa-briefcase"></i>{{s}}</a></li>
+            <li ng-repeat="s in app.storage._members" ng-show="s.MongoClientOptions"><a href=""><i class="fa fa-briefcase"></i>Mongo DB</a></li>
+            <!--
             <li ng-show="{{app.push}}"><a href=""><i class="fa fa-mobile"></i>Push set up</a></li>
             <li ng-show="{{app.secured}}"><a href=""><i class="fa fa-lightbulb-o"></i>Secured</a></li>
+            -->
         </ul>
     </div>
 </div>

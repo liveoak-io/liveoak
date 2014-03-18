@@ -2,13 +2,16 @@
 
 var loMod = angular.module('loApp');
 
-loMod.controller('GlobalCtrl', function($scope, LiveOak, Current) {
+loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, LiveOak) {
+
+  $log.debug('GlobalCtrl' + LiveOak);
+
+  /* jshint ignore:start */
   $scope.auth = LiveOak.auth;
   $scope.username = LiveOak.auth.idToken && LiveOak.auth.idToken.preferred_username;
   $scope.isAdmin = LiveOak.auth.hasResourceRole('admin');
   $scope.authenticated = LiveOak.auth.authenticated;
-
-  $scope.curApp = Current;
+  /* jshint ignore:end */
 
   $scope.userLabel = function() {
     var role = '';
@@ -22,14 +25,20 @@ loMod.controller('GlobalCtrl', function($scope, LiveOak, Current) {
 
 });
 
-angular.module('loApp.controllers').controller('AppDropdownCtrl', function($scope, LiveOak, Current) {
+angular.module('loApp.controllers').controller('AppDropdownCtrl', function() {
+  /*
+  //TODO Inspect if this code is needed and remove it respectively
 
-  // FIXME: Get with REST
-  $scope.applications = ['My App', 'Other App'];
+  $scope.applications = [];
+
+  $scope.appList2 = LoAppList.get(function(data){
+    for (var i in data._members){
+      var member = data._members[i];
+      $scope.applications.push({id: member.id, name:member.name});
+    }
+  });
+
   $scope.curApp = Current;
-  $scope.showNav = function() {
-    var show = $scope.applications.length > 0;
-    return LiveOak.auth.authenticated && show;
-  };
+  */
 
 });
