@@ -6,30 +6,21 @@
 package io.liveoak.mongo.gridfs;
 
 import java.io.File;
-import java.util.HashMap;
 
 import com.mongodb.DB;
-import com.mongodb.MongoClient;
 import io.liveoak.mongo.config.RootMongoConfigResource;
-import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
-import io.liveoak.spi.resource.config.ConfigMappingExporter;
-import io.liveoak.spi.resource.config.ConfigProperty;
-import io.liveoak.spi.resource.config.Configurable;
 import io.liveoak.spi.state.ResourceState;
 import org.vertx.java.core.Vertx;
-
-import java.io.File;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-@Configurable
 public class GridFSRootResource extends GridFSDirectoryResource implements RootResource {
 
     private Resource parent;

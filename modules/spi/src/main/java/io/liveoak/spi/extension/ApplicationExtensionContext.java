@@ -1,6 +1,5 @@
 package io.liveoak.spi.extension;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.service.ServiceName;

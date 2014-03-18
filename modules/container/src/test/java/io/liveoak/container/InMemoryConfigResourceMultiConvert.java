@@ -6,12 +6,10 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.config.ConfigMappingExporter;
 import io.liveoak.spi.resource.config.ConfigProperty;
-import io.liveoak.spi.resource.config.Configurable;
 
 /**
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
-@Configurable
 public class InMemoryConfigResourceMultiConvert implements RootResource {
 
     private Resource parent;

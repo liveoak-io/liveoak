@@ -6,22 +6,14 @@
 package io.liveoak.filesystem;
 
 import java.io.File;
-import java.util.HashMap;
 
-import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.config.ConfigMappingExporter;
-import io.liveoak.spi.resource.config.ConfigProperty;
-import io.liveoak.spi.resource.config.Configurable;
 import org.vertx.java.core.Vertx;
-
-import java.io.File;
 
 /**
  * @author Bob McWhirter
  */
-@Configurable
 public class FilesystemResource extends DirectoryResource implements RootResource, FSResource {
 
     public FilesystemResource(FileSystemAdminResource adminResource, String id, Vertx vertx) {

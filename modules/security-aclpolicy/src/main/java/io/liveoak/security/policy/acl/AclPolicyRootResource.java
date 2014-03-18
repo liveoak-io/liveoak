@@ -1,28 +1,17 @@
 package io.liveoak.security.policy.acl;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.liveoak.common.security.AuthzConstants;
-import io.liveoak.spi.InitializationException;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
-import io.liveoak.spi.resource.config.ConfigMappingExporter;
-import io.liveoak.spi.resource.config.ConfigProperty;
-import io.liveoak.spi.resource.config.Configurable;
 import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-@Configurable
 public class AclPolicyRootResource implements RootResource {
 
     private static final Logger log = Logger.getLogger(AclPolicyRootResource.class);

@@ -5,13 +5,11 @@ import java.io.File;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.config.ConfigProperty;
 import io.liveoak.spi.resource.config.ConfigPropertyConverter;
-import io.liveoak.spi.resource.config.Configurable;
 import io.liveoak.spi.resource.RootResource;
 
 /**
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
-@Configurable
 public class InMemoryConfigResourceWithConverter implements RootResource {
 
     private Resource parent;

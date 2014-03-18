@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class InternalApplicationExtension implements Consumer<Exception> {
 
@@ -38,8 +39,12 @@ public class InternalApplicationExtension implements Consumer<Exception> {
 
     public void remove() {
         // unmount them first
-        this.adminResourceController.setMode(ServiceController.Mode.REMOVE);
-        this.publicResourceController.setMode(ServiceController.Mode.REMOVE);
+        if (this.adminResourceController != null) {
+            this.adminResourceController.setMode(ServiceController.Mode.REMOVE);
+        }
+        if (this.publicResourceController != null) {
+            this.publicResourceController.setMode(ServiceController.Mode.REMOVE);
+        }
 
         String appId = this.app.id();
         ServiceController<InternalApplicationExtension> extController = (ServiceController<InternalApplicationExtension>) this.registry.getService(LiveOak.applicationExtension(appId, this.resourceId));
