@@ -40,7 +40,7 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         config.putProperty("db", "testConfigureTypeDB");
 
         ResourceState configReadPref = new DefaultResourceState();
-        configReadPref.putProperty(ReadPreferenceResource.Options.TYPE.toString(), ReadPreferenceResource.Types.SECONDARY.toString());
+        configReadPref.putProperty(ReadPreferenceResource.Options.TYPE.toString(),"secondary"); // use new string value here, if using ReadPreferenceResource.Types.SECONDARY.toString() then '==' will incorrectly work when we should be using equals() 
         config.putProperty(ReadPreferenceResource.ID, configReadPref);
 
         setUpSystem(config);

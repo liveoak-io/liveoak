@@ -86,19 +86,8 @@ public class MongoServersConfigTest extends BaseMongoConfigTest {
         assertThat(result.members().size()).isEqualTo(0);
 
         assertThat(result.getProperty(WriteConcernResource.ID)).isNotNull();
-        //TODO: properly test here
-
-//        assertThat( result.members().get( 0 ).id() ).isEqualTo("MongoClientOptions");
-//        assertThat(result.members().get(0).uri()).isEqualTo( new URI("/" + BASEPATH + ";config/MongoClientOptions"));
-//        assertThat(result.members().get(0).getPropertyNames().size()).isEqualTo(0);
-//
-//        assertThat( result.members().get( 1 ).id() ).isEqualTo("WriteConcern");
-//        assertThat(result.members().get(1).uri()).isEqualTo( new URI("/" + BASEPATH + ";config/WriteConcern"));
-//        assertThat(result.members().get(1).getPropertyNames().size()).isEqualTo(0);
-//
-//        assertThat(result.members().get(2).id()).isEqualTo("ReadPreferences");
-//        assertThat(result.members().get(2).uri()).isEqualTo( new URI("/" + BASEPATH + ";config/ReadPreferences"));
-//        assertThat(result.members().get(2).getPropertyNames().size()).isEqualTo(0);
+        assertThat(result.getProperty(ReadPreferenceResource.ID)).isNotNull();
+        assertThat(result.getProperty(MongoClientOptionsResource.ID)).isNotNull();
     }
 
     @Test
@@ -451,6 +440,20 @@ public class MongoServersConfigTest extends BaseMongoConfigTest {
         assertThat(serversResourceState.get(0).getProperty("host")).isEqualTo("127.0.0.3");
         assertThat(serversResourceState.get(0).getProperty("port")).isEqualTo(12345);
 
+    }
+
+    @Test
+    public void testModifyConfiguration() throws Exception {
+        ResourceState config = new DefaultResourceState();
+        config.putProperty("db", "testModifyConfiguration");
+        setUpSystem(config);
+
+        ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
+
+        assertThat(result.members()).isNotNull();
+        assertThat(result.members().size()).isEqualTo(0);
+
+        client.update(new RequestContext.Builder().build(), ADMIN_PATH, result);
     }
 
 }
