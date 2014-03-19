@@ -115,9 +115,13 @@ public class MongoClientOptionsResource implements Resource {
             builder.autoConnectRetry( mongoClientOptions.isAutoConnectRetry() );
         }
 
-        Long maxAutoConnectRetryTime = (Long) state.getProperty(Options.MAX_AUTOCONNECT_RETRY_TIME.toString());
+        Object maxAutoConnectRetryTime = state.getProperty(Options.MAX_AUTOCONNECT_RETRY_TIME.toString());
         if (maxAutoConnectRetryTime != null) {
-            builder.maxAutoConnectRetryTime( maxAutoConnectRetryTime );
+            if (maxAutoConnectRetryTime instanceof Integer) {
+                builder.maxAutoConnectRetryTime((int)maxAutoConnectRetryTime);
+            } else {
+                builder.maxAutoConnectRetryTime((long)maxAutoConnectRetryTime);
+            }
         } else {
             builder.maxAutoConnectRetryTime( mongoClientOptions.getMaxAutoConnectRetryTime() );
         }

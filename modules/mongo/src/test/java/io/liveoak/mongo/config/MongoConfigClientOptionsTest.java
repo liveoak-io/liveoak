@@ -83,7 +83,7 @@ public class MongoConfigClientOptionsTest extends BaseMongoConfigTest {
 
         ResourceState mongoClientConfigResourceState = new DefaultResourceState();
         mongoClientConfigResourceState.putProperty( MongoClientOptionsResource.Options.DESCRIPTION.toString(), "my cool mbaas" );
-        mongoClientConfigResourceState.putProperty( MongoClientOptionsResource.Options.MAX_AUTOCONNECT_RETRY_TIME.toString(), new Long(50) );
+        mongoClientConfigResourceState.putProperty( MongoClientOptionsResource.Options.MAX_AUTOCONNECT_RETRY_TIME.toString(), 50 ); //test that specifying an int here works
         mongoClientConfigResourceState.putProperty( MongoClientOptionsResource.Options.SOCKET_KEEP_ALIVE.toString(), true );
 
         config.putProperty( MongoClientOptionsResource.ID, mongoClientConfigResourceState);

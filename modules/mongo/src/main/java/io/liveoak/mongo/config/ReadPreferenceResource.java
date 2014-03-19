@@ -82,7 +82,7 @@ public class ReadPreferenceResource implements Resource {
     }
 
     public void updateReadPreference(ResourceState state) throws Exception {
-        Object name = state.getProperty(Options.TYPE.toString());
+        String name = (String)state.getProperty(Options.TYPE.toString());
         if (name == null) {
             name = this.readPreference.getName();
         }
@@ -96,28 +96,28 @@ public class ReadPreferenceResource implements Resource {
                 dbObjectTag.put(propertyName, tags.getProperty( propertyName ));
             }
 
-            if ( name == Types.PRIMARY_PREFERRED.toString() ) {
+            if ( name.equals(Types.PRIMARY_PREFERRED.toString()) ) {
                 this.readPreference = ReadPreference.primaryPreferred(dbObjectTag);
-            } else if ( name == Types.SECONDARY.toString() ) {
+            } else if ( name.equals(Types.SECONDARY.toString()) ) {
                 this.readPreference = ReadPreference.secondary(dbObjectTag);
-            } else if ( name == Types.SECONDARY_PREFERRED.toString() ) {
+            } else if ( name.equals(Types.SECONDARY_PREFERRED.toString()) ) {
                 this.readPreference = ReadPreference.secondaryPreferred(dbObjectTag);
-            } else if ( name == Types.NEAREST.toString() ) {
+            } else if ( name.equals(Types.NEAREST.toString()) ) {
                 this.readPreference = ReadPreference.nearest(dbObjectTag);
             } else {
                 throw new InitializationException("Unknown read preference type : [" + name  + "]");
             }
         } else {
 
-            if ( name == Types.PRIMARY.toString() ) {
+            if ( name.equals(Types.PRIMARY.toString()) ) {
                 this.readPreference = ReadPreference.primary();
-            } else if ( name == Types.PRIMARY_PREFERRED.toString() ) {
+            } else if ( name.equals(Types.PRIMARY_PREFERRED.toString())) {
                 this.readPreference = ReadPreference.primaryPreferred();
-            } else if ( name == Types.SECONDARY.toString() ) {
+            } else if ( name.equals(Types.SECONDARY.toString())) {
                 this.readPreference = ReadPreference.secondary();
-            } else if ( name == Types.SECONDARY_PREFERRED.toString() ) {
+            } else if ( name.equals(Types.SECONDARY_PREFERRED.toString())) {
                 this.readPreference=  ReadPreference.secondaryPreferred();
-            } else if ( name == Types.NEAREST.toString() ) {
+            } else if ( name.equals(Types.NEAREST.toString()) ) {
                 this.readPreference =  ReadPreference.nearest();
             } else {
                 throw new InitializationException("Unknown read preference type : [" + name  + "]");
