@@ -4,14 +4,9 @@
     <div class="col-md-10 lo-main-pane">
         <div class="row">
             <div class="lo-content-area col-md-10">
-                <ol class="breadcrumb">
-                    <li><a href="#/applications">Applications</a></li>
-                    <li><a href="#/applications/{{curApp.name}}">{{curApp.name}}</a></li>
-                    <li><a href="#/applications/{{curApp.name}}/storage">Storage</a></li>
-                    <li class="active">New Storage</li>
-                </ol>
+                <lo-breadcrumbs></lo-breadcrumbs>
 
-                <h2><span>{{curApp.name}}</span> New Storage</h2>
+                <h2><span>{{curApp.name}}</span> {{ create ? 'New Storage' : storageModel.id }}</h2>
 
                 <form class="lo-form-horizontal" name="realmForm" novalidate>
                     <fieldset>
@@ -19,7 +14,7 @@
                         <div class="form-group">
                         <div class="lo-db-instances">
                             <p>
-                                Doesnt' have it installed?
+                                Dont' have it installed?
                                 <span ng-switch on="storageModel.type">
                                     <a ng-switch-when="mongo" href="http://www.mongodb.org/" >Get your MongoDB instance.</a>
                                     <a ng-switch-when="mysql" href="http://www.mysql.com/" >Get your MySQL instance.</a>

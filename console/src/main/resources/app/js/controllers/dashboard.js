@@ -2,15 +2,20 @@
 
 var loMod = angular.module('loApp');
 
-loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, breadcrumbs, LoAppList, currentApp) {
+loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, LoAppList, currentApp) {
 
   $rootScope.curApp = currentApp;
+
+  $scope.breadcrumbs = [
+    {'label': "Applications",  'href':"#/applications"},
+    {'label': currentApp.name, 'href':"#/applications/" + currentApp.id},
+    {'label': "Dashboard",       'href':"#/applications/" + currentApp.id + "/dashboard"}
+  ];
 
   LoAppList.get(function(data){
     $scope.applications = data._members;
   });
 
-  $scope.breadcrumbs = breadcrumbs;
   $scope.dataPeriods = [ 'Hour', 'Day', 'Week', 'Month' ];
   $scope.range = 'Hour';
 

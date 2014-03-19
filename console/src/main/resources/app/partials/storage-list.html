@@ -3,24 +3,29 @@
 <div class="col-md-10 lo-main-pane">
     <div class="row">
         <div class="lo-content-area col-md-10">
-            <ol class="breadcrumb">
-                <li><a href="#/applications">Applications</a></li>
-                <li><a href="#/applications/{{curApp.name}}">{{ curApp.name }}</a></li>
-                <li class="active">Storage</li>
-            </ol>
+            <lo-breadcrumbs></lo-breadcrumbs>
 
             <h2><span>{{curApp.name}}</span> Storage</h2>
 
             <div class="lo-page-info">
                 <p ng-show="resources">
-                    <span class="lo-emph">You have</span> <strong>{{resources.length}}</strong> storage resource(s).
+                    <span class="lo-emph">You have</span> <strong>{{resources.length}}</strong> <span class="lo-emph">storage resource{{resources.length > 1 ? 's' : ''}}.</span>
                 </p>
-                <div class="pull-right">
+                <div class="pull-right" ng-show="resources">
                     <a href="#/applications/{{curApp.id}}/create-storage" class="btn btn-primary btn-lg" type="button">New Storage</a>
                 </div>
             </div>
 
-            <lo-storage-summary ng-repeat="s in resources" lo-storage="s" lo-app="curApp"></lo-storage-summary>
+            <div class="panel panel-default lo-panel" ng-hide="resources">
+                <div class="panel-body">
+                    <h2 class="text-center opacity20"><i class="fa fa-cloud fa-5x"></i></h2>
+                    <h2 class="text-center">This application currently has no storage resources.</h2>
+                    <h2 class="text-center"><a href="#/applications/{{curApp.id}}/create-storage" class="btn btn-primary btn-lg" type="button">New Storage</a></h2>
+                </div>
+
+            </div>
+
+            <lo-storage-summary ng-repeat="s in resources" lo-storage="s" lo-app="curApp" created="createdId"></lo-storage-summary>
 
         </div>
         <div class="lo-info-pane col-md-2">

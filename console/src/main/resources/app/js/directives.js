@@ -24,6 +24,14 @@ loDirectives.directive('loNavigation', function () {
   };
 });
 
+loDirectives.directive('loBreadcrumbs', function () {
+  return {
+    restrict: 'E',
+    replace: true,
+    templateUrl: '/admin/console/templates/lo-breadcrumbs.html'
+  };
+});
+
 loDirectives.directive('loAppSummary', function () {
   return {
     scope: {
@@ -39,6 +47,7 @@ loDirectives.directive('loStorageSummary', function () {
   return {
     scope: {
       storage: '=loStorage',
+      created: '=',
       loApp: '='
     },
     restrict: 'E',
@@ -63,6 +72,7 @@ loDirectives.directive('loCollapse', function() {
     },
     restrict: 'A',
     link : function(scope, element) {
+      element.addClass('clickable');
       var collapse = function(){
         element.toggleClass('collapsed');
         element.parent().find('.form-group').toggleClass('hidden');
