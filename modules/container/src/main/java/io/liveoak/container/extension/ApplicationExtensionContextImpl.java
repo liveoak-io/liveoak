@@ -1,6 +1,7 @@
 package io.liveoak.container.extension;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.spi.Application;
@@ -93,10 +94,17 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
                 .addDependency(privateName, RootResource.class, lifecycle.resourceInjector())
                 .install();
 
-        ServiceController<? extends Resource> controller = this.target.addService(privateName.append("mount"), mount)
+        ConfigPersistingService configPersister = new ConfigPersistingService( this.appExtension.extensionId() );
+        target.addService(privateName.append("persist"), configPersister)
                 .addDependency(privateName.append("apply-config"))
+                .addDependency(privateName, RootResource.class, configPersister.resourceInjector())
+                .addDependency(LiveOak.applicationConfigurationManager(appExtension.application().id()), ApplicationConfigurationManager.class, configPersister.configurationManagerInjector())
+                .install();
+
+        ServiceController<? extends Resource> controller = this.target.addService(privateName.append("mount"), mount)
+                .addDependency(privateName.append("lifecycle"))
                 .addDependency(this.adminMount, MountPointResource.class, mount.mountPointInjector())
-                .addDependency(privateName, RootResource.class, mount.resourceInjector())
+                .addDependency(privateName.append("persist"), RootResource.class, mount.resourceInjector())
                 .install();
         this.appExtension.adminResourceController(controller);
     }
@@ -111,9 +119,9 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
 
     protected Properties filteringProperties() {
         Properties props = new Properties();
-        props.setProperty( "application.id", application().id() );
-        props.setProperty( "application.name", application().name() );
-        props.setProperty( "application.dir", application().directory().getAbsolutePath() );
+        props.setProperty("application.id", application().id());
+        props.setProperty("application.name", application().name());
+        props.setProperty("application.dir", application().directory().getAbsolutePath());
         return props;
     }
 

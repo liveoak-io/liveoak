@@ -1,4 +1,4 @@
-<div class="panel panel-default lo-panel lo-panel-storage">
+<div class="panel panel-default lo-panel lo-panel-storage" ng-class="{'animated rollIn': created == storage.path}">
     <div class="panel-heading">
         <a href="#/applications/{{loApp.id}}/storage/{{storage.path}}/list"><h2 class="panel-title">{{storage.path}}</h2></a>
 
@@ -7,6 +7,7 @@
                 <a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="fa fa-trash-o"></i><b class="caret"></b></a>
                 <ul class="dropdown-menu">
                     <li><a href="#">Rename...</a></li>
+                    <li><a href="#/applications/{{loApp.id}}/storage/{{storage.path}}">Edit...</a></li>
                     <li role="presentation" class="divider"></li>
                     <li><a href="#">Delete...</a></li>
                 </ul>
