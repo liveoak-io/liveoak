@@ -158,6 +158,10 @@ loMod.factory('LoStorageList', function($resource) {
   });
 });
 
+loMod.factory('LoCollection', function($resource) {
+  return $resource('/chat/storage/chat?expand=members');
+});
+
 loMod.factory('LoApp', function($resource) {
   return $resource('/admin/applications/:appId', {
     appId : '@appId'
@@ -199,4 +203,8 @@ loMod.factory('LoAppLoader', function(Loader, LoApp, $route) {
 
 loMod.factory('LoAppListLoader', function(Loader, LoAppList) {
   return Loader.get(LoAppList);
+});
+
+loMod.factory('LoCollectionLoader', function(Loader, LoCollection) {
+  return Loader.get(LoCollection);
 });

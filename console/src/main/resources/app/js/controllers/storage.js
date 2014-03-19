@@ -106,3 +106,22 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
   }
 
 });
+
+loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, currentApp, currentCollection) {
+
+  $log.debug('StorageCollectionCtrl');
+
+  $rootScope.curApp = currentApp;
+
+  $scope.currentCollection = currentCollection;
+
+  $scope.storage = {
+    item: {
+      id: 1234,
+      fName: 'First',
+      lName: 'last',
+      collection: {asd:'asd', gre: 12343}
+    }
+  };
+
+});
