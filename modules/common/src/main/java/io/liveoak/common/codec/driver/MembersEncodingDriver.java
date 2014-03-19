@@ -21,7 +21,13 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
 
     @Override
     public void encode() throws Exception {
-        resource().readMembers(requestContext(), new MyResourceSink());
+        //we should only read the members if they are going to be returned in the response
+        //otherwise it could be an expensive operation when all we are requesting is metadata (ie count)
+        if (requestContext().returnFields().included("members")) {
+            resource().readMembers( requestContext(), new MyResourceSink());
+        }  else {
+            encodeNext();
+        }
     }
 
     @Override
