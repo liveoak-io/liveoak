@@ -85,6 +85,18 @@ loMod.config(['$routeProvider', function($routeProvider) {
       },
       templateUrl: '/admin/console/partials/push.html'
     })
+    .when('/applications/:appId/storage/:storageId/list', {
+      controller: 'StorageCollectionCtrl',
+      resolve : {
+        currentApp: function(LoAppLoader){
+          return new LoAppLoader();
+        },
+        currentCollection: function(LoCollectionLoader){
+          return new LoCollectionLoader();
+        }
+      },
+      templateUrl: '/admin/console/partials/storage-collection.html'
+    })
     .otherwise({
       templateUrl : '/admin/console/partials/notfound.html'
     });

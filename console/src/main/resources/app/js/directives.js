@@ -142,3 +142,11 @@ loDirectives.directive('loButtonClear', function () {
     }
   };
 });
+
+loDirectives.directive('loSelect', function () {
+  return {
+    link: function(scope, element) {
+      element.selectpicker();
+    }
+  };
+});
