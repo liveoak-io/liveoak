@@ -92,8 +92,8 @@ loMod.config(['$routeProvider', function($routeProvider) {
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
         },
-        currentCollection: function(LoCollectionLoader){
-          return new LoCollectionLoader();
+        currentCollectionList: function(LoCollectionListLoader){
+          return new LoCollectionListLoader();
         }
       },
       templateUrl: '/admin/console/partials/storage-collection.html'

@@ -17,15 +17,12 @@
 
 <div class="lo-page-info">
     <div class="pull-left">
-        <select lo-select class="select-lg">
-            <option>MyFirstCollection</option>
-            <option>MySecondCollection</option>
-            <option>MyThirdCollection</option>
+        <select ui-select2 class="select-lg" ng-model="collectionId" ng-options="o.id as o.id for o in collectionList">
         </select>
         <button class="btn btn-link btn-icon" type="button" data-toggle="tooltip" data-placement="top" title="Edit Collection Name..."><i class="fa fa-edit"></i><span>Edit Collection Name</span></button>
-						<span data-toggle="modal" data-target="#delete-collection">
-							<button class="btn btn-link btn-icon" data-toggle="tooltip" data-placement="top" title="Delete Collection..."><i class="fa fa-trash-o"></i><span>Delete Collection</span></button>
-						</span>
+        <span data-toggle="modal" data-target="#delete-collection">
+            <button class="btn btn-link btn-icon" data-toggle="tooltip" data-placement="top" title="Delete Collection..."><i class="fa fa-trash-o"></i><span>Delete Collection</span></button>
+        </span>
         <div class="modal fade" id="delete-collection" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -85,9 +82,9 @@
     <table class="table table-striped table-bordered">
         <thead>
         <tr>
-            <th colspan="5" class="table-actions">
+            <th colspan="{{ columns.length + 1 }}" class="table-actions">
                 <div class="search-comp clearfix">
-                    <input type="text" class="form-control search ng-pristine ng-valid" placeholder="Search...">
+                    <input type="text" class="form-control search ng-pristine ng-valid" placeholder="Search..." ng-model="query">
                     <button class="btn btn-link btn-icon" data-toggle="tooltip" data-placement="top" title="Search" type="submit">
                         <i class="fa fa-search"></i>
                         <span>Search</span>
@@ -147,56 +144,8 @@
             </th>
         </tr>
         <tr>
-            <th class="hasDropdown">
-                ID
-                <div class="dropdown">
-                    <button class="btn btn-link btn-icon dropdown-toggle" type="button" data-toggle="dropdown">
-                        <i class="fa fa-caret-square-o-down"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Delete Column</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Clear Column</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Hide Column</a></li>
-                        <li role="presentation" class="divider"></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Sort Column A-Z</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Sort Column Z-A</a></li>
-                    </ul>
-                </div>
-            </th>
-            <th class="hasDropdown">
-                firstname
-                <div class="dropdown">
-                    <button class="btn btn-link btn-icon dropdown-toggle" type="button" data-toggle="dropdown">
-                        <i class="fa fa-caret-square-o-down"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Delete Column</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Clear Column</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Hide Column</a></li>
-                        <li role="presentation" class="divider"></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Sort Column A-Z</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Sort Column Z-A</a></li>
-                    </ul>
-                </div>
-            </th>
-            <th class="hasDropdown">
-                lastname
-                <div class="dropdown">
-                    <button class="btn btn-link btn-icon dropdown-toggle" type="button" data-toggle="dropdown">
-                        <i class="fa fa-caret-square-o-down"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Delete Column</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Clear Column</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Hide Column</a></li>
-                        <li role="presentation" class="divider"></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Sort Column A-Z</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Sort Column Z-A</a></li>
-                    </ul>
-                </div>
-            </th>
-            <th class="hasDropdown before-actions">
-                address
+            <th ng-repeat="column in columns" class="hasDropdown" ng-class="{'before-actions':$last}">
+                {{ column }}
                 <div class="dropdown">
                     <button class="btn btn-link btn-icon dropdown-toggle" type="button" data-toggle="dropdown">
                         <i class="fa fa-caret-square-o-down"></i>
@@ -215,11 +164,10 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="item in storage">
-            <td>{{item.id}}</td>
-            <td>"{{item.fName}}"</td>
-            <td>"{{item.lName}}"</td>
-            <td class="before-actions">“{{item.collection}}”</td>
+        <tr ng-repeat="item in myData._members | filter:query">
+            <td ng-repeat="column in columns" ng-class="{'before-actions':$last}">
+                {{ item[column] }}
+            </td>
             <td class="actions"><button class="btn btn-link btn-icon" data-toggle="tooltip" data-placement="top" title="Delete Row"><i class="fa fa-trash-o"></i><span>Delete Row</span></button></td>
         </tr>
         </tbody>

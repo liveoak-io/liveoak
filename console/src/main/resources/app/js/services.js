@@ -159,7 +159,26 @@ loMod.factory('LoStorageList', function($resource) {
 });
 
 loMod.factory('LoCollection', function($resource) {
-  return $resource('/chat/storage/chat?expand=members');
+  return $resource('/:appId/:storageId/:collectionId?expand=members', {
+    appId : '@appId',
+    storageId : '@storageId',
+    collectionId : '@collectionId'
+  }, {
+    get : {
+      method : 'GET'
+    }
+  });
+});
+
+loMod.factory('LoCollectionList', function($resource) {
+  return $resource('/:appId/:storageId?expand=members', {
+    appId : '@appId',
+    storageId : '@storageId'
+  }, {
+    get : {
+      method : 'GET'
+    }
+  });
 });
 
 loMod.factory('LoApp', function($resource) {
@@ -189,6 +208,15 @@ loMod.factory('LoStorageListLoader', function(Loader, LoStorageList, $route) {
   return Loader.get(LoStorageList, function() {
     return {
       appId : $route.current.params.appId
+    };
+  });
+});
+
+loMod.factory('LoCollectionListLoader', function(Loader, LoCollectionList, $route) {
+  return Loader.get(LoCollectionList, function() {
+    return {
+      appId : $route.current.params.appId,
+      storageId : $route.current.params.storageId
     };
   });
 });

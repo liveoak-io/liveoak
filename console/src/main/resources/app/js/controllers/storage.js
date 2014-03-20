@@ -6,6 +6,10 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
 
   $log.debug('StorageCtrl');
 
+  if(loStorage.hasOwnProperty('MongoClientOptions')){
+    loStorage.type = 'mongo';
+  }
+
   $rootScope.curApp = currentApp;
 
   $scope.breadcrumbs = [
@@ -33,10 +37,6 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
   var storageModelBackup = angular.copy(loStorage);
   $scope.storageModel = angular.copy(loStorage);
 
-  if(loStorage.hasOwnProperty('MongoClientOptions')){
-    $scope.storageModel.type = 'mongo';
-  }
-
   $scope.clear = function(){
     $scope.storageModel = angular.copy(storageModelBackup);
     $scope.changed = false;
@@ -44,6 +44,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
 
   $scope.$watch('storageModel', function() {
     if (!angular.equals($scope.storageModel, storageModelBackup)) {
+      $log.debug('Scope changed');
       $scope.changed = true;
     } else {
       $scope.changed = false;
@@ -54,19 +55,30 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
     if(!angular.equals($scope.storageModel.credentials[0].password, $scope.passwdConfirm)){
       Notifications.error('Password does not match the password confirmation.');
     } else {
+
+      var credentials = [];
+
+      // Send the credentials data only if username or password was set
+      if ($scope.storageModel.credentials.length > 0 &&
+        ($scope.storageModel.credentials[0].username || $scope.storageModel.credentials[0].password)){
+
+        $log.debug('Credentials were set');
+        credentials.push(
+          { mechanism:'MONGODB-CR',
+            username: $scope.storageModel.credentials[0].username,
+            password: $scope.storageModel.credentials[0].password,
+            database: $scope.storageModel.db
+          }
+        );
+      }
+
       var data = {
         id: $scope.storageModel.id,
         type: $scope.storageModel.type,
         config: {
           db: $scope.storageModel.db,
           servers: $scope.storageModel.servers,
-          credentials: [
-            { mechanism:'MONGODB-CR',
-              username: $scope.storageModel.credentials[0].username,
-              password: $scope.storageModel.credentials[0].password,
-              database: $scope.storageModel.db
-            }
-          ]
+          credentials: credentials
         }
       };
 
@@ -133,13 +145,30 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
 
 });
 
-loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, currentApp, currentCollection) {
+loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, currentApp, currentCollectionList, LoCollection, $routeParams) {
 
   $log.debug('StorageCollectionCtrl');
 
   $rootScope.curApp = currentApp;
+  $scope.collectionList = currentCollectionList._members;
+  $scope.collectionId = $scope.collectionList[0].id;
+  $log.debug($scope.collectionId);
 
-  $scope.currentCollection = currentCollection;
+  $scope.currentCollectionList = currentCollectionList;
+  $log.debug(currentCollectionList._members);
+
+  $scope.myData = LoCollection.get({appId: currentApp.id, storageId: $routeParams.storageId, collectionId: 'chat'});
+
+  $scope.columns = [];
+
+  $scope.myData.$promise.then(function(data){
+    for (var c in data._members[0]){
+      if (c !== 'self'){
+        $scope.columns.push(c);
+      }
+    }
+    console.log($scope.columns);
+  });
 
   $scope.storage = {
     item: {
