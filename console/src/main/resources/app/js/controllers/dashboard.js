@@ -7,9 +7,9 @@ loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, LoA
   $rootScope.curApp = currentApp;
 
   $scope.breadcrumbs = [
-    {'label': "Applications",  'href':"#/applications"},
-    {'label': currentApp.name, 'href':"#/applications/" + currentApp.id},
-    {'label': "Dashboard",       'href':"#/applications/" + currentApp.id + "/dashboard"}
+    {'label': 'Applications',  'href':'#/applications'},
+    {'label': currentApp.name, 'href':'#/applications/' + currentApp.id},
+    {'label': 'Dashboard',     'href':'#/applications/' + currentApp.id + '/dashboard'}
   ];
 
   LoAppList.get(function(data){

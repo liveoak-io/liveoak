@@ -13,6 +13,7 @@ mods/
 *.swp
 epom
 log
+npm-debug.log
 .DS_Store
 phantomjsdriver.log
 /launcher/data

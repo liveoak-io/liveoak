@@ -9,9 +9,9 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
   $rootScope.curApp = currentApp;
 
   $scope.breadcrumbs = [
-    {'label': "Applications",  'href':"#/applications"},
-    {'label': currentApp.name, 'href':"#/applications/" + currentApp.id},
-    {'label': "Storage",       'href':"#/applications/" + currentApp.id + "/storage"}
+    {'label': 'Applications',  'href':'#/applications'},
+    {'label': currentApp.name, 'href':'#/applications/' + currentApp.id},
+    {'label': 'Storage',       'href':'#/applications/' + currentApp.id + '/storage'}
   ];
 
   LoAppList.get(function(data){
@@ -24,10 +24,10 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
 
   if (loStorage.id){
     $scope.create = false;
-    $scope.breadcrumbs.push({'label': loStorage.id,   'href':"#/applications/" + currentApp.id + "/storage/" + loStorage.id});
+    $scope.breadcrumbs.push({'label': loStorage.id, 'href':'#/applications/' + currentApp.id + '/storage/' + loStorage.id});
   }
   else {
-    $scope.breadcrumbs.push({'label': "New Storage",   'href':"#/applications/" + currentApp.id + "/storage/create-storage"});
+    $scope.breadcrumbs.push({'label': 'New Storage', 'href':'#/applications/' + currentApp.id + '/storage/create-storage'});
   }
 
   var storageModelBackup = angular.copy(loStorage);
@@ -75,7 +75,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
         $log.debug('Creating new storage resource: ' + data.id);
         LoStorage.create({appId: $scope.curApp.id}, data,
           // success
-          function(value, responseHeaders) {
+          function(/*value, responseHeaders*/) {
             Notifications.success('New storage successfully created.');
             storageModelBackup = angular.copy($scope.storageModel);
             $scope.changed = false;
@@ -101,9 +101,9 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
   $rootScope.curApp = currentApp;
 
   $scope.breadcrumbs = [
-    {'label': "Applications",  'href':"#/applications"},
-    {'label': currentApp.name, 'href':"#/applications/" + currentApp.id},
-    {'label': "Storage",       'href':"#/applications/" + currentApp.id + "/storage"}
+    {'label': 'Applications',  'href':'#/applications'},
+    {'label': currentApp.name, 'href':'#/applications/' + currentApp.id},
+    {'label': 'Storage',       'href':'#/applications/' + currentApp.id + '/storage'}
   ];
 
   $scope.createdId = $routeParams.created;
