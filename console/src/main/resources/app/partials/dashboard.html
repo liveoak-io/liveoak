@@ -1,6 +1,6 @@
     <lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="dashboard" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
 
-    <div class="col-md-10 lo-main-pane">
+    <div class="col-md-10 lo-main-pane app-dashboard">
         <div class="row">
             <div class="lo-content-area col-md-10">
                 <lo-breadcrumbs></lo-breadcrumbs>
@@ -33,7 +33,7 @@
                             <i class="fa fa-mobile"></i>
                             <div>
                                 <em>{{data[curApp.name].metrics[range].notifications}}</em>
-                                <span class="text">push notifications / second</span>
+                                <span class="text">notifications / second</span>
                             </div>
                         </div>
                         <div class="col-md-4 lo-measure-box storage">
@@ -47,7 +47,7 @@
                     </div>
                 </div>
 
-                <section class="lo-section">
+                <section class="lo-tutorials">
                     <h3><span>LiveOak</span> Tutorials</h3>
                     <i class="fa fa-file-text-o fa-4x"></i>
                     <p>Explore LiveOak Documentation and learn how to set up Security, Data and Push.</p>
@@ -65,12 +65,12 @@
                         <div>
                             <span class="lo-label">App Key</span>
                             <span class="lo-field">{{data[curApp.name].appKey}}</span>
-                            <button class="lo-icon-button" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy"><i class="fa fa-copy"></i><span>Copy</span></button>
+                            <!-- <button class="lo-icon-button" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy"><i class="fa fa-copy"></i><span>Copy</span></button> -->
                         </div>
                         <div>
                             <span class="lo-label">App Secret</span>
                             <span class="lo-field">{{data[curApp.name].appSecret}}</span>
-                            <button class="lo-icon-button" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy"><i class="fa fa-copy"></i><span>Copy</span></button>
+                            <!-- <button class="lo-icon-button" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy"><i class="fa fa-copy"></i><span>Copy</span></button> -->
                         </div>
                         <a href="#">View <strong>Security Settings</strong> »</a>
                     </section>
