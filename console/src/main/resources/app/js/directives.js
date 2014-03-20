@@ -43,7 +43,7 @@ loDirectives.directive('loAppSummary', function () {
   };
 });
 
-loDirectives.directive('loStorageSummary', function () {
+loDirectives.directive('loStorageSummary', function (LoCollectionList) {
   return {
     scope: {
       storage: '=loStorage',
@@ -52,7 +52,12 @@ loDirectives.directive('loStorageSummary', function () {
     },
     restrict: 'E',
     replace: true,
-    templateUrl: '/admin/console/templates/lo-storage-summary.html'
+    templateUrl: '/admin/console/templates/lo-storage-summary.html',
+    link: function(scope){
+      LoCollectionList.get({appId: scope.loApp.id, storageId: scope.storage.id}, function(){
+        scope.storage.hasCollections = true;
+      });
+    }
   };
 });
 

@@ -133,13 +133,30 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
 
 });
 
-loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, currentApp, currentCollection) {
+loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, currentApp, currentCollectionList, LoCollection, $routeParams) {
 
   $log.debug('StorageCollectionCtrl');
 
   $rootScope.curApp = currentApp;
+  $scope.collectionList = currentCollectionList._members;
+  $scope.collectionId = $scope.collectionList[0].id;
+  $log.debug($scope.collectionId);
 
-  $scope.currentCollection = currentCollection;
+  $scope.currentCollectionList = currentCollectionList;
+  $log.debug(currentCollectionList._members);
+
+  $scope.myData = LoCollection.get({appId: currentApp.id, storageId: $routeParams.storageId, collectionId: 'chat'});
+
+  $scope.columns = [];
+
+  $scope.myData.$promise.then(function(data){
+    for (var c in data._members[0]){
+      if (c !== 'self'){
+        $scope.columns.push(c);
+      }
+    }
+    console.log($scope.columns);
+  });
 
   $scope.storage = {
     item: {
