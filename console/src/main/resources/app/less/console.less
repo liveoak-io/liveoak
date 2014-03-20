@@ -24,12 +24,11 @@
 @c_graylight:       #aaa;
 @c_gray:            #666;
 
-@c_greenlight:      @c_green + @inc;
-@c_green:           #63b474;
-@c_greendark:       @c_green - @inc;
-
-@c_greenlight:			#c1e1c7;
 @c_greenxlight: 		#e0f0e3;
+@c_greenlight:			#b3d9ba;
+@c_green:           #63b474;
+@c_greenmedium:     #55a566;
+@c_greendark:       @c_green - @inc;
 
 @c_red:             #cb0000;
 
@@ -47,6 +46,7 @@ html {
     line-height: 1.909em;
     font-family: @exo;
     color: @c_gray;
+    background-color: @c_mainpane;
   }
 }
 
@@ -96,7 +96,7 @@ p {
   cursor: pointer;
 }
 
-.opacity20 {
+.opacity-20 {
   opacity: 0.2;
 }
 
@@ -150,7 +150,7 @@ p {
       font-size: 13px;
 
       &:hover {
-        background-color: @c_greendark;
+        background-color: @c_greenmedium;
       }
     }
   }
@@ -312,24 +312,64 @@ p {
     .panel-heading {
       background: #fff;
       border-bottom: 1px solid @c_mainpane;
+      padding: 15px 20px 10px 20px;
 
       .panel-title {
         display: inline-block;
         color: @c_gray;
-        font-size: 2.1em;
+        font-size: 23px;
         font-weight: 500;
       }
+      
+      .dropdown {
+        margin-top: 5px;
+        visibility: hidden;
+        
+        &.open {
+          visibility: visible;
+        }
+      }
     }
-  }
+    
+    &:hover .dropdown {
+      visibility: visible;
+    }
 
-  .panel-body {
-    padding: 36px 15px 32px;
+    .panel-body {
+      padding: 0 20px 15px 20px;
+      
+      &.empty-instance {
+        
+        padding: 30px;
+        
+        .fa {
+          font-size: 108px;
+          opacity: 0.2;
+        }
+        
+        p {
+          color: @c_gray;
+          font-size: 20px;
+          margin-bottom: 20px;
+          margin-top: 5px;
+        }
+      }
+    }
   }
 }
 
 .lo-main-pane.app-dashboard .panel {
   margin-top: 20px;
+  
+  .panel-heading {
+    padding: 10px 15px;
+  }
+  
+  .panel-body {
+    padding: 36px 15px 32px;
+  }
 }
+
 
 /* Panel entity */
 [class*="lo-panel-"] {
@@ -371,15 +411,14 @@ p {
 
       li {
         display: inline-block;
-        margin-right: 2em;
-        font-size: 1.2em;
+        margin-right: 40px;
+        font-size: 12px;
 
         a {
-          color: @c_gray + 30;
+          color: @c_gray;
 
           i {
-            font-size: 1.25em;
-            margin-right: 0.25em;
+            margin-right: 5px;
           }
 
           &:hover {
@@ -731,7 +770,6 @@ legend {
   border-width: 1px 0 0 0;
   border-color: @c_border;
   border-style: solid;
-  padding-top: .5em;
   font-size: 14px;
   font-weight: 600;
   padding-top: 19px;
@@ -1024,9 +1062,9 @@ legend {
 .open
 .dropdown-toggle.btn-primary
 {
-  background-color: @c_greendark;
+  background-color: @c_greenmedium;
   border-color: @c_greendark ;
-  background-image: linear-gradient(to bottom, @c_green - 5 0%, @c_green + 5 100%);
+  background-image: none;
 }
 
 /* Breadcrumb */
@@ -1058,8 +1096,14 @@ legend {
   }
 
   li > a:hover {
-    background-color: #e0f0e3;
-    border-color: #c1e1c7;
+    background-color: @c_greenxlight;
+    border-color: @c_greenlight;
+  }
+  
+  > li > a:focus, 
+  > li > a:active {
+    background-color: @c_green;
+    border-color: @c_greendark;
   }
 
   > li.active {
@@ -1095,7 +1139,7 @@ legend {
   }
   > .open > a:focus,
   > .open > a{
-    background: @c_greendark;
+    background: @c_greenmedium;
   }
 }
 
