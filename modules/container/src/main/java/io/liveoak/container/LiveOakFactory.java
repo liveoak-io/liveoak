@@ -157,7 +157,7 @@ public class LiveOakFactory {
     }
 
     protected void createServers() throws UnknownHostException {
-        AddressService address = new AddressService(InetAddress.getByName(bindAddress), 8080, 8383);
+        AddressService address = new AddressService(bindAddress, 8080, 8383);
         serviceContainer.addService(ADDRESS, address).install();
 
         UnsecureServerService unsecureServer = new UnsecureServerService();

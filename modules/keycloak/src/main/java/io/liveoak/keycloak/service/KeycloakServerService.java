@@ -37,7 +37,14 @@ public class KeycloakServerService implements Service<KeycloakServer> {
             // TODO Remove once fixed in Keycloak
             Thread.currentThread().setContextClassLoader(KeycloakServer.class.getClassLoader());
             UndertowServer undertow = this.undertowServerInjector.getValue();
-            this.server = new KeycloakServer(undertow);
+
+            Address address = addressInjector.getValue();
+            String liveOakUrl = "http://" + address.host();
+            if (address.port() != 80) {
+                liveOakUrl += ":" + address.port();
+            }
+
+            this.server = new KeycloakServer(undertow, liveOakUrl);
             this.server.start();
         } catch (Throwable t) {
             throw new StartException(t);

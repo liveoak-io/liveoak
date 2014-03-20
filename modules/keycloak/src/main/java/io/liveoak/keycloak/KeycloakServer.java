@@ -1,5 +1,6 @@
 package io.liveoak.keycloak;
 
+import io.liveoak.spi.container.Address;
 import io.undertow.server.handlers.resource.Resource;
 import io.undertow.server.handlers.resource.ResourceChangeListener;
 import io.undertow.server.handlers.resource.ResourceManager;
@@ -48,11 +49,13 @@ import static io.undertow.servlet.Servlets.servlet;
 public class KeycloakServer {
 
     private final UndertowServer undertow;
+    private String liveOakUrl;
 
     private KeycloakSessionFactory factory;
 
-    public KeycloakServer(UndertowServer undertow) {
+    public KeycloakServer(UndertowServer undertow, String liveOakUrl) {
         this.undertow = undertow;
+        this.liveOakUrl = liveOakUrl;
 
         Config.setAdminRealm("liveoak-admin");
         Config.setThemeDefault("liveoak");
@@ -88,8 +91,9 @@ public class KeycloakServer {
 
                 consoleApp.setAllowedClaimsMask(ClaimMask.USERNAME);
 
-                consoleApp.addRedirectUri("http://localhost:8080/admin");
-                consoleApp.addWebOrigin("http://localhost:8080");
+                consoleApp.addRedirectUri(liveOakUrl + "/admin/");
+                consoleApp.addWebOrigin(liveOakUrl);
+                consoleApp.setBaseUrl(liveOakUrl + "/admin/");
             }
 
             session.getTransaction().commit();

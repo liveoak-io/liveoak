@@ -1,58 +1,134 @@
-var Keycloak = function (options) {
-    options = options || {};
-
+var Keycloak = function (config) {
     if (!(this instanceof Keycloak)) {
-        return new Keycloak(options);
+        return new Keycloak(config);
     }
 
     var kc = this;
+    var adapter;
 
-    if (!options.url) {
-        var scripts = document.getElementsByTagName('script');
-        for (var i = 0; i < scripts.length; i++) {
-            if (scripts[i].src.match(/.*keycloak\.js/)) {
-                options.url = scripts[i].src.substr(0, scripts[i].src.indexOf('/auth/js/keycloak.js'));
-                break;
+    kc.init = function (init) {
+        kc.authenticated = false;
+
+        if (window.Cordova) {
+            adapter = loadAdapter('cordova');
+        } else {
+            adapter = loadAdapter();
+        }
+
+        var promise = createPromise();
+
+        var initPromise = createPromise();
+        initPromise.promise.success(function() {
+            kc.onReady && kc.onReady(kc.authenticated);
+            promise.setSuccess(kc.authenticated);
+        }).error(function() {
+            promise.setError();
+        });
+
+        var configPromise = loadConfig(config);
+
+        function processInit() {
+            var callback = parseCallback(window.location.href);
+            if (callback) {
+                window.history.replaceState({}, null, location.protocol + '//' + location.host + location.pathname + (callback.fragment ? '#' + callback.fragment : ''));
+                processCallback(callback, initPromise);
+                return;
+            } else if (init) {
+                if (init.code || init.error) {
+                    processCallback(init, initPromise);
+                    return;
+                } else if (init.token || init.refreshToken) {
+                    setToken(init.token, init.refreshToken);
+                    initPromise.setSuccess();
+                } else if (init == 'login-required') {
+                    var p = kc.login();
+                    if (p) {
+                        p.success(function() {
+                            initPromise.setSuccess();
+                        }).error(function() {
+                            initPromise.setError();
+                        });
+                    };
+                } else if (init == 'check-sso') {
+                    var p = kc.login({ prompt: 'none' });
+                    if (p) {
+                        p.success(function() {
+                            initPromise.setSuccess();
+                        }).error(function() {
+                            initPromise.setSuccess();
+                        });
+                    };
+                } else {
+                    throw 'invalid init: ' + init;
+                }
+            } else {
+                initPromise.setSuccess();
             }
         }
+
+        configPromise.success(processInit);
+        configPromise.error(function() {
+            promise.setError();
+        });
+
+        return promise.promise;
     }
 
-    if (!options.url) {
-        throw 'url missing';
+    kc.login = function (options) {
+        return adapter.login(options);
     }
 
-    if (!options.realm) {
-        throw 'realm missing';
-    }
+    kc.createLoginUrl = function(options) {
+        var state = createUUID();
 
-    if (!options.clientId) {
-        throw 'clientId missing';
-    }
-
-    kc.init = function (successCallback, errorCallback) {
-        if (window.oauth.callback) {
-            processCallback(successCallback, errorCallback);
-        } else if (options.token) {
-            kc.setToken(options.token, successCallback);
-        } else if (options.onload) {
-            switch (options.onload) {
-                case 'login-required' :
-                    window.location = kc.createLoginUrl(true);
-                    break;
-                case 'check-sso' :
-                    window.location = kc.createLoginUrl(false);
-                    break;
+        var redirectUri = adapter.redirectUri(options);
+        if (options && options.prompt) {
+            if (redirectUri.indexOf('?') == -1) {
+                redirectUri += '?prompt=' + options.prompt;
+            } else {
+                redirectUri += '&prompt=' + options.prompt;
             }
         }
+
+        sessionStorage.oauthState = state;
+
+        var url = getRealmUrl()
+            + '/tokens/login'
+            + '?client_id=' + encodeURIComponent(kc.clientId)
+            + '&redirect_uri=' + encodeURIComponent(redirectUri)
+            + '&state=' + encodeURIComponent(state)
+            + '&response_type=code';
+
+        if (options && options.prompt) {
+            url += '&prompt=' + options.prompt;
+        }
+
+        return url;
     }
 
-    kc.login = function () {
-        window.location.href = kc.createLoginUrl(true);
+    kc.logout = function(options) {
+        return adapter.logout(options);
     }
 
-    kc.logout = function () {
-        kc.setToken(undefined);
-        window.location.href = kc.createLogoutUrl();
+    kc.createLogoutUrl = function(options) {
+        var url = getRealmUrl()
+            + '/tokens/logout'
+            + '?redirect_uri=' + encodeURIComponent(adapter.redirectUri(options));
+
+        return url;
+    }
+
+    kc.createAccountUrl = function(options) {
+        var url = getRealmUrl()
+            + '/account'
+            + '?referrer=' + kc.clientId
+            + '&referrer_uri=' + encodeURIComponent(adapter.redirectUri(options));
+
+        return url;
+    }
+
+    kc.accountManagement = function() {
+        return adapter.accountManagement();
     }
 
     kc.hasRealmRole = function (role) {
@@ -60,122 +136,134 @@ var Keycloak = function (options) {
         return access && access.roles.indexOf(role) >= 0 || false;
     }
 
-    kc.hasResourceRole = function (role, resource) {
+    kc.hasResourceRole = function(role, resource) {
         if (!kc.resourceAccess) {
             return false;
         }
 
-        var access = kc.resourceAccess[resource || options.clientId];
+        var access = kc.resourceAccess[resource || kc.clientId];
         return access && access.roles.indexOf(role) >= 0 || false;
     }
 
-    kc.loadUserProfile = function (success, error) {
-        var url = kc.getRealmUrl() + '/account';
+    kc.loadUserProfile = function() {
+        var url = getRealmUrl() + '/account';
         var req = new XMLHttpRequest();
         req.open('GET', url, true);
         req.setRequestHeader('Accept', 'application/json');
         req.setRequestHeader('Authorization', 'bearer ' + kc.token);
 
+        var promise = createPromise();
+
         req.onreadystatechange = function () {
             if (req.readyState == 4) {
                 if (req.status == 200) {
                     kc.profile = JSON.parse(req.responseText);
-                    success && success(kc.profile)
+                    promise.setSuccess(kc.profile);
                 } else {
-                    var response = { status: req.status, statusText: req.status };
-                    if (req.responseText) {
-                        response.data = JSON.parse(req.responseText);
-                    }
-                    error && error(response);
+                    promise.setError();
                 }
             }
         }
 
         req.send();
+
+        return promise.promise;
     }
 
-    /**
-     * checks to make sure token is valid.  If it is, it calls successCallback with no parameters.
-     * If it isn't valid, it tries to refresh the access token.  On successful refresh, it calls successCallback.
-     *
-     * @param successCallback
-     * @param errorCallback
-     */
-    kc.onValidAccessToken = function(successCallback, errorCallback) {
-        if (!kc.tokenParsed) {
-            console.log('no token');
-            errorCallback();
-            return;
+    kc.isTokenExpired = function(minValidity) {
+        if (!kc.tokenParsed || !kc.refreshToken) {
+            throw 'Not authenticated';
         }
-        var currTime = new Date().getTime() / 1000;
-        if (currTime > kc.tokenParsed['exp']) {
-            if (!kc.refreshToken) {
-                console.log('no refresh token');
-                errorCallback();
-                return;
+
+        var expiresIn = kc.tokenParsed['exp'] - (new Date().getTime() / 1000);
+        if (minValidity) {
+            expiresIn -= minValidity;
+        }
+
+        return expiresIn < 0;
+    }
+
+    kc.updateToken = function(minValidity) {
+        if (!kc.tokenParsed || !kc.refreshToken) {
+            throw 'Not authenticated';
+        }
+
+        var promise = createPromise();
+
+        if (minValidity) {
+            if (!kc.isTokenExpired(minValidity)) {
+                promise.setSuccess(false);
+                return promise.promise;
             }
-            console.log('calling refresh');
-            var params = 'grant_type=refresh_token&' + 'refresh_token=' + kc.refreshToken;
-            var url = kc.getRealmUrl() + '/tokens/refresh';
-
-            var req = new XMLHttpRequest();
-            req.open('POST', url, true, options.clientId, options.clientSecret);
-            req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-            req.onreadystatechange = function () {
-                if (req.readyState == 4) {
-                    if (req.status == 200) {
-                        console.log('Refresh Success');
-                        var tokenResponse = JSON.parse(req.responseText);
-                        kc.refreshToken = tokenResponse['refresh_token'];
-                        kc.setToken(tokenResponse['access_token'], successCallback);
-                    } else {
-                        console.log('error on refresh HTTP invoke: ' + req.status);
-                        errorCallback && errorCallback({ authenticated: false, status: req.status, statusText: req.statusText });
-                    }
-                }
-            };
-            req.send(params);
-        } else {
-            console.log('Token is still valid');
-            successCallback();
         }
 
+        var params = 'grant_type=refresh_token&' + 'refresh_token=' + kc.refreshToken;
+        var url = getRealmUrl() + '/tokens/refresh';
+
+        var req = new XMLHttpRequest();
+        req.open('POST', url, true);
+        req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+        if (kc.clientId && kc.clientSecret) {
+            req.setRequestHeader('Authorization', 'Basic ' + btoa(kc.clientId + ':' + kc.clientSecret));
+        } else {
+            params += '&client_id=' + encodeURIComponent(kc.clientId);
+        }
+
+        req.onreadystatechange = function() {
+            if (req.readyState == 4) {
+                if (req.status == 200) {
+                    var tokenResponse = JSON.parse(req.responseText);
+                    setToken(tokenResponse['access_token'], tokenResponse['refresh_token']);
+                    kc.onAuthRefreshSuccess && kc.onAuthRefreshSuccess();
+                    promise.setSuccess(true);
+                } else {
+                    kc.onAuthRefreshError && kc.onAuthRefreshError();
+                    promise.setError();
+                }
+            }
+        };
+
+        req.send(params);
+
+        return promise.promise;
     }
 
-    kc.getRealmUrl = function() {
-        return options.url + '/auth/rest/realms/' + encodeURIComponent(options.realm);
+    function getRealmUrl() {
+        return kc.authServerUrl + '/rest/realms/' + encodeURIComponent(kc.realm);
     }
 
-    function processCallback(successCallback, errorCallback) {
-        var code = window.oauth.code;
-        var error = window.oauth.error;
-        var prompt = window.oauth.prompt;
+    function processCallback(oauth, promise) {
+        var code = oauth.code;
+        var error = oauth.error;
+        var prompt = oauth.prompt;
 
         if (code) {
             var params = 'code=' + code;
-            var url = kc.getRealmUrl() + '/tokens/access/codes';
+            var url = getRealmUrl() + '/tokens/access/codes';
 
             var req = new XMLHttpRequest();
             req.open('POST', url, true);
             req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
-            if (options.clientId && options.clientSecret) {
-                req.setRequestHeader('Authorization', 'Basic ' + btoa(options.clientId + ':' + options.clientSecret));
+            if (kc.clientId && kc.clientSecret) {
+                req.setRequestHeader('Authorization', 'Basic ' + btoa(kc.clientId + ':' + kc.clientSecret));
             } else {
-                params += '&client_id=' + encodeURIComponent(options.clientId);
+                params += '&client_id=' + encodeURIComponent(kc.clientId);
             }
 
             req.withCredentials = true;
 
-            req.onreadystatechange = function () {
+            req.onreadystatechange = function() {
                 if (req.readyState == 4) {
                     if (req.status == 200) {
                         var tokenResponse = JSON.parse(req.responseText);
-                        kc.refreshToken = tokenResponse['refresh_token'];
-                        kc.setToken(tokenResponse['access_token'], successCallback);
+                        setToken(tokenResponse['access_token'], tokenResponse['refresh_token']);
+                        kc.onAuthSuccess && kc.onAuthSuccess();
+                        promise && promise.setSuccess();
                     } else {
-                        errorCallback && errorCallback({ authenticated: false, status: req.status, statusText: req.statusText });
+                        kc.onAuthError && kc.onAuthError();
+                        promise && promise.setError();
                     }
                 }
             };
@@ -183,16 +271,82 @@ var Keycloak = function (options) {
             req.send(params);
         } else if (error) {
             if (prompt != 'none') {
-                setTimeout(function() {
-                    errorCallback && errorCallback({  authenticated: false, error: error })
-                }, 0);
+                kc.onAuthError && kc.onAuthError();
+                promise && promise.setError();
+            } else {
+                promise && promise.setSuccess();
             }
         }
     }
 
-    kc.setToken = function(token, successCallback) {
+    function loadConfig(url) {
+        var promise = createPromise();
+        var configUrl;
+
+        if (!config) {
+            configUrl = 'keycloak.json';
+        } else if (typeof config === 'string') {
+            configUrl = config;
+        }
+
+        if (configUrl) {
+            var req = new XMLHttpRequest();
+            req.open('GET', configUrl, true);
+            req.setRequestHeader('Accept', 'application/json');
+
+            req.onreadystatechange = function () {
+                if (req.readyState == 4) {
+                    if (req.status == 200) {
+                        var config = JSON.parse(req.responseText);
+
+                        kc.authServerUrl = config['auth-server-url'];
+                        kc.realm = config['realm'];
+                        kc.clientId = config['resource'];
+
+                        promise.setSuccess();
+                    } else {
+                        promise.setError();
+                    }
+                }
+            };
+
+            req.send();
+        } else {
+            if (!config['url']) {
+                var scripts = document.getElementsByTagName('script');
+                for (var i = 0; i < scripts.length; i++) {
+                    if (scripts[i].src.match(/.*keycloak\.js/)) {
+                        config.url = scripts[i].src.substr(0, scripts[i].src.indexOf('/js/keycloak.js'));
+                        break;
+                    }
+                }
+            }
+
+            if (!config.realm) {
+                throw 'realm missing';
+            }
+
+            if (!config.clientId) {
+                throw 'clientId missing';
+            }
+
+            kc.authServerUrl = config.url;
+            kc.realm = config.realm;
+            kc.clientId = config.clientId;
+
+            promise.setSuccess();
+        }
+
+        return promise.promise;
+    }
+
+    function clearToken() {
+        setToken(null, null);
+        kc.onAuthLogout && kc.onAuthLogout();
+    }
+
+    function setToken(token, refreshToken) {
         if (token) {
-            window.oauth.token = token;
             kc.token = token;
             kc.tokenParsed = JSON.parse(atob(token.split('.')[1]));
             kc.authenticated = true;
@@ -209,52 +363,24 @@ var Keycloak = function (options) {
                     kc.idToken[n] = kc.tokenParsed[n];
                 }
             }
-
-            setTimeout(function() {
-                successCallback && successCallback({ authenticated: kc.authenticated, subject: kc.subject });
-            }, 0);
         } else {
-            delete window.oauth.token;
             delete kc.token;
-        }
-    }
+            delete kc.tokenParsed;
+            delete kc.subject;
+            delete kc.realmAccess;
+            delete kc.resourceAccess;
+            delete kc.idToken;
 
-    kc.createLoginUrl = function(prompt) {
-        var state = createUUID();
-
-        sessionStorage.oauthState = state;
-        var url = kc.getRealmUrl()
-            + '/tokens/login'
-            + '?client_id=' + encodeURIComponent(options.clientId)
-            + '&redirect_uri=' + getEncodedRedirectUri()
-            + '&state=' + encodeURIComponent(state)
-            + '&response_type=code';
-
-        if (prompt == false) {
-            url += '&prompt=none';
+            kc.authenticated = false;
         }
 
-        return url;
-    }
-
-    kc.createLogoutUrl = function() {
-        var url = kc.getRealmUrl()
-            + '/tokens/logout'
-            + '?redirect_uri=' + getEncodedRedirectUri();
-        return url;
-    }
-
-    function getEncodedRedirectUri() {
-        var url;
-        if (options.redirectUri) {
-            url = options.redirectUri;
+        if (refreshToken) {
+            kc.refreshToken = refreshToken;
+            kc.refreshTokenParsed = JSON.parse(atob(refreshToken.split('.')[1]));
         } else {
-            url = (location.protocol + '//' + location.hostname + (location.port && (':' + location.port)) + location.pathname);
-            if (location.hash) {
-                url += '?redirect_fragment=' + encodeURIComponent(location.hash.substring(1));
-            }
+            delete kc.refreshToken;
+            delete kc.refreshTokenParsed;
         }
-        return encodeURI(url);
     }
 
     function createUUID() {
@@ -269,7 +395,206 @@ var Keycloak = function (options) {
         var uuid = s.join('');
         return uuid;
     }
-    
+
+    function parseCallback(url) {
+        if (url.indexOf('?') != -1) {
+            var oauth = {};
+
+            var params = url.split('?')[1].split('&');
+            for (var i = 0; i < params.length; i++) {
+                var p = params[i].split('=');
+                switch (decodeURIComponent(p[0])) {
+                    case 'code':
+                        oauth.code = p[1];
+                        break;
+                    case 'error':
+                        oauth.error = p[1];
+                        break;
+                    case 'state':
+                        oauth.state = decodeURIComponent(p[1]);
+                        break;
+                    case 'redirect_fragment':
+                        oauth.fragment = decodeURIComponent(p[1]);
+                        break;
+                    case 'prompt':
+                        oauth.prompt = p[1];
+                        break;
+                }
+            }
+
+            if ((oauth.code || oauth.error) && oauth.state && oauth.state == sessionStorage.oauthState) {
+                delete sessionStorage.oauthState;
+                return oauth;
+            }
+        }
+    }
+
+    function createPromise() {
+        var p = {
+            setSuccess: function(result) {
+                p.success = true;
+                p.result = result;
+                if (p.successCallback) {
+                    p.successCallback(result);
+                }
+            },
+
+            setError: function(result) {
+                p.error = true;
+                p.result = result;
+                if (p.errorCallback) {
+                    p.errorCallback(result);
+                }
+            },
+
+            promise: {
+                success: function(callback) {
+                    if (p.success) {
+                        callback(p.result);
+                    } else if (!p.error) {
+                        p.successCallback = callback;
+                    }
+                    return p.promise;
+                },
+                error: function(callback) {
+                    if (p.error) {
+                        callback(p.result);
+                    } else if (!p.success) {
+                        p.errorCallback = callback;
+                    }
+                    return p.promise;
+                }
+            }
+        }
+        return p;
+    }
+
+    function loadAdapter(type) {
+        if (!type || type == 'default') {
+            return {
+                login: function(options) {
+                    window.location.href = kc.createLoginUrl(options);
+                },
+
+                logout: function(options) {
+                    window.location.href = kc.createLogoutUrl(options);
+                },
+
+                accountManagement : function() {
+                    window.location.href = kc.createAccountUrl();
+                },
+
+                redirectUri: function(options) {
+                    if (options && options.redirectUri) {
+                        return options.redirectUri;
+                    } else if (kc.redirectUri) {
+                        return kc.redirectUri;
+                    } else {
+                        var url = (location.protocol + '//' + location.hostname + (location.port && (':' + location.port)) + location.pathname);
+                        if (location.hash) {
+                            url += '?redirect_fragment=' + encodeURIComponent(location.hash.substring(1));
+                        }
+                        return url;
+                    }
+                }
+            };
+        }
+
+        if (type == 'cordova') {
+            console.debug('Enabling Cordova support');
+
+            return {
+                login: function(options) {
+                    var promise = createPromise();
+
+                    var o = 'location=no';
+                    if (options && options.prompt == 'none') {
+                        o += ',hidden=yes';
+                    }
+
+                    var loginUrl = kc.createLoginUrl(options);
+                    var ref = window.open(loginUrl, '_blank', o);
+
+                    var callback;
+                    var error;
+
+                    ref.addEventListener('loadstart', function(event) {
+                        if (event.url.indexOf('http://localhost') == 0) {
+                            callback = parseCallback(event.url);
+                            ref.close();
+                        }
+                    });
+
+                    ref.addEventListener('loaderror', function(event) {
+                        if (event.url.indexOf('http://localhost') != 0) {
+                            error = true;
+                            ref.close();
+                        }
+                    });
+
+                    ref.addEventListener('exit', function(event) {
+                        if (error || !callback) {
+                            promise.setError();
+                        } else {
+                            processCallback(callback, promise);
+                        }
+                    });
+
+                    return promise.promise;
+                },
+
+                logout: function(options) {
+                    var promise = createPromise();
+
+                    var logoutUrl = kc.createLogoutUrl(options);
+                    var ref = window.open(logoutUrl, '_blank', 'location=no,hidden=yes');
+
+                    var error;
+
+                    ref.addEventListener('loadstart', function(event) {
+                        if (event.url.indexOf('http://localhost') == 0) {
+                            ref.close();
+                        }
+                    });
+
+                    ref.addEventListener('loaderror', function(event) {
+                        if (event.url.indexOf('http://localhost') != 0) {
+                            error = true;
+                            ref.close();
+                        }
+                    });
+
+                    ref.addEventListener('exit', function(event) {
+                        if (error) {
+                            promise.setError();
+                        } else {
+                            clearToken();
+                            promise.setSuccess();
+                        }
+                    });
+
+                    return promise.promise;
+                },
+
+                accountManagement : function() {
+                    var accountUrl = kc.createAccountUrl();
+                    var ref = window.open(accountUrl, '_blank', 'location=no');
+                    ref.addEventListener('loadstart', function(event) {
+                        if (event.url.indexOf('http://localhost') == 0) {
+                            ref.close();
+                        }
+                    });
+                },
+
+                redirectUri: function(options) {
+                    return 'http://localhost';
+                }
+            }
+        }
+
+        throw 'invalid adapter type: ' + type;
+    }
+
     var idTokenProperties = [
         "name", 
         "given_name", 
@@ -299,44 +624,3 @@ var Keycloak = function (options) {
         "claims_locales"
     ]
 }
-
-window.oauth = (function () {
-    var oauth = {};
-
-    var params = window.location.search.substring(1).split('&');
-    for (var i = 0; i < params.length; i++) {
-        var p = params[i].split('=');
-        switch (decodeURIComponent(p[0])) {
-            case 'code':
-                oauth.code = p[1];
-                break;
-            case 'error':
-                oauth.error = p[1];
-                break;
-            case 'state':
-                oauth.state = decodeURIComponent(p[1]);
-                break;
-            case 'redirect_fragment':
-                oauth.fragment = decodeURIComponent(p[1]);
-                break;
-            case 'prompt':
-                oauth.prompt = p[1];
-                break;
-        }
-    }
-
-    if (oauth.state && oauth.state == sessionStorage.oauthState) {
-        oauth.callback = true;
-        delete sessionStorage.oauthState;
-    } else {
-        oauth.callback = false;
-    }
-
-    if (oauth.callback) {
-        window.history.replaceState({}, null, location.protocol + '//' + location.host + location.pathname + (oauth.fragment ? '#' + oauth.fragment : ''));
-    } else if (oauth.fragment) {
-        window.history.replaceState({}, null, location.protocol + '//' + location.host + location.pathname + (oauth.fragment ? '#' + oauth.fragment : ''));
-    }
-
-    return oauth;
-}());

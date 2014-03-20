@@ -58,7 +58,17 @@ public class InternalApplication implements Application {
 
     public InternalApplicationExtension extend(String resourceId, ResourceState resourceDefinition) throws Exception {
         String extensionId = (String) resourceDefinition.getProperty("type");
-        return extend(extensionId, resourceId, ConversionUtils.convert((ResourceState) resourceDefinition.getProperty("config")));
+
+        ObjectNode config;
+
+        ResourceState configState = (ResourceState) resourceDefinition.getProperty("config");
+        if (configState != null) {
+            config = ConversionUtils.convert((ResourceState) resourceDefinition.getProperty("config"));
+        } else {
+            config = JsonNodeFactory.instance.objectNode();
+        }
+
+        return extend(extensionId, resourceId, config);
     }
 
     public InternalApplicationExtension extend(String extensionId) throws Exception {

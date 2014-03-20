@@ -113,13 +113,13 @@ angular.element(document).ready(function () {
     }
   });
 
-  liveOak.auth.init(function () {
+  liveOak.auth.init('login-required').success(function () {
       loMod.factory('LiveOak', function () {
           return liveOak;
       });
       angular.bootstrap(document, ['loApp']);
-  }, function () {
-      alert('authentication failed');
+  }).error(function() {
+      window.location.reload();
   });
   /* jshint ignore:end */
 });
