@@ -25,7 +25,7 @@ var LiveOak = function( options ) {
     }
 
     var http = new Http(options);
-
+    var auth;
     var stomp_client = new Stomp.Client( options.host, options.port, options.secure );
 
     this.connect = function( callback ) {
@@ -65,10 +65,15 @@ var LiveOak = function( options ) {
     if (options.auth) {
         if (!options.auth.url) {
             var port = options.port ? options.port + 303 : 8383;
-            options.auth.url = (options.secure ? 'https://' : 'http://') + options.host + ':' + port;
+            options.auth.url = (options.secure ? 'https://' : 'http://') + options.host + ':' + port + '/auth';
         }
 
-        this.auth = new Keycloak(options.auth);
+        auth = new Keycloak(options.auth);
+        this.auth = auth;
+
+        http.getToken = function() {
+            return auth.token;
+        }
     }
 
     function parseScriptUrl() {

@@ -6,6 +6,8 @@ var Http = function (options) {
         baseUrl += ':' + options.port;
     }
 
+    var instance = this;
+
     this.create = function (path, data, options) {
         var url;
         var method;
@@ -65,8 +67,9 @@ var Http = function (options) {
         req.setRequestHeader('Content-type', 'application/json');
         req.setRequestHeader('Accept', 'application/json');
 
-        if (window.oauth.token) {
-            req.setRequestHeader('Authorization', 'bearer ' + window.oauth.token);
+        var token = instance.getToken && instance.getToken();
+        if (token) {
+            req.setRequestHeader('Authorization', 'bearer ' + token);
         }
 
         req.onreadystatechange = function () {

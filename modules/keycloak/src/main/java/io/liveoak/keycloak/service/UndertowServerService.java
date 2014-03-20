@@ -17,7 +17,7 @@ public class UndertowServerService implements Service<UndertowServer> {
     @Override
     public void start(StartContext context) throws StartException {
         Address address = this.addressInjector.getValue();
-        this.server = new UndertowServer( address.host().getHostName(), address.portUndertow() );
+        this.server = new UndertowServer( address.host(), address.portUndertow() );
         this.server.start();
     }
 

@@ -28,7 +28,7 @@ public abstract class AbstractNetworkServerService implements Service<NetworkSer
     public void start(StartContext context) throws StartException {
         this.server = newServer();
         try {
-            this.server.host( this.addressInjector.getValue().host() );
+            this.server.host( InetAddress.getByName(this.addressInjector.getValue().host()) );
             this.server.port( this.addressInjector.getValue().port() );
             this.server.pipelineConfigurator( this.pipelineConfiguratorInjector.getValue() );
             this.server.start();

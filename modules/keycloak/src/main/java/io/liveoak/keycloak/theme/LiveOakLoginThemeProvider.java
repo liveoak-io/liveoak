@@ -38,7 +38,7 @@ public class LiveOakLoginThemeProvider implements ThemeProvider {
 
     @Override
     public Set<String> nameSet(Theme.Type type) {
-        if (type == Theme.Type.LOGIN /* || type == Theme.Type.ACCOUNT */) {
+        if (type == Theme.Type.LOGIN || type == Theme.Type.ACCOUNT) {
             return defaultThemes;
         } else {
             return Collections.emptySet();

@@ -12,11 +12,11 @@ import java.net.InetAddress;
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
 public class AddressService implements Address, Service<Address> {
-    private InetAddress host;
+    private String host;
     private int port;
     private int portUndertow;
 
-    public AddressService(InetAddress host, int port, int portUndertow) {
+    public AddressService(String host, int port, int portUndertow) {
         this.host = host;
         this.port = port;
         this.portUndertow = portUndertow;
@@ -36,12 +36,12 @@ public class AddressService implements Address, Service<Address> {
     }
 
     @Override
-    public void host(InetAddress host) {
+    public void host(String host) {
         this.host = host;
     }
 
     @Override
-    public InetAddress host() {
+    public String host() {
         return host;
     }
 
