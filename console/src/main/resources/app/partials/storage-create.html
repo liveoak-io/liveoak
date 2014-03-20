@@ -3,7 +3,7 @@
 
     <div class="col-md-10 lo-main-pane">
         <div class="row">
-            <div class="lo-content-area col-md-10">
+            <div class="lo-content-area col-md-9">
                 <lo-breadcrumbs></lo-breadcrumbs>
 
                 <h2><span>{{curApp.name}}</span> {{ create ? 'New Storage' : storageModel.id }}</h2>
@@ -12,21 +12,21 @@
                     <fieldset>
                         <legend lo-collapse><span class="text">Data Resource</span></legend>
                         <div class="form-group">
-                        <div class="lo-db-instances">
-                            <p>
-                                Dont' have it installed?
-                                <span ng-switch on="storageModel.type">
-                                    <a ng-switch-when="mongo" href="http://www.mongodb.org/" >Get your MongoDB instance.</a>
-                                    <a ng-switch-when="mysql" href="http://www.mysql.com/" >Get your MySQL instance.</a>
-                                    <a ng-switch-when="plsql" href="http://www.postgresql.org/" >Get your PostgreSQL instance.</a>
-                                    <span ng-switch-default>No Database selected.</span>
-                                </span>
-                            </p>
+                          <div class="lo-db-instances">
                             <div class="lo-db-mongo" ng-class="{active: storageModel.type === 'mongo'}" ng-click="storageModel.type = 'mongo'">MongoDB</div>
                             <div class="lo-db-mysql" ng-class="{active: storageModel.type === 'mysql'}" ng-click="storageModel.type = 'mysql'">MySQL</div>
                             <div class="lo-db-plsql" ng-class="{active: storageModel.type === 'plsql'}" ng-click="storageModel.type = 'plsql'">PostGres</div>
+                            <p>
+                              Doesnt' have it installed?
+                              <span ng-switch on="storageModel.type">
+                                <a ng-switch-when="mongo" href="http://www.mongodb.org/" >Get your MongoDB instance.</a>
+                                <a ng-switch-when="mysql" href="http://www.mysql.com/" >Get your MySQL instance.</a>
+                                <a ng-switch-when="plsql" href="http://www.postgresql.org/" >Get your PostgreSQL instance.</a>
+                                <span ng-switch-default>No Database selected.</span>
+                              </span>
+                            </p>
+                          </div>
                         </div>
-                            </div>
                     </fieldset>
 
                     <fieldset>
@@ -91,27 +91,6 @@
                         <button lo-button-save="save()">Save</button>
                     </div>
                 </form>
-            </div>
-            <div class="lo-info-pane col-md-2">
-                <h3><span>All</span> Storage Resources</h3>
-                <section>
-                    <h4>MyFirstInstance</h4>
-                    <div>
-                        <span class="lo-label">Storage Provider</span>
-                        <span class="lo-field">MongoDB</span>
-                        <span class="lo-label">Database Name</span>
-                        <span class="lo-field">MyDB</span>
-                    </div>
-                </section>
-                <section>
-                    <h4>MyFirstInstance</h4>
-                    <div>
-                        <span class="lo-label">Storage Provider</span>
-                        <span class="lo-field">MongoDB</span>
-                        <span class="lo-label">Database Name</span>
-                        <span class="lo-field">MyDB</span>
-                    </div>
-                </section>
             </div>
         </div>
     </div>

@@ -4,6 +4,15 @@
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
+    font-family: "Exo 2";
+}
+
+#kc-header-wrapper {
+	margin-bottom: 10px;
+}
+
+#kc-header-wrapper strong {
+	font-weight: 600;
 }
 
 .login-pf .container {
@@ -14,10 +23,14 @@
     border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.login-pf .container .form-horizontal .control-label {
+	font-size: 13px;
+}
+
 .login-pf .btn-primary {
     background-color: #63b474;
     border-color: #459656;
-    background-image: linear-gradient(to bottom, #63b474 0%, #63b474 100%);
+    background-image: none;
 }
 
 .login-pf .btn-primary:hover,
@@ -25,16 +38,19 @@
 .login-pf .btn-primary:active,
 .login-pf .btn-primary.active,
 .login-pf .open .dropdown-toggle.btn-primary {
-    background-color: #459656;
-    border-color: #459656;
-    background-image: linear-gradient(to bottom, #5eaf6f 0%, #68b979 100%);
+    background-color: #469757;
 }
 
 /* Forms */
+.login-pf .form-control {
+	font-size: 12px;
+}
+
 .login-pf .form-control:focus,
 .login-pf .form-control:hover {
     border-color: #63b474;
 }
+
 .login-pf .form-control:focus {
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 73, 0.6);
 }
@@ -50,6 +66,6 @@
 
 .login-pf #kc-logo-wrapper:before {
     content: "LiveOak";
-    font-family: fantasy;
-    font-size: 3.5em;
+    font-family: "Exo 2";
+    font-size: 30px;
 }
