@@ -57,6 +57,10 @@ public class InternalApplication implements Application {
     }
 
     public InternalApplicationExtension extend(String resourceId, ResourceState resourceDefinition) throws Exception {
+        return extend( resourceId, resourceDefinition, false );
+    }
+
+    public InternalApplicationExtension extend(String resourceId, ResourceState resourceDefinition, boolean boottime) throws Exception {
         String extensionId = (String) resourceDefinition.getProperty("type");
 
         ObjectNode config;
@@ -68,7 +72,7 @@ public class InternalApplication implements Application {
             config = JsonNodeFactory.instance.objectNode();
         }
 
-        return extend(extensionId, resourceId, config);
+        return extend(extensionId, resourceId, config, boottime);
     }
 
     public InternalApplicationExtension extend(String extensionId) throws Exception {
@@ -80,13 +84,17 @@ public class InternalApplication implements Application {
     }
 
     public InternalApplicationExtension extend(String extensionId, String resourceId, ObjectNode configuration) throws Exception {
+        return extend( extensionId, resourceId, configuration, false );
+    }
+
+    public InternalApplicationExtension extend(String extensionId, String resourceId, ObjectNode configuration, boolean boottime) throws Exception {
 
         ServiceTarget target = this.target.subTarget();
         StabilityMonitor monitor = new StabilityMonitor();
         target.addMonitor(monitor);
 
         ServiceName name = LiveOak.applicationExtension(this.id, resourceId);
-        ApplicationExtensionService appExt = new ApplicationExtensionService(extensionId, resourceId, configuration);
+        ApplicationExtensionService appExt = new ApplicationExtensionService(extensionId, resourceId, configuration, boottime);
 
         ServiceController<InternalApplicationExtension> controller = target.addService(name, appExt)
                 .addDependency(LiveOak.extension(extensionId), Extension.class, appExt.extensionInjector())

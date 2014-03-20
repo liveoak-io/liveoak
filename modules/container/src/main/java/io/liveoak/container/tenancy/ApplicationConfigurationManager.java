@@ -49,11 +49,22 @@ public class ApplicationConfigurationManager {
         ObjectMapper mapper = new ObjectMapper();
         ObjectWriter writer = mapper.writer();
         writer = writer.with(new DefaultPrettyPrinter("\\n"));
-        writer.writeValue( this.file, tree );
+        writer.writeValue(this.file, tree);
     }
 
-    public synchronized void removeResource(String id) {
+    public synchronized void removeResource(String id) throws IOException {
+        ObjectNode tree = read();
+        ObjectNode resourcesTree = (ObjectNode) tree.get("resources");
+        if (resourcesTree == null) {
+            return;
+        }
 
+        resourcesTree.remove( id );
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectWriter writer = mapper.writer();
+        writer = writer.with(new DefaultPrettyPrinter("\\n"));
+        writer.writeValue( this.file, tree );
     }
 
     private final File file;

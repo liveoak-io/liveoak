@@ -38,8 +38,10 @@ public class MockExtension implements Extension {
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
         MockAdminResource admin = new MockAdminResource( context.resourceId(), "application" );
-        context.target().addService(adminResource( context.application().id(), context.resourceId() ), new ValueService<MockAdminResource>(new ImmediateValue<>(admin)))
-                .install();
+        context.mountPrivate( admin );
+
+        MockResource resource = new MockResource( context.resourceId() );
+        context.mountPublic( resource );
     }
 
     @Override

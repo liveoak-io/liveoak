@@ -19,12 +19,13 @@ import java.util.Properties;
  */
 public class ApplicationExtensionContextImpl implements ApplicationExtensionContext {
 
-    public ApplicationExtensionContextImpl(ServiceTarget target, InternalApplicationExtension appExtension, ServiceName publicMount, ServiceName adminMount, ObjectNode configuration) {
+    public ApplicationExtensionContextImpl(ServiceTarget target, InternalApplicationExtension appExtension, ServiceName publicMount, ServiceName adminMount, ObjectNode configuration, boolean boottime) {
         this.target = target;
         this.appExtension = appExtension;
         this.publicMount = publicMount;
         this.adminMount = adminMount;
         this.configuration = configuration;
+        this.boottime = boottime;
     }
 
     public String extensionId() {
@@ -82,9 +83,16 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
                 .addInjection(configFilter.configurationInjector(), this.configuration)
                 .install();
 
+        AdminResourceWrappingResourceService wrapper = new AdminResourceWrappingResourceService( this.appExtension, this.boottime );
+        target.addService(privateName.append("wrapper"), wrapper)
+                .addDependency(privateName.append("filter-config"))
+                .addDependency(privateName, RootResource.class, wrapper.resourceInjector())
+                .addDependency(LiveOak.applicationConfigurationManager(appExtension.application().id()), ApplicationConfigurationManager.class, wrapper.configurationManagerInjector())
+                .install();
+
         UpdateResourceService configApply = new UpdateResourceService(this.appExtension);
         target.addService(privateName.append("apply-config"), configApply)
-                .addDependency(privateName, Resource.class, configApply.resourceInjector())
+                .addDependency(privateName.append( "wrapper" ), Resource.class, configApply.resourceInjector())
                 .addDependency(privateName.append("filter-config"), ObjectNode.class, configApply.configurationInjector())
                 .install();
 
@@ -94,17 +102,10 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
                 .addDependency(privateName, RootResource.class, lifecycle.resourceInjector())
                 .install();
 
-        ConfigPersistingService configPersister = new ConfigPersistingService( this.appExtension.extensionId() );
-        target.addService(privateName.append("persist"), configPersister)
-                .addDependency(privateName.append("apply-config"))
-                .addDependency(privateName, RootResource.class, configPersister.resourceInjector())
-                .addDependency(LiveOak.applicationConfigurationManager(appExtension.application().id()), ApplicationConfigurationManager.class, configPersister.configurationManagerInjector())
-                .install();
-
         ServiceController<? extends Resource> controller = this.target.addService(privateName.append("mount"), mount)
                 .addDependency(privateName.append("lifecycle"))
                 .addDependency(this.adminMount, MountPointResource.class, mount.mountPointInjector())
-                .addDependency(privateName.append("persist"), RootResource.class, mount.resourceInjector())
+                .addDependency(privateName.append("wrapper"), RootResource.class, mount.resourceInjector())
                 .install();
         this.appExtension.adminResourceController(controller);
     }
@@ -130,5 +131,6 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
     private final ServiceName adminMount;
     private final InternalApplicationExtension appExtension;
     private final ObjectNode configuration;
+    private final boolean boottime;
 
 }

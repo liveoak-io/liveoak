@@ -3,6 +3,11 @@ package io.liveoak.container.tenancy.service;
 import java.io.File;
 import java.io.IOException;
 
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.ApplicationContext;
@@ -69,6 +74,19 @@ public class ApplicationService implements Service<InternalApplication> {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectWriter writer = mapper.writer().with(new DefaultPrettyPrinter("\n"));
+            ObjectNode tree = JsonNodeFactory.instance.objectNode();
+            tree.put("id", this.id);
+            tree.put("name", appName);
+            tree.put("resources", JsonNodeFactory.instance.objectNode());
+            try {
+                applicationJson.getParentFile().mkdirs();
+                writer.writeValue(applicationJson, tree);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp);
@@ -97,9 +115,9 @@ public class ApplicationService implements Service<InternalApplication> {
                 .addDependency(appResourceName, ApplicationResource.class, appResourceMount.resourceInjector())
                 .install());
 
-        ServiceName configManagerName = LiveOak.applicationConfigurationManager( this.id );
-        ApplicationConfigurationService configManager = new ApplicationConfigurationService( applicationJson );
-        target.addService( configManagerName, configManager )
+        ServiceName configManagerName = LiveOak.applicationConfigurationManager(this.id);
+        ApplicationConfigurationService configManager = new ApplicationConfigurationService(applicationJson);
+        target.addService(configManagerName, configManager)
                 .install();
 
         ApplicationResourcesService resources = new ApplicationResourcesService(resourcesTree);

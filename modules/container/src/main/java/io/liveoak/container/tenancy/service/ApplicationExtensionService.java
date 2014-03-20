@@ -18,10 +18,11 @@ import java.util.Properties;
 public class ApplicationExtensionService implements Service<InternalApplicationExtension> {
 
 
-    public ApplicationExtensionService(String extensionId, String resourceId, ObjectNode configuration) {
+    public ApplicationExtensionService(String extensionId, String resourceId, ObjectNode configuration, boolean boottime) {
         this.extensionId = extensionId;
         this.resourceId = resourceId;
         this.configuration = configuration;
+        this.boottime = boottime;
     }
 
     @Override
@@ -58,7 +59,8 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
                 this.appExtension,
                 LiveOak.applicationContext(appId),
                 LiveOak.applicationAdminResource(appId).append( "extensions" ),
-                this.configuration );
+                this.configuration,
+                this.boottime);
 
         try {
             this.extensionInjector.getValue().extend(extensionContext);
@@ -119,4 +121,5 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
 
     private InternalApplicationExtension appExtension;
     private final ObjectNode configuration;
+    private boolean boottime;
 }

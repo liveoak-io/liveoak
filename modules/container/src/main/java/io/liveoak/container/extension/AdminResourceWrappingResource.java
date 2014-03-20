@@ -1,6 +1,7 @@
 package io.liveoak.container.extension;
 
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
+import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -14,16 +15,17 @@ import java.net.URI;
 /**
  * @author Bob McWhirter
  */
-public class ConfigPersistingRootResource implements RootResource {
+public class AdminResourceWrappingResource implements RootResource {
 
-    public ConfigPersistingRootResource(String type, ApplicationConfigurationManager configManager, RootResource delegate) {
-        this.type = type;
+    public AdminResourceWrappingResource(InternalApplicationExtension extension, ApplicationConfigurationManager configManager, RootResource delegate, boolean boottime) {
+        this.extension = extension;
         this.configManager = configManager;
         this.delegate = delegate;
+        this.ignoreUpdate = boottime;
     }
 
     public String type() {
-        return this.type;
+        return this.extension.extensionId();
     }
 
     public ApplicationConfigurationManager configurationManager() {
@@ -52,8 +54,12 @@ public class ConfigPersistingRootResource implements RootResource {
 
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        System.err.println( "** update properties" );
-        this.delegate.updateProperties(ctx, state, new ConfigPersistingResponder( this, state, responder));
+        if (this.ignoreUpdate) {
+            this.ignoreUpdate = false;
+            this.delegate.updateProperties(ctx, state, responder);
+        } else {
+            this.delegate.updateProperties(ctx, state, new ConfigPersistingResponder(this, state, responder));
+        }
     }
 
     @Override
@@ -78,12 +84,17 @@ public class ConfigPersistingRootResource implements RootResource {
 
     @Override
     public void delete(RequestContext ctx, Responder responder) throws Exception {
-        this.delegate.delete(ctx, responder);
+        this.extension.remove();
+        // TODO should we call delete() on this resource?  I think yes.
+        //this.delegate.delete(ctx, responder);
+        responder.resourceDeleted(this.delegate);
+        this.configManager.removeResource(this.delegate.id());
     }
 
-    private final String type;
+    private final InternalApplicationExtension extension;
     private final RootResource delegate;
     private final ApplicationConfigurationManager configManager;
+    private boolean ignoreUpdate;
 
 
 }

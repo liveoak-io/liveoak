@@ -22,6 +22,7 @@ import static org.fest.assertions.Assertions.assertThat;
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
 public class GitResourceTest extends AbstractResourceTestCase {
+
     @Override
     protected File applicationDirectory() {
         return new File( this.projectRoot, "target/test-app" );

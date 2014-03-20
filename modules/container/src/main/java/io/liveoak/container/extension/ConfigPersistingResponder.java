@@ -1,6 +1,5 @@
 package io.liveoak.container.extension;
 
-import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.util.ConversionUtils;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -13,7 +12,7 @@ import java.io.IOException;
  */
 public class ConfigPersistingResponder implements Responder {
 
-    public ConfigPersistingResponder(ConfigPersistingRootResource resource, ResourceState state, Responder delegate) {
+    public ConfigPersistingResponder(AdminResourceWrappingResource resource, ResourceState state, Responder delegate) {
         this.resource = resource;
         this.state = state;
         this.delegate = delegate;
@@ -36,9 +35,9 @@ public class ConfigPersistingResponder implements Responder {
 
     @Override
     public void resourceUpdated(Resource resource) {
-        this.delegate.resourceUpdated( resource );
         try {
             this.resource.configurationManager().updateResource( this.resource.id(), this.resource.type(), ConversionUtils.convert( this.state ));
+            this.delegate.resourceUpdated(resource);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,7 +98,7 @@ public class ConfigPersistingResponder implements Responder {
         this.delegate.invalidRequest( message, cause );
     }
 
-    private final ConfigPersistingRootResource resource;
+    private final AdminResourceWrappingResource resource;
     private final ResourceState state;
     private Responder delegate;
 }

@@ -99,6 +99,7 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
     @After
     public void tearDownSystem() throws Exception {
         removeAllResources();
+        this.application.configurationFile().delete();
         this.system.stop();
     }
 

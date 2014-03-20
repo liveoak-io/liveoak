@@ -31,7 +31,8 @@ public class ApplicationResourcesService implements Service<Void> {
             Set<String> fields = this.resourcesTree.getPropertyNames();
             for (String resourceId : fields) {
                 ResourceState resourceState = (ResourceState) this.resourcesTree.getProperty(resourceId);
-                this.applicationInjector.getValue().extend(resourceId, resourceState);
+                System.err.println( "BOOTTIME INSTALL OF: " + resourceId );
+                this.applicationInjector.getValue().extend(resourceId, resourceState, true);
             }
         } catch (Exception e) {
             throw new StartException(e);

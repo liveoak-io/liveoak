@@ -32,7 +32,8 @@ public class ApplicationExtensionRemovalService implements Service<Void> {
                 appExtension,
                 null,
                 null,
-                JsonNodeFactory.instance.objectNode());
+                JsonNodeFactory.instance.objectNode(),
+                false);
 
         StabilityMonitor monitor = new StabilityMonitor();
         target.addMonitor(monitor);

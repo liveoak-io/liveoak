@@ -97,6 +97,7 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
         }
 
         this.extensions.clear();
+        this.application.configurationFile().delete();
 
         this.system.awaitStability();
     }

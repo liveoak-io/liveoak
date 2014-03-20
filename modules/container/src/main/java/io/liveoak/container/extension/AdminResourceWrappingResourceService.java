@@ -1,6 +1,7 @@
 package io.liveoak.container.extension;
 
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
+import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -12,15 +13,16 @@ import org.jboss.msc.value.InjectedValue;
 /**
  * @author Bob McWhirter
  */
-public class ConfigPersistingService implements Service<RootResource> {
+public class AdminResourceWrappingResourceService implements Service<RootResource> {
 
-    public ConfigPersistingService(String type) {
-        this.type = type;
+    public AdminResourceWrappingResourceService(InternalApplicationExtension extension, boolean boottime) {
+        this.extension = extension;
+        this.boottime = boottime;
     }
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.persistingResource = new ConfigPersistingRootResource( this.type, this.managerInjector.getValue(), resourceInjector.getValue() );
+        this.persistingResource = new AdminResourceWrappingResource(this.extension, this.managerInjector.getValue(), resourceInjector.getValue(), this.boottime);
     }
 
     @Override
@@ -41,8 +43,9 @@ public class ConfigPersistingService implements Service<RootResource> {
         return this.managerInjector;
     }
 
-    private String type;
+    private InternalApplicationExtension extension;
     private InjectedValue<RootResource> resourceInjector = new InjectedValue<>();
     private InjectedValue<ApplicationConfigurationManager> managerInjector = new InjectedValue<>();
-    private ConfigPersistingRootResource persistingResource;
+    private AdminResourceWrappingResource persistingResource;
+    private boolean boottime;
 }
