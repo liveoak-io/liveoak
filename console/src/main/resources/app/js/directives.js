@@ -54,7 +54,7 @@ loDirectives.directive('loStorageSummary', function (LoCollectionList) {
     replace: true,
     templateUrl: '/admin/console/templates/lo-storage-summary.html',
     link: function(scope){
-      LoCollectionList.get({appId: scope.loApp.id, storageId: scope.storage.id}, function(){
+      LoCollectionList.get({appId: scope.loApp.id, storageId: scope.storage.path}, function(){
         scope.storage.hasCollections = true;
       });
     }
