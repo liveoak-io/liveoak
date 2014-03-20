@@ -1,3 +1,42 @@
+/* TODO - remove external dependencies */
+
+@font-face {
+    font-family: 'Exo 2';
+    font-style: normal;
+    font-weight: 300;
+    src: local('Exo 2 Light'), local('Exo2-Light'), url(http://themes.googleusercontent.com/static/fonts/exo2/v1/JWvvdsUbb528VH-BDTzpW_esZW2xOQ-xsNqO47m55DA.woff) format('woff');
+}
+@font-face {
+    font-family: 'Exo 2';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Exo 2'), local('Exo2-Regular'), url(http://themes.googleusercontent.com/static/fonts/exo2/v1/8C2PVL2WIMUnPF90ukjrZQ.woff) format('woff');
+}
+@font-face {
+    font-family: 'Exo 2';
+    font-style: normal;
+    font-weight: 600;
+    src: local('Exo 2 Semi Bold'), local('Exo2-SemiBold'), url(http://themes.googleusercontent.com/static/fonts/exo2/v1/L7cKReMyy06lvTzTWfUEtfesZW2xOQ-xsNqO47m55DA.woff) format('woff');
+}
+@font-face {
+    font-family: 'Exo 2';
+    font-style: italic;
+    font-weight: 300;
+    src: local('Exo 2 Light Italic'), local('Exo2-LightItalic'), url(http://themes.googleusercontent.com/static/fonts/exo2/v1/nWbHq5XdqJFjIrJyBvpVoxsxEYwM7FgeyaSgU71cLG0.woff) format('woff');
+}
+@font-face {
+    font-family: 'Exo 2';
+    font-style: italic;
+    font-weight: 400;
+    src: local('Exo 2 Italic'), local('Exo2-Italic'), url(http://themes.googleusercontent.com/static/fonts/exo2/v1/G075hziEYGpfdK2KgVmqBQ.woff) format('woff');
+}
+@font-face {
+    font-family: 'Exo 2';
+    font-style: italic;
+    font-weight: 600;
+    src: local('Exo 2 Semi Bold Italic'), local('Exo2-SemiBoldItalic'), url(http://themes.googleusercontent.com/static/fonts/exo2/v1/1cBqBVaZ3i9Efab2hdPpzBsxEYwM7FgeyaSgU71cLG0.woff) format('woff');
+}
+
 .login-pf body {
     background: #3a7d49 url("../img/login-bg.png") top left no-repeat;
     -webkit-background-size: cover;
