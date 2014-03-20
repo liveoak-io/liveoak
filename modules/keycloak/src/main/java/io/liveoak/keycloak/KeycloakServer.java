@@ -91,6 +91,7 @@ public class KeycloakServer {
 
                 consoleApp.setAllowedClaimsMask(ClaimMask.USERNAME);
 
+                consoleApp.addRedirectUri(liveOakUrl + "/admin");
                 consoleApp.addRedirectUri(liveOakUrl + "/admin/");
                 consoleApp.addWebOrigin(liveOakUrl);
                 consoleApp.setBaseUrl(liveOakUrl + "/admin/");
