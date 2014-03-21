@@ -1,6 +1,6 @@
 @exo:               "Exo 2", sans-serif;
 @fsize:             12px;
-@fsizebig:          14px;
+@fsizebig:          13px;
 
 @inc:               30;
 /* Main navigation colors */
@@ -69,10 +69,6 @@ h3, .h3 {
   font-size: 18px;
 }
 
-p {
-  font-size: @fsizebig;
-}
-
 a {
   color: @c_green;
 
@@ -86,10 +82,11 @@ a {
 }
 
 p {
-  color: @c_graylight;
+  color: @c_gray;
   margin: 0;
   line-height: 1.4em;
   font-weight: 300;
+  font-size: @fsizebig;
 }
 
 .clickable {
@@ -106,6 +103,13 @@ p {
   height: 7px;
   background-color: @c_green;
   display: inline-block;
+}
+
+hr {
+  border-color: #ddd;
+  margin-top: 15px;
+  margin-bottom: 19px;
+  clear: both;
 }
 
 /* Apply to make color slightly lighter */
@@ -273,7 +277,8 @@ p {
         .fa {
           display: block;
           color: inherit;
-          opacity: inherit;
+          opacity: 1;
+          -webkit-opacity: inherit;
         }
       }
 
@@ -306,7 +311,7 @@ p {
   .lo-content-area {
 
     > h2 {
-      margin-bottom: 1em;
+      margin-bottom: 15px;
     }
   }
 }
@@ -318,7 +323,7 @@ p {
 
     .panel-heading {
       background: #fff;
-      border-bottom: 1px solid @c_mainpane;
+      border: none;
       padding: 12px 20px 6px 20px;
 
       .panel-title {
@@ -326,6 +331,15 @@ p {
         color: @c_gray;
         font-size: 23px;
         font-weight: 500;
+      }
+      
+      h3 {
+        margin: 2px 0 0 0;
+      }
+      
+      .pull-right span {
+        margin-top: 4px;
+        display: inline-block;
       }
       
       .dropdown {
@@ -364,20 +378,6 @@ p {
     }
   }
 }
-
-/* Dashboard */
-.lo-main-pane.app-dashboard .panel {
-  margin-top: 20px;
-  
-  .panel-heading {
-    padding: 10px 15px;
-  }
-  
-  .panel-body {
-    padding: 36px 15px 32px;
-  }
-}
-
 
 /* Panel entity */
 [class*="lo-panel-"] {
@@ -435,22 +435,6 @@ p {
             text-decoration: none;
           }
         }
-      }
-    }
-  }
-}
-
-/* Panel App */
-.lo-panel-app {
-
-}
-
-/* Panel Storage */
-.lo-panel-storage {
-  .dropdown {
-    .dropdown-toggle {
-      > i {
-        color: @c_gray;
       }
     }
   }
@@ -604,7 +588,6 @@ p {
   }
 }
 
-/* Tutorials section (Under the Dashboard Panel) */
 .lo-tutorials {
 
   i {
@@ -620,12 +603,16 @@ p {
   
   p {
 	  color: @c_gray;
-	  margin-bottom: 5px;
+	  margin-bottom: 2px;
   }
   
   a {
     font-size: @fsize;
   }
+}
+
+.lo-info-pane .lo-tutorials p {
+  margin-bottom: 7px;
 }
 
 .lo-main-pane.app-dashboard .lo-tutorials {
@@ -661,7 +648,27 @@ button.lo-icon-button {
 }
 
 /* LO form specific */
+
+p.subtitle {
+  float: right;
+  font-size: @fsize;
+  color: @c_graylight;
+}
+
+h2.pull-left + p.subtitle {
+  margin-top: 30px;
+}
+
+.required {
+  color: @c_red;
+}
+
+p.form-info {
+  margin-bottom: 23px;
+}
+
 .lo-form-horizontal {
+  clear: both;
 
   fieldset {
     margin-bottom: 24px;
@@ -677,7 +684,6 @@ button.lo-icon-button {
     > span {
       position: absolute;
       right: 5px;
-      color: @c_red;
     }
   }
   
@@ -1168,28 +1174,6 @@ legend {
 }
 
 
-/* Storage Collections Page */
-
-.storage-collections {
-
-  .lo-page-info .btn-icon {
-    margin-bottom: 10px;
-    margin-left: 12px;
-
-    + span .btn-icon {
-      margin-left: 5px;
-    }
-  }
-
-  hr {
-    float: left;
-    width: 100%;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    border-color: #ddd;
-  }
-}
-
 /* Modal */
 
 .modal .modal-body {
@@ -1217,4 +1201,50 @@ legend {
 		text-align: right;
 		font-weight: normal;
 	}
+}
+
+/*
+***********************************
+          Specific Pages
+***********************************
+*/
+
+/* Dashboard Page */
+.lo-main-pane.app-dashboard .panel {
+  margin-top: 20px;
+  
+  .panel-heading {
+    padding: 10px 15px;
+    border-bottom: 1px solid @c_mainpane;
+    
+    .btn-group {
+      margin-top: 2px;
+    }
+  }
+  
+  .panel-body {
+    padding: 36px 15px 32px;
+  }
+}
+
+
+/* Storage Collections Page */
+
+.storage-collections {
+
+  .lo-page-info .btn-icon {
+    margin-bottom: 10px;
+    margin-left: 12px;
+
+    + span .btn-icon {
+      margin-left: 5px;
+    }
+  }
+
+  hr {
+    float: left;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
 }
