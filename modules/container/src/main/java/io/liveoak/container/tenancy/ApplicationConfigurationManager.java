@@ -64,7 +64,9 @@ public class ApplicationConfigurationManager {
         ObjectMapper mapper = new ObjectMapper();
         ObjectWriter writer = mapper.writer();
         writer = writer.with(new DefaultPrettyPrinter("\\n"));
+        System.err.println( "writing " + tree + " to " + this.file );
         writer.writeValue( this.file, tree );
+        System.err.println( "write complete" );
     }
 
     private final File file;

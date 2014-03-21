@@ -81,6 +81,10 @@ public class ConfigurationPersistingTest {
     }
 
     protected ObjectNode readConfig() throws IOException {
+        System.err.println( "read-from-disk: " + this.application.configurationFile() + " // " + this.application.configurationFile().exists() );
+        if ( this.application.configurationFile().exists() ) {
+            System.err.println( "file size: " + this.application.configurationFile().length() );
+        }
         return (ObjectNode) mapper.readTree(this.application.configurationFile());
     }
 
