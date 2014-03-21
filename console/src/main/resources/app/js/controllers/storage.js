@@ -52,7 +52,9 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
   }, true);
 
   $scope.save = function(){
-    if(!angular.equals($scope.storageModel.credentials[0].password, $scope.passwdConfirm)){
+    if($scope.storageModel.credentials.length > 0 &&
+      !angular.equals($scope.storageModel.credentials[0].password, $scope.passwdConfirm)){
+
       Notifications.error('Password does not match the password confirmation.');
     } else {
 
@@ -99,7 +101,15 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
           });
       } else {
         $log.debug('Updating storage resource: ' + data.id);
-        LoStorage.update({appId: $scope.curApp.id}, data);
+        LoStorage.update({appId: $scope.curApp.id, storageId: $scope.storageModel.id}, $scope.storageModel,
+        function(){
+          // Update success
+          Notifications.success('Storage successfully udpated.');
+        },
+        function(httpResponse){
+          // Update failure
+          Notifications.error('Failed to update the storage (' + httpResponse.status + (httpResponse.data ? (' ' + httpResponse.data) : '') + ')');
+        });
       }
     }
   };
