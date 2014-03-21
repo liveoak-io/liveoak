@@ -87,8 +87,8 @@ public class AdminResourceWrappingResource implements RootResource {
         this.extension.remove();
         // TODO should we call delete() on this resource?  I think yes.
         //this.delegate.delete(ctx, responder);
-        responder.resourceDeleted(this.delegate);
         this.configManager.removeResource(this.delegate.id());
+        responder.resourceDeleted(this.delegate);
     }
 
     private final InternalApplicationExtension extension;
