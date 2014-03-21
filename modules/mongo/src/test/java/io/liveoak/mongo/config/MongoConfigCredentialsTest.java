@@ -49,7 +49,6 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH );
         assertThat( result.getProperty( "db" ) ).isEqualTo("testConfigureCRDB");
 
-        // by default it should exist but be empty
         assertThat(result.getProperty("credentials")).isNotNull();
         assertThat(((List )result.getProperty("credentials")).size()).isEqualTo(1);
         ResourceState credentialResult = (ResourceState)(( List ) result.getProperty("credentials") ).get(0);
@@ -207,6 +206,43 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         assertThat(credentialResultC.getProperty( "password" )).isEqualTo( "pwC");
         assertThat(credentialResultC.getProperty( "database" )).isEqualTo( "databaseC" );
         assertThat(credentialResultC.getProperty("mechanism")).isEqualTo("MONGODB-CR");
+    }
+
+    @Test
+    public void testClearCredentials() throws Exception {
+        ResourceState config = new DefaultResourceState();
+        config.putProperty("db", "testClearCredentials");
+
+        List<ResourceState> credentials = new ArrayList<ResourceState>();
+        ResourceState credential = new DefaultResourceState();
+        credential.putProperty("mechanism", "MONGODB-CR");
+        credential.putProperty("username", "foo");
+        credential.putProperty("password", "bar");
+        credential.putProperty("database", "testDB1");
+
+        credentials.add(credential);
+        config.putProperty( "credentials", credentials );
+
+        setUpSystem( config );
+
+        ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH );
+        assertThat( result.getProperty( "db" ) ).isEqualTo("testClearCredentials");
+
+        assertThat(result.getProperty("credentials")).isNotNull();
+        assertThat(((List )result.getProperty("credentials")).size()).isEqualTo(1);
+        ResourceState credentialResult = (ResourceState)(( List ) result.getProperty("credentials") ).get(0);
+        assertThat(credentialResult.getPropertyNames().size()).isEqualTo( 4 );
+        assertThat( credentialResult.getProperty( "username" ) ).isEqualTo( "foo" );
+        assertThat(credentialResult.getProperty( "password" )).isEqualTo( "bar");
+        assertThat(credentialResult.getProperty( "database" )).isEqualTo( "testDB1" );
+        assertThat(credentialResult.getProperty("mechanism")).isEqualTo("MONGODB-CR");
+
+        result.putProperty( "credentials", new ArrayList());
+        ResourceState updatedResult = client.update(new RequestContext.Builder().build(), ADMIN_PATH, result);
+
+        assertThat( updatedResult.getProperty( "db" ) ).isEqualTo("testClearCredentials");
+        assertThat((List)updatedResult.getProperty("credentials")).isEmpty();
+
     }
 
 

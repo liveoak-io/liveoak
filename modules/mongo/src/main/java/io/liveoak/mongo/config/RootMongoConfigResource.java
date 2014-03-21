@@ -187,16 +187,11 @@ public class RootMongoConfigResource implements ConfigResource, RootResource {
                            throw new InitializationException("Configuration value \"servers\" is specified as an unexpected value");
                         }
                     }
-                    //return serverAddresses;
                 }
             } else {
                 throw new InitializationException("Configuration value \"servers\" must be specified as a list.");
             }
         }
-//        else {
-//            serverAddresses = new ArrayList<ServerAddress>(1);
-//            serverAddresses.add(new ServerAddress());
-//        }
         return serverAddresses;
         } catch (Exception e) {
             throw new InitializationException("Exception occurred when trying to read the server addresses from the configuration", e);
@@ -206,36 +201,34 @@ public class RootMongoConfigResource implements ConfigResource, RootResource {
     private List<MongoCredential> getMongoCredentials(ResourceState state) throws Exception {
         try {
             List<MongoCredential> mongoCredentials = null;
-            Object credentialsProperty = state.getProperty("credentials");
-            if (credentialsProperty != null) {
-                if (credentialsProperty instanceof List) {
-                    List credentials = (List) credentialsProperty;
-                    if (!credentials.isEmpty()) {
-                        mongoCredentials = new ArrayList<MongoCredential>(credentials.size());
-                        for (Object credential: credentials) {
-                            if (credential instanceof ResourceState) {
-                               ResourceState credentialRS = (ResourceState) credential;
+            Object credentialsProperty = state.getProperty( "credentials" );
+            if ( credentialsProperty != null ) {
+                if ( credentialsProperty instanceof List ) {
+                    List credentials = ( List ) credentialsProperty;
+                    mongoCredentials = new ArrayList<MongoCredential>( credentials.size() );
+                    for ( Object credential : credentials ) {
+                        if ( credential instanceof ResourceState ) {
+                            ResourceState credentialRS = ( ResourceState ) credential;
 
-                                String username = (String)credentialRS.getProperty("username");
-                                String password = (String)credentialRS.getProperty("password");
-                                String mechanism = (String)credentialRS.getProperty("mechanism");
-                                String database = (String)credentialRS.getProperty("database");
+                            String username = ( String ) credentialRS.getProperty( "username" );
+                            String password = ( String ) credentialRS.getProperty( "password" );
+                            String mechanism = ( String ) credentialRS.getProperty( "mechanism" );
+                            String database = ( String ) credentialRS.getProperty( "database" );
 
-                                if (mechanism.equals( MongoCredential.MONGODB_CR_MECHANISM)) {
-                                   MongoCredential mongoCredential =  MongoCredential.createMongoCRCredential(username, database, password.toCharArray());
-                                   mongoCredentials.add(mongoCredential);
-                                } else {
-                                   MongoCredential mongoCredential =  MongoCredential.createGSSAPICredential(username);
-                                   mongoCredentials.add(mongoCredential);
-                                }
-
+                            if ( mechanism.equals( MongoCredential.MONGODB_CR_MECHANISM ) ) {
+                                MongoCredential mongoCredential = MongoCredential.createMongoCRCredential( username, database, password.toCharArray() );
+                                mongoCredentials.add( mongoCredential );
                             } else {
-                                throw new InitializationException("Configuration value \"credentials\" is specified as an unexpected value");
+                                MongoCredential mongoCredential = MongoCredential.createGSSAPICredential( username );
+                                mongoCredentials.add( mongoCredential );
                             }
+
+                        } else {
+                            throw new InitializationException( "Configuration value \"credentials\" is specified as an unexpected value" );
                         }
                     }
                 } else {
-                    throw new InitializationException("Configuration value \"credentials\" must be specified as a list.");
+                    throw new InitializationException( "Configuration value \"credentials\" must be specified as a list." );
                 }
             }
             return mongoCredentials;
