@@ -1,10 +1,9 @@
 <div class="panel panel-default lo-panel lo-panel-storage" ng-class="{'animated rollIn': created == storage.path}">
     <div class="panel-heading">
-        <a      ng-show="storage.hasCollections"
-                ng-href="#/applications/{{loApp.id}}/storage/{{storage.path}}/list"><h2 class="panel-title">{{storage.path}}</h2>
-        </a>
-        <h2     ng-hide="storage.hasCollections"
-                class="panel-title">{{storage.path}}</h2>
+      <h2 class="panel-title">
+        <a ng-show="storage.hasCollections" ng-href="#/applications/{{loApp.id}}/storage/{{storage.path}}/list">{{storage.path}}</a>
+      </h2>
+      <h2 ng-hide="storage.hasCollections" class="panel-title">{{storage.path}}</h2>
 
         <div class="pull-right">
             <div class="dropdown">
