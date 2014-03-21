@@ -28,6 +28,9 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
 
   if (loStorage.id){
     $scope.create = false;
+    if (loStorage.credentials.length === 0 ){
+      loStorage.credentials = [{'mechanism':'MONGODB-CR'}];
+    }
     $scope.breadcrumbs.push({'label': loStorage.id, 'href':'#/applications/' + currentApp.id + '/storage/' + loStorage.id});
   }
   else {
@@ -52,8 +55,14 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
   }, true);
 
   $scope.save = function(){
-    if($scope.storageModel.credentials.length > 0 &&
-      !angular.equals($scope.storageModel.credentials[0].password, $scope.passwdConfirm)){
+
+    var unameSet = ($scope.storageModel.credentials[0].hasOwnProperty('username') && $scope.storageModel.credentials[0].username !== '');
+    var paswdSet = ($scope.storageModel.credentials[0].hasOwnProperty('password') && $scope.storageModel.credentials[0].password !== '');
+
+    if ((unameSet && !paswdSet)||(!unameSet && paswdSet)) {
+
+      Notifications.error('Fill in both username and password.');
+    } else if (paswdSet && !angular.equals($scope.storageModel.credentials[0].password, $scope.passwdConfirm)) {
 
       Notifications.error('Password does not match the password confirmation.');
     } else {
@@ -62,7 +71,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
 
       // Send the credentials data only if username or password was set
       if ($scope.storageModel.credentials.length > 0 &&
-        ($scope.storageModel.credentials[0].username || $scope.storageModel.credentials[0].password)){
+        ($scope.storageModel.credentials[0].username || $scope.storageModel.credentials[0].password)) {
 
         $log.debug('Credentials were set');
         credentials.push(
@@ -84,7 +93,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
         }
       };
 
-      $log.debug(''+data);
+      // Create new storage resource
       if ($scope.create){
         $log.debug('Creating new storage resource: ' + data.id);
         LoStorage.create({appId: $scope.curApp.id}, data,
@@ -99,12 +108,24 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
           function(httpResponse) {
             Notifications.error('Failed to create new storage (' + httpResponse.status + (httpResponse.data ? (' ' + httpResponse.data) : '') + ')');
           });
-      } else {
-        $log.debug('Updating storage resource: ' + data.id);
-        LoStorage.update({appId: $scope.curApp.id, storageId: $scope.storageModel.id}, $scope.storageModel,
+      }
+      // Update the storage resource
+      else {
+        $log.debug('Updating storage resource: ' + $scope.storageModel.id);
+
+        if (($scope.storageModel.credentials[0].username === '' && $scope.storageModel.credentials[0].password === '') ||
+            (!$scope.storageModel.credentials[0].hasOwnProperty('username') && !$scope.storageModel.credentials[0].hasOwnProperty('password'))) {
+
+          $scope.storageModel.credentials = [];
+        } else {
+          $scope.storageModel.credentials[0].database = $scope.storageModel.db;
+        }
+
+        LoStorage.update({appId: $scope.curApp.id, storageId: storageModelBackup.id}, $scope.storageModel,
         function(){
           // Update success
           Notifications.success('Storage successfully udpated.');
+          $location.path('applications/' + currentApp.id + '/storage');
         },
         function(httpResponse){
           // Update failure
