@@ -81,7 +81,7 @@
                             <label class="col-sm-2 control-label" for="passwdConfirm">Password confirmation</label>
 
                             <div class="col-sm-4">
-                                <input class="form-control" ng-model="passwdConfirm" type="password" id="passwdConfirm">
+                                <input class="form-control" ng-model="passwdConfirm" ng-disabled="!storageModel.credentials[0].password" type="password" id="passwdConfirm">
                             </div>
                         </div>
                     </fieldset>
