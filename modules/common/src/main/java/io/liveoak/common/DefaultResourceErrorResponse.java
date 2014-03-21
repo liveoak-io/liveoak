@@ -5,25 +5,27 @@
  */
 package io.liveoak.common;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourceRequest;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
  */
 public class DefaultResourceErrorResponse extends DefaultResourceResponse implements ResourceErrorResponse {
 
-
-
     public DefaultResourceErrorResponse(ResourceRequest inReplyTo, ErrorType errorType) {
         super(inReplyTo, ResponseType.ERROR);
         this.errorType = errorType;
+        setState(getState());
     }
 
     public DefaultResourceErrorResponse(ResourceRequest inReplyTo, ErrorType errorType, String message) {
         super(inReplyTo, ResponseType.ERROR);
         this.errorType = errorType;
         this.message = message;
+        setState(getState());
     }
 
     public DefaultResourceErrorResponse(ResourceRequest inReplyTo, ErrorType errorType, String message, Throwable cause) {
@@ -31,12 +33,15 @@ public class DefaultResourceErrorResponse extends DefaultResourceResponse implem
         this.errorType = errorType;
         this.cause = cause;
         this.message = message;
+        setState(getState());
+
     }
 
     public DefaultResourceErrorResponse(ResourceRequest inReplyTo, ErrorType errorType, Throwable cause) {
         super(inReplyTo, ResponseType.ERROR);
         this.errorType = errorType;
         this.cause = cause;
+        setState(getState());
     }
 
     public Throwable cause() {
@@ -54,13 +59,30 @@ public class DefaultResourceErrorResponse extends DefaultResourceResponse implem
         return null;
     }
 
-
     public ErrorType errorType() {
         return this.errorType;
     }
 
     public String toString() {
         return "[DefaultResourceErrorResponse: type=" + this.errorType + "]";
+    }
+
+    private ResourceState getState() {
+        ResourceState state = new DefaultResourceState();
+
+        if (errorType != null) {
+            state.putProperty( "error-type", errorType.toString() );
+        }
+
+        if (message != null) {
+        state.putProperty( "message", message);
+        }
+
+        if (cause != null) {
+            state.putProperty( "cause", cause.toString());
+        }
+
+        return state;
     }
 
     private ErrorType errorType;
