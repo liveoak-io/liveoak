@@ -5,16 +5,23 @@
  */
 package io.liveoak.container.protocols.http;
 
+import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.common.DefaultResourceResponse;
-import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.common.codec.EncodingResult;
 import io.liveoak.common.codec.IncompatibleMediaTypeException;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.protocols.RequestCompleteEvent;
 import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.spi.*;
+import io.liveoak.spi.MediaType;
+import io.liveoak.spi.MediaTypeMatcher;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.RequestType;
+import io.liveoak.spi.ResourceErrorResponse;
+import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.ResourceRequest;
+import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.resource.async.BinaryContentSink;
 import io.liveoak.spi.resource.async.BinaryResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -32,7 +39,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import org.jboss.logging.Logger;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -74,6 +80,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
                 break;
             case ERROR:
                 if (msg instanceof ResourceErrorResponse) {
+                    shouldEncodeState = true;
                     switch (((DefaultResourceErrorResponse) msg).errorType()) {
                         case NOT_AUTHORIZED:
                             responseStatusCode = HttpResponseStatus.UNAUTHORIZED.code();
@@ -204,7 +211,11 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
 
                 response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus, content);
                 response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes());
-                response.headers().add(HttpHeaders.Names.LOCATION, msg.resource().uri().toString());
+                if (msg.resource() != null) {
+                    response.headers().add(HttpHeaders.Names.LOCATION, msg.resource().uri().toString());
+                } else {
+                    response.headers().add(HttpHeaders.Names.LOCATION, msg.inReplyTo().resourcePath().toString());
+                }
                 response.headers().add(HttpHeaders.Names.CONTENT_TYPE, encodingResult.mediaType());
             }
         } else {

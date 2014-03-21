@@ -7,6 +7,7 @@
 package io.liveoak.container;
 
 import io.liveoak.client.impl.ClientResourceResponseImpl;
+import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.common.codec.driver.RootEncodingDriver;
 import io.liveoak.common.codec.state.ResourceStateEncoder;
 import io.liveoak.container.protocols.RequestCompleteEvent;
@@ -68,6 +69,7 @@ public class ResourceStateHandler extends ChannelOutboundHandlerAdapter {
         }
 
         final ResourceStateEncoder encoder = new ResourceStateEncoder();
+
         RootEncodingDriver driver = new RootEncodingDriver(response.inReplyTo().requestContext(), encoder, response.resource(), () -> {
             ResourceState state = encoder.root();
             response.setState(state);
@@ -78,7 +80,7 @@ public class ResourceStateHandler extends ChannelOutboundHandlerAdapter {
             driver.encode();
         } catch (Exception e) {
             e.printStackTrace();
-            ctx.writeAndFlush(new ClientResourceResponseImpl(response.inReplyTo(), ClientResourceResponse.ResponseType.NOT_ACCEPTABLE, response.inReplyTo().resourcePath().toString(), null));
+            ctx.writeAndFlush( new DefaultResourceErrorResponse( response.inReplyTo(), ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, e.getMessage(), e ) );
             ctx.fireUserEventTriggered(new RequestCompleteEvent(response.requestId()));
         }
 

@@ -1,10 +1,5 @@
 package io.liveoak.client;
 
-import java.net.SocketAddress;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
-
 import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.spi.CreateNotSupportedException;
 import io.liveoak.spi.DeleteNotSupportedException;
@@ -22,6 +17,11 @@ import io.liveoak.spi.UpdateNotSupportedException;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.state.ResourceState;
+
+import java.net.SocketAddress;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 /**
  * @author Bob McWhirter
@@ -134,7 +134,9 @@ public class DefaultClient implements Client {
         try {
             return future.get();
         } catch (ExecutionException e) {
-            e.getCause().fillInStackTrace();
+            if (e.getCause() != null) {
+                e.getCause().fillInStackTrace();
+            }
             if (e.getCause() instanceof ResourceException) {
                 throw (ResourceException) e.getCause();
             }
