@@ -56,7 +56,7 @@
                             <label class="col-sm-2 control-label" for="dburl">URL Path <span class="required">*</span></label>
 
                             <div class="col-sm-4">
-                                <input class="form-control" ng-model="storageModel.id" id="dburl" required>
+                                <input class="form-control" ng-model="storageModel.id" id="dburl" ng-disabled="!create" required>
                             </div>
                         </div>
                     </fieldset>
