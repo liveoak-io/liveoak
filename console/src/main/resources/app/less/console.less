@@ -69,7 +69,7 @@ h3, .h3 {
   font-size: 18px;
 }
 
-a, p {
+p {
   font-size: @fsizebig;
 }
 
@@ -113,15 +113,12 @@ p {
 
 /* Information from the top of the main content pane */
 .lo-page-info {
-  margin-bottom: 2em;
+  margin-bottom: 20px;
 
   p {
     color: @c_gray;
     display: inline-block;
-  }
-
-  button {
-    margin-top: -.5em;
+    margin-top: 5px;
   }
 }
 
@@ -312,7 +309,7 @@ p {
     .panel-heading {
       background: #fff;
       border-bottom: 1px solid @c_mainpane;
-      padding: 15px 20px 10px 20px;
+      padding: 12px 20px 6px 20px;
 
       .panel-title {
         display: inline-block;
@@ -322,7 +319,7 @@ p {
       }
       
       .dropdown {
-        margin-top: 5px;
+        margin-top: 8px;
         visibility: hidden;
         
         &.open {
@@ -358,6 +355,7 @@ p {
   }
 }
 
+/* Dashboard */
 .lo-main-pane.app-dashboard .panel {
   margin-top: 20px;
   
@@ -416,9 +414,10 @@ p {
 
         a {
           color: @c_gray;
+          font-size: 13px;
 
           i {
-            margin-right: 5px;
+            margin-right: 6px;
           }
 
           &:hover {
@@ -527,36 +526,6 @@ p {
         padding-left: 5px;
       }
     }
-  }
-}
-
-/* Panel Collections */
-
-.collections {
-
-  .lo-main-pane {
-    padding: 0 30px 30px;
-  }
-
-  .lo-page-info .btn-icon {
-    margin-bottom: 10px;
-    margin-left: 12px;
-
-    + span .btn-icon {
-      margin-left: 8px;
-    }
-  }
-
-  hr {
-    float: left;
-    width: 100%;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    border-color: #ddd;
-  }
-
-  form {
-    clear: both;
   }
 }
 
@@ -849,7 +818,7 @@ legend {
 
 .table {
   font-size: 12px;
-
+  
   > thead > tr > th,
   > tbody > tr > th,
   > tfoot > tr > th {
@@ -908,14 +877,11 @@ legend {
         font-size: 14px;
       }
     }
-
-    th.actions {
-      visibility: hidden;
-    }
   }
 
   .actions {
-    border-left: none;
+    width: 70px;
+    text-align: center;
   }
 
   .before-actions {
@@ -923,10 +889,14 @@ legend {
   }
 
   td.actions {
-    text-align: right;
 
     .btn {
       visibility: hidden;
+      margin-left: 0;
+      
+      + .btn {
+        margin-left: 10px;
+      }
     }
   }
 
@@ -1080,7 +1050,6 @@ legend {
 
 /* Dropdown */
 .dropdown-menu {
-  margin-top: 0;
   padding: 5px 0 4px;
 
   li > a {
@@ -1188,3 +1157,56 @@ legend {
   background-color: #E4F3FA;
   border-color: #5994B2;
 }
+
+
+/* Storage Collections Page */
+
+.storage-collections {
+
+  .lo-page-info .btn-icon {
+    margin-bottom: 10px;
+    margin-left: 12px;
+
+    + span .btn-icon {
+      margin-left: 5px;
+    }
+  }
+
+  hr {
+    float: left;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border-color: #ddd;
+  }
+}
+
+/* Modal */
+
+.modal .modal-body {
+
+	p {
+		font-size: 12px;
+		display: block;
+		line-height: 1.2em;
+		margin-bottom: 8px;
+		
+		&:last-child {
+			margin-bottom: 0;
+		}
+		
+		&.primary-message {
+			font-weight: bold;
+		}
+	}
+	
+	.form-group:last-child {
+		margin-bottom: 0;
+	}
+	
+	label {
+		text-align: right;
+		font-weight: normal;
+	}
+}
+
