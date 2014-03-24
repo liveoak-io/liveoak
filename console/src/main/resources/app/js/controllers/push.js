@@ -2,15 +2,11 @@
 
 var loMod = angular.module('loApp');
 
-loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, LoAppList, Notifications, currentApp) {
+loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, Notifications, currentApp) {
 
   $log.debug('PushCtrl');
 
   $rootScope.curApp = currentApp;
-
-  LoAppList.get(function(data){
-    $scope.applications = data._members;
-  });
 
   $scope.breadcrumbs = [
     {'label': 'Applications',       'href':'#/applications'},
@@ -50,9 +46,9 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
         upsServerURL: $scope.pushModel.upsServerURL,
         applicationId: $scope.pushModel.applicationId,
         masterSecret: $scope.pushModel.masterSecret
-      }
+      };
 
-      var data = $scope.create ? { type: "ups", config: configuration } : configuration;
+      var data = $scope.create ? { type: 'ups', config: configuration } : configuration;
 
       $log.debug('Updating push resource: ' + data);
       LoPush.update({appId: $scope.curApp.id}, data,

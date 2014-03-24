@@ -17,7 +17,7 @@
 
         <div class="lo-page-info">
           <div class="pull-left">
-            <select ui-select2 class="selectpicker select-lg" ng-model="collectionId" ng-options="o.id as o.id for o in collectionList"></select>
+            <select lo-select class="select-lg" ng-model="collectionId" ng-options="o.id as o.id for o in collectionList"></select>
             <button class="btn btn-link btn-icon" type="button" data-toggle="tooltip" data-placement="top" title="Edit Collection Name...">
               <i class="fa fa-edit"></i>
               <span>Edit Collection Name</span>
@@ -186,8 +186,3 @@
     </div>
   </div>
 </div>
-
-<script>
-  // Initialize Boostrap-select
-  $('.selectpicker').selectpicker();
-</script>

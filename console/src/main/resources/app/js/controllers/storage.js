@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp');
 
-loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, LoStorage, loStorage, LoAppList, Notifications, currentApp) {
+loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, LoStorage, loStorage, Notifications, currentApp) {
 
   $log.debug('StorageCtrl');
 
@@ -17,10 +17,6 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
     {'label': currentApp.name, 'href':'#/applications/' + currentApp.id},
     {'label': 'Storage',       'href':'#/applications/' + currentApp.id + '/storage'}
   ];
-
-  LoAppList.get(function(data){
-    $scope.applications = data._members;
-  });
 
   $scope.changed = false;
 
@@ -137,7 +133,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
 
 });
 
-loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routeParams, LoAppList, loStorageList, currentApp) {
+loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routeParams, loStorageList, currentApp) {
 
   $log.debug('StorageListCtrl');
 
@@ -150,10 +146,6 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
   ];
 
   $scope.createdId = $routeParams.created;
-
-  LoAppList.get(function(data){
-    $scope.applications = data._members;
-  });
 
   $scope.loStorageList=loStorageList;
 

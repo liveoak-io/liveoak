@@ -176,10 +176,12 @@ loDirectives.directive('loButtonDelete', function () {
   };
 });
 
-loDirectives.directive('loSelect', function () {
+loDirectives.directive('loSelect', function($timeout) {
   return {
     link: function(scope, element) {
-      element.selectpicker();
+      $timeout(function() {
+        $(element).selectpicker();
+      }, 0);
     }
   };
 });
