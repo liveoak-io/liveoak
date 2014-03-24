@@ -221,6 +221,21 @@ loMod.factory('LoCollectionListLoader', function(Loader, LoCollectionList, $rout
   });
 });
 
+loMod.factory('LoPushLoader', function(Loader, LoPush, $route) {
+  return Loader.get(LoPush, function() {
+      return {
+        appId : $route.current.params.appId
+      };
+    },
+    function(httpResponse) {
+      console.log(httpResponse);
+      return {
+        appId : $route.current.params.appId
+      };
+    }
+  );
+});
+
 loMod.factory('LoAppLoader', function(Loader, LoApp, $route) {
   return Loader.get(LoApp, function() {
     return {
@@ -236,3 +251,28 @@ loMod.factory('LoAppListLoader', function(Loader, LoAppList) {
 loMod.factory('LoCollectionLoader', function(Loader, LoCollection) {
   return Loader.get(LoCollection);
 });
+
+loMod.factory('LoPush', function($resource) {
+  return $resource('/admin/applications/:appId/resources/push', {
+    appId : '@appId'
+  }, {
+    get : {
+      method : 'GET',
+      params : { appId : '@appId'}
+    },
+    update : {
+      method : 'PUT',
+      params : { appId : '@appId'}
+    },
+    create: {
+      method : 'POST',
+      url: '/admin/applications/:appId/resources/',
+      params : { appId : '@appId'}
+    },
+    delete : {
+      method : 'DELETE',
+      params : { appId : '@appId'}
+    }
+  });
+});
+
