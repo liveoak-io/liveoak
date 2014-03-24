@@ -143,7 +143,7 @@ loDirectives.directive('loButtonClear', function () {
     restrict: 'A',
     link: function (scope, elem) {
       elem.addClass('btn btn-default btn-lg');
-      elem.attr('type','submit');
+      elem.attr('type','button');
       elem.bind('click', function() {
         scope.$apply(function() {
           var form = elem.closest('form');
@@ -152,6 +152,24 @@ loDirectives.directive('loButtonClear', function () {
             form.find('.ng-invalid').removeClass('has-error');
             scope.loButtonClear();
           }
+        });
+      });
+    }
+  };
+});
+
+loDirectives.directive('loButtonDelete', function () {
+  return {
+    scope: {
+      loButtonDelete: '&'
+    },
+    restrict: 'A',
+    link: function (scope, elem) {
+      elem.addClass('btn btn-danger btn-lg');
+      elem.attr('type','button');
+      elem.bind('click', function() {
+        scope.$apply(function() {
+          scope.loButtonDelete();
         });
       });
     }
