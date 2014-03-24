@@ -87,7 +87,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
           return LoPush.get({appId: $route.current.params.appId}).$promise.then(function(data) {
               return data;
             },
-            function(httpResponse) {
+            function() {
               return {};
             }
           );
