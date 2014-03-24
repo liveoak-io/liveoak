@@ -95,7 +95,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
       },
       templateUrl: '/admin/console/partials/push.html'
     })
-    .when('/applications/:appId/storage/:storageId/list', {
+    .when('/applications/:appId/storage/:storageId/browse', {
       controller: 'StorageCollectionCtrl',
       resolve : {
         currentApp: function(LoAppLoader){
