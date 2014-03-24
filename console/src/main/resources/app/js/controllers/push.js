@@ -2,15 +2,11 @@
 
 var loMod = angular.module('loApp');
 
-loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, LoAppList, Notifications, currentApp) {
+loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, Notifications, currentApp) {
 
   $log.debug('PushCtrl');
 
   $rootScope.curApp = currentApp;
-
-  LoAppList.get(function(data){
-    $scope.applications = data._members;
-  });
 
   $scope.breadcrumbs = [
     {'label': 'Applications',       'href':'#/applications'},
