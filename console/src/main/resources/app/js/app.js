@@ -119,6 +119,9 @@ loMod.config(['$routeProvider', function($routeProvider) {
       },
       templateUrl: '/admin/console/partials/storage-collection.html'
     })
+    .when('/error', {
+      templateUrl : '/admin/console/partials/notfound.html'
+    })
     .otherwise({
       templateUrl : '/admin/console/partials/notfound.html'
     });

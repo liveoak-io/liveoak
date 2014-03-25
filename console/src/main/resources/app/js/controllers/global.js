@@ -2,9 +2,16 @@
 
 var loMod = angular.module('loApp');
 
-loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, LiveOak, LoAppList) {
+loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, LiveOak, LoAppList) {
 
   $log.debug('GlobalCtrl' + LiveOak);
+
+  $rootScope.$on('$routeChangeError',
+    /* Following function can get use of 'event, current, previous, rejection' arguments to specify the error */
+    function () {
+      $log.error('failed to change routes');
+      $location.path('/error');
+    });
 
   /* jshint ignore:start */
   $scope.auth = LiveOak.auth;
