@@ -1,6 +1,6 @@
 'use strict';
 
-var loMod = angular.module('loApp');
+var loMod = angular.module('loApp.controllers.storage', []);
 
 loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, LoStorage, loStorage, Notifications, currentApp) {
 

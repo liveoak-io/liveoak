@@ -1,6 +1,6 @@
 'use strict';
 
-var loMod = angular.module('loApp');
+var loMod = angular.module('loApp.controllers.global', []);
 
 loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, LiveOak, LoAppList) {
 

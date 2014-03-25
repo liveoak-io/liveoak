@@ -1,6 +1,6 @@
 'use strict';
 
-var loMod = angular.module('loApp');
+var loMod = angular.module('loApp.controllers.dashboard', []);
 
 loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, currentApp, loStorageList, loPush) {
 

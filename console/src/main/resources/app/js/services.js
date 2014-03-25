@@ -1,16 +1,8 @@
 'use strict';
 
-var loMod = angular.module('loApp');
+var loMod = angular.module('loApp.services', []).value('version', '0.1');
 
-/* Services */
-
-// Demonstrate how to register services
-// In this case it is a simple value service.
-angular.module('loApp.services', []).
-  value('version', '0.1');
-
-angular.module('services.breadcrumbs', []);
-angular.module('services.breadcrumbs').factory('breadcrumbs', ['$rootScope', '$location', function($rootScope, $location){
+angular.module('services.breadcrumbs', []).factory('breadcrumbs', ['$rootScope', '$location', function($rootScope, $location){
 
   var breadcrumbs = [];
   var breadcrumbsService = {};

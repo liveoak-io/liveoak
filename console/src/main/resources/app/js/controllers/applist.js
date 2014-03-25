@@ -1,6 +1,6 @@
 'use strict';
 
-var loMod = angular.module('loApp');
+var loMod = angular.module('loApp.controllers.application', []);
 
 loMod.controller('AppListCtrl', function($scope, $routeParams, breadcrumbs, loAppList, LoStorageList) {
 
