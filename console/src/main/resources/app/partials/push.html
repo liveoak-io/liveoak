@@ -1,31 +1,29 @@
 <!-- Mock page for Push - TODO actual implementation -->
 <lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="push" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
 
-<div class="col-md-10 lo-main-pane">
+<div class="col-md-9 lo-main-pane app-push">
     <div class="row">
         <div class="lo-content-area col-md-10">
             <lo-breadcrumbs></lo-breadcrumbs>
-            <h2><span>{{curApp.name}}</span> Push Notifications</h2>
-
+            <h2 class="pull-left"><span>{{curApp.name}}</span> Push Notifications</h2>
+            <p class="subtitle"><span class="required">*</span> Required fields</p>
             <hr>
-            <div class="lo-page-info" ng-show="create">
-                <p>
-                    <span class="lo-emph">To configure push for this application, please enter your AeroGear UnifiedPush Server information. <i class="fa fa-info-circle" data-tooltip-placement="right" data-tooltip="To be able to use this feature, you need to have an application already configured in Aerogear UPS."></i></span>
-                </p>
-            </div>
+            <p class="form-info" ng-show="create">To configure push for this application, please enter your AeroGear UnifiedPush Server information. <i class="fa fa-info-circle" data-tooltip-placement="right" data-tooltip="To be able to use this feature, you need to have an application already configured in Aerogear UPS."></i></p>
+
             <div class="panel panel-default lo-panel" ng-hide="create">
-                <div class="panel-body">
-                    <div class="pull-right">
-                        <h5><span class="lo-field"><i class="green-circle"></i> Active</span></h5>
-                    </div>
-                    <h3 class="">Connected to <a href="#">{{pushAppName}}</a></h3>
-
-                    <span class="lo-emph">Configured <strong>3</strong> minutes ago.</span>
+              <div class="panel-heading clearfix">
+                <h3 class="pull-left">Connected to <a href="#">{{pushAppName}}</a> <span class="lo-emph">in AeroGear UPS</span></h3>
+                <div class="pull-right">
+                    <span class="lo-field"><i class="green-circle"></i> Active</span>
                 </div>
-
+              </div>
+              <div class="panel-body">
+                <span class="lo-emph">Configured <strong>3</strong> minutes ago.</span>
+              </div>
             </div>
 
             <form class="lo-form-horizontal clearfix" name="pushForm">
+              <fieldset>
                 <div class="form-group clearfix">
                     <label class="col-sm-3 control-label" for="push-url">AeroGear UnifiedPush URL <span class="required">*</span></label>
                     <div class="col-sm-4">
@@ -44,6 +42,7 @@
                         <input class="form-control" type="password" id="secret" ng-model="pushModel.masterSecret" required>
                     </div>
                 </div>
+              </fieldset>
 
                 <div class="pull-right form-actions" ng-show="changed">
                     <button lo-button-clear="clear()">Clear changes</button>

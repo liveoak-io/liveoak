@@ -6,7 +6,8 @@
             <div class="lo-content-area col-md-9">
                 <lo-breadcrumbs></lo-breadcrumbs>
 
-                <h2><span>{{curApp.name}}</span> {{ create ? 'New Storage' : storageModel.id }}</h2>
+                <h2 class="pull-left"><span>{{curApp.name}}</span> {{ create ? 'New Storage' : storageModel.id }}</h2>
+                <p class="subtitle"><span class="required">*</span> Required fields</p>
 
                 <form class="lo-form-horizontal" name="realmForm" novalidate>
                     <fieldset>
