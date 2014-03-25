@@ -174,34 +174,23 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, cur
   $log.debug('StorageCollectionCtrl');
 
   $rootScope.curApp = currentApp;
+
   $scope.collectionList = currentCollectionList._members;
-  $log.debug(currentCollectionList);
-  $scope.collectionId = $scope.collectionList[0].id;
-  $log.debug($scope.collectionId);
-
-  $scope.currentCollectionList = currentCollectionList;
-  $log.debug(currentCollectionList._members);
-
-  $scope.myData = LoCollection.get({appId: currentApp.id, storageId: $routeParams.storageId, collectionId: 'chat'});
 
   $scope.columns = [];
 
-  $scope.myData.$promise.then(function(data){
-    for (var c in data._members[0]){
-      if (c !== 'self'){
-        $scope.columns.push(c);
+  if ($scope.collectionList) {
+    $scope.collectionId = $scope.collectionList[0].id;
+    $log.debug($scope.collectionId);
+
+    $scope.myData = LoCollection.get({appId: currentApp.id, storageId: $routeParams.storageId, collectionId: 'chat'});
+    $scope.myData.$promise.then(function(data){
+      for (var c in data._members[0]){
+        if (c !== 'self'){
+          $scope.columns.push(c);
+        }
       }
-    }
-    console.log($scope.columns);
-  });
-
-  $scope.storage = {
-    item: {
-      id: 1234,
-      fName: 'First',
-      lName: 'last',
-      collection: {asd:'asd', gre: 12343}
-    }
-  };
-
+      console.log($scope.columns);
+    });
+  }
 });
