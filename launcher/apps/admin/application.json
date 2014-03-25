@@ -19,6 +19,14 @@
       "config" : {
         "directory" : "${application.dir}/css"
       }
+    },
+    "push" : {
+      "type" : "ups",
+      "config" : {
+        "upsServerURL" : "a",
+        "applicationId" : "a",
+        "masterSecret" : "a"
+      }
     }
   }
 }
