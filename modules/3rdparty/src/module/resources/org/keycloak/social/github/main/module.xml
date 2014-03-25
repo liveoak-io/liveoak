@@ -22,12 +22,11 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.3" name="org.keycloak.social.core">
+<module xmlns="urn:jboss:module:1.3" name="org.keycloak.social.github">
     <resources>
-        <artifact name="org.keycloak:keycloak-social-core:${keycloak.version}"/>
+        <artifact name="org.keycloak:keycloak-social-github:${keycloak.version}"/>
     </resources>
     <dependencies>
-        <module name="org.keycloak"/>
-        <module name="org.json" export="true"/>
+        <module name="org.keycloak.social.core"/>
     </dependencies>
 </module>

@@ -14,7 +14,9 @@
                 <include path="META-INF" />
             </imports>
         </module>
+        <module name="org.keycloak.social.facebook" services="import"/>
         <module name="org.keycloak.social.google" services="import"/>
+        <module name="org.keycloak.social.github" services="import"/>
 
         <!-- Needed for JPA model -->
         <module name="org.hibernate" services="import"/>
