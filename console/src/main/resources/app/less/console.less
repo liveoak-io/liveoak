@@ -41,18 +41,36 @@
 ***********************************
 */
 
-html {
-  body {
-    line-height: 1.909em;
-    font-family: @exo;
-    color: @c_gray;
-    background-color: @c_mainpane;
+body {
+  line-height: 1.909em;
+  font-family: @exo;
+  color: @c_gray;
+  background-color: @c_mainpane;
+}
+
+/* Code to fix the backgrounds */
+html, body {
+  height: 100%;
+}
+
+#lo-content-row {
+  min-height: calc(~"100% - 79px");
+}
+
+#lo-content-row {
+  overflow: hidden;
+  
+  > aside, > div {
+    margin-bottom: -99999px;
+    padding-bottom: 99999px;
   }
 }
 
-html, body, #lo-content-row, .lo-sidebar, .lo-main-pane, .lo-main-pane > .row, .lo-info-pane {
-	height: 100%;
+.lo-info-pane {
+  margin-bottom: -99999px;
+  padding-bottom: 99999px;
 }
+
 
 /* Basic elements */
 h1, h2, h3, h4, h5, h6 {
@@ -210,7 +228,7 @@ hr {
 
 /* Side menu (1st column) */
 .lo-sidebar {
-  background: @c_snav;
+  background-color: @c_snav;
   padding: 0;
 
   .dropdown {
@@ -303,10 +321,10 @@ hr {
 /* The main area (2rd column) */
 .lo-main-pane {
   padding: 0;
-  background: @c_mainpane;
 
   .lo-content-area {
     padding: 0 30px 30px;
+    background-color: @c_mainpane;
   }
 
   .lo-content-area {
@@ -535,8 +553,10 @@ hr {
 /* The info area (3rd column) */
 .lo-info-pane {
   font-size: @fsize;
-  background: @c_white;
-  padding: 0 20px;
+  background-color: @c_white;
+  padding-top: 0;
+  padding-left: 20px;
+  padding-right: 20px;
   line-height: 1.3em;
 
   a {
