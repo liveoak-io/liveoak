@@ -3,6 +3,7 @@ package io.liveoak.container.tenancy;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.container.extension.ExtensionService;
 import io.liveoak.container.extension.MountService;
+import io.liveoak.container.tenancy.service.ApplicationsDeployerService;
 import io.liveoak.container.tenancy.service.ApplicationsDirectoryService;
 import io.liveoak.container.zero.ApplicationExtensionsResource;
 import io.liveoak.container.zero.ApplicationResource;
@@ -19,6 +20,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.net.URISyntaxException;
 import java.util.Collection;
 
 import static io.liveoak.spi.LiveOak.*;
@@ -35,8 +38,8 @@ public class TenancyTest {
     public void setUpServiceContainer() {
         this.serviceContainer = ServiceContainer.Factory.create();
 
-
-        this.serviceContainer.addService(LiveOak.APPLICATIONS_DIR, new ApplicationsDirectoryService(null))
+        File appDir = new File(getClass().getClassLoader().getResource("apps").getFile());
+        this.serviceContainer.addService(LiveOak.APPLICATIONS_DIR, new ApplicationsDirectoryService(appDir))
                 .install();
 
         /*
@@ -147,6 +150,12 @@ public class TenancyTest {
 
         InternalApplicationRegistry registry = new InternalApplicationRegistry(this.serviceContainer);
         this.serviceContainer.addService(LiveOak.APPLICATION_REGISTRY, new ValueService<InternalApplicationRegistry>(new ImmediateValue<>(registry)))
+                .install();
+
+        ApplicationsDeployerService deployerService = new ApplicationsDeployerService();
+        this.serviceContainer.addService(APPLICATIONS_DEPLOYER, deployerService)
+                .addDependency(APPLICATIONS_DIR, File.class, deployerService.applicationsDirectoryInjector())
+                .addDependency(APPLICATION_REGISTRY, InternalApplicationRegistry.class, deployerService.applicationRegistryInjector())
                 .install();
 
         ExtensionService ext = new ExtensionService(ZeroExtension.APPLICATION_ID, new ZeroExtension(), JsonNodeFactory.instance.objectNode());

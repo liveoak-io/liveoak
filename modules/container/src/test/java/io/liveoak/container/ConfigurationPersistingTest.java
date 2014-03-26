@@ -65,6 +65,8 @@ public class ConfigurationPersistingTest {
         this.system = LiveOakFactory.create();
         this.client = this.system.client();
 
+        this.system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
+
         this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application");
         this.system.extensionInstaller().load("mock", new MockExtension());
         this.system.awaitStability();

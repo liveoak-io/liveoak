@@ -1,6 +1,5 @@
 package io.liveoak.container.zero.service;
 
-import io.liveoak.container.tenancy.ApplicationRegistry;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.container.zero.ApplicationsResource;
 import org.jboss.msc.inject.Injector;

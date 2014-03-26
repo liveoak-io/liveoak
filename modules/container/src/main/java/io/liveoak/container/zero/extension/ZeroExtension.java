@@ -1,9 +1,7 @@
 package io.liveoak.container.zero.extension;
 
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.container.zero.ZeroServices;
-import io.liveoak.container.zero.service.ZeroApplicationDeployer;
 import io.liveoak.container.zero.service.ZeroResourcesService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
@@ -23,12 +21,6 @@ public class ZeroExtension implements Extension {
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
         ServiceTarget target = context.target();
-
-        ZeroApplicationDeployer appDeployer = new ZeroApplicationDeployer();
-
-        target.addService(ZeroServices.BOOTSTRAP.append("application"), appDeployer)
-                .addDependency( LiveOak.APPLICATION_REGISTRY, InternalApplicationRegistry.class, appDeployer.applicationRegistryInjector() )
-                .install();
 
         ZeroResourcesService appResources = new ZeroResourcesService();
 

@@ -20,7 +20,9 @@ import io.liveoak.container.interceptor.TimingInterceptor;
 import io.liveoak.container.protocols.PipelineConfigurator;
 import io.liveoak.container.service.*;
 import io.liveoak.container.tenancy.GlobalContext;
+import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.container.tenancy.service.ApplicationRegistryService;
+import io.liveoak.container.tenancy.service.ApplicationsDeployerService;
 import io.liveoak.container.tenancy.service.ApplicationsDirectoryService;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.container.zero.service.ZeroBootstrapper;
@@ -37,7 +39,6 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.platform.PlatformManager;
 
 import java.io.File;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.Executor;
 
@@ -47,6 +48,7 @@ import static io.liveoak.spi.LiveOak.*;
  * Bootstrapping <code>main()</code> method.
  *
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class LiveOakFactory {
 
@@ -109,25 +111,25 @@ public class LiveOakFactory {
         serviceContainer.addService(LIVEOAK, new ValueService<LiveOakSystem>(new ImmediateValue<>(system)))
                 .install();
 
-        serviceContainer.addService(SERVICE_REGISTRY,
-                new ValueService<ServiceRegistry>(
-                        new ImmediateValue<>(serviceContainer)
-                ))
+        serviceContainer.addService(SERVICE_REGISTRY, new ValueService<ServiceRegistry>(new ImmediateValue<>(serviceContainer)))
                 .install();
 
-        serviceContainer.addService(SERVICE_CONTAINER,
-                new ValueService<ServiceRegistry>(
-                        new ImmediateValue<>(serviceContainer)
-                ))
+        serviceContainer.addService(SERVICE_CONTAINER, new ValueService<ServiceRegistry>(new ImmediateValue<>(serviceContainer)))
                 .install();
 
     }
 
     protected void createTenancy() {
-        serviceContainer.addService( APPLICATIONS_DIR, new ApplicationsDirectoryService( this.appsDir ) )
+        serviceContainer.addService(APPLICATIONS_DIR, new ApplicationsDirectoryService(this.appsDir))
                 .install();
 
         serviceContainer.addService(APPLICATION_REGISTRY, new ApplicationRegistryService())
+                .install();
+
+        ApplicationsDeployerService deployerService = new ApplicationsDeployerService();
+        serviceContainer.addService(APPLICATIONS_DEPLOYER, deployerService)
+                .addDependency(APPLICATIONS_DIR, File.class, deployerService.applicationsDirectoryInjector())
+                .addDependency(APPLICATION_REGISTRY, InternalApplicationRegistry.class, deployerService.applicationRegistryInjector())
                 .install();
 
         Service<GlobalContext> globalContext = new ValueService<GlobalContext>(new ImmediateValue<>(new GlobalContext()));
@@ -137,13 +139,10 @@ public class LiveOakFactory {
 
     protected void createExtensions() {
         ExtensionInstaller installer = new ExtensionInstaller(serviceContainer, LiveOak.resource(ZeroExtension.APPLICATION_ID, "system"));
-        serviceContainer.addService(EXTENSION_INSTALLER,
-                new ValueService<ExtensionInstaller>(
-                        new ImmediateValue<>(installer)
-                ))
+        serviceContainer.addService(EXTENSION_INSTALLER, new ValueService<ExtensionInstaller>(new ImmediateValue<>(installer)))
                 .install();
 
-        ExtensionLoader extensionLoader = new ExtensionLoader(new File( configDir, "extensions" ).getAbsoluteFile() );
+        ExtensionLoader extensionLoader = new ExtensionLoader(new File(configDir, "extensions").getAbsoluteFile());
 
         serviceContainer.addService(EXTENSION_LOADER, extensionLoader)
                 .addDependency(EXTENSION_INSTALLER, ExtensionInstaller.class, extensionLoader.extensionInstallerInjector())
@@ -151,8 +150,8 @@ public class LiveOakFactory {
 
         ZeroBootstrapper zero = new ZeroBootstrapper();
 
-        serviceContainer.addService( LiveOak.LIVEOAK.append( "zero", "bootstrapper" ), zero )
-                .addDependency(EXTENSION_INSTALLER, ExtensionInstaller.class, zero.extensionInstallerInjector() )
+        serviceContainer.addService(LiveOak.LIVEOAK.append("zero", "bootstrapper"), zero)
+                .addDependency(EXTENSION_INSTALLER, ExtensionInstaller.class, zero.extensionInstallerInjector())
                 .install();
     }
 

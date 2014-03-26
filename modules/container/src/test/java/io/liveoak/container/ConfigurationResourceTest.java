@@ -66,6 +66,8 @@ public class ConfigurationResourceTest {
         this.system = LiveOakFactory.create();
         this.client = this.system.client();
 
+        this.system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
+
         this.application = this.system.applicationRegistry().createApplication( "testApp", "Test Application" );
 
         this.system.extensionInstaller().load("config", new InMemoryConfigExtension());

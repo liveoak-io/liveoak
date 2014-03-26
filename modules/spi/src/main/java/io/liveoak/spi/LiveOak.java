@@ -40,13 +40,13 @@ public class LiveOak {
 
     private static final ServiceName APPLICATION = LIVEOAK.append("application");
     public static final ServiceName APPLICATION_REGISTRY = GLOBAL.append( "application-registry" );
+    public static final ServiceName APPLICATIONS_DIR = LIVEOAK.append( "dir", "applications" );
+    public static final ServiceName APPLICATIONS_DEPLOYER = LIVEOAK.append("applications", "deployer");
 
     public static final ServiceName SERVICE_REGISTRY = LIVEOAK.append( "msc", "service-registry" );
     public static final ServiceName SERVICE_CONTAINER = LIVEOAK.append( "msc", "service-container" );
     public static final ServiceName EXTENSION_LOADER = LIVEOAK.append( "extension-loader" );
     public static final ServiceName EXTENSION_INSTALLER = LIVEOAK.append( "extension-installer" );
-
-    public static final ServiceName APPLICATIONS_DIR = LIVEOAK.append( "dir", "applications" );
 
     public static ServiceName application(String appId) {
         return LIVEOAK.append( "application", appId );

@@ -12,6 +12,7 @@ import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.container.util.ConversionUtils;
+import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.resource.RootResource;
@@ -73,6 +74,7 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
     public void setUpSystem() throws Exception {
         try {
             this.system = LiveOakFactory.create();
+            this.system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
             this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application", applicationDirectory());
 
             loadExtensions();
