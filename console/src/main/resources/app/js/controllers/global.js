@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.global', []);
 
-loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, LiveOak, LoAppList) {
+loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, LiveOak, LoApp) {
 
   $log.debug('GlobalCtrl' + LiveOak);
 
@@ -34,7 +34,7 @@ loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, Liv
   $rootScope.reIPv6Host = new RegExp('^' + reIPv6String + '$|^' + reHostString + '$');
   $rootScope.reIPv4IPv6Host = new RegExp('^' + reIPv4String + '$|^' + reIPv6String + '$|^' + reHostString + '$');
 
-  LoAppList.get(function(data){
+  LoApp.getList(function(data){
     $rootScope.applications = data._members;
   });
 

@@ -112,6 +112,18 @@ loMod.factory('Loader', function($q) {
       return delay.promise;
     };
   };
+  loader.getList = function(service, id) {
+    return function() {
+      var i = id && id();
+      var delay = $q.defer();
+      service.getList(i, function(entry) {
+        delay.resolve(entry);
+      }, function() {
+        delay.reject('Unable to fetch ' + i);
+      });
+      return delay.promise;
+    };
+  };
   loader.query = function(service, id) {
     return function() {
       var i = id && id();
@@ -135,6 +147,10 @@ loMod.factory('LoStorage', function($resource) {
     get : {
       method : 'GET'
     },
+    getList : {
+      method : 'GET',
+      params: { expand : 'members' }
+    },
     create : {
       method : 'POST',
       params : { appId : '@appId'}
@@ -146,35 +162,27 @@ loMod.factory('LoStorage', function($resource) {
   });
 });
 
-loMod.factory('LoStorageList', function($resource) {
-  return $resource('/admin/applications/:appId/resources?expand=members', {
-    appId : '@appId'
-  }, {
-    get : {
-      method : 'GET'
-    }
-  });
-});
-
 loMod.factory('LoCollection', function($resource) {
-  return $resource('/:appId/:storageId/:collectionId?expand=members', {
+  return $resource('/:appId/:storageId/:collectionId', {
     appId : '@appId',
     storageId : '@storageId',
     collectionId : '@collectionId'
   }, {
-    get : {
-      method : 'GET'
-    }
-  });
-});
-
-loMod.factory('LoCollectionList', function($resource) {
-  return $resource('/:appId/:storageId?expand=members', {
-    appId : '@appId',
-    storageId : '@storageId'
-  }, {
-    get : {
-      method : 'GET'
+    getList : {
+      method : 'GET',
+      params: { expand : 'members' }
+    },
+    create : {
+      method : 'POST',
+      params : { appId : '@appId', storageId : '@storageId'}
+    },
+    update : {
+      method : 'PUT',
+      params : { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId'}
+    },
+    delete : {
+      method : 'DELETE',
+      params : { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId'}
     }
   });
 });
@@ -185,12 +193,12 @@ loMod.factory('LoApp', function($resource) {
   }, {
     get : {
       method : 'GET'
+    },
+    getList : {
+      method : 'GET',
+      params: { expand : 'members' }
     }
   });
-});
-
-loMod.factory('LoAppList', function($resource) {
-  return $resource('/admin/applications?expand=members');
 });
 
 loMod.factory('LoStorageLoader', function(Loader, LoStorage, $route) {
@@ -202,16 +210,16 @@ loMod.factory('LoStorageLoader', function(Loader, LoStorage, $route) {
   });
 });
 
-loMod.factory('LoStorageListLoader', function(Loader, LoStorageList, $route) {
-  return Loader.get(LoStorageList, function() {
+loMod.factory('LoStorageListLoader', function(Loader, LoStorage, $route) {
+  return Loader.getList(LoStorage, function() {
     return {
       appId : $route.current.params.appId
     };
   });
 });
 
-loMod.factory('LoCollectionListLoader', function(Loader, LoCollectionList, $route) {
-  return Loader.get(LoCollectionList, function() {
+loMod.factory('LoCollectionListLoader', function(Loader, LoCollection, $route) {
+  return Loader.getList(LoCollection, function() {
     return {
       appId : $route.current.params.appId,
       storageId : $route.current.params.storageId
@@ -242,8 +250,8 @@ loMod.factory('LoAppLoader', function(Loader, LoApp, $route) {
   });
 });
 
-loMod.factory('LoAppListLoader', function(Loader, LoAppList) {
-  return Loader.get(LoAppList);
+loMod.factory('LoAppListLoader', function(Loader, LoApp) {
+  return Loader.getList(LoApp);
 });
 
 loMod.factory('LoCollectionLoader', function(Loader, LoCollection) {

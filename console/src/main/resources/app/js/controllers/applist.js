@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.application', []);
 
-loMod.controller('AppListCtrl', function($scope, $routeParams, breadcrumbs, loAppList, LoStorageList) {
+loMod.controller('AppListCtrl', function($scope, $routeParams, breadcrumbs, loAppList, LoStorage) {
 
   $scope.breadcrumbs = breadcrumbs;
 
@@ -13,7 +13,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, breadcrumbs, loAp
       id: loAppList._members[i].id,
       name: loAppList._members[i].name
     };
-    app.storage = LoStorageList.get({appId: app.id});
+    app.storage = LoStorage.getList({appId: app.id});
     $scope.applications.push(app);
   }
 
