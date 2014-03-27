@@ -1,6 +1,6 @@
 'use strict';
 
-var loMod = angular.module('loApp');
+var loMod = angular.module('loApp.controllers.push', []);
 
 loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, Notifications, currentApp) {
 
