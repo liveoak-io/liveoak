@@ -38,6 +38,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
 
   $scope.clear = function(){
     $scope.storageModel = angular.copy(storageModelBackup);
+    $scope.passwdConfirm = '';
     $scope.changed = false;
   };
 
@@ -174,6 +175,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, cur
 
   $rootScope.curApp = currentApp;
   $scope.collectionList = currentCollectionList._members;
+  $log.debug(currentCollectionList);
   $scope.collectionId = $scope.collectionList[0].id;
   $log.debug($scope.collectionId);
 
