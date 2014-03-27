@@ -9,7 +9,8 @@ var loMod = angular.module('loApp', [
   'loApp.controllers',
   'services.breadcrumbs',
   'ngResource',
-  'ngAnimate'
+  'ngAnimate',
+  'ui.bootstrap'
 ]);
 
 loMod.config(['$routeProvider', function($routeProvider) {

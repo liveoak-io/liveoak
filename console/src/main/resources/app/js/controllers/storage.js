@@ -169,28 +169,83 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
 
 });
 
-loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, currentApp, currentCollectionList, LoCollection, $routeParams) {
+loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $route, currentApp,
+                                                   currentCollectionList, LoCollection, $routeParams, LoCollectionItem) {
 
   $log.debug('StorageCollectionCtrl');
 
   $rootScope.curApp = currentApp;
-
   $scope.collectionList = currentCollectionList._members;
 
-  $scope.columns = [];
+  $scope.predicate = 'id';
 
-  if ($scope.collectionList) {
-    $scope.collectionId = $scope.collectionList[0].id;
-    $log.debug($scope.collectionId);
+  $scope.setFilter = function(predicate, reverse){
+    $scope.predicate = predicate;
+    $scope.reverse = reverse;
+  };
 
-    $scope.myData = LoCollection.get({appId: currentApp.id, storageId: $routeParams.storageId, collectionId: 'chat'});
-    $scope.myData.$promise.then(function(data){
-      for (var c in data._members[0]){
-        if (c !== 'self'){
-          $scope.columns.push(c);
+  var loadCollectionData = function(colId) {
+    $scope.columns = [];
+    $scope.myData = LoCollectionItem.getList({appId: currentApp.id, storageId: $routeParams.storageId, collectionId: colId});
+    $scope.myData.$promise.then(function (data) {
+      if (data._members && data._members[0]) {
+        for (var c in data._members[0]) {
+          if (c !== 'self') {
+            $scope.columns.push(c);
+          }
         }
       }
-      console.log($scope.columns);
     });
-  }
+  };
+
+  // If nothing is selected, select the 1st item from the list
+  var selectFirst = function() {
+    if ($scope.collectionList) {
+
+      if (!$scope.collectionId) {
+        $scope.collectionId = $scope.collectionList[0].id;
+      }
+    }
+  };
+
+  selectFirst();
+
+  var loadCollectionList = function(callback) {
+    var promise = LoCollection.getList({appId: currentApp.id, storageId: $routeParams.storageId});
+    promise.$promise.then(function (data) {
+      $scope.collectionList = data._members;
+      if (callback) {
+        callback();
+      }
+    });
+  };
+
+  loadCollectionList();
+
+  $scope.$watch('collectionId', function(){
+      if ( $scope.collectionId ) {
+        loadCollectionData($scope.collectionId);
+      }
+    }
+  );
+
+  $scope.create = function() {
+    LoCollection.create({appId: currentApp.id, storageId: $routeParams.storageId}, {id : $scope.newCollectionId});
+    loadCollectionList();
+  };
+
+  $scope.remove = function() {
+    LoCollection.delete({appId: currentApp.id, storageId: $routeParams.storageId, collectionId: $scope.collectionId});
+    // There's a watcher on $scope.collectionId, list will be updated from there
+    $scope.collectionId = false;
+    loadCollectionList(selectFirst);
+  };
+
+  $scope.removeLine = function(id) {
+    LoCollectionItem.delete({appId: currentApp.id, storageId: $routeParams.storageId,
+      collectionId: $scope.collectionId, itemId: id});
+
+    loadCollectionData($scope.collectionId);
+  };
+
 });

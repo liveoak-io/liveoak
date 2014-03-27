@@ -176,12 +176,34 @@ loDirectives.directive('loButtonDelete', function () {
   };
 });
 
+/*
+ For this directive to work correctly the Collection for generating options must be set in ng-options or directly
+ as a value for directive attribute, i.e. lo-select='myOptionCollection'
+*/
 loDirectives.directive('loSelect', function($timeout) {
   return {
-    link: function(scope, element) {
-      $timeout(function() {
-        $(element).selectpicker();
-      }, 0);
+    restrict: 'A',
+    link: function(scope, element, iAttrs){
+
+      // Name of the options collection
+      var options;
+
+      if (iAttrs.loSelect){
+        options = iAttrs.loSelect;
+      } else {
+        // If loSelect attribute has no value assigned, parse the options collection name from ng-options
+        options = iAttrs.ngOptions.split('in').pop().trim();
+      }
+
+      var initSelectpicker = function(){
+        element.selectpicker('refresh');
+      };
+
+      scope.$watchCollection(options, function(){
+        initSelectpicker();
+      });
+
+      $timeout(initSelectpicker, 0, false);
     }
   };
 });

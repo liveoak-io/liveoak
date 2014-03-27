@@ -187,6 +187,35 @@ loMod.factory('LoCollection', function($resource) {
   });
 });
 
+loMod.factory('LoCollectionItem', function($resource) {
+  return $resource('/:appId/:storageId/:collectionId/:itemId', {
+    appId : '@appId',
+    storageId : '@storageId',
+    collectionId : '@collectionId'
+  }, {
+    get : {
+      method : 'GET',
+      params: { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId', itemId: '@itemId' }
+    },
+    getList : {
+      method : 'GET',
+      params: { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId', expand : 'members' }
+    },
+    create : {
+      method : 'POST',
+      params : { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId'}
+    },
+    update : {
+      method : 'PUT',
+      params : { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId', itemId: '@itemId'}
+    },
+    delete : {
+      method : 'DELETE',
+      params : { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId', itemId: '@itemid'}
+    }
+  });
+});
+
 loMod.factory('LoApp', function($resource) {
   return $resource('/admin/applications/:appId', {
     appId : '@appId'
