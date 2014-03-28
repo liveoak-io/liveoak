@@ -136,6 +136,13 @@ hr {
   color: @c_graylight;
 }
 
+/* Hide spinner for type="number" inputs */
+input[type=number].no-spinner::-webkit-inner-spin-button,
+input[type=number].no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 /*
 ***********************************
     LiveOak specific elements
