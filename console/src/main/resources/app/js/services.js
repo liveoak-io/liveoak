@@ -88,6 +88,12 @@ loMod.factory('Notifications', function($rootScope, $timeout, $log) {
     $log.warn(message);
   };
 
+  notifications.httpError = function(message, httpResponse) {
+    message += ' (' + (httpResponse.data.message ? (httpResponse.data.message) : (httpResponse.data.cause ? (httpResponse.data.cause) : '')) + ')';
+    notifications.message('danger', 'Error!', message);
+    $log.error(message);
+  };
+
   return notifications;
 });
 

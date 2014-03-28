@@ -62,7 +62,7 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
         },
         // error
         function(httpResponse) {
-          Notifications.error('Failed to update Push configuration (' + httpResponse.status + (httpResponse.data ? (' ' + httpResponse.data) : '') + ')');
+          Notifications.httpError('Failed to update Push configuration', httpResponse);
         }
       );
     }
@@ -81,7 +81,7 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
       },
       // error
       function(httpResponse) {
-        Notifications.error('Failed to delete Push configuration (' + httpResponse.status + (httpResponse.data ? (' ' + httpResponse.data) : '') + ')');
+        Notifications.httpError('Failed to delete Push configuration', httpResponse);
       }
     );
   };

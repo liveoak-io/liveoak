@@ -103,7 +103,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
           },
           // error
           function(httpResponse) {
-            Notifications.error('Failed to create new storage (' + httpResponse.status + (httpResponse.data ? (' ' + httpResponse.data) : '') + ')');
+            Notifications.httpError('Failed to create new storage', httpResponse);
           });
       }
       // Update the storage resource
@@ -126,7 +126,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
         },
         function(httpResponse){
           // Update failure
-          Notifications.error('Failed to update the storage (' + httpResponse.status + (httpResponse.data ? (' ' + httpResponse.data) : '') + ')');
+          Notifications.httpError('Failed to update the storage', httpResponse);
         });
       }
     }

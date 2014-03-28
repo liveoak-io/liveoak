@@ -41,6 +41,7 @@ public class DefaultResourceErrorResponse extends DefaultResourceResponse implem
         super(inReplyTo, ResponseType.ERROR);
         this.errorType = errorType;
         this.cause = cause;
+        this.message = cause.getMessage();
         setState(getState());
     }
 
