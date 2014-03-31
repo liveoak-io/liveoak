@@ -11,7 +11,7 @@
 
                 <form class="lo-form-horizontal" name="storageForm" novalidate>
                     <fieldset>
-                        <legend lo-collapse><span class="text">Data Resource</span></legend>
+                        <legend lo-collapse class="collapsible"><span class="text">Data Resource</span></legend>
                         <div class="form-group">
                           <div class="lo-db-instances">
                             <div class="lo-db-mongo" ng-class="{active: storageModel.type === 'mongo'}" ng-click="storageModel.type = 'mongo'">MongoDB</div>
@@ -31,7 +31,7 @@
                     </fieldset>
 
                     <fieldset>
-                        <legend lo-collapse><span class="text">Settings</span></legend>
+                        <legend lo-collapse class="collapsible"><span class="text">Settings</span></legend>
                         <div class="form-group clearfix">
                             <label class="col-sm-2 control-label" for="dbhost">Host <span class="required">*</span></label>
 
@@ -65,7 +65,7 @@
                     </fieldset>
 
                     <fieldset>
-                        <legend lo-collapse><span class="text">Security</span></legend>
+                        <legend lo-collapse class="collapsible"><span class="text">Security</span></legend>
                         <div class="form-group clearfix">
                             <label class="col-sm-2 control-label" for="stuname">Username</label>
 
