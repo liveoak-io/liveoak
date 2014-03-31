@@ -786,6 +786,15 @@ p.form-info {
   }
 }
 
+.radio-inline, .checkbox-inline {
+  padding-left: 0;
+}
+
+.form-inline-info {
+  margin-top: 5px;
+  margin-bottom: 0;
+}
+
 /* Collapsible forms */
 legend {
   border-width: 1px 0 0 0;
@@ -803,7 +812,7 @@ legend {
     cursor: pointer;
   }
 
-  &:before{
+  &.collapsible:before{
     content: "";
     color: @c_graylight;
     display: inline-block;
@@ -812,8 +821,12 @@ legend {
     margin-right: .5em;
   }
 
-  &.collapsed:before{
-    content: "";
+  &.collapsible.collapsed {
+    margin-bottom: 0;
+    
+    &:before{
+      content: "";
+    }
   }
 }
 
@@ -1166,6 +1179,11 @@ legend {
 
 /* Notifications/Alerts */
 
+.alert {
+  line-height: 1.4em;
+}
+
+/*
 .feedback-aligner {
   position: fixed;
   top: 1.5em;
@@ -1209,35 +1227,59 @@ legend {
   background-color: #E4F3FA;
   border-color: #5994B2;
 }
+*/
 
 /* Modal */
 
-.modal .modal-body {
+.modal-content {
+  position: relative;
+  
+  .modal-body {
+    padding: 0;
+    margin: 20px;
 
-	p {
-		font-size: 12px;
-		display: block;
-		line-height: 1.2em;
-		margin-bottom: 8px;
-		
-		&:last-child {
-			margin-bottom: 0;
-		}
-		
-		&.primary-message {
-			font-weight: bold;
-		}
-	}
-	
-	.form-group:last-child {
-		margin-bottom: 0;
-	}
-	
-	label {
-		text-align: right;
-		font-weight: normal;
-	}
+  	p {
+  		font-size: 12px;
+  		display: block;
+  		line-height: 1.2em;
+  		margin-bottom: 8px;
+  		
+  		&:last-child {
+  			margin-bottom: 0;
+  		}
+  		
+  		&.primary-message {
+  			font-weight: bold;
+  		}
+  	}
+  	
+  	.form-group:last-child {
+  		margin-bottom: 0;
+  	}
+  	
+  	label {
+  		text-align: right;
+  		font-weight: normal;
+  	}
+  	
+  	legend {
+    	border-top: none;
+    	padding-top: 0;
+  	}
+  	
+  	.bootstrap-select:not([class*="span"]):not([class*="col-"]):not([class*="form-control"]) {
+    	width: 100%;
+  	}
+  }
+
+  .steps {
+  	position: absolute;
+  	bottom: 22px;
+  	margin-left: 20px;
+  	color: @c_graylight;
+  }
 }
+
 
 /*
 ***********************************
@@ -1267,11 +1309,14 @@ legend {
 
 .storage-collections {
 
-  .lo-page-info .btn-icon {
-    margin-bottom: 10px;
-    margin-left: 12px;
+  .lo-page-info {
+    
+    .btn-icon {
+      margin-bottom: 10px;
+      margin-left: 12px;
+    }
 
-    + span .btn-icon {
+    span .btn-icon {
       margin-left: 5px;
     }
   }
