@@ -1,30 +1,129 @@
-<lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="push" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
+<div class="row">
+  <div class="lo-content-area col-md-10 next-steps">
+    <lo-breadcrumbs></lo-breadcrumbs>
 
-<div class="col-md-9 lo-main-pane app-push">
-    <div class="row">
-        <div class="lo-content-area col-md-10">
-            <lo-breadcrumbs></lo-breadcrumbs>
-
-            <h2 class="pull-left">What you can do next:</h2>
-            <hr>
-            <div class="col-md-3 panel panel-default lo-panel">
-                <div class="panel-body text-center empty-instance">
-                    <i class="fa fa-cloud"></i>
-                    <h2>Storage</h2>
-                </div>
-            </div>
-            <div class="col-md-3 col-md-offset-1 panel panel-default lo-panel">
-                <div class="panel-body text-center empty-instance">
-                    <i class="fa fa-lock"></i>
-                    <h2>Security</h2>
-                </div>
-            </div>
-            <div class="col-md-3 col-md-offset-1 panel panel-default lo-panel">
-                <div class="panel-body text-center empty-instance">
-                    <i class="fa fa-mobile-phone"></i>
-                    <h2>Push</h2>
-                </div>
-            </div>
+    <h2>What you can do next:</h2>
+    
+    <hr>
+    
+    <section class="table">
+    
+      <div class="table-row">
+        <div class="table-cell">
+          <i class="fa fa-cloud"></i>
+          <h3>Storage</h3>
         </div>
+        <div class="table-cell">
+          <i class="fa fa-lock"></i>
+          <h3>Security</h3>
+        </div>
+        <div class="table-cell">
+          <i class="fa fa-mobile"></i>
+          <h3>Push</h3>
+        </div>
+      </div>
+      
+      <div class="table-row">
+        <div class="table-cell">
+          <div>
+            <span class="lo-label">Storage Provider:</span>
+            <span class="lo-field">mongoDB</span>
+          </div>
+          <div>
+            <span class="lo-label">URL Path:</span>
+            <span class="lo-field">/storage</span>
+          </div>
+        </div>
+        <div class="table-cell">
+          <div>
+            <span class="lo-label">Keycloak Realm:</span>
+            <span class="lo-field">Applications</span>
+          </div>
+        </div>
+        <div class="table-cell">
+          <div>
+            <span class="lo-label">AeroGear UPS URL:</span>
+            <span class="lo-field">www.someurl.com</span>
+          </div>
+          <div>
+            <span class="lo-label">Application ID:</span>
+            <span class="lo-field">someid</span>
+          </div>
+          <div>
+            <span class="lo-label">Master Secret:</span>
+            <span class="lo-field">somemastersecret</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="table-row">
+        <div class="table-cell">
+          <a href="#">View <strong>Storage</strong> »</a>
+        </div>
+        <div class="table-cell">
+          <a href="#">View <strong>Security</strong> »</a>
+        </div>
+        <div class="table-cell">
+          <a href="#">View <strong>Push</strong> »</a>
+        </div>
+      </div>
+    </section>
+    
+    <section class="lo-tutorials">
+      <h3><span>LiveOak</span> Tutorials</h3>
+      <i class="fa fa-file-text-o fa-4x"></i>
+      <p>Explore LiveOak Documentation and learn how to set up Security, Data and Push.</p>
+      <a href="#">How to start building your app »</a>
+    </section>
+    
+<!--
+    <div class="table">
+      <div class="col-md-4 panel lo-panel first">
+        <div class="panel-body text-center">
+          <i class="fa fa-cloud"></i>
+          <h3>Storage</h3>
+          <div>
+            <span class="lo-label">Storage Provider:</span>
+            <span class="lo-field">mongoDB</span>
+          </div>
+          <div>
+            <span class="lo-label">URL Path</span>
+            <span class="lo-field">/storage</span>
+          </div>
+          <a href="#">View <strong>Storage</strong> »</a>
+        </div>
+      </div>
+      <div class="col-md-4 panel lo-panel">
+        <div class="panel-body text-center">
+          <i class="fa fa-lock"></i>
+          <h3>Security</h3>
+          <div>
+            <span class="lo-label">Keycloak Realm:</span>
+            <span class="lo-field">Applications</span>
+          </div>
+          <a href="#">View <strong>Security</strong> »</a>
+        </div>
+      </div>
+      <div class="col-md-4 panel lo-panel">
+        <div class="panel-body text-center">
+          <i class="fa fa-mobile"></i>
+          <h3>Push</h3>
+          <div>
+            <span class="lo-label">AeroGear UPS URL:</span>
+            <span class="lo-field">www.someurl.com</span>
+          </div>
+          <div>
+            <span class="lo-label">Application ID:</span>
+            <span class="lo-field">someid</span>
+          </div>
+          <div>
+            <span class="lo-label">Master Secret:</span>
+            <span class="lo-field">somemastersecret</span>
+          </div>
+          <a href="#">View <strong>Push</strong> »</a>
+        </div>
+      </div>
     </div>
+-->
+  </div>
 </div>
