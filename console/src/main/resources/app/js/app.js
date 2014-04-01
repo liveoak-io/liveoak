@@ -30,6 +30,27 @@ loMod.config(['$routeProvider', function($routeProvider) {
     .when('/applications/:appId', {
       redirectTo: '/applications/:appId/dashboard'
     })
+    .when('/applications/:appId/next-steps', {
+      templateUrl : '/admin/console/partials/next-steps.html',
+      controller : 'DashboardCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader){
+          return new LoAppLoader();
+        },
+        loStorageList : function(LoStorageListLoader) {
+          return new LoStorageListLoader();
+        },
+        loPush: function(LoPush, $route) {
+          return LoPush.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return {};
+            }
+          );
+        }
+      }
+    })
     .when('/applications/dashboard', {
       redirectTo: '#/applications/admin/dashboard' // FIXME hardcoded
     })
