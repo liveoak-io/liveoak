@@ -1,3 +1,8 @@
+/*
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+ */
 package io.liveoak.console;
 
 import org.jboss.arquillian.drone.api.annotation.Drone;
@@ -10,8 +15,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
+import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.junit.Assert.*;
 
+/**
+ * @author <a href="mailto:amendonc@redhat.com">Alexandre Mendonca</a>
+ */
 @RunWith(Arquillian.class)
 public class LoginTest {
 
@@ -35,10 +44,13 @@ public class LoginTest {
     @FindBy(className = "lo-user")
     private WebElement loggedUser;
 
+    @FindBy
+    private WebElement logout;
+
     @Test
     @InSequence(1)
     public void loginComponentsExist() {
-        browser.get(BASE_URL);
+        browser.navigate().to(BASE_URL);
 
         assertTrue("Check that page contains username input element", username.isDisplayed());
         assertTrue("Check that page contains password input element", password.isDisplayed());
@@ -49,8 +61,6 @@ public class LoginTest {
     @Test
     @InSequence(2)
     public void loginFails() {
-        browser.get(BASE_URL);
-
         username.sendKeys("hacker");
         password.sendKeys("letmein");
 
@@ -66,9 +76,9 @@ public class LoginTest {
     @Test
     @InSequence(3)
     public void loginSucceeds() {
-        browser.get(BASE_URL);
-
+        username.clear();
         username.sendKeys("admin");
+        password.clear();
         password.sendKeys("admin");
 
         guardHttp(loginButton).click();
@@ -82,12 +92,38 @@ public class LoginTest {
     @Test
     @InSequence(4)
     public void loginPersist() {
-        browser.get(BASE_URL);
+        browser.navigate().to(BASE_URL);
+
+        waitGui().until().element(loggedUser).is().visible();
 
         assertEquals("Check that page title is the LiveOak Admin Console",
                 "LiveOak - LiveOak Admin Console", browser.getTitle());
         assertTrue("Check that page contains logged user element", loggedUser.isDisplayed());
         assertEquals("Check that logged user is 'admin'", "admin", loggedUser.getText().trim());
+    }
+
+    @Test
+    @InSequence(5)
+    public void logoutSucceeds() {
+        loggedUser.click();
+
+        guardHttp(logout).click();
+
+        assertTrue("Check that page contains username input element", username.isDisplayed());
+        assertTrue("Check that page contains password input element", password.isDisplayed());
+
+        assertTrue("Check that page contains login button element", loginButton.isDisplayed());
+    }
+
+    @Test
+    @InSequence(6)
+    public void logoutPersists() {
+        browser.navigate().to(BASE_URL);
+
+        assertTrue("Check that page contains username input element", username.isDisplayed());
+        assertTrue("Check that page contains password input element", password.isDisplayed());
+
+        assertTrue("Check that page contains login button element", loginButton.isDisplayed());
     }
 
 }
