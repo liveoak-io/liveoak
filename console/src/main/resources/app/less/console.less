@@ -175,7 +175,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   }
 
   .navbar-utility {
-    padding-right: 15px;
+    padding-right: 20px;
     
     li.dropdown > .dropdown-toggle {
 	    padding-left: 10px;
@@ -222,7 +222,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
 
   .navbar-brand {
     margin: 0;
-    padding: 0 20px;
+    padding: 0 30px;
 
     h1 {
       font-size: 20px;
@@ -345,6 +345,32 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
     }
   }
 }
+
+/* Nav menu (tabs) */
+
+.nav-tabs > li:first-child {
+  margin-left: 30px;
+}
+
+.nav-tabs-pf > li.active > a:before, 
+.nav-tabs-pf > li.active > a:active:before, 
+.nav-tabs-pf > li.active > a:focus:before, 
+.nav-tabs-pf > li.active > a:hover:before {
+  background-color: @c_green;
+}
+
+.nav-tabs-pf > li > a {
+  padding-top: 13px;
+  padding-bottom: 13px;
+}
+
+.nav-tabs-pf > li.active > a, 
+.nav-tabs-pf > li.active > a:active, 
+.nav-tabs-pf > li.active > a:focus, 
+.nav-tabs-pf > li.active > a:hover {
+  color: @c_green;
+} 
+
 
 /* Panel */
 .lo-panel {
@@ -720,6 +746,7 @@ p.form-info {
     font-weight: 400;
     position: relative;
     padding-left: 0;
+    font-size: 12px;
 
     > span {
       position: absolute;
@@ -734,6 +761,14 @@ p.form-info {
 
     > div {
       padding-left: .5em;
+    }
+    
+    table {
+      margin-bottom: 0;
+    }
+    
+    .bootstrap-select:not([class*="span"]):not([class*="col-"]):not([class*="form-control"]) {
+      width: 100%;
     }
   }
 
@@ -796,6 +831,15 @@ p.form-info {
 .form-inline-info {
   margin-top: 5px;
   margin-bottom: 0;
+}
+
+.bootstrap-select.btn-group.show-tick .dropdown-menu li.selected a i.check-mark {
+  font-family: 'FontAwesome';
+  margin-top: 5px;
+  
+  &:before {
+    content: "";
+  }
 }
 
 /* Collapsible forms */
