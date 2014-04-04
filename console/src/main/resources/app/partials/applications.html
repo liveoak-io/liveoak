@@ -8,140 +8,8 @@
         <button class="btn btn-primary btn-lg" type="button" data-toggle="modal" data-target="#create-application">Create Application</button>
       </div>
     </div>
-    
-    <!-- Modal Create Application -->
-    
-    <div class="modal fade" id="create-application" tabindex="-1" role="dialog" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-              <span class="pficon pficon-close"></span>
-            </button>
-            <h4 class="modal-title">Create Application</h4>
-          </div>
-          
-          <form class="horizontal-form">
-          
-            <!-- Step 1 -->
-            <div class="modal-body" id="step1">
-              <div class="form-group clearfix">
-                <label for="application-name" class="col-sm-3 control-label">Application Name</label>
-                <div class="col-sm-7">
-                  <input type="text" class="form-control" id="application-name" ng-model="newCollectionId">
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="setup" class="col-sm-3 control-label">Type of Setup</label>
-                <div class="col-sm-7">
-                  <label class="checkbox-inline">
-                    <input type="radio" name="setup-type" checked> Basic
-                  </label>
-                  <label class="checkbox-inline">
-                    <input type="radio" name="setup-type"> Do-It-Yourself
-                  </label>
-                </div>
-              </div>
-              <div class="col-sm-offset-3 col-sm-9 form-inline-info">
-                <!-- For Basic -->
-                <div class="alert alert-info">
-                  <span class="pficon pficon-info"></span>
-                  This will create an application with storage (mongoDB), security (Keycloak), Push (AeroGear UPS) and analytics resources pre configured with defaults.
-                </div>
-                
-                <!-- For Do-It-Yourself -->
-                <div class="alert alert-info hide">
-                  <span class="pficon pficon-info"></span>
-                  This will create an application with no resources. Recommended for advanced users.
-                </div>
-              </div>
-            </div>
-            
-            <!-- Step 2 -->
-            <div class="modal-body hide" id="step2">
-              <fieldset>
-                <legend><span class="text">Storage</span></legend>
-                <div class="form-group clearfix">
-                  <label for="dburl" class="col-sm-3 control-label">URL Path</label>
-                  <div class="col-sm-7">
-                    <input type="text" class="form-control" id="dburl">
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-            
-            <!-- Step 3 -->
-            <div class="modal-body hide" id="step3">
-              <fieldset>
-                <legend><span class="text">Security</span></legend>
-                <div class="form-group clearfix">
-                  <label for="dburl" class="col-sm-3 control-label">Keycloak Realm</label>
-                  <div class="col-sm-7">
-                    <select class="selectpicker">
-        						  <option selected="selected">Applications</option>
-        						  <option>Create Realm...</option>
-        						</select>
-        						<!-- Show input when option Create Realm is selected -->
-        						<!-- <input type="text" class="form-control" placeholder="Realm Name"> -->
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-            
-            <!-- Step 4 -->
-            <div class="modal-body hide" id="step4">
-              <fieldset>
-                <legend>
-                  <span class="text">Push Notifications</span>
-                  <p class="subtitle">All fields are optional</p>
-                </legend>
-                
-                <div class="form-group clearfix">
-                  <label for="pushUrl" class="col-sm-3 control-label">AeroGear UPS URL</label>
-                  <div class="col-sm-7">
-                    <input type="text" class="form-control" id="pushUrl">
-                  </div>
-                </div>
-                <div class="form-group clearfix">
-                  <label for="appId" class="col-sm-3 control-label">Application ID</label>
-                  <div class="col-sm-7">
-                    <input type="text" class="form-control" id="appId">
-                  </div>
-                </div>
-                <div class="form-group clearfix">
-                  <label for="secret" class="col-sm-3 control-label">Master Secret</label>
-                  <div class="col-sm-7">
-                    <input type="text" class="form-control" id="secret">
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-            
-            <!-- Basic -->
-            <div class="modal-footer hide">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="create()">Create</button>
-            </div>
-            
-            <!-- Do-It-Yourself -->
-            <div class="modal-footer">
-              <!-- First Step -->
-              <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button> -->
-              <button type="button" class="btn btn-default" data-dismiss="modal">Previous</button>
-              <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="create()">Next <i class="fa fa-angle-right"></i></button>
-              <!-- Last Step -->
-              <!-- <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="create()">Create </button> -->
-            </div>
-            
-            <!-- Only for Do-It-Yourself -->
-            <span class="steps">Step 1/4</span>
-            
-          </form>
-        </div>
-      </div>
-    </div>
 
-    <lo-app-summary ng-repeat="app in applications" lo-app="app"></lo-app-summary>
+    <lo-app-summary ng-repeat="app in applications" lo-app="app" created="createdId"></lo-app-summary>
   </div>
   <div class="lo-info-pane col-md-3">
     <section class="lo-tutorials">
@@ -150,6 +18,130 @@
       <p>Explore LiveOak Documentation and learn how to set up Security Data and Push.</p>
       <a href="#">How to start your own app »</a>
     </section>
+  </div>
+</div>
+
+<!-- Modal Create Application -->
+<div class="modal fade" id="create-application" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <span class="pficon pficon-close"></span>
+        </button>
+        <h4 class="modal-title">Create Application</h4>
+      </div>
+
+      <form class="horizontal-form">
+
+        <!-- Step 1 -->
+        <div class="modal-body" id="step1" ng-show="setupStep == 1">
+          <div class="form-group clearfix">
+            <label for="application-name" class="col-sm-3 control-label">Application Name</label>
+            <div class="col-sm-7">
+              <input type="text" class="form-control" id="application-name" ng-model="appModel.id">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Type of Setup</label>
+            <div class="col-sm-7">
+              <label class="checkbox-inline">
+                <input type="radio" ng-model="setupType" value="basic"> Basic
+              </label>
+              <label class="checkbox-inline">
+                <input type="radio" ng-model="setupType" value="diy"> Do-It-Yourself
+              </label>
+            </div>
+          </div>
+          <div class="col-sm-offset-3 col-sm-9 form-inline-info">
+            <!-- For Basic -->
+            <div class="alert alert-info" ng-show="setupType == 'basic'">
+              <span class="pficon pficon-info"></span>
+              This will create an application with storage (mongoDB), security (Keycloak), Push (AeroGear UPS) and analytics resources pre configured with defaults.
+            </div>
+
+            <!-- For Do-It-Yourself -->
+            <div class="alert alert-info" ng-show="setupType == 'diy'">
+              <span class="pficon pficon-info"></span>
+              This will create an application with no resources. Recommended for advanced users.
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="modal-body" id="step2" ng-show="setupStep == 2">
+          <fieldset>
+            <legend><span class="text">Storage</span></legend>
+            <div class="form-group clearfix">
+              <label for="dburl" class="col-sm-3 control-label">URL Path</label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" id="dburl">
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="modal-body" id="step3" ng-show="setupStep == 3">
+          <fieldset>
+            <legend><span class="text">Security</span></legend>
+            <div class="form-group clearfix">
+              <label for="dburl" class="col-sm-3 control-label">Keycloak Realm</label>
+              <div class="col-sm-7">
+                <select class="selectpicker">
+                  <option selected="selected">Applications</option>
+                  <option>Create Realm...</option>
+                </select>
+                <!-- Show input when option Create Realm is selected -->
+                <!-- <input type="text" class="form-control" placeholder="Realm Name"> -->
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="modal-body" id="step4" ng-show="setupStep == 4">
+          <fieldset>
+            <legend>
+              <span class="text">Push Notifications</span>
+              <p class="subtitle">All fields are optional</p>
+            </legend>
+
+            <div class="form-group clearfix">
+              <label for="pushUrl" class="col-sm-3 control-label">AeroGear UPS URL</label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" id="pushUrl">
+              </div>
+            </div>
+            <div class="form-group clearfix">
+              <label for="appId" class="col-sm-3 control-label">Application ID</label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" id="appId">
+              </div>
+            </div>
+            <div class="form-group clearfix">
+              <label for="secret" class="col-sm-3 control-label">Master Secret</label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" id="secret">
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="modal-footer">
+          <!-- First Step -->
+          <button type="button" class="btn btn-default" ng-show="setupStep == 1" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-default" ng-show="setupStep > 1" ng-click="prevStep()"><i class="fa fa-angle-left"></i> Previous</button>
+          <button type="button" class="btn btn-primary" ng-show="setupType == 'basic' && setupStep < 4" ng-click="nextStep()">Next <i class="fa fa-angle-right"></i></button>
+          <!-- Last Step -->
+          <button type="button" class="btn btn-primary" ng-show="setupStep == 4 || setupType == 'diy'" onclick="$('.modal-backdrop').remove(); // FIXME use ng modal" ng-click="create()" data-dismiss="modal">Create </button>
+        </div>
+
+        <!-- Only for Basic -->
+        <span class="steps" ng-show="setupType == 'basic'">Step {{setupStep}}/4</span>
+
+      </form>
+    </div>
   </div>
 </div>
 
