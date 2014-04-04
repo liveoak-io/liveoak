@@ -226,6 +226,10 @@ loMod.factory('LoApp', function($resource) {
     getList : {
       method : 'GET',
       params: { expand : 'members' }
+    },
+    create : {
+      method : 'POST',
+      url: '/admin/applications/'
     }
   });
 });

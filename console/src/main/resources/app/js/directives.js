@@ -35,7 +35,8 @@ loDirectives.directive('loBreadcrumbs', function () {
 loDirectives.directive('loAppSummary', function () {
   return {
     scope: {
-      app: '=loApp'
+      app: '=loApp',
+      created: '='
     },
     restrict: 'E',
     replace: true,
