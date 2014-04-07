@@ -47,6 +47,9 @@
         <fileSet>
             <directory>../launcher/conf</directory>
             <outputDirectory>/conf</outputDirectory>
+            <excludes>
+                <exclude>extensions/mongo-launcher.json</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <directory>../launcher/apps/admin</directory>

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.jboss.logging.Logger;
 
 import static io.liveoak.mongo.launcher.MongoLauncher.nullOrEmpty;
+import static io.liveoak.mongo.launcher.config.Constants.*;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -41,7 +42,7 @@ public class MongoLauncherAutoSetup {
 
         // locate mongoLauncher.json extension config
         File extDir = new File(confDir, "extensions");
-        File launcherJson = new File(extDir, "mongoLauncher.json");
+        File launcherJson = new File(extDir, "mongo-launcher.json");
 
         // we expect it to be present. If it's not present it means it is first-time setup
         // in that case we restore it
@@ -72,9 +73,9 @@ public class MongoLauncherAutoSetup {
                 // if set, report the fact and return
                 JsonNode config = extension.get("config");
                 if (config != null) {
-                    JsonNode value = config.get("enabled");
+                    JsonNode value = config.get(ENABLED);
                     if (value != null && "false".equals(value.asText())) {
-                        log.info("MongoDB auto-start has been disabled in mongoLauncher.json - make sure to manually start MongoDB on appropriate port");
+                        log.info("MongoDB auto-start has been disabled in mongo-launcher.json - make sure to manually start MongoDB on appropriate port");
                         return;
                     }
                 }
@@ -87,7 +88,7 @@ public class MongoLauncherAutoSetup {
         // the default config has useAnyMongod set, and doesn't care about mongod version
         // check if mongodPath is set - that means user has set it
         ObjectNode config = (ObjectNode) extension.get("config");
-        JsonNode mongodPath = config.get("mongodPath");
+        JsonNode mongodPath = config.get(MONGOD_PATH);
 
         if (mongodPath != null)  {
             // check that mongod executes
@@ -103,7 +104,7 @@ public class MongoLauncherAutoSetup {
             String path = MongoLauncher.findMongod();
             if (nullOrEmpty(path)) {
                 // if no mongod found, launch installer to get it
-                // set path to it in mongoLauncher.json
+                // set path to it in mongo-launcher.json
                 MongoInstaller installer = new MongoInstaller();
                 // use ~/.liveoak/mongo for downloaded archives
                 Path mongoDir = Paths.get(System.getProperty("user.home"), ".liveoak", "mongo");
@@ -131,13 +132,13 @@ public class MongoLauncherAutoSetup {
                 }
             }
 
-            // if success set path in mongoLauncher.json
+            // if success set path in mongo-launcher.json
             // determine mongod version
             String mongoVersion = OsUtils.execWithOneLiner(new String[] {path, "--version"}, null, false);
 
             if (!nullOrEmpty(mongoVersion)) {
                 try {
-                    config.put("mongodPath", path);
+                    config.put(MONGOD_PATH, path);
                     mapper.writeValue(launcherJson, extension);
                 } catch (IOException e) {
                     log.error("Failed to update: " + launcherJson.getAbsolutePath(), e);
@@ -165,10 +166,11 @@ public class MongoLauncherAutoSetup {
         result.put("module-id", "io.liveoak.mongo-launcher");
         ObjectNode config = result.putObject("config");
 
-        config.put("enabled", "auto");
-        config.put("logPath", new File(dataDir, "mongod.log").getAbsolutePath());
-        config.put("pidFilePath", new File(dataDir, "mongod.pid").getAbsolutePath());
-        config.put("dbPath", dataDir.getAbsolutePath());
+        config.put(ENABLED, "auto");
+        config.put(LOG_PATH, new File(dataDir, "mongod.log").getAbsolutePath());
+        config.put(PID_FILE_PATH, new File(dataDir, "mongod.pid").getAbsolutePath());
+        config.put(DB_PATH, dataDir.getAbsolutePath());
+        config.put(USE_SMALL_FILES, true);
 
         return result;
     }

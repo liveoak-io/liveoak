@@ -30,6 +30,8 @@ public class MongoLauncher {
     private boolean useAnyMongod;
     private String dbPath;
     private String logPath;
+    private boolean useSmallFiles = true;
+    private StringBuilder extraArgs;
     private OutputStream stdin;
     private Process process;
 
@@ -81,6 +83,25 @@ public class MongoLauncher {
         return useAnyMongod;
     }
 
+    public void setUseSmallFiles(boolean useSmallFiles) {
+        this.useSmallFiles = useSmallFiles;
+    }
+
+    public boolean getUseSmallFiles() {
+        return useSmallFiles;
+    }
+
+    public void addExtraArgs(String extra) {
+        if (extraArgs == null) {
+            extraArgs = new StringBuilder();
+        }
+        extraArgs.append(" ").append(extra);
+    }
+
+    public String getExtraArgs() {
+        return extraArgs.toString();
+    }
+
     public void startMongo() throws IOException {
 
         StringBuilder sb = new StringBuilder();
@@ -109,8 +130,16 @@ public class MongoLauncher {
             sb.append(" --logpath " + logPath);
         }
 
+        if (useSmallFiles) {
+            sb.append(" --smallfiles");
+        }
+
         if (port != 0) {
             sb.append(" --port " + port);
+        }
+
+        if (extraArgs != null) {
+            sb.append(extraArgs);
         }
 
         log.info("Starting mongod: " + sb);

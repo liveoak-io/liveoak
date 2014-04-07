@@ -64,7 +64,7 @@ public class MongoLauncherService implements Service<MongoLauncher> {
         if (detectRunning) {
             if (serverRunning(port)) {
                 log.warn("It appears there is an existing server on port: " + port);
-                log.warn("Using that one (you can change this behavior via 'enabled' property in conf/extensions/mongoLauncher.json)");
+                log.warn("Not starting mongod (you can change this behavior via 'enabled' property in conf/extensions/mongo-launcher.json)");
                 return;
             }
         }
@@ -89,12 +89,19 @@ public class MongoLauncherService implements Service<MongoLauncher> {
             launcher.setPidFilePath(val);
         }
 
+        launcher.setUseSmallFiles(config.useSmallFiles());
+
+        val = config.extraArgs();
+        if (val != null) {
+            launcher.addExtraArgs(val);
+        }
+
         launcher.setUseAnyMongod(config.useAnyMongod());
 
         try {
             launcher.startMongo();
         } catch (IOException e) {
-            throw new StartException("Failed to start MongoDB - Check mongoLauncher.json extension configuration file", e);
+            throw new StartException("Failed to start MongoDB - Check mongo-launcher.json extension configuration file", e);
         }
     }
 
