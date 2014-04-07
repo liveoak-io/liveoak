@@ -48,6 +48,8 @@ public class MongoLauncherTest extends AbstractTestCase {
         File pidFile = new File(target, "mongod.pid");
         mongo.setPidFilePath(pidFile.getAbsolutePath());
         mongo.setLogPath(new File(target, "mongod.log").getAbsolutePath());
+        mongo.addExtraArgs("-v");
+        mongo.addExtraArgs("--maxConns 5");
         int mongoPort = 27026;
         mongo.setPort(mongoPort);
 

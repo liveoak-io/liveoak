@@ -13,6 +13,8 @@ import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.resource.config.ConfigResource;
 import io.liveoak.spi.state.ResourceState;
 
+import static io.liveoak.mongo.launcher.config.Constants.*;
+
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
@@ -27,7 +29,9 @@ public class MongoLauncherConfigResource implements ConfigResource, RootResource
     private String dbPath;
     private String logPath;
     private Boolean useAnyMongod = true;
+    private Boolean useSmallFiles = true;
     private String enabled = "auto";
+    private String extraArgs;
 
     public MongoLauncherConfigResource(String id) {
         this.id = id;
@@ -76,35 +80,46 @@ public class MongoLauncherConfigResource implements ConfigResource, RootResource
         return enabled;
     }
 
+    public boolean useSmallFiles() {
+        return useSmallFiles;
+    }
+
+    public String extraArgs() {
+        return extraArgs;
+    }
+
     @Override
     public void readConfigProperties(RequestContext ctx, PropertySink sink, Resource resource) throws Exception {
-        sink.accept("mongodPath", mongodPath);
-        sink.accept("port", port );
-        sink.accept("dbPath", dbPath);
-        sink.accept("logPath", logPath);
-        sink.accept("pidFilePath", pidFilePath);
-        sink.accept("useAnyMogod", useAnyMongod);
-        sink.accept("enabled", enabled);
+        sink.accept(MONGOD_PATH, mongodPath);
+        sink.accept(PORT, port );
+        sink.accept(DB_PATH, dbPath);
+        sink.accept(LOG_PATH, logPath);
+        sink.accept(PID_FILE_PATH, pidFilePath);
+        sink.accept(USE_ANY_MONGOD, useAnyMongod);
+        sink.accept(USE_SMALL_FILES, useSmallFiles);
+        sink.accept(ENABLED, enabled);
+        sink.accept(EXTRA_ARGS, extraArgs);
     }
 
     @Override
     public void updateConfigProperties(RequestContext ctx, ResourceState state, Responder responder, Resource resource) throws Exception {
-        mongodPath = getStringProperty("mongodPath", state);
-        dbPath = getStringProperty("dbPath", state);
-        logPath = getStringProperty("logPath", state);
-        pidFilePath = getStringProperty("pidFilePath", state);
-        port = getIntegerProperty("port", state);
-        if (port == null) {
-            port = 27017;
-        }
-        useAnyMongod = getBooleanProperty("useAnyMongod", state);
-        if (useAnyMongod == null) {
-            useAnyMongod = true;
-        }
-        enabled = getStringProperty("enabled", state);
-        if (enabled == null) {
-            enabled = "auto";
-        }
+        mongodPath = getStringProperty(MONGOD_PATH, state);
+        dbPath = getStringProperty(DB_PATH, state);
+        logPath = getStringProperty(LOG_PATH, state);
+        pidFilePath = getStringProperty(PID_FILE_PATH, state);
+        extraArgs = getStringProperty(EXTRA_ARGS, state);
+
+        Integer port = getIntegerProperty(PORT, state);
+        this.port = port == null ? 27017 : port;
+
+        Boolean useAnyMongod = getBooleanProperty(USE_ANY_MONGOD, state);
+        this.useAnyMongod = useAnyMongod == null ? true : useAnyMongod;
+
+        Boolean useSmallFiles = getBooleanProperty(USE_SMALL_FILES, state);
+        this.useSmallFiles = useSmallFiles == null ? true : useSmallFiles;
+
+        String enabled = getStringProperty(ENABLED, state);
+        this.enabled = enabled == null ? "auto" : enabled;
     }
 
     // TODO: this should be part of ResourceState probably
