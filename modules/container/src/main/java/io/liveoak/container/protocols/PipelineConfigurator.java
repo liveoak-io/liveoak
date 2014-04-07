@@ -7,6 +7,7 @@ package io.liveoak.container.protocols;
 
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.ErrorHandler;
+import io.liveoak.container.RequestContextDisposerHandler;
 import io.liveoak.container.ResourceHandler;
 import io.liveoak.container.ResourceStateHandler;
 import io.liveoak.container.auth.SecuredStompServerContext;
@@ -166,6 +167,10 @@ public class PipelineConfigurator {
         pipeline.addLast("http-resource-encoder", new HttpResourceResponseEncoder(this.codecManager));
         pipeline.addLast("http-request-body-handler", new HttpRequestBodyHandler());
         pipeline.addLast("interceptor", new InterceptorHandler("http", this.interceptorManager ) );
+        pipeline.addLast("request-context-disposer", new RequestContextDisposerHandler());
+
+        //pipeline.addLast("auth-handler", new AuthHandler(this.client));
+        //pipeline.addLast("authz-handler", new AuthzHandler(this.client));
 
         pipeline.addLast("subscription-watcher", new SubscriptionWatcher(this.subscriptionManager));
         //pipeline.addLast( new DebugHandler( "server-debug" ) );
@@ -178,6 +183,7 @@ public class PipelineConfigurator {
         //pipeline.addLast( new DebugHandler( "local-head" ) );
         pipeline.addLast(new LocalResourceResponseEncoder(this.workerPool));
         pipeline.addLast("interceptor", new InterceptorHandler("local", this.interceptorManager));
+        pipeline.addLast("request-context-disposer", new RequestContextDisposerHandler());
         pipeline.addLast(new SubscriptionWatcher(this.subscriptionManager));
         pipeline.addLast(new ResourceStateHandler(this.workerPool));
         pipeline.addLast(new ResourceHandler(this.globalContext, this.workerPool));

@@ -98,7 +98,9 @@
         <module>stomp</module>
         <module>interceptor</module>
         <module>container</module>
+        <module>wildfly</module>
         <module>autosetup</module>
+        <module>keycloak</module>
 
         <module>mongo</module>
         <module>mongo-gridfs</module>
@@ -108,7 +110,6 @@
         <module>scheduler</module>
         <module>git</module>
         <module>3rdparty</module>
-        <module>keycloak</module>
         <module>security</module>
         <module>security-uripolicy</module>
         <module>security-aclpolicy</module>

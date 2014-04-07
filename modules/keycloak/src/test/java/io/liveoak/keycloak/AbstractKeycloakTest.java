@@ -9,8 +9,6 @@ package io.liveoak.keycloak;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.testtools.AbstractResourceTestCase;
-import org.keycloak.models.Config;
-import org.keycloak.models.utils.ModelProviderUtils;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -19,11 +17,13 @@ public abstract class AbstractKeycloakTest extends AbstractResourceTestCase {
 
     protected ObjectNode createTestConfig() {
         ObjectNode config = JsonNodeFactory.instance.objectNode();
+        config.put("keycloak-url", "http://localhost:8383/auth");
+        config.put("load-public-keys", false);
 
-        String requestedModel = Config.getModelProvider();
-        if (requestedModel != null) {
-            config.put(KeycloakSystemResource.MODEL, requestedModel);
-        }
+        ObjectNode keys = JsonNodeFactory.instance.objectNode();
+        keys.put("liveoak-apps", TokenUtil.PUBLIC_KEY_PEM);
+
+        config.put("public-keys", keys);
 
         return config;
     }

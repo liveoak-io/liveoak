@@ -17,6 +17,7 @@ public class ClientConnectorService implements Service<Void> {
 
     @Override
     public void start(StartContext context) throws StartException {
+        System.err.println( "connect client" );
         try {
             this.clientInjector.getValue().connect( new LocalAddress( "liveoak" ) );
         } catch (Exception e) {

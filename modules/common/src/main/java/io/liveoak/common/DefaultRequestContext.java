@@ -16,6 +16,9 @@ import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.Sorting;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
@@ -31,6 +34,7 @@ public class DefaultRequestContext implements RequestContext {
     private RequestType requestType;
     private RequestAttributes requestAttributes;
     private Sorting sorting;
+    private List<Runnable> disposeTasks;
 
     public DefaultRequestContext(SecurityContext securityContext, Pagination pagination, ReturnFields returnFields, ResourceParams resourceParams,
                                  ResourcePath resourcePath, RequestType requestType, RequestAttributes requestAttributes, Sorting sorting) {
@@ -107,5 +111,22 @@ public class DefaultRequestContext implements RequestContext {
     @Override
     public Sorting sorting() {
         return sorting;
+    }
+
+    @Override
+    public void dispose() {
+        if (disposeTasks != null) {
+            for (Runnable r : disposeTasks) {
+                r.run();
+            }
+        }
+    }
+
+    @Override
+    public void onDispose(Runnable runnable) {
+        if (disposeTasks == null) {
+            disposeTasks = new LinkedList<>();
+        }
+        disposeTasks.add(runnable);
     }
 }

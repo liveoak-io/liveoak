@@ -1,6 +1,5 @@
 package io.liveoak.container;
 
-import io.liveoak.client.DefaultClient;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.state.ResourceState;
@@ -20,6 +19,7 @@ public class LocalServerTest {
     @Before
     public void setUp() throws Exception {
         this.system = LiveOakFactory.create();
+        this.system.awaitStability();
     }
 
     @After

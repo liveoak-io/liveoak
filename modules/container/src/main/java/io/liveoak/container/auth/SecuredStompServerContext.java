@@ -143,6 +143,8 @@ public class SecuredStompServerContext extends ContainerStompServerContext {
                             sendError("Failed to authenticate token. Error: " + state.getProperty("error"), null, HttpResponseStatus.UNAUTHORIZED.code());
                             return;
                         } else {
+                            securityContext.setOriginal(token);
+
                             securityContext.setRealm((String) state.getProperty("realm"));
                             securityContext.setSubject((String) state.getProperty("subject"));
                             securityContext.setLastVerified(((Date) state.getProperty("issued-at")).getTime());

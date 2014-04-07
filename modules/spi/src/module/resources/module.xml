@@ -12,7 +12,7 @@
     </resources>
 
     <dependencies>
-        <module name="io.netty" export="true"/>
+        <module name="io.netty" slot="liveoak" export="true"/>
         <module name="io.vertx" services="export" export="true"/>
         <module name="org.jboss.msc" export="true"/>
         <module name="org.jboss.logging" export="true"/>

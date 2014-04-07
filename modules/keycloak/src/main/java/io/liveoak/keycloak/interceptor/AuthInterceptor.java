@@ -7,12 +7,12 @@ package io.liveoak.keycloak.interceptor;
 
 import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.common.DefaultSecurityContext;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
-import io.liveoak.spi.ResourceErrorResponse;
-import io.liveoak.spi.ResourceRequest;
-import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.container.interceptor.DefaultInterceptor;
 import io.liveoak.spi.container.interceptor.InboundInterceptorContext;
 import io.liveoak.spi.state.ResourceState;
@@ -70,6 +70,8 @@ public class AuthInterceptor extends DefaultInterceptor {
                             log.warn("Authentication failed. Request: " + req + ", error: " + state.getProperty("error"));
                             context.replyWith(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.NOT_AUTHORIZED));
                         } else {
+                            securityContext.setOriginal(token);
+
                             securityContext.setRealm((String) state.getProperty("realm"));
                             securityContext.setSubject((String) state.getProperty("subject"));
                             securityContext.setLastVerified(((Date) state.getProperty("issued-at")).getTime());

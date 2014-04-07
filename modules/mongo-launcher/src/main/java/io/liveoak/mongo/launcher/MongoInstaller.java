@@ -55,6 +55,11 @@ public class MongoInstaller {
     }
 
     public void performInstall() throws IOException {
+        System.err.println( "attempting to install mongo!" );
+        System.err.println( "attempting to install mongo!" );
+        System.err.println( "attempting to install mongo!" );
+        System.err.println( "attempting to install mongo!" );
+        System.err.println( "attempting to install mongo!" );
         // determine architecture
         OsArch osArch = OsUtils.determineOSAndArch();
 

@@ -100,6 +100,15 @@ public class MongoLauncherService implements Service<MongoLauncher> {
 
         try {
             launcher.startMongo();
+
+            while(!serverRunning(port)) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                }
+            }
+
+            log.info("Mongo started");
         } catch (IOException e) {
             throw new StartException("Failed to start MongoDB - Check mongo-launcher.json extension configuration file", e);
         }

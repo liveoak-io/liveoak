@@ -13,6 +13,7 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 /**
  * @author Bob McWhirter
@@ -28,8 +29,8 @@ public abstract class AbstractNetworkServerService implements Service<NetworkSer
     public void start(StartContext context) throws StartException {
         this.server = newServer();
         try {
-            this.server.host( InetAddress.getByName(this.addressInjector.getValue().host()) );
-            this.server.port( this.addressInjector.getValue().port() );
+            this.server.host( this.bindingInjector.getValue().getAddress() );
+            this.server.port( this.bindingInjector.getValue().getPort() );
             this.server.pipelineConfigurator( this.pipelineConfiguratorInjector.getValue() );
             this.server.start();
         } catch (Exception e) {
@@ -51,8 +52,8 @@ public abstract class AbstractNetworkServerService implements Service<NetworkSer
         return this.server;
     }
 
-    public Injector<Address> addressInjector() {
-        return this.addressInjector;
+    public Injector<InetSocketAddress> bindingInjector() {
+        return this.bindingInjector;
     }
 
     public Injector<PipelineConfigurator> pipelineConfiguratorInjector() {
@@ -61,7 +62,7 @@ public abstract class AbstractNetworkServerService implements Service<NetworkSer
 
     private AbstractNetworkServer server;
 
-    private InjectedValue<Address> addressInjector = new InjectedValue<>();
+    private InjectedValue<InetSocketAddress> bindingInjector = new InjectedValue<>();
     private InjectedValue<PipelineConfigurator> pipelineConfiguratorInjector = new InjectedValue<>();
 
     private static final Logger log = Logger.getLogger(AbstractNetworkServerService.class);

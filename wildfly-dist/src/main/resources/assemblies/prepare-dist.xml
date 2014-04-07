@@ -1,0 +1,21 @@
+<!--
+  ~ Copyright 2013 Red Hat, Inc. and/or its affiliates.
+  ~
+  ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+  -->
+<assembly>
+    <id>prepare-dist</id>
+    <formats>
+        <format>dir</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>${project.build.directory}/dependency/wildfly-${wildfly.version}</directory>
+            <outputDirectory>liveoak-${project.version}</outputDirectory>
+            <excludes>
+              <exclude>**/standalone.xml</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
+</assembly>

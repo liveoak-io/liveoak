@@ -6,24 +6,11 @@
     </resources>
 
     <dependencies>
-        <module name="com.fasterxml.jackson.core"/>
-        <module name="io.liveoak.spi"/>
         <module name="io.liveoak.common"/>
+        <module name="io.liveoak.spi"/>
         <module name="io.liveoak.interceptor"/>
-        <module name="org.keycloak" services="import">
-            <imports>
-                <include path="META-INF/**" />
-                <include path="META-INF" />
-            </imports>
-        </module>
-        <module name="org.keycloak.social.facebook" services="import"/>
-        <module name="org.keycloak.social.google" services="import"/>
-        <module name="org.keycloak.social.github" services="import"/>
-
-        <!-- Needed for JPA model -->
-        <module name="org.hibernate" services="import"/>
-        <module name="com.h2database.h2"/>
-
-        <module name="org.undertow"/>
+        <module name="org.keycloak.core"/>
+        <module name="org.jboss.resteasy.resteasy-jackson-provider"/>
+        <module name="org.apache.httpcomponents" slot="4.3"/>
     </dependencies>
 </module>

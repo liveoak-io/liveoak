@@ -83,6 +83,7 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
             this.vertx = this.system.vertx();
 
             this.system.awaitStability();
+            System.err.println( "stable" );
         } catch (Throwable t) {
             t.printStackTrace();
         }

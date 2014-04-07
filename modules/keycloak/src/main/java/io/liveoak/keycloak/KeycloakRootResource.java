@@ -6,7 +6,6 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import org.jboss.logging.Logger;
-import org.keycloak.models.RealmModel;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -18,12 +17,10 @@ public class KeycloakRootResource implements RootResource {
     private Resource parent;
     private final String id;
     private final TokensResource tokensResource;
-    private final PublicKeyResource publicKeyResource;
 
-    public KeycloakRootResource(String id, RealmModel realmModel) {
+    public KeycloakRootResource(String id, KeycloakConfig address) {
         this.id = id;
-        this.tokensResource = new TokensResource( this, realmModel );
-        this.publicKeyResource = new PublicKeyResource( this, realmModel );
+        this.tokensResource = new TokensResource(this, address);
     }
 
     @Override
@@ -43,24 +40,23 @@ public class KeycloakRootResource implements RootResource {
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) {
-        if ( id.equals( this.tokensResource.id() ) ) {
-            responder.resourceRead( this.tokensResource );
-        } else if ( id.equals( this.publicKeyResource.id() ) ) {
-            responder.resourceRead( this.publicKeyResource );
+        if (id.equals(this.tokensResource.id())) {
+            responder.resourceRead(this.tokensResource);
         } else {
-            responder.noSuchResource( id );
+            responder.noSuchResource(id);
         }
     }
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         sink.accept(this.tokensResource);
-        sink.accept(this.publicKeyResource);
         sink.close();
     }
 
     public Logger logger() {
         return log;
-    };
+    }
+
+    ;
 }
 

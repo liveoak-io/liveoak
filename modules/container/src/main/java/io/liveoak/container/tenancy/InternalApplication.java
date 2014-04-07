@@ -100,7 +100,6 @@ public class InternalApplication implements Application {
                 .addDependency(LiveOak.extension(extensionId), Extension.class, appExt.extensionInjector())
                 .addDependency(LiveOak.application(this.id), InternalApplication.class, appExt.applicationInjector())
                 .addDependency(LiveOak.SERVICE_REGISTRY, ServiceRegistry.class, appExt.serviceRegistryInjector())
-                .addDependency(LiveOak.SERVICE_CONTAINER, ServiceContainer.class, appExt.serviceContainerInjector())
                 .install();
 
         monitor.awaitStability();

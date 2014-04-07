@@ -37,6 +37,9 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
             @Override
             public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
                 System.err.println( controller.getName() + " :: " + transition );
+                if ( transition.enters(ServiceController.State.START_FAILED )) {
+                    System.err.println( controller.getImmediateUnavailableDependencies() );
+                }
                 if ( controller.getStartException() != null ) {
                     controller.getStartException().printStackTrace();
                 }
@@ -86,10 +89,6 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
         return this.serviceRegistryInjector;
     }
 
-    public Injector<ServiceContainer> serviceContainerInjector() {
-        return this.serviceContainerInjector;
-    }
-
     public Injector<Extension> extensionInjector() {
         return this.extensionInjector;
     }
@@ -116,7 +115,6 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
 
     private InjectedValue<InternalApplication> applicationInjector = new InjectedValue<>();
     private InjectedValue<ServiceRegistry> serviceRegistryInjector = new InjectedValue<>();
-    private InjectedValue<ServiceContainer> serviceContainerInjector = new InjectedValue<>();
     private InjectedValue<Extension> extensionInjector = new InjectedValue<>();
 
     private InternalApplicationExtension appExtension;

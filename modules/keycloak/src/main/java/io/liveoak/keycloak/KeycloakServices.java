@@ -20,8 +20,11 @@ public class KeycloakServices {
         return KEYCLOAK.append( "server", id );
     }
 
-    public static final ServiceName sessionFactory(String id) {
-        return keycloak( id ).append( "session-factory" );
+    public static final ServiceName sessionFactory() {
+        return KEYCLOAK.append( "session-factory" );
+    }
+    public static final ServiceName address() {
+        return KEYCLOAK.append( "address" );
     }
 
     public static final ServiceName realmRepresentation(String appId) {

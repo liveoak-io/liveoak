@@ -17,12 +17,13 @@ public class ClientService implements Service<DefaultClient> {
 
     @Override
     public void start(StartContext context) throws StartException {
+        System.err.println( "start client" );
         this.client = new DefaultClient();
     }
 
     @Override
     public void stop(StopContext context) {
-        this.client.close();
+        //this.client.close();
     }
 
     @Override

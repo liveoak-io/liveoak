@@ -13,6 +13,7 @@ public class DefaultSecurityContext implements SecurityContext {
     private String subject;
     private Set<String> roles;
     private long lastVerified;
+    private String original;
 
     public DefaultSecurityContext() {
     }
@@ -63,4 +64,12 @@ public class DefaultSecurityContext implements SecurityContext {
         return roles != null && roles.contains(role);
     }
 
+    @Override
+    public String getToken() {
+        return original;
+    }
+
+    public void setOriginal(String original) {
+        this.original = original;
+    }
 }

@@ -21,7 +21,7 @@
         <module name="org.jboss.logmanager" services="import"/>
         <module name="com.fasterxml.jackson.core"/>
         <module name="io.vertx"/>
-        <module name="io.netty"/>
+        <module name="io.netty" slot="liveoak"/>
         <system>
             <paths>
                 <path name="org/jboss/modules"/>

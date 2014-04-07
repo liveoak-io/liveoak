@@ -3,7 +3,10 @@ package io.liveoak.keycloak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
-import org.keycloak.models.RealmModel;
+
+import java.security.PublicKey;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -11,11 +14,13 @@ import org.keycloak.models.RealmModel;
 public class TokensResource implements Resource {
 
     private Resource parent;
-    private final RealmModel realmModel;
+    private KeycloakConfig config;
+    private Map<String, PublicKey> publicKeys;
 
-    public TokensResource(Resource parent, RealmModel realmModel) {
+    public TokensResource(Resource parent, KeycloakConfig config) {
         this.parent = parent;
-        this.realmModel = realmModel;
+        this.config = config;
+        this.publicKeys = new Hashtable<>();
     }
 
     @Override
@@ -30,6 +35,7 @@ public class TokensResource implements Resource {
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        responder.resourceRead(new TokenResource(this, id, realmModel) );
+        responder.resourceRead(new TokenResource(id, this, config));
     }
+
 }

@@ -15,6 +15,9 @@ import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.Sorting;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
@@ -74,5 +77,15 @@ public class RequestContextDecorator implements RequestContext {
     @Override
     public Sorting sorting() {
         return delegate.sorting();
+    }
+
+    @Override
+    public void dispose() {
+        delegate.dispose();
+    }
+
+    @Override
+    public void onDispose(Runnable runnable) {
+        delegate.onDispose(runnable);
     }
 }

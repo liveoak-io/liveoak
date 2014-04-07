@@ -74,6 +74,7 @@ public class FileResource implements FSResource, BinaryResource {
                 });
                 asyncFile.endHandler((end) -> {
                     sink.close();
+                    asyncFile.close();
                 });
             } else {
                 sink.close();
