@@ -385,7 +385,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
       .panel-title {
         display: inline-block;
         color: @c_gray;
-        font-size: 23px;
+        font-size: 21px;
         font-weight: 500;
       }
       
@@ -468,7 +468,11 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
     border-bottom: none;
 
     .panel-title {
-      color: @c_green;
+      color: @c_gray;
+      
+      a {
+        color: @c_green;
+      }
     }
   }
 
@@ -485,20 +489,14 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
       li {
         display: inline-block;
         margin-right: 40px;
-        font-size: 12px;
+        font-size: 13px;
 
-        a {
+        a, a:hover {
           color: @c_gray;
-          font-size: 13px;
+        }
 
-          i {
-            margin-right: 6px;
-          }
-
-          &:hover {
-            color: @c_gray;
-            text-decoration: none;
-          }
+        i {
+          margin-right: 6px;
         }
       }
     }
@@ -733,7 +731,7 @@ p.form-info {
   margin-bottom: 23px;
 }
 
-.lo-form-horizontal {
+.lo-form-horizontal, form {
   clear: both;
 
   fieldset {
