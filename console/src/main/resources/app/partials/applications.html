@@ -32,8 +32,7 @@
         <h4 class="modal-title">Create Application</h4>
       </div>
 
-      <form class="horizontal-form">
-
+      <form id="new-app-form" name="new-app-form" class="horizontal-form">
         <!-- Step 1 -->
         <div class="modal-body" id="step1" ng-show="setupStep == 1">
           <div class="form-group clearfix">
@@ -75,20 +74,20 @@
             <div class="form-group clearfix">
               <label for="dburl" class="col-sm-3 control-label">URL Path</label>
               <div class="col-sm-7">
-                <input type="text" class="form-control" id="dburl">
+                <input type="text" class="form-control" id="dburl" ng-model="storagePath">
               </div>
             </div>
           </fieldset>
         </div>
 
         <!-- Step 3 -->
-        <div class="modal-body" id="step3" ng-show="setupStep == 3">
+        <div class="modal-body hide" id="step3-old" ng-show="setupStep == 3">
           <fieldset>
             <legend><span class="text">Security</span></legend>
             <div class="form-group clearfix">
               <label for="dburl" class="col-sm-3 control-label">Keycloak Realm</label>
               <div class="col-sm-7">
-                <select class="selectpicker">
+                <select class="selectpicker" disabled>
                   <option selected="selected">Applications</option>
                   <option>Create Realm...</option>
                 </select>
@@ -100,29 +99,30 @@
         </div>
 
         <!-- Step 4 -->
-        <div class="modal-body" id="step4" ng-show="setupStep == 4">
+        <div class="modal-body" id="step3" ng-show="setupStep == 3">
           <fieldset>
             <legend>
               <span class="text">Push Notifications</span>
-              <p class="subtitle">All fields are optional</p>
+              <p class="subtitle">All fields are required for Push configuration</p>
             </legend>
 
             <div class="form-group clearfix">
               <label for="pushUrl" class="col-sm-3 control-label">AeroGear UPS URL</label>
               <div class="col-sm-7">
-                <input type="text" class="form-control" id="pushUrl">
+                <input type="text" class="form-control" id="pushUrl" ng-model="pushModel.upsServerURL" lo-http-prefix>
+                <span class="help-block" ng-show="new-app-form.pushUrl.$error.url">Not a valid URL.</span>
               </div>
             </div>
             <div class="form-group clearfix">
               <label for="appId" class="col-sm-3 control-label">Application ID</label>
               <div class="col-sm-7">
-                <input type="text" class="form-control" id="appId">
+                <input type="text" class="form-control" id="appId" ng-model="pushModel.applicationId">
               </div>
             </div>
             <div class="form-group clearfix">
               <label for="secret" class="col-sm-3 control-label">Master Secret</label>
               <div class="col-sm-7">
-                <input type="text" class="form-control" id="secret">
+                <input type="text" class="form-control" id="secret" ng-model="pushModel.masterSecret">
               </div>
             </div>
           </fieldset>
@@ -132,13 +132,13 @@
           <!-- First Step -->
           <button type="button" class="btn btn-default btn-lg" ng-show="setupStep == 1" data-dismiss="modal">Cancel</button>
           <button type="button" class="btn btn-default btn-lg" ng-show="setupStep > 1" ng-click="prevStep()"><i class="fa fa-angle-left"></i> Previous</button>
-          <button type="button" class="btn btn-primary btn-lg" ng-show="setupType == 'basic' && setupStep < 4" ng-click="nextStep()">Next <i class="fa fa-angle-right"></i></button>
+          <button type="button" class="btn btn-primary btn-lg" ng-show="setupType == 'basic' && setupStep < setupSteps" ng-click="nextStep()" ng-disabled="!stepValid()">Next <i class="fa fa-angle-right"></i></button>
           <!-- Last Step -->
-          <button type="button" class="btn btn-primary btn-lg" ng-show="setupStep == 4 || setupType == 'diy'" onclick="$('.modal-backdrop').remove(); // FIXME use ng modal" ng-click="create()" data-dismiss="modal">Create </button>
+          <button type="button" class="btn btn-primary btn-lg" ng-show="setupStep == setupSteps || setupType == 'diy'" onclick="$('body').removeClass('modal-open'); $('.modal-backdrop').remove(); // FIXME use ng modal" ng-click="create()" ng-disabled="!stepValid()" data-dismiss="modal">Create </button>
         </div>
 
         <!-- Only for Basic -->
-        <span class="steps" ng-show="setupType == 'basic'">Step {{setupStep}}/4</span>
+        <span class="steps" ng-show="setupType == 'basic'">Step {{setupStep}}/{{setupSteps}}</span>
 
       </form>
     </div>
