@@ -10,7 +10,7 @@
             <hr>
             <p class="form-info" ng-show="create">To configure push for this application, please enter your AeroGear UnifiedPush Server information. <i class="fa fa-info-circle" data-tooltip-placement="right" data-tooltip="To be able to use this feature, you need to have an application already configured in Aerogear UPS."></i></p>
 
-            <div class="panel panel-default lo-panel" ng-hide="create">
+            <div class="panel" ng-hide="create">
               <div class="panel-heading clearfix">
                 <h3 class="pull-left">Connected to <a ng-href="{{pushModel.upsServerURL}}/#/mobileApps/variants/{{pushModel.applicationId}}">{{pushAppName}}</a> <span class="lo-emph">in AeroGear UPS</span></h3>
                 <div class="pull-right">
