@@ -23,61 +23,62 @@
           <h3>Push</h3>
         </div>
       </div>
-      
+
+      <!-- Storage -->
       <div class="table-row">
         <div class="table-cell">
-          <!--
-<div>
-            <span class="lo-label">Storage Provider:</span>
-            <span class="lo-field">mongoDB</span>
+          <div  ng-repeat="storage in storageList">
+            <div>
+              <span class="lo-label">Storage Provider:</span>
+              <span class="lo-field">{{storage.provider}}</span>
+            </div>
+            <div>
+              <span class="lo-label">URL Path:</span>
+              <span class="lo-field">/{{storage.id}}</span>
+            </div>
           </div>
-          <div>
-            <span class="lo-label">URL Path:</span>
-            <span class="lo-field">/storage</span>
-          </div>
--->
-          <p>Store your application's data in the cloud</p>
+          <p ng-hide="storageList.length > 0">Store your application's data in the cloud</p>
         </div>
+        <!-- Security -->
         <div class="table-cell">
-          <!--
-<div>
+          <div ng-show="auth.realm">
             <span class="lo-label">Keycloak Realm:</span>
-            <span class="lo-field">Applications</span>
+            <span class="lo-field">{{auth.realm}}</span>
           </div>
--->
-          <p>Manage login, SSO, users and more with Keycloak</p>
+          <p ng-hide="auth.realm">Manage login, SSO, users and more with Keycloak</p>
         </div>
+        <!-- Push -->
         <div class="table-cell">
-          <!--
-<div>
-            <span class="lo-label">AeroGear UPS URL:</span>
-            <span class="lo-field">www.someurl.com</span>
+          <div ng-show="pushConfig && pushConfig.upsServerURL">
+            <div>
+              <span class="lo-label">AeroGear UPS URL:</span>
+              <span class="lo-field">{{pushConfig.upsServerURL}}</span>
+            </div>
+            <div>
+              <span class="lo-label">Application ID:</span>
+              <span class="lo-field">{{pushConfig.applicationId}}</span>
+            </div>
+            <div>
+              <span class="lo-label">Master Secret:</span>
+              <span class="lo-field">{{pushConfig.masterSecret}}</span>
+            </div>
           </div>
-          <div>
-            <span class="lo-label">Application ID:</span>
-            <span class="lo-field">someid</span>
-          </div>
-          <div>
-            <span class="lo-label">Master Secret:</span>
-            <span class="lo-field">somemastersecret</span>
-          </div>
--->
-          <p>Manage your push notifications with AeroGear UPS</p>
+          <p ng-hide="pushConfig && pushConfig.upsServerURL">Manage your push notifications with AeroGear UPS</p>
         </div>
       </div>
       
       <div class="table-row">
         <div class="table-cell">
-          <!-- <a href="#">View <strong>Storage</strong> »</a> -->
-          <a href="#">Configure <strong>Storage</strong> »</a>
+          <a href="#/applications/{{curApp.id}}/storage/{{storageList[0]}}/browse" ng-show="storageList.length > 0">View <strong>Storage</strong> »</a>
+          <a href="#/applications/{{curApp.id}}/storage" ng-hide="storageList.length > 0">Configure <strong>Storage</strong> »</a>
         </div>
         <div class="table-cell">
-          <!-- <a href="#">View <strong>Security</strong> »</a> -->
-          <a href="#">Configure <strong>Security</strong> »</a>
+          <a href="#/applications/{{curApp.id}}/security" ng-show="auth.realm">View <strong>Security</strong> »</a>
+          <a href="#/applications/{{curApp.id}}/security" ng-hide="auth.realm">Configure <strong>Security</strong> »</a>
         </div>
         <div class="table-cell">
-          <!-- <a href="#">View <strong>Push</strong> »</a> -->
-          <a href="#">Configure <strong>Push</strong> »</a>
+          <a href="#/applications/{{curApp.id}}/push" ng-show="pushConfig && pushConfig.upsServerURL">View <strong>Push</strong> »</a>
+          <a href="#/applications/{{curApp.id}}/push" ng-hide="pushConfig && pushConfig.upsServerURL">Configure <strong>Push</strong> »</a>
         </div>
       </div>
     </section>
