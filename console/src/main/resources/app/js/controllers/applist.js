@@ -53,6 +53,11 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, Notifi
   $scope.appModel = {
   };
 
+  var redirectOnNewAppSuccess = function() {
+    //$location.search('created', $scope.appModel.id).path('applications');
+    $location.path('applications/' + $scope.appModel.id + '/next-steps');
+  };
+
   $scope.create = function() {
     var data = {
       id: $scope.appModel.id,
@@ -95,7 +100,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, Notifi
                   // success
                   function (/*value, responseHeaders*/) {
                     Notifications.success('Push configuration created successfully.');
-                    $location.search('created', $scope.appModel.id).path('applications');
+                    redirectOnNewAppSuccess();
                   },
                   // error
                   function (httpResponse) {
@@ -104,7 +109,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, Notifi
                 );
               }
               else {
-                $location.search('created', $scope.appModel.id).path('applications');
+                redirectOnNewAppSuccess();
               }
             },
             // error
@@ -114,7 +119,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, Notifi
             });
         }
         else {
-          $location.search('created', $scope.appModel.id).path('applications');
+          redirectOnNewAppSuccess();
         }
       },
       // error
@@ -122,5 +127,29 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, Notifi
         Notifications.httpError('Failed to create new application', httpResponse);
       });
   };
+
+});
+
+loMod.controller('NextStepsCtrl', function($scope, $rootScope, $routeParams, currentApp, loStorageList, loPush) {
+
+  $rootScope.curApp = currentApp;
+
+  $scope.storageList = [];
+
+  /* jshint unused: false */
+  angular.forEach(loStorageList._members, function (value, key) {
+    if (value.hasOwnProperty('db')) {
+      this.push({id: value.id, provider: value.hasOwnProperty('MongoClientOptions') ? 'mongoDB' : 'unknown'});
+    }
+  }, $scope.storageList);
+  /* jshint unused: true */
+
+  $scope.pushConfig = loPush;
+
+  $scope.breadcrumbs = [
+    {'label': 'Applications', 'href': '#/applications'},
+    {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
+    {'label': 'Next Steps', 'href': '#/applications/' + currentApp.id + '/next-steps'}
+  ];
 
 });

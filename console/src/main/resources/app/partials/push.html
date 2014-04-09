@@ -24,20 +24,20 @@
 
             <form class="lo-form-horizontal clearfix" name="pushForm">
               <fieldset>
-                <div class="form-group clearfix" ng-class="{'has-error': !pushForm.pushUrl.$valid}">
+                <div class="form-group clearfix" ng-class="{'has-error': pushForm.pushUrl.$dirty && !pushForm.pushUrl.$valid}">
                     <label class="col-sm-3 control-label" for="pushUrl">AeroGear UnifiedPush URL <span class="required">*</span></label>
                     <div class="col-sm-4">
                         <input class="form-control" type="url" id="pushUrl" name="pushUrl" ng-model="pushModel.upsServerURL" lo-http-prefix required>
                         <span class="help-block" ng-show="pushForm.pushUrl.$error.url">Not a valid URL.</span>
                     </div>
                 </div>
-                <div class="form-group clearfix" ng-class="{'has-error': !pushForm.appId.$valid}">
+                <div class="form-group clearfix" ng-class="{'has-error': pushForm.appId.$dirty && !pushForm.appId.$valid}">
                     <label class="col-sm-3 control-label" for="appId">Application ID <span class="required">*</span></label>
                     <div class="col-sm-4">
                         <input class="form-control" type="text" id="appId" name="appId" ng-model="pushModel.applicationId" required>
                     </div>
                 </div>
-                <div class="form-group clearfix" ng-class="{'has-error': !pushForm.secret.$valid}">
+                <div class="form-group clearfix" ng-class="{'has-error': pushForm.secret.$dirty && !pushForm.secret.$valid}">
                     <label class="col-sm-3 control-label" for="secret">Master Secret <span class="required">*</span></label>
                     <div class="col-sm-4">
                         <input class="form-control" type="password" id="secret" name="secret" ng-model="pushModel.masterSecret" required>
