@@ -34,16 +34,16 @@
 
       <form id="new-app-form" name="new-app-form" class="horizontal-form">
         <!-- Step 1 -->
-        <div class="modal-body" id="step1" ng-show="setupStep == 1">
+        <div class="modal-body clearfix" id="step1" ng-show="setupStep == 1">
           <div class="form-group clearfix">
-            <label for="application-name" class="col-sm-3 control-label">Application Name</label>
-            <div class="col-sm-7">
+            <label for="application-name" class="col-sm-4 control-label">Application Name</label>
+            <div class="col-sm-6">
               <input type="text" class="form-control" id="application-name" ng-model="appModel.id">
             </div>
           </div>
           <div class="form-group">
-            <label class="col-sm-3 control-label">Type of Setup</label>
-            <div class="col-sm-7">
+            <label class="col-sm-4 control-label">Type of Setup</label>
+            <div class="col-sm-6">
               <label class="checkbox-inline">
                 <input type="radio" ng-model="setupType" value="basic"> Basic
               </label>
@@ -52,7 +52,7 @@
               </label>
             </div>
           </div>
-          <div class="col-sm-offset-3 col-sm-9 form-inline-info">
+          <div class="col-sm-offset-4 col-sm-8 form-inline-info">
             <!-- For Basic -->
             <div class="alert alert-info" ng-show="setupType == 'basic'">
               <span class="pficon pficon-info"></span>
@@ -68,12 +68,12 @@
         </div>
 
         <!-- Step 2 -->
-        <div class="modal-body" id="step2" ng-show="setupStep == 2">
+        <div class="modal-body clearfix" id="step2" ng-show="setupStep == 2">
           <fieldset>
             <legend><span class="text">Storage</span></legend>
             <div class="form-group clearfix">
-              <label for="dburl" class="col-sm-3 control-label">URL Path</label>
-              <div class="col-sm-7">
+              <label for="dburl" class="col-sm-4 control-label">URL Path</label>
+              <div class="col-sm-6">
                 <input type="text" class="form-control" id="dburl" ng-model="storagePath">
               </div>
             </div>
@@ -81,12 +81,12 @@
         </div>
 
         <!-- Step 3 -->
-        <div class="modal-body hide" id="step3-old" ng-show="setupStep == 3">
+        <div class="modal-body clearfix hide" id="step3-old" ng-show="setupStep == 3">
           <fieldset>
             <legend><span class="text">Security</span></legend>
             <div class="form-group clearfix">
-              <label for="dburl" class="col-sm-3 control-label">Keycloak Realm</label>
-              <div class="col-sm-7">
+              <label for="dburl" class="col-sm-4 control-label">Keycloak Realm</label>
+              <div class="col-sm-6">
                 <select class="selectpicker" disabled>
                   <option selected="selected">Applications</option>
                   <option>Create Realm...</option>
@@ -99,29 +99,29 @@
         </div>
 
         <!-- Step 4 -->
-        <div class="modal-body" id="step3" ng-show="setupStep == 3">
+        <div class="modal-body clearfix" id="step3" ng-show="setupStep == 3">
           <fieldset>
             <legend>
               <span class="text">Push Notifications</span>
-              <p class="subtitle">All fields are required for Push configuration</p>
+              <p class="subtitle">This step is optional</p>
             </legend>
 
             <div class="form-group clearfix">
-              <label for="pushUrl" class="col-sm-3 control-label">AeroGear UPS URL</label>
-              <div class="col-sm-7">
+              <label for="pushUrl" class="col-sm-4 control-label">AeroGear UPS URL</label>
+              <div class="col-sm-6">
                 <input type="text" class="form-control" id="pushUrl" ng-model="pushModel.upsServerURL" lo-http-prefix>
                 <span class="help-block" ng-show="new-app-form.pushUrl.$error.url">Not a valid URL.</span>
               </div>
             </div>
             <div class="form-group clearfix">
-              <label for="appId" class="col-sm-3 control-label">Application ID</label>
-              <div class="col-sm-7">
+              <label for="appId" class="col-sm-4 control-label">Application ID</label>
+              <div class="col-sm-6">
                 <input type="text" class="form-control" id="appId" ng-model="pushModel.applicationId">
               </div>
             </div>
             <div class="form-group clearfix">
-              <label for="secret" class="col-sm-3 control-label">Master Secret</label>
-              <div class="col-sm-7">
+              <label for="secret" class="col-sm-4 control-label">Master Secret</label>
+              <div class="col-sm-6">
                 <input type="text" class="form-control" id="secret" ng-model="pushModel.masterSecret">
               </div>
             </div>
