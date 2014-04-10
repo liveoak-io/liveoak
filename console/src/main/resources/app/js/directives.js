@@ -230,3 +230,17 @@ loDirectives.directive('loHttpPrefix', function() {
     }
   };
 });
+
+loDirectives.directive('loAutofocus', function($timeout) {
+  return {
+    priority: 1,
+    link: function (scope, element) {
+      $timeout(function () {
+        var elems = element.find('[autofocus]');
+        if (elems && elems.length > 0) {
+          elems[0].focus();
+        }
+      }, 150);
+    }
+  };
+});

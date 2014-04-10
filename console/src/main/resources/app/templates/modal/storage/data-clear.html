@@ -1,0 +1,11 @@
+<div class="modal-header">
+  <h3>Clear Current Collection</h3>
+</div>
+<div class="modal-body">
+  <p class="primary-message">Are you sure you wan't to delete all the contents of the collection "{{ collectionId }}"?</p>
+  <p>This action can be undone with the "Clear changes" button, but may be dangerous.</p>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button type="button" class="btn btn-danger" ng-click="collectionClear(); close()">Delete</button>
+</div>

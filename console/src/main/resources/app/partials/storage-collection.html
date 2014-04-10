@@ -4,13 +4,7 @@
   <div class="col-md-10 lo-main-pane">
     <div class="row">
       <div class="lo-content-area">
-        <ol class="breadcrumb">
-            <li><a href="#/applications">Applications</a></li>
-            <li><a href="#/applications/{{curApp.name}}">{{curApp.name}}</a></li>
-            <li><a href="#/applications/{{curApp.name}}/storage">Storage</a></li>
-            <li><a href="#">Name_of_the_storage</a></li>
-            <li class="active">Storage Collections</li>
-        </ol>
+        <lo-breadcrumbs></lo-breadcrumbs>
         <h2><span>{{curApp.name}}</span> Storage Collections</h2>
 
         <!-- Collections page - main page -->
@@ -23,77 +17,31 @@
                     ng-show="collectionList.length > 0"></select>
 
             <span ng-hide="collectionList.length > 0">No collections available.</span>
-            <button class="btn btn-link btn-icon" type="button" data-toggle="tooltip" data-placement="top" title="Edit Collection Name...">
+            <!-- TODO - Waiting for LIVEOAK-234 to be resolved.
+            <button disabled class="btn btn-link btn-icon" type="button" data-toggle="tooltip" data-placement="top" title="Edit Collection Name...">
               <i class="fa fa-edit"></i>
               <span>Edit Collection Name</span>
             </button>
+            -->
+
+            <!-- Delete Collection Modal -->
             <span data-toggle="modal" data-target="#delete-collection">
-              <button class="btn btn-link btn-icon" data-toggle="tooltip" data-placement="top" title="Delete Collection...">
+              <button class="btn btn-link btn-icon" ng-click="modalCollectionDelete()">
                 <i class="fa fa-trash-o"></i>
                 <span>Delete Collection</span>
               </button>
             </span>
-
-            <!-- Delete Collection Modal -->
-            <div class="modal fade" id="delete-collection" tabindex="-1" role="dialog" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                      <span class="pficon pficon-close"></span>
-                    </button>
-                    <h4 class="modal-title">Delete Collection</h4>
-                  </div>
-                  <div class="modal-body">
-                    <div class="form-group">
-                      <p class="primary-message">Are you sure you wan't to delete the collection "{{ collectionId }}"?</p>
-                      <p>This action can't be undone.</p>
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger btn-lg" data-dismiss="modal" ng-click="remove()">Delete</button>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
 
           <div class="pull-right">
-
             <!-- Add Collection Modal -->
-
-            <button class="btn btn-default btn-lg" data-toggle="modal" data-target="#add-collection">Add Collection</button>
-            <div class="modal fade" id="add-collection" tabindex="-1" role="dialog" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                      <span class="pficon pficon-close"></span>
-                    </button>
-                    <h4 class="modal-title">Add Collection</h4>
-                  </div>
-                  <div class="modal-body">
-                    <div class="form-group">
-                      <label for="collection-name" class="col-sm-3 control-label">Collection Name</label>
-                      <div class="col-sm-7">
-                        <input type="text" class="form-control" id="collection-name" ng-model="newCollectionId">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="create()">Save</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <button class="btn btn-default btn-lg" ng-click="modalCollectionAdd()">Add Collection</button>
           </div>
         </div>
         
-        <hr ng-show="collectionId && (columns.length > 0)"/>
+        <hr/>
 
-        <form class="lo-form-horizontal clearfix" ng-show="collectionId && (columns.length > 0)">
+        <form class="lo-form-horizontal clearfix">
           <table class="table table-striped table-bordered">
             <thead>
               <tr>
@@ -106,9 +54,10 @@
                     </button>
                   </div>
 
+                  <!-- TODO Commenting out until it's fully implemented
                   <div class="advanced-search">
-                    <a href="#" class="advanced">Advanced Search</a>
-                    <div class="popover fade bottom">
+                    <a class="dropdown-toggle advanced">Advanced Search</a>
+                    <div class="dropdown-menu bottom">
                       <div class="arrow"></div>
                       <div class="form-group">
                         <label for="columns-select">Search in Columns</label>
@@ -143,32 +92,34 @@
                       </div>
                     </div>
                   </div>
+                  -->
 
                   <div class="pull-right">
-                    <button class="btn btn-default">Add Column</button>
-                    <button class="btn btn-default">Add Row</button>
+                    <button class="btn btn-default" ng-click="modalColumnAdd()">Add Column</button>
+                    <button class="btn btn-default" ng-click="modalRowAdd()">Add Row</button>
+
                     <div class="dropdown">
                       <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
                         <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Delete All Data</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="modalDataDeleteAll()">Delete All Data</a></li>
                       </ul>
                     </div>
                   </div>
                 </th>
               </tr>
               <tr>
-                <th ng-repeat="column in columns" class="hasDropdown" ng-class="{'before-actions':$last}">
+                <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown" ng-class="{'before-actions':$last}">
                   {{ column }}
                   <div class="dropdown">
                     <button class="btn btn-link btn-icon dropdown-toggle" type="button" data-toggle="dropdown">
                       <i class="fa fa-caret-square-o-down"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Delete Column</a></li>
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Clear Column</a></li>
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Hide Column</a></li>
+                      <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="columnRemove(column)" href="#">Delete Column</a></li>
+                      <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="columnClear(column)" href="#">Clear Column</a></li>
+                      <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="columnHide(column)" href="#">Hide Column</a></li>
                       <li role="presentation" class="divider"></li>
                       <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="setFilter(column, false)">Sort Column A-Z</a></li>
                       <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="setFilter(column, true)">Sort Column Z-A</a></li>
@@ -178,14 +129,15 @@
                 <th class="actions">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              <tr ng-repeat="item in myData._members | filter:query | orderBy:predicate:reverse">
-                <td ng-repeat="column in columns" ng-class="{'before-actions':$last}">
-                  {{ item[column] }}
+            <tbody ng-show="collectionId && (columns.length > 0)">
+              <tr ng-repeat="item in collectionData._members  | filter:query | orderBy:predicate:reverse">
+                <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}" ng-click="isEdit = true">
+                  <input class="form-control" type="text" ng-show="isEdit" ng-model="item[column]"/>
+                  <span ng-hide="isEdit">{{ item[column] }}</span>
                 </td>
                 <td class="actions">
                   <button class="btn btn-link btn-icon" data-toggle="tooltip" data-placement="top" title="Delete Row"
-                          ng-click="removeLine(item['id'])">
+                          ng-click="rowRemove(item['id'])">
                     <i class="fa fa-trash-o"></i>
                     <span>Delete Row</span>
                   </button>
@@ -193,9 +145,9 @@
               </tr>
             </tbody>
           </table>
-          <div class="pull-right form-actions">
-            <button class="btn btn-default btn-lg">Clear changes</button>
-            <button class="btn btn-primary btn-lg">Save</button>
+          <div class="pull-right form-actions" ng-show="isDataChange || isColHidden || isClearAll || isColumnChange || rowsToDelete.length > 0">
+            <button class="btn btn-default btn-lg" ng-click="reset()">Clear changes</button>
+            <button class="btn btn-primary btn-lg" ng-click="save()">Save</button>
           </div>
         </form>
       </div>

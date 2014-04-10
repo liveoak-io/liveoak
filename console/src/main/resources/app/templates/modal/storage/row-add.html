@@ -1,0 +1,17 @@
+<form lo-autofocus>
+  <div class="modal-header">
+    <h3>Add New Row</h3>
+  </div>
+  <div class="modal-body">
+    <div class="form-group clearfix" ng-repeat="column in columns | filter:notId">
+      <label class="col-sm-3 control-label">{{column}}</label>
+      <div class="col-sm-7">
+        <input class="form-control" type="text" ng-model="newRow[column]" autofocus/>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button type="submit" class="btn btn-primary" ng-click="rowAdd(); close()">Add</button>
+  </div>
+</form>
