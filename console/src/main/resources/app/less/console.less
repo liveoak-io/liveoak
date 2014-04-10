@@ -765,6 +765,11 @@ p.form-info {
 .form-inline-info {
   margin-top: 5px;
   margin-bottom: 0;
+  padding-left: 5px;
+  
+  .alert {
+    margin-bottom: 0;
+  }
 }
 
 .bootstrap-select.btn-group.show-tick .dropdown-menu li.selected a i.check-mark {
@@ -1242,10 +1247,6 @@ legend {
 
 /* Notifications/Alerts */
 
-.alert {
-  line-height: 1.4em;
-}
-
 .feedback-aligner {
   position: fixed;
   top: 1.5em;
@@ -1253,42 +1254,13 @@ legend {
   width: 100%;
   height: 0;
   z-index: 100;
+  
+  .alert {
+    width: 500px;
+    margin: 0 auto;
+  }
 }
 
-.feedback-aligner .row {
-  margin-bottom: 15px;
-}
-
-.feedback-aligner .alert {
-  background-position: 1.27273em center;
-  background-repeat: no-repeat;
-  border-radius: 2px;
-  border-width: 1px;
-  color: #4D5258;
-  display: inline-block;
-  font-size: 1.1em;
-  line-height: 1.4em;
-  margin: 0;
-  padding: 0.909091em 3.63636em;
-  position: relative;
-  text-align: left;
-}
-.feedback-aligner .alert.alert-success {
-  background-color: #E4F1E1;
-  border-color: #4B9E39;
-}
-.feedback-aligner .alert.alert-danger {
-  background-color: #F8E7E7;
-  border-color: #B91415;
-}
-.feedback-aligner .alert.alert-warning {
-  background-color: #FEF1E9;
-  border-color: #F17528;
-}
-.feedback-aligner .alert.alert-info {
-  background-color: #E4F3FA;
-  border-color: #5994B2;
-}
 
 /* Modal */
 
@@ -1318,18 +1290,26 @@ legend {
   		margin-bottom: 0;
   	}
   	
-  	label {
-  		text-align: right;
-  		font-weight: normal;
+  	fieldset {
+    	margin-bottom: 0;
   	}
   	
   	legend {
     	border-top: none;
     	padding-top: 0;
   	}
+  	  	
+  	label {
+  		text-align: right;
+  		font-weight: normal;
+  	}
   	
   	.bootstrap-select:not([class*="span"]):not([class*="col-"]):not([class*="form-control"]) {
     	width: 100%;
+  	}
+  	
+  	+ .modal-footer {
+    	margin-top: 0;
   	}
   }
 
@@ -1339,6 +1319,10 @@ legend {
   	margin-left: 20px;
   	color: @c_graylight;
   }
+}
+
+.modal#create-application .modal-body {
+  min-height: 150px;
 }
 
 
