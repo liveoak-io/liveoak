@@ -31,7 +31,7 @@ public class MongoInstaller {
 
     private static final String URL_ROOT = "http://fastdl.mongodb.org";
 
-    private String version = "2.4.9";
+    private String version = "2.6.0";
     private String tempDir;
     private String installDir;
     private File mongod;

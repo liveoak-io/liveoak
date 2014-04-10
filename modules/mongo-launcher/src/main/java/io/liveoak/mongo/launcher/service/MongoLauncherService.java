@@ -46,6 +46,7 @@ public class MongoLauncherService implements Service<MongoLauncher> {
                 break;
             case "true":
                 detectRunning = false;
+                break;
             case "false":
                 log.info("MongoLauncher is explicitly disabled. Not starting mongod automatically");
                 return;
@@ -61,11 +62,13 @@ public class MongoLauncherService implements Service<MongoLauncher> {
             launcher.setPort(port);
         }
 
-        if (detectRunning) {
-            if (serverRunning(port)) {
-                log.warn("It appears there is an existing server on port: " + port);
+        if (serverRunning(port)) {
+            log.warn("It appears there is an existing server on port: " + port);
+            if (detectRunning) {
                 log.warn("Not starting mongod (you can change this behavior via 'enabled' property in conf/extensions/mongo-launcher.json)");
                 return;
+            } else {
+                throw new RuntimeException("Can't start mongod (port already in use)");
             }
         }
 
