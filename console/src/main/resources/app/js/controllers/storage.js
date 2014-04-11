@@ -227,6 +227,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
   var loadCollectionData = function(colId, loadColumns) {
 
+    $log.debug('Loading collection data.');
+
     var dataPromise = LoCollectionItem.getList({appId: currentApp.id, storageId: $routeParams.storageId, collectionId: colId}).$promise;
 
     dataPromise.then(function (data) {
@@ -246,18 +248,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       $scope.collectionData = data;
       $scope.collectionDataBackup = angular.copy(data);
       $scope.isDataChange = false;
-
-      LiveOak.connect( function() {
-
-        var urlSubscribe = '/' + currentApp.id + '/' + $routeParams.storageId + '/' + colId + '/*';
-
-        LiveOak.subscribe(urlSubscribe, function (data) {
-          $log.debug('read:');
-          $log.debug(data);
-          loadCollectionData($scope.collectionId, true);
-          $scope.live = data;
-        });
-      });
     } );
   };
 
@@ -282,16 +272,33 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
   loadCollectionList();
 
+  var resetEnv = function(){
+    $scope.columnsHidden = [];
+    $scope.isColHidden = false;
+    $scope.isColumnChange = false;
+    $scope.isClearAll = false;
+    $scope.isDataChange = false;
+    $scope.rowsToDelete = [];
+  };
+
   $scope.$watch('collectionId', function(){
       $log.debug('Collection ID changed.');
       if ( $scope.collectionId ) {
         loadCollectionData($scope.collectionId, true);
-        $scope.columnsHidden = [];
-        $scope.isColHidden = false;
-        $scope.isColumnChange = false;
-        $scope.isClearAll = false;
-        $scope.isDataChange = false;
-        $scope.rowsToDelete = [];
+
+        LiveOak.connect( function() {
+          var urlSubscribe = '/' + currentApp.id + '/' + $routeParams.storageId + '/' + $scope.collectionId + '/*';
+          LiveOak.subscribe(urlSubscribe, function (data) {
+            //Notifications.warn('Data were changed outside console: ' + JSON.stringify(data));
+
+            $log.debug('UPS read: ' + JSON.stringify(data));
+
+            loadCollectionData($scope.collectionId, true);
+            $scope.live = data;
+          });
+        });
+
+        resetEnv();
       }
     }
   );
@@ -523,9 +530,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
         delete itemFromBackup.self;
       }
 
-      $log.debug('Inspecting original: ' + JSON.stringify(itemToSave));
-      $log.debug('Inspecting backup:   ' + JSON.stringify(itemFromBackup));
-
       if (itemToSave.id) {
         $log.debug('Checking for update: ' + JSON.stringify(itemToSave));
         if (itemFromBackup && !angular.equals(itemToSave, itemFromBackup)) {
@@ -544,25 +548,18 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       }
     }
 
-    $scope.columnsHidden = [];
-    $scope.isColHidden = false;
-    $scope.isColumnChange = false;
-    $scope.isClearAll = false;
-    $scope.isDataChange = false;
-    $scope.rowsToDelete = [];
+    Notifications.info('Collection data saved.');
 
+    resetEnv();
     loadCollectionData($scope.collectionId, true);
   };
 
   $scope.reset = function(){
     $log.debug('Resetting the page.');
-    $scope.columnsHidden = [];
-    $scope.isColHidden = false;
-    $scope.isColumnChange = false;
-    $scope.isClearAll = false;
-    $scope.isDataChange = false;
-    $scope.rowsToDelete = [];
-    $scope.columns = $scope.columnsBackup;
+
+    resetEnv();
+
+    $scope.columns = angular.copy($scope.columnsBackup);
     $scope.collectionData = angular.copy($scope.collectionDataBackup);
     //loadCollectionData($scope.collectionId, true);
   };
