@@ -16,7 +16,13 @@ var loMod = angular.module('loApp', [
 loMod.config(['$routeProvider', function($routeProvider) {
   $routeProvider
     .when('/', {
-      redirectTo: '/applications/admin/dashboard' // FIXME hardcoded
+      template: '',
+      controller: 'HomeCtrl',
+      resolve: {
+        loAppList : function(LoAppListLoader) {
+          return new LoAppListLoader();
+        }
+      }
     })
     .when('/applications', {
       templateUrl : '/admin/console/partials/applications.html',
@@ -71,9 +77,6 @@ loMod.config(['$routeProvider', function($routeProvider) {
           );
         }
       }
-    })
-    .when('/applications/dashboard', {
-      redirectTo: '#/applications/admin/dashboard' // FIXME hardcoded
     })
     .when('/applications/:appId/dashboard', {
       templateUrl : '/admin/console/partials/dashboard.html',
