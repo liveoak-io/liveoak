@@ -1,40 +1,40 @@
-    <header>
-        <nav class="navbar navbar-default navbar-pf">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#/">
-                    <h1>LiveOak</h1>
-                </a>
-            </div>
-            <div class="collapse navbar-collapse navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-utility">
-                    <li class="dropdown">
-                        <a href="#" class="lo-user dropdown-toggle" data-toggle="dropdown">
-                            <span class="pficon pficon-user"></span>
-                            {{username}} <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="#" id="acct-management" ng-click="auth.accountManagement()">Manage Account</a>
-                            </li>
-                            <li class="separator">
-                                <a href="#" id="logout" ng-click="auth.logout()">Sign Out</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-                <ul class="nav navbar-nav navbar-primary">
-                    <li class="dropdown context col-md-2">
-                        <a href="#/applications">
-                            Applications
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </header>
+<header>
+  <nav class="navbar navbar-default navbar-pf">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#/">
+        <h1>LiveOak</h1>
+      </a>
+    </div>
+    <div class="collapse navbar-collapse navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-utility">
+        <li class="dropdown">
+          <a href="#" class="lo-user dropdown-toggle" data-toggle="dropdown">
+            <span class="pficon pficon-user"></span>
+            {{username}} <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a href="#" id="acct-management" ng-click="auth.accountManagement()">Manage Account</a>
+            </li>
+            <li class="separator">
+              <a href="#" id="logout" ng-click="auth.logout()">Sign Out</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-primary">
+        <li class="dropdown context col-md-2">
+          <a href="#/applications">
+            Applications
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>

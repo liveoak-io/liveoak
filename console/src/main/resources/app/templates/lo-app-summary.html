@@ -1,25 +1,25 @@
 <div class="panel lo-panel-app" ng-class="{'animated flipInY': created == app.id}">
-    <div class="panel-heading">
-        <h3 class="panel-title"><a href="#/applications/{{app.id}}">{{app.name}}</a></h3>
+  <div class="panel-heading">
+    <h3 class="panel-title"><a href="#/applications/{{app.id}}">{{app.name}}</a></h3>
 
-        <div class="pull-right">
-            <div class="dropdown">
-                <a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="fa fa-cog"></i><b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    <li><a href="">Edit...</a></li>
-                    <li role="presentation" class="divider"></li>
-                    <li><a href="">Delete...</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div class="panel-body">
-        <ul class="lo-app-opts">
-            <li ng-repeat="s in app.storage._members" ng-show="s.MongoClientOptions"><a href=""><i class="fa fa-briefcase"></i>Mongo DB</a></li>
-            <!--
-            <li ng-show="{{app.push}}"><a href=""><i class="fa fa-mobile"></i>Push set up</a></li>
-            <li ng-show="{{app.secured}}"><a href=""><i class="fa fa-lightbulb-o"></i>Secured</a></li>
-            -->
+    <div class="pull-right">
+      <div class="dropdown">
+        <a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="fa fa-cog"></i><b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          <li><a href="">Edit...</a></li>
+          <li role="presentation" class="divider"></li>
+          <li><a href="">Delete...</a></li>
         </ul>
+      </div>
     </div>
+  </div>
+  <div class="panel-body">
+    <ul class="lo-app-opts">
+      <li ng-repeat="s in app.storage._members" ng-show="s.MongoClientOptions"><a href=""><i class="fa fa-briefcase"></i>Mongo DB</a></li>
+      <!--
+      <li ng-show="{{app.push}}"><a href=""><i class="fa fa-mobile"></i>Push set up</a></li>
+      <li ng-show="{{app.secured}}"><a href=""><i class="fa fa-lightbulb-o"></i>Secured</a></li>
+      -->
+    </ul>
+  </div>
 </div>

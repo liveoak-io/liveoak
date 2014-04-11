@@ -1,100 +1,100 @@
 <div id="lo-content-row" class="row">
-    <lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="storage" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
+  <lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="storage" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
 
-    <div class="col-md-10 lo-main-pane">
-        <div class="row">
-            <div class="lo-content-area col-md-9">
-                <lo-breadcrumbs></lo-breadcrumbs>
+  <div class="col-md-10 lo-main-pane">
+    <div class="row">
+      <div class="lo-content-area col-md-9">
+        <lo-breadcrumbs></lo-breadcrumbs>
 
-                <h2 class="pull-left"><span>{{curApp.name}}</span> {{ create ? 'New Storage' : storageModel.id }}</h2>
-                <p class="subtitle"><span class="required">*</span> Required fields</p>
+        <h2 class="pull-left"><span>{{curApp.name}}</span> {{ create ? 'New Storage' : storageModel.id }}</h2>
+        <p class="subtitle"><span class="required">*</span> Required fields</p>
 
-                <form class="lo-form-horizontal" name="storageForm" novalidate>
-                    <fieldset>
-                        <legend lo-collapse class="collapsible"><span class="text">Data Resource</span></legend>
-                        <div class="form-group">
-                          <div class="lo-db-instances">
-                            <div class="lo-db-mongo" ng-class="{active: storageModel.type === 'mongo'}" ng-click="storageModel.type = 'mongo'">MongoDB</div>
-                            <div class="lo-db-mysql" ng-class="{active: storageModel.type === 'mysql'}" ng-click="storageModel.type = 'mysql'">MySQL</div>
-                            <div class="lo-db-plsql" ng-class="{active: storageModel.type === 'plsql'}" ng-click="storageModel.type = 'plsql'">PostGres</div>
-                            <p>
-                              Don't have it installed?
+        <form class="lo-form-horizontal" name="storageForm" novalidate>
+          <fieldset>
+            <legend lo-collapse class="collapsible"><span class="text">Data Resource</span></legend>
+            <div class="form-group">
+              <div class="lo-db-instances">
+                <div class="lo-db-mongo" ng-class="{active: storageModel.type === 'mongo'}" ng-click="storageModel.type = 'mongo'">MongoDB</div>
+                <div class="lo-db-mysql" ng-class="{active: storageModel.type === 'mysql'}" ng-click="storageModel.type = 'mysql'">MySQL</div>
+                <div class="lo-db-plsql" ng-class="{active: storageModel.type === 'plsql'}" ng-click="storageModel.type = 'plsql'">PostGres</div>
+                <p>
+                  Don't have it installed?
                               <span ng-switch on="storageModel.type">
                                 <a ng-switch-when="mongo" href="http://www.mongodb.org/" >Get your MongoDB instance.</a>
                                 <a ng-switch-when="mysql" href="http://www.mysql.com/" >Get your MySQL instance.</a>
                                 <a ng-switch-when="plsql" href="http://www.postgresql.org/" >Get your PostgreSQL instance.</a>
                                 <span ng-switch-default>No Database selected.</span>
                               </span>
-                            </p>
-                          </div>
-                        </div>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend lo-collapse class="collapsible"><span class="text">Settings</span></legend>
-                        <div class="form-group clearfix">
-                            <label class="col-sm-2 control-label" for="dbhost">Host <span class="required">*</span></label>
-
-                            <div class="col-sm-4" ng-class="{'has-error': storageForm.dbhost.$error.pattern}">
-                                <input class="form-control" ng-model="storageModel.servers[0].host" type="text" id="dbhost" name="dbhost" ng-pattern="reIPv4Host" required>
-                                <span class="help-block" ng-show="storageForm.dbhost.$error.pattern">Not a valid address.</span>
-                            </div>
-                        </div>
-                        <div class="form-group clearfix">
-                            <label class="col-sm-2 control-label" for="dbport">Port <span class="required">*</span></label>
-
-                            <div class="col-sm-4" ng-class="{'has-error': storageForm.dbport.$dirty && !storageForm.dbport.$valid}">
-                                <input class="form-control no-spinner" type="number" ng-model="storageModel.servers[0].port" ng-pattern="rePort" id="dbport" name="dbport" required />
-                                <span class="help-block" ng-show="storageForm.dbport.$dirty && !storageForm.dbport.$valid">Not a valid port number (1-65535).</span>
-                            </div>
-                        </div>
-                        <div class="form-group clearfix">
-                            <label class="col-sm-2 control-label" for="dbname">Database Name <span class="required">*</span></label>
-
-                            <div class="col-sm-4">
-                                <input class="form-control" ng-model="storageModel.db" type="text" id="dbname" required>
-                            </div>
-                        </div>
-                        <div class="form-group clearfix">
-                            <label class="col-sm-2 control-label" for="dburl">URL Path <span class="required">*</span></label>
-
-                            <div class="col-sm-4">
-                                <input class="form-control" ng-model="storageModel.id" id="dburl" ng-disabled="!create" required>
-                            </div>
-                        </div>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend lo-collapse class="collapsible"><span class="text">Security</span></legend>
-                        <div class="form-group clearfix">
-                            <label class="col-sm-2 control-label" for="stuname">Username</label>
-
-                            <div class="col-sm-4">
-                                <input class="form-control" ng-model="storageModel.credentials[0].username" type="text" id="stuname">
-                            </div>
-                        </div>
-                        <div class="form-group clearfix">
-                            <label class="col-sm-2 control-label" for="passwd">Password</label>
-
-                            <div class="col-sm-4">
-                                <input class="form-control" ng-model="storageModel.credentials[0].password" type="password" id="passwd">
-                            </div>
-                        </div>
-                        <div class="form-group clearfix">
-                            <label class="col-sm-2 control-label" for="passwdConfirm">Password confirmation</label>
-
-                            <div class="col-sm-4">
-                                <input class="form-control" ng-model="passwdConfirm" ng-disabled="!storageModel.credentials[0].password" type="password" id="passwdConfirm">
-                            </div>
-                        </div>
-                    </fieldset>
-
-                    <div class="pull-right form-actions" ng-show="changed">
-                        <button lo-button-clear="clear()">Clear changes</button>
-                        <button lo-button-save="save()" ng-disabled="!storageForm.$valid">Save</button>
-                    </div>
-                </form>
+                </p>
+              </div>
             </div>
-        </div>
+          </fieldset>
+
+          <fieldset>
+            <legend lo-collapse class="collapsible"><span class="text">Settings</span></legend>
+            <div class="form-group clearfix">
+              <label class="col-sm-2 control-label" for="dbhost">Host <span class="required">*</span></label>
+
+              <div class="col-sm-4" ng-class="{'has-error': storageForm.dbhost.$error.pattern}">
+                <input class="form-control" ng-model="storageModel.servers[0].host" type="text" id="dbhost" name="dbhost" ng-pattern="reIPv4Host" required>
+                <span class="help-block" ng-show="storageForm.dbhost.$error.pattern">Not a valid address.</span>
+              </div>
+            </div>
+            <div class="form-group clearfix">
+              <label class="col-sm-2 control-label" for="dbport">Port <span class="required">*</span></label>
+
+              <div class="col-sm-4" ng-class="{'has-error': storageForm.dbport.$dirty && !storageForm.dbport.$valid}">
+                <input class="form-control no-spinner" type="number" ng-model="storageModel.servers[0].port" ng-pattern="rePort" id="dbport" name="dbport" required />
+                <span class="help-block" ng-show="storageForm.dbport.$dirty && !storageForm.dbport.$valid">Not a valid port number (1-65535).</span>
+              </div>
+            </div>
+            <div class="form-group clearfix">
+              <label class="col-sm-2 control-label" for="dbname">Database Name <span class="required">*</span></label>
+
+              <div class="col-sm-4">
+                <input class="form-control" ng-model="storageModel.db" type="text" id="dbname" required>
+              </div>
+            </div>
+            <div class="form-group clearfix">
+              <label class="col-sm-2 control-label" for="dburl">URL Path <span class="required">*</span></label>
+
+              <div class="col-sm-4">
+                <input class="form-control" ng-model="storageModel.id" id="dburl" ng-disabled="!create" required>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend lo-collapse class="collapsible"><span class="text">Security</span></legend>
+            <div class="form-group clearfix">
+              <label class="col-sm-2 control-label" for="stuname">Username</label>
+
+              <div class="col-sm-4">
+                <input class="form-control" ng-model="storageModel.credentials[0].username" type="text" id="stuname">
+              </div>
+            </div>
+            <div class="form-group clearfix">
+              <label class="col-sm-2 control-label" for="passwd">Password</label>
+
+              <div class="col-sm-4">
+                <input class="form-control" ng-model="storageModel.credentials[0].password" type="password" id="passwd">
+              </div>
+            </div>
+            <div class="form-group clearfix">
+              <label class="col-sm-2 control-label" for="passwdConfirm">Password confirmation</label>
+
+              <div class="col-sm-4">
+                <input class="form-control" ng-model="passwdConfirm" ng-disabled="!storageModel.credentials[0].password" type="password" id="passwdConfirm">
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="pull-right form-actions" ng-show="changed">
+            <button lo-button-clear="clear()">Clear changes</button>
+            <button lo-button-save="save()" ng-disabled="!storageForm.$valid">Save</button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>

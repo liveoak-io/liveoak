@@ -1,29 +1,29 @@
 <div class="panel" ng-class="{'animated rollIn': created == storage.path}">
-    <div class="panel-heading">
-      <h2 class="panel-title">
-        <a ng-show="storage.hasCollections" ng-href="#/applications/{{loApp.id}}/storage/{{storage.path}}/browse">{{storage.path}}</a>
-      </h2>
-      <h2 ng-hide="storage.hasCollections" class="panel-title">{{storage.path}}</h2>
+  <div class="panel-heading">
+    <h2 class="panel-title">
+      <a ng-show="storage.hasCollections" ng-href="#/applications/{{loApp.id}}/storage/{{storage.path}}/browse">{{storage.path}}</a>
+    </h2>
+    <h2 ng-hide="storage.hasCollections" class="panel-title">{{storage.path}}</h2>
 
-        <div class="pull-right">
-            <div class="dropdown">
-                <a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="fa fa-cog"></i><b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    <!-- li><a href="#">Rename...</a></li -->
-                    <li><a href="#/applications/{{loApp.id}}/storage/{{storage.path}}">Edit...</a></li>
-                    <li role="presentation" class="divider"></li>
-                    <li><a href="#">Delete...</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <div class="panel-body">
-        <ul class="lo-app-opts">
-            <li><a href="#"><i class="fa fa-briefcase"></i>{{storage.provider}}</a></li>
-            <li><a href="#"><i class="fa fa-link"></i>/{{storage.path}}</a></li>
-            <li><a href="#"><i class="fa fa-desktop"></i>{{storage.host}}</a></li>
-            <li><a href="#"><i class="fa fa-thumb-tack"></i>{{storage.port}}</a></li>
+    <div class="pull-right">
+      <div class="dropdown">
+        <a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="fa fa-cog"></i><b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          <!-- li><a href="#">Rename...</a></li -->
+          <li><a href="#/applications/{{loApp.id}}/storage/{{storage.path}}">Edit...</a></li>
+          <li role="presentation" class="divider"></li>
+          <li><a href="#">Delete...</a></li>
         </ul>
+      </div>
     </div>
+  </div>
+
+  <div class="panel-body">
+    <ul class="lo-app-opts">
+      <li><a href><i class="fa fa-briefcase"></i>{{storage.provider}}</a></li>
+      <li><a href><i class="fa fa-link"></i>/{{storage.path}}</a></li>
+      <li><a href><i class="fa fa-desktop"></i>{{storage.host}}</a></li>
+      <li><a href><i class="fa fa-thumb-tack"></i>{{storage.port}}</a></li>
+    </ul>
+  </div>
 </div>

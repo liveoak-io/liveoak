@@ -37,115 +37,115 @@
             <button class="btn btn-default btn-lg" ng-click="modalCollectionAdd()">Add Collection</button>
           </div>
         </div>
-        
+
         <hr/>
 
         <form class="lo-form-horizontal clearfix">
           <table class="table table-striped table-bordered">
             <thead>
-              <tr>
-                <th colspan="{{ columns.length + 1 }}" class="table-actions">
-                  <div class="search-comp clearfix">
-                    <input type="text" class="form-control search ng-pristine ng-valid" placeholder="Search..." ng-model="query">
-                    <button class="btn btn-link btn-icon" data-toggle="tooltip" data-placement="top" title="Search" type="submit">
-                      <i class="fa fa-search"></i>
-                      <span>Search</span>
-                    </button>
-                  </div>
+            <tr>
+              <th colspan="{{ columns.length + 1 }}" class="table-actions">
+                <div class="search-comp clearfix">
+                  <input type="text" class="form-control search ng-pristine ng-valid" placeholder="Search..." ng-model="query">
+                  <button class="btn btn-link btn-icon" data-toggle="tooltip" data-placement="top" title="Search" type="submit">
+                    <i class="fa fa-search"></i>
+                    <span>Search</span>
+                  </button>
+                </div>
 
-                  <!-- TODO Commenting out until it's fully implemented
-                  <div class="advanced-search">
-                    <a class="dropdown-toggle advanced">Advanced Search</a>
-                    <div class="dropdown-menu bottom">
-                      <div class="arrow"></div>
-                      <div class="form-group">
-                        <label for="columns-select">Search in Columns</label>
-                        <select class="selectpicker form-control" id="columns-select" multiple>
-                          <option>ID</option>
-                          <option>firstname</option>
-                          <option>lastname</option>
-                          <option>address</option>
+                <!-- TODO Commenting out until it's fully implemented
+                <div class="advanced-search">
+                  <a class="dropdown-toggle advanced">Advanced Search</a>
+                  <div class="dropdown-menu bottom">
+                    <div class="arrow"></div>
+                    <div class="form-group">
+                      <label for="columns-select">Search in Columns</label>
+                      <select class="selectpicker form-control" id="columns-select" multiple>
+                        <option>ID</option>
+                        <option>firstname</option>
+                        <option>lastname</option>
+                        <option>address</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="condition-input1">Condition</label>
+                      <div class="inline-items">
+                        <select class="selectpicker inline">
+                          <option>Equals</option>
+                          <option>Not equal</option>
                         </select>
+                        <input class="inline" type="text" placeholder="Contains text" id="condition-input1">
+                        <button data-placement="top" data-toggle="tooltip" type="button" class="btn btn-link btn-icon inline add-condition" data-original-title="Add Condition"><i class="fa fa-plus-circle"></i><span>Add Condition</span></button>
                       </div>
-                      <div class="form-group">
-                        <label for="condition-input1">Condition</label>
-                        <div class="inline-items">
-                          <select class="selectpicker inline">
-                            <option>Equals</option>
-                            <option>Not equal</option>
-                          </select>
-                          <input class="inline" type="text" placeholder="Contains text" id="condition-input1">
-                          <button data-placement="top" data-toggle="tooltip" type="button" class="btn btn-link btn-icon inline add-condition" data-original-title="Add Condition"><i class="fa fa-plus-circle"></i><span>Add Condition</span></button>
-                        </div>
-                        <div class="inline-items hide">
-                          <select class="selectpicker inline">
-                            <option>Equals</option>
-                            <option>Not equal</option>
-                          </select>
-                          <input class="inline" type="text" placeholder="Contains text">
-                          <button data-placement="top" data-toggle="tooltip" type="button" class="btn btn-link btn-icon inline" data-original-title="Add Condition"><i class="fa fa-plus-circle"></i><span>Add Condition</span></button>
-                        </div>
-                      </div>
-                      <div class="pull-right form-actions">
-                        <button class="btn btn-primary btn-lg">Search</button>
+                      <div class="inline-items hide">
+                        <select class="selectpicker inline">
+                          <option>Equals</option>
+                          <option>Not equal</option>
+                        </select>
+                        <input class="inline" type="text" placeholder="Contains text">
+                        <button data-placement="top" data-toggle="tooltip" type="button" class="btn btn-link btn-icon inline" data-original-title="Add Condition"><i class="fa fa-plus-circle"></i><span>Add Condition</span></button>
                       </div>
                     </div>
-                  </div>
-                  -->
-
-                  <div class="pull-right">
-                    <button class="btn btn-default" ng-click="modalColumnAdd()">Add Column</button>
-                    <button type="button" class="btn btn-default" ng-click="modalRowAdd()" ng-disabled="!(columns.length > 1)">Add Row</button>
-
-                    <div class="dropdown">
-                      <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
-                          ng-disabled="!((collectionId && (collectionData._members.length > 0)) || (columnsHidden.length > 0))">
-                        <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                        <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="columnsHidden = []"
-                            ng-show="columnsHidden.length > 0">Show All Columns</a></li>
-                        <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="modalDataDeleteAll()"
-                            ng-show="(collectionId && (collectionData._members.length > 0))">Delete All Data</a></li>
-                      </ul>
+                    <div class="pull-right form-actions">
+                      <button class="btn btn-primary btn-lg">Search</button>
                     </div>
                   </div>
-                </th>
-              </tr>
-              <tr>
-                <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown" ng-class="{'before-actions':$last}">
-                  {{ column }}
+                </div>
+                -->
+
+                <div class="pull-right">
+                  <button class="btn btn-default" ng-click="modalColumnAdd()">Add Column</button>
+                  <button type="button" class="btn btn-default" ng-click="modalRowAdd()" ng-disabled="!(columns.length > 1)">Add Row</button>
+
                   <div class="dropdown">
-                    <button class="btn btn-link btn-icon dropdown-toggle" type="button" data-toggle="dropdown">
-                      <i class="fa fa-caret-square-o-down"></i>
+                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
+                            ng-disabled="!((collectionId && (collectionData._members.length > 0)) || (columnsHidden.length > 0))">
+                      <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                      <li role="presentation" ng-hide="column === 'id'"><a role="menuitem" tabindex="-1" href="" ng-click="columnRemove(column)" href="#">Delete Column</a></li>
-                      <li role="presentation" ng-hide="column === 'id'"><a role="menuitem" tabindex="-1" href="" ng-click="columnClear(column)" href="#">Clear Column</a></li>
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="columnHide(column)" href="#">Hide Column</a></li>
-                      <li role="presentation" class="divider"></li>
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="setFilter(column, false)">Sort Column A-Z</a></li>
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="setFilter(column, true)">Sort Column Z-A</a></li>
+                      <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="columnsHidden = []"
+                                                 ng-show="columnsHidden.length > 0">Show All Columns</a></li>
+                      <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="modalDataDeleteAll()"
+                                                 ng-show="(collectionId && (collectionData._members.length > 0))">Delete All Data</a></li>
                     </ul>
                   </div>
-                </th>
-                <th class="actions">Actions</th>
-              </tr>
+                </div>
+              </th>
+            </tr>
+            <tr>
+              <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown" ng-class="{'before-actions':$last}">
+                {{ column }}
+                <div class="dropdown">
+                  <button class="btn btn-link btn-icon dropdown-toggle" type="button" data-toggle="dropdown">
+                    <i class="fa fa-caret-square-o-down"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                    <li role="presentation" ng-hide="column === 'id'"><a role="menuitem" tabindex="-1" href="" ng-click="columnRemove(column)" href="#">Delete Column</a></li>
+                    <li role="presentation" ng-hide="column === 'id'"><a role="menuitem" tabindex="-1" href="" ng-click="columnClear(column)" href="#">Clear Column</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="columnHide(column)" href="#">Hide Column</a></li>
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="setFilter(column, false)">Sort Column A-Z</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="setFilter(column, true)">Sort Column Z-A</a></li>
+                  </ul>
+                </div>
+              </th>
+              <th class="actions">Actions</th>
+            </tr>
             </thead>
             <tbody ng-show="collectionId && (columns.length > 0)">
-              <tr ng-repeat="item in collectionData._members  | filter:query | orderBy:predicate:reverse">
-                <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}" ng-click="isEdit = (true && column !== 'id')">
-                  <input class="form-control" type="text" ng-show="isEdit" ng-model="item[column]"/>
-                  <span ng-hide="isEdit">{{ item[column] }}</span>
-                </td>
-                <td class="actions">
-                  <button class="btn btn-link btn-icon" data-toggle="tooltip" data-placement="top" title="Delete Row"
-                          ng-click="rowRemove(item['id'])">
-                    <i class="fa fa-trash-o"></i>
-                    <span>Delete Row</span>
-                  </button>
-                </td>
-              </tr>
+            <tr ng-repeat="item in collectionData._members  | filter:query | orderBy:predicate:reverse">
+              <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}" ng-click="isEdit = (true && column !== 'id')">
+                <input class="form-control" type="text" ng-show="isEdit" ng-model="item[column]"/>
+                <span ng-hide="isEdit">{{ item[column] }}</span>
+              </td>
+              <td class="actions">
+                <button class="btn btn-link btn-icon" data-toggle="tooltip" data-placement="top" title="Delete Row"
+                        ng-click="rowRemove(item['id'])">
+                  <i class="fa fa-trash-o"></i>
+                  <span>Delete Row</span>
+                </button>
+              </td>
+            </tr>
             </tbody>
           </table>
           <div class="pull-right form-actions" ng-show="isDataChange || isColHidden || isClearAll || isColumnChange || rowsToDelete.length > 0">

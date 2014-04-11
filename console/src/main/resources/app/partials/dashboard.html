@@ -1,98 +1,98 @@
-    <lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="dashboard" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
+<lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="dashboard" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
 
-    <div class="col-md-10 lo-main-pane app-dashboard">
-        <div class="row">
-            <div class="lo-content-area col-md-10">
-                <lo-breadcrumbs></lo-breadcrumbs>
+<div class="col-md-10 lo-main-pane app-dashboard">
+  <div class="row">
+    <div class="lo-content-area col-md-10">
+      <lo-breadcrumbs></lo-breadcrumbs>
 
-                <div class="panel lo-dashboard">
-                    <div class="panel-heading">
-                        <h2 class="panel-title"><span>{{ curApp.name }}</span> Dashboard</h2>
+      <div class="panel lo-dashboard">
+        <div class="panel-heading">
+          <h2 class="panel-title"><span>{{ curApp.name }}</span> Dashboard</h2>
 
-                        <div class="btn-group pull-right">
-                            <button ng-repeat="period in dataPeriods" class="btn btn-default" type="button" ng-model="$parent.range" btn-radio="period">{{period}}</button>
-                        </div>
-                    </div>
-
-                    <div class="panel-body">
-                        <div class="col-md-12 lo-measure-box api highlight">
-                            <i class="fa fa-spinner"></i>
-                            <div>
-                                <em>{{data[curApp.name].metrics[range].requests || "0"}}</em>
-                                <span class="text">API requests / second</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4 lo-measure-box users">
-                            <i class="fa fa-users"></i>
-                            <div>
-                                <em>{{data[curApp.name].metrics[range].users || "0"}}</em>
-                                <span class="text">active users / second</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4 lo-measure-box push">
-                            <i class="fa fa-mobile"></i>
-                            <div>
-                                <em>{{data[curApp.name].metrics[range].notifications || "0"}}</em>
-                                <span class="text">notifications / second</span>
-                            </div>
-                        </div>
-                        <div class="col-md-4 lo-measure-box storage">
-                            <i class="fa fa-cloud"></i>
-                            <div>
-                                <em>{{data[curApp.name].metrics[range].storage || "0.0"}}</em>
-                                <span class="measure">GB</span>
-                                <span class="text">gigabytes / second</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <section class="lo-tutorials">
-                    <h3><span>LiveOak</span> Tutorials</h3>
-                    <i class="fa fa-file-text-o fa-4x"></i>
-                    <p>Explore LiveOak Documentation and learn how to set up Security, Data and Push.</p>
-                    <a href="#">How to start building your app »</a>
-                </section>
-            </div>
-            <div class="lo-info-pane col-md-2">
-                <section class="details">
-                    <h3><span>{{ curApp.name }}</span> Details</h3>
-                    <section>
-                        <div>
-                            <span class="lo-label">App Status</span>
-                            <span class="lo-field"><i class="circle"></i> Running</span>
-                        </div>
-                        <div>
-                            <span class="lo-label">App Key</span>
-                            <span class="lo-field">{{curApp.id}}</span>
-                            <!-- <button class="lo-icon-button" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy"><i class="fa fa-copy"></i><span>Copy</span></button> -->
-                        </div>
-                        <div>
-                            <span class="lo-label">Security Realm</span>
-                            <span class="lo-field">{{auth.realm}}</span>
-                            <!-- <button class="lo-icon-button" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy"><i class="fa fa-copy"></i><span>Copy</span></button> -->
-                        </div>
-                        <a href="#">View <strong>Security Settings</strong> »</a>
-                    </section>
-                    <section>
-                        <div>
-                            <span class="lo-label">Storage</span>
-                            <ul>
-                                <li ng-repeat="storage in storageList"><span class="lo-field">{{storage}}</span></li>
-                                <li><span class="lo-field" ng-hide="storageList">No storage resources.</span></li>
-                            </ul>
-                        </div>
-                        <a href="#/applications/{{curApp.id}}/storage" ng-show="storageList">View All <strong>Storage Resources</strong> »</a>
-                        <a href="#/applications/{{curApp.id}}/create-storage" ng-hide="storageList">Create a <strong>Storage Resource</strong> »</a>
-                    </section>
-                    <section>
-                        <div>
-                            <span class="lo-label">Push Notifications</span>
-                            <span class="lo-field">{{pushConfig.upsServerURL ? 'Set Up' : 'Not Set Up'}}</span>
-                        </div>
-                        <a href="#/applications/{{curApp.id}}/push">View <strong>Push Settings</strong> »</a>
-                    </section>
-                </section>
-            </div>
+          <div class="btn-group pull-right">
+            <button ng-repeat="period in dataPeriods" class="btn btn-default" type="button" ng-model="$parent.range" btn-radio="period">{{period}}</button>
+          </div>
         </div>
+
+        <div class="panel-body">
+          <div class="col-md-12 lo-measure-box api highlight">
+            <i class="fa fa-spinner"></i>
+            <div>
+              <em>{{data[curApp.name].metrics[range].requests || "0"}}</em>
+              <span class="text">API requests / second</span>
+            </div>
+          </div>
+          <div class="col-md-4 lo-measure-box users">
+            <i class="fa fa-users"></i>
+            <div>
+              <em>{{data[curApp.name].metrics[range].users || "0"}}</em>
+              <span class="text">active users / second</span>
+            </div>
+          </div>
+          <div class="col-md-4 lo-measure-box push">
+            <i class="fa fa-mobile"></i>
+            <div>
+              <em>{{data[curApp.name].metrics[range].notifications || "0"}}</em>
+              <span class="text">notifications / second</span>
+            </div>
+          </div>
+          <div class="col-md-4 lo-measure-box storage">
+            <i class="fa fa-cloud"></i>
+            <div>
+              <em>{{data[curApp.name].metrics[range].storage || "0.0"}}</em>
+              <span class="measure">GB</span>
+              <span class="text">gigabytes / second</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="lo-tutorials">
+        <h3><span>LiveOak</span> Tutorials</h3>
+        <i class="fa fa-file-text-o fa-4x"></i>
+        <p>Explore LiveOak Documentation and learn how to set up Security, Data and Push.</p>
+        <a href="#">How to start building your app »</a>
+      </section>
     </div>
+    <div class="lo-info-pane col-md-2">
+      <section class="details">
+        <h3><span>{{ curApp.name }}</span> Details</h3>
+        <section>
+          <div>
+            <span class="lo-label">App Status</span>
+            <span class="lo-field"><i class="circle"></i> Running</span>
+          </div>
+          <div>
+            <span class="lo-label">App Key</span>
+            <span class="lo-field">{{curApp.id}}</span>
+            <!-- <button class="lo-icon-button" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy"><i class="fa fa-copy"></i><span>Copy</span></button> -->
+          </div>
+          <div>
+            <span class="lo-label">Security Realm</span>
+            <span class="lo-field">{{auth.realm}}</span>
+            <!-- <button class="lo-icon-button" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy"><i class="fa fa-copy"></i><span>Copy</span></button> -->
+          </div>
+          <a href="#">View <strong>Security Settings</strong> »</a>
+        </section>
+        <section>
+          <div>
+            <span class="lo-label">Storage</span>
+            <ul>
+              <li ng-repeat="storage in storageList"><span class="lo-field">{{storage}}</span></li>
+              <li><span class="lo-field" ng-hide="storageList">No storage resources.</span></li>
+            </ul>
+          </div>
+          <a href="#/applications/{{curApp.id}}/storage" ng-show="storageList">View All <strong>Storage Resources</strong> »</a>
+          <a href="#/applications/{{curApp.id}}/create-storage" ng-hide="storageList">Create a <strong>Storage Resource</strong> »</a>
+        </section>
+        <section>
+          <div>
+            <span class="lo-label">Push Notifications</span>
+            <span class="lo-field">{{pushConfig.upsServerURL ? 'Set Up' : 'Not Set Up'}}</span>
+          </div>
+          <a href="#/applications/{{curApp.id}}/push">View <strong>Push Settings</strong> »</a>
+        </section>
+      </section>
+    </div>
+  </div>
+</div>
