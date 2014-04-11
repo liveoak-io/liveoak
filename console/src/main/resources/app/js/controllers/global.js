@@ -50,6 +50,15 @@ loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, Liv
 
 });
 
+loMod.controller('HomeCtrl', function($log, $rootScope, $scope, $location, loAppList) {
+  if (loAppList._members.length == 1) {
+    $location.url('/applications/' + loAppList._members[0].id);
+  }
+  else {
+    $location.url('/applications');
+  }
+});
+
 angular.module('loApp.controllers').controller('AppDropdownCtrl', function() {
   /*
   //TODO Inspect if this code is needed and remove it respectively
