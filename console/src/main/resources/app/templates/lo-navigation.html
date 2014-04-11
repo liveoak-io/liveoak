@@ -1,8 +1,8 @@
 <aside class="lo-sidebar col-md-2 fixed clearfix">
     <div class="dropdown">
-        <a data-toggle="dropdown" class="dropdown-toggle" href="#">{{ loApp.name }}<b class="caret"></b></a>
+        <a data-toggle="dropdown" class="dropdown-toggle" href="#">{{ loApp.name | characters: 25 :true }}<b class="caret"></b></a>
         <ul class="dropdown-menu">
-            <li ng-repeat="app in loApps" ng-class="{active: app.id == loApp.id}"><a ng-href="#/applications/{{app.id}}/{{loCurrent}}">{{ app.name }}</a></li>
+            <li ng-repeat="app in loApps" ng-class="{active: app.id == loApp.id}"><a ng-href="#/applications/{{app.id}}/{{loCurrent}}">{{ app.name | characters: 35 :true }}</a></li>
         </ul>
     </div>
 

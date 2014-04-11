@@ -115,13 +115,13 @@
               <tr>
                 <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown" ng-class="{'before-actions':$last}">
                   {{ column }}
-                  <div class="dropdown" ng-hide="column === 'id'">
+                  <div class="dropdown">
                     <button class="btn btn-link btn-icon dropdown-toggle" type="button" data-toggle="dropdown">
                       <i class="fa fa-caret-square-o-down"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="columnRemove(column)" href="#">Delete Column</a></li>
-                      <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="columnClear(column)" href="#">Clear Column</a></li>
+                      <li role="presentation" ng-hide="column === 'id'"><a role="menuitem" tabindex="-1" href="" ng-click="columnRemove(column)" href="#">Delete Column</a></li>
+                      <li role="presentation" ng-hide="column === 'id'"><a role="menuitem" tabindex="-1" href="" ng-click="columnClear(column)" href="#">Clear Column</a></li>
                       <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="columnHide(column)" href="#">Hide Column</a></li>
                       <li role="presentation" class="divider"></li>
                       <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="setFilter(column, false)">Sort Column A-Z</a></li>
