@@ -57,18 +57,21 @@ public class AggregatingResource implements BinaryResource {
             File file = this.manifest.file();
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(file));
-
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    line = line.trim();
-                    if (line.equals("") || line.startsWith("//")) {
-                        continue;
+                try {
+                    String line = null;
+                    while ((line = reader.readLine()) != null) {
+                        line = line.trim();
+                        if (line.equals("") || line.startsWith("//")) {
+                            continue;
+                        }
+                        if (line.startsWith("require")) {
+                            String rest = line.substring("require".length()).trim();
+                            File sub = new File(file.getParent(), rest);
+                            list.add(sub);
+                        }
                     }
-                    if (line.startsWith("require")) {
-                        String rest = line.substring("require".length()).trim();
-                        File sub = new File(file.getParent(), rest);
-                        list.add(sub);
-                    }
+                } finally {
+                    reader.close();
                 }
             } catch (Exception e) {
                 log.debug("Failed to parse aggregating resource file: " + file, e);
