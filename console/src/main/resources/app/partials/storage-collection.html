@@ -6,7 +6,6 @@
       <div class="lo-content-area">
         <lo-breadcrumbs></lo-breadcrumbs>
         <h2><span>{{curApp.name}}</span> Storage Collections</h2>
-
         <!-- Collections page - main page -->
         <div class="lo-page-info">
           <div class="pull-left">
@@ -96,14 +95,18 @@
 
                   <div class="pull-right">
                     <button class="btn btn-default" ng-click="modalColumnAdd()">Add Column</button>
-                    <button class="btn btn-default" ng-click="modalRowAdd()">Add Row</button>
+                    <button type="button" class="btn btn-default" ng-click="modalRowAdd()" ng-disabled="!(columns.length > 1)">Add Row</button>
 
                     <div class="dropdown">
-                      <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                      <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
+                          ng-disabled="!((collectionId && (collectionData._members.length > 0)) || (columnsHidden.length > 0))">
                         <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                        <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="modalDataDeleteAll()">Delete All Data</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="columnsHidden = []"
+                            ng-show="columnsHidden.length > 0">Show All Columns</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="modalDataDeleteAll()"
+                            ng-show="(collectionId && (collectionData._members.length > 0))">Delete All Data</a></li>
                       </ul>
                     </div>
                   </div>
@@ -112,7 +115,7 @@
               <tr>
                 <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown" ng-class="{'before-actions':$last}">
                   {{ column }}
-                  <div class="dropdown">
+                  <div class="dropdown" ng-hide="column === 'id'">
                     <button class="btn btn-link btn-icon dropdown-toggle" type="button" data-toggle="dropdown">
                       <i class="fa fa-caret-square-o-down"></i>
                     </button>
@@ -131,7 +134,7 @@
             </thead>
             <tbody ng-show="collectionId && (columns.length > 0)">
               <tr ng-repeat="item in collectionData._members  | filter:query | orderBy:predicate:reverse">
-                <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}" ng-click="isEdit = true">
+                <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}" ng-click="isEdit = (true && column !== 'id')">
                   <input class="form-control" type="text" ng-show="isEdit" ng-model="item[column]"/>
                   <span ng-hide="isEdit">{{ item[column] }}</span>
                 </td>

@@ -12,6 +12,6 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button type="submit" class="btn btn-primary" ng-click="collectionCreate(collectionName); close()">Add</button>
+    <button type="submit" class="btn btn-primary" ng-click="collectionCreate(collectionName); close()" ng-disabled="!collectionName">Add</button>
   </div>
 </form>
