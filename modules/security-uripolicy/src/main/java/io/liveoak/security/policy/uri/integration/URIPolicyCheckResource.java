@@ -50,13 +50,14 @@ public class URIPolicyCheckResource implements Resource {
             if (policy != null) {
                 RequestContext reqCtxToAuthorize = ctx.requestAttributes() != null ? ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, RequestContext.class) : null;
                 ResourceState reqResourceState = ctx.requestAttributes() != null ? ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, ResourceState.class) : null;
+                ResourceState respResourceState = ctx.requestAttributes() != null ? ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_RESPONSE_RESOURCE_STATE, ResourceState.class) : null;
                 if (reqCtxToAuthorize == null) {
                     if (log.isTraceEnabled()) {
                         log.trace("Request is null. Rejecting");
                     }
                     decision = AuthzDecision.REJECT;
                 } else {
-                    decision = policy.isAuthorized(reqCtxToAuthorize, reqResourceState);
+                    decision = policy.isAuthorized(reqCtxToAuthorize, reqResourceState, respResourceState);
                 }
             }
         } catch (Throwable t) {
