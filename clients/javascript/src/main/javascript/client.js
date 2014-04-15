@@ -58,7 +58,7 @@ var LiveOak = function( options ) {
     this.subscribe = function( path, callback ) {
         stomp_client.subscribe( path, function(msg) {
             var data = JSON.parse( msg.body );
-            callback( data );
+            callback( data, msg.headers.action );
         });
     };
 
