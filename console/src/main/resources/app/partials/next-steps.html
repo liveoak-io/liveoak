@@ -49,10 +49,10 @@
         </div>
         <!-- Push -->
         <div class="table-cell">
-          <div ng-show="pushConfig && pushConfig.upsServerURL">
+          <div ng-show="pushConfig && pushConfig.upsURL">
             <div>
               <span class="lo-label">AeroGear UPS URL:</span>
-              <span class="lo-field">{{pushConfig.upsServerURL}}</span>
+              <span class="lo-field">{{pushConfig.upsURL}}</span>
             </div>
             <div>
               <span class="lo-label">Application ID:</span>
@@ -63,7 +63,7 @@
               <span class="lo-field">{{pushConfig.masterSecret}}</span>
             </div>
           </div>
-          <p ng-hide="pushConfig && pushConfig.upsServerURL">Manage your push notifications with AeroGear UPS</p>
+          <p ng-hide="pushConfig && pushConfig.upsURL">Manage your push notifications with AeroGear UPS</p>
         </div>
       </div>
 
@@ -77,8 +77,8 @@
           <a href="#/applications/{{curApp.id}}/security" ng-hide="auth.realm">Configure <strong>Security</strong> »</a>
         </div>
         <div class="table-cell">
-          <a href="#/applications/{{curApp.id}}/push" ng-show="pushConfig && pushConfig.upsServerURL">View <strong>Push</strong> »</a>
-          <a href="#/applications/{{curApp.id}}/push" ng-hide="pushConfig && pushConfig.upsServerURL">Configure <strong>Push</strong> »</a>
+          <a href="#/applications/{{curApp.id}}/push" ng-show="pushConfig && pushConfig.upsURL">View <strong>Push</strong> »</a>
+          <a href="#/applications/{{curApp.id}}/push" ng-hide="pushConfig && pushConfig.upsURL">Configure <strong>Push</strong> »</a>
         </div>
       </div>
     </section>

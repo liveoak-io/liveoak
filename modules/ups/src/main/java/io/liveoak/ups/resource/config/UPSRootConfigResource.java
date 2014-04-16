@@ -16,9 +16,9 @@ public class UPSRootConfigResource implements ConfigResource, RootResource {
     Resource parent;
     String id;
 
-    protected static final String UPS_SERVER_URL = "upsServerURL";
-    protected static final String APPLICATION_ID = "applicationId";
-    protected static final String MASTER_SECRET = "masterSecret";
+    public static final String UPS_SERVER_URL = "upsURL";
+    public static final String APPLICATION_ID = "applicationId";
+    public static final String MASTER_SECRET = "masterSecret";
 
     private String upsServerURL;
     private String applicationId;

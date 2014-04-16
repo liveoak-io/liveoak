@@ -12,7 +12,7 @@
 
       <div class="panel" ng-hide="create">
         <div class="panel-heading clearfix">
-          <h3 class="pull-left">Connected to <a ng-href="{{pushModel.upsServerURL}}/#/mobileApps/variants/{{pushModel.applicationId}}">{{pushAppName}}</a> <span class="lo-emph">in AeroGear UPS</span></h3>
+          <h3 class="pull-left">Connected to <a ng-href="{{pushModel.upsURL}}/#/mobileApps/variants/{{pushModel.applicationId}}">{{pushAppName}}</a> <span class="lo-emph">in AeroGear UPS</span></h3>
           <div class="pull-right">
             <span class="lo-field"><i class="green-circle"></i> Active</span>
           </div>
@@ -27,7 +27,7 @@
           <div class="form-group clearfix" ng-class="{'has-error': pushForm.pushUrl.$dirty && !pushForm.pushUrl.$valid}">
             <label class="col-sm-3 control-label" for="pushUrl">AeroGear UnifiedPush URL <span class="required">*</span></label>
             <div class="col-sm-4">
-              <input class="form-control" type="url" id="pushUrl" name="pushUrl" ng-model="pushModel.upsServerURL" lo-http-prefix required>
+              <input class="form-control" type="url" id="pushUrl" name="pushUrl" ng-model="pushModel.upsURL" lo-http-prefix required>
               <span class="help-block" ng-show="pushForm.pushUrl.$error.url">Not a valid URL.</span>
             </div>
           </div>
