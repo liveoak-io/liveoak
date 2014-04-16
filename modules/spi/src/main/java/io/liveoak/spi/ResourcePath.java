@@ -85,6 +85,24 @@ public class ResourcePath {
         return this.segments.isEmpty();
     }
 
+    /**
+     * @param children
+     * @return true if this resourcePath is equal to or is parent of argument
+     */
+    public boolean isParentOf(ResourcePath children) {
+        if (this.segments.size() > children.segments.size()) {
+            return false;
+        }
+
+        for (int i=0 ; i<this.segments.size() ; i++) {
+            if (!this.segments.get(i).equals(children.segments.get(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public List<Segment> segments() {
         return this.segments;
     }

@@ -63,7 +63,8 @@ public class AuthzCheckResource implements Resource {
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         try {
             RequestContext ctxToAuthorize = ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, RequestContext.class);
-            ResourceState resStateToAuthorize = ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, ResourceState.class);
+            ResourceState reqStateToAuthorize = ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, ResourceState.class);
+            ResourceState respStateToAuthorize = ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_RESPONSE_RESOURCE_STATE, ResourceState.class);
             if (ctxToAuthorize == null) {
                 if (log.isTraceEnabled()) {
                     log.trace("Request to authorize is null. Rejecting");
@@ -71,7 +72,7 @@ public class AuthzCheckResource implements Resource {
                 writeAuthzResponse(sink, false);
                 return;
             }
-            PolicyHandler handler = new PolicyHandler(ctxToAuthorize, resStateToAuthorize, sink);
+            PolicyHandler handler = new PolicyHandler(ctxToAuthorize, reqStateToAuthorize, respStateToAuthorize, sink);
             handler.next();
         } catch (Throwable t) {
             log.error("Failed to authorize request", t);
@@ -85,15 +86,17 @@ public class AuthzCheckResource implements Resource {
 
         private PropertySink sink;
         private RequestContext ctxToAuthorize;
-        private ResourceState stateToAuthorize;
+        private ResourceState reqStateToAuthorize;
+        private ResourceState respStateToAuthorize;
 
         private AuthzDecision decision = AuthzDecision.IGNORE;
 
-        public PolicyHandler(RequestContext ctxToAuthorize, ResourceState stateToAuthorize, PropertySink sink) {
+        public PolicyHandler(RequestContext ctxToAuthorize, ResourceState reqStateToAuthorize, ResourceState respStateToAuthorize, PropertySink sink) {
             this.sink = sink;
 
             this.ctxToAuthorize = ctxToAuthorize;
-            this.stateToAuthorize = stateToAuthorize;
+            this.reqStateToAuthorize = reqStateToAuthorize;
+            this.respStateToAuthorize = respStateToAuthorize;
             queue = getPolicies(ctxToAuthorize.resourcePath());
 
             if (queue.isEmpty()) {
@@ -140,7 +143,8 @@ public class AuthzCheckResource implements Resource {
         private RequestContext createPolicyReq() {
             RequestAttributes attribs = new DefaultRequestAttributes();
             attribs.setAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, ctxToAuthorize);
-            attribs.setAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, stateToAuthorize);
+            attribs.setAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, reqStateToAuthorize);
+            attribs.setAttribute(AuthzConstants.ATTR_RESPONSE_RESOURCE_STATE, respStateToAuthorize);
             return new RequestContext.Builder().requestAttributes(attribs).build();
         }
 

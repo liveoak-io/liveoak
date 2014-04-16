@@ -26,6 +26,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-common</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-interceptor</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <scope>provided</scope>

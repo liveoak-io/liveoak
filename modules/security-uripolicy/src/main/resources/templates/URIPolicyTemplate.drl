@@ -44,6 +44,7 @@ when
   $endSemaphore: EndSemaphore( finished == false );
   $securityContext: SecurityContext();
   $requestState: ResourceState();
+  $responseState: ResourceState();
   $resourceParams: ResourceParamsDecorator($sort: safeValue('sort'), $expand: safeValue('expand'), $fields: safeValue('fields'),
                                            $offset: intValue('offset'), $limit: intValue('limit'), $q: safeValue('q'));
   URIMatcherCache($uriMatcher: getURIMatcher("URIPolicyRule_@{POLICY_COUNTER}"));

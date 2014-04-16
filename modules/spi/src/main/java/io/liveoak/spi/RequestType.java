@@ -12,5 +12,9 @@ public enum RequestType {
     CREATE,
     READ,
     UPDATE,
-    DELETE,
+    DELETE;
+
+    public boolean matches(String toMatch) {
+        return this.toString().equals(toMatch) || "*".equals(toMatch);
+    }
 }

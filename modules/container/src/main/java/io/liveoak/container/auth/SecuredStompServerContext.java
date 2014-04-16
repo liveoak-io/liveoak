@@ -172,6 +172,7 @@ public class SecuredStompServerContext extends ContainerStompServerContext {
                 RequestContext reqContext = createRequestContext();
                 attribs.setAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, reqContext);
                 attribs.setAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, new DefaultResourceState());
+                attribs.setAttribute(AuthzConstants.ATTR_RESPONSE_RESOURCE_STATE, new DefaultResourceState());
                 RequestContext authzRequest = new RequestContext.Builder().requestAttributes(attribs).build();
 
                 client.read(authzRequest, applicationPrefix + "/authz/authzCheck", (ClientResourceResponse resourceResponse) -> {

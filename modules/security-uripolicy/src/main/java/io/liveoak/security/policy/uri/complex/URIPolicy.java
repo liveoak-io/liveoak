@@ -76,10 +76,10 @@ public class URIPolicy {
     }
 
     public AuthzDecision isAuthorized(RequestContext reqContext) {
-        return isAuthorized(reqContext, null);
+        return isAuthorized(reqContext, null, null);
     }
 
-    public AuthzDecision isAuthorized(RequestContext reqContext, ResourceState reqResourceState) {
+    public AuthzDecision isAuthorized(RequestContext reqContext, ResourceState reqResourceState, ResourceState respResourceState) {
         if (log.isTraceEnabled()) {
             log.trace("Start checking request: " + reqContext);
         }
@@ -104,11 +104,16 @@ public class URIPolicy {
             workingMemory.insert(reqContextDecorator.securityContext());
             workingMemory.insert(reqContextDecorator.resourceParams());
 
-            // TODO: this is temporary
-            if (reqResourceState == null) {
-                reqResourceState = new DefaultResourceState();
+            // TODO: this is temporary. Actually we have either requestResource (in case of CREATE or UPDATE requests) or responseState (in case of outbound or subscription READ requests)
+            ResourceState stateToInsert;
+            if (reqResourceState != null) {
+                stateToInsert = reqResourceState;
+            } else if (respResourceState != null) {
+                stateToInsert = respResourceState;
+            } else {
+                stateToInsert = new DefaultResourceState();
             }
-            workingMemory.insert(reqResourceState);
+            workingMemory.insert(stateToInsert);
 
             // Uncomment for drools debugging (TODO: should be somehow configurable...)
             //workingMemory.addEventListener(new DebugAgendaEventListener());

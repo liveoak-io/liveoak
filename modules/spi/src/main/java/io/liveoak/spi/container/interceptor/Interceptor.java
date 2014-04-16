@@ -7,8 +7,6 @@ import java.util.UUID;
  */
 public interface Interceptor {
 
-    int priority();
-
     void onInbound(InboundInterceptorContext context) throws Exception;
 
     void onOutbound(OutboundInterceptorContext context) throws Exception;

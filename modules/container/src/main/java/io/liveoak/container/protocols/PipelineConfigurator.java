@@ -6,21 +6,17 @@
 package io.liveoak.container.protocols;
 
 import io.liveoak.common.codec.ResourceCodecManager;
-import io.liveoak.common.protocol.DebugHandler;
 import io.liveoak.container.ErrorHandler;
 import io.liveoak.container.ResourceHandler;
 import io.liveoak.container.ResourceStateHandler;
-import io.liveoak.container.auth.AuthHandler;
-import io.liveoak.container.auth.AuthzHandler;
 import io.liveoak.container.auth.SecuredStompServerContext;
 import io.liveoak.container.interceptor.InterceptorHandler;
-import io.liveoak.container.interceptor.InterceptorManager;
+import io.liveoak.container.interceptor.InterceptorManagerImpl;
 import io.liveoak.container.protocols.http.*;
 import io.liveoak.container.protocols.local.LocalResourceResponseEncoder;
 import io.liveoak.container.protocols.websocket.WebSocketHandshakerHandler;
 import io.liveoak.container.protocols.websocket.WebSocketStompFrameDecoder;
 import io.liveoak.container.protocols.websocket.WebSocketStompFrameEncoder;
-import io.liveoak.container.subscriptions.ContainerStompServerContext;
 import io.liveoak.container.subscriptions.SubscriptionWatcher;
 import io.liveoak.container.tenancy.GlobalContext;
 import io.liveoak.spi.client.Client;
@@ -86,11 +82,11 @@ public class PipelineConfigurator {
         return this.workerPool;
     }
 
-    public void interceptorManager(InterceptorManager interceptorManager) {
+    public void interceptorManager(InterceptorManagerImpl interceptorManager) {
         this.interceptorManager = interceptorManager;
     }
 
-    public InterceptorManager interceptorManager() {
+    public InterceptorManagerImpl interceptorManager() {
         return this.interceptorManager;
     }
 
@@ -169,10 +165,7 @@ public class PipelineConfigurator {
         pipeline.addLast("http-resource-decoder", new HttpResourceRequestDecoder(this.codecManager));
         pipeline.addLast("http-resource-encoder", new HttpResourceResponseEncoder(this.codecManager));
         pipeline.addLast("http-request-body-handler", new HttpRequestBodyHandler());
-        pipeline.addLast("interceptor", new InterceptorHandler( this.interceptorManager ) );
-
-        pipeline.addLast("auth-handler", new AuthHandler(this.client));
-        pipeline.addLast("authz-handler", new AuthzHandler(this.client));
+        pipeline.addLast("interceptor", new InterceptorHandler("http", this.interceptorManager ) );
 
         pipeline.addLast("subscription-watcher", new SubscriptionWatcher(this.subscriptionManager));
         //pipeline.addLast( new DebugHandler( "server-debug" ) );
@@ -184,7 +177,7 @@ public class PipelineConfigurator {
     public void setupLocal(ChannelPipeline pipeline) {
         //pipeline.addLast( new DebugHandler( "local-head" ) );
         pipeline.addLast(new LocalResourceResponseEncoder(this.workerPool));
-        pipeline.addLast("interceptor", new InterceptorHandler(this.interceptorManager));
+        pipeline.addLast("interceptor", new InterceptorHandler("local", this.interceptorManager));
         pipeline.addLast(new SubscriptionWatcher(this.subscriptionManager));
         pipeline.addLast(new ResourceStateHandler(this.workerPool));
         pipeline.addLast(new ResourceHandler(this.globalContext, this.workerPool));
@@ -195,7 +188,7 @@ public class PipelineConfigurator {
     private GlobalContext globalContext;
     private ResourceCodecManager codecManager;
     private SubscriptionManager subscriptionManager;
-    private InterceptorManager interceptorManager;
+    private InterceptorManagerImpl interceptorManager;
     private Executor workerPool;
 
 }

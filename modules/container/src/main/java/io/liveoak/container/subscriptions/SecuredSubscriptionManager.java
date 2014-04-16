@@ -70,7 +70,7 @@ public class SecuredSubscriptionManager extends DefaultSubscriptionManager {
             attribs.setAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, reqContext);
 
             // Use the state of the resource, which is sent to subscription
-            attribs.setAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, origResourceResponse.state());
+            attribs.setAttribute(AuthzConstants.ATTR_RESPONSE_RESOURCE_STATE, origResourceResponse.state());
 
             RequestContext authzRequest = new RequestContext.Builder().requestAttributes(attribs).build();
 

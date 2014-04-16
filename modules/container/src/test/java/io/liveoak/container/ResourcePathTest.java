@@ -9,6 +9,7 @@ import io.liveoak.spi.ResourcePath;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Bob McWhirter
@@ -56,6 +57,24 @@ public class ResourcePathTest {
         assertThat(path.subPath().head().name()).isEqualTo("people");
         assertThat(path.subPath().subPath().head().name()).isEqualTo("bob");
         assertThat(path.subPath().subPath().subPath().segments()).isEmpty();
+    }
+
+    @Test
+    public void testParents() {
+        ResourcePath parent1 = new ResourcePath("/memory/some");
+        ResourcePath parent2 = new ResourcePath();
+
+        assertThat(parent1.isParentOf(new ResourcePath())).isFalse();
+        assertThat(parent1.isParentOf(new ResourcePath("/"))).isFalse();
+        assertThat(parent1.isParentOf(new ResourcePath("/memory"))).isFalse();
+        assertThat(parent1.isParentOf(new ResourcePath("/memory/some"))).isTrue();
+        assertThat(parent1.isParentOf(new ResourcePath("/memory/some/another"))).isTrue();
+
+        assertThat(parent2.isParentOf(new ResourcePath())).isTrue();
+        assertThat(parent2.isParentOf(new ResourcePath("/"))).isTrue();
+        assertThat(parent2.isParentOf(new ResourcePath("/memory"))).isTrue();
+        assertThat(parent2.isParentOf(new ResourcePath("/memory/some"))).isTrue();
+        assertThat(parent2.isParentOf(new ResourcePath("/memory/some/another"))).isTrue();
     }
 
     @Test
