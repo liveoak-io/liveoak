@@ -91,7 +91,7 @@ public class AuthzInterceptor extends DefaultInterceptor {
     @Override
     public void onOutbound(OutboundInterceptorContext context) throws Exception {
         ResourceResponse response = context.response();
-        if (context.request().requestType() == RequestType.READ && response.state() != null) {
+        if (context.request().requestType() == RequestType.READ && response.responseType() == ResourceResponse.ResponseType.READ && response.state() != null) {
             ResourcePath resourcePath = new ResourcePath(response.resource().uri().toString());
             SecurityContext securityContext = context.request().requestContext().securityContext();
             processState(resourcePath, response.state(), securityContext, new Consumer<ResourceState>() {
