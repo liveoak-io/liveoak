@@ -190,6 +190,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   $scope.collectionDataBackup = {};
   $scope.live = {};
 
+  $scope.subscriptionId = false;
+
   $scope.columnsHidden = [];
   $scope.newRow = {};
   $scope.rowsToDelete = [];
@@ -282,20 +284,32 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   };
 
   $scope.$watch('collectionId', function(){
-      $log.debug('Collection ID changed.');
+      $log.debug('Collection ID changed: ' + $scope.collectionId);
       if ( $scope.collectionId ) {
-        loadCollectionData($scope.collectionId, true);
 
-        LiveOak.connect( function() {
-          var urlSubscribe = '/' + currentApp.id + '/' + $routeParams.storageId + '/' + $scope.collectionId + '/*';
-          LiveOak.subscribe(urlSubscribe, function (data) {
-            //Notifications.warn('Data were changed outside console: ' + JSON.stringify(data));
+        LiveOak.connect(function () {
 
-            $log.debug('UPS read: ' + JSON.stringify(data));
+          if ($scope.subscriptionId){
+            $log.debug('Removing subscription \"' + $scope.subscriptionId + '\"');
+            LiveOak.unsubscribe($scope.subscriptionId);
+            $scope.subscriptionId = false;
+          }
 
-            loadCollectionData($scope.collectionId, true);
-            $scope.live = data;
-          });
+          loadCollectionData($scope.collectionId, true);
+
+          if (!$scope.subscriptionId) {
+
+            var urlSubscribe = '/' + currentApp.id + '/' + $routeParams.storageId + '/' + $scope.collectionId + '/*';
+            $scope.subscriptionId = LiveOak.subscribe(urlSubscribe, function (data) {
+              //Notifications.warn('Data were changed outside console: ' + JSON.stringify(data));
+              $log.debug('UPS read: ' + JSON.stringify(data));
+
+              loadCollectionData($scope.collectionId, true);
+              $scope.live = data;
+            });
+
+            $log.debug('Subscribe id is: ' + $scope.subscriptionId);
+          }
         });
 
         resetEnv();
