@@ -56,10 +56,15 @@ var LiveOak = function( options ) {
     this.remove = http.remove;
 
     this.subscribe = function( path, callback ) {
-        stomp_client.subscribe( path, function(msg) {
+        var id = stomp_client.subscribe( path, function(msg) {
             var data = JSON.parse( msg.body );
             callback( data, msg.headers.action );
         });
+        return id;
+    };
+
+    this.unsubscribe = function( id, headers ) {
+        stomp_client.unsubscribe( id, headers );
     };
 
     if (options.auth) {
