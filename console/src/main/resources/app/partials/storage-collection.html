@@ -9,7 +9,6 @@
         <!-- Collections page - main page -->
         <div class="lo-page-info">
           <div class="pull-left">
-
             <!-- Collection selector -->
             <select lo-select class="select-lg selectpicker"
                     ng-model="collectionId" ng-options="o.id as o.id for o in collectionList"
@@ -47,7 +46,7 @@
               <th colspan="{{ columns.length + 1 }}" class="table-actions">
                 <div class="search-comp clearfix">
                   <input type="text" class="form-control search ng-pristine ng-valid" placeholder="Search..." ng-model="query">
-                  <button class="btn btn-link btn-icon" data-toggle="tooltip" data-placement="top" title="Search" type="submit">
+                  <button class="btn btn-link btn-icon" tooltip="Search" type="submit">
                     <i class="fa fa-search"></i>
                     <span>Search</span>
                   </button>
@@ -98,7 +97,7 @@
                   <button type="button" class="btn btn-default" ng-click="modalRowAdd()" ng-disabled="!(columns.length > 1)">Add Row</button>
 
                   <div class="dropdown">
-                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
+                    <button class="btn btn-default dropdown-toggle" type="button"
                             ng-disabled="!((collectionId && (collectionData._members.length > 0)) || (columnsHidden.length > 0))">
                       <span class="caret"></span>
                     </button>
@@ -116,7 +115,7 @@
               <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown" ng-class="{'before-actions':$last}">
                 {{ column }}
                 <div class="dropdown">
-                  <button class="btn btn-link btn-icon dropdown-toggle" type="button" data-toggle="dropdown">
+                  <button class="btn btn-link btn-icon dropdown-toggle" type="button">
                     <i class="fa fa-caret-square-o-down"></i>
                   </button>
                   <ul class="dropdown-menu dropdown-menu-right" role="menu">
@@ -139,8 +138,7 @@
                 <span ng-hide="isEdit">{{ item[column] }}</span>
               </td>
               <td class="actions">
-                <button class="btn btn-link btn-icon" data-toggle="tooltip" data-placement="top" title="Delete Row"
-                        ng-click="rowRemove(item['id'])">
+                <button class="btn btn-link btn-icon" tooltip="Delete Row" ng-click="rowRemove(item['id'])">
                   <i class="fa fa-trash-o"></i>
                   <span>Delete Row</span>
                 </button>
