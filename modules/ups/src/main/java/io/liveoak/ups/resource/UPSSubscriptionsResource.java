@@ -6,27 +6,27 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.ups.resource.config.UPSRootConfigResource;
+import io.liveoak.ups.UPS;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
- */
+* @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+*/
 public class UPSSubscriptionsResource implements Resource {
 
     UPSRootResource parent;
-    UPSRootConfigResource config;
     SubscriptionManager subscriptionManager;
+    UPS upsService;
     public static final String ID = "subscriptions";
 
-    Map<String, UPSSubscription> subscriptions = new HashMap<>();
+    Map<String, SubscriptionResource> subscriptions = new HashMap<>();
 
-    public UPSSubscriptionsResource (UPSRootResource parent, UPSRootConfigResource config,  SubscriptionManager subscriptionManager) {
+    public UPSSubscriptionsResource (UPSRootResource parent, UPS upsService, SubscriptionManager subscriptionManager) {
         this.parent = parent;
         this.subscriptionManager = subscriptionManager;
-        this.config = config;
+        this.upsService = upsService;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class UPSSubscriptionsResource implements Resource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        for (UPSSubscription subscription : subscriptions.values()){
+        for (SubscriptionResource subscription : subscriptions.values()){
             sink.accept(subscription);
         }
         sink.close();
@@ -58,26 +58,24 @@ public class UPSSubscriptionsResource implements Resource {
 
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        UPSSubscription subscription = UPSSubscription.create(this, config, ctx, state, responder);
+        SubscriptionResource subscription =  SubscriptionResource.create( this, upsService, ctx, state, responder );
 
         if (subscription != null) {
             subscriptions.put(subscription.id(),subscription) ;
             subscriptionManager.addSubscription(subscription);
+            responder.resourceCreated(subscription);
         }
-
-        responder.resourceCreated(subscription);
     }
 
-    public void deleteSubscription(UPSSubscription subscription) {
+    public void deleteSubscription(SubscriptionResource subscription) {
         subscriptionManager.removeSubscription( subscription );
         subscriptions.remove(subscription.id());
     }
 
-    public void updateSubscription(UPSSubscription subscription) {
+    public void updateSubscription(SubscriptionResource subscription) {
         subscriptionManager.removeSubscription( subscription );
         subscriptionManager.addSubscription(subscription);
         subscriptions.put(subscription.id(), subscription);
     }
-
 
 }

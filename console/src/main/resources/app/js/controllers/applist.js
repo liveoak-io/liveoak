@@ -43,8 +43,8 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, Notifi
       case 3:
         return !$scope.pushModel ||
           ($scope.pushModel &&
-            ($scope.pushModel.upsServerURL && $scope.pushModel.applicationId && $scope.pushModel.masterSecret) ||
-            (!$scope.pushModel.upsServerURL && !$scope.pushModel.applicationId && !$scope.pushModel.masterSecret));
+            ($scope.pushModel.upsURL && $scope.pushModel.applicationId && $scope.pushModel.masterSecret) ||
+            (!$scope.pushModel.upsURL && !$scope.pushModel.applicationId && !$scope.pushModel.masterSecret));
       default:
         return false;
     }
@@ -86,11 +86,11 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, Notifi
             function(/*value, responseHeaders*/) {
               Notifications.success('New storage successfully created.');
 
-              if($scope.pushModel && $scope.pushModel.upsServerURL) {
+              if($scope.pushModel && $scope.pushModel.upsURL) {
                 var pushData = {
                   type: 'ups',
                   config: {
-                    upsServerURL: $scope.pushModel.upsServerURL,
+                    upsURL: $scope.pushModel.upsURL,
                     applicationId: $scope.pushModel.applicationId,
                     masterSecret: $scope.pushModel.masterSecret
                   }

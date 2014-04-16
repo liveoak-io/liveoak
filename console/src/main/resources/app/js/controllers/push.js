@@ -37,13 +37,13 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
   }, true);
 
   $scope.save = function(){
-    if(!$scope.pushModel.upsServerURL || !$scope.pushModel.applicationId || !$scope.pushModel.masterSecret){
+    if(!$scope.pushModel.upsURL || !$scope.pushModel.applicationId || !$scope.pushModel.masterSecret){
       Notifications.error('All fields are required for Push configuration.');
     }
     else {
 
       var configuration = {
-        upsServerURL: $scope.pushModel.upsServerURL,
+        upsURL: $scope.pushModel.upsURL,
         applicationId: $scope.pushModel.applicationId,
         masterSecret: $scope.pushModel.masterSecret
       };

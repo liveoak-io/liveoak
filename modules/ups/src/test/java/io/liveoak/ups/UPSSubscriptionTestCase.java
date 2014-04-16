@@ -34,7 +34,7 @@ public class UPSSubscriptionTestCase extends BaseUPSTestCase {
 
         ResourceState subscription = new DefaultResourceState();
         // add the resource path
-        subscription.putProperty( "resourcePath", "/foo/bar" );
+        subscription.putProperty( "resource-path", "/foo/bar" );
 
         // add some aliases
         List aliases = Arrays.asList( "myAliasA", "myAliasB" );
@@ -50,7 +50,7 @@ public class UPSSubscriptionTestCase extends BaseUPSTestCase {
 
         // add some device types
         List deviceTypes = Arrays.asList( "Android Phone", "iOS Phone" );
-        subscription.putProperty( "deviceType", deviceTypes );
+        subscription.putProperty( "device-type", deviceTypes );
 
         // add the message
         ResourceState message = new DefaultResourceState();
@@ -64,11 +64,11 @@ public class UPSSubscriptionTestCase extends BaseUPSTestCase {
         assertThat( result ).isNotNull();
         assertThat( result.members() ).isEmpty();
         assertThat( result.getPropertyNames() ).isNotEmpty();
-        assertThat( result.getProperty( "resourcePath" ) ).isEqualTo( "/foo/bar" );
+        assertThat( result.getProperty( "resource-path" ) ).isEqualTo( "/foo/bar" );
         assertThat( result.getProperty( "alias" ) ).isEqualTo( Arrays.asList( "myAliasA", "myAliasB" ) );
         assertThat( result.getProperty( "variants" ) ).isEqualTo( Arrays.asList( "variantA", "variantB" ) );
         assertThat( ( List ) result.getProperty( "categories" ) ).containsOnly( "phone", "small tablet", "large tablet" );
-        assertThat( result.getProperty( "deviceType" ) ).isEqualTo( Arrays.asList( "Android Phone", "iOS Phone" ) );
+        assertThat( result.getProperty( "device-type" ) ).isEqualTo( Arrays.asList( "Android Phone", "iOS Phone" ) );
         ResourceState messageResult = ( ResourceState ) result.getProperty( "message" );
         assertThat( messageResult.getProperty( "alert" ) ).isEqualTo( "Hello" );
         assertThat( messageResult.getProperty( "myCustomProp" ) ).isEqualTo( "foobar" );
@@ -78,7 +78,7 @@ public class UPSSubscriptionTestCase extends BaseUPSTestCase {
     public void testDeleteSubscription() throws Exception {
         ResourceState subscription = new DefaultResourceState("testDelete");
         // add the resource path
-        subscription.putProperty( "resourcePath", "/foo/bar" );
+        subscription.putProperty( "resource-path", "/foo/bar" );
 
         // add some aliases
         List aliases = Arrays.asList( "myAliasA", "myAliasB" );
@@ -109,7 +109,7 @@ public class UPSSubscriptionTestCase extends BaseUPSTestCase {
         assertThat( result ).isNotNull();
         assertThat( result.members() ).isEmpty();
         assertThat( result.getPropertyNames() ).isNotEmpty();
-        assertThat( result.getProperty( "upsServerURL" ) ).isEqualTo( "http://localhost:8080/my_ups_server" );
+        assertThat( result.getProperty( "upsURL" ) ).isEqualTo( "http://localhost:8080/my_ups_server" );
         assertThat( result.getProperty( "applicationId" ) ).isEqualTo( "my-application-id" );
         assertThat( result.getProperty( "masterSecret" ) ).isEqualTo( "shhhh-its-a-secret" );
 

@@ -6,6 +6,7 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.ups.UPS;
 import io.liveoak.ups.resource.config.UPSRootConfigResource;
 
 /**
@@ -17,15 +18,21 @@ public class UPSRootResource implements RootResource {
     String id;
     UPSRootConfigResource configResource;
     SubscriptionManager subscriptionManager;
-    UPSSubscriptionsResource upsSubscriptionsResource;
-    UPSNotifierResource upsNotifierResource;
+    AliasesResource aliasesResource;
+    UPSSubscriptionsResource subscriptionsResource;
+
+    UPS upsService;
 
     public UPSRootResource(String id, UPSRootConfigResource configResource, SubscriptionManager subscriptionManager) {
         this.id = id;
         this.configResource = configResource;
         this.subscriptionManager = subscriptionManager;
-        this.upsNotifierResource = new UPSNotifierResource( this );
-        this.upsSubscriptionsResource = new UPSSubscriptionsResource(this, configResource, subscriptionManager);
+
+        //setup the service to handle communication with a UPS instance
+        upsService = new UPS(configResource);
+
+        this.aliasesResource = new AliasesResource( this, upsService, subscriptionManager );
+        this.subscriptionsResource = new UPSSubscriptionsResource( this, upsService, subscriptionManager );
     }
 
     @Override
@@ -45,19 +52,19 @@ public class UPSRootResource implements RootResource {
 
     @Override
     public void readMembers( RequestContext ctx, ResourceSink sink ) throws Exception {
-        //sink.accept(upsNotifierResource);
-        sink.accept(upsSubscriptionsResource);
+        sink.accept(aliasesResource);
+        sink.accept(subscriptionsResource);
         sink.close();
     }
 
     @Override
     public void readMember( RequestContext ctx, String id, Responder responder ) throws Exception {
-        if (id.equals( UPSSubscriptionsResource.ID )) {
-            responder.resourceRead( this.upsSubscriptionsResource);
-//        } else if (id.equals( UPSNotifierResource.ID )) {
-//            responder.resourceRead(this.upsNotifierResource);
+        if (id.equals( AliasesResource.ID )) {
+            responder.resourceRead( this.aliasesResource);
+        } else if (id.equals( UPSSubscriptionsResource.ID)) {
+            responder.resourceRead(this.subscriptionsResource);
         } else {
-            responder.noSuchResource( id );
+            responder.noSuchResource(id);
         }
     }
 

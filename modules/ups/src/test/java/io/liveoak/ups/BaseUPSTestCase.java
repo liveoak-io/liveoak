@@ -21,7 +21,7 @@ public class BaseUPSTestCase extends AbstractResourceTestCase {
 
     public ResourceState createConfig() {
         ResourceState config = new DefaultResourceState();
-        config.putProperty( "upsServerURL", "http://localhost:8080/my_ups_server" );
+        config.putProperty( "upsURL", "http://localhost:8080/my_ups_server" );
         config.putProperty( "applicationId", "my-application-id");
         config.putProperty( "masterSecret", "shhhh-its-a-secret");
         return config;
