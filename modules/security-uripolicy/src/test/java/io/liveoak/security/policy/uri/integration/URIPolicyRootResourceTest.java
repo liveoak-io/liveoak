@@ -6,7 +6,9 @@
 
 package io.liveoak.security.policy.uri.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.DefaultRequestAttributes;
 import io.liveoak.common.DefaultResourceParams;
 import io.liveoak.common.DefaultSecurityContext;
@@ -31,12 +33,13 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
     @Override
     public void loadExtensions() throws Exception {
         loadExtension( "uriPolicy", new SecurityURIPolicyExtension() );
-        installResource( "uriPolicy", "uriPolicy", JsonNodeFactory.instance.objectNode() );
+        installResource( "uriPolicy", "uriPolicy", getPolicyConfig() );
     }
 
-    @Override
-    protected File applicationDirectory() {
-        return new File( this.projectRoot, "src/test/resources/policy-config" );
+    private ObjectNode getPolicyConfig() throws Exception {
+        ObjectMapper om = new ObjectMapper();
+        ObjectNode objectNode = om.readValue(getClass().getClassLoader().getResourceAsStream("policy-config/uri-policy-config.json"), ObjectNode.class);
+        return objectNode;
     }
 
     @Test

@@ -1,7 +1,7 @@
 package io.liveoak.container.extension;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.container.util.ConversionUtils;
+import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
 import org.jboss.msc.inject.Injector;

@@ -13,7 +13,7 @@ public class URIPolicyConfigRule {
 
     private int priority;
     private String uriPattern;
-    private String queryParamsCondition;
+    private String conditions;
     private String requestType;
 
     private String allowedRoles;
@@ -37,12 +37,12 @@ public class URIPolicyConfigRule {
         this.uriPattern = uriPattern;
     }
 
-    public String getQueryParamsCondition() {
-        return queryParamsCondition;
+    public String getConditions() {
+        return conditions;
     }
 
-    public void setQueryParamsCondition(String queryParamsCondition) {
-        this.queryParamsCondition = queryParamsCondition;
+    public void setConditions(String conditions) {
+        this.conditions = conditions;
     }
 
     public String getRequestType() {
@@ -90,7 +90,7 @@ public class URIPolicyConfigRule {
         return new StringBuilder("URIPolicyConfigRule [ ")
                 .append("priority=").append(priority)
                 .append(", uriPattern=").append(uriPattern)
-                .append(", queryParamsCondition=").append(queryParamsCondition)
+                .append(", conditions=").append(conditions)
                 .append(", requestType=").append(requestType)
                 .append(", allowedRoles=").append(allowedRoles)
                 .append(", deniedRoles=").append(deniedRoles)

@@ -5,7 +5,7 @@ import java.io.File;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.tenancy.service.ApplicationExtensionService;
-import io.liveoak.container.util.ConversionUtils;
+import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.container.zero.ApplicationResource;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.LiveOak;

@@ -20,8 +20,6 @@ public class URIPolicyTemplateDataProvider implements DataProvider {
     private final URIPolicyRule uriPolicyRule;
     private boolean processed = false;
 
-    private static AtomicInteger counter = new AtomicInteger(0);
-
     public URIPolicyTemplateDataProvider(URIPolicyRule uriPolicyRule) {
         this.uriPolicyRule = uriPolicyRule;
     }
@@ -36,7 +34,7 @@ public class URIPolicyTemplateDataProvider implements DataProvider {
         processed = true;
 
         return new String[]{
-                String.valueOf(counter.incrementAndGet()),
+                String.valueOf(uriPolicyRule.getId()),
                 String.valueOf(uriPolicyRule.getPriority()),
                 String.valueOf(uriPolicyRule.getPriority() - 1),
                 uriPolicyRule.getUriPattern(),

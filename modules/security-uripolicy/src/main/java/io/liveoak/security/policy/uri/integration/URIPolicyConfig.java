@@ -13,20 +13,20 @@ import java.util.List;
  */
 public class URIPolicyConfig {
 
-    private List<URIPolicyConfigRule> uriRules;
+    private List<URIPolicyConfigRule> rules;
 
-    public List<URIPolicyConfigRule> getUriRules() {
-        return uriRules;
+    public List<URIPolicyConfigRule> getRules() {
+        return rules;
     }
 
-    public void setUriRules(List<URIPolicyConfigRule> uriRules) {
-        this.uriRules = uriRules;
+    public void setRules(List<URIPolicyConfigRule> rules) {
+        this.rules = rules;
     }
 
     @Override
     public String toString() {
         return new StringBuilder("URIPolicyConfig [ ")
-                .append("uriRules=").append(uriRules)
+                .append("rules=").append(rules)
                 .append(" ]").toString();
     }
 }

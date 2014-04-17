@@ -1,5 +1,5 @@
 { 
-    "uriRules": [
+    "rules": [
         {
             "priority": 1,
             "uriPattern": "/app/*",

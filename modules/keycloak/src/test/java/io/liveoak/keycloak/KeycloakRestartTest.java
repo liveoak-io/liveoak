@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.container.util.ConversionUtils;
+import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.keycloak.extension.KeycloakExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.testtools.AbstractResourceTestCase;

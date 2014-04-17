@@ -1,5 +1,5 @@
 { 
-    "uriRules": [
+    "rules": [
         {
             "priority": 2,
             "uriPattern": "*",
@@ -22,21 +22,21 @@
             "priority": 1,
             "uriPattern": "/testApp/storage*",
             "requestType": "READ",
-            "queryParamsCondition": "parseJson($q).get('user') == $securityContext.subject",
+            "conditions": "parseJson($q).get('user') == $securityContext.subject",
             "allowedRoles": "'test-app/user'"
         },
         {
             "priority": 1,
             "uriPattern": "/testApp/storage*",
             "requestType": "CREATE",
-            "queryParamsCondition": "$requestState.getProperty('user') ==  $securityContext.subject",
+            "conditions": "$requestState.getProperty('user') ==  $securityContext.subject",
             "allowedRoles": "'test-app/user'"
         },
         {
             "priority": 1,
             "uriPattern": "/testApp/storage*",
             "requestType": "CREATE,UPDATE",
-            "queryParamsCondition": "$requestState.getProperty('user') !=  $securityContext.subject",
+            "conditions": "$requestState.getProperty('user') !=  $securityContext.subject",
             "deniedUsers": "'*'"
         }
     ]

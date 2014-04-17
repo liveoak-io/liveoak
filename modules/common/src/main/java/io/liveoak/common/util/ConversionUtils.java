@@ -1,11 +1,10 @@
-package io.liveoak.container.util;
+package io.liveoak.common.util;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.*;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.state.ResourceState;
-import org.vertx.java.core.json.JsonArray;
 
 import java.util.ArrayList;
 import java.util.Iterator;

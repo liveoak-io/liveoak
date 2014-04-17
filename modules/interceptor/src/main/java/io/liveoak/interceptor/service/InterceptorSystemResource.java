@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.container.interceptor.InterceptorManager;
 import io.liveoak.spi.resource.RootResource;
@@ -47,30 +48,11 @@ public class InterceptorSystemResource implements RootResource {
         ResourceState resourceState = this.interceptorManager.getInterceptorsConfig();
 
         for (String key : resourceState.getPropertyNames()) {
-            List<ResourceState> list = (List<ResourceState>)resourceState.getProperty(key);
+            List<ResourceState> resourceStates = (List<ResourceState>)resourceState.getProperty(key);
 
             // Convert "ResourceState" to "Resource" as this is expected by encoders
-            List<Resource> result = new ArrayList<>();
-            for (ResourceState interceptorConfig : list) {
-                 result.add(new SynchronousResource() {
-
-                     @Override
-                     public Resource parent() {
-                         return InterceptorSystemResource.this;
-                     }
-
-                     @Override
-                     public String id() {
-                         return null;
-                     }
-
-                     @Override
-                     public ResourceState properties() throws Exception {
-                         return interceptorConfig;
-                     }
-                 });
-            }
-            sink.accept(key, result);
+            List<Resource> resources = ResourceConversionUtils.convertList(resourceStates, this);
+            sink.accept(key, resources);
         }
         sink.close();
     }

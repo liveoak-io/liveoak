@@ -14,6 +14,7 @@ import io.liveoak.spi.RequestType;
  */
 public class URIPolicyRule {
 
+    private final int id;
     private final int priority;
     private final String uriPattern;
     private final String queryParamsCondition;
@@ -24,8 +25,9 @@ public class URIPolicyRule {
     private final String allowedUsers;
     private final String deniedUsers;
 
-    private URIPolicyRule(int priority, String uriPattern, String queryParamsCondition, String requestType, String allowedRoles, String deniedRoles,
+    private URIPolicyRule(int id, int priority, String uriPattern, String queryParamsCondition, String requestType, String allowedRoles, String deniedRoles,
                           String allowedUsers, String deniedUsers) {
+        this.id = id;
         this.priority = priority;
         this.uriPattern = uriPattern;
         this.queryParamsCondition = queryParamsCondition;
@@ -37,7 +39,7 @@ public class URIPolicyRule {
         this.deniedUsers = deniedUsers;
     }
 
-    public static URIPolicyRule createRule(int priority, String uriPattern, String queryParamsCondition, String requestType,
+    public static URIPolicyRule createRule(int id, int priority, String uriPattern, String queryParamsCondition, String requestType,
                                            String allowedRoles, String deniedRoles, String allowedUsers, String deniedUsers) {
 
         // From uriPattern from "user-friendly" form to "drools-friendly" form
@@ -54,8 +56,12 @@ public class URIPolicyRule {
         // RequestType must be wildcard or some of RequestType enums
         requestType = validateAndFormatRequestType(requestType);
 
-        return new URIPolicyRule(priority, formattedPattern, queryParamsCondition, requestType, allowedRoles, deniedRoles,
+        return new URIPolicyRule(id, priority, formattedPattern, queryParamsCondition, requestType, allowedRoles, deniedRoles,
                 allowedUsers, deniedUsers);
+    }
+
+    public int getId() {
+        return id;
     }
 
     public int getPriority() {

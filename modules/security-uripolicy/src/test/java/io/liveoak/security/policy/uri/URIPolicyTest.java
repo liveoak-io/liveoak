@@ -9,13 +9,18 @@ import io.liveoak.common.DefaultResourceParams;
 import io.liveoak.common.DefaultSecurityContext;
 import io.liveoak.security.policy.uri.complex.URIPolicy;
 import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.security.policy.uri.complex.URIPolicyConfigurator;
+import io.liveoak.security.policy.uri.integration.URIPolicyConfig;
+import io.liveoak.security.policy.uri.integration.URIPolicyConfigRule;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.ResourcePath;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,10 +33,62 @@ import java.util.Set;
  */
 public class URIPolicyTest {
 
+    private URIPolicy uriPolicy;
+
+    @Before
+    public void before() {
+        List<URIPolicyConfigRule> rules = new ArrayList<>();
+
+        rules.add(createRule(8, "/droolsTest/foo", null,
+                "READ", "\"role1\", \"role2\"", null, null, null));
+
+
+        rules.add(createRule(9, "/droolsTest/*", "$resourceParams.value(\"param1\") == \"foo\" && $resourceParams.intValue(\"param2\") >= 10",
+                "*", null, null, "\"*\"", null));
+
+        rules.add(createRule(9, "/droolsTest/*/bar/([abc].*)", "resourceParams.value(\"param1\") == $uriMatcher.group(1) && resourceParams.value(\"param2\") == $uriMatcher.group(2) && resourceParams.value(\"param3\") == $securityContext.subject",
+                "*", null, null, "\"*\"", null));
+
+        rules.add(createRule(10, "/droolsTest/{ $securityContext.subject }", null,
+                "*", null, null, "$securityContext.subject", null));
+
+        rules.add(createRule(10, "/droolsTest/{ any($securityContext.roles) }", null,
+                "*", null, null, "\"*\"", null));
+
+        rules.add(createRule(5, "/droolsTest/foo", null,
+                "*", null, "\"role1\"", "\"*\"", null));
+
+        rules.add(createRule(20, "/droolsTest/*", null,
+                "*", null, "\"evilRole\"", null, null));
+
+        rules.add(createRule(5, "/droolsTest/*", "$sort == \"user,name\" || $limit == 5 || $q.contains(\"\\\"completed\\\":false\")",
+                "*", null, null, "\"*\"", null));
+
+        rules.add(createRule(5, "/droolsTest/*", "parseJson($q).get(\"completed\") == true",
+                "*", null, null, "\"*\"", null));
+
+        URIPolicyConfig config = new URIPolicyConfig();
+        config.setRules(rules);
+        this.uriPolicy = new URIPolicy();
+        new URIPolicyConfigurator().configure(uriPolicy, config);
+    }
+
+    private URIPolicyConfigRule createRule(int priority, String uriPattern, String conditions, String requestType,
+                                           String allowedRoles, String deniedRoles, String allowedUsers, String deniedUsers) {
+        URIPolicyConfigRule configRule = new URIPolicyConfigRule();
+        configRule.setPriority(priority);
+        configRule.setUriPattern(uriPattern);
+        configRule.setConditions(conditions);
+        configRule.setRequestType(requestType);
+        configRule.setAllowedRoles(allowedRoles);
+        configRule.setDeniedRoles(deniedRoles);
+        configRule.setAllowedUsers(allowedUsers);
+        configRule.setDeniedUsers(deniedUsers);
+        return configRule;
+    }
+
     @Test
     public void testPolicy() {
-        URIPolicy uriPolicy = new URIPolicy(new DemoURIPolicyWorker());
-
         Set<String> johnRoles = new HashSet<>();
         johnRoles.add("role1");
         DefaultSecurityContext john = new DefaultSecurityContext();
