@@ -16,6 +16,7 @@ import io.liveoak.spi.container.interceptor.DefaultInterceptor;
 import io.liveoak.spi.container.interceptor.InboundInterceptorContext;
 import io.liveoak.spi.container.interceptor.OutboundInterceptorContext;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,8 @@ import java.util.function.Consumer;
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public class AuthzInterceptor extends DefaultInterceptor {
+
+    private static final Logger log = Logger.getLogger(AuthzInterceptor.class);
 
     private final Client client;
 
@@ -94,7 +97,9 @@ public class AuthzInterceptor extends DefaultInterceptor {
         if (context.request().requestType() == RequestType.READ && response.responseType() == ResourceResponse.ResponseType.READ && response.state() != null) {
             ResourcePath resourcePath = new ResourcePath(response.resource().uri().toString());
             SecurityContext securityContext = context.request().requestContext().securityContext();
-            processState(resourcePath, response.state(), securityContext, new Consumer<ResourceState>() {
+
+            // Process just members of response.state() and not the state itself as resource has been already authorized at onInbound
+            processMembers(resourcePath, response.state(), securityContext, new Consumer<ResourceState>() {
 
                 @Override
                 public void accept(ResourceState authorizedState) {
@@ -108,7 +113,7 @@ public class AuthzInterceptor extends DefaultInterceptor {
         }
     }
 
-    protected void processState(ResourcePath currentResourcePath, ResourceState resourceState, SecurityContext securityContext, Consumer<ResourceState> callback) {
+    protected void processMembers(ResourcePath currentResourcePath, ResourceState resourceState, SecurityContext securityContext, Consumer<ResourceState> callback) {
         if (resourceState.members().isEmpty()) {
             callback.accept(resourceState);
             return;
@@ -139,7 +144,7 @@ public class AuthzInterceptor extends DefaultInterceptor {
 
                     @Override
                     public void accept(ClientResourceResponse authzResponse) {
-                        boolean authorized = false;
+                        boolean authorized;
                         if (authzResponse.responseType() == ClientResourceResponse.ResponseType.NO_SUCH_RESOURCE) {
                             authorized = true;
                         } else {
@@ -150,7 +155,7 @@ public class AuthzInterceptor extends DefaultInterceptor {
 
                         if (authorized) {
                             // Recursive call to check members of this one
-                            processState(childResourcePath, childState, securityContext, new Consumer<ResourceState>() {
+                            processMembers(childResourcePath, childState, securityContext, new Consumer<ResourceState>() {
 
                                 @Override
                                 public void accept(ResourceState childState) {
@@ -159,8 +164,9 @@ public class AuthzInterceptor extends DefaultInterceptor {
 
                             });
                         } else {
-                            // TODO:
-                            // logger.trace...
+                            if (log.isTraceEnabled()) {
+                                log.tracef("Resource %s not authorized and removed from the response", childResourcePath);
+                            }
                             notAuthorized(resourceState, childState);
                             checkAuthzFinished(pendingRequests, resourceState, callback);
                         }
