@@ -1,6 +1,9 @@
 <form lo-autofocus>
   <div class="modal-header">
-    <h3>Add New Row</h3>
+    <button type="button" class="close" ng-click="cancel()">
+      <span class="pficon pficon-close"></span>
+    </button>
+    <h4 class="modal-title">Add New Row</h4>
   </div>
   <div class="modal-body">
     <div class="form-group clearfix" ng-repeat="column in columns | filter:notId">
