@@ -1,43 +1,25 @@
-{ 
-    "uriRules": [
+{
+    "rules": [
         {
-            "priority": 2,
-            "uriPattern": "*",
-            "requestType": "*",
-            "allowedRoles": "'test-app/admin'"
+            "uriPattern": "/testApp",
+            "requestTypes": [ "READ" ],
+            "allowedUsers": [ "*" ]
         },
         {
-            "priority": 1,
-            "uriPattern": "/testApp/app/(.*)[.](html|css|js|png)",
-            "requestType": "READ",
-            "allowedUsers": "'*'"
+            "uriPattern": "/testApp/app/index.html",
+            "requestTypes": [ "READ" ],
+            "allowedUsers": [ "*" ]
         },
         {
-            "priority": 1,
-            "uriPattern": "/testApp/client/(.*)[.]js",
-            "requestType": "READ",
-            "allowedUsers": "'*'"
+            "uriPattern": "/testApp/client*",
+            "requestTypes": [ "*" ],
+            "allowedUsers": [ "*" ]
         },
         {
-            "priority": 1,
             "uriPattern": "/testApp/storage*",
-            "requestType": "READ",
-            "queryParamsCondition": "parseJson($q).get('user') == $securityContext.subject",
-            "allowedRoles": "'test-app/user'"
-        },
-        {
-            "priority": 1,
-            "uriPattern": "/testApp/storage*",
-            "requestType": "CREATE",
-            "queryParamsCondition": "$requestState.getProperty('user') ==  $securityContext.subject",
-            "allowedRoles": "'test-app/user'"
-        },
-        {
-            "priority": 1,
-            "uriPattern": "/testApp/storage*",
-            "requestType": "CREATE,UPDATE",
-            "queryParamsCondition": "$requestState.getProperty('user') !=  $securityContext.subject",
-            "deniedUsers": "'*'"
+            "requestTypes": [ "READ" ],
+            "allowedRoles": [ "test-app/user" ],
+            "deniedUsers": [ "evil" ]
         }
     ]
 }

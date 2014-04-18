@@ -1,18 +1,11 @@
-/*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
- *
- * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
- */
-
 package io.liveoak.security.policy.uri.integration;
 
 import io.liveoak.common.security.AuthzConstants;
-import io.liveoak.security.policy.uri.complex.URIPolicy;
 import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.security.policy.uri.impl.URIPolicy;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 
 /**
@@ -49,15 +42,13 @@ public class URIPolicyCheckResource implements Resource {
         try {
             if (policy != null) {
                 RequestContext reqCtxToAuthorize = ctx.requestAttributes() != null ? ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, RequestContext.class) : null;
-                ResourceState reqResourceState = ctx.requestAttributes() != null ? ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_REQUEST_RESOURCE_STATE, ResourceState.class) : null;
-                ResourceState respResourceState = ctx.requestAttributes() != null ? ctx.requestAttributes().getAttribute(AuthzConstants.ATTR_RESPONSE_RESOURCE_STATE, ResourceState.class) : null;
                 if (reqCtxToAuthorize == null) {
                     if (log.isTraceEnabled()) {
                         log.trace("Request is null. Rejecting");
                     }
                     decision = AuthzDecision.REJECT;
                 } else {
-                    decision = policy.isAuthorized(reqCtxToAuthorize, reqResourceState, respResourceState);
+                    decision = policy.isAuthorized(reqCtxToAuthorize);
                 }
             }
         } catch (Throwable t) {
@@ -72,4 +63,5 @@ public class URIPolicyCheckResource implements Resource {
         sink.accept(AuthzConstants.ATTR_AUTHZ_POLICY_RESULT, decision.toString());
         sink.close();
     }
+
 }

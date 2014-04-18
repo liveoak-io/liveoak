@@ -1,6 +1,6 @@
 package io.liveoak.container.extension;
 
-import io.liveoak.container.util.ConversionUtils;
+import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;

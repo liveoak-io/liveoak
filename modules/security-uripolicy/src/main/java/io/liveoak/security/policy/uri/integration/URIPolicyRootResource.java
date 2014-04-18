@@ -1,23 +1,12 @@
-/*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
- *
- * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
- */
-
 package io.liveoak.security.policy.uri.integration;
 
 import io.liveoak.common.security.AuthzConstants;
-import io.liveoak.security.policy.uri.complex.URIPolicy;
-import io.liveoak.spi.InitializationException;
+import io.liveoak.security.policy.uri.impl.URIPolicy;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -63,5 +52,4 @@ public class URIPolicyRootResource implements RootResource {
         sink.accept(this.policyCheckResource);
         sink.close();
     }
-
 }

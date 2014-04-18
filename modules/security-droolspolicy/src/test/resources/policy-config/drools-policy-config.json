@@ -1,0 +1,43 @@
+{ 
+    "rules": [
+        {
+            "priority": 2,
+            "uriPattern": "*",
+            "requestType": "*",
+            "allowedRoles": "'test-app/admin'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/testApp/app/(.*)[.](html|css|js|png)",
+            "requestType": "READ",
+            "allowedUsers": "'*'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/testApp/client/(.*)[.]js",
+            "requestType": "READ",
+            "allowedUsers": "'*'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/testApp/storage*",
+            "requestType": "READ",
+            "conditions": "parseJson($q).get('user') == $securityContext.subject",
+            "allowedRoles": "'test-app/user'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/testApp/storage*",
+            "requestType": "CREATE",
+            "conditions": "$requestState.getProperty('user') ==  $securityContext.subject",
+            "allowedRoles": "'test-app/user'"
+        },
+        {
+            "priority": 1,
+            "uriPattern": "/testApp/storage*",
+            "requestType": "CREATE,UPDATE",
+            "conditions": "$requestState.getProperty('user') !=  $securityContext.subject",
+            "deniedUsers": "'*'"
+        }
+    ]
+}

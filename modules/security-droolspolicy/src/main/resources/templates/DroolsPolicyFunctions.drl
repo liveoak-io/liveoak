@@ -1,0 +1,88 @@
+package io.liveoak.security.policy.drools.impl;
+
+import io.liveoak.security.policy.drools.impl.RulesProcessingResult;
+import io.liveoak.security.policy.drools.impl.URIMatcher;
+import io.liveoak.security.policy.drools.impl.RequestContextDecorator;
+import io.liveoak.security.policy.drools.impl.JsonParsingUtils;
+import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.spi.RequestType;
+import io.liveoak.spi.ResourcePath;
+import org.jboss.logging.Logger;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+import static io.liveoak.security.policy.drools.impl.LoggerHelper.logger;
+
+dialect "mvel"
+
+function boolean uriMatches(String ruleName, String regex, ResourcePath resourcePath, URIMatcher uriMatcher) {
+  if (uriMatcher.isProcessed()) {
+    return uriMatcher.isMatched();
+  }
+
+  String textToMatch = resourcePath.toString();
+  Pattern p = Pattern.compile(regex);
+  Matcher m = p.matcher(textToMatch);
+
+  if (m.find()) {
+    uriMatcher.setMatched(true);
+
+    for (int i=0 ; i<=m.groupCount() ; i++) {
+      uriMatcher.addGroup(m.group(i));
+    }
+  } else {
+    uriMatcher.setMatched(false);
+  }
+
+  uriMatcher.setProcessed(true);
+  if (logger().isTraceEnabled()) {
+    logger().trace("Checking URI regex for rule " + ruleName + ". regex: " + regex + ", textToMatch: " + textToMatch
+        + ", result: " + uriMatcher);
+  }
+
+  return uriMatcher.isMatched();
+}
+
+
+function boolean requestConditionsMatches(String ruleName, boolean result) {
+  if (logger().isTraceEnabled()) {
+    logger().trace("Checking params condition for rule: " + ruleName + ", result: " + result);
+  }
+  return result;
+}
+
+
+function boolean requestTypeMatches(String ruleName, RequestType reqType, String allowedTypes) {
+  boolean result = allowedTypes.contains(reqType.name());
+
+  if (logger().isTraceEnabled()) {
+    logger().trace("Checking requestType for rule " + ruleName + ". Incoming requestType: " + reqType
+        + ", allowedTypes: " + allowedTypes + ", result: " + result);
+  }
+
+  return result;
+}
+
+
+function String any(Collection items) {
+  String rulesProcessingResult = "";
+  boolean first=true;
+  Iterator iterator = items.iterator();
+  while (iterator.hasNext()) {
+      String item = (String)(iterator.next());
+      if (first) {
+        rulesProcessingResult = item;
+        first = false;
+      } else {
+        rulesProcessingResult = rulesProcessingResult + "|" + item;
+      }
+  }
+  return rulesProcessingResult;
+}
+
+function Map parseJson(String jsonString) {
+  return JsonParsingUtils.parseJsonStringAsMap(jsonString);
+}

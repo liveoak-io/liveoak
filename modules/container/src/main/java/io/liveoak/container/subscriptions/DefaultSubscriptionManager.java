@@ -1,5 +1,6 @@
 package io.liveoak.container.subscriptions;
 
+import io.liveoak.common.util.ObjectsTree;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.container.Subscription;
@@ -18,18 +19,18 @@ public class DefaultSubscriptionManager implements SubscriptionManager {
 
     @Override
     public void addSubscription(Subscription subscription) {
-        this.tree.addSubscription(subscription);
+        this.subscriptionsTree.addObject(subscription, subscription.resourcePath());
     }
 
     @Override
     public void removeSubscription(Subscription subscription) {
-        this.tree.removeSubscription(subscription);
+        this.subscriptionsTree.removeObject(subscription, subscription.resourcePath());
     }
 
     @Override
     public void resourceCreated(ResourceResponse resourceResponse) {
         ResourcePath path = resourcePathOf(resourceResponse.resource());
-        this.tree.subscriptions(path).forEach((subscription) -> {
+        this.subscriptionsTree.objects(path).forEach((subscription) -> {
             subscribeResourceCreated(path, subscription, resourceResponse);
         });
     }
@@ -45,7 +46,7 @@ public class DefaultSubscriptionManager implements SubscriptionManager {
     @Override
     public void resourceUpdated(ResourceResponse resourceResponse) {
         ResourcePath path = resourcePathOf(resourceResponse.resource());
-        this.tree.subscriptions(path).forEach((subscription) -> {
+        this.subscriptionsTree.objects(path).forEach((subscription) -> {
             subscribeResourceUpdated(path, subscription, resourceResponse);
         });
     }
@@ -61,7 +62,7 @@ public class DefaultSubscriptionManager implements SubscriptionManager {
     @Override
     public void resourceDeleted(ResourceResponse resourceResponse) {
         ResourcePath path = resourcePathOf(resourceResponse.resource());
-        this.tree.subscriptions(path).forEach((subscription) -> {
+        this.subscriptionsTree.objects(path).forEach((subscription) -> {
             subscribeResourceDeleted(path, subscription, resourceResponse);
         });
     }
@@ -89,10 +90,10 @@ public class DefaultSubscriptionManager implements SubscriptionManager {
         return path;
     }
 
-    public SubscriptionTree treeFor(ResourcePath path) {
-        return this.tree.findLeaf(path);
+    public ObjectsTree<Subscription> treeFor(ResourcePath path) {
+        return this.subscriptionsTree.findLeaf(path);
     }
 
-    private SubscriptionTree tree = new SubscriptionTree("");
+    private ObjectsTree<Subscription> subscriptionsTree = new ObjectsTree<Subscription>();
     private static final Logger log = Logger.getLogger(DefaultSubscriptionManager.class);
 }

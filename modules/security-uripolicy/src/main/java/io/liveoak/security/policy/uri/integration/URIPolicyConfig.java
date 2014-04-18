@@ -1,9 +1,3 @@
-/*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
- *
- * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
- */
-
 package io.liveoak.security.policy.uri.integration;
 
 import java.util.List;
@@ -13,20 +7,20 @@ import java.util.List;
  */
 public class URIPolicyConfig {
 
-    private List<URIPolicyConfigRule> uriRules;
+    private List<URIPolicyConfigRule> rules;
 
-    public List<URIPolicyConfigRule> getUriRules() {
-        return uriRules;
+    public List<URIPolicyConfigRule> getRules() {
+        return rules;
     }
 
-    public void setUriRules(List<URIPolicyConfigRule> uriRules) {
-        this.uriRules = uriRules;
+    public void setRules(List<URIPolicyConfigRule> rules) {
+        this.rules = rules;
     }
 
     @Override
     public String toString() {
         return new StringBuilder("URIPolicyConfig [ ")
-                .append("uriRules=").append(uriRules)
+                .append("rules=").append(rules)
                 .append(" ]").toString();
     }
 }
