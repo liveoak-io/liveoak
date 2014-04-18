@@ -13,11 +13,11 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <properties>
-        <module-name>io.liveoak.security.uripolicy</module-name>
+        <module-name>io.liveoak.security.droolspolicy</module-name>
     </properties>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>liveoak-security-uripolicy</artifactId>
-    <name>liveoak-security-uripolicy</name>
+    <artifactId>liveoak-security-droolspolicy</artifactId>
+    <name>liveoak-security-droolspolicy</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -34,6 +34,21 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-templates</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

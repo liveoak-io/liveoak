@@ -15,5 +15,6 @@
         <module name="io.liveoak.spi"/>
         <module name="io.liveoak.common"/>
         <module name="com.fasterxml.jackson.core"/>
+        <module name="org.drools"/>
     </dependencies>
 </module>
