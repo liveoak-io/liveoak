@@ -1,7 +1,7 @@
 <div class="row">
   <ul class="nav nav-tabs nav-tabs-pf">
-    <li class="active"><a href="#">General Settings</a></li>
-    <li><a href="#">Clients</a></li>
+    <li class="active"><a href="">General Settings</a></li>
+    <li><a href="#/applications/{{curApp.id}}/application-clients">Clients</a></li>
   </ul>
   <div class="lo-content-area col-md-10 next-steps">
     <lo-breadcrumbs></lo-breadcrumbs>
@@ -13,7 +13,7 @@
         <div class="form-group clearfix">
           <label class="col-sm-2 control-label" for="appname">Application Name <span class="required">*</span></label>
           <div class="col-sm-4">
-            <input class="form-control" type="text" id="appname" required>
+            <input class="form-control" type="text" id="appname" ng-model="curApp.id" required>
           </div>
         </div>
         <div class="form-group clearfix">
