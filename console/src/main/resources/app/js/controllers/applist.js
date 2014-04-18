@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.application', []);
 
-loMod.controller('AppListCtrl', function($scope, $routeParams, $location, Notifications, loAppList, LoApp, LoStorage, LoPush) {
+loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal, Notifications, loAppList, LoApp, LoStorage, LoPush) {
 
   $scope.applications = [];
 
@@ -14,8 +14,51 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, Notifi
       name: loAppList._members[i].name
     };
     app.storage = LoStorage.getList({appId: app.id});
+    app.storage.$promise.then(function (result) {
+      app["mongo_storages"] = 0;
+      for (var j = 0; j < result._members.length; j++) {
+        if(result._members[j].hasOwnProperty('MongoClientOptions')) {
+          app["mongo_storages"]++;
+        }
+      }
+    });
+    app.push = LoPush.get({appId: app.id});
+
     $scope.applications.push(app);
   }
+
+  // Delete Application
+  $scope.modalApplicationDelete = function(appId) {
+    $scope.deleteAppId = appId;
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/application/application-delete.html',
+      controller: DeleteApplicationModalCtrl,
+      scope: $scope
+    });
+  };
+
+  var DeleteApplicationModalCtrl = function ($scope, $modalInstance, $log, LoApp) {
+
+    $scope.applicationDelete = function (appId) {
+      $log.debug('Deleting application: ' + appId);
+      LoApp.delete({appId: appId},
+        // success
+        function(/*value, responseHeaders*/) {
+          Notifications.success('Application "' + appId + '" deleted successfully.');
+          $modalInstance.close();
+        },
+        // error
+        function (httpResponse) {
+          Notifications.httpError('Failed to delete application "' + appId + '".', httpResponse);
+        }
+      );
+    };
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+
+  };
 
   // New Application Wizard
 
@@ -127,6 +170,30 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, Notifi
         Notifications.httpError('Failed to create new application', httpResponse);
       });
   };
+
+});
+
+loMod.controller('AppSettingsCtrl', function($scope, $rootScope, currentApp) {
+
+  $rootScope.curApp = currentApp;
+
+  $scope.breadcrumbs = [
+    {'label': 'Applications',  'href':'#/applications'},
+    {'label': currentApp.name, 'href':'#/applications/' + currentApp.id},
+    {'label': 'Settings',      'href':'#/applications/' + currentApp.id + '/application-settings'}
+  ];
+
+});
+
+loMod.controller('AppClientsCtrl', function($scope, $rootScope, currentApp) {
+
+  $rootScope.curApp = currentApp;
+
+  $scope.breadcrumbs = [
+    {'label': 'Applications',  'href':'#/applications'},
+    {'label': currentApp.name, 'href':'#/applications/' + currentApp.id},
+    {'label': 'Clients',      'href':'#/applications/' + currentApp.id + '/application-clients'}
+  ];
 
 });
 

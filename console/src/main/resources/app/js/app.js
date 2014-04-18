@@ -38,43 +38,19 @@ loMod.config(['$routeProvider', function($routeProvider) {
     })
     .when('/applications/:appId/application-clients', {
       templateUrl : '/admin/console/partials/application-clients.html',
-      controller : 'DashboardCtrl',
+      controller : 'AppClientsCtrl',
       resolve: {
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
-        },
-        loStorageList : function(LoStorageListLoader) {
-          return new LoStorageListLoader();
-        },
-        loPush: function(LoPush, $route) {
-          return LoPush.get({appId: $route.current.params.appId}).$promise.then(function(data) {
-              return data;
-            },
-            function() {
-              return {};
-            }
-          );
         }
       }
     })
     .when('/applications/:appId/application-settings', {
       templateUrl : '/admin/console/partials/application-settings.html',
-      controller : 'DashboardCtrl',
+      controller : 'AppSettingsCtrl',
       resolve: {
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
-        },
-        loStorageList : function(LoStorageListLoader) {
-          return new LoStorageListLoader();
-        },
-        loPush: function(LoPush, $route) {
-          return LoPush.get({appId: $route.current.params.appId}).$promise.then(function(data) {
-              return data;
-            },
-            function() {
-              return {};
-            }
-          );
         }
       }
     })
