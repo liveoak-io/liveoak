@@ -1,0 +1,25 @@
+{
+    "rules": [
+        {
+            "uriPattern": "/testApp",
+            "requestTypes": [ "READ" ],
+            "allowedUsers": [ "*" ]
+        },
+        {
+            "uriPattern": "/testApp/app/index.html",
+            "requestTypes": [ "READ" ],
+            "allowedUsers": [ "*" ]
+        },
+        {
+            "uriPattern": "/testApp/client*",
+            "requestTypes": [ "*" ],
+            "allowedUsers": [ "*" ]
+        },
+        {
+            "uriPattern": "/testApp/storage*",
+            "requestTypes": [ "READ" ],
+            "allowedRoles": [ "test-app/user" ],
+            "deniedUsers": [ "evil" ]
+        }
+    ]
+}

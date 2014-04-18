@@ -1,10 +1,4 @@
-/*
- * Copyright 2014 Red Hat, Inc. and/or its affiliates.
- *
- * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
- */
-
-package io.liveoak.security.policy.drools.integration;
+package io.liveoak.security.policy.uri.integration;
 
 import java.util.List;
 
@@ -12,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.common.util.ResourceConversionUtils;
-import io.liveoak.security.policy.drools.impl.DroolsPolicy;
-import io.liveoak.security.policy.drools.impl.DroolsPolicyConfigurator;
+import io.liveoak.security.policy.uri.impl.URIPolicy;
+import io.liveoak.security.policy.uri.impl.URIPolicyConfigurator;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -22,16 +16,16 @@ import io.liveoak.spi.state.ResourceState;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class DroolsPolicyConfigResource implements RootResource, SynchronousResource {
+public class URIPolicyConfigResource implements RootResource, SynchronousResource {
 
     private final String id;
-    private final DroolsPolicy droolsPolicy;
-    private DroolsPolicyConfig droolsPolicyConfig;
+    private final URIPolicy uriPolicy;
+    private URIPolicyConfig uriPolicyConfig;
     private Resource parent;
 
-    public DroolsPolicyConfigResource(String id, DroolsPolicy droolsPolicy) {
+    public URIPolicyConfigResource(String id, URIPolicy uriPolicy) {
         this.id = id;
-        this.droolsPolicy = droolsPolicy;
+        this.uriPolicy = uriPolicy;
     }
 
     @Override
@@ -53,7 +47,7 @@ public class DroolsPolicyConfigResource implements RootResource, SynchronousReso
     public ResourceState properties() throws Exception {
         ObjectMapper om = new ObjectMapper();
         // TODO: performance as Object is converted couple of times into various formats...
-        String str = om.writeValueAsString(this.droolsPolicyConfig);
+        String str = om.writeValueAsString(this.uriPolicyConfig);
         ObjectNode objectNode = om.readValue(str, ObjectNode.class);
         ResourceState resourceState = ConversionUtils.convert(objectNode);
         List<ResourceState> childResourceStates = (List<ResourceState>)resourceState.getProperty("rules");
@@ -66,8 +60,8 @@ public class DroolsPolicyConfigResource implements RootResource, SynchronousReso
     public void properties(ResourceState props) throws Exception {
         ObjectNode objectNode = ConversionUtils.convert(props);
         ObjectMapper om = new ObjectMapper();
-        this.droolsPolicyConfig = om.readValue(objectNode.toString(), DroolsPolicyConfig.class);
+        this.uriPolicyConfig = om.readValue(objectNode.toString(), URIPolicyConfig.class);
 
-        new DroolsPolicyConfigurator().configure(this.droolsPolicy, this.droolsPolicyConfig);
+        new URIPolicyConfigurator().configure(uriPolicy, uriPolicyConfig);
     }
 }

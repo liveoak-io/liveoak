@@ -41,7 +41,7 @@ public class DroolsPolicyRootResourceTest extends AbstractResourceTestCase {
     }
 
     @Test
-    public void testURIPolicyServiceRequest() throws Exception {
+    public void testDroolsPolicyServiceRequest() throws Exception {
         RequestContext reqCtx = new RequestContext.Builder().build();
         ResourceState state = client.read(reqCtx, "/testApp/drools-policy");
         boolean authzCheckFound = false;
