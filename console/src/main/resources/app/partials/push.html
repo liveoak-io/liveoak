@@ -19,6 +19,9 @@
         </div>
         <div class="panel-body">
           <span class="lo-emph">Configured <strong>3</strong> minutes ago.</span>
+          <span data-toggle="modal" data-target="#delete-push" ng-hide="create || changed">
+            <button type="button" class="btn btn-danger btn-sm pull-right">Delete</button>
+          </span>
         </div>
       </div>
 
@@ -45,14 +48,9 @@
           </div>
         </fieldset>
 
-        <div class="pull-right form-actions" ng-show="changed">
-          <button lo-button-clear="clear()">Clear changes</button>
-          <button lo-button-save="save()" ng-disabled="!pushForm.$valid">Save</button>
-        </div>
-        <div class="pull-right form-actions" ng-hide="create || changed" >
-                    <span data-toggle="modal" data-target="#delete-push">
-                        <button type="button" class="btn btn-danger btn-lg">Delete</button>
-                    </span>
+        <div class="pull-right form-actions">
+          <button lo-button-clear="clear()" ng-disabled="!changed">Clear changes</button>
+          <button lo-button-save="save()" ng-disabled="!changed || !pushForm.$valid">Save</button>
         </div>
       </form>
     </div>

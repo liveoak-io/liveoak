@@ -42,6 +42,10 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
     $scope.changed = false;
   };
 
+  $scope.cancelCreate = function() {
+    $location.path('applications/' + currentApp.id + '/storage');
+  };
+
   $scope.$watch('storageModel', function() {
     if (!angular.equals($scope.storageModel, storageModelBackup)) {
       $log.debug('Scope changed');

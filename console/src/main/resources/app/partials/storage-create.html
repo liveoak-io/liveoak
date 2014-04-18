@@ -89,9 +89,10 @@
             </div>
           </fieldset>
 
-          <div class="pull-right form-actions" ng-show="changed">
-            <button lo-button-clear="clear()">Clear changes</button>
-            <button lo-button-save="save()" ng-disabled="!storageForm.$valid">Save</button>
+          <div class="pull-right form-actions">
+            <button lo-button-clear="clear()" ng-hide="create" ng-disabled="!changed">Clear changes</button>
+            <button lo-button-clear="cancelCreate()" ng-show="create">Cancel</button>
+            <button lo-button-save="save()" ng-disabled="!changed || !storageForm.$valid">Save</button>
           </div>
         </form>
       </div>
