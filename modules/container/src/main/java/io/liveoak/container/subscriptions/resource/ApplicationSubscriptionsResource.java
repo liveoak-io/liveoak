@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Bob McWhirter
@@ -86,23 +87,24 @@ public class ApplicationSubscriptionsResource implements SynchronousResource, Ro
 
     @Override
     public Collection<? extends Resource> members() {
-        return subscriptionManager.treeFor(applicationResourcePath()).subscriptions().map( ( e ) -> {
-            if ( e instanceof StompSubscription ) {
-                return new StompSubscriptionResource( this, ( StompSubscription ) e );
-            } else if ( e instanceof HttpSubscription ) {
-                return new HttpSubscriptionResource( this, ( HttpSubscription ) e );
-            } else if ( e instanceof Resource) {
+        Stream<Subscription> subscriptionStream = subscriptionManager.treeFor(applicationResourcePath()).objects();
+        return subscriptionStream.map((e) -> {
+            if (e instanceof StompSubscription) {
+                return new StompSubscriptionResource(this, (StompSubscription) e);
+            } else if (e instanceof HttpSubscription) {
+                return new HttpSubscriptionResource(this, (HttpSubscription) e);
+            } else if (e instanceof Resource) {
                 return (Resource) e;
             } else {
-                return new BasicSubscriptionResource( this, e );
+                return new BasicSubscriptionResource(this, e);
             }
-        } ).collect( Collectors.toList() );
+        }).collect( Collectors.toList() );
     }
 
     @Override
     public Resource member(String id) {
         Optional<Subscription> result = subscriptionManager.treeFor(applicationResourcePath())
-                .subscriptions()
+                .objects()
                 .filter(e -> e.id().equals(id))
                 .findFirst();
 

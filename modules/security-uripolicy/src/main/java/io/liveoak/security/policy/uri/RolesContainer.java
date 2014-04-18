@@ -61,6 +61,10 @@ public class RolesContainer {
     }
 
     public RolesContainer addAllAllowedRoles(Collection<String> coll) {
+        if (coll == null) {
+            return this;
+        }
+
         if (allowedRoles == null) {
             allowedRoles = new HashSet<>();
         }
@@ -69,6 +73,10 @@ public class RolesContainer {
     }
 
     public RolesContainer addAllDeniedRoles(Collection<String> coll) {
+        if (coll == null) {
+            return this;
+        }
+
         if (deniedRoles == null) {
             deniedRoles = new HashSet<>();
         }
@@ -77,6 +85,10 @@ public class RolesContainer {
     }
 
     public RolesContainer addAllAllowedUsers(Collection<String> coll) {
+        if (coll == null) {
+            return this;
+        }
+
         if (allowedUsers == null) {
             allowedUsers = new HashSet<>();
         }
@@ -85,6 +97,10 @@ public class RolesContainer {
     }
 
     public RolesContainer addAllDeniedUsers(Collection<String> coll) {
+        if (coll == null) {
+            return this;
+        }
+
         if (deniedUsers == null) {
             deniedUsers = new HashSet<>();
         }
