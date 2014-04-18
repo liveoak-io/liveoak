@@ -158,6 +158,10 @@ loMod.factory('LoStorage', function($resource) {
     update : {
       method : 'PUT',
       params : { appId : '@appId', storageId : '@storageId'}
+    },
+    delete : {
+      method : 'DELETE',
+      params : { appId : '@appId', storageId : '@storageId'}
     }
   });
 });

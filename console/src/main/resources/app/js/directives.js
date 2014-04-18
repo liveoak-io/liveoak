@@ -49,7 +49,8 @@ loDirectives.directive('loStorageSummary', function (LoCollection) {
     scope: {
       storage: '=loStorage',
       created: '=',
-      loApp: '='
+      loApp: '=',
+      loDelete: '&'
     },
     restrict: 'E',
     replace: true,
