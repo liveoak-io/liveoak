@@ -24,7 +24,8 @@
         </div>
       </div>
 
-      <lo-storage-summary ng-repeat="s in resources" lo-storage="s" lo-app="curApp" created="createdId"></lo-storage-summary>
+      <lo-storage-summary ng-repeat="s in resources" lo-storage="s" lo-app="curApp" created="createdId"
+          lo-delete="modalStorageDelete(storageId)"></lo-storage-summary>
 
     </div>
     <div class="lo-info-pane col-md-3">

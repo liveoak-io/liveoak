@@ -2,15 +2,15 @@
   <button type="button" class="close" ng-click="cancel()">
     <span class="pficon pficon-close"></span>
   </button>
-  <h4 class="modal-title">Delete Collection</h4>
+  <h4 class="modal-title">Delete Storage</h4>
 </div>
 <div class="modal-body">
   <div class="form-group">
-    <p class="primary-message">Are you sure you wan't to delete the collection "{{ collectionId }}"?</p>
+    <p class="primary-message">Are you sure you wan't to delete the storage "{{ storageId }}"?</p>
     <p>This action can't be undone.</p>
   </div>
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
-  <button type="button" class="btn btn-danger" ng-click="collectionDelete(); close()">Delete</button>
+  <button type="button" class="btn btn-danger" ng-click="storageDelete(); close()">Delete</button>
 </div>

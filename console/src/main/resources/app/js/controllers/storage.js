@@ -134,7 +134,8 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
 
 });
 
-loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routeParams, loStorageList, currentApp) {
+loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routeParams, loStorageList, currentApp,
+                                             LoStorage, Notifications, $modal) {
 
   $log.debug('StorageListCtrl');
 
@@ -149,6 +150,8 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
   $scope.createdId = $routeParams.created;
 
   $scope.loStorageList=loStorageList;
+
+  $scope.storageId = '';
 
   $scope.resources = [];
 
@@ -169,6 +172,38 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
     }
   }
 
+  var ModalInstanceCtrl = function ($scope, $modalInstance) {
+
+    $scope.close = function () {
+      $modalInstance.close();
+    };
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+
+  };
+
+  $scope.modalStorageDelete = function(id){
+    console.log('opening model '+id);
+    $scope.storageId = id;
+
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/storage/storage-delete.html',
+      controller: ModalInstanceCtrl,
+      scope: $scope
+    });
+  };
+
+  $scope.storageDelete = function(){
+    LoStorage.delete({ appId : currentApp.id, storageId : $scope.storageId},
+      function(){
+        Notifications.success('Storage successfully deleted.');
+      },
+      function(httpResponse){
+        Notifications.httpError('Failed to delete the storage.', httpResponse);
+      });
+  };
 });
 
 loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $route, currentApp, $modal, Notifications,
