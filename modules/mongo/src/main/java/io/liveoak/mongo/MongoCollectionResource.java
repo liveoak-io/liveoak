@@ -205,13 +205,25 @@ public class MongoCollectionResource extends MongoResource {
 
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        if ( state.id().equals( this.id() ) ) {
-            if ( state.getPropertyNames().isEmpty() || state.getPropertyNames().size() == 1 && state.getPropertyNames().contains( "id" )) {
-                responder.resourceUpdated( this );
-                return;
+
+        // if the state properties are not empty [other than the id value] then throw an error since the other properties are not writable
+        if ( state.getPropertyNames().isEmpty() || state.getPropertyNames().size() == 1 && state.getPropertyNames().contains( "id" ) ) {
+            // if the current state id does not match the current id, then rename the collection.
+            if ( state.id()!= null && !state.id().equals( this.id() ) ) {
+                // if there already exists a collection by this name, then throw an error
+                if ( getDBCollection().getDB().collectionExists( state.id() ) ) {
+                    responder.resourceAlreadyExists( state.id() );
+                    return;
+                }
+
+                this.dbCollection = getDBCollection().rename( state.id() );
             }
+
+            responder.resourceUpdated( this );
+            return;
         }
-        responder.updateNotSupported( this );
+
+        responder.invalidRequest("Only the ID is updatable on this type of resource collection.");
 
     }
 
