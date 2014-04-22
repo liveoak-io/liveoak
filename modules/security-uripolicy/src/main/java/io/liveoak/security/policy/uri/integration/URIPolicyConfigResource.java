@@ -1,6 +1,8 @@
 package io.liveoak.security.policy.uri.integration;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -17,6 +19,8 @@ import io.liveoak.spi.state.ResourceState;
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public class URIPolicyConfigResource implements RootResource, SynchronousResource {
+
+    public static final String RULES_PROPERTY = "rules";
 
     private final String id;
     private final URIPolicy uriPolicy;
@@ -52,12 +56,20 @@ public class URIPolicyConfigResource implements RootResource, SynchronousResourc
         ResourceState resourceState = ConversionUtils.convert(objectNode);
         List<ResourceState> childResourceStates = (List<ResourceState>)resourceState.getProperty("rules");
         List<Resource> childResources = ResourceConversionUtils.convertList(childResourceStates, this);
-        resourceState.putProperty("rules", childResources);
+        resourceState.putProperty(RULES_PROPERTY, childResources);
         return resourceState;
     }
 
     @Override
     public void properties(ResourceState props) throws Exception {
+        // Keep just "rules" . Other props not important for us
+        Set<String> namesCopy = new HashSet<>(props.getPropertyNames());
+        for (String propName : namesCopy) {
+            if (!RULES_PROPERTY.equals(propName)) {
+                props.removeProperty(propName);
+            }
+        }
+
         ObjectNode objectNode = ConversionUtils.convert(props);
         ObjectMapper om = new ObjectMapper();
         this.uriPolicyConfig = om.readValue(objectNode.toString(), URIPolicyConfig.class);

@@ -127,6 +127,11 @@ public class JSONDecoder implements ResourceDecoder {
             return value;
         }
 
+        if (token == JsonToken.VALUE_NULL) {
+            parser.nextToken();
+            return value;
+        }
+
         if (token == JsonToken.START_OBJECT) {
             return decodeObject(parser);
         }
