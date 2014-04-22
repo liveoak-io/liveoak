@@ -1,20 +1,12 @@
 package io.liveoak.security.policy.uri;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.DefaultRequestAttributes;
-import io.liveoak.common.DefaultResourceParams;
 import io.liveoak.common.DefaultSecurityContext;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.security.policy.uri.extension.URIPolicyExtension;
 import io.liveoak.spi.RequestAttributes;
 import io.liveoak.spi.RequestContext;
@@ -26,6 +18,11 @@ import io.liveoak.testtools.AbstractResourceTestCase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -43,7 +40,7 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
     }
 
     private ObjectNode getPolicyConfig() throws Exception {
-        ObjectMapper om = new ObjectMapper();
+        ObjectMapper om = ObjectMapperFactory.create();
         ObjectNode objectNode = om.readValue(getClass().getClassLoader().getResourceAsStream("policy-config/uri-policy-config.json"), ObjectNode.class);
         return objectNode;
     }

@@ -1,12 +1,11 @@
 package io.liveoak.container.extension;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
-import io.liveoak.spi.extension.SystemExtensionContext;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoader;
@@ -29,10 +28,7 @@ public class ExtensionInstaller {
     }
 
     public void load(File extensionDesc) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true );
-        mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true );
-        mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true );
+        ObjectMapper mapper = ObjectMapperFactory.create();
         ObjectNode fullConfig = (ObjectNode) mapper.readTree(extensionDesc);
         String id = extensionDesc.getName();
         if (id.endsWith(".json")) {

@@ -1,13 +1,11 @@
 package io.liveoak.container.tenancy;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.common.codec.json.JSONDecoder;
+import io.liveoak.common.util.ObjectMapperFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,10 +20,7 @@ public class ApplicationConfigurationManager {
     }
 
     public synchronized ObjectNode read() throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-        mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-        mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        ObjectMapper mapper = ObjectMapperFactory.create();
         return (ObjectNode) mapper.readTree(this.file);
     }
 
@@ -61,7 +56,7 @@ public class ApplicationConfigurationManager {
 
         resourcesTree.remove( id );
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = ObjectMapperFactory.create();
         ObjectWriter writer = mapper.writer();
         writer = writer.with(new DefaultPrettyPrinter("\\n"));
         System.err.println( "writing " + tree + " to " + this.file );

@@ -1,14 +1,12 @@
 package io.liveoak.container.tenancy.service;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.json.JSONDecoder;
+import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.tenancy.InternalApplication;
@@ -26,6 +24,9 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author Bob McWhirter
@@ -75,7 +76,7 @@ public class ApplicationService implements Service<InternalApplication> {
                 e.printStackTrace();
             }
         } else {
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = ObjectMapperFactory.create();
             ObjectWriter writer = mapper.writer().with(new DefaultPrettyPrinter("\n"));
             ObjectNode tree = JsonNodeFactory.instance.objectNode();
             tree.put("id", this.id);
