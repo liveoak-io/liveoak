@@ -14,6 +14,7 @@ import io.liveoak.common.DefaultSecurityContext;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.security.policy.drools.extension.DroolsPolicyExtension;
 import io.liveoak.spi.*;
 import io.liveoak.spi.state.ResourceState;
@@ -35,7 +36,7 @@ public class DroolsPolicyRootResourceTest extends AbstractResourceTestCase {
     }
 
     private ObjectNode getPolicyConfig() throws Exception {
-        ObjectMapper om = new ObjectMapper();
+        ObjectMapper om = ObjectMapperFactory.create();
         ObjectNode objectNode = om.readValue(getClass().getClassLoader().getResourceAsStream("policy-config/drools-policy-config.json"), ObjectNode.class);
         return objectNode;
     }

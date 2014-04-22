@@ -5,23 +5,26 @@
  */
 package io.liveoak.mongo.launcher;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.util.ObjectMapperFactory;
+import org.jboss.logging.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.jboss.logging.Logger;
-
 import static io.liveoak.mongo.launcher.MongoLauncher.nullOrEmpty;
-import static io.liveoak.mongo.launcher.config.Constants.*;
+import static io.liveoak.mongo.launcher.config.Constants.DB_PATH;
+import static io.liveoak.mongo.launcher.config.Constants.ENABLED;
+import static io.liveoak.mongo.launcher.config.Constants.LOG_PATH;
+import static io.liveoak.mongo.launcher.config.Constants.MONGOD_PATH;
+import static io.liveoak.mongo.launcher.config.Constants.PID_FILE_PATH;
+import static io.liveoak.mongo.launcher.config.Constants.USE_SMALL_FILES;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -46,12 +49,7 @@ public class MongoLauncherAutoSetup {
 
         // we expect it to be present. If it's not present it means it is first-time setup
         // in that case we restore it
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true );
-        mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true );
-        mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true );
-        mapper.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false );
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        ObjectMapper mapper = ObjectMapperFactory.create();
 
         ObjectNode extension;
         if (!launcherJson.isFile()) {

@@ -1,6 +1,7 @@
 package io.liveoak.security.policy.acl.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.security.policy.acl.AclPolicyConfig;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -22,7 +23,7 @@ public class AclPolicyConfigService implements Service<AclPolicyConfig> {
 
         if (file.exists()) {
             try {
-                ObjectMapper om = new ObjectMapper();
+                ObjectMapper om = ObjectMapperFactory.create();
                 this.policy = om.readValue(file, AclPolicyConfig.class);
             } catch (IOException e) {
                 throw new StartException( e );

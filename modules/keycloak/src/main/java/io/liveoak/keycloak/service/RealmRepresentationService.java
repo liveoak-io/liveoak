@@ -3,6 +3,7 @@ package io.liveoak.keycloak.service;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.liveoak.common.util.ObjectMapperFactory;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -27,10 +28,7 @@ public class RealmRepresentationService implements Service<RealmRepresentation> 
         File file = this.fileInjector.getValue();
         if (file.exists()) {
             try {
-                JsonFactory factory = new JsonFactory();
-                factory.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES);
-                factory.enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES);
-                ObjectMapper mapper = new ObjectMapper(factory);
+                ObjectMapper mapper = ObjectMapperFactory.create();
                 this.realmRepresentation = mapper.readValue(file, RealmRepresentation.class);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to parse json", e);

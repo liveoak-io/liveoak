@@ -6,13 +6,10 @@
 
 package io.liveoak.security.policy.drools.integration;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
+import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.security.policy.drools.impl.DroolsPolicy;
 import io.liveoak.security.policy.drools.impl.DroolsPolicyConfigurator;
@@ -20,6 +17,10 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -55,7 +56,7 @@ public class DroolsPolicyConfigResource implements RootResource, SynchronousReso
 
     @Override
     public ResourceState properties() throws Exception {
-        ObjectMapper om = new ObjectMapper();
+        ObjectMapper om = ObjectMapperFactory.create();
         // TODO: performance as Object is converted couple of times into various formats...
         String str = om.writeValueAsString(this.droolsPolicyConfig);
         ObjectNode objectNode = om.readValue(str, ObjectNode.class);
@@ -77,7 +78,7 @@ public class DroolsPolicyConfigResource implements RootResource, SynchronousReso
         }
 
         ObjectNode objectNode = ConversionUtils.convert(props);
-        ObjectMapper om = new ObjectMapper();
+        ObjectMapper om = ObjectMapperFactory.create();
         this.droolsPolicyConfig = om.readValue(objectNode.toString(), DroolsPolicyConfig.class);
 
         new DroolsPolicyConfigurator().configure(this.droolsPolicy, this.droolsPolicyConfig);

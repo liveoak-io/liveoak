@@ -1,6 +1,7 @@
 package io.liveoak.security.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.security.spi.AuthzPolicyGroup;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -22,7 +23,7 @@ public class AuthzPolicyGroupService implements Service<AuthzPolicyGroup> {
         File file = this.fileInjector.getValue();
         if (file.exists()) {
             try {
-                ObjectMapper om = new ObjectMapper();
+                ObjectMapper om = ObjectMapperFactory.create();
                 this.group = om.readValue(this.fileInjector.getValue(), AuthzPolicyGroup.class);
             } catch (IOException e) {
                 throw new StartException(e);

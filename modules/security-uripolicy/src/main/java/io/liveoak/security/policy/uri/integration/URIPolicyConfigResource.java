@@ -1,12 +1,9 @@
 package io.liveoak.security.policy.uri.integration;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
+import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.security.policy.uri.impl.URIPolicy;
 import io.liveoak.security.policy.uri.impl.URIPolicyConfigurator;
@@ -14,6 +11,10 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -49,7 +50,7 @@ public class URIPolicyConfigResource implements RootResource, SynchronousResourc
 
     @Override
     public ResourceState properties() throws Exception {
-        ObjectMapper om = new ObjectMapper();
+        ObjectMapper om = ObjectMapperFactory.create();
         // TODO: performance as Object is converted couple of times into various formats...
         String str = om.writeValueAsString(this.uriPolicyConfig);
         ObjectNode objectNode = om.readValue(str, ObjectNode.class);
@@ -71,7 +72,7 @@ public class URIPolicyConfigResource implements RootResource, SynchronousResourc
         }
 
         ObjectNode objectNode = ConversionUtils.convert(props);
-        ObjectMapper om = new ObjectMapper();
+        ObjectMapper om = ObjectMapperFactory.create();
         this.uriPolicyConfig = om.readValue(objectNode.toString(), URIPolicyConfig.class);
 
         new URIPolicyConfigurator().configure(uriPolicy, uriPolicyConfig);

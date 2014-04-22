@@ -1,5 +1,14 @@
 package io.liveoak.container.interceptor.extension;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.util.ConversionUtils;
+import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.state.ResourceState;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,14 +16,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.common.util.ConversionUtils;
-import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -35,7 +36,7 @@ public class InterceptorsConfig {
     public static InterceptorsConfig createConfigFromResourceState(ResourceState resourceState) throws IOException {
         ObjectNode config = ConversionUtils.convert(resourceState);
         InterceptorsConfig result = new InterceptorsConfig();
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = ObjectMapperFactory.create();
 
         Iterator<String> iterator = config.fieldNames();
         while (iterator.hasNext()) {
@@ -61,7 +62,7 @@ public class InterceptorsConfig {
             ArrayNode chainsNode = result.putArray(chainName);
 
             for (InterceptorConfigEntry configEntry : chainConfigs) {
-                ObjectMapper mapper = new ObjectMapper();
+                ObjectMapper mapper = ObjectMapperFactory.create();
                 String cfg = mapper.writeValueAsString(configEntry);
                 ObjectNode interceptorConfigNode = mapper.readValue(cfg, ObjectNode.class);
                 chainsNode.add(interceptorConfigNode);
