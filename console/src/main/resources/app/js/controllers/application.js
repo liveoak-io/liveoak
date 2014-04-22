@@ -8,20 +8,23 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
 
   $scope.createdId = $routeParams.created;
 
+  var increaseStorages = function (resources) {
+    for (var j = 0; j < resources._members.length; j++) {
+      if(resources._members[j].hasOwnProperty('MongoClientOptions')) {
+        app.mongoStorages++;
+      }
+    }
+  };
+
   for (var i = 0; i < loAppList._members.length; i++) {
     var app = {
       id: loAppList._members[i].id,
       name: loAppList._members[i].name
     };
     app.storage = LoStorage.getList({appId: app.id});
-    app.storage.$promise.then(function (result) {
-      app["mongo_storages"] = 0;
-      for (var j = 0; j < result._members.length; j++) {
-        if(result._members[j].hasOwnProperty('MongoClientOptions')) {
-          app["mongo_storages"]++;
-        }
-      }
-    });
+
+    app.mongoStorages = 0;
+    app.storage.$promise.then(increaseStorages);
     app.push = LoPush.get({appId: app.id});
 
     $scope.applications.push(app);
