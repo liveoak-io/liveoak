@@ -32,6 +32,8 @@ public class RootMongoConfigResource implements ConfigResource, RootResource {
     WriteConcernResource writeConcernResource = null;
     ReadPreferenceResource readPreferenceResource = null;
     MongoClientOptionsResource mongoClientOptionsResource = null;
+    List<ServerAddressResource> serverAddresses;
+    List<MongoCredentialResource> credentials;
 
     public RootMongoConfigResource(String id) {
         this.id = id;
@@ -150,6 +152,13 @@ public class RootMongoConfigResource implements ConfigResource, RootResource {
                 this.db = db;
             }
         }
+
+        //Load the configuration values into the resource
+        getServerAddresses();
+        getMongoCredentials();
+        getWriteConcernResource();
+        getReadPreferenceResource();
+        getMongoClientOptionsResource();
     }
 
     private String getPropertyAsString(ResourceState state, String name) throws Exception {
@@ -238,37 +247,41 @@ public class RootMongoConfigResource implements ConfigResource, RootResource {
     }
 
     private List<ServerAddressResource> getServerAddresses() {
-        List<ServerAddressResource> serverAddresses = new ArrayList<ServerAddressResource>();
-        for (ServerAddress serverAddress : mongoClient.getServerAddressList()) {
-            serverAddresses.add( new ServerAddressResource(this, serverAddress));
+        if (mongoClient != null) {
+            serverAddresses = new ArrayList<ServerAddressResource>();
+            for (ServerAddress serverAddress : mongoClient.getServerAddressList()) {
+                serverAddresses.add( new ServerAddressResource(this, serverAddress));
+            }
         }
         return serverAddresses;
     }
 
     private List<MongoCredentialResource> getMongoCredentials() {
-        List<MongoCredentialResource> credentials = new ArrayList<MongoCredentialResource>();
-        for (MongoCredential credential : mongoClient.getCredentialsList()) {
-            credentials.add(new MongoCredentialResource( this, credential));
+        if ( mongoClient != null ) {
+            credentials = new ArrayList<MongoCredentialResource>();
+            for ( MongoCredential credential : mongoClient.getCredentialsList() ) {
+                credentials.add( new MongoCredentialResource( this, credential ) );
+            }
         }
         return credentials;
     }
 
     private WriteConcernResource getWriteConcernResource() {
-        if (this.writeConcernResource == null) {
+        if (this.writeConcernResource == null && mongoClient != null) {
           writeConcernResource = new WriteConcernResource( this, mongoClient.getWriteConcern());
         }
         return this.writeConcernResource;
     }
 
     private ReadPreferenceResource getReadPreferenceResource() {
-        if (this.readPreferenceResource == null) {
+        if (this.readPreferenceResource == null && mongoClient != null) {
             this.readPreferenceResource = new ReadPreferenceResource( this, mongoClient.getReadPreference());
         }
         return this.readPreferenceResource;
     }
 
     private MongoClientOptionsResource getMongoClientOptionsResource() {
-        if (this.mongoClientOptionsResource == null) {
+        if (this.mongoClientOptionsResource == null && mongoClient != null) {
             this.mongoClientOptionsResource = new MongoClientOptionsResource( this, mongoClient.getMongoClientOptions());
         }
         return this.mongoClientOptionsResource;
