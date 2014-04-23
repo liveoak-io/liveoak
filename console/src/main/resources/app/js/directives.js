@@ -181,12 +181,15 @@ loDirectives.directive('loButtonDelete', function () {
 /*
  For this directive to work correctly the Collection for generating options must be set in ng-options or directly
  as a value for directive attribute, i.e. lo-select='myOptionCollection'
+
+ TODO - There is a bug when using this directive within a ng-repeat loop. As a workaround, please use any value as
+  a parameter of loSelect attribute. Please note, that this will treat your option list as a constant, and changes
+  to the option list won't be reflected in the select element.
 */
 loDirectives.directive('loSelect', function($timeout) {
   return {
     restrict: 'A',
     link: function(scope, element, iAttrs){
-
       // Name of the options collection
       var options;
 
@@ -201,9 +204,11 @@ loDirectives.directive('loSelect', function($timeout) {
         element.selectpicker('refresh');
       };
 
-      scope.$watchCollection(options, function(){
-        initSelectpicker();
-      });
+      if (!iAttrs.loSelect) {
+        scope.$watchCollection(options, function () {
+          initSelectpicker();
+        });
+      }
 
       $timeout(initSelectpicker, 0, false);
     }

@@ -1043,9 +1043,14 @@ legend {
 
 /* Advanced search box */
 
+.search-clear {
+  padding-left: 10px;
+}
+
+
 .advanced-search {
   position: relative;
-
+  line-height:20px;
   > a {
     font-size: 12px;
     font-weight: normal;
@@ -1053,43 +1058,44 @@ legend {
   }
 
   .popover {
-    display: none;
+    display: block;
     width: 400px;
     max-width: 400px;
     padding: 15px;
     position: absolute;
     top: 28px;
     left: -156px;
-
+    /*
     &.fade.in {
       display: block;
     }
+    */
   }
 
   .inline-items {
     margin-bottom: 5px;
 
+    .bootstrap-select:not([class*="span"]):not([class*="col-"]):not([class*="form-control"]) {
+      width: 100px;
+      margin-bottom: 4px;
+    }
+
+    .form-control {
+      width: calc(~"100% - 140px");
+    }
+  }
+
+  &:last-child {
+    margin-bottom: 15px;
+  }
+
+  .inline {
+    display: inline-block;
+    margin-right: 5px;
+
     &:last-child {
-      margin-bottom: 15px;
+      margin-right: 0;
     }
-
-    .inline {
-      display: inline-block;
-      margin-right: 5px;
-
-      &:last-child {
-        margin-right: 0;
-      }
-    }
-  }
-
-  .bootstrap-select:not([class*="span"]):not([class*="col-"]):not([class*="form-control"]) {
-    width: 100px;
-    margin-bottom: 4px;
-  }
-
-  input {
-    width: calc(~"100% - 131px");
   }
 
   .btn-icon {
@@ -1320,7 +1326,7 @@ legend {
   	}
   	
   	.bootstrap-select:not([class*="span"]):not([class*="col-"]):not([class*="form-control"]) {
-    	width: 100%;
+/*    	width: 100%;*/
   	}
   	
   	+ .modal-footer {

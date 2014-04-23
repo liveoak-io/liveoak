@@ -242,6 +242,14 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   $scope.isClearAll = false;
   $scope.isDataChange = false;
 
+  $scope.searchColumns = [];
+  $scope.searchConditions = [{type:'EQUALS', text:''}];
+  $scope.showAdvanced = false;
+
+  $scope.searchQuery = '';
+  $scope.filterColumns = [];
+  $scope.filterConditions = [];
+
   // Filter for hidden columns
   $scope.notHidden = function(item) {
     if ($scope.columnsHidden.indexOf(item) === -1){
@@ -320,6 +328,11 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $scope.isClearAll = false;
     $scope.isDataChange = false;
     $scope.rowsToDelete = [];
+    $scope.searchQuery = '';
+    $scope.filterColumns = [];
+    $scope.filterConditions = [];
+    $scope.searchColumns = [];
+    $scope.searchConditions = [{type:'EQUALS', text:''}];
   };
 
   $scope.$watch('collectionId', function(){
@@ -535,6 +548,38 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $scope.collectionData._members = [];
     $scope.columnsHidden = [];
     $scope.isClearAll = true;
+  };
+
+  $scope.searchClear = function(){
+    $scope.searchQuery = '';
+    $scope.filterColumns = [];
+    $scope.filterConditions = [];
+
+    $scope.searchColumns = [];
+    $scope.searchConditions = [{type:'EQUALS', text:''}];
+  };
+
+  $scope.searchConditionAdd = function(){
+    $scope.searchConditions.push({type:'E', text:''});
+  };
+
+  $scope.searchConditionRemove = function(index){
+    $log.debug('Going to remove '+index);
+    $scope.searchConditions.splice(index,1);
+  };
+
+  $scope.advancedSearch = function(){
+    $scope.filterColumns = angular.copy($scope.searchColumns);
+
+    $scope.filterConditions = [];
+
+    angular.forEach($scope.searchConditions, function(condition){
+      if (condition.text !== '') {
+        $scope.filterConditions.push(condition);
+      }
+    });
+
+    $scope.showAdvanced = false;
   };
 
   $scope.save = function(){

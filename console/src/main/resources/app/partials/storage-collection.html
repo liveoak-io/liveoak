@@ -45,52 +45,56 @@
             <tr>
               <th colspan="{{ columns.length + 1 }}" class="table-actions">
                 <div class="search-comp clearfix">
-                  <input type="text" class="form-control search ng-pristine ng-valid" placeholder="Search..." ng-model="query">
+                  <input type="text" class="form-control search ng-pristine ng-valid" placeholder="Search..."
+                         ng-model="searchQuery">
                   <button class="btn btn-link btn-icon" tooltip="Search" type="submit">
                     <i class="fa fa-search"></i>
                     <span>Search</span>
                   </button>
                 </div>
-
-                <!-- TODO Commenting out until it's fully implemented
+                <!-- Advanced search dialog -->
                 <div class="advanced-search">
-                  <a class="dropdown-toggle advanced">Advanced Search</a>
-                  <div class="dropdown-menu bottom">
+                  <a class="dropdown-toggle-button advanced" ng-click="showAdvanced = !showAdvanced">Advanced Search</a>
+                  <a class="dropdown-toggle-button search-clear"
+                     ng-show="searchQuery !== '' || filterColumns.length !== 0"
+                     ng-click="searchClear()">Clear Search</a>
+                  <div class="asearch popover bottom" ng-show="showAdvanced">
                     <div class="arrow"></div>
                     <div class="form-group">
                       <label for="columns-select">Search in Columns</label>
-                      <select class="selectpicker form-control" id="columns-select" multiple>
-                        <option>ID</option>
-                        <option>firstname</option>
-                        <option>lastname</option>
-                        <option>address</option>
+                      <select lo-select class="select-lg selectpicker" multiple id="columns-select"
+                              ng-model="searchColumns" ng-options="o as o for o in columns"></select>
                       </select>
                     </div>
                     <div class="form-group">
                       <label for="condition-input1">Condition</label>
-                      <div class="inline-items">
-                        <select class="selectpicker inline">
-                          <option>Equals</option>
-                          <option>Not equal</option>
+
+                      <div class="inline-items" ng-repeat="condition in searchConditions">
+
+                        <select lo-select="false" class="select-lg selectpicker inline"
+                                ng-model="condition.type"
+                                ng-options="o.key as o.val for o in [{key:'EQUALS', val:'Equals'},{key:'EQUALS_NOT', val:'Not equal'}]">
                         </select>
-                        <input class="inline" type="text" placeholder="Contains text" id="condition-input1">
-                        <button data-placement="top" data-toggle="tooltip" type="button" class="btn btn-link btn-icon inline add-condition" data-original-title="Add Condition"><i class="fa fa-plus-circle"></i><span>Add Condition</span></button>
+
+                        <input class="inline form-control" type="text" placeholder="Contains text"
+                               ng-model="condition.text">
+                        <!--
+                        <button data-placement="top" data-toggle="tooltip" type="button" ng-click="searchConditionRemove($index)"
+                                class="btn btn-link btn-icon inline add-condition" data-original-title="Remove Condition">
+                          <i class="fa fa-minus-circle"></i><span>Add Condition</span></button>
+                        -->
+                        <button ng-show="$last"
+                                data-placement="top" data-toggle="tooltip" type="button" ng-click="searchConditionAdd()"
+                                class="btn btn-link btn-icon inline add-condition" data-original-title="Add Condition">
+                          <i class="fa fa-plus-circle"></i><span>Add Condition</span></button>
                       </div>
-                      <div class="inline-items hide">
-                        <select class="selectpicker inline">
-                          <option>Equals</option>
-                          <option>Not equal</option>
-                        </select>
-                        <input class="inline" type="text" placeholder="Contains text">
-                        <button data-placement="top" data-toggle="tooltip" type="button" class="btn btn-link btn-icon inline" data-original-title="Add Condition"><i class="fa fa-plus-circle"></i><span>Add Condition</span></button>
-                      </div>
+
                     </div>
                     <div class="pull-right form-actions">
-                      <button class="btn btn-primary btn-lg">Search</button>
+                      <button class="btn btn-primary btn-lg" ng-click="advancedSearch()">Search</button>
                     </div>
                   </div>
                 </div>
-                -->
 
                 <div class="pull-right">
                   <button class="btn btn-default" ng-click="modalColumnAdd()">Add Column</button>
@@ -132,7 +136,8 @@
             </tr>
             </thead>
             <tbody ng-show="collectionId && (columns.length > 0)">
-            <tr ng-repeat="item in collectionData._members  | filter:query | orderBy:predicate:reverse">
+            <tr ng-repeat="item in collectionData._members | orderBy:predicate:reverse | conditional:searchQuery:filterColumns:filterConditions">
+
               <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}" ng-click="isEdit = (true && column !== 'id')">
                 <input class="form-control" type="text" ng-show="isEdit" ng-model="item[column]"/>
                 <span ng-hide="isEdit">{{ item[column] }}</span>
