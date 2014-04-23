@@ -196,6 +196,25 @@ angular.element(document).ready(function () {
 var resourceRequests = 0;
 var loadingTimer = -1;
 
+loMod.factory('authInterceptor', function($q, LiveOak) {
+  return {
+    request: function (config) {
+      var deferred = $q.defer();
+      if (LiveOak.auth.token) {
+        LiveOak.auth.updateToken(5).success(function() {
+          config.headers = config.headers || {};
+          config.headers.Authorization = 'Bearer ' + LiveOak.auth.token;
+
+          deferred.resolve(config);
+        }).error(function() {
+          deferred.reject('Failed to refresh token');
+        });
+      }
+      return deferred.promise;
+    }
+  };
+});
+
 loMod.factory('spinnerInterceptor', function($q) {
   return function(promise) {
     return promise.then(function(response) {
@@ -237,5 +256,5 @@ loMod.config(function($httpProvider) {
   $httpProvider.defaults.transformRequest.push(spinnerFunction);
 
   $httpProvider.responseInterceptors.push('spinnerInterceptor');
-
+  $httpProvider.interceptors.push('authInterceptor');
 });
