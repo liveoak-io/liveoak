@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2013 Red Hat, Inc. and/or its affiliates.
+  ~ Copyright 2014 Red Hat, Inc. and/or its affiliates.
   ~
   ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
   -->
@@ -33,12 +33,12 @@
             <outputDirectory>/liveoak-${project.version}/m2-repo</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>../launcher/apps/</directory>
-            <outputDirectory>/liveoak-${project.version}/apps</outputDirectory>
+            <directory>./src/main/resources/conf/extensions</directory>
+            <outputDirectory>/liveoak-${project.version}/conf/extensions</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>../launcher/conf/</directory>
-            <outputDirectory>/liveoak-${project.version}/conf</outputDirectory>
+            <directory>../console/target/dist/</directory>
+            <outputDirectory>/liveoak-${project.version}/apps/admin</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>../console/target/app/</directory>
@@ -48,45 +48,5 @@
             <directory>../clients/javascript/src/main/javascript/</directory>
             <outputDirectory>/liveoak-${project.version}/client</outputDirectory>
         </fileSet>
-<!--
-        <fileSet>
-            <directory>../clients/javascript/src/main/javascript</directory>
-            <outputDirectory>/javascript</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>../launcher/src/main/css</directory>
-            <outputDirectory>/css</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>../launcher/etc</directory>
-            <outputDirectory>/etc</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>../launcher/conf</directory>
-            <outputDirectory>/conf</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>../launcher/apps/admin</directory>
-            <outputDirectory>/apps/admin</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>../console/target/app</directory>
-            <outputDirectory>/apps/admin/console</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>../launcher/target</directory>
-            <outputDirectory>/lib</outputDirectory>
-        </fileSet>
--->
     </fileSets>
-    <!--
-      <dependencySets>
-        <dependencySet>
-          <outputDirectory>/</outputDirectory>
-          <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
-          <unpack>false</unpack>
-          <scope>runtime</scope>
-        </dependencySet>
-      </dependencySets>
-    -->
 </assembly>

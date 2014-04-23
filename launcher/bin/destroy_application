@@ -1,7 +1,0 @@
-#!/bin/sh
-
-app_id=$1
-
-curl -X DELETE \
-  http://localhost:8080/admin/applications/$app_id
-

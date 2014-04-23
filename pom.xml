@@ -100,7 +100,6 @@
     <modules>
         <module>support/build-config</module>
         <module>support/module-assembly</module>
-        <module>launcher</module>
         <module>test-tools</module>
         <module>modules</module>
         <module>console</module>

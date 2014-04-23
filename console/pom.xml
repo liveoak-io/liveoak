@@ -179,6 +179,21 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>copy-dist-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/dist</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/dist</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <phase>test-compile</phase>
                         <goals>
                             <goal>testResources</goal>

@@ -43,6 +43,10 @@
           requestTypes: [ 'READ' ],
           allowedUsers: [ '*' ]
         }, {
+          uriPattern: '/admin/css/*',
+          requestTypes: [ 'READ' ],
+          allowedUsers: [ '*' ]
+        }, {
           uriPattern: '/admin/client/*',
           requestTypes: [ 'READ' ],
           allowedUsers: [ '*' ]
