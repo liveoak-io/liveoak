@@ -5,15 +5,14 @@
  */
 package io.liveoak.mongo;
 
-import java.util.ArrayList;
-import java.util.Set;
-
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
+
+import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -39,7 +38,12 @@ public class MongoAggregationItem extends MongoObjectResource {
             } else if (value instanceof BasicDBList) {
                 value = getResourceCollection(value);
             }
-            sink.accept(key, value);
+
+            if (supportedObject( value ))  {
+                sink.accept(key, value);
+            }  else {
+                log.warn("Unsupported Property type: " + value.getClass() + " cannot encode.");
+            }
         }
         sink.close();
     }

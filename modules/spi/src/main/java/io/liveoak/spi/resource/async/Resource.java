@@ -7,8 +7,11 @@ package io.liveoak.spi.resource.async;
 
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +33,8 @@ import java.util.List;
  */
 public interface Resource {
 
+    static final Logger log = Logger.getLogger(Resource.class);
+
     /**
      * Retrieve the URI associated with this resource.
      *
@@ -40,7 +45,19 @@ public interface Resource {
         Resource current = this;
 
         while (current != null) {
-            segments.add(0, current.id());
+            String currentId = current.id();
+            try {
+                // if the id starts with a ';', then don't encode this part
+                if (currentId.startsWith(";")) {
+                currentId = ";" + URLEncoder.encode(current.id().substring(1), "UTF-8");
+                } else {
+                    currentId = URLEncoder.encode(current.id(), "UTF-8");
+                }
+            } catch (UnsupportedEncodingException e) {
+                // if we cant encode the uri, then log the error message and use the unencoded value
+                log.error( "Error trying to encode URI value [" + currentId + "] to UTF-8. Attempting to use unencoded value", e );
+            }
+            segments.add(0, currentId);
             current = current.parent();
         }
 

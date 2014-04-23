@@ -5,19 +5,18 @@
  */
 package io.liveoak.mongo;
 
-import java.util.Set;
-
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
-
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+
+import java.util.Set;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -84,7 +83,12 @@ public class MongoBaseObjectResource extends MongoObjectResource {
                 } else if (value instanceof DBRef) {
                     value = getResource((DBRef) value, returnFields.child(key).isEmpty());
                 }
-                sink.accept(key, value);
+
+                if (supportedObject(value)) {
+                    sink.accept(key, value);
+                } else {
+                    log.warn("Unsupported Property type " + value.getClass() + " cannot encode.");
+                }
             }
         }
         sink.close();

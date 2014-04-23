@@ -6,19 +6,17 @@
 
 package io.liveoak.mongo;
 
-import static org.fest.assertions.Assertions.assertThat;
-
-import org.bson.types.ObjectId;
-import org.fest.assertions.Fail;
-import org.junit.Test;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-
 import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
+import org.bson.types.ObjectId;
+import org.fest.assertions.Fail;
+import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -35,7 +33,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         object.append("foo", "bar");
         db.getCollection(methodName).insert(object);
         assertThat(db.getCollection(methodName).getCount()).isEqualTo(1);
-        String id = "_mOI:" + object.getObjectId("_id").toString();
+        String id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
 
         // now delete the object
         ResourceState result = client.delete(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + id);
