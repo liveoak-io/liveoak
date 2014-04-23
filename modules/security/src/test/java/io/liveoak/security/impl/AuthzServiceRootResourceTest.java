@@ -8,6 +8,7 @@ package io.liveoak.security.impl;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultRequestAttributes;
+import io.liveoak.common.DefaultSecurityContext;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.security.SecurityServices;
@@ -85,7 +86,33 @@ public class AuthzServiceRootResourceTest extends AbstractResourceTestCase {
     public void testAuthzAccept() throws Exception {
         addPolicy(AuthzDecision.ACCEPT);
 
-        RequestContext reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some"));
+        DefaultSecurityContext securityContext = new DefaultSecurityContext();
+        securityContext.setRealm("liveoak-apps");
+
+        RequestContext reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some")).securityContext(securityContext);
+        Assert.assertTrue(getAuthzResult(reqCtxToCheck));
+    }
+
+    @Test
+    public void testAuthzInvalidRealm() throws Exception {
+        addPolicy(AuthzDecision.ACCEPT);
+
+        DefaultSecurityContext securityContext = new DefaultSecurityContext();
+        securityContext.setRealm("invalid");
+
+        RequestContext reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some")).securityContext(securityContext);
+        Assert.assertFalse(getAuthzResult(reqCtxToCheck));
+    }
+
+    @Test
+    public void testAuthzAdminOverrides() throws Exception {
+        addPolicy(AuthzDecision.REJECT);
+
+        DefaultSecurityContext securityContext = new DefaultSecurityContext();
+        securityContext.setRealm("liveoak-admin");
+        securityContext.setRoles(Collections.singleton("admin"));
+
+        RequestContext reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some")).securityContext(securityContext);
         Assert.assertTrue(getAuthzResult(reqCtxToCheck));
     }
 

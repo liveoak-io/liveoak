@@ -97,7 +97,7 @@ public class AuthInterceptor extends DefaultInterceptor {
         String auth = requestContext.requestAttributes().getAttribute(HttpHeaders.Names.AUTHORIZATION, String.class);
         if (auth != null) {
             String[] a = auth.split(" ");
-            if (a.length == 2 && a[0].equals(AUTH_TYPE)) {
+            if (a.length == 2 && a[0].equalsIgnoreCase(AUTH_TYPE)) {
                 return a[1];
             }
         }

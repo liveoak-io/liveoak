@@ -72,6 +72,20 @@ public class AuthzCheckResource implements Resource {
                 writeAuthzResponse(sink, false);
                 return;
             }
+
+            if (ctxToAuthorize.securityContext() != null && ctxToAuthorize.securityContext().getRealm() != null) {
+                String realm = ctxToAuthorize.securityContext().getRealm();
+                if (realm.equals("liveoak-admin")) {
+                    boolean accepted = ctxToAuthorize.securityContext().getRoles().contains("admin");
+                    writeAuthzResponse(sink, accepted);
+                    return;
+                } else if (!realm.equals("liveoak-apps")) {
+                    log.error("Invalid realm " + realm);
+                    writeAuthzResponse(sink, false);
+                    return;
+                }
+            }
+
             PolicyHandler handler = new PolicyHandler(ctxToAuthorize, reqStateToAuthorize, respStateToAuthorize, sink);
             handler.next();
         } catch (Throwable t) {

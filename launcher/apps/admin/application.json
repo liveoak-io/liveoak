@@ -21,6 +21,33 @@
       config: {
         directory: "${application.dir}/css"
       }
+    },
+
+    auth: {
+      type: 'keycloak'
+    },
+
+    authz: {
+      type: 'security'
+    },
+
+    uri-policy: {
+      type: 'uri-policy',
+      config: {
+        rules: [{
+          uriPattern: '/admin',
+          requestTypes: [ 'READ' ],
+          allowedUsers: [ '*' ]
+        }, {
+          uriPattern: '/admin/console/*',
+          requestTypes: [ 'READ' ],
+          allowedUsers: [ '*' ]
+        }, {
+          uriPattern: '/admin/client/*',
+          requestTypes: [ 'READ' ],
+          allowedUsers: [ '*' ]
+        }]
+      }
     }
   }
 }
