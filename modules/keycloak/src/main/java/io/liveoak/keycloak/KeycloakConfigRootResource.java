@@ -26,7 +26,6 @@ public class KeycloakConfigRootResource implements RootResource {
     private Resource parent;
     private final String id;
     private KeycloakConfig config;
-    private RealmsResource realmsResource;
 
     public KeycloakConfigRootResource(String id, KeycloakConfig config) {
         this.id = id;
@@ -75,46 +74,6 @@ public class KeycloakConfigRootResource implements RootResource {
         config.setLoadKeys(keys.contains(LOAD_PUBLIC_KEYS) ? (boolean) state.getProperty(LOAD_PUBLIC_KEYS) : false);
 
         responder.resourceUpdated(this);
-    }
-
-    @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.accept(new RealmsResource(this, getKeycloakAdmin(ctx)));
-        sink.close();
-    }
-
-    @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        if (id.equals(RealmsResource.ID)) {
-            responder.resourceRead(new RealmsResource(this, getKeycloakAdmin(ctx)));
-        } else {
-            responder.noSuchResource(id);
-        }
-    }
-
-    private KeycloakAdmin getKeycloakAdmin(RequestContext ctx) {
-        KeycloakAdmin admin = (KeycloakAdmin) ctx.requestAttributes().getAttribute(KeycloakAdmin.class.getName());
-        if (admin == null) {
-            String token = ctx.securityContext() != null ? ctx.securityContext().getToken() : null;
-            admin = new KeycloakAdmin(config, token);
-            ctx.requestAttributes().setAttribute(KeycloakAdmin.class.getName(), admin);
-
-            ctx.onDispose(new KeycloakAdminDisposer(admin));
-        }
-        return admin;
-    }
-
-    private class KeycloakAdminDisposer implements Runnable {
-        private KeycloakAdmin admin;
-
-        private KeycloakAdminDisposer(KeycloakAdmin admin) {
-            this.admin = admin;
-        }
-
-        @Override
-        public void run() {
-            admin.close();
-        }
     }
 
     public Logger logger() {
