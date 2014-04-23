@@ -8,6 +8,7 @@ import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.security.policy.uri.extension.URIPolicyExtension;
+import io.liveoak.security.policy.uri.integration.URIPolicyConfigResource;
 import io.liveoak.spi.RequestAttributes;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
@@ -138,7 +139,7 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
         // Find and remove storage rule
         RequestContext reqCtx = new RequestContext.Builder();
         ResourceState config = client.read(reqCtx, "/admin/applications/testApp/resources/uri-policy");
-        List<ResourceState> rules = (List<ResourceState>)config.getProperty("rules");
+        List<ResourceState> rules = (List<ResourceState>)config.getProperty(URIPolicyConfigResource.RULES_PROPERTY);
 
         ResourceState storageRule = null;
         for (ResourceState rule : rules) {

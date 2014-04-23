@@ -7,7 +7,7 @@
 package io.liveoak.security.impl.interceptor;
 
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.testtools.resources.MockInMemoryResource;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -19,38 +19,33 @@ public class MockInMemoryRootResource extends MockInMemoryResource implements Ro
         initMembers();
     }
 
-    @Override
-    public void parent(Resource parent) {
-        this.parent = parent;
-    }
-
     private void initMembers() {
         addMember("todos")
-            .addProperty("somePropertyOfTodosCollection", "someValue")
+            .putProperty("somePropertyOfTodosCollection", "someValue")
             .addMember("todo1")
-                .addProperty("title", "todo1")
-                .addProperty("user", "john")
+                .putProperty("title", "todo1")
+                .putProperty("user", "john")
                 .parentAsMock()
             .addMember("todo2")
-                .addProperty("title", "todo2")
-                .addProperty("user", "john")
+                .putProperty("title", "todo2")
+                .putProperty("user", "john")
                 .parentAsMock()
             .addMember("todo3")
-                .addProperty("title", "secret todo")
-                .addProperty("user", "bob")
+                .putProperty("title", "secret todo")
+                .putProperty("user", "bob")
                 .parentAsMock()
             .parentAsMock()
         .addMember("chat")
             .addMember("message1")
-                .addProperty("message", "some message")
-                .addProperty("author", "john")
+                .putProperty("message", "some message")
+                .putProperty("author", "john")
                 .parentAsMock()
             .addMember("message2")
-                .addProperty("message", "secret message")
-                .addProperty("author", "bob")
+                .putProperty("message", "secret message")
+                .putProperty("author", "bob")
                 .parentAsMock()
             .parentAsMock()
         .addMember("secured")
-            .addProperty("title", "secret message");
+            .putProperty("title", "secret message");
     }
 }

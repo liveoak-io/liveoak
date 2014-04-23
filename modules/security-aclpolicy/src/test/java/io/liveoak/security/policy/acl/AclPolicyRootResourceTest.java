@@ -1,30 +1,26 @@
 package io.liveoak.security.policy.acl;
 
-import java.io.File;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.DefaultRequestAttributes;
-import io.liveoak.common.DefaultSecurityContext;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.interceptor.extension.InterceptorExtension;
 import io.liveoak.security.policy.acl.extension.SecurityACLPolicyExtension;
-import io.liveoak.spi.InitializationException;
+import io.liveoak.security.policy.acl.integration.AclPolicyConfigResource;
 import io.liveoak.spi.RequestAttributes;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
-import io.liveoak.spi.ResourcePath;
-import io.liveoak.spi.SecurityContext;
-import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
 import io.liveoak.testtools.MockExtension;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -34,98 +30,118 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
 
     @Override
     public void loadExtensions() throws Exception {
-        loadExtension( "aclPolicy", new SecurityACLPolicyExtension() );
-        loadExtension( "mock", new MockExtension( MockResource.class ) );
+        loadExtension("interceptor", new InterceptorExtension(), createInterceptorConfig());
+        loadExtension( "acl-policy", new SecurityACLPolicyExtension() );
+        loadExtension("mock-storage", new MockExtension( MockAclTestStorageResource.class ));
 
-        installResource( "aclPolicy", "aclPolicy", JsonNodeFactory.instance.objectNode() );
-        installResource( "mock", "mock", JsonNodeFactory.instance.objectNode() );
+        installResource( "acl-policy", "acl-policy", createPolicyConfig());
+        installResource( "mock-storage", "mock-storage", JsonNodeFactory.instance.objectNode() );
     }
 
-    @Override
-    protected File applicationDirectory() {
-        return new File( this.projectRoot, "src/test/resources/policy-config" );
+    private ObjectNode createInterceptorConfig() {
+        ObjectNode config = JsonNodeFactory.instance.objectNode();
+        ObjectNode aclUpdater = JsonNodeFactory.instance.objectNode()
+                .put("interceptor-name", "acl-updater")
+                .put("resource-path-prefix", "/testApp/mock-storage");
+        config.putArray("local").add(aclUpdater);
+        return config;
+    }
+
+    private ObjectNode createPolicyConfig() throws Exception {
+        ObjectMapper om = ObjectMapperFactory.create();
+        ObjectNode objectNode = om.readValue(getClass().getClassLoader().getResourceAsStream("policy-config/acl-policy-config.json"), ObjectNode.class);
+        return objectNode;
     }
 
     @Test
-    public void testAclPolicyServiceRequest() throws Exception {
-        RequestContext reqCtx = new RequestContext.Builder().build();
-        ResourceState state = client.read(reqCtx, "/testApp/aclPolicy");
-        boolean authzCheckFound = false;
-        for (ResourceState member : state.members()) {
-            if (member.id().equals("authzCheck")) {
-                authzCheckFound = true;
+    public void testTodomvc() throws Exception {
+        // Create some resources. AclUpdaterInterceptor should create ACE entries for those
+        sendCreateRequest("/testApp/mock-storage/todos", "123", "john123");
+        sendCreateRequest("/testApp/mock-storage/todos", "456", "john123");
+        sendCreateRequest("/testApp/mock-storage/todos", "789", "peter123");
+
+        // Test created resources
+        RequestContext testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/123", "john123", RequestType.READ);
+        assertAuthzDecision(testReq, AuthzDecision.ACCEPT);
+
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/123", "john123", RequestType.UPDATE);
+        assertAuthzDecision(testReq, AuthzDecision.ACCEPT);
+
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/123", "john123", RequestType.DELETE);
+        assertAuthzDecision(testReq, AuthzDecision.ACCEPT);
+
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/123", "john123", RequestType.CREATE);
+        assertAuthzDecision(testReq, AuthzDecision.IGNORE);
+
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/456", "john123", RequestType.READ);
+        assertAuthzDecision(testReq, AuthzDecision.ACCEPT);
+
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/456", "peter123", RequestType.READ);
+        assertAuthzDecision(testReq, AuthzDecision.IGNORE);
+
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/789", "john123", RequestType.READ);
+        assertAuthzDecision(testReq, AuthzDecision.IGNORE);
+
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/789", "peter123", RequestType.READ);
+        assertAuthzDecision(testReq, AuthzDecision.ACCEPT);
+    }
+
+    @Test
+    public void testTodomvcUpdateConfig() throws Exception {
+        // First create some resource
+        sendCreateRequest("/testApp/mock-storage/todos", "john-rw", "john123");
+
+        // Update auto-rules config now. Allow just reading for owner in todos collection
+        RequestContext reqCtx = new RequestContext.Builder();
+        ResourceState config = client.read(reqCtx, "/admin/applications/testApp/resources/acl-policy");
+        List<ResourceState> autoRules = (List<ResourceState>)config.getProperty(AclPolicyConfigResource.AUTO_RULES_PROPERTY);
+
+        ResourceState todomvcRule = null;
+        for (ResourceState rule : autoRules) {
+            if (rule.getProperty("resourcePath").equals("/testApp/mock-storage/todos")) {
+                todomvcRule = rule;
                 break;
             }
         }
-        Assert.assertTrue("Child resource 'authzCheck' not found", authzCheckFound);
+        Assert.assertNotNull(todomvcRule);
+        todomvcRule.putProperty("autoAddedOwnerPermissions", Arrays.asList(RequestType.READ.toString()));
+
+        // Update config with removed storage rule
+        client.update(reqCtx, "/admin/applications/testApp/resources/acl-policy", config);
+
+        // Create another resource. So this would be just readable by john123 due to updated autorules
+        sendCreateRequest("/testApp/mock-storage/todos", "john-ro", "john123");
+
+        // Test created resources
+        RequestContext testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/john-rw", "john123", RequestType.READ);
+        assertAuthzDecision(testReq, AuthzDecision.ACCEPT);
+
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/john-rw", "john123", RequestType.UPDATE);
+        assertAuthzDecision(testReq, AuthzDecision.ACCEPT);
+
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/john-rw", "john123", RequestType.DELETE);
+        assertAuthzDecision(testReq, AuthzDecision.ACCEPT);
+
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/john-ro", "john123", RequestType.READ);
+        assertAuthzDecision(testReq, AuthzDecision.ACCEPT);
+
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/john-ro", "john123", RequestType.UPDATE);
+        assertAuthzDecision(testReq, AuthzDecision.IGNORE);
+
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/john-ro", "john123", RequestType.DELETE);
+        assertAuthzDecision(testReq, AuthzDecision.IGNORE);
     }
 
-    @Test
-    public void testAuthorizationRequest() throws Exception {
-        // create some sample securityContext instances
-        SecurityContext anonymous = new DefaultSecurityContext();
-        DefaultSecurityContext admin = new DefaultSecurityContext();
-        Set<String> s1 = new HashSet();
-        s1.addAll(Arrays.asList(new String[]{"test-app/admin", "test-app/user"}));
-        admin.setRealm("default");
-        admin.setSubject("admin");
-        admin.setRoles(s1);
-
-        DefaultSecurityContext user = new DefaultSecurityContext();
-        Set<String> s2 = new HashSet();
-        s2.addAll(Arrays.asList(new String[]{"test-app/user"}));
-        user.setRealm("default");
-        user.setSubject("john");
-        user.setRoles(s2);
-
-        // READ request to /mock/1 should be IGNORED for all users
-        RequestContext.Builder appReq = new RequestContext.Builder().requestType(RequestType.READ)
-                .resourcePath(new ResourcePath("/testApp/mock/1"));
-        assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.IGNORE);
-        assertAuthzDecision(appReq.securityContext(admin), AuthzDecision.IGNORE);
-        assertAuthzDecision(appReq.securityContext(user), AuthzDecision.IGNORE);
-
-        // CREATE request to /mock/1 should be IGNORED for all users
-        appReq = new RequestContext.Builder().requestType(RequestType.CREATE)
-                .resourcePath(new ResourcePath("/testApp/mock/1"));
-        assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.IGNORE);
-        assertAuthzDecision(appReq.securityContext(admin), AuthzDecision.IGNORE);
-        assertAuthzDecision(appReq.securityContext(user), AuthzDecision.IGNORE);
-
-        // UPDATE request to /mock/1 should be ALLOWED for john thanks to allowedUserAttribute and for admin thanks to allowedRolesAttribute
-        appReq = new RequestContext.Builder().requestType(RequestType.UPDATE)
-                .resourcePath(new ResourcePath("/testApp/mock/1"));
-        assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.IGNORE);
-        assertAuthzDecision(appReq.securityContext(admin), AuthzDecision.ACCEPT);
-        assertAuthzDecision(appReq.securityContext(user), AuthzDecision.ACCEPT);
-
-        // DELETE request to /mock/1 should be ALLOWED just for john
-        appReq = new RequestContext.Builder().requestType(RequestType.DELETE)
-                .resourcePath(new ResourcePath("/testApp/mock/1"));
-        assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.IGNORE);
-        assertAuthzDecision(appReq.securityContext(admin), AuthzDecision.IGNORE);
-        assertAuthzDecision(appReq.securityContext(user), AuthzDecision.ACCEPT);
-
-        // UPDATE request to /mock/2 should be IGNORED for all users as property with username can't be obtained
-        appReq = new RequestContext.Builder().requestType(RequestType.UPDATE)
-                .resourcePath(new ResourcePath("/testApp/mock/2"));
-        assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.IGNORE);
-        assertAuthzDecision(appReq.securityContext(admin), AuthzDecision.IGNORE);
-        assertAuthzDecision(appReq.securityContext(user), AuthzDecision.IGNORE);
-
-        // UPDATE request to /mock/notFound should be IGNORED for all users as resource doesn't exist
-        appReq = new RequestContext.Builder().requestType(RequestType.UPDATE)
-                .resourcePath(new ResourcePath("/testApp/mock/notFound"));
-        assertAuthzDecision(appReq.securityContext(anonymous), AuthzDecision.IGNORE);
-        assertAuthzDecision(appReq.securityContext(admin), AuthzDecision.IGNORE);
-        assertAuthzDecision(appReq.securityContext(user), AuthzDecision.IGNORE);
+    private void sendCreateRequest(String collectionPath, String resourceId, String subject) throws Exception {
+        RequestContext createReq1 = AclPolicyTestCase.createRequestContext(collectionPath, subject, RequestType.CREATE);
+        client.create(createReq1, collectionPath, new DefaultResourceState(resourceId));
     }
 
     private void assertAuthzDecision(RequestContext reqCtxToCheck, AuthzDecision expectedDecision) throws Exception {
         RequestAttributes attribs = new DefaultRequestAttributes();
         attribs.setAttribute(AuthzConstants.ATTR_REQUEST_CONTEXT, reqCtxToCheck);
         RequestContext reqCtx = new RequestContext.Builder().requestAttributes(attribs).build();
-        ResourceState state = client.read(reqCtx, "/testApp/aclPolicy/authzCheck");
+        ResourceState state = client.read(reqCtx, "/testApp/acl-policy/authzCheck");
         String decision = (String) state.getProperty(AuthzConstants.ATTR_AUTHZ_POLICY_RESULT);
         Assert.assertNotNull(decision);
         Assert.assertEquals(expectedDecision, Enum.valueOf(AuthzDecision.class, decision));

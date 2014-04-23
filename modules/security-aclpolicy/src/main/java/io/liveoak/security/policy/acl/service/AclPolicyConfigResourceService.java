@@ -1,7 +1,13 @@
+/*
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+ */
+
 package io.liveoak.security.policy.acl.service;
 
 import io.liveoak.security.policy.acl.impl.AclPolicy;
-import io.liveoak.security.policy.acl.integration.AclPolicyRootResource;
+import io.liveoak.security.policy.acl.integration.AclPolicyConfigResource;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -10,20 +16,17 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 
 /**
- * @author Bob McWhirter
+ * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class AclPolicyRootResourceService implements Service<AclPolicyRootResource> {
+public class AclPolicyConfigResourceService implements Service<AclPolicyConfigResource> {
 
-    public AclPolicyRootResourceService(String id) {
+    public AclPolicyConfigResourceService(String id) {
         this.id = id;
     }
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.resource = new AclPolicyRootResource(
-                this.id ,
-                this.policyInjector.getValue()
-        );
+        this.resource = new AclPolicyConfigResource( this.id, this.policyInjector.getValue() );
     }
 
     @Override
@@ -32,7 +35,7 @@ public class AclPolicyRootResourceService implements Service<AclPolicyRootResour
     }
 
     @Override
-    public AclPolicyRootResource getValue() throws IllegalStateException, IllegalArgumentException {
+    public AclPolicyConfigResource getValue() throws IllegalStateException, IllegalArgumentException {
         return this.resource;
     }
 
@@ -41,8 +44,6 @@ public class AclPolicyRootResourceService implements Service<AclPolicyRootResour
     }
 
     private String id;
-
     private InjectedValue<AclPolicy> policyInjector = new InjectedValue<>();
-
-    private AclPolicyRootResource resource;
+    private AclPolicyConfigResource resource;
 }
