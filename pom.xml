@@ -105,9 +105,8 @@
         <module>modules</module>
         <module>console</module>
         <module>keycloak</module>
-        <module>wildfly-dist</module>
-<!--
         <module>dist</module>
+<!--
         <module>testsuite</module>
 -->
     </modules>

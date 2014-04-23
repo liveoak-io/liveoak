@@ -18,6 +18,17 @@
     <packaging>pom</packaging>
     <dependencies>
         <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-dist</artifactId>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-keycloak</artifactId>
+            <type>war</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-spi</artifactId>
         </dependency>
@@ -42,17 +53,46 @@
     <build>
         <plugins>
             <plugin>
+              <artifactId>maven-dependency-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>unpack-wildfly</id>
+                  <goals>
+                    <goal>unpack</goal>
+                  </goals>
+                  <phase>prepare-package</phase>
+                  <configuration>
+                    <artifact>org.wildfly:wildfly-dist:${wildfly.version}:zip</artifact>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>assemble-dist</id>
-                        <phase>package</phase>
+                        <id>prepare-dist</id>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>src/main/resources/assemblies/dist.xml</descriptor>
+                                <descriptor>src/main/resources/assemblies/prepare-dist.xml</descriptor>
+                            </descriptors>
+                            <finalName>dist</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-artifacts</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/resources/assemblies/install-artifacts.xml</descriptor>
                             </descriptors>
                             <finalName>dist</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
