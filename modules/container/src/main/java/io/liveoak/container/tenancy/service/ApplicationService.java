@@ -62,7 +62,7 @@ public class ApplicationService implements Service<InternalApplication> {
         System.err.println(appDir + " .mkdirs: " + appDir.mkdirs() + " // " + appDir.exists());
         File applicationJson = new File(appDir, "application.json");
 
-        String appName = this.id;
+        String appName = this.name;
         ResourcePath htmlApp = null;
         ResourceState resourcesTree = null;
 
