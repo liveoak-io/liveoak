@@ -46,6 +46,8 @@ body {
   font-family: @exo;
   color: @c_gray;
   background-color: @c_mainpane;
+  font-size: 12px;
+  line-height: 1.5em;
 }
 
 /* Code to fix the backgrounds */
@@ -525,6 +527,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
         color: @c_graylight;
         padding-left: 3px;
         display: block;
+        padding-top: 0.5em;
       }
     }
 
@@ -1218,7 +1221,10 @@ legend {
 }
 
 /* Forms */
-.form-control{
+.form-control {
+
+  font-size: 12px;
+  
   &:focus, &:hover {
     border-color: @c_green;
   }
@@ -1247,6 +1253,11 @@ legend {
 
 /* Notifications/Alerts */
 
+.alert {
+  line-height: 1.5em;
+  padding: 9px 10px 9px 34px;
+}
+
 .feedback-aligner {
   position: fixed;
   top: 1.5em;
@@ -1259,6 +1270,10 @@ legend {
     width: 500px;
     margin: 0 auto;
   }
+}
+
+.help-block {
+  margin-bottom: 0;
 }
 
 
