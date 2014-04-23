@@ -34,6 +34,7 @@ public class DefaultClient implements Client {
 
     //@Override
     public void connect(SocketAddress address) throws Exception {
+        System.err.println( "connect local client" );
         this.connection = new LocalConnection(this);
         this.connection.connect(address);
     }

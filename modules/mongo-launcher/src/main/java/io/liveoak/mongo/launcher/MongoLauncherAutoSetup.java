@@ -35,6 +35,8 @@ public class MongoLauncherAutoSetup {
 
     public static void setup(File liveoakDir, File confDir) {
 
+        System.err.println( "** SETTING UP MONGO" );
+
         try {
             liveoakDir = liveoakDir.getCanonicalFile();
         } catch (IOException ignored) {}
@@ -119,7 +121,11 @@ public class MongoLauncherAutoSetup {
                 try {
                     installer.performInstall();
                 } catch (IOException e) {
+                    e.printStackTrace();
                     throw new RuntimeException("MongoDB installation failed: ", e);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    throw t;
                 }
 
                 // mongo should be installed under mongoDir

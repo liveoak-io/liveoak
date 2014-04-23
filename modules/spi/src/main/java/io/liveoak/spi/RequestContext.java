@@ -6,6 +6,9 @@
 package io.liveoak.spi;
 
 
+import java.util.LinkedList;
+import java.util.List;
+
 public interface RequestContext {
 
     Application application();
@@ -26,7 +29,13 @@ public interface RequestContext {
 
     Sorting sorting();
 
+    void dispose();
+
+    void onDispose(Runnable runnable);
+
     public static class Builder implements RequestContext {
+
+        private List<Runnable> disposeTasks;
 
         public Builder() {
 
@@ -124,6 +133,23 @@ public interface RequestContext {
         @Override
         public Sorting sorting() {
             return sorting;
+        }
+
+        @Override
+        public void dispose() {
+            if (disposeTasks != null) {
+                for (Runnable r : disposeTasks) {
+                    r.run();
+                }
+            }
+        }
+
+        @Override
+        public void onDispose(Runnable runnable) {
+            if (disposeTasks == null) {
+                disposeTasks = new LinkedList<>();
+            }
+            disposeTasks.add(runnable);
         }
 
         private Sorting sorting;

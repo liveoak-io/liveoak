@@ -23,6 +23,7 @@ public class ApplicationResourcesService implements Service<Void> {
 
     @Override
     public void start(StartContext context) throws StartException {
+        System.err.println( "application resources service: START: " + this.resourcesTree );
         if (this.resourcesTree == null) {
             return;
         }

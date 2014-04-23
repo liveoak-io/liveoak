@@ -41,6 +41,8 @@ public interface SecurityContext {
      */
     Set<String> getRoles();
 
+    String getToken();
+
     /**
      * @param role the role
      * @return if the authenticated user is assigned the specified role
@@ -78,6 +80,12 @@ public interface SecurityContext {
         public boolean hasRole(String role) {
             return false;
         }
+
+        @Override
+        public String getToken() {
+            return null;
+        }
+
     };
 
 }

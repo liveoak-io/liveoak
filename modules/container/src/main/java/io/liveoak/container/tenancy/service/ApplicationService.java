@@ -48,9 +48,18 @@ public class ApplicationService implements Service<InternalApplication> {
 
         if (appDir == null) {
             appDir = new File(this.applicationsDirectoryInjector.getValue(), this.id);
+        }
+
+        if ( ! appDir.exists() ) {
+            System.err.println( "attempt to create: " + appDir );
             appDir.mkdirs();
         }
 
+        if ( ! appDir.exists() ) {
+            System.err.println( "FAILED TO CREATE: " + appDir );
+        }
+
+        System.err.println(appDir + " .mkdirs: " + appDir.mkdirs() + " // " + appDir.exists());
         File applicationJson = new File(appDir, "application.json");
 
         String appName = this.id;

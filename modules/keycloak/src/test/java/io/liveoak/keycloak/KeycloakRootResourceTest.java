@@ -5,6 +5,7 @@ import io.liveoak.keycloak.extension.KeycloakExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.keycloak.models.RealmModel;
 import org.keycloak.representations.AccessToken;
@@ -21,7 +22,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class KeycloakRootResourceTest extends AbstractKeycloakTest {
 
-    private KeycloakRootResource keycloak;
     private TokenUtil tokenUtil;
 
     @Override
@@ -37,7 +37,7 @@ public class KeycloakRootResourceTest extends AbstractKeycloakTest {
 
     @Before
     public void before() throws Exception {
-        tokenUtil = new TokenUtil((RealmModel) this.system.service( KeycloakServices.realmModel("testApp") ));
+        tokenUtil = new TokenUtil("liveoak-apps");
     }
 
     @Test

@@ -5,7 +5,7 @@
     console: {
       type: 'filesystem',
       config: {
-        directory: "${io.liveoak.console.dir}"
+        directory: "${application.dir}/console"
       }
     },
 

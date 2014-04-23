@@ -54,7 +54,9 @@ public class ServiceRestarter extends AbstractServiceListener {
         } else if (this.direction == Direction.UPWARDS) {
             if (transition.entersRestState()) {
                 this.controller.removeListener(this);
-                this.callback.accept(controller);
+                if (this.callback != null) {
+                    this.callback.accept(controller);
+                }
             }
         }
     }
