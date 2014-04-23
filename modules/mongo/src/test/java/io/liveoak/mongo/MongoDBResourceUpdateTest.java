@@ -6,21 +6,19 @@
 
 package io.liveoak.mongo;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-
-import org.bson.types.ObjectId;
-import org.fest.assertions.Fail;
-import org.junit.Test;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.CreateNotSupportedException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
+import org.bson.types.ObjectId;
+import org.fest.assertions.Fail;
+import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -37,7 +35,7 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         object.append("foo", "bar");
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = "_mOI:" + object.getObjectId("_id").toString();
+        String id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
 
         // update the resource using the client.update method
         ResourceState resourceState = new DefaultResourceState();
@@ -54,7 +52,7 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         assertThat(db.getCollection(methodName).getCount()).isEqualTo(1);
         DBObject dbObject = db.getCollection(methodName).findOne();
         assertEquals("baz", dbObject.get("foo"));
-        assertEquals(new ObjectId(id.substring("_mOI:".length())), dbObject.get("_id"));
+        assertEquals(new ObjectId(id.substring("ObjectId(\"".length(), id.length() - "\")".length())), dbObject.get("_id"));
     }
 
     @Test
@@ -67,7 +65,7 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         object.append("foo", new BasicDBObject("bar", "baz"));
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = "_mOI:" + object.getObjectId("_id").toString();
+        String id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
 
         // update the resource using the client.update method
         ResourceState resourceState = new DefaultResourceState();
@@ -94,7 +92,7 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         object.append("foo", new BasicDBObject("bar", new BasicDBObject("baz", "ABC")));
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = "_mOI:" + object.getObjectId("_id").toString();
+        String id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
 
         // update the resource using the client.update method
         ResourceState resourceState = new DefaultResourceState();

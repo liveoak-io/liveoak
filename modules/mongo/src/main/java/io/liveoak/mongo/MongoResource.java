@@ -5,21 +5,19 @@
  */
 package io.liveoak.mongo;
 
-import java.util.Collection;
-import java.util.Set;
-
-import org.bson.types.ObjectId;
-
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
-
 import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
+import org.bson.types.ObjectId;
 import org.jboss.logging.Logger;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
@@ -32,9 +30,10 @@ public abstract class MongoResource implements Resource, BlockingResource {
     protected static final String MBAAS_ID_FIELD = "id";
 
     // TODO: see if there is a more elegant way to handle this. Prefixes are lame....
-    protected static final String MBAAS_MONGO_OBJECT_ID_PREFIX = "_mOI:";
+    protected static final String MBAAS_MONGO_OBJECT_ID_PREFIX = "ObjectId(\"";
+    protected static final String MBAAS_MONGO_OBJECT_ID_SUFFIX = "\")";
 
-    private static final Logger log = Logger.getLogger("io.liveoak.mongo");
+    protected static final Logger log = Logger.getLogger("io.liveoak.mongo");
 
     public MongoResource(MongoResource parent) {
         this.parent = parent;
@@ -50,8 +49,8 @@ public abstract class MongoResource implements Resource, BlockingResource {
     }
 
     protected DBObject getMongoID(String liveOakID) {
-        if (liveOakID.startsWith(MBAAS_MONGO_OBJECT_ID_PREFIX)) {
-            String id = liveOakID.substring(MBAAS_MONGO_OBJECT_ID_PREFIX.length());
+        if (liveOakID.startsWith(MBAAS_MONGO_OBJECT_ID_PREFIX) && liveOakID.endsWith( MBAAS_MONGO_OBJECT_ID_SUFFIX)) {
+            String id = liveOakID.substring(MBAAS_MONGO_OBJECT_ID_PREFIX.length(), liveOakID.length() - MBAAS_MONGO_OBJECT_ID_SUFFIX.length());
             return new BasicDBObject(MONGO_ID_FIELD, new ObjectId(id));
         } else {
             return new BasicDBObject(MONGO_ID_FIELD, liveOakID);
@@ -66,7 +65,7 @@ public abstract class MongoResource implements Resource, BlockingResource {
 
     protected String getResourceID(Object id) {
         if (id instanceof ObjectId) {
-            return MBAAS_MONGO_OBJECT_ID_PREFIX + id.toString();
+            return MBAAS_MONGO_OBJECT_ID_PREFIX + id.toString() + MBAAS_MONGO_OBJECT_ID_SUFFIX;
         } else {
             return id.toString();
         }

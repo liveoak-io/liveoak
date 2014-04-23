@@ -5,18 +5,20 @@
  */
 package io.liveoak.mongo;
 
-import java.util.ArrayList;
-import java.util.Set;
-
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
-
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Set;
 
 /**
  * @author Bob McWhirter
@@ -64,10 +66,32 @@ public class MongoObjectResource extends MongoResource {
                 } else if (value instanceof DBRef) {
                     value = getResource((DBRef) value, ctx.returnFields().child(key).isEmpty());
                 }
-                sink.accept(key, value);
+
+                if (supportedObject(value))    {
+                    sink.accept(key, value);
+                }  else {
+                    log.warn("Unsupported Property type " + value.getClass() + " cannot encode.");
+                }
             }
         }
         sink.close();
+    }
+
+    protected boolean supportedObject( Object object ) {
+        if ( object instanceof Resource ||
+                object instanceof String ||
+                object instanceof Boolean ||
+                object instanceof Integer ||
+                object instanceof Double ||
+                object instanceof Long ||
+                object instanceof Date ||
+                object instanceof Boolean ||
+                object instanceof Collection ||
+                object == null ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     protected Object getResourceCollection(Object object) throws Exception {
