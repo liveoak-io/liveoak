@@ -38,12 +38,8 @@
 }
 
 .login-pf body {
-    background: #3a7d49 url("../img/login-bg.png") top left no-repeat;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-    font-family: "Exo 2";
+  font-family: "Exo 2";
+  background: #61b272 url("../img/login-bg-flat.png") center center no-repeat;
 }
 
 #kc-header-wrapper {
@@ -64,6 +60,10 @@
 
 .login-pf .container .form-horizontal .control-label {
 	font-size: 13px;
+}
+
+.login-pf .container .form-horizontal .form-control {
+  font-size: 12px;
 }
 
 .login-pf .btn-primary {
