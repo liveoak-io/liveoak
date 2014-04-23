@@ -42,12 +42,10 @@ public class KeycloakServerApplication extends KeycloakApplication {
         RealmManager manager = new RealmManager(session);
         RealmModel adminRealm = manager.getRealm(Config.getAdminRealm());
 
-        if (adminRealm.getApplicationByName("console") == null) {
-            ApplicationModel consoleApp = new ApplicationManager(manager).createApplication(adminRealm, "console");
+        ApplicationModel consoleApp = adminRealm.getApplicationByName("console");
+        if (consoleApp == null) {
+            consoleApp = new ApplicationManager(manager).createApplication(adminRealm, "console");
             consoleApp.setPublicClient(true);
-
-            consoleApp.addDefaultRole("user");
-            consoleApp.addRole("admin");
 
             consoleApp.setAllowedClaimsMask(ClaimMask.USERNAME);
 
@@ -55,10 +53,11 @@ public class KeycloakServerApplication extends KeycloakApplication {
             consoleApp.addRedirectUri(baseUrl + "/admin/");
             consoleApp.addWebOrigin(baseUrl);
             consoleApp.setBaseUrl(baseUrl + "/admin/");
+
+            consoleApp.addScope(adminRealm.getRole("admin"));
         }
 
         RealmModel appsRealm = manager.getRealm("liveoak-apps");
-
         if (appsRealm == null) {
             RealmManager realmManager = new RealmManager(session);
             RealmModel realm = realmManager.createRealm("liveoak-apps");
@@ -74,13 +73,6 @@ public class KeycloakServerApplication extends KeycloakApplication {
             realm.setAccessCodeLifespanUserAction(300);
 
             manager.generateRealmKeys(realm);
-
-            adminRealm = manager.getRealm(Config.getAdminRealm());
-            ApplicationModel appsRealmApp = adminRealm.getApplicationByName("liveoak-apps-realm");
-
-            UserModel admin = adminRealm.getUser("admin");
-
-            adminRealm.grantRole(admin, appsRealmApp.getRole(AdminRoles.MANAGE_APPLICATIONS));
         }
     }
 
