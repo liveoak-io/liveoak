@@ -70,6 +70,7 @@ public class GridFSBlobResource extends GridFSResource implements BlockingResour
                 });
                 asyncFile.endHandler((end) -> {
                     sink.close();
+                    asyncFile.close();
                     tmpFile.delete();
                 });
             } else {
