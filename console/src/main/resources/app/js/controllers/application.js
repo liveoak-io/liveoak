@@ -116,7 +116,6 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
     LoApp.create(data,
       // success
       function(/*value, responseHeaders*/) {
-        Notifications.success('New application successfully created.');
         if($scope.setupType === 'basic') {
           var storageData = {
             id: $scope.storagePath,
@@ -131,8 +130,6 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
           LoStorage.create({appId: $scope.appModel.id}, storageData,
             // success
             function(/*value, responseHeaders*/) {
-              Notifications.success('New storage successfully created.');
-
               if($scope.pushModel && $scope.pushModel.upsURL) {
                 var pushData = {
                   type: 'ups',
@@ -146,32 +143,34 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
                 LoPush.update({appId: $scope.appModel.id}, pushData,
                   // success
                   function (/*value, responseHeaders*/) {
-                    Notifications.success('Push configuration created successfully.');
+                    Notifications.success('The application ' + data.name + ' has been created with storage and push configured.');
                     redirectOnNewAppSuccess();
                   },
                   // error
                   function (httpResponse) {
-                    Notifications.httpError('Failed to update Push configuration', httpResponse);
+                    Notifications.httpError('The application ' + data.name + ' has been created with storage but failed to configure push.', httpResponse);
                   }
                 );
               }
               else {
+                Notifications.success('The application ' + data.name + ' has been created with storage configured.');
                 redirectOnNewAppSuccess();
               }
             },
             // error
             function(httpResponse) {
-              Notifications.httpError('Failed to create new storage', httpResponse);
+              Notifications.httpError('The application ' + data.name + ' has been created but failed to configure storage.', httpResponse);
               // TODO: Rollback ?
             });
         }
         else {
+          Notifications.success('The application ' + data.name + ' has been created.');
           redirectOnNewAppSuccess();
         }
       },
       // error
       function(httpResponse) {
-        Notifications.httpError('Failed to create new application', httpResponse);
+        Notifications.httpError('The application ' + data.name + ' could not be created.', httpResponse);
       });
   };
 
