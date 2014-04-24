@@ -45,7 +45,7 @@ public class MongoLauncherAutoSetup {
             confDir = confDir.getCanonicalFile();
         } catch (IOException ignored) {}
 
-        // locate mongoLauncher.json extension config
+        // locate mongo-launcher.json extension config
         File extDir = new File(confDir, "extensions");
         File launcherJson = new File(extDir, "mongo-launcher.json");
 

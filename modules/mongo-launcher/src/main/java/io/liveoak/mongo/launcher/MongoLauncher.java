@@ -185,11 +185,20 @@ public class MongoLauncher {
                     }
                     if (nullOrEmpty(result)) {
                         try {
-                            result = OsUtils.execWithOneLiner(new String[] {"sh", "-c", "locate mongod | grep mongod$"}, null, false);
+                            String results = OsUtils.execWithResult(new String[] {"sh", "-c", "locate mongod | grep /mongod$"}, null, false);
+                            for (String line: results.split("\\n")) {
+                                line = line.trim();
+                                // check that file exists since 'locate' is rarely in sync with current affairs
+                                if (new File(line).isFile()) {
+                                    result = line;
+                                    break;
+                                }
+                            }
                         } catch (Exception ignored) {
-                            log.debug("[IGNORED] Command execution failed: sh -c 'locate mongod | grep mongod$'", ignored);
+                            log.debug("[IGNORED] Command execution failed: sh -c 'locate mongod | grep /mongod$'", ignored);
                         }
                     }
+
                 }
             }
 
