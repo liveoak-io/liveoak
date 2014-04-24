@@ -7,7 +7,8 @@ module.exports = function (grunt) {
   // configurable paths
   var projectConfig = {
     src: 'app',
-    dist: '../../../target/app'
+    // TODO - find the current LO version dynamically
+    dist: '../../../../dist/target/dist/liveoak-1.0.0-SNAPSHOT/apps/admin/console/'
   };
 
   grunt.initConfig({
@@ -15,10 +16,11 @@ module.exports = function (grunt) {
     less: {
       development: {
         options: {
-          paths: ['../../../target/app/css/']
+          paths: ['<%= config.dist  %>/css/']
         },
         files: {
-          '../../../target/app/css/console.css': 'app/less/console.less'
+          '<%= config.dist %>/css/console.css': '<%= config.src %>/less/console.less',
+          '<%= config.dist %>/css/reset.css': '<%= config.src %>/less/reset.less'
         }
       }
     },
@@ -27,33 +29,33 @@ module.exports = function (grunt) {
         livereload: true
       },
       css: {
-        files: 'app/less/*.less',
+        files: '<%= config.src %>/less/*.less',
         tasks: ['less']
       },
       js: {
-        files: ['app/js/*.js','app/js/controllers/*.js'],
+        files: ['<%= config.src %>/js/*.js','<%= config.src %>/js/controllers/*.js'],
         tasks: ['copy','jshint']
       },
       html: {
-        files: ['app/partials/*.html',
-          'app/templates/*.html',
-          'app/*.html'],
+        files: ['<%= config.src %>/partials/*.html',
+          '<%= config.src %>/templates/*.html',
+          '<%= config.src %>/*.html'],
         tasks: ['copy']
       },
       livereload: {
         files: [
-          'app/*.html',
-          'app/partials/*.html',
-          'app/templates/*.html',
+          '<%= config.src %>/*.html',
+          '<%= config.src %>/partials/*.html',
+          '<%= config.src %>/templates/*.html',
           'js/*.js'
         ]
       }
     },
     copy: {
       build: {
-        cwd: '',
-        src: [ 'app/js/**', 'app/img/**', 'app/css/**', 'app/lib/**', 'app/partials/**', 'app/templates/**', 'app/*.html' ],
-        dest: '../../../target/',
+        cwd: '<%= config.src %>',
+        src: [ 'js/**', 'img/**', 'css/**', 'lib/**', 'partials/**', 'templates/**', '*.html' ],
+        dest: '<%= config.dist %>',
         expand: true
       }
     },
@@ -65,7 +67,7 @@ module.exports = function (grunt) {
       },
       all: [
         'Gruntfile.js',
-        'app/js/{,*/}*.js'
+        '<%= config.src %>/js/{,*/}*.js'
       ],
       test: {
         options: {
