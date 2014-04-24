@@ -1,5 +1,6 @@
 package io.liveoak.ups.resource;
 
+import io.liveoak.mongo.internal.InternalStorage;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.spi.resource.RootResource;
@@ -20,13 +21,15 @@ public class UPSRootResource implements RootResource {
     SubscriptionManager subscriptionManager;
     AliasesResource aliasesResource;
     UPSSubscriptionsResource subscriptionsResource;
+    InternalStorage internalStorage;
 
     UPS upsService;
 
-    public UPSRootResource(String id, UPSRootConfigResource configResource, SubscriptionManager subscriptionManager) {
+    public UPSRootResource(String id, UPSRootConfigResource configResource, SubscriptionManager subscriptionManager, InternalStorage internalStorage) {
         this.id = id;
         this.configResource = configResource;
         this.subscriptionManager = subscriptionManager;
+        this.internalStorage = internalStorage;
 
         //setup the service to handle communication with a UPS instance
         upsService = new UPS(configResource);

@@ -20,6 +20,7 @@
 
     <dependencies>
         <module name="io.liveoak.spi"/>
+        <module name="io.liveoak.mongo"/>
         <system>
             <paths>
                 <path name="javax/net"/>

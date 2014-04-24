@@ -1,5 +1,6 @@
 package io.liveoak.ups;
 
+import io.liveoak.mongo.internal.InternalStorage;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.ups.resource.UPSRootResource;
 import io.liveoak.ups.resource.config.UPSRootConfigResource;
@@ -23,7 +24,7 @@ public class UPSResourceService implements Service<UPSRootResource> {
 
     @Override
     public void start( StartContext context ) throws StartException {
-        this.upsRootResource = new UPSRootResource(this.id, configResourceInjector.getValue(), subscriptionManagerInjector.getValue());
+        this.upsRootResource = new UPSRootResource(this.id, configResourceInjector.getValue(), subscriptionManagerInjector.getValue(), internalStorageInjector.getValue());
     }
 
     @Override
@@ -40,4 +41,6 @@ public class UPSResourceService implements Service<UPSRootResource> {
     public InjectedValue<SubscriptionManager> subscriptionManagerInjector = new InjectedValue<SubscriptionManager>();
 
     public InjectedValue<UPSRootConfigResource> configResourceInjector = new InjectedValue<UPSRootConfigResource>();
+
+    public InjectedValue<InternalStorage> internalStorageInjector = new InjectedValue<InternalStorage>();
 }

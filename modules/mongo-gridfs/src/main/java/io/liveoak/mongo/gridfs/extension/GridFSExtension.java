@@ -7,6 +7,7 @@ import io.liveoak.mongo.gridfs.service.TmpDirService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.SystemExtensionContext;
+import io.liveoak.spi.resource.async.DefaultRootResource;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 import org.vertx.java.core.Vertx;
@@ -23,7 +24,7 @@ public class GridFSExtension extends MongoExtension {
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
         // setup Mongo client
-        super.extend(context);
+        context.mountPrivate( new DefaultRootResource( context.id() ));
 
         ServiceTarget target = context.target();
         target.addService( TMP_DIR, new TmpDirService() )

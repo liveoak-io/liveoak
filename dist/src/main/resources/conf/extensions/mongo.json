@@ -1,3 +1,6 @@
 {
-    module-id:  'io.liveoak.mongo'
+    module-id:  'io.liveoak.mongo',
+    config: {
+      db: "liveoak"
+    }
 }

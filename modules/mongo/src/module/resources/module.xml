@@ -13,7 +13,7 @@
 
     <dependencies>
         <module name="io.liveoak.spi"/>
-        <module name="org.mongodb"/>
+        <module name="org.mongodb" export="true"/>
         <system>
             <paths>
                 <path name="javax/net"/>

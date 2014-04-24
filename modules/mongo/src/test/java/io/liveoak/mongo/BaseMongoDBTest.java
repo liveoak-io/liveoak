@@ -6,6 +6,8 @@
 
 package io.liveoak.mongo;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -37,7 +39,11 @@ public class BaseMongoDBTest extends AbstractResourceTestCase {
 
     @Override
     public void loadExtensions() throws Exception {
-        loadExtension( "mongo", new MongoExtension() );
+
+        ObjectNode config = JsonNodeFactory.instance.objectNode();
+        config.put( "db", "MongoInteralTest_" + UUID.randomUUID());
+
+        loadExtension( "mongo", new MongoExtension(), config );
         installResource( "mongo", BASEPATH, createConfig() );
     }
 
