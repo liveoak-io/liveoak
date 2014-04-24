@@ -1,0 +1,36 @@
+<!--
+  ~ Copyright 2013 Red Hat, Inc. and/or its affiliates.
+  ~
+  ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+  -->
+<assembly>
+    <id>launcher</id>
+    <formats>
+        <format>dir</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>./src/main/resources/conf/extensions</directory>
+            <outputDirectory>/conf/extensions</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../console/target/dist/</directory>
+            <outputDirectory>/apps/admin</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../console/target/app/</directory>
+            <outputDirectory>/apps/admin/console</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../clients/javascript/src/main/javascript/</directory>
+            <outputDirectory>/client</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>./src/main/resources/launcher</directory>
+            <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>0744</fileMode>
+        </fileSet>
+    </fileSets>
+</assembly>
