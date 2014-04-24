@@ -107,6 +107,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
   $scope.create = function() {
     var data = {
       id: $scope.appModel.id,
+      name: $scope.appModel.id,
       type: 'application',
       config: {
       }

@@ -36,7 +36,7 @@ public class ApplicationService implements Service<InternalApplication> {
 
     public ApplicationService(String id, String name, File directory) {
         this.id = id;
-        this.name = name;
+        this.name = name != null ? name : id;
         this.directory = directory;
     }
 
