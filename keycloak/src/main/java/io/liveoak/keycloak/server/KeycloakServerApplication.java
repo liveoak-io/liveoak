@@ -1,12 +1,10 @@
 package io.liveoak.keycloak.server;
 
-import org.keycloak.models.AdminRoles;
 import org.keycloak.models.ApplicationModel;
 import org.keycloak.models.ClaimMask;
 import org.keycloak.models.Config;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserModel;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.services.managers.ApplicationManager;
 import org.keycloak.services.managers.RealmManager;
@@ -26,6 +24,9 @@ public class KeycloakServerApplication extends KeycloakApplication {
 
     public KeycloakServerApplication(@Context ServletContext servletContext) throws FileNotFoundException {
         super(servletContext);
+
+        classes.add(KeycloakAdminCorsFilter.class);
+        classes.add(KeycloakAdminCorsPreflightFilter.class);
 
         KeycloakSession session = factory.createSession();
         session.getTransaction().begin();
