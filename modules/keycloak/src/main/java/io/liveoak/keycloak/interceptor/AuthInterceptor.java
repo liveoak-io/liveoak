@@ -66,7 +66,10 @@ public class AuthInterceptor extends DefaultInterceptor {
                 public void accept(ClientResourceResponse resourceResponse) {
                     try {
                         ResourceState state = resourceResponse.state();
-                        if (state.getProperty("error") != null) {
+                        if (resourceResponse.responseType().equals(ClientResourceResponse.ResponseType.NO_SUCH_RESOURCE)) {
+                            log.info("Auth not configured for " + prefix);
+                            context.forward();
+                        } else if (state.getProperty("error") != null) {
                             log.warn("Authentication failed. Request: " + req + ", error: " + state.getProperty("error"));
                             context.replyWith(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.NOT_AUTHORIZED));
                         } else {
