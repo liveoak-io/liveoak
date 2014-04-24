@@ -28,7 +28,7 @@ public class MockAuthInterceptor extends DefaultInterceptor {
         ResourceRequest req = context.request();
         RequestContext requestContext = req.requestContext();
         DefaultSecurityContext securityContext = (DefaultSecurityContext) requestContext.securityContext();
-        securityContext.setRealm("foo");
+        securityContext.setRealm("liveoak-apps");
         securityContext.setSubject(this.subject);
         super.onInbound(context);
     }
