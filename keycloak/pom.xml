@@ -8,7 +8,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>o.liveoak</groupId>
+    <groupId>io.liveoak</groupId>
     <artifactId>liveoak-keycloak-server</artifactId>
     <packaging>war</packaging>
     <name>LiveOak Keycloak Server</name>

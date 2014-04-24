@@ -44,16 +44,6 @@
         <url-pattern>/rest/*</url-pattern>
     </filter-mapping>
 
-    <filter>
-        <filter-name>Keycloak Admin Cors Filter</filter-name>
-        <filter-class>io.liveoak.keycloak.server.KeycloakAdminCorsFilter</filter-class>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>Keycloak Admin Cors Filter</filter-name>
-        <url-pattern>/rest/admin/*</url-pattern>
-    </filter-mapping>
-
     <servlet-mapping>
         <servlet-name>Resteasy</servlet-name>
         <url-pattern>/rest/*</url-pattern>

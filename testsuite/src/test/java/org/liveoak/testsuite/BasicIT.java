@@ -1,60 +1,19 @@
 package org.liveoak.testsuite;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.liveoak.testsuite.annotations.Resource;
-import org.liveoak.testsuite.junit.LiveOak;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
-@RunWith(LiveOak.class)
-public class BasicIT {
-
-    @Resource
-    private HttpClient client;
-
-    @Resource
-    private URL url;
+public class BasicIT extends AbstractLiveOakTest {
 
     @Test
-    public void testAppIndexHtml() throws Exception {
-        String resource = getResource(client, new URL(url, "/default/app/index.html"));
-
-        Assert.assertNotNull( resource );
-        resource = resource.trim();
-
-        Assert.assertTrue(resource.startsWith("<!DOCTYPE html>"));
-        Assert.assertTrue(resource.contains("<title>testsuite</title>"));
-        Assert.assertTrue(resource.endsWith("</html>"));
-    }
-
-    @Test
-    public void testClientJS() throws Exception {
-        String js = getResource(client, new URL(url, "/default/client/liveoak.js"));
-
-        Assert.assertTrue(js.contains("var LiveOak = function"));
-        Assert.assertTrue(js.contains("var Keycloak = function"));
-        Assert.assertTrue(js.contains("var Http = function"));
-        Assert.assertTrue(js.contains("var Stomp"));
-    }
-
-    private String getResource(HttpClient client, URL resource) throws IOException, URISyntaxException {
-        System.err.println( "GET: " + resource );
-        HttpGet appGet = new HttpGet(resource.toURI());
-        HttpResponse response = client.execute(appGet);
-        System.err.println( "RESPONSE: " + response );
-        Assert.assertEquals(200, response.getStatusLine().getStatusCode());
-        return IOUtils.toString(response.getEntity().getContent());
+    public void getAdminResource() throws Exception {
+        JsonNode node = get("/admin");
+        Assert.assertEquals("admin", node.get("id").asText());
+        Assert.assertEquals("/admin", node.get("self").get("href").asText());
     }
 
 }

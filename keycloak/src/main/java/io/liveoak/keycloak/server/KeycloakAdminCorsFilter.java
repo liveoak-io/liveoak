@@ -1,58 +1,48 @@
 package io.liveoak.keycloak.server;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
-public class KeycloakAdminCorsFilter implements Filter {
+@Provider
+public class KeycloakAdminCorsFilter implements ContainerResponseFilter {
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-    }
-
-    @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-        if (req instanceof HttpServletRequest) {
-            HttpServletRequest request = (HttpServletRequest) req;
-            HttpServletResponse response = (HttpServletResponse) res;
-
-            String origin = request.getHeader("Origin");
-            if (origin != null) {
-                String requestURI = request.getRequestURI();
-                if (requestURI.startsWith(origin.replace(":8080", ":8383"))) {
-                    response.addHeader("Access-Control-Allow-Origin", origin);
-                    response.addHeader("Access-Control-Allow-Credentials", "true");
-                    response.addHeader("Access-Control-Max-Age", "86400");
-
-                    if (request.getMethod().equals("OPTIONS")) {
-                        String requestMethod = request.getHeader("Access-Control-Request-Method");
-                        if (requestMethod != null) {
-                            response.addHeader("Access-Control-Allow-Methods", requestMethod);
-                        }
-
-                        String requestHeaders = request.getHeader("Access-Control-Request-Headers");
-                        if (requestHeaders != null) {
-                            response.addHeader("Access-Control-Allow-Headers", requestMethod);
-                        }
-                    }
-                }
-            }
+    public void filter(ContainerRequestContext req, ContainerResponseContext res) throws IOException {
+        URI requestUri = req.getUriInfo().getRequestUri();
+        if (!requestUri.getPath().startsWith("/auth/rest/admin")) {
+            return;
         }
 
-        chain.doFilter(req, res);
+        String origin = req.getHeaderString("Origin");
+        if (isValidOrigin(origin, requestUri) && !req.getMethod().equals(HttpMethod.OPTIONS)) {
+            res.getHeaders().add("Access-Control-Allow-Origin", origin);
+        }
     }
 
-    @Override
-    public void destroy() {
+    public static boolean isValidOrigin(String origin, URI requestUri) {
+        if (origin == null) {
+            return false;
+        }
+
+        try {
+            URI originUri = new URI(origin);
+            return originUri.getScheme().equals(requestUri.getScheme()) && originUri.getHost().equals(requestUri.getHost());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }
