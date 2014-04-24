@@ -28,7 +28,6 @@ public class KeycloakAdminCorsFilter implements ContainerResponseFilter {
         String origin = req.getHeaderString("Origin");
         if (isValidOrigin(origin, requestUri) && !req.getMethod().equals(HttpMethod.OPTIONS)) {
             res.getHeaders().add("Access-Control-Allow-Origin", origin);
-//            res.getHeaders().add("Access-Control-Allow-Credentials", "true");
         }
     }
 

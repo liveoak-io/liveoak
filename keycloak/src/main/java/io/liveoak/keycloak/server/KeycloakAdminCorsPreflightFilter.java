@@ -30,7 +30,6 @@ public class KeycloakAdminCorsPreflightFilter implements ContainerRequestFilter 
             Response.ResponseBuilder response = Response.ok();
 
             response.header("Access-Control-Allow-Origin", origin);
-//            response.header("Access-Control-Allow-Credentials", "true");
             response.header("Access-Control-Max-Age", "86400");
 
             if (req.getMethod().equals(HttpMethod.OPTIONS)) {

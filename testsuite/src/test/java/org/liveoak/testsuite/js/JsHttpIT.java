@@ -1,15 +1,16 @@
 package org.liveoak.testsuite.js;
 
+import org.apache.commons.io.IOUtils;
+import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.liveoak.testsuite.annotations.Resource;
-import org.liveoak.testsuite.junit.LiveOak;
-import org.liveoak.testsuite.utils.JsExecutor;
+import org.liveoak.testsuite.AbstractLiveOakTest;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
 import java.io.IOException;
@@ -18,27 +19,24 @@ import java.net.URL;
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
-@RunWith(LiveOak.class)
-public class JsHttpIT {
+@Ignore
+public class JsHttpIT extends AbstractLiveOakTest {
 
-    @Resource
-    private WebDriver driver;
+    @Drone
+    private WebDriver browser;
 
-    @Resource
-    private JsExecutor js;
-
-    @Resource
-    private URL url;
+    @Drone
+    private JavascriptExecutor js;
 
     @Before
-    public void before() throws IOException, JSONException {
-        driver.navigate().to(new URL(url, "/default/app/index.html"));
-        js.execute("init-liveoak.js");
+    public void before() throws Exception {
+        browser.navigate().to(new URL(baseUrl + "/default/app/index.html"));
+        execute("init-liveoak.js");
     }
 
     @Test
     public void testReadMembers() throws IOException, JSONException {
-        JSONArray result = (JSONArray) js.execute("read-members.js", "/default/app");
+        JSONArray result = (JSONArray) execute("read-members.js", "/default/app");
 
         System.err.println( "RESULT: " + result );
         Assert.assertTrue(result.length() > 0);
@@ -48,7 +46,7 @@ public class JsHttpIT {
 
     @Test
     public void testRead() throws IOException, JSONException {
-        JSONObject result = (JSONObject) js.execute("read.js", "/default");
+        JSONObject result = (JSONObject) execute("read.js", "/default");
 
         Assert.assertEquals("default", result.getString("id"));
         Assert.assertEquals("/default", result.getJSONObject("self").getString("href"));
