@@ -12,41 +12,41 @@
     <files>
       <file>
         <source>./src/main/resources/conf/standalone.xml</source>
-        <outputDirectory>/liveoak-${project.version}/standalone/configuration/</outputDirectory>
+        <outputDirectory>/standalone/configuration/</outputDirectory>
       </file>
       <file>
         <source>../keycloak/target/auth-server.war</source>
-        <outputDirectory>/liveoak-${project.version}/standalone/deployments</outputDirectory>
+        <outputDirectory>/standalone/deployments</outputDirectory>
       </file>
       <file>
         <source>./src/main/resources/deployments/auth-server.war.dodeploy</source>
-        <outputDirectory>/liveoak-${project.version}/standalone/deployments/</outputDirectory>
+        <outputDirectory>/standalone/deployments/</outputDirectory>
       </file>
     </files>
     <fileSets>
         <fileSet>
             <directory>../modules/target/modules</directory>
-            <outputDirectory>/liveoak-${project.version}/modules/system/layers/base</outputDirectory>
+            <outputDirectory>/modules/system/layers/base</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>../modules/target/m2-repo</directory>
-            <outputDirectory>/liveoak-${project.version}/m2-repo</outputDirectory>
+            <outputDirectory>/m2-repo</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>./src/main/resources/conf/extensions</directory>
-            <outputDirectory>/liveoak-${project.version}/conf/extensions</outputDirectory>
+            <outputDirectory>/conf/extensions</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>../console/target/dist/</directory>
-            <outputDirectory>/liveoak-${project.version}/apps/admin</outputDirectory>
+            <outputDirectory>/apps/admin</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>../console/target/app/</directory>
-            <outputDirectory>/liveoak-${project.version}/apps/admin/console</outputDirectory>
+            <outputDirectory>/apps/admin/console</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>../clients/javascript/src/main/javascript/</directory>
-            <outputDirectory>/liveoak-${project.version}/client</outputDirectory>
+            <outputDirectory>/client</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>

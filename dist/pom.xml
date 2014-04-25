@@ -75,7 +75,7 @@
                             <descriptors>
                                 <descriptor>src/main/resources/assemblies/prepare-dist.xml</descriptor>
                             </descriptors>
-                            <finalName>dist</finalName>
+                            <finalName>liveoak</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
@@ -89,7 +89,7 @@
                             <descriptors>
                                 <descriptor>src/main/resources/assemblies/install-artifacts.xml</descriptor>
                             </descriptors>
-                            <finalName>dist</finalName>
+                            <finalName>liveoak</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>

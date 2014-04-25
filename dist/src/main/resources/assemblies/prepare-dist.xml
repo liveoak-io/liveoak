@@ -12,7 +12,7 @@
     <fileSets>
         <fileSet>
             <directory>${project.build.directory}/dependency/wildfly-${wildfly.version}</directory>
-            <outputDirectory>liveoak-${project.version}</outputDirectory>
+            <outputDirectory></outputDirectory>
             <excludes>
               <exclude>**/standalone.xml</exclude>
             </excludes>
