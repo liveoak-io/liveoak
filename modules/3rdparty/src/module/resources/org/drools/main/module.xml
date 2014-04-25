@@ -14,7 +14,7 @@
         <artifact name="org.drools:knowledge-api:${drools.version}"/>
         <artifact name="org.drools:knowledge-internal-api:${drools.version}"/>
         <artifact name="org.codehaus.janino:janino:${janino.version}"/>
-        <artifact name="org.mvel:mvel2:2.1.5.Final"/>
+        <artifact name="org.mvel:mvel2:${mvel.version}"/>
         <artifact name="org.antlr:antlr-runtime:3.3"/>
     </resources>
 
