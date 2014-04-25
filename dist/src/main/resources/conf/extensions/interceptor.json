@@ -19,8 +19,7 @@
                     request-type-mapping: '*'
                 },
                 {
-                    interceptor-name: 'acl-updater',
-                    request-type-mapping: 'CREATE'
+                    interceptor-name: 'acl-updater'
                 }
             ]
     }

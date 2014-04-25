@@ -6,15 +6,11 @@
 
 package io.liveoak.security.policy.acl.interceptor;
 
-import java.util.function.Consumer;
-
 import io.liveoak.common.DefaultRequestAttributes;
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.security.policy.acl.AclPolicyConstants;
 import io.liveoak.spi.RequestAttributes;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.client.Client;
@@ -48,24 +44,24 @@ public class AclUpdaterInterceptor extends DefaultInterceptor {
     public void onOutbound(OutboundInterceptorContext context) throws Exception {
         ResourceResponse response = context.response();
 
-        String prefix = getPrefix(context.request().resourcePath());
-        RequestAttributes attribs = new DefaultRequestAttributes();
-        attribs.setAttribute(AclPolicyConstants.ATTR_CREATED_RESOURCE_RESPONSE, context.response());
-        RequestContext aclUpdateRequest = new RequestContext.Builder().requestAttributes(attribs).build();
-
-        if (response.responseType() == ResourceResponse.ResponseType.CREATED) {
+        if (response.responseType() == ResourceResponse.ResponseType.CREATED || response.responseType() == ResourceResponse.ResponseType.DELETED) {
+            String prefix = getPrefix(context.request().resourcePath());
+            RequestAttributes attribs = new DefaultRequestAttributes();
+            attribs.setAttribute(AclPolicyConstants.ATTR_CREATED_RESOURCE_RESPONSE, context.response());
+            RequestContext aclUpdateRequest = new RequestContext.Builder().requestAttributes(attribs).build();
 
             // TODO: For now it's hardcoded to 'acl-policy' . We should be able to handle the situation when resourceId is different
-            client.update(aclUpdateRequest, prefix + "/acl-policy/" + AclPolicyConstants.RESOURCE_CREATION_LISTENER_RESOURCE_ID, new DefaultResourceState(), (updateResponse) -> {
+            client.update(aclUpdateRequest, prefix + "/acl-policy/" + AclPolicyConstants.RESOURCE_LISTENER_RESOURCE_ID, new DefaultResourceState(), (updateResponse) -> {
                 if (updateResponse.responseType() == ClientResourceResponse.ResponseType.NO_SUCH_RESOURCE) {
                     log.warn("No resource for ACL policy creation listener available");
                 } else {
-                    log.debug("ACL Rules successfully created: " + updateResponse.state());
+                    log.debug("ACL Rules updated: " + updateResponse.state());
                 }
 
                 context.forward();
             });
-        }  else {
+
+        } else {
             context.forward();
         }
     }

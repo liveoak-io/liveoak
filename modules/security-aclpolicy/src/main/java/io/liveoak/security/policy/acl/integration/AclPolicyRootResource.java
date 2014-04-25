@@ -7,15 +7,9 @@ import java.util.Map;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.security.policy.acl.AclPolicyConstants;
 import io.liveoak.security.policy.acl.impl.AclPolicy;
-import io.liveoak.security.policy.acl.impl.AclPolicyConfig;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
-import io.liveoak.spi.resource.async.Responder;
-import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -30,7 +24,7 @@ public class AclPolicyRootResource implements RootResource, SynchronousResource 
     public AclPolicyRootResource(String id, AclPolicy policy) {
         this.id = id;
         this.children.put(AuthzConstants.AUTHZ_CHECK_RESOURCE_ID, new AclPolicyCheckResource(this, AuthzConstants.AUTHZ_CHECK_RESOURCE_ID, policy));
-        this.children.put(AclPolicyConstants.RESOURCE_CREATION_LISTENER_RESOURCE_ID, new AclCreationListenerResource(this, AclPolicyConstants.RESOURCE_CREATION_LISTENER_RESOURCE_ID, policy));
+        this.children.put(AclPolicyConstants.RESOURCE_LISTENER_RESOURCE_ID, new AclListenerResource(this, AclPolicyConstants.RESOURCE_LISTENER_RESOURCE_ID, policy));
     }
 
     @Override

@@ -13,5 +13,5 @@ public class AclPolicyConstants {
 
     public static final String ATTR_CREATED_RESOURCE_RESPONSE = "ATTR_CREATED_RESOURCE_RESPONSE";
 
-    public static final String RESOURCE_CREATION_LISTENER_RESOURCE_ID = "resourceCreationListener";
+    public static final String RESOURCE_LISTENER_RESOURCE_ID = "resourceListener";
 }

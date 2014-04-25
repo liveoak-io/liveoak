@@ -13,6 +13,7 @@ import java.util.Map;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -85,6 +86,16 @@ public class MockInMemoryResource implements SynchronousResource {
 
         Resource resource = ResourceConversionUtils.convertResourceState(child, this);
         responder.resourceCreated(resource);
+    }
+
+    @Override
+    public void delete(RequestContext ctx, Responder responder) throws Exception {
+        if (parent instanceof MockInMemoryResource) {
+            parentAsMock().members.remove(this.id());
+            responder.resourceDeleted(this);
+        } else {
+            responder.deleteNotSupported(this);
+        }
     }
 
     public MockInMemoryResource putProperty(String key, String value) {

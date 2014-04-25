@@ -57,7 +57,7 @@ public class AclPolicy {
     }
 
     public ResourceState autocreateAce(ResourceResponse createdResourceResponse) {
-        ResourceState createdEntries = new DefaultResourceState("entries");
+        ResourceState createdEntries = new DefaultResourceState("createdEntries");
 
         ResourcePath parentResourcePath = createdResourceResponse.inReplyTo().resourcePath();
         String parentResourceURI = parentResourcePath.toString();
@@ -73,6 +73,20 @@ public class AclPolicy {
         });
 
         return createdEntries;
+    }
+
+    public ResourceState deleteAce(ResourceResponse deletedResourceResponse) {
+        ResourceState deletedEntries = new DefaultResourceState("deletedEntries");
+
+        ResourcePath deletedResourcePath = deletedResourceResponse.inReplyTo().resourcePath();
+
+        // Delete all ACE entries for this resource
+        DBObject query = new BasicDBObject();
+        query.put(ACE_RESOURCE_PATH, deletedResourcePath.toString());
+        this.aclCollection.remove(query);
+
+        log.debugf("Deleted ACEs for path: %s", deletedResourcePath);
+        return deletedEntries;
     }
 
     private ResourceState createACE(String createdResourceURI, SecurityContext securityContext, AutoRuleConfig autoRuleConfig) {

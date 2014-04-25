@@ -113,6 +113,22 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
     }
 
     @Test
+    public void testTodomvcDelete() throws Exception {
+        sendCreateRequest("/testApp/mock-storage/todos", "123", "john123");
+
+        RequestContext testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/123", "john123", RequestType.READ);
+        assertAuthzDecision(testReq, AuthzDecision.ACCEPT);
+
+        // Delete resource
+        RequestContext deleteReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/123", "john123", RequestType.DELETE);
+        client.delete(deleteReq, "/testApp/mock-storage/todos/123");
+
+        // And assert that ACE entry was deleted as well and user doesn't have permission now
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/123", "john123", RequestType.READ);
+        assertAuthzDecision(testReq, AuthzDecision.IGNORE);
+    }
+
+    @Test
     public void testTodomvcUpdateConfig() throws Exception {
         // First create some resource
         sendCreateRequest("/testApp/mock-storage/todos", "john-rw", "john123");
