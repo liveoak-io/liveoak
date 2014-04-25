@@ -50,9 +50,10 @@ loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, Liv
 
 });
 
-loMod.controller('HomeCtrl', function($log, $rootScope, $scope, $location, loAppList) {
-  if (loAppList._members.length === 1) {
-    $location.url('/applications/' + loAppList._members[0].id);
+loMod.controller('HomeCtrl', function($log, $rootScope, $scope, $location, $filter, loAppList) {
+  var filtered = $filter('filter')(loAppList._members, {'visible': true});
+  if (filtered.length === 1) {
+    $location.url('/applications/' + filtered[0].id);
   }
   else {
     $location.url('/applications');
