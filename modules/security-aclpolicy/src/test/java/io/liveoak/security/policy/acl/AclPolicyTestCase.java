@@ -11,6 +11,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
+import com.mongodb.WriteConcern;
 import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.common.DefaultResourceResponse;
 import io.liveoak.common.DefaultSecurityContext;
@@ -26,6 +30,7 @@ import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,11 +41,17 @@ import org.junit.Test;
  */
 public class AclPolicyTestCase {
 
+    private final Logger log = Logger.getLogger(AclPolicyTestCase.class);
+
     private AclPolicy aclPolicy;
     private MockAclTestStorageResource mockResource = new MockAclTestStorageResource("storage");
+    private MongoClient mongoClient;
+    private DB db;
 
     @Before
     public void before() {
+        initMongo();
+
         List<AutoRuleConfig> autoRules = new ArrayList<>();
 
         // User can read,update or delete his own todos
@@ -51,9 +62,8 @@ public class AclPolicyTestCase {
 
         AclPolicyConfig config = new AclPolicyConfig();
         config.setAutoRules(autoRules);
-        aclPolicy = new AclPolicy();
+        this.aclPolicy = new AclPolicy(db.getCollection("acl"));
         new AclPolicyConfigurator().configure(aclPolicy, config);
-        aclPolicy.start();
     }
 
     private AutoRuleConfig createRule(String collectionPath, String... autoAddedOwnerPermissions) {
@@ -63,9 +73,26 @@ public class AclPolicyTestCase {
         return autoRule;
     }
 
+    private void initMongo() {
+        String database = System.getProperty("mongo.db", "liveoak-acl");
+        Integer port = new Integer(System.getProperty("mongo.port", "27017"));
+        String host = System.getProperty("mongo.host", "localhost");
+        log.debug("Using Mongo for ACL on " + host + ":" + port + ", database: " + database);
+
+        try {
+            mongoClient = new MongoClient(host, port);
+            db = mongoClient.getDB(database);
+            db.setWriteConcern(WriteConcern.ACKNOWLEDGED);
+            db.dropDatabase();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @After
     public void after() {
-        aclPolicy.stop();
+        mongoClient.close();
+        log.debug("Closed mongo client");
     }
 
     @Test

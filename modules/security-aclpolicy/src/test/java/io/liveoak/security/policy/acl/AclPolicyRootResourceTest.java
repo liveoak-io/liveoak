@@ -1,7 +1,9 @@
 package io.liveoak.security.policy.acl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -10,8 +12,10 @@ import io.liveoak.common.DefaultRequestAttributes;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.interceptor.extension.InterceptorExtension;
+import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.security.policy.acl.extension.SecurityACLPolicyExtension;
 import io.liveoak.security.policy.acl.integration.AclPolicyConfigResource;
 import io.liveoak.spi.RequestAttributes;
@@ -20,6 +24,7 @@ import io.liveoak.spi.RequestType;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
 import io.liveoak.testtools.MockExtension;
+import org.jboss.logging.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,9 +33,12 @@ import org.junit.Test;
  */
 public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
 
+    private final Logger log = Logger.getLogger(AclPolicyRootResourceTest.class);
+
     @Override
     public void loadExtensions() throws Exception {
         loadExtension("interceptor", new InterceptorExtension(), createInterceptorConfig());
+        loadExtension("mongo", new MongoExtension(), createMongoConfig());
         loadExtension( "acl-policy", new SecurityACLPolicyExtension() );
         loadExtension("mock-storage", new MockExtension( MockAclTestStorageResource.class ));
 
@@ -51,6 +59,24 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
         ObjectMapper om = ObjectMapperFactory.create();
         ObjectNode objectNode = om.readValue(getClass().getClassLoader().getResourceAsStream("policy-config/acl-policy-config.json"), ObjectNode.class);
         return objectNode;
+    }
+
+    private ObjectNode createMongoConfig() {
+        String database = System.getProperty("mongo.db", "liveoak-acl");
+        Integer port = new Integer(System.getProperty("mongo.port", "27017"));
+        String host = System.getProperty("mongo.host", "localhost");
+        log.debug("Using Mongo for ACL on " + host + ":" + port + ", database: " + database);
+
+        ResourceState config = new DefaultResourceState();
+        config.putProperty("db", database);
+
+        List<ResourceState> servers = new ArrayList<ResourceState>();
+        ResourceState server = new DefaultResourceState();
+        server.putProperty("port", port);
+        server.putProperty("host", host);
+        servers.add(server);
+        config.putProperty("servers", servers);
+        return ConversionUtils.convert(config);
     }
 
     @Test

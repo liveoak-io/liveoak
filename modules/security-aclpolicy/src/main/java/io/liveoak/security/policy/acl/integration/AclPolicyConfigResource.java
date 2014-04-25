@@ -56,16 +56,6 @@ public class AclPolicyConfigResource implements RootResource, SynchronousResourc
     }
 
     @Override
-    public void start() throws Exception {
-        this.aclPolicy.start();
-    }
-
-    @Override
-    public void stop() {
-        this.aclPolicy.stop();
-    }
-
-    @Override
     public ResourceState properties() throws Exception {
         ObjectMapper om = ObjectMapperFactory.create();
         // TODO: performance as Object is converted couple of times into various formats...

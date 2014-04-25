@@ -37,7 +37,6 @@ public class AclPolicy {
     private static final Logger log = Logger.getLogger(AclPolicy.class);
 
     private final AtomicReference<AclPolicyConfig> policyConfig = new AtomicReference<>();
-    private MongoClient mongoClient;
     private DBCollection aclCollection;
 
     public static final String ACE_REALM = "realm";
@@ -47,17 +46,12 @@ public class AclPolicy {
     public static final String ACE_ACTIONS = "actions";
     public static final String ACE_PERMITTED = "permitted";
 
+    public AclPolicy(DBCollection aclCollection) {
+        this.aclCollection = aclCollection;
+    }
+
     public void setPolicyConfig(AclPolicyConfig policyConfig) {
         this.policyConfig.set(policyConfig);
-    }
-
-    public void start() {
-        initMongo();
-    }
-
-    public void stop() {
-        this.mongoClient.close();
-        log.info("Mongo client for ACL Policy closed");
     }
 
     public ResourceState autocreateAce(ResourceResponse createdResourceResponse) {
@@ -136,21 +130,5 @@ public class AclPolicy {
             }
         }
         return decision;
-    }
-
-    private void initMongo() {
-        // TODO: This is temporary
-        try {
-            String host = System.getProperty("mongo.host.acl", "localhost");
-            String port = System.getProperty("mongo.port.acl", "27017");
-            String dbName = System.getProperty("mongo.db.acl", "liveoak-acl");
-            this.mongoClient = new MongoClient(host, Integer.parseInt(port));
-            DB db = mongoClient.getDB(dbName);
-            this.aclCollection = db.getCollection("acl");
-
-            log.info("Started Mongo client for ACL Policy: host=" + host + ", port=" + port + ", db=" + dbName);
-        } catch (UnknownHostException uhe) {
-            throw new RuntimeException(uhe);
-        }
     }
 }
