@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-  ~ Copyright 2013 Red Hat, Inc. and/or its affiliates.
+  ~ Copyright 2014 Red Hat, Inc. and/or its affiliates.
   ~
   ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
   -->
@@ -46,6 +46,7 @@
         </dependency>
     </dependencies>
     <build>
+        <finalName>liveoak</finalName>
         <plugins>
             <plugin>
               <artifactId>maven-dependency-plugin</artifactId>
@@ -75,7 +76,6 @@
                             <descriptors>
                                 <descriptor>src/main/resources/assemblies/prepare-dist.xml</descriptor>
                             </descriptors>
-                            <finalName>liveoak</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
@@ -89,7 +89,6 @@
                             <descriptors>
                                 <descriptor>src/main/resources/assemblies/install-artifacts.xml</descriptor>
                             </descriptors>
-                            <finalName>liveoak</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
@@ -97,4 +96,59 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>release</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>assemble</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/resources/assemblies/assembly.xml</descriptor>
+                                    </descriptors>
+                                    <finalName>LiveOak-${project.version}</finalName>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <outputDirectory>target</outputDirectory>
+                                    <workDirectory>target/assembly/work</workDirectory>
+                                    <tarLongFileMode>gnu</tarLongFileMode>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>assemble-src</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/resources/assemblies/assembly-src.xml</descriptor>
+                                    </descriptors>
+                                    <finalName>LiveOak-${project.version}</finalName>
+                                    <appendAssemblyId>true</appendAssemblyId>
+                                    <outputDirectory>target</outputDirectory>
+                                    <workDirectory>target/assembly-src/work</workDirectory>
+                                    <tarLongFileMode>gnu</tarLongFileMode>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

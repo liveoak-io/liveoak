@@ -1,0 +1,55 @@
+<!--
+  ~ Copyright 2014 Red Hat, Inc. and/or its affiliates.
+  ~
+  ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+  -->
+<assembly>
+    <id>distro</id>
+    <formats>
+        <format>zip</format>
+        <format>tar.gz</format>
+    </formats>
+
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <fileSets>
+        <fileSet>
+            <directory>target</directory>
+            <outputDirectory/>
+            <includes>
+                <include>${build.finalName}/**</include>
+            </includes>
+            <excludes>
+                <exclude>**/*.sh</exclude>
+                <exclude>${build.finalName}/domain/tmp/auth</exclude>
+                <exclude>${build.finalName}/standalone/tmp/auth</exclude>
+                <exclude>**/*-users.properties</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>target</directory>
+            <outputDirectory/>
+            <includes>
+                <include>${build.finalName}/**/*.sh</include>
+            </includes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>target</directory>
+            <outputDirectory/>
+            <includes>
+                <include>${build.finalName}/**/*-users.properties</include>
+            </includes>
+            <fileMode>0600</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>target</directory>
+            <outputDirectory/>
+            <includes>
+                <include>${build.finalName}/domain/tmp/auth</include>
+                <include>${build.finalName}/standalone/tmp/auth</include>
+            </includes>
+            <directoryMode>0700</directoryMode>
+        </fileSet>
+    </fileSets>
+</assembly>
