@@ -1375,7 +1375,8 @@ legend {
 /* Edit Storage Page */
 
 .lo-db-instances {
-  text-align: center;
+/*   text-align: center; */ /* for 1 resource */
+  text-align: left;
   padding-left: 0;
 
   [class*="lo-db-"] {
@@ -1389,6 +1390,7 @@ legend {
     height: 105px;
     border-radius: 6px;
     margin: 1em;
+    margin-left: 0; /* for 1 resource */
     cursor: pointer;
     margin-top: 0;
     margin-bottom: 15px;

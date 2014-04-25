@@ -45,6 +45,15 @@ loMod.config(['$routeProvider', function($routeProvider) {
         }
       }
     })
+    .when('/applications/:appId/application-client', {
+      templateUrl : '/admin/console/partials/application-client.html',
+      controller : 'AppClientsCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader){
+          return new LoAppLoader();
+        }
+      }
+    })
     .when('/applications/:appId/application-settings', {
       templateUrl : '/admin/console/partials/application-settings.html',
       controller : 'AppSettingsCtrl',

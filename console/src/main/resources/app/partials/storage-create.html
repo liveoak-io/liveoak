@@ -13,10 +13,10 @@
           <fieldset>
             <legend lo-collapse class="collapsible"><span class="text">Data Resource</span></legend>
             <div class="form-group">
-              <div class="lo-db-instances">
-                <div class="lo-db-mongo" ng-class="{active: storageModel.type === 'mongo'}" ng-click="storageModel.type = 'mongo'">MongoDB</div>
-                <div class="lo-db-mysql" ng-class="{active: storageModel.type === 'mysql'}" ng-click="storageModel.type = 'mysql'">MySQL</div>
-                <div class="lo-db-plsql" ng-class="{active: storageModel.type === 'plsql'}" ng-click="storageModel.type = 'plsql'">PostGres</div>
+              <div class="lo-db-instances col-sm-offset-2">
+                <div class="lo-db-mongo" ng-class="{active: storageModel.type === 'mongo'}" ng-click="storageModel.type = 'mongo'">MongoDB</div> 
+                <!-- <div class="lo-db-mysql" ng-class="{active: storageModel.type === 'mysql'}" ng-click="storageModel.type = 'mysql'">MySQL</div> -->
+                <!-- <div class="lo-db-plsql" ng-class="{active: storageModel.type === 'plsql'}" ng-click="storageModel.type = 'plsql'">PostGres</div> -->
                 <p>
                   Don't have it installed?
                               <span ng-switch on="storageModel.type">
