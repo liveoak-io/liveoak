@@ -141,20 +141,20 @@ public class AclPolicyTestCase {
 
     @Test
     public void testChat() {
-        aclPolicy.autocreateAce( createResourceResponse("/storage/chat", "123", "john123"));
+        aclPolicy.autocreateAce( createResourceResponse("/storage/chat", "ObjectId(\"123\")", "john123"));
         aclPolicy.autocreateAce( createResourceResponse("/storage/chat", "456", "john123"));
         aclPolicy.autocreateAce( createResourceResponse("/storage/chat", "789", "peter123", "chat/user"));
 
-        RequestContext testReq = createRequestContext("/storage/chat/123", "john123", RequestType.READ);
+        RequestContext testReq = createRequestContext("/storage/chat/ObjectId(\"123\")", "john123", RequestType.READ);
         Assert.assertEquals(AuthzDecision.ACCEPT, aclPolicy.isAuthorized(testReq));
 
-        testReq = createRequestContext("/storage/chat/123", "john123", RequestType.UPDATE);
+        testReq = createRequestContext("/storage/chat/ObjectId(\"123\")", "john123", RequestType.UPDATE);
         Assert.assertEquals(AuthzDecision.IGNORE, aclPolicy.isAuthorized(testReq));
 
-        testReq = createRequestContext("/storage/chat/123", "john123", RequestType.DELETE);
+        testReq = createRequestContext("/storage/chat/ObjectId(\"123\")", "john123", RequestType.DELETE);
         Assert.assertEquals(AuthzDecision.IGNORE, aclPolicy.isAuthorized(testReq));
 
-        testReq = createRequestContext("/storage/chat/123", "john123", RequestType.CREATE);
+        testReq = createRequestContext("/storage/chat/ObjectId(\"123\")", "john123", RequestType.CREATE);
         Assert.assertEquals(AuthzDecision.IGNORE, aclPolicy.isAuthorized(testReq));
 
         testReq = createRequestContext("/storage/chat/456", "john123", RequestType.READ);

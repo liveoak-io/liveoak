@@ -6,6 +6,8 @@
 
 package io.liveoak.security.policy.acl.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -59,7 +61,7 @@ public class AclPolicy {
 
         ResourcePath parentResourcePath = createdResourceResponse.inReplyTo().resourcePath();
         String parentResourceURI = parentResourcePath.toString();
-        String createdResourceURI = createdResourceResponse.resource().uri().toString();
+        String createdResourceURI = parentResourceURI + "/" + createdResourceResponse.resource().id();
 
         List<AutoRuleConfig> autoRules = this.policyConfig.get().getAutoRules();
         autoRules.stream().filter((autoRule) -> {

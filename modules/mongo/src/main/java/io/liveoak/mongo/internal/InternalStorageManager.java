@@ -18,8 +18,15 @@ public class InternalStorageManager {
     }
 
     public InternalStorage getInternalStorage(String appName, String serviceName) {
+        appName = replaceCollectionName(appName);
+        serviceName = replaceCollectionName(serviceName);
         DBCollection collection = database.getCollection(appName).getCollection(serviceName);
         return new InternalStorage(collection);
+    }
+
+    // Collection names like "acl-policy" are causing problems
+    public static String replaceCollectionName(String collectionName) {
+        return collectionName.replaceAll("-", "_");
     }
 }
 
