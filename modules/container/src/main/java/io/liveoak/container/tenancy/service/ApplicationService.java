@@ -63,6 +63,7 @@ public class ApplicationService implements Service<InternalApplication> {
         File applicationJson = new File(appDir, "application.json");
 
         String appName = this.name;
+        Boolean appVisible = Boolean.TRUE;
         ResourcePath htmlApp = null;
         ResourceState resourcesTree = null;
 
@@ -77,6 +78,9 @@ public class ApplicationService implements Service<InternalApplication> {
                 if ((value = state.getProperty("html-app")) != null) {
                     htmlApp = new ResourcePath((String) value);
                     htmlApp.prependSegment(this.id);
+                }
+                if ((value = state.getProperty("visible")) != null) {
+                    appVisible = (Boolean) value;
                 }
                 if ((value = state.getProperty("resources")) != null) {
                     resourcesTree = (ResourceState) value;
@@ -99,7 +103,7 @@ public class ApplicationService implements Service<InternalApplication> {
             }
         }
 
-        this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp);
+        this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp, appVisible);
 
         // context resource
 

@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.application', []);
 
-loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal, Notifications, loAppList, LoApp, LoStorage, LoPush) {
+loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal, $filter, Notifications, loAppList, LoApp, LoStorage, LoPush) {
 
   $scope.applications = [];
 
@@ -19,7 +19,8 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
   for (var i = 0; i < loAppList._members.length; i++) {
     var app = {
       id: loAppList._members[i].id,
-      name: loAppList._members[i].name
+      name: loAppList._members[i].name,
+      visible: loAppList._members[i].visible
     };
     app.storage = LoStorage.getList({appId: app.id});
 
@@ -29,6 +30,8 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
 
     $scope.applications.push(app);
   }
+
+  $scope.filteredApps = $filter('filter')($scope.applications, !app.visible);
 
   // Delete Application
   $scope.modalApplicationDelete = function(appId) {

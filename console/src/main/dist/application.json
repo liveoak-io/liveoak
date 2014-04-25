@@ -1,5 +1,6 @@
 {
   name: 'LiveOak Admin Console',
+  visible: false,
   html-app: '/console/index.html',
   resources: {
     console: {

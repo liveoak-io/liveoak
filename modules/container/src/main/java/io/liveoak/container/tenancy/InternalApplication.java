@@ -25,12 +25,13 @@ import org.jboss.msc.service.StabilityMonitor;
  */
 public class InternalApplication implements Application {
 
-    public InternalApplication(ServiceTarget target, String id, String name, File directory, ResourcePath htmlAppPath) {
+    public InternalApplication(ServiceTarget target, String id, String name, File directory, ResourcePath htmlAppPath, Boolean visible) {
         this.target = target;
         this.id = id;
         this.name = name;
         this.directory = directory;
         this.htmlAppPath = htmlAppPath;
+        this.visible = visible;
     }
 
     @Override
@@ -46,6 +47,11 @@ public class InternalApplication implements Application {
     @Override
     public File directory() {
         return this.directory;
+    }
+
+    @Override
+    public Boolean visible() {
+        return this.visible;
     }
 
     public File configurationFile() {
@@ -142,5 +148,6 @@ public class InternalApplication implements Application {
     private String name;
     private File directory;
     private final ResourcePath htmlAppPath;
+    private Boolean visible;
 
 }

@@ -10,5 +10,6 @@ public interface Application {
     String id();
     String name();
     File directory();
+    Boolean visible();
 
 }
