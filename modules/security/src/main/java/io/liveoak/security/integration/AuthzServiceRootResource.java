@@ -1,8 +1,7 @@
 package io.liveoak.security.integration;
 
 import io.liveoak.common.security.AuthzConstants;
-import io.liveoak.security.spi.AuthzPolicyEntry;
-import io.liveoak.security.spi.AuthzPolicyGroup;
+import io.liveoak.security.spi.AuthzServiceConfig;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.RootResource;
@@ -11,7 +10,7 @@ import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import org.jboss.logging.Logger;
 
-import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Root resource to be registered in DefaultContainer
@@ -28,13 +27,20 @@ public class AuthzServiceRootResource implements RootResource {
 
     private AuthzCheckResource authzCheckResource;
 
-    public AuthzServiceRootResource(String id, AuthzPolicyGroup policies, Client client) {
+    private final AtomicReference<AuthzServiceConfig> config = new AtomicReference<>();
+
+    public AuthzServiceRootResource(String id, Client client) {
         this.id = id;
-        this.authzCheckResource = new AuthzCheckResource(this, AuthzConstants.AUTHZ_CHECK_RESOURCE_ID, policies, client);
+        this.authzCheckResource = new AuthzCheckResource(this, AuthzConstants.AUTHZ_CHECK_RESOURCE_ID, client);
     }
 
-    public void policies(List<AuthzPolicyEntry> entries) {
-        this.authzCheckResource.policies(entries);
+    public void setConfig(AuthzServiceConfig config) {
+        this.config.set(config);
+        log.info("Security configuration updated: " + config);
+    }
+
+    public AuthzServiceConfig getConfig() {
+        return config.get();
     }
 
     @Override

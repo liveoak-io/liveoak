@@ -1,7 +1,6 @@
 package io.liveoak.security.service;
 
 import io.liveoak.security.integration.AuthzServiceRootResource;
-import io.liveoak.security.spi.AuthzPolicyGroup;
 import io.liveoak.spi.client.Client;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -23,7 +22,6 @@ public class AuthzResourceService implements Service<AuthzServiceRootResource> {
     public void start(StartContext context) throws StartException {
        this.resource = new AuthzServiceRootResource(
                this.id,
-               this.policyGroupInjector.getValue(),
                this.clientInjector.getValue()
        );
     }
@@ -43,14 +41,9 @@ public class AuthzResourceService implements Service<AuthzServiceRootResource> {
         return this.clientInjector;
     }
 
-    public Injector<AuthzPolicyGroup> policyGroupInjector() {
-        return this.policyGroupInjector;
-    }
-
     private String id;
 
     private InjectedValue<Client> clientInjector = new InjectedValue<>();
-    private InjectedValue<AuthzPolicyGroup> policyGroupInjector = new InjectedValue<>();
 
     private AuthzServiceRootResource resource;
 }

@@ -16,6 +16,7 @@ import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.interceptor.extension.InterceptorExtension;
 import io.liveoak.security.extension.SecurityExtension;
+import io.liveoak.security.integration.AuthzServiceConfigResource;
 import io.liveoak.security.integration.AuthzServiceRootResource;
 import io.liveoak.security.spi.AuthzPolicyEntry;
 import io.liveoak.spi.LiveOak;
@@ -40,18 +41,18 @@ public class AuthzInterceptorTest extends AbstractResourceTestCase {
 
     @Override
     public void loadExtensions() throws Exception {
-        loadExtension("interceptor", new InterceptorExtension(), createInterceptorConfig());
+        loadExtension("interceptor", new InterceptorExtension(), getInterceptorConfig());
         loadExtension("authz", new SecurityExtension());
         loadExtension("mock-resource", new MockExtension( MockInMemoryRootResource.class ));
         loadExtension("mock-policy", new MockExtension( InterceptorTestAuthzResource.class ));
         loadExtension("mock-auth-interceptor", new InterceptorTestExtension(mockAuthInterceptor), JsonNodeFactory.instance.objectNode());
 
-        installResource("authz", "authz", JsonNodeFactory.instance.objectNode());
+        installResource("authz", "authz", getSecurityConfig());
         installResource("mock-resource", "mock-resource", JsonNodeFactory.instance.objectNode() );
         installResource("mock-policy", "mock-policy", JsonNodeFactory.instance.objectNode() );
     }
 
-    protected ObjectNode createInterceptorConfig() {
+    private ObjectNode getInterceptorConfig() {
         ObjectNode config = JsonNodeFactory.instance.objectNode();
         ObjectNode mockAuth = JsonNodeFactory.instance.objectNode()
                 .put("interceptor-name", "mock-auth")
@@ -63,15 +64,19 @@ public class AuthzInterceptorTest extends AbstractResourceTestCase {
         return config;
     }
 
+    private ObjectNode getSecurityConfig() throws Exception {
+        ObjectNode config = JsonNodeFactory.instance.objectNode();
+        ObjectNode policyConfig = JsonNodeFactory.instance.objectNode();
+        policyConfig.put("policyName", "Mock Policy");
+        policyConfig.put("policyResourceEndpoint", "/testApp/mock-policy");
+        config.putArray(AuthzServiceConfigResource.POLICIES_PROPERTY).add(policyConfig);
+        return config;
+    }
+
     @Before
     public void before() throws Exception {
         AuthzServiceRootResource authzRootResource = (AuthzServiceRootResource) this.system.service(LiveOak.resource("testApp", "authz"));
         this.mockPolicy = (InterceptorTestAuthzResource) this.system.service(LiveOak.resource("testApp", "mock-policy" ) );
-
-        AuthzPolicyEntry policyEntry = new AuthzPolicyEntry();
-        policyEntry.setPolicyName("Mock Policy");
-        policyEntry.setPolicyResourceEndpoint("/testApp/" + mockPolicy.id());
-        authzRootResource.policies(Collections.singletonList(policyEntry));
     }
 
     @Test

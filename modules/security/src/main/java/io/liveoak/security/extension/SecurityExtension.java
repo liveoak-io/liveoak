@@ -1,12 +1,11 @@
 package io.liveoak.security.extension;
 
 import io.liveoak.interceptor.service.InterceptorRegistrationHelper;
-import io.liveoak.security.SecurityServices;
+import io.liveoak.security.integration.AuthzServiceRootResource;
 import io.liveoak.security.interceptor.AuthzInterceptor;
 import io.liveoak.security.interceptor.AuthzInterceptorService;
-import io.liveoak.security.service.AuthzPolicyGroupService;
+import io.liveoak.security.service.AuthzConfigResourceService;
 import io.liveoak.security.service.AuthzResourceService;
-import io.liveoak.security.spi.AuthzPolicyGroup;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
@@ -41,25 +40,18 @@ public class SecurityExtension implements Extension {
 
         ServiceTarget target = context.target();
 
-
-        File authzConfig = new File(context.application().directory(), "authz-config.json");
-
-        AuthzPolicyGroupService policyGroup = new AuthzPolicyGroupService();
-
-        target.addService(SecurityServices.policyGroup(appId), policyGroup)
-                .addInjection(policyGroup.fileInjector(), authzConfig)
-                .install();
-
         AuthzResourceService resource = new AuthzResourceService(context.resourceId());
-
         target.addService(LiveOak.resource(appId, context.resourceId()), resource)
                 .addDependency(LiveOak.CLIENT, Client.class, resource.clientInjector())
-                .addDependency(SecurityServices.policyGroup(appId), AuthzPolicyGroup.class, resource.policyGroupInjector())
                 .install();
 
-        context.mountPublic(LiveOak.resource(appId, context.resourceId()));
+        AuthzConfigResourceService configResource = new AuthzConfigResourceService(context.resourceId());
+        target.addService(LiveOak.adminResource(appId, context.resourceId()), configResource)
+                .addDependency(LiveOak.resource(appId, context.resourceId()), AuthzServiceRootResource.class, configResource.rootResourceInjector())
+                .install();
 
-        context.mountPrivate(new DefaultRootResource(context.resourceId()));
+        context.mountPublic();
+        context.mountPrivate();
     }
 
     @Override
