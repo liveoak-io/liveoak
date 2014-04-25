@@ -7,8 +7,7 @@ module.exports = function (grunt) {
   // configurable paths
   var projectConfig = {
     src: 'app',
-    // TODO - find the current LO version dynamically
-    dist: '../../../../dist/target/dist/liveoak-1.0.0.Alpha01-SNAPSHOT/apps/admin/console/'
+    dist: '../../../../dist/target/liveoak/apps/admin/console/'
   };
 
   grunt.initConfig({
