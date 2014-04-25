@@ -35,6 +35,7 @@ public class InternalStorage {
          // Note: this method is more of a helper method than anything.
          // The resource could call getCollection().getCollection('foo') to
          // do the same thing.
+         collectionName = InternalStorageManager.replaceCollectionName(collectionName);
          return this.collection.getCollection(collectionName);
     }
 }

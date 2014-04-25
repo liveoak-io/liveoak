@@ -4,16 +4,19 @@
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.liveoak.security.impl.interceptor;
+package io.liveoak.testtools.resources;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.common.util.ResourceConversionUtils;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
 /**
@@ -33,6 +36,10 @@ public class MockInMemoryResource implements SynchronousResource {
     @Override
     public Resource parent() {
         return parent;
+    }
+
+    public void parent(Resource parent) {
+        this.parent = parent;
     }
 
     public MockInMemoryResource parentAsMock() {
@@ -63,7 +70,35 @@ public class MockInMemoryResource implements SynchronousResource {
         return state;
     }
 
-    public MockInMemoryResource addProperty(String key, String value) {
+    @Override
+    public void properties(ResourceState props) throws Exception {
+        for (String key : props.getPropertyNames()) {
+            putProperty(key, (String)props.getProperty(key));
+        }
+    }
+
+    @Override
+    public void createMember(RequestContext ctx, ResourceState child, Responder responder) throws Exception {
+        MockInMemoryResource createdChild = addMember(child.id());
+        for (String key : child.getPropertyNames()) {
+            createdChild.putProperty(key, (String)child.getProperty(key));
+        }
+
+        Resource resource = ResourceConversionUtils.convertResourceState(child, this);
+        responder.resourceCreated(resource);
+    }
+
+    @Override
+    public void delete(RequestContext ctx, Responder responder) throws Exception {
+        if (parent instanceof MockInMemoryResource) {
+            parentAsMock().members.remove(this.id());
+            responder.resourceDeleted(this);
+        } else {
+            responder.deleteNotSupported(this);
+        }
+    }
+
+    public MockInMemoryResource putProperty(String key, String value) {
         properties.put(key, value);
         return this;
     }

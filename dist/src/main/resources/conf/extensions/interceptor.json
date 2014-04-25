@@ -17,6 +17,9 @@
                     interceptor-name: 'authz',
                     resource-path-prefix: '/',
                     request-type-mapping: '*'
+                },
+                {
+                    interceptor-name: 'acl-updater'
                 }
             ]
     }

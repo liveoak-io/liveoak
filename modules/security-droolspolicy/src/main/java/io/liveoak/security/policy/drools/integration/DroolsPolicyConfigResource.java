@@ -61,7 +61,7 @@ public class DroolsPolicyConfigResource implements RootResource, SynchronousReso
         String str = om.writeValueAsString(this.droolsPolicyConfig);
         ObjectNode objectNode = om.readValue(str, ObjectNode.class);
         ResourceState resourceState = ConversionUtils.convert(objectNode);
-        List<ResourceState> childResourceStates = (List<ResourceState>)resourceState.getProperty("rules");
+        List<ResourceState> childResourceStates = (List<ResourceState>)resourceState.getProperty(RULES_PROPERTY);
         List<Resource> childResources = ResourceConversionUtils.convertList(childResourceStates, this);
         resourceState.putProperty(RULES_PROPERTY, childResources);
         return resourceState;

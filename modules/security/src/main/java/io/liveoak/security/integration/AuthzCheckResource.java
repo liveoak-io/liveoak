@@ -10,7 +10,6 @@ import io.liveoak.common.DefaultRequestAttributes;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.security.spi.AuthzPolicyEntry;
-import io.liveoak.security.spi.AuthzPolicyGroup;
 import io.liveoak.spi.RequestAttributes;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
@@ -34,19 +33,13 @@ public class AuthzCheckResource implements Resource {
     private static final Logger log = Logger.getLogger(AuthzCheckResource.class);
 
     private final String id;
-    private final Resource parent;
+    private final AuthzServiceRootResource parent;
     private final Client client;
-    private AuthzPolicyGroup policies;
 
-    public AuthzCheckResource(Resource parent, String id, AuthzPolicyGroup policies, Client client){
+    public AuthzCheckResource(AuthzServiceRootResource parent, String id, Client client){
         this.id = id;
         this.parent = parent;
-        this.policies = policies;
         this.client = client;
-    }
-
-    void policies(List<AuthzPolicyEntry> entries) {
-        this.policies.entries( entries );
     }
 
     @Override
@@ -172,8 +165,9 @@ public class AuthzCheckResource implements Resource {
 
         private Queue<AuthzPolicyEntry> getPolicies(ResourcePath resPath) {
             Queue<AuthzPolicyEntry> l = new LinkedList<>();
+            List<AuthzPolicyEntry> policies = parent.getConfig().getPolicies();
             if (policies != null) {
-                for (AuthzPolicyEntry policyEntry : policies.entries()) {
+                for (AuthzPolicyEntry policyEntry : policies) {
                     if (policyEntry.isResourceMapped(resPath)) {
                         l.add(policyEntry);
                     }

@@ -14,6 +14,9 @@
     <dependencies>
         <module name="io.liveoak.spi"/>
         <module name="io.liveoak.common"/>
+        <module name="io.liveoak.interceptor"/>
+        <module name="io.liveoak.mongo"/>
         <module name="com.fasterxml.jackson.core"/>
+        <module name="org.mongodb"/>
     </dependencies>
 </module>

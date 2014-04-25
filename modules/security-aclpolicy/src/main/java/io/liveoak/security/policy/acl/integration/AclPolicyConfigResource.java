@@ -1,36 +1,43 @@
-package io.liveoak.security.policy.uri.integration;
+/*
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+ */
+
+package io.liveoak.security.policy.acl.integration;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.common.util.ResourceConversionUtils;
-import io.liveoak.security.policy.uri.impl.URIPolicy;
-import io.liveoak.security.policy.uri.impl.URIPolicyConfigurator;
+import io.liveoak.security.policy.acl.impl.AclPolicy;
+import io.liveoak.security.policy.acl.impl.AclPolicyConfig;
+import io.liveoak.security.policy.acl.impl.AclPolicyConfigurator;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class URIPolicyConfigResource implements RootResource, SynchronousResource {
+public class AclPolicyConfigResource implements RootResource, SynchronousResource {
 
-    public static final String RULES_PROPERTY = "rules";
+    public static final String AUTO_RULES_PROPERTY = "autoRules";
 
     private final String id;
-    private final URIPolicy uriPolicy;
-    private URIPolicyConfig uriPolicyConfig;
+    private final AclPolicy aclPolicy;
+    private AclPolicyConfig aclPolicyConfig;
     private Resource parent;
 
-    public URIPolicyConfigResource(String id, URIPolicy uriPolicy) {
+    public AclPolicyConfigResource(String id, AclPolicy aclPolicy) {
         this.id = id;
-        this.uriPolicy = uriPolicy;
+        this.aclPolicy = aclPolicy;
     }
 
     @Override
@@ -52,29 +59,29 @@ public class URIPolicyConfigResource implements RootResource, SynchronousResourc
     public ResourceState properties() throws Exception {
         ObjectMapper om = ObjectMapperFactory.create();
         // TODO: performance as Object is converted couple of times into various formats...
-        String str = om.writeValueAsString(this.uriPolicyConfig);
+        String str = om.writeValueAsString(this.aclPolicyConfig);
         ObjectNode objectNode = om.readValue(str, ObjectNode.class);
         ResourceState resourceState = ConversionUtils.convert(objectNode);
-        List<ResourceState> childResourceStates = (List<ResourceState>)resourceState.getProperty(RULES_PROPERTY);
+        List<ResourceState> childResourceStates = (List<ResourceState>)resourceState.getProperty(AUTO_RULES_PROPERTY);
         List<Resource> childResources = ResourceConversionUtils.convertList(childResourceStates, this);
-        resourceState.putProperty(RULES_PROPERTY, childResources);
+        resourceState.putProperty(AUTO_RULES_PROPERTY, childResources);
         return resourceState;
     }
 
     @Override
     public void properties(ResourceState props) throws Exception {
-        // Keep just "rules" . Other props not important for us
+        // Keep just "autoRules" . Other props not important for us
         Set<String> namesCopy = new HashSet<>(props.getPropertyNames());
         for (String propName : namesCopy) {
-            if (!RULES_PROPERTY.equals(propName)) {
+            if (!AUTO_RULES_PROPERTY.equals(propName)) {
                 props.removeProperty(propName);
             }
         }
 
         ObjectNode objectNode = ConversionUtils.convert(props);
         ObjectMapper om = ObjectMapperFactory.create();
-        this.uriPolicyConfig = om.readValue(objectNode.toString(), URIPolicyConfig.class);
+        this.aclPolicyConfig = om.readValue(objectNode.toString(), AclPolicyConfig.class);
 
-        new URIPolicyConfigurator().configure(uriPolicy, uriPolicyConfig);
+        new AclPolicyConfigurator().configure(this.aclPolicy, this.aclPolicyConfig);
     }
 }

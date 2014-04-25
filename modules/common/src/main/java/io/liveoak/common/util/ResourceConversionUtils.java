@@ -30,7 +30,7 @@ public class ResourceConversionUtils {
 
             @Override
             public String id() {
-                return null;
+                return resourceState.id();
             }
 
             @Override

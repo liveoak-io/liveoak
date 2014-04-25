@@ -1,13 +1,12 @@
 {
-    "aclRules": [
+    "autoRules": [
         {
-            "requestType": "UPDATE",
-            "allowedUserAttribute": "user",
-            "allowedRolesAttribute": "roles"
+            "resourcePath": "/testApp/mock-storage/todos",
+            "autoAddedOwnerPermissions": [ "READ", "UPDATE", "DELETE" ]
         },
         {
-            "requestType": "DELETE",
-            "allowedUserAttribute": "user"
+            "resourcePath": "/testApp/mock-storage/chat",
+            "autoAddedOwnerPermissions": [ "READ" ]
         }
     ]
 }

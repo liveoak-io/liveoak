@@ -1,17 +1,26 @@
 package io.liveoak.security.policy.acl.extension;
 
-import io.liveoak.security.policy.acl.AclPolicyConfig;
-import io.liveoak.security.policy.acl.AclPolicyRootResource;
+import io.liveoak.interceptor.service.InterceptorRegistrationHelper;
+import io.liveoak.mongo.internal.InternalStorage;
+import io.liveoak.mongo.internal.InternalStorageFactory;
+import io.liveoak.security.policy.acl.impl.AclPolicy;
 import io.liveoak.security.policy.acl.SecurityACLPolicyServices;
-import io.liveoak.security.policy.acl.service.AclPolicyConfigService;
+import io.liveoak.security.policy.acl.interceptor.AclUpdaterInterceptor;
+import io.liveoak.security.policy.acl.service.AclPolicyConfigResourceService;
 import io.liveoak.security.policy.acl.service.AclPolicyRootResourceService;
+import io.liveoak.security.policy.acl.service.AclPolicyService;
+import io.liveoak.security.policy.acl.service.AclUpdaterInterceptorService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
 import io.liveoak.spi.resource.async.DefaultRootResource;
+import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.ValueService;
+import org.jboss.msc.value.ImmediateValue;
 
 import java.io.File;
 
@@ -19,9 +28,18 @@ import java.io.File;
  * @author Bob McWhirter
  */
 public class SecurityACLPolicyExtension implements Extension {
+
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
         context.mountPrivate( new DefaultRootResource( context.id() ));
+
+        // Install AclUpdaterInterceptor
+        ServiceTarget target = context.target();
+        AclUpdaterInterceptorService aclInterceptor = new AclUpdaterInterceptorService();
+        ServiceController<AclUpdaterInterceptor> aclController = target.addService(LiveOak.interceptor("acl-updater"), aclInterceptor)
+                .addDependency(LiveOak.CLIENT, Client.class, aclInterceptor.clientInjector())
+                .install();
+        InterceptorRegistrationHelper.installInterceptor(target, aclController);
     }
 
     @Override
@@ -31,22 +49,25 @@ public class SecurityACLPolicyExtension implements Extension {
 
         ServiceTarget target = context.target();
 
-        AclPolicyConfigService policy = new AclPolicyConfigService();
-        File file = new File( context.application().directory(), "acl-policy-config.json" );
+        ServiceName mongoStorageServiceName = InternalStorageFactory.createService(context);
 
-        target.addService(SecurityACLPolicyServices.policy( appId, context.resourceId() ), policy )
-                .addInjection( policy.fileInjector(), file )
+        AclPolicyService policy = new AclPolicyService();
+        target.addService(SecurityACLPolicyServices.policy(appId, context.resourceId()), policy)
+                .addDependency(mongoStorageServiceName, InternalStorage.class, policy.mongoStorageInjector())
                 .install();
 
         AclPolicyRootResourceService resource = new AclPolicyRootResourceService( context.resourceId() );
-        target.addService(LiveOak.resource( appId, context.resourceId() ), resource )
-                .addDependency(SecurityACLPolicyServices.policy(appId, context.resourceId()), AclPolicyConfig.class, resource.policyInjector())
-                .addDependency(LiveOak.CLIENT, Client.class, resource.clientInjector() )
+        target.addService(LiveOak.resource(appId, context.resourceId()), resource)
+                .addDependency(SecurityACLPolicyServices.policy(appId, context.resourceId()), AclPolicy.class, resource.policyInjector())
+                .install();
+
+        AclPolicyConfigResourceService configResource = new AclPolicyConfigResourceService( context.resourceId() );
+        target.addService(LiveOak.adminResource(appId, context.resourceId()), configResource)
+                .addDependency(SecurityACLPolicyServices.policy(appId, context.resourceId()), AclPolicy.class, configResource.policyInjector())
                 .install();
 
         context.mountPublic();
-
-        context.mountPrivate( new DefaultRootResource( context.resourceId() ));
+        context.mountPrivate();
 
     }
 
