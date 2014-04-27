@@ -55,66 +55,80 @@ public class MongoLauncherService implements Service<MongoLauncher> {
                 return;
         }
 
+        context.asynchronous();
+
         launcher = new MongoLauncher();
+        boolean exitIfPortTaken = detectRunning;
 
-        int port = config.port();
-        if (port != 0) {
-            launcher.setPort(port);
-        }
-
-        if (serverRunning(port)) {
-            log.warn("It appears there is an existing server on port: " + port);
-            if (detectRunning) {
-                log.warn("Not starting mongod (you can change this behavior via 'enabled' property in conf/extensions/mongo-launcher.json)");
-                return;
-            } else {
-                throw new RuntimeException("Can't start mongod (port already in use)");
-            }
-        }
-
-        String val = config.mongodPath();
-        if (val != null) {
-            launcher.setMongodPath(val);
-        }
-
-        val = config.dbPath();
-        if (val != null) {
-            launcher.setDbPath(val);
-        }
-
-        val = config.logPath();
-        if (val != null) {
-            launcher.setLogPath(val);
-        }
-
-        val = config.pidFilePath();
-        if (val != null) {
-            launcher.setPidFilePath(val);
-        }
-
-        launcher.setUseSmallFiles(config.useSmallFiles());
-
-        val = config.extraArgs();
-        if (val != null) {
-            launcher.addExtraArgs(val);
-        }
-
-        launcher.setUseAnyMongod(config.useAnyMongod());
-
-        try {
-            launcher.startMongo();
-
-            while(!serverRunning(port)) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
+        new Thread(() -> {
+            try {
+                int port = config.port();
+                if (port != 0) {
+                    launcher.setPort(port);
                 }
-            }
 
-            log.info("Mongo started");
-        } catch (IOException e) {
-            throw new StartException("Failed to start MongoDB - Check mongo-launcher.json extension configuration file", e);
-        }
+                if (serverRunning(port)) {
+                    log.warn("It appears there is an existing server on port: " + port);
+                    if (exitIfPortTaken) {
+                        log.warn("Not starting mongod (you can change this behavior via 'enabled' property in conf/extensions/mongo-launcher.json)");
+                        return;
+                    } else {
+                        throw new RuntimeException("Can't start mongod (port already in use)");
+                    }
+                }
+
+                String val = config.mongodPath();
+                if (val != null) {
+                    launcher.setMongodPath(val);
+                }
+
+                val = config.dbPath();
+                if (val != null) {
+                    launcher.setDbPath(val);
+                }
+
+                val = config.logPath();
+                if (val != null) {
+                    launcher.setLogPath(val);
+                }
+
+                val = config.pidFilePath();
+                if (val != null) {
+                    launcher.setPidFilePath(val);
+                }
+
+                launcher.setUseSmallFiles(config.useSmallFiles());
+
+                val = config.extraArgs();
+                if (val != null) {
+                    launcher.addExtraArgs(val);
+                }
+
+                launcher.setUseAnyMongod(config.useAnyMongod());
+
+                try {
+                    launcher.startMongo();
+
+                    while(!serverRunning(port)) {
+                        try {
+                            Thread.sleep(300);
+                        } catch (InterruptedException e) {
+                            context.failed(new StartException("Interrupted", e));
+                            return;
+                        }
+                    }
+
+                    log.info("Mongo started");
+                } catch (Throwable e) {
+                    throw new RuntimeException("Failed to start MongoDB - Check mongo-launcher.json extension configuration file", e);
+                }
+
+                context.complete();
+
+            } catch (Throwable t) {
+                context.failed(new StartException(t));
+            }
+        }, "MongoLauncherService starter").start();
     }
 
     private boolean serverRunning(int port) {
@@ -130,7 +144,7 @@ public class MongoLauncherService implements Service<MongoLauncher> {
                 return true;
             }
         } catch (IOException ignored) {
-            log.debug("[DEBUG] Connection test: ", ignored);
+            log.debug("[IGNORED] Connection test: ", ignored);
         }
         return false;
     }

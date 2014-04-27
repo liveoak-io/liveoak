@@ -15,11 +15,15 @@ import org.jboss.msc.value.InjectedValue;
 public class ZeroBootstrapper implements Service<Void> {
     @Override
     public void start(StartContext context) throws StartException {
-        try {
-            this.extensionInstallerInjector.getValue().load( "zero", new ZeroExtension() );
-        } catch (Exception e) {
-            throw new StartException(e);
-        }
+        context.asynchronous();
+        new Thread(() -> {
+            try {
+                this.extensionInstallerInjector.getValue().load( "zero", new ZeroExtension() );
+                context.complete();
+            } catch (Throwable e) {
+                context.failed(new StartException(e));
+            }
+        }, "ZeroBootstrapper starter").start();
     }
 
     @Override

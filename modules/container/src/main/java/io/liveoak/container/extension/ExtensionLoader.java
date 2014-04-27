@@ -1,6 +1,7 @@
 package io.liveoak.container.extension;
 
 
+import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -15,6 +16,8 @@ import java.io.File;
  */
 public class ExtensionLoader implements Service<Void> {
 
+    private static final Logger log = Logger.getLogger(ExtensionLoader.class);
+
     public ExtensionLoader(File configDir) {
         this.configDir = configDir;
     }
@@ -22,14 +25,23 @@ public class ExtensionLoader implements Service<Void> {
     @Override
     public void start(StartContext context) throws StartException {
         if ( this.configDir != null && this.configDir.exists()) {
-            File[] configs = this.configDir.listFiles();
-            for ( File config : configs ) {
+            context.asynchronous();
+            new Thread(() -> {
                 try {
-                    this.extensionInstaller.getValue().load( config );
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    File[] configs = this.configDir.listFiles();
+                    for (File config : configs) {
+                        try {
+                            this.extensionInstaller.getValue().load(config);
+                        } catch (Exception e) {
+                            // TODO: are we to ignore an exception here, and continue?
+                            log.error("[IGNORED] Failed to load: " + config.getName(), e);
+                        }
+                    }
+                } catch (Throwable t) {
+                    context.failed(new StartException(t));
                 }
-            }
+                context.complete();
+            }, "ExtensionLoader starter").start();
         }
     }
 

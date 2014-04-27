@@ -3,6 +3,7 @@ package io.liveoak.container.tenancy.service;
 import java.io.File;
 
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
+import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -14,19 +15,34 @@ import org.jboss.msc.value.InjectedValue;
  * @author Ken Finnigan
  */
 public class ApplicationsDeployerService implements Service<Void> {
-    @Override
-    public void start(StartContext context) throws StartException {
-        File[] appDirs = this.appDirInjector.getValue().listFiles(pathname -> pathname.isDirectory());
 
-        for(File appDir: appDirs) {
-            if ((new File(appDir, "application.json")).exists()) {
-                try {
-                    this.registryInjector.getValue().createApplication(appDir.getName(), appDir.getName());
-                } catch (InterruptedException e) {
-                    throw new StartException(e);
+    private static final Logger log = Logger.getLogger(ApplicationsDeployerService.class);
+
+    @Override
+    public void start(final StartContext context) throws StartException {
+        context.asynchronous();
+        new Thread( () -> {
+            try {
+                File[] appDirs = this.appDirInjector.getValue().listFiles(pathname -> pathname.isDirectory());
+
+                for (File appDir : appDirs) {
+                    if ((new File(appDir, "application.json")).exists()) {
+                        try {
+                            this.registryInjector.getValue().createApplication(appDir.getName(), appDir.getName());
+                        } catch (InterruptedException e) {
+                            context.failed(new StartException(e));
+                            return;
+                        } catch (Throwable t) {
+                            log.error("[IGNORED] Failed to deploy application: " + appDir.getName(), t);
+                        }
+                    }
                 }
+                context.complete();
+
+            } catch (Throwable th) {
+                context.failed(new StartException(th));
             }
-        }
+        }, "ApplicationsDeployerService starter").start();
     }
 
     @Override
