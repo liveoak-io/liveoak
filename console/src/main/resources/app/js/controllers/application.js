@@ -16,11 +16,12 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
     }
   };
 
-  for (var i = 0; i < loAppList._members.length; i++) {
+  var filtered = $filter('filter')(loAppList._members, {'visible': true});
+  for (var i = 0; i < filtered.length; i++) {
     var app = {
-      id: loAppList._members[i].id,
-      name: loAppList._members[i].name,
-      visible: loAppList._members[i].visible
+      id: filtered[i].id,
+      name: filtered[i].name,
+      visible: filtered[i].visible
     };
     app.storage = LoStorage.getList({appId: app.id});
 
@@ -30,8 +31,6 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
 
     $scope.applications.push(app);
   }
-
-  $scope.filteredApps = $filter('filter')($scope.applications, !app.visible);
 
   // Delete Application
   $scope.modalApplicationDelete = function(appId) {
