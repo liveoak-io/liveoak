@@ -1,0 +1,107 @@
+<div class="row">
+  <ul class="nav nav-tabs nav-tabs-pf">
+    <li><a href="#/applications/{{curApp.id}}/application-settings">General Settings</a></li>
+    <li class="active"><a href="">Clients</a></li>
+  </ul>
+  <div class="lo-content-area col-md-10 next-steps">
+    
+    <ol class="breadcrumb">
+      <li><a href="#">Applications</a></li>
+      <li><a href="#">ApplicationName</a></li>
+      <li><a href="#">Clients</a></li>
+      <li>ClientName</li>
+    </ol>
+    
+    <h2 class="pull-left"><span>ClientName</span> Configuration</h2>
+    <p class="subtitle">All fields are required</p>
+    
+    <hr>
+
+    <form class="lo-form-horizontal">
+      <fieldset>
+        <div class="form-group clearfix">
+          <label class="col-sm-2 control-label" for="clientname">Client Name</label>
+          <div class="col-sm-4">
+            <input class="form-control" type="text" id="clientname" required>
+          </div>
+        </div>
+        <div class="form-group clearfix">
+          <label class="col-sm-2 control-label" for="platform">Platform</label>
+          <div class="lo-instances col-sm-offset-2">
+            <label class="checkbox-inline html5 active">
+              <input type="radio" name="platform" > HTML 5
+            </label>
+            <label class="checkbox-inline android">
+              <input type="radio" name="platform"> Android
+            </label>
+            <label class="checkbox-inline ios">
+              <input type="radio" name="platform"> iOS
+            </label>
+            <label class="checkbox-inline custom">
+              <input type="radio" name="platform"> My Platform
+            </label>
+            <span data-tooltip-placement="top" data-tooltip="Add Platform">
+              <button type="button" class="btn btn-link btn-icon inline add-condition" data-toggle="modal" data-target="#add-platform"><i class="fa fa-plus-circle"></i><span>Add Platform</span></button>
+            </span>
+
+          </div>
+        </div>
+        <div class="form-group clearfix">
+          <label class="col-sm-2 control-label" for="uri">Redirect URI</label>
+          <div class="col-sm-4">
+            <input class="form-control" type="text" id="uri" required>
+          </div>
+        </div>
+        <div class="form-group clearfix">
+          <label class="col-sm-2 control-label" for="scope02">Scope</label>
+          <div class="col-sm-4">
+            <select class="selectpicker" id="scope02" multiple>
+              <option>Role 01</option>
+              <option>Role 02</option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+    <div class="pull-right form-actions">
+      <button class="btn btn-default btn-lg" type="button">Clear changes</button>
+      <button class="btn btn-primary btn-lg" type="submit">Save</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Add Platform Modal -->
+<div class="modal fade" id="add-platform" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <span class="pficon pficon-close"></span>
+        </button>
+        <h4 class="modal-title">Add Platform</h4>
+      </div>
+      <form class="horizontal-form">
+        <div class="modal-body">
+          <fieldset>
+            <div class="form-group clearfix">
+              <label for="pfname" class="col-sm-3 control-label">Platform Name <span class="required">*</span></label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" id="pfname">
+              </div>
+            </div>
+          </fieldset>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Initialize Boostrap-select
+  $('.selectpicker').selectpicker();
+</script>

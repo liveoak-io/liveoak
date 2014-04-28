@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="lo-content-area col-md-9">
+  <div class="lo-content-area col-md-12">
     <h2>Applications</h2>
 
     <div class="lo-page-info">
@@ -18,16 +18,7 @@
         <button class="btn btn-primary btn-lg" type="button" data-toggle="modal" data-target="#create-application">Create Application</button>
       </div>
     </div>
-
     <lo-app-summary ng-repeat="app in filteredApps" lo-app="app" created="createdId"></lo-app-summary>
-  </div>
-  <div class="lo-info-pane col-md-3">
-    <section class="lo-tutorials">
-      <h3><span>LiveOak</span> Tutorials</h3>
-      <i class="fa fa-file-text-o fa-4x"></i>
-      <p>Explore LiveOak Documentation and learn how to set up Security Data and Push.</p>
-      <a href="#">How to start your own app »</a>
-    </section>
   </div>
 </div>
 
