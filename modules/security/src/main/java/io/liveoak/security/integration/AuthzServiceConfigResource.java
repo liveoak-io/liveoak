@@ -60,8 +60,10 @@ public class AuthzServiceConfigResource implements RootResource, SynchronousReso
         ObjectNode objectNode = om.readValue(str, ObjectNode.class);
         ResourceState resourceState = ConversionUtils.convert(objectNode);
         List<ResourceState> childResourceStates = (List<ResourceState>)resourceState.getProperty(POLICIES_PROPERTY);
-        List<Resource> childResources = ResourceConversionUtils.convertList(childResourceStates, this);
-        resourceState.putProperty(POLICIES_PROPERTY, childResources);
+        if (childResourceStates != null) {
+            List<Resource> childResources = ResourceConversionUtils.convertList(childResourceStates, this);
+            resourceState.putProperty(POLICIES_PROPERTY, childResources);
+        }
         return resourceState;
     }
 
