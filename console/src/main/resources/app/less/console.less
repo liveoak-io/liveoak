@@ -109,6 +109,10 @@ p {
   font-size: @fsizebig;
 }
 
+i {
+  font-size: 16px;
+}
+
 .clickable {
   cursor: pointer;
 }
@@ -406,7 +410,8 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
       display: inline-block;
     }
     
-    .dropdown {
+    .dropdown,
+    .pull-right > a {
       margin-top: 8px;
       visibility: hidden;
       
@@ -416,10 +421,6 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
       
       .dropdown-toggle {
 
-        > i {
-          font-size: 1.5em;
-        }
-  
         > b {
           display: none;
         }
@@ -433,12 +434,14 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
     }
     
     + .panel-body {
-      padding-top: 0;
+      padding-top: 2px;
     }
   }
   
-  &:hover .dropdown {
+  &:hover .dropdown,
+  &:hover .pull-right > a {
     visibility: visible;
+    display: block;
   }
 
   .panel-body {
@@ -446,18 +449,23 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
     
     &.empty-instance {
       
-      padding: 30px;
+      padding: 45px 30px;
       
       .fa {
-        font-size: 108px;
+        font-size: 128px;
         opacity: 0.2;
       }
       
       p {
         color: @c_gray;
         font-size: 20px;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         margin-top: 5px;
+      }
+      
+      .btn-lg {
+        font-size: 14px;
+        padding: 6px 12px;
       }
     }
 
@@ -816,7 +824,7 @@ p.form-info {
       text-align: center;
       font-size: 15px;
       font-weight: 600;
-      padding-top: 38px;
+      padding-top: 42px;
       line-height: 1.2em;
       
       input {

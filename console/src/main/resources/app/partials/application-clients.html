@@ -16,16 +16,9 @@
 
     <div class="panel">
       <div class="panel-heading">
-        <h2 class="panel-title">Client Name</h2>
+        <h2 class="panel-title"><a href="#/applications/{{curApp.id}}/application-client">Client Name</a></h2>
         <div class="pull-right">
-          <div class="dropdown">
-            <a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="fa fa-cog"></i><b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li><a href="">Edit...</a></li>
-              <li role="presentation" class="divider"></li>
-              <li><a href="#" data-toggle="modal" data-target="#delete-client">Delete...</a></li>
-            </ul>
-          </div>
+          <a href="#" data-toggle="modal" data-target="#delete-client"><i class="fa fa-trash-o"></i></a>
         </div>
       </div>
       <div class="panel-body">
