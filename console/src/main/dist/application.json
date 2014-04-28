@@ -29,7 +29,15 @@
     },
 
     authz: {
-      type: 'security'
+      type: 'security',
+      config: {
+        policies: [
+          {
+            policyName : "URIPolicy",
+            policyResourceEndpoint: "/admin/uri-policy/authzCheck"
+          }
+        ]
+      }
     },
 
     uri-policy: {
@@ -40,15 +48,15 @@
           requestTypes: [ 'READ' ],
           allowedUsers: [ '*' ]
         }, {
-          uriPattern: '/admin/console/*',
+          uriPattern: '/admin/console*',
           requestTypes: [ 'READ' ],
           allowedUsers: [ '*' ]
         }, {
-          uriPattern: '/admin/css/*',
+          uriPattern: '/admin/css*',
           requestTypes: [ 'READ' ],
           allowedUsers: [ '*' ]
         }, {
-          uriPattern: '/admin/client/*',
+          uriPattern: '/admin/client*',
           requestTypes: [ 'READ' ],
           allowedUsers: [ '*' ]
         }]

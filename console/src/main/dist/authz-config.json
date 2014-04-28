@@ -1,8 +1,0 @@
-{
-    "policies": [
-        {
-            "policyName" : "URIPolicy",
-            "policyResourceEndpoint": "/admin/uri-policy/authzCheck"
-        } 
-    ]
-}
