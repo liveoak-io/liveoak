@@ -28,15 +28,24 @@ public class ApplicationResourcesService implements Service<Void> {
             return;
         }
 
+        context.asynchronous();
         try {
-            Set<String> fields = this.resourcesTree.getPropertyNames();
-            for (String resourceId : fields) {
-                ResourceState resourceState = (ResourceState) this.resourcesTree.getProperty(resourceId);
-                System.err.println( "BOOTTIME INSTALL OF: " + resourceId );
-                this.applicationInjector.getValue().extend(resourceId, resourceState, true);
-            }
-        } catch (Exception e) {
-            throw new StartException(e);
+            new Thread(() -> {
+                try {
+                    Set<String> fields = this.resourcesTree.getPropertyNames();
+                    for (String resourceId : fields) {
+                        ResourceState resourceState = (ResourceState) this.resourcesTree.getProperty(resourceId);
+                        System.err.println( "BOOTTIME INSTALL OF: " + resourceId );
+                        this.applicationInjector.getValue().extend(resourceId, resourceState, true);
+                    }
+                    context.complete();
+
+                } catch (Throwable e) {
+                    context.failed(new StartException(e));
+                }
+            }, "ApplicationResourcesService starter - " + this.applicationInjector.getValue().name()).start();
+        } catch (Throwable e) {
+            context.failed(new StartException(e));
         }
     }
 
