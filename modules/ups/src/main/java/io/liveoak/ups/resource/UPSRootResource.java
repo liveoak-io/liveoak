@@ -1,5 +1,7 @@
 package io.liveoak.ups.resource;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
 import io.liveoak.mongo.internal.InternalStorage;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.container.SubscriptionManager;
@@ -7,6 +9,8 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.ups.AliasUPSSubscription;
+import io.liveoak.ups.BaseUPSSubscription;
 import io.liveoak.ups.UPS;
 import io.liveoak.ups.resource.config.UPSRootConfigResource;
 
@@ -20,7 +24,7 @@ public class UPSRootResource implements RootResource {
     UPSRootConfigResource configResource;
     SubscriptionManager subscriptionManager;
     AliasesResource aliasesResource;
-    UPSSubscriptionsResource subscriptionsResource;
+    SubscriptionsResource  subscriptionsResource;
     InternalStorage internalStorage;
 
     UPS upsService;
@@ -34,8 +38,20 @@ public class UPSRootResource implements RootResource {
         //setup the service to handle communication with a UPS instance
         upsService = new UPS(configResource);
 
-        this.aliasesResource = new AliasesResource( this, upsService, subscriptionManager );
-        this.subscriptionsResource = new UPSSubscriptionsResource( this, upsService, subscriptionManager );
+        DBCollection subscriptionsCollections = internalStorage.getCollection( "subscriptions" );
+        subscriptionsCollections.ensureIndex(new BasicDBObject( "resource-path", 1 ));
+        subscriptionManager.addSubscription(new BaseUPSSubscription(subscriptionsCollections, upsService));
+
+        this.subscriptionsResource = new SubscriptionsResource(this, subscriptionsCollections);
+
+        DBCollection aliasesCollection = internalStorage.getCollection("aliases");
+        // adds the index if it doesn't already exist
+        aliasesCollection.ensureIndex( new BasicDBObject("subscriptions.resource-path", 1));
+
+        subscriptionManager.addSubscription( new AliasUPSSubscription( aliasesCollection, upsService ) );
+
+        this.aliasesResource = new AliasesResource( this, aliasesCollection);
+
     }
 
     @Override
@@ -64,7 +80,7 @@ public class UPSRootResource implements RootResource {
     public void readMember( RequestContext ctx, String id, Responder responder ) throws Exception {
         if (id.equals( AliasesResource.ID )) {
             responder.resourceRead( this.aliasesResource);
-        } else if (id.equals( UPSSubscriptionsResource.ID)) {
+        } else if (id.equals( SubscriptionsResource.ID)) {
             responder.resourceRead(this.subscriptionsResource);
         } else {
             responder.noSuchResource(id);

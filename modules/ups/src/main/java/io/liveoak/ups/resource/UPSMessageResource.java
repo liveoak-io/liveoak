@@ -15,23 +15,22 @@ import java.util.Map;
 public class UPSMessageResource implements Resource {
 
     private SubscriptionResource parent;
-    public final static String ID = "message";
 
     Map<String, Object> attributes = new HashMap<String, Object>();
 
 
-    public UPSMessageResource(SubscriptionResource parent, Map<String, Object> attributes) {
+    public UPSMessageResource( SubscriptionResource parent, Map<String, Object> attributes) {
         this.parent = parent;
         this.attributes = attributes;
     }
 
-    //return null since dealing with an embedded resource
+    //return null since dealing with an embedded resources
     @Override
     public Resource parent() {
         return null;
     }
 
-    //return null since dealing with an embedded resource
+    //return null since dealing with an embedded resources
     @Override
     public String id() {
         return null;
@@ -40,17 +39,18 @@ public class UPSMessageResource implements Resource {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        for (String key : attributes.keySet()) {
-            sink.accept( key, attributes.get( key ) );
+        if (attributes != null) {
+            for (String key : attributes.keySet()) {
+                sink.accept( key, attributes.get( key ) );
+            }
         }
 
         sink.close();
     }
 
-    // embedded resource, cannot update the properties here, must do so from the parent resource
+    // embedded resources, cannot update the properties here, must do so from the parent resources
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         responder.updateNotSupported(this);
     }
-
 }

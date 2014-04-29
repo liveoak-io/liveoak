@@ -98,7 +98,31 @@ public class UPSSubscriptionTestCase extends BaseUPSTestCase {
         } catch (ResourceNotFoundException e) {
             //expected
         }
+    }
 
+    @Test
+    public void testUpdateSubscription() throws Exception {
+        ResourceState subscription = new DefaultResourceState("testUpdate");
+        // add the resources path
+        subscription.putProperty( "resource-path", "/foo/bar" );
+
+        // add some aliases
+        List aliases = Arrays.asList( "myAliasA", "myAliasB" );
+        subscription.putProperty( "alias", aliases );
+
+        ResourceState createResponse = client.create( new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/subscriptions", subscription );
+        assertThat(createResponse).isNotNull();
+        assertThat(createResponse.id()).isEqualTo("testUpdate");
+        assertThat( createResponse.getProperty( "resource-path" ) ).isEqualTo("/foo/bar");
+
+        // update the resource-path
+        createResponse.putProperty( "resource-path", "/foo/baz" );
+
+        ResourceState updateResponse = client.update( new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/subscriptions/testUpdate", createResponse );
+        assertThat(updateResponse.getProperty( "resource-path")).isEqualTo( "/foo/baz" );
+
+        ResourceState readResponse = client.read( new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/subscriptions/testUpdate" );
+        assertThat(readResponse.getProperty( "resource-path" )).isEqualTo( "/foo/baz" );
     }
 
     @Test
