@@ -44,12 +44,13 @@ public class BasicServerTest {
     @Before
     public void setUpServer() throws Exception {
         this.system = LiveOakFactory.create();
-        this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application");
-
         this.system.extensionInstaller().load( "memory", new InMemoryDBExtension() );
 
-        this.application.extend( "memory" );
+        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
+        this.system.awaitStability();
+        this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application");
 
+        this.application.extend( "memory" );
         this.system.awaitStability();
     }
 

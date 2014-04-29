@@ -26,10 +26,13 @@ public class HttpSubscriptionTest {
     @Before
     public void setUp() throws Exception {
         this.system = LiveOakFactory.create();
-        this.application = this.system.applicationRegistry().createApplication( "testApp", "Test Application" );
-
         this.system.extensionInstaller().load("memory", new InMemoryDBExtension());
+
+        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
+        this.system.awaitStability();
+        this.application = this.system.applicationRegistry().createApplication( "testApp", "Test Application" );
         this.application.extend("memory");
+
         this.system.awaitStability();
 
         InMemoryDBResource resource = (InMemoryDBResource) this.system.service( InMemoryDBExtension.resource("testApp", "memory") );

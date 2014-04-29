@@ -74,13 +74,17 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
     public void setUpSystem() throws Exception {
         try {
             this.system = LiveOakFactory.create();
+            this.client = this.system.client();
+            this.vertx = this.system.vertx();
+
+            // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
+            this.system.awaitStability();
+
             this.system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
             this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application", applicationDirectory());
 
+            // loadExtensions() relies on this.application
             loadExtensions();
-
-            this.client = this.system.client();
-            this.vertx = this.system.vertx();
 
             this.system.awaitStability();
             System.err.println( "stable" );

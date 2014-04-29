@@ -36,11 +36,12 @@ public class ClientTest {
         this.system = LiveOakFactory.create();
         this.client = this.system.client();
 
-        this.application = this.system.applicationRegistry().createApplication( "testApp", "Test Application" );
+        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
+        this.system.awaitStability();
 
+        this.application = this.system.applicationRegistry().createApplication( "testApp", "Test Application" );
         this.system.extensionInstaller().load( "db", new InMemoryDBExtension() );
         this.application.extend( "db" );
-        this.system.awaitStability();
 
         InMemoryDBResource db = (InMemoryDBResource) this.system.service( InMemoryDBExtension.resource( "testApp", "db") );
         db.addMember(new InMemoryCollectionResource(db, "people"));

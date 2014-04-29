@@ -65,10 +65,14 @@ public class ConfigurationPersistingTest {
         this.system = LiveOakFactory.create();
         this.client = this.system.client();
 
-        this.system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
-
-        this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application");
         this.system.extensionInstaller().load("mock", new MockExtension());
+
+        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
+        this.system.awaitStability();
+
+        this.system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
+        this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application");
+
         this.system.awaitStability();
 
         this.mapper = new ObjectMapper();
