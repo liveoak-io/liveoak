@@ -71,6 +71,7 @@ public class MongoLauncherService implements Service<MongoLauncher> {
                     log.warn("It appears there is an existing server on port: " + port);
                     if (exitIfPortTaken) {
                         log.warn("Not starting mongod (you can change this behavior via 'enabled' property in conf/extensions/mongo-launcher.json)");
+                        context.complete();
                         return;
                     } else {
                         throw new RuntimeException("Can't start mongod (port already in use)");
