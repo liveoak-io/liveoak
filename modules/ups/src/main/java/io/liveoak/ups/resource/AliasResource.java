@@ -6,83 +6,104 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.ups.UPS;
+import io.liveoak.ups.Alias;
+import io.liveoak.ups.UPSSubscription;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class AliasResource implements Resource {
+public class AliasResource implements SubscriptionResourceParent {
 
     AliasesResource parent;
-    String id;
-    String userid;
-    UPS upsService;
+    Alias alias;
 
-    Map<String, SubscriptionResource> resources;
-
-    public AliasResource(AliasesResource parent, UPS upsService, String id, String userid) {
+    public AliasResource(AliasesResource parent, Alias alias) {
         this.parent = parent;
-        this.id = id;
-        this.userid = userid;
-        this.resources = new HashMap<String, SubscriptionResource>();
-        this.upsService = upsService;
+        this.alias = alias;
     }
 
     @Override
     public Resource parent() {
-        return parent;
+        return this.parent;
     }
 
     @Override
     public String id() {
-        return this.id;
+        return this.alias.id();
     }
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("user", this.userid );
+        sink.accept("subject", alias.subject());
         sink.close();
     }
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        for (SubscriptionResource subscriptionResource: resources.values()) {
-            sink.accept(subscriptionResource);
+        List<UPSSubscription> subscriptions = alias.getSubscriptions();
+        for (UPSSubscription subscription: subscriptions) {
+                sink.accept(new SubscriptionResource(this, subscription));
         }
         sink.close();
     }
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        SubscriptionResource subscription = resources.get( id );
-        if (subscription != null) {
-            responder.resourceRead(subscription);
-        } else {
-            responder.noSuchResource(id);
+        List<UPSSubscription> subscriptions = alias.getSubscriptions();
+        for (UPSSubscription subscription: subscriptions) {
+            if (subscription.id().equals( id )) {
+                responder.resourceRead( new SubscriptionResource(this, subscription));
+                return;
+            }
         }
+
+        responder.noSuchResource( id );
     }
 
     @Override
-    public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        SubscriptionResource subscriptionResource = AliasSubscriptionResource.create(this, this.upsService, ctx, state, responder );
-        if (subscriptionResource != null) {
-            resources.put(subscriptionResource.id(), subscriptionResource);
-            parent.getSubscriptionManager().addSubscription(subscriptionResource);
-            responder.resourceCreated(subscriptionResource);
+    public void createMember( RequestContext ctx, ResourceState state, Responder responder ) throws Exception {
+
+        // if the alias is specified, throw an error. The system handles aliases for this type of subscription
+        if (state.getProperty( "alias" ) != null && !state.getProperty("alias").equals(this.id())) {
+            responder.invalidRequest( "Alias not allowed to be customized when creating this type of subscription." );
+            return;
+        }
+
+        List<String> aliases = new ArrayList<>();
+        //NOTE: the alias is always the parent ID for this type of resources !
+        aliases.add(alias.id());
+        state.putProperty("alias", aliases);
+
+        List<UPSSubscription> upsSubscriptions = alias.getSubscriptions();
+        UPSSubscription subscription = UPSSubscription.create( state );
+        if (subscription != null ) {
+            upsSubscriptions.add(subscription);
+            alias.setSubscriptions( upsSubscriptions );
+            parent.saveAlias(alias);
+            responder.resourceCreated( new SubscriptionResource( this, subscription ) );
+        } else {
+            responder.invalidRequest("Cannot create a UPS Subscription without a resource-path specified");
         }
     }
 
     @Override
     public void delete(RequestContext ctx, Responder responder) throws Exception {
-        parent.removeAlias(this.id, ctx, responder);
+        parent.deleteAlias(this.id());
         responder.resourceDeleted(this);
     }
 
-    public void deleteSubscription(String id) {
-        parent.getSubscriptionManager().removeSubscription( resources.get(id) );
-        resources.remove(id);
+    @Override
+    public void updateSubscription( UPSSubscription upsSubscription ) {
+        alias.updateSubscription( upsSubscription );
+        parent.saveAlias(alias);
+    }
+
+    @Override
+    public void deleteSubscription( String id ) {
+        alias.removeSubscription(id);
+        parent.saveAlias(alias);
     }
 }
