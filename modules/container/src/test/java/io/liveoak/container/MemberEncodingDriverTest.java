@@ -37,10 +37,12 @@ public class MemberEncodingDriverTest {
     public void setUp() throws Exception {
         this.system = LiveOakFactory.create();
         this.client = this.system.client();
+        this.system.extensionInstaller().load(RESOURCE_ID, new TestReadingMembersExtension());
+
+        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
+        this.system.awaitStability();
 
         this.application = this.system.applicationRegistry().createApplication( "testApp", "Test Application" );
-
-        this.system.extensionInstaller().load(RESOURCE_ID, new TestReadingMembersExtension());
         this.application.extend(RESOURCE_ID, RESOURCE_ID, JsonNodeFactory.instance.objectNode());
         this.system.awaitStability();
     }

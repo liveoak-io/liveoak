@@ -65,12 +65,15 @@ public class ConfigurationResourceTest {
     public void setUp() throws Exception {
         this.system = LiveOakFactory.create();
         this.client = this.system.client();
+        this.system.extensionInstaller().load("config", new InMemoryConfigExtension());
+
+        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
+        this.system.awaitStability();
 
         this.system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
-
         this.application = this.system.applicationRegistry().createApplication( "testApp", "Test Application" );
 
-        this.system.extensionInstaller().load("config", new InMemoryConfigExtension());
+        this.system.awaitStability();
 
         ObjectNode configNode = JsonNodeFactory.instance.objectNode();
         configNode.put(FIRST_KEY, FIRST_VALUE);
