@@ -1,7 +1,7 @@
 {
     module-id: 'io.liveoak.keycloak',
     config: {
-        keycloak-url: 'http://localhost:8383/auth',
+        keycloak-url: 'http://localhost:8080/auth',
         load-public-keys: true
     }
 }
