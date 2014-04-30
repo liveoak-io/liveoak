@@ -352,7 +352,7 @@
             </servlet-container>
             <handlers>
                 <reverse-proxy name="reverse-proxy" connections-per-thread="30">
-                    <host name="http://localhost:8081" instance-id="myRoute"/>
+                    <host name="http://localhost:8383" instance-id="myRoute"/>
                 </reverse-proxy>
                 <file name="welcome-content" path="${jboss.home.dir}/welcome-content" directory-listing="true"/>
             </handlers>
@@ -376,6 +376,9 @@
         <subsystem xmlns="urn:liveoak:liveoak:1.0" socket-binding="liveoak"/>
     </profile>
     <interfaces>
+        <interface name="localhost">
+            <inet-address value="127.0.0.1"/>
+        </interface>
         <interface name="management">
             <inet-address value="${jboss.bind.address.management:127.0.0.1}"/>
         </interface>
@@ -395,7 +398,7 @@
         <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
         <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9993}"/>
         <socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>
-        <socket-binding name="liveoak" port="${jboss.liveoak.port:8081}"/>
+        <socket-binding name="liveoak" interface="localhost" port="${jboss.liveoak.port:8383}"/>
         <socket-binding name="http" port="${jboss.http.port:8080}"/>
         <socket-binding name="https" port="${jboss.https.port:8443}"/>
         <socket-binding name="txn-recovery-environment" port="4712"/>
