@@ -96,7 +96,9 @@ public class PipelineConfigurator {
     }
 
     public void switchToPureStomp(ChannelPipeline pipeline) {
-        pipeline.remove(ProtocolDetector.class);
+        if (pipeline.get("protocol-detector") != null) {
+            pipeline.remove("protocol-detector");
+        }
 
         StompServerContext serverContext = new SecuredStompServerContext(this.codecManager, this.subscriptionManager, this.client);
 
@@ -119,7 +121,9 @@ public class PipelineConfigurator {
     }
 
     public void switchToHttpWebSockets(ChannelPipeline pipeline) {
-        pipeline.remove(ProtocolDetector.class);
+        if (pipeline.get("protocol-detector") != null) {
+            pipeline.remove("protocol-detector");
+        }
         //pipeline.addLast(new DebugHandler("server-pre-http"));
         pipeline.addLast(new HttpRequestDecoder());
         pipeline.addLast(new HttpResponseEncoder());
@@ -157,16 +161,17 @@ public class PipelineConfigurator {
 
     public void switchToPlainHttp(ChannelPipeline pipeline) {
         // turn off automatic socket read for better http body read control
+        pipeline.addLast("channel-resetter", new ChannelResetterHandler(this));
         pipeline.channel().config().setAutoRead(false);
         pipeline.remove(WebSocketHandshakerHandler.class);
         //pipeline.addLast(new DebugHandler("server-pre-cors"));
-        pipeline.addLast("cors-origin-handler", new CORSHandler() );
+        pipeline.addLast("cors-origin-handler", new CORSHandler());
         pipeline.addLast("cors-preflight-handler", new CORSPreflightOptionsHandler());
         //pipeline.addLast( new DebugHandler( "server-post-cors" ) );
         pipeline.addLast("http-resource-decoder", new HttpResourceRequestDecoder(this.codecManager));
         pipeline.addLast("http-resource-encoder", new HttpResourceResponseEncoder(this.codecManager));
         pipeline.addLast("http-request-body-handler", new HttpRequestBodyHandler());
-        pipeline.addLast("interceptor", new InterceptorHandler("http", this.interceptorManager ) );
+        pipeline.addLast("interceptor", new InterceptorHandler("http", this.interceptorManager));
         pipeline.addLast("request-context-disposer", new RequestContextDisposerHandler());
 
         //pipeline.addLast("auth-handler", new AuthHandler(this.client));

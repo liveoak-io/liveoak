@@ -19,7 +19,7 @@ public class UnsecureServer extends AbstractNetworkServer {
     protected ChannelHandler createChildHandler() {
         return new ChannelInitializer<NioSocketChannel>() {
             protected void initChannel(NioSocketChannel ch) throws Exception {
-                ch.pipeline().addLast(new ProtocolDetector(getPipelineConfigurator()));
+                ch.pipeline().addLast("protocol-detector", new ProtocolDetector(getPipelineConfigurator()));
             }
         };
     }
