@@ -54,6 +54,24 @@ loMod.config(['$routeProvider', function($routeProvider) {
         }
       }
     })
+    .when('/applications/:appId/security', {
+      templateUrl : '/admin/console/partials/security-list.html',
+      controller : 'AppClientsCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader){
+          return new LoAppLoader();
+        }
+      }
+    })
+    .when('/applications/:appId/create-security', {
+      templateUrl : '/admin/console/partials/security-create.html',
+      controller : 'AppClientsCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader){
+          return new LoAppLoader();
+        }
+      }
+    })
     .when('/applications/:appId/application-settings', {
       templateUrl : '/admin/console/partials/application-settings.html',
       controller : 'AppSettingsCtrl',

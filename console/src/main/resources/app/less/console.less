@@ -647,6 +647,30 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
       }
     }
   }
+  
+  ul li {
+  
+    margin-bottom: 5px;
+    
+    .translucid {
+      opacity: 0.5;
+    }
+    
+    .fa + a {
+      margin-left: 5px;
+    }
+    
+    .btn-icon {
+      margin-left: 10px;
+      line-height: 14px;
+      visibility: hidden;
+    }
+    
+    &:hover .btn-icon {
+      visibility: visible;
+    }
+    
+  }
 }
 
 .lo-tutorials {
@@ -743,10 +767,13 @@ p.form-info {
     position: relative;
     padding-left: 0;
     font-size: 12px;
+    line-height: 1.3em;
+    padding-top: 5px;
 
     > span {
       position: absolute;
       right: 5px;
+      top: 3px;
     }
   }
   
@@ -780,6 +807,7 @@ p.form-info {
   
   .alert {
     margin-bottom: 0;
+    z-index: 1051;
   }
 }
 
@@ -790,6 +818,24 @@ p.form-info {
   &:before {
     content: "";
   }
+}
+
+.bootstrap-select.btn-group .btn .filter-option {
+  font-size: 12px;
+}
+
+.bootstrap-select.btn-group, 
+.bootstrap-select.btn-group[class*="span"] {
+  margin-bottom: 0;
+}
+
+.col-sm-9.bootstrap-select.btn-group > .dropdown-menu {
+  min-width: calc(~"100% - 25px");
+  margin-left: .5em;
+}
+
+.form-actions {
+  margin-top: 10px;
 }
 
 
@@ -927,6 +973,7 @@ legend {
   span {
     text-indent: -99999px;
     display: inline-block;
+    width: 0;
   }
 
   &:hover, &:focus {
