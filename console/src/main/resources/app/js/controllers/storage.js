@@ -235,8 +235,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   $scope.newRow = {};
   $scope.rowsToDelete = [];
 
-  $scope.isColHidden = false;
-
   // TODO - seems to be redundant because with each column change, there's a data change.
   $scope.isColumnChange = false;
   $scope.isClearAll = false;
@@ -255,6 +253,63 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     if ($scope.columnsHidden.indexOf(item) === -1){
       return true;
     }
+    return false;
+  };
+
+  $scope.isNextHidden = function(currentColumn, inverse) {
+    var currentColumnIndex = $scope.columns.indexOf(currentColumn);
+
+    // If current column doesn't exist the next column cannot be hidden.
+    if (currentColumnIndex === -1){
+      return false;
+    }
+
+    // If the current column is the last column, there is no next column to be hidden.
+    if (currentColumnIndex === $scope.columns.length) {
+      return false;
+    }
+
+    var nextColumnName;
+    if(inverse) {
+      nextColumnName = $scope.columns[currentColumnIndex - 1];
+    } else {
+      nextColumnName = $scope.columns[currentColumnIndex + 1];
+    }
+
+    if ($scope.columnsHidden.indexOf(nextColumnName) > -1){
+      return true;
+    }
+
+    return false;
+  };
+
+  $scope.unhideNext = function(currentColumn, inverse) {
+    var currentColumnIndex = $scope.columns.indexOf(currentColumn);
+
+    // If current column doesn't exist the next column cannot be hidden.
+    if (currentColumnIndex === -1){
+      return false;
+    }
+
+    // If the current column is the last column, there is no next column to unhide.
+    if (currentColumnIndex === $scope.columns.length) {
+      return false;
+    }
+
+    var nextColumnName;
+    if (inverse) {
+      nextColumnName = $scope.columns[currentColumnIndex - 1];
+    } else {
+      nextColumnName = $scope.columns[currentColumnIndex + 1];
+    }
+
+    var hiddenColumnIndex = $scope.columnsHidden.indexOf(nextColumnName);
+
+    if (hiddenColumnIndex > -1){
+      $scope.columnsHidden.splice(hiddenColumnIndex, 1);
+      $scope.unhideNext(nextColumnName, inverse);
+    }
+
     return false;
   };
 
@@ -322,8 +377,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   loadCollectionList();
 
   var resetEnv = function(){
-    $scope.columnsHidden = [];
-    $scope.isColHidden = false;
     $scope.isColumnChange = false;
     $scope.isClearAll = false;
     $scope.isDataChange = false;
@@ -484,13 +537,22 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     }
 
     if (rowToRemove > -1){
-      $scope.collectionData._members.splice(rowToRemove, 1);
+      $scope.rowsToDelete.push(id);
     } else {
       $log.error('Unable to find item to remove. The ID \"'+rowToRemove+'\" does not exist.');
     }
 
-    $scope.rowsToDelete.push(id);
     $scope.isDataChange = true;
+  };
+
+  $scope.rowRemoveUndo = function(id) {
+    $log.debug('Un-deleting row ' + id);
+
+    var undoRowId = $scope.rowsToDelete.indexOf(id);
+
+    if (undoRowId > -1){
+      $scope.rowsToDelete.splice(undoRowId, 1);
+    }
   };
 
   $scope.columnAdd = function(columnName){
@@ -538,7 +600,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
   $scope.columnHide = function(col) {
     $scope.columnsHidden.push(col);
-    $scope.isColHidden = true;
   };
 
   $scope.collectionClear = function(){
@@ -594,13 +655,26 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
           collectionId: $scope.collectionId, itemId: itemToClear.id});
       }
     } else {
+
+      var removeFromList = function(id){
+        for (var k in $scope.collectionData._members){
+          var item = $scope.collectionData._members[k];
+          if (item.id === id){
+            $scope.collectionDataBackup._members.splice(k,1);
+            return;
+          }
+        }
+      };
+
     // Else delete specific rows only
       for (var i in $scope.rowsToDelete) {
         var itemToDelete = $scope.rowsToDelete[i];
         if (itemToDelete) {
           $log.debug('Going to delete: ' + JSON.stringify(itemToDelete));
-          LoCollectionItem.delete({appId: currentApp.id, storageId: $routeParams.storageId,
-            collectionId: $scope.collectionId, itemId: itemToDelete});
+          var deletePromise = LoCollectionItem.delete({appId: currentApp.id, storageId: $routeParams.storageId,
+            collectionId: $scope.collectionId, itemId: itemToDelete}).$promise;
+
+          deletePromise.then(removeFromList(itemToDelete));
         }
       }
     }

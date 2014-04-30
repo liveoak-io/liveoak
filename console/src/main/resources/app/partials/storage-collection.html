@@ -72,24 +72,29 @@
                       <div class="inline-items" ng-repeat="condition in searchConditions">
 
                         <select lo-select="false" class="select-lg selectpicker inline"
-                                ng-model="condition.type"
-                                ng-options="o.key as o.val for o in [{key:'EQUALS', val:'Equals'},{key:'EQUALS_NOT', val:'Not equal'}]">
+                                ng-model="condition.type">
+                          <option value="EQUALS">Equals</option>
+                          <option value="EQUALS_NOT">Not equal</option>
                         </select>
 
                         <input class="inline form-control" type="text" placeholder="Contains text"
                                ng-model="condition.text">
-                        <!--
+
                         <button data-placement="top" data-toggle="tooltip" type="button" ng-click="searchConditionRemove($index)"
                                 class="btn btn-link btn-icon inline add-condition" data-original-title="Remove Condition">
                           <i class="fa fa-minus-circle"></i><span>Add Condition</span></button>
-                        -->
+
+                        <!--
                         <button ng-show="$last"
                                 data-placement="top" data-toggle="tooltip" type="button" ng-click="searchConditionAdd()"
                                 class="btn btn-link btn-icon inline add-condition" data-original-title="Add Condition">
                           <i class="fa fa-plus-circle"></i><span>Add Condition</span></button>
+                          -->
                       </div>
-
                     </div>
+
+                    <a class="lo-condition-add" ng-click="searchConditionAdd()">Add Condition</a>
+
                     <div class="pull-right form-actions">
                       <button class="btn btn-primary btn-lg" ng-click="advancedSearch()">Search</button>
                     </div>
@@ -106,18 +111,32 @@
                       <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                      <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="columnsHidden = []"
-                                                 ng-show="columnsHidden.length > 0">Show All Columns</a></li>
-                      <li role="presentation"><a role="menuitem" tabindex="-1" ng-click="modalDataDeleteAll()"
-                                                 ng-show="(collectionId && (collectionData._members.length > 0))">Delete All Data</a></li>
+                      <li role="presentation">
+                        <a role="menuitem" tabindex="-1" ng-click="columnsHidden = []"
+                           ng-show="columnsHidden.length > 0">Show All Columns</a>
+                      </li>
+                      <li role="presentation">
+                        <a role="menuitem" tabindex="-1" ng-click="modalDataDeleteAll()"
+                           ng-show="(collectionId && (collectionData._members.length > 0))">Delete All Data</a>
+                      </li>
                     </ul>
                   </div>
                 </div>
               </th>
             </tr>
             <tr>
-              <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown" ng-class="{'before-actions':$last}">
+              <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown caption" ng-class="{'before-actions':$last}">
+                <button class="btn btn-link btn-icon btn-unhide btn-unhide-left" type="button"
+                        ng-show="isNextHidden(column, true) && $first" ng-click="unhideNext(column, true)">
+                  <i class="lo-unhide-right"></i>
+                </button>
                 {{ column }}
+                <button class="btn btn-link btn-icon btn-unhide btn-unhide-right" type="button"
+                        ng-show="isNextHidden(column)" ng-click="unhideNext(column)">
+                  <i class="lo-unhide-left"></i>
+                  <i class="lo-unhide-right"></i>
+                </button>
+
                 <div class="dropdown">
                   <button class="btn btn-link btn-icon dropdown-toggle" type="button">
                     <i class="fa fa-caret-square-o-down"></i>
@@ -132,26 +151,43 @@
                   </ul>
                 </div>
               </th>
-              <th class="actions">Actions</th>
+              <th class="actions caption">
+                <button class="btn btn-link btn-icon btn-unhide btn-unhide-left" type="button"
+                        ng-show="columns.length === columnsHidden.length" ng-click="columnsHidden = []">
+                  <i class="lo-unhide-right"></i>
+                </button>
+                Actions
+              </th>
             </tr>
             </thead>
             <tbody ng-show="collectionId && (columns.length > 0)">
-            <tr ng-repeat="item in collectionData._members | orderBy:predicate:reverse | conditional:searchQuery:filterColumns:filterConditions">
+            <tr ng-repeat="item in collectionData._members | orderBy:predicate:reverse | conditional:searchQuery:filterColumns:filterConditions"
+                ng-class="{deleted: rowsToDelete.indexOf(item['id']) > -1}">
 
               <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}" ng-click="isEdit = (true && column !== 'id')">
                 <input class="form-control" type="text" ng-show="isEdit" ng-model="item[column]"/>
                 <span ng-hide="isEdit">{{ item[column] }}</span>
               </td>
               <td class="actions">
-                <button class="btn btn-link btn-icon" tooltip="Delete Row" ng-click="rowRemove(item['id'])">
+
+                <button class="btn btn-link btn-icon" tooltip="Delete Row" ng-click="rowRemove(item['id'])"
+                        ng-show="rowsToDelete.indexOf(item['id']) < 0">
                   <i class="fa fa-trash-o"></i>
                   <span>Delete Row</span>
                 </button>
+
+                <div ng-show="rowsToDelete.indexOf(item['id']) > -1">
+                  <button class="btn btn-link btn-icon" tooltip="Put back" ng-click="rowRemoveUndo(item['id'])">
+                    <i class="fa fa-rotate-left"></i>
+                    <span>Put back</span>
+                  </button>
+                </div>
+
               </td>
             </tr>
             </tbody>
           </table>
-          <div class="pull-right form-actions" ng-show="isDataChange || isColHidden || isClearAll || isColumnChange || rowsToDelete.length > 0">
+          <div class="pull-right form-actions" ng-show="isDataChange || isClearAll || isColumnChange || rowsToDelete.length > 0">
             <button class="btn btn-default btn-lg" ng-click="reset()">Clear changes</button>
             <button class="btn btn-primary btn-lg" ng-click="save()">Save</button>
           </div>
