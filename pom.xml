@@ -108,6 +108,7 @@
         <module>modules</module>
         <module>console</module>
         <module>keycloak</module>
+        <module>proxy</module>
         <module>dist</module>
         <module>testsuite</module>
     </modules>

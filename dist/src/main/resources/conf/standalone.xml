@@ -342,7 +342,7 @@
             <server name="default-server">
                 <http-listener name="default" socket-binding="http"/>
                 <host name="default-host" alias="localhost">
-                    <location name="/" handler="welcome-content"/>
+                    <location name="/" handler="reverse-proxy"/>
                     <filter-ref name="server-header"/>
                     <filter-ref name="x-powered-by-header"/>
                 </host>
@@ -351,6 +351,9 @@
                 <jsp-config/>
             </servlet-container>
             <handlers>
+                <reverse-proxy name="reverse-proxy" connections-per-thread="30">
+                    <host name="http://localhost:8081" instance-id="myRoute"/>
+                </reverse-proxy>
                 <file name="welcome-content" path="${jboss.home.dir}/welcome-content" directory-listing="true"/>
             </handlers>
             <filters>
@@ -392,8 +395,8 @@
         <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
         <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9993}"/>
         <socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>
-        <socket-binding name="liveoak" port="${jboss.liveoak.port:8080}"/>
-        <socket-binding name="http" port="${jboss.http.port:8383}"/>
+        <socket-binding name="liveoak" port="${jboss.liveoak.port:8081}"/>
+        <socket-binding name="http" port="${jboss.http.port:8080}"/>
         <socket-binding name="https" port="${jboss.https.port:8443}"/>
         <socket-binding name="txn-recovery-environment" port="4712"/>
         <socket-binding name="txn-status-manager" port="4713"/>
