@@ -1551,3 +1551,23 @@ legend {
     margin-top: 25px;
   }
 }
+
+.lo-checkbox {
+  opacity: 0.1;
+  &.selected {
+    opacity: 1.0;
+    color: @c_green;
+  }
+  &:hover {
+    opacity: 0.5;
+  }
+}
+
+tr.deleted {
+  td {
+    span {
+      opacity: 0.4;
+      text-decoration: line-through;
+    }
+  }
+}
