@@ -2,18 +2,22 @@
 
 var loMod = angular.module('loApp.controllers.application', []);
 
-loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal, $filter, Notifications, loAppList, LoApp, LoStorage, LoPush) {
+loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal, $filter, Notifications, loAppList, LoApp, LoStorage, LoPush, LoRealmApp) {
 
   $scope.applications = [];
 
   $scope.createdId = $routeParams.created;
 
-  var increaseStorages = function (resources) {
-    for (var j = 0; j < resources._members.length; j++) {
-      if(resources._members[j].hasOwnProperty('MongoClientOptions')) {
-        app.mongoStorages++;
+  var increaseStorages = function(app) {
+    return function (resources) {
+      if (resources._members) {
+        for (var j = 0; j < resources._members.length; j++) {
+          if (resources._members[j].hasOwnProperty('MongoClientOptions')) {
+            app.mongoStorages++;
+          }
+        }
       }
-    }
+    };
   };
 
   var filtered = $filter('filter')(loAppList._members, {'visible': true});
@@ -26,7 +30,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
     app.storage = LoStorage.getList({appId: app.id});
 
     app.mongoStorages = 0;
-    app.storage.$promise.then(increaseStorages);
+    app.storage.$promise.then(increaseStorages(app));
     app.push = LoPush.get({appId: app.id});
 
     $scope.applications.push(app);
@@ -115,70 +119,78 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
       }
     };
 
-    LoApp.create(data,
-      // success
-      function(/*value, responseHeaders*/) {
-        if($scope.setupType === 'basic') {
-          var storageData = {
-            id: $scope.storagePath,
-            type: 'mongo',
-            config: {
-              db: $scope.appModel.id,
-              servers: [{host: 'localhost', port: 27017}],
-              credentials: []
-            }
-          };
+    new LoRealmApp({name: $scope.appModel.id}).$create({realmId: 'liveoak-apps'},
+      function(/*realmApp*/) {
+        LoApp.create(data,
+          // success
+          function(/*value, responseHeaders*/) {
+            if($scope.setupType === 'basic') {
+              var storageData = {
+                id: $scope.storagePath,
+                type: 'mongo',
+                config: {
+                  db: $scope.appModel.id,
+                  servers: [{host: 'localhost', port: 27017}],
+                  credentials: []
+                }
+              };
 
-          LoStorage.create({appId: $scope.appModel.id}, storageData,
-            // success
-            function(/*value, responseHeaders*/) {
-              if($scope.pushModel && $scope.pushModel.upsURL) {
-                var pushData = {
-                  type: 'ups',
-                  config: {
-                    upsURL: $scope.pushModel.upsURL,
-                    applicationId: $scope.pushModel.applicationId,
-                    masterSecret: $scope.pushModel.masterSecret
+              LoStorage.create({appId: $scope.appModel.id}, storageData,
+                // success
+                function(/*value, responseHeaders*/) {
+                  if($scope.pushModel && $scope.pushModel.upsURL) {
+                    var pushData = {
+                      type: 'ups',
+                      config: {
+                        upsURL: $scope.pushModel.upsURL,
+                        applicationId: $scope.pushModel.applicationId,
+                        masterSecret: $scope.pushModel.masterSecret
+                      }
+                    };
+
+                    LoPush.update({appId: $scope.appModel.id}, pushData,
+                      // success
+                      function (/*value, responseHeaders*/) {
+                        Notifications.success('The application ' + data.name + ' has been created with storage and push configured.');
+                        redirectOnNewAppSuccess();
+                      },
+                      // error
+                      function (httpResponse) {
+                        Notifications.httpError('The application ' + data.name + ' has been created with storage but failed to configure push.', httpResponse);
+                      }
+                    );
                   }
-                };
-
-                LoPush.update({appId: $scope.appModel.id}, pushData,
-                  // success
-                  function (/*value, responseHeaders*/) {
-                    Notifications.success('The application ' + data.name + ' has been created with storage and push configured.');
+                  else {
+                    Notifications.success('The application ' + data.name + ' has been created with storage configured.');
                     redirectOnNewAppSuccess();
-                  },
-                  // error
-                  function (httpResponse) {
-                    Notifications.httpError('The application ' + data.name + ' has been created with storage but failed to configure push.', httpResponse);
                   }
-                );
-              }
-              else {
-                Notifications.success('The application ' + data.name + ' has been created with storage configured.');
-                redirectOnNewAppSuccess();
-              }
-            },
-            // error
-            function(httpResponse) {
-              Notifications.httpError('The application ' + data.name + ' has been created but failed to configure storage.', httpResponse);
-              // TODO: Rollback ?
-            });
-        }
-        else {
-          Notifications.success('The application ' + data.name + ' has been created.');
-          redirectOnNewAppSuccess();
-        }
+                },
+                // error
+                function(httpResponse) {
+                  Notifications.httpError('The application ' + data.name + ' has been created but failed to configure storage.', httpResponse);
+                  // TODO: Rollback ?
+                });
+            }
+            else {
+              Notifications.success('The application ' + data.name + ' has been created.');
+              redirectOnNewAppSuccess();
+            }
+          },
+          // error
+          function(httpResponse) {
+            Notifications.httpError('The application ' + data.name + ' could not be created.', httpResponse);
+          });
       },
-      // error
       function(httpResponse) {
         Notifications.httpError('The application ' + data.name + ' could not be created.', httpResponse);
-      });
+      }
+    );
+
   };
 
 });
 
-loMod.controller('AppSettingsCtrl', function($scope, $rootScope, currentApp) {
+loMod.controller('AppSettingsCtrl', function($scope, $rootScope, $log, $route, $modal, currentApp, LoRealmApp, LoRealmAppRoles, loRealmApp, loRealmAppRoles, Notifications) {
 
   $rootScope.curApp = currentApp;
 
@@ -188,6 +200,164 @@ loMod.controller('AppSettingsCtrl', function($scope, $rootScope, currentApp) {
     {'label': 'Settings',      'href':'#/applications/' + currentApp.id + '/application-settings'}
   ];
 
+  var settingsBackup = {};
+  var resetEnv = function() {
+    $scope.settings = {
+      name: currentApp.name,
+      roles: loRealmAppRoles,
+      defaultRoles: angular.copy(loRealmApp.defaultRoles),
+      deletedRoles: [],
+      newRoles: []
+    };
+    settingsBackup = angular.copy($scope.settings);
+  };
+
+  resetEnv();
+
+  $scope.$watch('settings', function() {
+    $scope.changed = !angular.equals($scope.settings, settingsBackup);
+  }, true);
+
+  $scope.clear = function() {
+    $scope.settings = angular.copy(settingsBackup);
+    $scope.changed = false;
+  };
+
+  $scope.toggleDefaultRole = function(roleName) {
+    var idx = $scope.settings.defaultRoles.indexOf(roleName);
+    if (idx > -1) {
+      $scope.settings.defaultRoles.splice(idx, 1);
+    }
+    else {
+      $scope.settings.defaultRoles.push(roleName);
+    }
+  };
+
+  $scope.toggleDeletedRole = function(roleName) {
+    var idx = $scope.settings.deletedRoles.indexOf(roleName);
+    if (idx > -1) {
+      $scope.settings.deletedRoles.splice(idx, 1);
+    }
+    else {
+      $scope.settings.deletedRoles.push(roleName);
+    }
+  };
+
+  var AddRoleModalCtrl = function ($scope, $modalInstance, Notifications, LoRealmAppRoles, roles) {
+
+    $scope.newRole = new LoRealmAppRoles();
+
+    $scope.addRole = function () {
+      for(var i = 0; i < roles.length; i++) {
+        if(roles[i].name === $scope.newRole.name) {
+          Notifications.error('The role with name "' + $scope.newRole.name + '" already exists.');
+          return;
+        }
+      }
+
+      $modalInstance.close($scope.newRole);
+    };
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+
+  };
+
+  $scope.modalAddRole = function() {
+    var modalAddRole = $modal.open({
+      templateUrl: '/admin/console/templates/modal/application/role-add.html',
+      controller: AddRoleModalCtrl,
+      scope: $scope,
+      resolve: {
+        roles: function () {
+          return $scope.settings.roles.concat($scope.settings.newRoles);
+        }
+      }
+    });
+
+    modalAddRole.result.then(
+      function(newRole) { // modal completion
+        $scope.settings.newRoles.push(newRole);
+      }
+    );
+  };
+
+  $scope.pendingTasks = -1;
+
+  $scope.$watch('pendingTasks', function (newVal, oldVal/*, scope*/) {
+    if(oldVal === 1 && newVal === 0) {
+      $route.reload();
+    }
+  });
+
+  $scope.save = function() {
+    // check newly added and simultaneously deleted roles..
+    // we are going backwards so splice won't affect the index we are working at
+    var idx = $scope.settings.newRoles.length;
+    while (idx--) {
+      var deletedIdx = $scope.settings.deletedRoles.indexOf($scope.settings.newRoles[idx]);
+      if (deletedIdx !== -1) {
+        $scope.settings.deletedRoles.splice(deletedIdx, 1);
+        $scope.settings.newRoles.splice(idx, 1);
+      }
+    }
+
+    var defaultRolesChanged = !angular.equals(loRealmApp.defaultRoles, $scope.settings.defaultRoles);
+    $scope.pendingTasks = $scope.settings.deletedRoles.length + $scope.settings.newRoles.length + defaultRolesChanged;
+
+    var deleteRoleSuccessCallback = function(value) {
+      $scope.pendingTasks--;
+      Notifications.success('The application role "' +  value.name + '" was deleted.');
+    };
+
+    var deleteRoleFailureCallback = function(httpResponse) {
+      $scope.pendingTasks--;
+      Notifications.error('Unable to delete the application role "' +  httpResponse.config.data.name + '".', httpResponse);
+    };
+
+    for (var drIdx = 0; drIdx < $scope.settings.deletedRoles.length; drIdx++) {
+      $scope.settings.deletedRoles[drIdx].$delete({realmId: 'liveoak-apps', appId: currentApp.id, roleName: $scope.settings.deletedRoles[drIdx].name},
+        deleteRoleSuccessCallback, deleteRoleFailureCallback
+      );
+    }
+
+    var addRoleSuccessCallback = function(value) {
+      $scope.pendingTasks--;
+      Notifications.success('The application role "' + value.name + '" has been created.');
+    };
+
+    var addRoleFailureCallback = function(httpResponse) {
+      $scope.pendingTasks--;
+      Notifications.error('Unable to create the application role "' + httpResponse.config.data.name + '".', httpResponse);
+    };
+
+    for (var nrIdx = 0; nrIdx < $scope.settings.newRoles.length; nrIdx++) {
+      $scope.settings.newRoles[nrIdx].$save({realmId: 'liveoak-apps', appId: currentApp.id},
+        addRoleSuccessCallback, addRoleFailureCallback
+      );
+    }
+
+    if (!angular.equals(loRealmApp.defaultRoles, $scope.settings.defaultRoles)) {
+      loRealmApp.defaultRoles = $scope.settings.defaultRoles;
+      loRealmApp.$save({realmId: 'liveoak-apps', appId: currentApp.id},
+        function(value/*, responseHeaders*/) {
+          $scope.pendingTasks--;
+          Notifications.success('The application default roles have been set to: "' + value.defaultRoles + '".');
+        },
+        function (httpResponse) {
+          $scope.pendingTasks--;
+          Notifications.error('Unable to configure the application default roles.', httpResponse);
+        }
+      );
+    }
+
+    // FIXME: Check this once REST works for renaming
+    if(currentApp.name !== $scope.settings.name) {
+      currentApp.name = $scope.settings.name;
+      currentApp.$save();
+    }
+  };
 });
 
 loMod.controller('AppClientsCtrl', function($scope, $rootScope, currentApp) {

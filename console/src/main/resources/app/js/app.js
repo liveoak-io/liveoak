@@ -76,8 +76,14 @@ loMod.config(['$routeProvider', function($routeProvider) {
       templateUrl : '/admin/console/partials/application-settings.html',
       controller : 'AppSettingsCtrl',
       resolve: {
-        currentApp: function(LoAppLoader){
+        currentApp: function(LoAppLoader) {
           return new LoAppLoader();
+        },
+        loRealmApp : function(LoRealmAppLoader) {
+          return new LoRealmAppLoader();
+        },
+        loRealmAppRoles : function(LoRealmAppRolesLoader) {
+          return new LoRealmAppRolesLoader();
         }
       }
     })

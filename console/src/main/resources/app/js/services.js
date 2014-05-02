@@ -89,7 +89,7 @@ loMod.factory('Notifications', function($rootScope, $timeout, $log) {
   };
 
   notifications.httpError = function(message, httpResponse) {
-    message += ' (' + (httpResponse.data.message ? (httpResponse.data.message) : (httpResponse.data.cause ? (httpResponse.data.cause) : '')) + ')';
+    message += ' (' + (httpResponse.data.message || httpResponse.data.cause || httpResponse.data.cause || httpResponse.data.errorMessage) + ')';
     notifications.message('danger', 'Error!', message);
     $log.error(message);
   };
@@ -234,6 +234,10 @@ loMod.factory('LoApp', function($resource) {
     create : {
       method : 'POST',
       url: '/admin/applications/'
+    },
+    save : {
+      method : 'PUT',
+      url: '/admin/applications/:appId'
     }
   });
 });
@@ -319,3 +323,42 @@ loMod.factory('LoPush', function($resource) {
   });
 });
 
+loMod.factory('LoRealmApp', function($resource) {
+  return $resource('http://' + window.location.hostname + ':8383/auth/rest/admin/realms/:realmId/applications/:appId', {
+    realmId : 'liveoak-apps',
+    appId: '@appId'
+  }, {
+    save: {
+      method: 'PUT'
+    },
+    create: {
+      method: 'POST'
+    }
+  });
+});
+
+loMod.factory('LoRealmAppRoles', function($resource) {
+  return $resource('http://' + window.location.hostname + ':8383/auth/rest/admin/realms/:realmId/applications/:appId/roles/:roleName', {
+    realmId : '@realmId',
+    appId: '@appId',
+    roleName: '@roleName'
+  });
+});
+
+loMod.factory('LoRealmAppLoader', function(Loader, LoRealmApp, $route) {
+  return Loader.get(LoRealmApp, function() {
+    return {
+      realmId: 'liveoak-apps',
+      appId : $route.current.params.appId
+    };
+  });
+});
+
+loMod.factory('LoRealmAppRolesLoader', function(Loader, LoRealmAppRoles, $route) {
+  return Loader.query(LoRealmAppRoles, function() {
+    return {
+      realmId: 'liveoak-apps',
+      appId : $route.current.params.appId
+    };
+  });
+});
