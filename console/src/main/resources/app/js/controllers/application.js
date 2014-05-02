@@ -124,6 +124,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
         LoApp.create(data,
           // success
           function(/*value, responseHeaders*/) {
+            new LoApp({type:'aggregating-filesystem',config:{directory:'${io.liveoak.js.dir}'}}).$addResource({appId: $scope.appModel.id, resourceId: 'client'});
             if($scope.setupType === 'basic') {
               var storageData = {
                 id: $scope.storagePath,

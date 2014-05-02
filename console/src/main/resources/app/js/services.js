@@ -238,6 +238,10 @@ loMod.factory('LoApp', function($resource) {
     save : {
       method : 'PUT',
       url: '/admin/applications/:appId'
+    },
+    addResource : {
+      method : 'PUT',
+      url: '/admin/applications/:appId/resources/:resourceId'
     }
   });
 });
