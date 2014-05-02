@@ -328,7 +328,7 @@ loMod.factory('LoPush', function($resource) {
 });
 
 loMod.factory('LoRealmApp', function($resource) {
-  return $resource('http://' + window.location.hostname + ':8383/auth/rest/admin/realms/:realmId/applications/:appId', {
+  return $resource('/auth/rest/admin/realms/:realmId/applications/:appId', {
     realmId : 'liveoak-apps',
     appId: '@appId'
   }, {
@@ -342,7 +342,7 @@ loMod.factory('LoRealmApp', function($resource) {
 });
 
 loMod.factory('LoRealmAppRoles', function($resource) {
-  return $resource('http://' + window.location.hostname + ':8383/auth/rest/admin/realms/:realmId/applications/:appId/roles/:roleName', {
+  return $resource('/auth/rest/admin/realms/:realmId/applications/:appId/roles/:roleName', {
     realmId : '@realmId',
     appId: '@appId',
     roleName: '@roleName'
