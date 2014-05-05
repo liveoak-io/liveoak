@@ -1,5 +1,6 @@
 {
     module-id:  'io.liveoak.mongo',
+    dependencies: ['mongo-launcher'],
     config: {
       db: "liveoak"
     }
