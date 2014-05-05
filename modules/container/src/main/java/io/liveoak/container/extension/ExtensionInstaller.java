@@ -1,5 +1,6 @@
 package io.liveoak.container.extension;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -9,6 +10,7 @@ import io.liveoak.spi.extension.Extension;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoader;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StabilityMonitor;
@@ -71,9 +73,16 @@ public class ExtensionInstaller {
         StabilityMonitor monitor = new StabilityMonitor();
         ServiceTarget target = this.target.subTarget();
         target.addMonitor( monitor );
-        target.addService(LiveOak.extension( id ), new ExtensionService( id, extension, config ) )
-                .install();
-         monitor.awaitStability();
+        ServiceBuilder builder = target.addService(LiveOak.extension(id), new ExtensionService(id, extension, config));
+
+        JsonNode deps = config.get("dependencies");
+        if (deps != null) {
+            for (JsonNode node: deps) {
+                builder.addDependency(LiveOak.extension(node.asText()));
+            }
+        }
+        builder.install();
+        monitor.awaitStability();
     }
 
     private ServiceTarget target;
