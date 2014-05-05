@@ -1047,25 +1047,77 @@ legend {
   }
 
   thead {
+    th {
+      &.caption{
+        text-align: center;
+      }
 
-    th.hasDropdown {
+      &.hasDropdown {
+        .dropdown {
+          float: right;
+          line-height: 17px;
+          visibility: hidden;
 
-      .dropdown {
-        float: right;
-        line-height: 17px;
-        visibility: hidden;
+          &.open {
+            visibility: visible;
+          }
+        }
 
-        &.open {
+        &:hover .dropdown {
           visibility: visible;
+        }
+
+        .btn-icon i {
+          font-size: 14px;
         }
       }
 
-      &:hover .dropdown {
-        visibility: visible;
+      /* Data table hide/unhide buttons*/
+      .btn-unhide {
+
+        font-size: 0px;
+
+        .lo-unhide-left, .lo-unhide-right {
+          background: url('../img/unhide.png');
+          width: 12px;
+          height: 13px;
+          display: inline-block;
+        }
+
+        .lo-unhide-left {
+          background-position: 0 13px;
+          position:relative;
+          left: 1px;
+        }
+
+        .lo-unhide-right {
+          background-position: 12px 13px;
+        }
+
+        &:hover {
+          .lo-unhide-left {
+            background-position: 0 0px;
+          }
+
+          .lo-unhide-right {
+            background-position: 12px 0;
+          }
+        }
       }
 
-      .btn-icon i {
-        font-size: 14px;
+      .btn-unhide-left, .btn-unhide-right {
+        bottom: -4px;
+        position: relative;
+      }
+
+      .btn-unhide-left {
+        float: left;
+        margin-left: -10px;
+      }
+
+      .btn-unhide-right {
+        float: right;
+        margin-right: -23px;
       }
     }
   }
@@ -1089,6 +1141,13 @@ legend {
         margin-left: 10px;
       }
     }
+
+    .deleted {
+      td span{
+        opacity: 0.4;
+        text-decoration: line-through;
+      }
+    }
   }
 
   tr:hover td.actions .btn {
@@ -1110,6 +1169,11 @@ legend {
     font-size: 12px;
     font-weight: normal;
     line-height: 26px;
+  }
+
+  .lo-condition-add {
+    position: relative;
+    top: 15px;
   }
 
   .popover {
@@ -1618,3 +1682,5 @@ tr.deleted {
     }
   }
 }
+
+
