@@ -18,6 +18,7 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 
 /**
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
@@ -69,7 +70,7 @@ public interface ConfigResource extends Resource {
                 // Add the value to the sink if it's not null
                 sink.accept(key, value);
             } else {
-                System.err.println("Unable to get value for key: " + key);
+                log.warn("Unable to get value for key: " + key);
             }
         }
 
@@ -87,7 +88,7 @@ public interface ConfigResource extends Resource {
                             // Add the value to the sink if it's not null
                             sink.accept(entry.getKey(), entry.getValue());
                         } else {
-                            System.err.println("Unable to get value for key: " + entry.getKey());
+                            log.warn("Unable to get value for key: " + entry.getKey());
                         }
                     }
                 }
@@ -265,4 +266,5 @@ public interface ConfigResource extends Resource {
         return fields;
     }
 
+    static final Logger log = Logger.getLogger(ConfigResource.class);
 }

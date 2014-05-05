@@ -19,7 +19,7 @@ public class LocalServerService implements Service<LocalServer> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        System.err.println( "start local server: " + context.getController().getName() );
+        log.info("start local server: " + context.getController().getName());
         this.server = new LocalServer();
         this.server.pipelineConfigurator(this.pipelineConfiguratorInjector.getValue());
         try {
@@ -28,7 +28,7 @@ public class LocalServerService implements Service<LocalServer> {
             log.error("", e);
             throw new StartException(e);
         }
-        System.err.println( "local server started" );
+        log.info("local server started");
     }
 
     @Override

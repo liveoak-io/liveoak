@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ObjectMapperFactory;
+import org.jboss.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,10 +60,12 @@ public class ApplicationConfigurationManager {
         ObjectMapper mapper = ObjectMapperFactory.create();
         ObjectWriter writer = mapper.writer();
         writer = writer.with(new DefaultPrettyPrinter("\\n"));
-        System.err.println( "writing " + tree + " to " + this.file );
+        log.debug("writing " + tree + " to " + this.file);
         writer.writeValue( this.file, tree );
-        System.err.println( "write complete" );
+        log.debug("write complete");
     }
 
     private final File file;
+
+    private static final Logger log = Logger.getLogger(ApplicationConfigurationManager.class);
 }

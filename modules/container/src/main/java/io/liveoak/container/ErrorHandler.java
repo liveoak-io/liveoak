@@ -23,8 +23,6 @@ public class ErrorHandler extends ChannelDuplexHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.error("Internal error: ", cause);
-        System.err.println( cause );
-        cause.printStackTrace();
         DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR);
         response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
     }

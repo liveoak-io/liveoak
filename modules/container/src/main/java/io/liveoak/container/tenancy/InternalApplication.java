@@ -12,6 +12,7 @@ import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
@@ -114,8 +115,7 @@ public class InternalApplication implements Application {
 
         if (intAppExt.exception() != null) {
             intAppExt.remove();
-            //TODO Log this better?
-            intAppExt.exception().printStackTrace(System.err);
+            log.error(intAppExt.exception());
             throw intAppExt.exception();
         }
 
@@ -150,4 +150,5 @@ public class InternalApplication implements Application {
     private final ResourcePath htmlAppPath;
     private Boolean visible;
 
+    private static final Logger log = Logger.getLogger(InternalApplication.class);
 }

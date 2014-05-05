@@ -6,6 +6,7 @@ import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
+import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.*;
 import org.jboss.msc.value.InjectedValue;
@@ -28,7 +29,7 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
     @Override
     public void start(StartContext context) throws StartException {
 
-        System.err.println( "** Activate " + this.extensionId + " as " + resourceId + " for " + this.applicationInjector.getValue().id() );
+        log.info( "** Activate " + this.extensionId + " as " + resourceId + " for " + this.applicationInjector.getValue().id() );
 
         ServiceTarget target = context.getChildTarget();
 
@@ -120,4 +121,6 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
     private InternalApplicationExtension appExtension;
     private final ObjectNode configuration;
     private boolean boottime;
+
+    private static final Logger log = Logger.getLogger(ApplicationExtensionService.class);
 }

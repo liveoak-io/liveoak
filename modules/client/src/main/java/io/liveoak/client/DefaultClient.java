@@ -17,6 +17,7 @@ import io.liveoak.spi.UpdateNotSupportedException;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 
 import java.net.SocketAddress;
 import java.util.concurrent.CompletableFuture;
@@ -34,7 +35,7 @@ public class DefaultClient implements Client {
 
     //@Override
     public void connect(SocketAddress address) throws Exception {
-        System.err.println( "connect local client" );
+        log.debug("connect local client");
         this.connection = new LocalConnection(this);
         this.connection.connect(address);
     }
@@ -287,4 +288,6 @@ public class DefaultClient implements Client {
     }
 
     private Connection connection;
+
+    private static final Logger log = Logger.getLogger(DefaultClient.class);
 }

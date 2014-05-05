@@ -50,16 +50,14 @@ public class DebugHandler extends ChannelDuplexHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.debugf(cause, "%s  exception-caught", this.name);
-        System.err.println( this.name + " // " + cause );
         super.exceptionCaught(ctx, cause);
     }
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         log.debugf("%s write: %s", this.name, msg);
-        System.err.println(this.name + " // WRITE // " + msg);
         if ( msg instanceof ByteBuf) {
-            System.err.println( ((ByteBuf)msg).toString( Charset.defaultCharset() ));
+            log.debug( ((ByteBuf)msg).toString( Charset.defaultCharset() ));
         }
         super.write(ctx, msg, promise);
     }
@@ -67,9 +65,8 @@ public class DebugHandler extends ChannelDuplexHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         log.debugf("%s read : %s // %s", this.name, msg, msg.getClass());
-        System.err.println(this.name + " // READ // " + msg);
         if ( msg instanceof ByteBuf ) {
-            System.err.println( ((ByteBuf) msg).toString( Charset.defaultCharset() ));
+            log.debug( ((ByteBuf) msg).toString( Charset.defaultCharset() ));
         }
         ReferenceCountUtil.retain(msg);
         super.channelRead(ctx, msg);

@@ -16,10 +16,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
 
+import org.jboss.logging.Logger;
+
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 public class MongoInstaller {
+
+    private static final Logger log = Logger.getLogger(MongoInstaller.class);
 
     private static final String CLEAR;
 
@@ -55,11 +59,11 @@ public class MongoInstaller {
     }
 
     public void performInstall() throws IOException {
-        System.err.println( "attempting to install mongo!" );
-        System.err.println( "attempting to install mongo!" );
-        System.err.println( "attempting to install mongo!" );
-        System.err.println( "attempting to install mongo!" );
-        System.err.println( "attempting to install mongo!" );
+        log.debug("attempting to install mongo!");
+        log.debug("attempting to install mongo!");
+        log.debug("attempting to install mongo!");
+        log.debug("attempting to install mongo!");
+        log.debug("attempting to install mongo!");
         // determine architecture
         OsArch osArch = OsUtils.determineOSAndArch();
 
@@ -92,7 +96,7 @@ public class MongoInstaller {
         boolean skipDownload = false;
         if (matches.length == 1) {
             if (matches[0].isDirectory()) {
-                System.out.println("MongoDB already installed at: " + matches[0].getAbsolutePath());
+                log.info("MongoDB already installed at: " + matches[0].getAbsolutePath());
                 skipDownload = true;
             } else {
                 throw new RuntimeException("Installation can't continue. Please remove the file: " + matches[0].getAbsolutePath());
@@ -100,15 +104,15 @@ public class MongoInstaller {
         }
 
         if (!skipDownload) {
-            System.out.println("No existing MongoDB found");
-            System.out.println("Installing from: " + url);
+            log.info("No existing MongoDB found");
+            log.info("Installing from: " + url);
 
             download(new URL(url), dest);
             //fakeDownload(new URL(url), dest);
 
             try {
                 // unpack into install location
-                System.out.println("Unpacking to: " + installDir);
+                log.info("Unpacking to: " + installDir);
                 if (osArch.isWindows()) {
                     OsUtils.unjarOnWindows(installDir, dest.getAbsolutePath(), true);
                 } else {
@@ -215,7 +219,7 @@ public class MongoInstaller {
         try {
             new MongoInstaller().performInstall();
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            log.error(e.getMessage());
             System.exit(-1);
         }
     }

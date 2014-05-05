@@ -3,6 +3,7 @@ package io.liveoak.container.service;
 import io.liveoak.client.DefaultClient;
 import io.liveoak.spi.client.Client;
 import io.netty.channel.local.LocalAddress;
+import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -17,7 +18,7 @@ public class ClientConnectorService implements Service<Void> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        System.err.println( "connect client" );
+        log.debug("connect client");
         try {
             this.clientInjector.getValue().connect( new LocalAddress( "liveoak" ) );
         } catch (Exception e) {
@@ -40,4 +41,6 @@ public class ClientConnectorService implements Service<Void> {
     }
 
     private InjectedValue<DefaultClient> clientInjector = new InjectedValue<>();
+
+    private static final Logger log = Logger.getLogger(ClientConnectorService.class);
 }

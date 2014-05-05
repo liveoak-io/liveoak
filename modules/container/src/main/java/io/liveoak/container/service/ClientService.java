@@ -3,6 +3,7 @@ package io.liveoak.container.service;
 import io.liveoak.client.DefaultClient;
 import io.liveoak.container.server.LocalServer;
 import io.liveoak.spi.client.Client;
+import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -17,7 +18,7 @@ public class ClientService implements Service<DefaultClient> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        System.err.println( "start client" );
+        log.debug("start client");
         this.client = new DefaultClient();
     }
 
@@ -32,4 +33,6 @@ public class ClientService implements Service<DefaultClient> {
     }
 
     private DefaultClient client;
+
+    private static final Logger log = Logger.getLogger(ClientService.class);
 }

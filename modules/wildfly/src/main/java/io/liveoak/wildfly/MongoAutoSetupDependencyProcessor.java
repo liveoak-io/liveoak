@@ -4,6 +4,7 @@ import io.liveoak.spi.LiveOak;
 import org.jboss.as.ee.structure.DeploymentType;
 import org.jboss.as.ee.structure.DeploymentTypeMarker;
 import org.jboss.as.server.deployment.*;
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceName;
 
 import java.util.Collections;
@@ -16,6 +17,7 @@ import static org.jboss.as.ee.component.Attachments.WEB_SETUP_ACTIONS;
  */
 public class MongoAutoSetupDependencyProcessor implements DeploymentUnitProcessor {
 
+    private static final Logger log = Logger.getLogger(MongoAutoSetupDependencyProcessor.class);
 
     public static final int PRIORITY = 1;
     public static final Phase PHASE = Phase.DEPENDENCIES;
@@ -28,7 +30,7 @@ public class MongoAutoSetupDependencyProcessor implements DeploymentUnitProcesso
         if (!DeploymentTypeMarker.isType(DeploymentType.WAR, deploymentUnit)) {
             return; // Skip non web deployments
         }
-        System.err.println( "adding dependency on mongo to: " + deploymentUnit.getServiceName() );
+        log.info("adding dependency on mongo to: " + deploymentUnit.getServiceName());
         deploymentUnit.addToAttachmentList( WEB_SETUP_ACTIONS,  new DependencySetupAction() );
     }
 

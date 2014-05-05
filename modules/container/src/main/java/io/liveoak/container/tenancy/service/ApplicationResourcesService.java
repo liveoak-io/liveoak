@@ -4,6 +4,7 @@ import java.util.Set;
 
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -23,7 +24,7 @@ public class ApplicationResourcesService implements Service<Void> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        System.err.println( "application resources service: START: " + this.resourcesTree );
+        log.debug("application resources service: START: " + this.resourcesTree);
         if (this.resourcesTree == null) {
             return;
         }
@@ -35,7 +36,7 @@ public class ApplicationResourcesService implements Service<Void> {
                     Set<String> fields = this.resourcesTree.getPropertyNames();
                     for (String resourceId : fields) {
                         ResourceState resourceState = (ResourceState) this.resourcesTree.getProperty(resourceId);
-                        System.err.println( "BOOTTIME INSTALL OF: " + resourceId );
+                        log.debug("BOOTTIME INSTALL OF: " + resourceId);
                         this.applicationInjector.getValue().extend(resourceId, resourceState, true);
                     }
                     context.complete();
@@ -65,4 +66,6 @@ public class ApplicationResourcesService implements Service<Void> {
 
     private ResourceState resourcesTree;
     private InjectedValue<InternalApplication> applicationInjector = new InjectedValue<>();
+
+    private static final Logger log = Logger.getLogger(ApplicationResourcesService.class);
 }

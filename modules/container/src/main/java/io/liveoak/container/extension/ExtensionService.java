@@ -6,6 +6,7 @@ import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.*;
 
 /**
@@ -41,7 +42,7 @@ public class ExtensionService implements Service<Extension> {
         } catch (Exception e) {
             throw new StartException(e);
         }
-        System.err.println( "** Extension activated: " + this.id );
+        log.info("** Extension activated: " + this.id);
     }
 
     @Override
@@ -75,5 +76,7 @@ public class ExtensionService implements Service<Extension> {
     private final Extension extension;
     private final ObjectNode fullConfig;
     private boolean common;
+
+    private static final Logger log = Logger.getLogger(ExtensionService.class);
 
 }

@@ -16,6 +16,7 @@ import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
@@ -50,16 +51,16 @@ public class ApplicationService implements Service<InternalApplication> {
             appDir = new File(this.applicationsDirectoryInjector.getValue(), this.id);
         }
 
-        if ( ! appDir.exists() ) {
-            System.err.println( "attempt to create: " + appDir );
+        if ( !appDir.exists() ) {
+            log.debug("attempt to create: " + appDir);
             appDir.mkdirs();
         }
 
-        if ( ! appDir.exists() ) {
-            System.err.println( "FAILED TO CREATE: " + appDir );
+        if ( !appDir.exists() ) {
+            log.error("FAILED TO CREATE: " + appDir);
         }
 
-        System.err.println(appDir + " .mkdirs: " + appDir.mkdirs() + " // " + appDir.exists());
+        log.debug(appDir + " .mkdirs: " + appDir.mkdirs() + " // " + appDir.exists());
         File applicationJson = new File(appDir, "application.json");
 
         String appName = this.name;
@@ -99,7 +100,7 @@ public class ApplicationService implements Service<InternalApplication> {
                 applicationJson.getParentFile().mkdirs();
                 writer.writeValue(applicationJson, tree);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e);
             }
         }
 
@@ -160,4 +161,6 @@ public class ApplicationService implements Service<InternalApplication> {
     private File directory;
     private InjectedValue<File> applicationsDirectoryInjector = new InjectedValue<>();
     private InternalApplication app;
+
+    private static final Logger log = Logger.getLogger(ApplicationService.class);
 }

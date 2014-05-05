@@ -1,5 +1,6 @@
 package io.liveoak.container.tenancy;
 
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceListener;
 
@@ -17,9 +18,7 @@ public class DebugServiceListener implements ServiceListener {
         switch ( transition.getAfter() ) {
             case PROBLEM:
             case START_FAILED:
-                System.err.println( controller.getName() );
-                controller.getStartException().printStackTrace();
-                System.err.println("");
+                log.error(controller.getName() + " start failed.", controller.getStartException());
                 break;
         }
     }
@@ -63,4 +62,6 @@ public class DebugServiceListener implements ServiceListener {
     public void transitiveDependencyAvailable(ServiceController controller) {
 
     }
+
+    private static final Logger log = Logger.getLogger(DebugServiceListener.class);
 }

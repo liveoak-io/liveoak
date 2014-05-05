@@ -35,7 +35,7 @@ public class MongoLauncherAutoSetup {
 
     public static void setup(File liveoakDir, File confDir) {
 
-        System.err.println( "** SETTING UP MONGO" );
+        log.info("** SETTING UP MONGO");
 
         try {
             liveoakDir = liveoakDir.getCanonicalFile();
