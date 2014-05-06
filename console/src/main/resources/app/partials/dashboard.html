@@ -2,41 +2,41 @@
 
 <div class="col-md-10 lo-main-pane app-dashboard">
   <div class="row">
-    <div class="lo-content-area col-md-10">
+    <div class="lo-content-area col-md-12 col-lg-10">
       <lo-breadcrumbs></lo-breadcrumbs>
 
       <div class="panel lo-dashboard">
-        <div class="panel-heading">
+        <div class="panel-heading clearfix">
           <h2 class="panel-title"><span>{{ curApp.name }}</span> Dashboard</h2>
 
-          <div class="btn-group pull-right">
+          <div class="btn-group">
             <button ng-repeat="period in dataPeriods" class="btn btn-default" type="button" ng-model="$parent.range" btn-radio="period">{{period}}</button>
           </div>
         </div>
 
         <div class="panel-body">
-          <div class="col-md-12 lo-measure-box api highlight">
+          <div class="col-xs-12 lo-measure-box api highlight">
             <i class="fa fa-spinner"></i>
             <div>
               <em>{{data[curApp.name].metrics[range].requests || "0"}}</em>
               <span class="text">API requests / second</span>
             </div>
           </div>
-          <div class="col-md-4 lo-measure-box users">
+          <div class="col-xs-4 lo-measure-box users">
             <i class="fa fa-users"></i>
             <div>
               <em>{{data[curApp.name].metrics[range].users || "0"}}</em>
               <span class="text">active users / second</span>
             </div>
           </div>
-          <div class="col-md-4 lo-measure-box push">
+          <div class="col-xs-4 lo-measure-box push">
             <i class="fa fa-mobile"></i>
             <div>
               <em>{{data[curApp.name].metrics[range].notifications || "0"}}</em>
               <span class="text">notifications / second</span>
             </div>
           </div>
-          <div class="col-md-4 lo-measure-box storage">
+          <div class="col-xs-4 lo-measure-box storage">
             <i class="fa fa-cloud"></i>
             <div>
               <em>{{data[curApp.name].metrics[range].storage || "0.0"}}</em>
@@ -54,7 +54,7 @@
         <a href="#">How to start building your app »</a>
       </section>
     </div>
-    <div class="lo-info-pane col-md-2">
+    <div class="lo-info-pane col-md-12 col-lg-2 clearfix">
       <section class="details">
         <h3><span>{{ curApp.name }}</span> Details</h3>
         <section>

@@ -7,7 +7,7 @@
 
       <h2><span>{{curApp.name}}</span> Storage</h2>
 
-      <div class="lo-page-info">
+      <div class="lo-page-info clearfix">
         <p ng-show="resources">
           <span class="lo-emph">You have</span> <strong>{{resources.length}}</strong> storage resource{{resources.length > 1 ? 's' : ''}}.
         </p>
@@ -28,7 +28,7 @@
           lo-delete="modalStorageDelete(storageId)"></lo-storage-summary>
 
     </div>
-    <div class="lo-info-pane col-md-3">
+    <div class="lo-info-pane col-md-3 clearfix">
       <section class="lo-tutorials">
         <h3><span>LiveOak</span> Tutorials</h3>
         <i class="fa fa-file-text-o fa-4x"></i>
