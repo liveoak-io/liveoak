@@ -45,6 +45,10 @@ public class InternalApplication implements Application {
         return this.name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public File directory() {
         return this.directory;
@@ -53,6 +57,10 @@ public class InternalApplication implements Application {
     @Override
     public Boolean visible() {
         return this.visible;
+    }
+
+    public void setVisible(Boolean visible) {
+        this.visible = visible;
     }
 
     public File configurationFile() {

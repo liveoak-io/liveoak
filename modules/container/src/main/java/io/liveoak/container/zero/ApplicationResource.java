@@ -9,6 +9,8 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
@@ -58,11 +60,25 @@ public class ApplicationResource implements RootResource, SynchronousResource {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("id", this.app.id());
         sink.accept("name", this.app.name());
         sink.accept("visible", this.app.visible());
         sink.accept("directory", this.app.directory().getAbsolutePath());
         sink.close();
+    }
+
+    @Override
+    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        String name = (String) state.getProperty("name");
+        if (name != null && !name.isEmpty()) {
+            this.app.setName(name);
+        }
+
+        Boolean visible = (Boolean) state.getProperty("visible");
+        if (visible != null) {
+            this.app.setVisible(visible);
+        }
+
+        responder.resourceUpdated(this);
     }
 
     private Resource parent;
