@@ -9,11 +9,11 @@
         <h2 class="pull-left"><span>{{curApp.name}}</span> {{ create ? 'New Storage' : storageModel.id }}</h2>
         <p class="subtitle"><span class="required">*</span> Required fields</p>
 
-        <form class="lo-form-horizontal" name="storageForm" novalidate>
+        <form class="lo-form-horizontal clearfix" name="storageForm" novalidate>
           <fieldset>
             <legend lo-collapse class="collapsible"><span class="text">Data Resource</span></legend>
             <div class="form-group">
-              <div class="lo-db-instances col-sm-offset-2">
+              <div class="lo-db-instances col-sm-offset-3">
                 <div class="lo-db-mongo" ng-class="{active: storageModel.type === 'mongo'}" ng-click="storageModel.type = 'mongo'">MongoDB</div> 
                 <!-- <div class="lo-db-mysql" ng-class="{active: storageModel.type === 'mysql'}" ng-click="storageModel.type = 'mysql'">MySQL</div> -->
                 <!-- <div class="lo-db-plsql" ng-class="{active: storageModel.type === 'plsql'}" ng-click="storageModel.type = 'plsql'">PostGres</div> -->
@@ -33,7 +33,7 @@
           <fieldset>
             <legend lo-collapse class="collapsible"><span class="text">Settings</span></legend>
             <div class="form-group clearfix">
-              <label class="col-sm-2 control-label" for="dbhost">Host <span class="required">*</span></label>
+              <label class="col-sm-3  control-label" for="dbhost">Host <span class="required">*</span></label>
 
               <div class="col-sm-4" ng-class="{'has-error': storageForm.dbhost.$error.pattern}">
                 <input class="form-control" ng-model="storageModel.servers[0].host" type="text" id="dbhost" name="dbhost" ng-pattern="reIPv4Host" required placeholder="e.g. localhost">
@@ -41,7 +41,7 @@
               </div>
             </div>
             <div class="form-group clearfix">
-              <label class="col-sm-2 control-label" for="dbport">Port <span class="required">*</span></label>
+              <label class="col-sm-3  control-label" for="dbport">Port <span class="required">*</span></label>
 
               <div class="col-sm-4" ng-class="{'has-error': storageForm.dbport.$dirty && !storageForm.dbport.$valid}">
                 <input class="form-control no-spinner" type="number" ng-model="storageModel.servers[0].port" ng-pattern="rePort" id="dbport" name="dbport" required placeholder="e.g. 27017">
@@ -49,14 +49,14 @@
               </div>
             </div>
             <div class="form-group clearfix">
-              <label class="col-sm-2 control-label" for="dbname">Database Name <span class="required">*</span></label>
+              <label class="col-sm-3  control-label" for="dbname">Database Name <span class="required">*</span></label>
 
               <div class="col-sm-4">
                 <input class="form-control" ng-model="storageModel.db" type="text" id="dbname" required>
               </div>
             </div>
             <div class="form-group clearfix">
-              <label class="col-sm-2 control-label" for="dburl">URL Path <span class="required">*</span></label>
+              <label class="col-sm-3  control-label" for="dburl">URL Path <span class="required">*</span></label>
 
               <div class="col-sm-4">
                 <input class="form-control" ng-model="storageModel.id" id="dburl" ng-disabled="!create" required placeholder="e.g. storage">
@@ -67,21 +67,21 @@
           <fieldset>
             <legend lo-collapse class="collapsible"><span class="text">Security</span></legend>
             <div class="form-group clearfix">
-              <label class="col-sm-2 control-label" for="stuname">Username</label>
+              <label class="col-sm-3  control-label" for="stuname">Username</label>
 
               <div class="col-sm-4">
                 <input class="form-control" ng-model="storageModel.credentials[0].username" type="text" id="stuname">
               </div>
             </div>
             <div class="form-group clearfix">
-              <label class="col-sm-2 control-label" for="passwd">Password</label>
+              <label class="col-sm-3  control-label" for="passwd">Password</label>
 
               <div class="col-sm-4">
                 <input class="form-control" ng-model="storageModel.credentials[0].password" type="password" id="passwd">
               </div>
             </div>
             <div class="form-group clearfix">
-              <label class="col-sm-2 control-label" for="passwdConfirm">Password confirmation</label>
+              <label class="col-sm-3  control-label" for="passwdConfirm">Password confirmation</label>
 
               <div class="col-sm-4">
                 <input class="form-control" ng-model="passwdConfirm" ng-disabled="!storageModel.credentials[0].password" type="password" id="passwdConfirm">
