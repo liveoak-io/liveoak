@@ -42,15 +42,55 @@ loMod.config(['$routeProvider', function($routeProvider) {
       resolve: {
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
+        },
+        loRealmAppClients : function(LoRealmAppListLoader) {
+          return new LoRealmAppListLoader();
         }
       }
     })
-    .when('/applications/:appId/application-client', {
+    .when('/applications/:appId/application-clients/:clientId', {
       templateUrl : '/admin/console/partials/application-client.html',
-      controller : 'AppClientsCtrl',
+      controller : 'AppClientCtrl',
       resolve: {
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
+        },
+        loRealmAppClient: function(LoRealmApp, $route) {
+          return LoRealmApp.get({appId: $route.current.params.clientId}).$promise.then(function (data) {
+            return data;
+          });
+        },
+        loClientRoles: function(LoRealmAppRoles, $route) {
+          return LoRealmAppRoles.query({appId: $route.current.params.clientId}).$promise.then(function (data) {
+            return data;
+          });
+        },
+        loRealmRoles: function(LoRealmRolesLoader){
+          return new LoRealmRolesLoader();
+        },
+        scopeMappings: function(LoRealmAppClientScopeMappingLoader){
+          return new LoRealmAppClientScopeMappingLoader();
+        }
+      }
+    })
+    .when('/applications/:appId/create-client', {
+      templateUrl : '/admin/console/partials/application-client.html',
+      controller : 'AppClientCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader){
+          return new LoAppLoader();
+        },
+        loRealmAppClient: function(LoRealmApp) {
+          return new LoRealmApp();
+        },
+        loClientRoles: function(LoRealmAppRoles) {
+          return new LoRealmAppRoles();
+        },
+        loRealmRoles: function(LoRealmRolesLoader){
+          return new LoRealmRolesLoader();
+        },
+        scopeMappings: function(LoRealmAppClientScopeMapping){
+          return new LoRealmAppClientScopeMapping();
         }
       }
     })

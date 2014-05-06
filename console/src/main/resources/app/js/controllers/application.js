@@ -361,7 +361,26 @@ loMod.controller('AppSettingsCtrl', function($scope, $rootScope, $log, $route, $
   };
 });
 
-loMod.controller('AppClientsCtrl', function($scope, $rootScope, currentApp) {
+loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, LoRealmAppClientScopeMapping, currentApp, loRealmAppClients) {
+
+  $rootScope.curApp = currentApp;
+
+  $scope.breadcrumbs = [
+    {'label': 'Applications', 'href': '#/applications'},
+    {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
+    {'label': 'Clients', 'href': '#/applications/' + currentApp.id + '/application-clients'}
+  ];
+
+  $scope.appClients = $filter('filter')(loRealmAppClients, {'publicClient': true});
+
+  for (var i = 0; i < $scope.appClients.length; i++) {
+    //$scope.appClients[i].realmRoles = [];
+    $scope.appClients[i].realmRoles = LoRealmAppClientScopeMapping.query({appId: currentApp.name, clientId: $scope.appClients[i].name});
+  }
+
+});
+
+loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, $http, LoRealmApp, LoRealmAppRoles, LoRealmAppClientScopeMapping, currentApp, loRealmAppClient, loRealmRoles, loClientRoles, scopeMappings) {
 
   $rootScope.curApp = currentApp;
 
@@ -370,6 +389,105 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, currentApp) {
     {'label': currentApp.name, 'href':'#/applications/' + currentApp.id},
     {'label': 'Clients',      'href':'#/applications/' + currentApp.id + '/application-clients'}
   ];
+
+  if (loRealmAppClient && loRealmAppClient.id) {
+    $scope.create = false;
+    $scope.appClient = loRealmAppClient;
+    $scope.breadcrumbs.push({'label': loRealmAppClient.name, 'href':'#/applications/' + currentApp.id + '/application-clients/' + loRealmAppClient.name});
+  }
+  else {
+    $scope.create = true;
+    $scope.appClient = new LoRealmApp();
+    $scope.appClient.bearerOnly = false;
+    $scope.appClient.publicClient = true;
+    $scope.breadcrumbs.push({'label': 'New Client', 'href':'#/applications/' + currentApp.id + '/application-clients/create-client'});
+  }
+
+  $scope.changed = false;
+
+  $scope.addRedirectUri = function() {
+    $scope.settings.redirectUris.push($scope.newRedirectUri);
+    $scope.newRedirectUri = '';
+  };
+
+  $scope.deleteRedirectUri = function(index) {
+    $scope.settings.redirectUris.splice(index, 1);
+  };
+
+  $scope.availableRoles = loClientRoles;//loRealmRoles.concat(loClientRoles);
+
+  $scope.settings = {
+    name: $scope.appClient.name,
+    scopeMappings: [],
+    redirectUris: angular.copy($scope.appClient.redirectUris) || []
+  };
+  angular.forEach(scopeMappings, function(role) {$scope.settings.scopeMappings.push(role.id);});
+
+  var settingsBackup = angular.copy($scope.settings);
+
+  $scope.$watch('settings', function() {
+    $scope.changed = !angular.equals($scope.settings, settingsBackup);
+  }, true);
+
+  $scope.clear = function() {
+    $scope.settings = angular.copy(settingsBackup);
+  };
+
+  var arrayObjectIndexOf = function(array, object) {
+    for (var i = 0; i < array.length; i++){
+      if (angular.equals(array[i], object)) {
+        return i;
+      }
+    }
+    return -1;
+  };
+
+  $scope.save = function() {
+
+    if($scope.appClient.name !== $scope.settings.name || !angular.equals($scope.appClient.redirectUris, $scope.settings.redirectUris)) {
+      $scope.appClient.name = $scope.settings.name;
+      $scope.appClient.redirectUris = $scope.settings.redirectUris;
+      if($scope.create) {
+        $scope.appClient.$create();
+      }
+      else {
+        $scope.appClient.$save();
+      }
+    }
+    if(!angular.equals($scope.settings.scopeMappings, settingsBackup.scopeMappings)) {
+      var smData = [];
+      for(var i = 0; i < $scope.availableRoles.length; i++) {
+        if($scope.settings.scopeMappings.indexOf($scope.availableRoles[i].id) > -1) {
+          smData.push($scope.availableRoles[i]);
+          console.log('Adding ' + $scope.availableRoles[i].name);
+        }
+      }
+
+      // Find which to delete, if any
+      var smDelete = [];
+      for(var j = 0; j < scopeMappings.length; j++) {
+        if(arrayObjectIndexOf(smData, scopeMappings[j]) === -1) {
+          smDelete.push(scopeMappings[j]);
+        }
+      }
+
+      // FIXME: It seems DELETE cannot have payload in ng-resource...
+      // var smRes = new LoRealmAppClientScopeMapping(smDelete);
+      // smRes.$delete({appId: $route.current.params.appId, clientId: $route.current.params.clientId});
+      if(smDelete.length > 0) {
+        $http.delete('/auth/rest/admin/realms/liveoak-apps/applications/' + $route.current.params.appId +  '/scope-mappings/applications/' + $route.current.params.clientId,
+          {data: smDelete, headers : {'content-type' : 'application/json'}});
+      }
+
+      // FIXME: For some reason, using this is causing the [..] to be passed as JSON Object {..}
+      // var smRes = new LoRealmAppClientScopeMapping(smData);
+      // smRes.$save({appId: $route.current.params.appId, clientId: $route.current.params.clientId});
+      if(smData.length > 0) {
+        $http.post('/auth/rest/admin/realms/liveoak-apps/applications/' + $route.current.params.appId +  '/scope-mappings/applications/' + $route.current.params.clientId,
+          smData);
+      }
+    }
+  };
 
 });
 

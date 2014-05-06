@@ -343,9 +343,40 @@ loMod.factory('LoRealmApp', function($resource) {
 
 loMod.factory('LoRealmAppRoles', function($resource) {
   return $resource('/auth/rest/admin/realms/:realmId/applications/:appId/roles/:roleName', {
-    realmId : '@realmId',
+    realmId : 'liveoak-apps',
     appId: '@appId',
     roleName: '@roleName'
+  });
+});
+
+loMod.factory('LoRealmRoles', function($resource) {
+  return $resource('/auth/rest/admin/realms/:realmId/roles', {
+    realmId : 'liveoak-apps'
+  });
+});
+
+loMod.factory('LoRealmClientRoles', function($resource) {
+  return $resource('/auth/rest/admin/realms/:realmId/applications/:appId/scope-mappings/realm', {
+    realmId: 'liveoak-apps',
+    appId: '@appId'
+  });
+});
+
+loMod.factory('LoRealmAppClientScopeMapping', function($resource) {
+  return $resource('/auth/rest/admin/realms/:realmId/applications/:appId/scope-mappings/applications/:clientId', {
+    realmId: 'liveoak-apps',
+    appId : '@appId',
+    clientId : '@clientId'
+  });
+});
+
+loMod.factory('LoRealmAppClientScopeMappingLoader', function(Loader, LoRealmAppClientScopeMapping, $route) {
+  return Loader.query(LoRealmAppClientScopeMapping, function() {
+    return {
+      realmId: 'liveoak-apps',
+      appId: $route.current.params.appId,
+      clientId: $route.current.params.clientId
+    };
   });
 });
 
@@ -358,8 +389,33 @@ loMod.factory('LoRealmAppLoader', function(Loader, LoRealmApp, $route) {
   });
 });
 
+loMod.factory('LoRealmRolesLoader', function(Loader, LoRealmRoles) {
+  return Loader.query(LoRealmRoles, function() {
+    return {
+      realmId: 'liveoak-apps'
+    };
+  });
+});
+
+loMod.factory('LoRealmAppListLoader', function(Loader, LoRealmApp) {
+  return Loader.query(LoRealmApp, function() {
+    return {
+      realmId: 'liveoak-apps'
+    };
+  });
+});
+
 loMod.factory('LoRealmAppRolesLoader', function(Loader, LoRealmAppRoles, $route) {
   return Loader.query(LoRealmAppRoles, function() {
+    return {
+      realmId: 'liveoak-apps',
+      appId : $route.current.params.appId
+    };
+  });
+});
+
+loMod.factory('LoRealmClientRolesLoader', function(Loader, LoRealmClientRoles, $route) {
+  return Loader.query(LoRealmClientRoles, function() {
     return {
       realmId: 'liveoak-apps',
       appId : $route.current.params.appId
