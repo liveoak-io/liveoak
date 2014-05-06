@@ -44,6 +44,19 @@ loDirectives.directive('loAppSummary', function () {
   };
 });
 
+loDirectives.directive('loClientSummary', function () {
+  return {
+    scope: {
+      app: '=loApp',
+      client: '=loClient',
+      created: '='
+    },
+    restrict: 'E',
+    replace: true,
+    templateUrl: '/admin/console/templates/lo-client-summary.html'
+  };
+});
+
 loDirectives.directive('loStorageSummary', function (LoCollection) {
   return {
     scope: {
@@ -203,7 +216,6 @@ loDirectives.directive('loSelect', function($timeout) {
     }
   };
 });
-
 loDirectives.directive('loHttpPrefix', function() {
   return {
     restrict: 'A',

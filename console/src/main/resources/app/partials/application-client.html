@@ -1,20 +1,14 @@
 <div class="row">
   <ul class="nav nav-tabs nav-tabs-pf">
     <li><a href="#/applications/{{curApp.id}}/application-settings">General Settings</a></li>
-    <li class="active"><a href="">Clients</a></li>
+    <li class="active"><a href="#/applications/{{curApp.id}}/application-clients">Clients</a></li>
   </ul>
   <div class="lo-content-area col-md-10 next-steps">
-    
-    <ol class="breadcrumb">
-      <li><a href="#">Applications</a></li>
-      <li><a href="#">ApplicationName</a></li>
-      <li><a href="#">Clients</a></li>
-      <li>ClientName</li>
-    </ol>
-    
-    <h2 class="pull-left"><span>ClientName</span> Configuration</h2>
+
+    <lo-breadcrumbs></lo-breadcrumbs>
+    <h2 class="pull-left"><span>{{ appClient.name || 'New Client' }}</span> Configuration</h2>
     <p class="subtitle">All fields are required</p>
-    
+
     <hr>
 
     <form class="lo-form-horizontal clearfix">
@@ -22,23 +16,23 @@
         <div class="form-group clearfix">
           <label class="col-sm-2 control-label" for="clientname">Client Name</label>
           <div class="col-sm-4">
-            <input class="form-control" type="text" id="clientname" required>
+            <input class="form-control" type="text" id="clientname" ng-model="settings.name" required ng-readonly="!create" autofocus>
           </div>
         </div>
         <div class="form-group clearfix">
           <label class="col-sm-2 control-label" for="platform">Platform</label>
           <div class="lo-instances col-sm-offset-2">
-            <label class="checkbox-inline html5 active">
-              <input type="radio" name="platform" > HTML 5
+            <label class="checkbox-inline html5" ng-class="{'active': settings.platform == 'html5'}">
+              <input type="radio" name="platform" ng-model="settings.platform" value="html5"> HTML 5
             </label>
-            <label class="checkbox-inline android">
-              <input type="radio" name="platform"> Android
+            <label class="checkbox-inline android" ng-class="{'active': settings.platform == 'android'}">
+              <input type="radio" name="platform" ng-model="settings.platform" value="android"> Android
             </label>
-            <label class="checkbox-inline ios">
-              <input type="radio" name="platform"> iOS
+            <label class="checkbox-inline ios" ng-class="{'active': settings.platform == 'ios'}">
+              <input type="radio" name="platform" ng-model="settings.platform" value="ios"> iOS
             </label>
-            <label class="checkbox-inline custom">
-              <input type="radio" name="platform"> My Platform
+            <label class="checkbox-inline custom" ng-class="{'active': settings.platform == 'custom'}">
+              <input type="radio" name="platform" ng-model="settings.platform" value="custom"> My Platform
             </label>
             <span data-tooltip-placement="top" data-tooltip="Add Platform">
               <button type="button" class="btn btn-link btn-icon inline add-condition" data-toggle="modal" data-target="#add-platform"><i class="fa fa-plus-circle"></i><span>Add Platform</span></button>
@@ -46,25 +40,42 @@
 
           </div>
         </div>
-        <div class="form-group clearfix">
-          <label class="col-sm-2 control-label" for="uri">Redirect URI</label>
+        <div class="form-group clearfix" data-ng-show="!appClient.bearerOnly">
+          <label class="col-sm-2 control-label" for="newRedirectUri">Redirect URIs</label>
           <div class="col-sm-4">
-            <input class="form-control" type="text" id="uri" required>
+            <div ng-repeat="redirectUri in settings.redirectUris" class="row">
+              <div class="col-sm-12" style="padding: 0;">
+                <div class="input-group">
+                  <input class="form-control" type="text" name="redirectUri" id="redirectUri" data-ng-model="redirectUri" readonly />
+                  <div class="input-group-btn">
+                    <button class="btn btn-default" type="button" data-ng-click="deleteRedirectUri($index)"><i class="fa fa-trash-o"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="form-group clearfix">
-          <label class="col-sm-2 control-label" for="scope02">Scope</label>
+          <div class="col-sm-4 col-sm-offset-2">
+            <div ng-class="{'input-group': newRedirectUri.length > 0}">
+              <input class="form-control" type="text" id="newRedirectUri" name="newRedirectUri" ng-model="newRedirectUri" placeholder="New redirect URI..."/>
+              <div class="input-group-btn" ng-show="newRedirectUri.length > 0">
+                <button class="btn btn-primary" data-ng-click="addRedirectUri()" >Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group clearfix">
+          <label class="col-sm-2 control-label" for="scope">Scope</label>
           <div class="col-sm-4">
-            <select class="selectpicker" id="scope02" multiple>
-              <option>Role 01</option>
-              <option>Role 02</option>
+            <select lo-select id="scope" ng-options="role.id as role.name for role in availableRoles" ng-model="settings.scopeMappings" multiple>
             </select>
           </div>
         </div>
       </fieldset>
       <div class="pull-right form-actions">
-        <button class="btn btn-default btn-lg" type="button">Clear changes</button>
-        <button class="btn btn-primary btn-lg" type="submit">Save</button>
+        <button class="btn btn-default btn-lg" ng-disabled="!changed" type="button" ng-click="clear()">Clear changes</button>
+        <button class="btn btn-primary btn-lg" ng-disabled="!changed" type="submit" ng-click="save()">Save</button>
       </div>
     </form>
   </div>
