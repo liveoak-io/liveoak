@@ -178,7 +178,7 @@ loDirectives.directive('loButtonDelete', function () {
   };
 });
 
-loDirectives.directive('loSelect', function() {
+loDirectives.directive('loSelect', function($timeout) {
   return {
     restrict: 'A',
     require: '?ngModel',
@@ -187,7 +187,9 @@ loDirectives.directive('loSelect', function() {
 
       ngModel.$render = function() {
         element.val(ngModel.$viewValue || '');
-        element.selectpicker('refresh');
+        $timeout(function() {
+          element.selectpicker('refresh');
+        },0,false);
       };
 
       if (attrs.ngOptions){
