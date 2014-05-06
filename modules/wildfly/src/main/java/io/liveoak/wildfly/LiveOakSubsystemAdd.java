@@ -4,27 +4,19 @@ import io.liveoak.container.service.bootstrap.*;
 import io.liveoak.mongo.launcher.service.MongoLauncherAutoSetupService;
 import io.liveoak.spi.LiveOak;
 import org.jboss.as.controller.*;
-import org.jboss.as.controller.operations.common.Util;
-import org.jboss.as.controller.registry.ImmutableManagementResourceRegistration;
 import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.network.SocketBinding;
 import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
-import org.jboss.as.server.Services;
 import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
-import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 
-import java.net.URL;
 import java.util.List;
-
-import static io.liveoak.spi.LiveOak.SERVICE_REGISTRY;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 
 /**
  * @author Bob McWhirter
@@ -32,7 +24,16 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
     static final LiveOakSubsystemAdd INSTANCE = new LiveOakSubsystemAdd();
 
-    private final Logger log = Logger.getLogger(LiveOakSubsystemAdd.class);
+    static final ServiceName JBOSS_HOME = ServiceName.of("jboss", "server", "path", "jboss.home.dir");
+    static final ServiceName LIVEOAK_SUB = LiveOak.LIVEOAK.append("wildfly", "subsystem");
+    static final String LIVEOAK_HOME_PROPERTY = "liveoak.home.dir";
+    static final ServiceName LIVEOAK_HOME = LIVEOAK_SUB.append("path", LIVEOAK_HOME_PROPERTY);
+    static final ServiceName CONF_PATH = LIVEOAK_SUB.append("conf-dir", "path");
+    static final ServiceName EXTS_PATH = LIVEOAK_SUB.append("exts-dir", "path");
+    static final ServiceName APPS_PATH = LIVEOAK_SUB.append("apps-dir", "path");
+
+
+    private static final Logger log = Logger.getLogger(LiveOakSubsystemAdd.class);
 
     private LiveOakSubsystemAdd() {
     }
@@ -70,18 +71,29 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
         log.debug("BOOT MODEL: " + model);
         log.debug("BOOT OP: " + operation);
 
-        ServiceName name = LiveOak.LIVEOAK.append("wildfly", "subsystem");
 
-        ConfDirectoryPathService confDirPath = new ConfDirectoryPathService();
-        context.getServiceTarget().addService(name.append("conf-dir", "path"), confDirPath)
-                .addDependency(ServiceName.of("jboss", "server", "path", "jboss.home.dir"), String.class, confDirPath.jbossHomeInjector())
+        ServiceName liveoakHome = null;
+        String propVal = System.getProperty(LIVEOAK_HOME_PROPERTY);
+        if (propVal == null) {
+            liveoakHome = JBOSS_HOME;
+        } else {
+            // check that directory exists?
+            PathService liveOakPathService = new PathService(propVal);
+            liveOakPathService.parentPathInjector().inject(null);
+            context.getServiceTarget().addService(LIVEOAK_HOME, liveOakPathService).install();
+            liveoakHome = LIVEOAK_HOME;
+        }
+
+        PathService confDirPath = new PathService("conf");
+        context.getServiceTarget().addService(CONF_PATH, confDirPath)
+                .addDependency(liveoakHome, String.class, confDirPath.parentPathInjector())
                 .install();
 
         MongoLauncherAutoSetupService mongo = new MongoLauncherAutoSetupService();
 
-        context.getServiceTarget().addService(name.append("mongo-autosetup"), mongo)
-                .addDependency(name.append("conf-dir", "path"), String.class, mongo.extensionsDirInjector())
-                .addDependency(ServiceName.of("jboss", "server", "path", "jboss.home.dir"), String.class, mongo.liveoakDirInjector())
+        context.getServiceTarget().addService(LIVEOAK_SUB.append("mongo-autosetup"), mongo)
+                .addDependency(CONF_PATH, String.class, mongo.extensionsDirInjector())
+                .addDependency(liveoakHome, String.class, mongo.liveoakDirInjector())
                 .install();
 
         log.info("installed mongo auto-setup");
@@ -97,41 +109,41 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         PropertiesManagerService properties = new PropertiesManagerService();
 
-        context.getServiceTarget().addService(name.append("properties"), properties)
-                .addDependency(ServiceName.of("jboss", "server", "path", "jboss.home.dir"), String.class, properties.jbossHomeInjector())
+        context.getServiceTarget().addService(LIVEOAK_SUB.append("properties"), properties)
+                .addDependency(liveoakHome, String.class, properties.jbossHomeInjector())
                 .install();
 
-        ApplicationsDirectoryPathService appsDirPath = new ApplicationsDirectoryPathService();
-        context.getServiceTarget().addService(name.append("apps-dir", "path"), appsDirPath)
-                .addDependency(ServiceName.of("jboss", "server", "path", "jboss.home.dir"), String.class, appsDirPath.jbossHomeInjector())
+        PathService appsDirPath = new PathService("apps");
+        context.getServiceTarget().addService(APPS_PATH, appsDirPath)
+                .addDependency(liveoakHome, String.class, appsDirPath.parentPathInjector())
                 .install();
 
         TenancyBootstrappingService tenancy = new TenancyBootstrappingService();
-        context.getServiceTarget().addService(name.append("tenancy"), tenancy)
-                .addDependency(name.append("apps-dir", "path"), String.class, tenancy.applicationsDirectoryInjector())
-                .addDependency(name.append("mongo-autosetup" ))
+        context.getServiceTarget().addService(LIVEOAK_SUB.append("tenancy"), tenancy)
+                .addDependency(APPS_PATH, String.class, tenancy.applicationsDirectoryInjector())
+                .addDependency(LIVEOAK_SUB.append("mongo-autosetup" ))
                 .install();
 
-        context.getServiceTarget().addService(name.append("servers"), new ServersBootstrappingService()).install();
-        context.getServiceTarget().addService(name.append("codecs"), new CodecBootstrappingService()).install();
-        context.getServiceTarget().addService(name.append("client"), new ClientBootstrappingService()).install();
+        context.getServiceTarget().addService(LIVEOAK_SUB.append("servers"), new ServersBootstrappingService()).install();
+        context.getServiceTarget().addService(LIVEOAK_SUB.append("codecs"), new CodecBootstrappingService()).install();
+        context.getServiceTarget().addService(LIVEOAK_SUB.append("client"), new ClientBootstrappingService()).install();
 
-        ExtensionsDirectoryPathService extsDirPath = new ExtensionsDirectoryPathService();
-        context.getServiceTarget().addService(name.append("exts-dir", "path"), extsDirPath)
-                .addDependency(ServiceName.of("jboss", "server", "path", "jboss.home.dir"), String.class, extsDirPath.jbossHomeInjector())
+        PathService extsDirPath = new PathService("conf/extensions");
+        context.getServiceTarget().addService(EXTS_PATH, extsDirPath)
+                .addDependency(liveoakHome, String.class, extsDirPath.parentPathInjector())
                 .install();
 
         ExtensionsBootstrappingService extensions = new ExtensionsBootstrappingService();
-        context.getServiceTarget().addService(name.append("extensions"), extensions)
-                .addDependency(name.append("exts-dir", "path"), String.class, extensions.extensionsDirectoryInjector())
-                .addDependency(name.append("properties"))
-                .addDependency(name.append("mongo-autosetup" ))
+        context.getServiceTarget().addService(LIVEOAK_SUB.append("extensions"), extensions)
+                .addDependency(EXTS_PATH, String.class, extensions.extensionsDirectoryInjector())
+                .addDependency(LIVEOAK_SUB.append("properties"))
+                .addDependency(LIVEOAK_SUB.append("mongo-autosetup" ))
                 .install();
 
         context.getServiceTarget().addService(LiveOak.SERVICE_REGISTRY, new ValueService<ServiceRegistry>(new ImmediateValue<>(context.getServiceRegistry(false))))
                 .install();
 
-        context.getServiceTarget().addService(name.append("vertx"), new VertxBootstrappingService())
+        context.getServiceTarget().addService(LIVEOAK_SUB.append("vertx"), new VertxBootstrappingService())
                 .install();
 
         // ----------------------------------------
