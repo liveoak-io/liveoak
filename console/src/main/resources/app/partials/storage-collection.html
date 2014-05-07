@@ -10,9 +10,11 @@
         <div class="lo-page-info">
           <div class="pull-left">
             <!-- Collection selector -->
-            <select lo-select class="select-lg selectpicker"
-                    ng-model="collectionId" ng-options="o.id as o.id for o in collectionList"
-                    ng-show="collectionList.length > 0"></select>
+            <!-- TODO create a watcher on the loSelect directive to check for ngShow attr change and refreshing the widget accordingly -->
+            <span ng-show="collectionList.length > 0">
+              <select lo-select class="select-lg selectpicker"
+                    ng-model="collectionId" ng-options="o.id as o.id for o in collectionList"></select>
+            </span>
 
             <span ng-hide="collectionList.length > 0">No collections available.</span>
             <!-- TODO - Waiting for LIVEOAK-234 to be resolved.
