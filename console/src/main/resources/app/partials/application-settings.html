@@ -8,7 +8,7 @@
     <h2 class="pull-left"><span>{{curApp.name}}</span> General Settings</h2>
     <p class="subtitle"><span class="required">*</span> Required fields</p>
     <hr>
-    <form class="lo-form-horizontal">
+    <form class="lo-form-horizontal clearfix">
       <fieldset>
         <div class="form-group clearfix">
           <label class="col-sm-2 control-label" for="appname">Application Name <span class="required">*</span></label>
@@ -35,7 +35,7 @@
                 <th class="actions">Actions</th>
               </tr>
               <tr ng-show="settings.roles.concat(settings.newRoles).length === 0">
-                <th colspan="4"><h4>No Applications Roles defined.</h4></th>
+                <th colspan="4">No Applications Roles defined.</th>
               </tr>
               </thead>
               <tbody>

@@ -196,7 +196,6 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   .navbar-primary {
     background-color: @c_navlight;
     background-image: none;
-    min-height: 40px;
     margin-bottom: 0;
     border: solid @c_border;
     border-width: 1px 0;
@@ -1383,10 +1382,10 @@ legend {
   text-align: center;
   width: 100%;
   height: 0;
-  z-index: 100;
+  z-index: 1060;
   
   .alert {
-    min-width: 500px;
+    width: 500px;
     margin: 0 auto;
   }
 }
@@ -1560,7 +1559,7 @@ legend {
   hr {
     float: left;
     width: 100%;
-    margin-top: 10px;
+    margin-top: 0;
     margin-bottom: 20px;
   }
 }
@@ -1703,11 +1702,18 @@ legend {
 }
 
 .lo-checkbox {
-  opacity: 0.1;
+  opacity: 0.2;
+  
   &.selected {
     opacity: 1.0;
     color: @c_green;
+    
+    &:hover {
+      opacity: 1;
+      color: @c_greendark;
+    }
   }
+  
   &:hover {
     opacity: 0.5;
   }
@@ -1737,17 +1743,17 @@ tr.deleted {
 
   .app-dashboard .lo-info-pane {
 
-    padding: 0 40px;
+    padding: 0 35px;
     
     h3 {
-      margin-top: 20px;
-      margin-bottom: 15px;
+      margin: 20px 10px 15px;
     }
 
     .details section {
       float: left;
       width: 33%;
       margin-bottom: 20px;
+      padding: 0 10px;
     }
   } 
 }
@@ -1772,11 +1778,18 @@ tr.deleted {
 
 @media only screen and (min-width: 768px) {
 
-  .navbar-pf .navbar-utility {
-    padding-right: 20px;
+  .navbar-pf {
     
-    a.lo-user {
-      line-height: 22px;
+    .navbar-utility {
+      padding-right: 20px;
+      
+      a.lo-user {
+        line-height: 22px;
+      }
+    }
+
+    .navbar-primary {
+      min-height: 40px;
     }
   }
 }
@@ -1811,7 +1824,7 @@ tr.deleted {
   }
 }
 
-@media only screen and (min-width: 641px) and (max-width: 991px) {
+@media only screen and (max-width: 991px) {
 
   .lo-sidebar .navbar-vertical {
     
@@ -1823,7 +1836,7 @@ tr.deleted {
       margin-bottom: 0;
     }
   
-    li, li:first-child {
+    li {
       display: table-cell;
       width: 25%;
       margin: 0;
@@ -1836,9 +1849,6 @@ tr.deleted {
       }
     }
   }
-}
-
-@media only screen and (max-width: 991px) {
   
   .lo-info-pane {  
     
@@ -1927,29 +1937,42 @@ tr.deleted {
 }
 
 @media only screen and (max-width: 640px) {
+
+  .nav-tabs > li:first-child {
+    margin-left: 15px;
+  }
   
-  .lo-sidebar .navbar-vertical {
+  .lo-sidebar {
     
-    margin-bottom: 0;
-    
-    li {
-  
-      margin-top: 15px;
+    .dropdown {
+      margin-top: 8px;
       
-      &:first-child {
-        margin-top: 15px;
-      }
-      
-      &.active {
-        background: none;
-      }
-      
-      a .fa {
-        display: inline-block;
-        vertical-align: middle;
-        margin-right: 10px;
+      .dropdown-toggle {
+        padding-top: 8px;
+        padding-bottom: 10px; 
       }
     }
+    
+    .navbar-vertical li {
+      
+      padding-bottom: 10px;
+      
+      a {
+        font-size: 13px;
+      
+        .fa {
+          font-size: 2.5em;
+        }
+      }
+    }
+  }
+  
+  .app-dashboard .lo-info-pane {
+    padding: 0 20px;
+  }
+  
+  .lo-main-pane .lo-content-area {
+    padding: 0 15px 30px;
   }
   
   .panel.lo-dashboard .panel-heading .panel-title {
@@ -1984,7 +2007,7 @@ tr.deleted {
     
   .feedback-aligner .alert {
     min-width: 0;
-    width: calc(~"100% - 30px");;
+    width: calc(~"100% - 30px");
   }
   
   .next-steps .columns {
@@ -1999,6 +2022,18 @@ tr.deleted {
   } 
   
   .advanced-search {
+    margin-bottom: 10px;
+    
+    + .pull-right {
+      margin-bottom: 5px;
+    }
+  }
+  
+  .search-comp input {
+    width: 150px;
+  }
+  
+  .storage-collections .lo-page-info .pull-left {
     margin-bottom: 10px;
   }
 }
