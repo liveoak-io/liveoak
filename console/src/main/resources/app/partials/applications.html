@@ -58,7 +58,7 @@
             <!-- For Basic -->
             <div class="alert alert-info" ng-show="setupType == 'basic'">
               <span class="pficon pficon-info"></span>
-              This will create an application with storage (mongoDB), security (Keycloak), Push (AeroGear UPS) and analytics resources pre configured with defaults.
+              This will create an application with storage (mongoDB), security (Keycloak), and Push (AeroGear UPS) resources pre configured with defaults.
             </div>
 
             <!-- For Do-It-Yourself -->
@@ -76,7 +76,7 @@
             <div class="form-group clearfix">
               <label for="dburl" class="col-sm-4 control-label">URL Path</label>
               <div class="col-sm-6">
-                <input type="text" class="form-control" id="dburl" ng-model="storagePath" placeholder="e.g. storage">
+                <input type="text" class="form-control" id="dburl" ng-model="storagePath" ng-init="storagePath='storage'">
               </div>
             </div>
           </fieldset>
