@@ -206,7 +206,7 @@ loMod.controller('AppSettingsCtrl', function($scope, $rootScope, $log, $route, $
     $scope.settings = {
       name: currentApp.name,
       roles: loRealmAppRoles,
-      defaultRoles: angular.copy(loRealmApp.defaultRoles),
+      defaultRoles: angular.copy(loRealmApp.defaultRoles) || [],
       deletedRoles: [],
       newRoles: []
     };
@@ -475,7 +475,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
       // var smRes = new LoRealmAppClientScopeMapping(smDelete);
       // smRes.$delete({appId: $route.current.params.appId, clientId: $route.current.params.clientId});
       if(smDelete.length > 0) {
-        $http.delete('/auth/rest/admin/realms/liveoak-apps/applications/' + $route.current.params.appId +  '/scope-mappings/applications/' + $route.current.params.clientId,
+        $http.delete('/auth/rest/admin/realms/liveoak-apps/applications/' + $route.current.params.clientId +  '/scope-mappings/applications/' + $route.current.params.appId,
           {data: smDelete, headers : {'content-type' : 'application/json'}});
       }
 
@@ -483,7 +483,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
       // var smRes = new LoRealmAppClientScopeMapping(smData);
       // smRes.$save({appId: $route.current.params.appId, clientId: $route.current.params.clientId});
       if(smData.length > 0) {
-        $http.post('/auth/rest/admin/realms/liveoak-apps/applications/' + $route.current.params.appId +  '/scope-mappings/applications/' + $route.current.params.clientId,
+        $http.post('/auth/rest/admin/realms/liveoak-apps/applications/' + $route.current.params.clientId +  '/scope-mappings/applications/' + $route.current.params.appId,
           smData);
       }
     }

@@ -363,7 +363,7 @@ loMod.factory('LoRealmClientRoles', function($resource) {
 });
 
 loMod.factory('LoRealmAppClientScopeMapping', function($resource) {
-  return $resource('/auth/rest/admin/realms/:realmId/applications/:appId/scope-mappings/applications/:clientId', {
+  return $resource('/auth/rest/admin/realms/:realmId/applications/:clientId/scope-mappings/applications/:appId', {
     realmId: 'liveoak-apps',
     appId : '@appId',
     clientId : '@clientId'

@@ -61,7 +61,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
           });
         },
         loClientRoles: function(LoRealmAppRoles, $route) {
-          return LoRealmAppRoles.query({appId: $route.current.params.clientId}).$promise.then(function (data) {
+          return LoRealmAppRoles.query({appId: $route.current.params.appId}).$promise.then(function (data) {
             return data;
           });
         },
@@ -96,7 +96,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
     })
     .when('/applications/:appId/security', {
       templateUrl : '/admin/console/partials/security-list.html',
-      controller : 'AppClientsCtrl',
+      controller : 'SecurityCtrl',
       resolve: {
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
@@ -105,7 +105,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
     })
     .when('/applications/:appId/create-security', {
       templateUrl : '/admin/console/partials/security-create.html',
-      controller : 'AppClientsCtrl',
+      controller : 'SecurityCtrl',
       resolve: {
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
