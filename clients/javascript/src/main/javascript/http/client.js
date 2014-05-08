@@ -32,7 +32,8 @@ var Http = function (options) {
     }
 
     this.readMembers = function (path, options) {
-        var url = createUrl(path, { expand: '*',  query: options.query, sort: options.sort });
+        options.expand = '*';
+        var url = createUrl(path, options);
         request('GET', url, null, function (data) {
             var members = data._members || [];
             options.success(members);
@@ -132,6 +133,18 @@ var Http = function (options) {
                 query += '&';
             }
             query += 'sort=' + params.sort;
+        }
+        if (params.limit) {
+            if (query) {
+                query += '&';
+            }
+            query += 'limit=' + params.limit;
+        }
+        if (params.offset) {
+            if (query) {
+                query += '&';
+            }
+            query += 'offset=' + params.offset;
         }
 
         if (query != '') {

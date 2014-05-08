@@ -60,7 +60,9 @@ public class KeycloakConfigRootResource implements RootResource {
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         Set<String> keys = state.getPropertyNames();
 
-        config.setBaseUrl(keys.contains(KEYCLOAK_URL) ? (String) state.getProperty(KEYCLOAK_URL) : "http://localhost:8383/auth");
+        if (keys.contains(KEYCLOAK_URL)) {
+            config.setBaseUrl((String) state.getProperty(KEYCLOAK_URL));
+        }
 
         Map<String, String> publicKeys = new Hashtable<>();
         if (keys.contains(PUBLIC_KEYS)) {
