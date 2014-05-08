@@ -4,17 +4,10 @@
       <a ng-show="storage.hasCollections" ng-href="#/applications/{{loApp.id}}/storage/{{storage.path}}/browse">{{storage.path}}</a>
     </h2>
     <h2 ng-hide="storage.hasCollections" class="panel-title">{{storage.path}}</h2>
-
+    <a class="edit" href="#/applications/{{loApp.id}}/storage/{{storage.path}}">Edit Settings</a>
+    
     <div class="pull-right">
-      <div class="dropdown">
-        <a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="fa fa-cog"></i><b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <!-- li><a href="#">Rename...</a></li -->
-          <li><a href="#/applications/{{loApp.id}}/storage/{{storage.path}}">Edit...</a></li>
-          <li role="presentation" class="divider"></li>
-          <li><a href="" ng-click="loDelete({storageId: storage.path})">Delete...</a></li>
-        </ul>
-      </div>
+      <a href="" data-tooltip-placement="top" data-tooltip="Delete Storage" ng-click="loDelete({storageId: storage.path})"><i class="fa fa-trash-o"></i></a>
     </div>
   </div>
 

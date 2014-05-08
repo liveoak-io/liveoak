@@ -376,7 +376,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   .panel-heading {
     background: #fff;
     border: none;
-    padding: 12px 20px 6px 20px;
+    padding: 12px 20px 8px 20px;
 
     .panel-title {
       display: inline-block;
@@ -387,6 +387,10 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
       a {
         color: @c_green;
       }
+    }
+    
+    .edit {
+      margin-left: 15px;
     }
     
     h3 {
@@ -775,11 +779,11 @@ p.form-info {
     &:last-child {
       margin-bottom: 0;
     }
-
-    > div {
-      padding-left: .5em;
-    }
     
+    > div {
+      padding-left: 0.5em;
+    }
+
     table {
       margin-bottom: 0;
     }
@@ -1158,6 +1162,7 @@ legend {
 .advanced-search {
   position: relative;
   line-height:20px;
+  
   > a {
     font-size: 12px;
     font-weight: normal;
@@ -1177,11 +1182,16 @@ legend {
     position: absolute;
     top: 28px;
     left: -156px;
+    font-weight: normal;
     /*
     &.fade.in {
       display: block;
     }
     */
+    
+    .form-group > div {
+      padding-left: 0;
+    }
   }
 
   .inline-items {
@@ -1193,7 +1203,7 @@ legend {
     }
 
     .form-control {
-      width: calc(~"100% - 140px");
+      width: calc(~"100% - 137px");
     }
   }
 
@@ -1212,6 +1222,7 @@ legend {
 
   .btn-icon {
     margin-bottom: 5px;
+    margin-left: 0;
   }
 }
 
@@ -1547,7 +1558,6 @@ legend {
   .lo-page-info {
     
     .btn-icon {
-      margin-bottom: 10px;
       margin-left: 12px;
     }
 
@@ -1620,7 +1630,7 @@ legend {
       }
       
       a {
-        font-size: 13px;
+        font-size: 14px;
         margin-top: 20px;
         margin-bottom: 30px;
         float: right;

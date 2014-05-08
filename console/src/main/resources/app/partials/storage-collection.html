@@ -27,7 +27,7 @@
             <!-- Delete Collection Modal -->
             <span data-toggle="modal" data-target="#delete-collection">
               <button class="btn btn-link btn-icon" ng-click="modalCollectionDelete()">
-                <i class="fa fa-trash-o"></i>
+                <i class="fa fa-trash-o" data-tooltip-placement="top" data-tooltip="Delete Collection"></i>
                 <span>Delete Collection</span>
               </button>
             </span>
@@ -56,15 +56,15 @@
                 </div>
                 <!-- Advanced search dialog -->
                 <div class="advanced-search">
-                  <a class="dropdown-toggle-button advanced" ng-click="showAdvanced = !showAdvanced">Advanced Search</a>
-                  <a class="dropdown-toggle-button search-clear"
+                  <a href class="dropdown-toggle-button advanced" ng-click="showAdvanced = !showAdvanced">Advanced Search</a>
+                  <a class="dropdown-toggle-button search-clear" href
                      ng-show="searchQuery !== '' || filterColumns.length !== 0"
                      ng-click="searchClear()">Clear Search</a>
                   <div class="asearch popover bottom" ng-show="showAdvanced">
                     <div class="arrow"></div>
                     <div class="form-group">
                       <label for="columns-select">Search in Columns</label>
-                      <select lo-select class="select-lg selectpicker" multiple id="columns-select"
+                      <select lo-select class="select selectpicker" multiple id="columns-select"
                               ng-model="searchColumns" ng-options="o as o for o in columns"></select>
                       </select>
                     </div>
@@ -73,7 +73,7 @@
 
                       <div class="inline-items" ng-repeat="condition in searchConditions">
 
-                        <select lo-select="false" class="select-lg selectpicker inline"
+                        <select lo-select="false" class="select selectpicker inline"
                                 ng-model="condition.type">
                           <option value="EQUALS">Equals</option>
                           <option value="EQUALS_NOT">Not equal</option>
@@ -82,9 +82,8 @@
                         <input class="inline form-control" type="text" placeholder="Contains text"
                                ng-model="condition.text">
 
-                        <button data-placement="top" data-toggle="tooltip" type="button" ng-click="searchConditionRemove($index)"
-                                class="btn btn-link btn-icon inline add-condition" data-original-title="Remove Condition">
-                          <i class="fa fa-minus-circle"></i><span>Add Condition</span></button>
+                        <button type="button" ng-click="searchConditionRemove($index)" class="btn btn-link btn-icon inline add-condition">
+                          <i class="fa fa-minus-circle" data-tooltip-placement="top" data-tooltip="Remove Condition"></i><span>Remove Condition</span></button>
 
                         <!--
                         <button ng-show="$last"
@@ -95,7 +94,7 @@
                       </div>
                     </div>
 
-                    <a class="lo-condition-add" ng-click="searchConditionAdd()">Add Condition</a>
+                    <a href class="lo-condition-add" ng-click="searchConditionAdd()">Add Condition</a>
 
                     <div class="pull-right form-actions">
                       <button class="btn btn-primary btn-lg" ng-click="advancedSearch()">Search</button>
