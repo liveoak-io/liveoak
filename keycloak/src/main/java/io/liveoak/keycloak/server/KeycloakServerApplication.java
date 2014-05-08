@@ -31,7 +31,7 @@ public class KeycloakServerApplication extends KeycloakApplication {
         KeycloakSession session = factory.createSession();
         session.getTransaction().begin();
         try {
-            configureLiveOakConsole(session, "http://localhost:8080");
+            configureLiveOakConsole(session);
 
             session.getTransaction().commit();
         } finally {
@@ -39,7 +39,7 @@ public class KeycloakServerApplication extends KeycloakApplication {
         }
     }
 
-    protected void configureLiveOakConsole(KeycloakSession session, String baseUrl) {
+    protected void configureLiveOakConsole(KeycloakSession session) {
         RealmManager manager = new RealmManager(session);
         RealmModel adminRealm = manager.getRealm(Config.getAdminRealm());
 
@@ -52,6 +52,13 @@ public class KeycloakServerApplication extends KeycloakApplication {
             consoleApp.setPublicClient(true);
 
             consoleApp.setAllowedClaimsMask(ClaimMask.USERNAME);
+
+            // TODO Remove once KC supports relative redirect_uri
+            String baseUrl = "http://" + System.getProperty("jboss.bind.address", "localhost");
+            String port = System.getProperty("jboss.http.port", "8080");
+            if (!port.equals("80")) {
+                baseUrl += ":" + port;
+            }
 
             consoleApp.addRedirectUri(baseUrl + "/admin");
             consoleApp.addRedirectUri(baseUrl + "/admin/");

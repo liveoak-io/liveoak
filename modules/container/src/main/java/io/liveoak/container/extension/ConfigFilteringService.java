@@ -26,13 +26,8 @@ public class ConfigFilteringService implements Service<ObjectNode> {
     }
 
     public ConfigFilteringService(Properties props) {
-        this.props = new Properties(props);
-        Properties sysProps = System.getProperties();
-        for (String name : sysProps.stringPropertyNames()) {
-            if (name.startsWith("io.liveoak")) {
-                this.props.setProperty(name, sysProps.getProperty(name));
-            }
-        }
+        this.props = new Properties(System.getProperties());
+        this.props.putAll(props);
     }
 
     @Override
