@@ -10,6 +10,7 @@ import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistry;
@@ -26,7 +27,7 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     static final ServiceName JBOSS_HOME = ServiceName.of("jboss", "server", "path", "jboss.home.dir");
     static final ServiceName LIVEOAK_SUB = LiveOak.LIVEOAK.append("wildfly", "subsystem");
-    static final String LIVEOAK_HOME_PROPERTY = "liveoak.home.dir";
+    static final String LIVEOAK_HOME_PROPERTY = "io.liveoak.home.dir";
     static final ServiceName LIVEOAK_HOME = LIVEOAK_SUB.append("path", LIVEOAK_HOME_PROPERTY);
     static final ServiceName CONF_PATH = LIVEOAK_SUB.append("conf-dir", "path");
     static final ServiceName EXTS_PATH = LIVEOAK_SUB.append("exts-dir", "path");
@@ -72,28 +73,28 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
         log.debug("BOOT OP: " + operation);
 
 
-        ServiceName liveoakHome = null;
         String propVal = System.getProperty(LIVEOAK_HOME_PROPERTY);
+
+        // check that directory exists?
+        PathService liveOakPathService = new PathService(LIVEOAK_HOME, propVal);
+        ServiceBuilder builder = context.getServiceTarget().addService(LIVEOAK_HOME, liveOakPathService);
         if (propVal == null) {
-            liveoakHome = JBOSS_HOME;
+            builder.addDependency(JBOSS_HOME, liveOakPathService.parentPathInjector());
         } else {
-            // check that directory exists?
-            PathService liveOakPathService = new PathService(propVal);
             liveOakPathService.parentPathInjector().inject(null);
-            context.getServiceTarget().addService(LIVEOAK_HOME, liveOakPathService).install();
-            liveoakHome = LIVEOAK_HOME;
         }
+        builder.install();
 
         PathService confDirPath = new PathService("conf");
         context.getServiceTarget().addService(CONF_PATH, confDirPath)
-                .addDependency(liveoakHome, String.class, confDirPath.parentPathInjector())
+                .addDependency(LIVEOAK_HOME, String.class, confDirPath.parentPathInjector())
                 .install();
 
         MongoLauncherAutoSetupService mongo = new MongoLauncherAutoSetupService();
 
         context.getServiceTarget().addService(LIVEOAK_SUB.append("mongo-autosetup"), mongo)
                 .addDependency(CONF_PATH, String.class, mongo.extensionsDirInjector())
-                .addDependency(liveoakHome, String.class, mongo.liveoakDirInjector())
+                .addDependency(LIVEOAK_HOME, String.class, mongo.liveoakDirInjector())
                 .install();
 
         log.info("installed mongo auto-setup");
@@ -110,12 +111,12 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
         PropertiesManagerService properties = new PropertiesManagerService();
 
         context.getServiceTarget().addService(LIVEOAK_SUB.append("properties"), properties)
-                .addDependency(liveoakHome, String.class, properties.jbossHomeInjector())
+                .addDependency(LIVEOAK_HOME, String.class, properties.jbossHomeInjector())
                 .install();
 
         PathService appsDirPath = new PathService("apps");
         context.getServiceTarget().addService(APPS_PATH, appsDirPath)
-                .addDependency(liveoakHome, String.class, appsDirPath.parentPathInjector())
+                .addDependency(LIVEOAK_HOME, String.class, appsDirPath.parentPathInjector())
                 .install();
 
         TenancyBootstrappingService tenancy = new TenancyBootstrappingService();
@@ -130,7 +131,7 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         PathService extsDirPath = new PathService("conf/extensions");
         context.getServiceTarget().addService(EXTS_PATH, extsDirPath)
-                .addDependency(liveoakHome, String.class, extsDirPath.parentPathInjector())
+                .addDependency(LIVEOAK_HOME, String.class, extsDirPath.parentPathInjector())
                 .install();
 
         ExtensionsBootstrappingService extensions = new ExtensionsBootstrappingService();
@@ -145,9 +146,5 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         context.getServiceTarget().addService(LIVEOAK_SUB.append("vertx"), new VertxBootstrappingService())
                 .install();
-
-        // ----------------------------------------
-
-
     }
 }
