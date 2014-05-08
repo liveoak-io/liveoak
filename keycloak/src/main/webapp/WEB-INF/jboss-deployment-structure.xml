@@ -1,7 +1,11 @@
 <jboss-deployment-structure>
     <deployment>
+        <exclusions>
+            <module name="org.jboss.resteasy.resteasy-jackson2-provider"/>
+        </exclusions>
         <dependencies>
             <module name="org.bouncycastle"/>
+            <module name="org.jboss.resteasy.resteasy-jackson-provider" services="import"/>
         </dependencies>
     </deployment>
 </jboss-deployment-structure>
