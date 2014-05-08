@@ -16,5 +16,3 @@ log
 npm-debug.log
 .DS_Store
 phantomjsdriver.log
-/testsuite/src/test/test-configurations/*/conf/extensions/mongo-launcher.json
-/testsuite/src/test/test-configurations/*/data
