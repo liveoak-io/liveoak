@@ -75,7 +75,7 @@ fi
 
 #Setup LIVEOAK_HOME
 LIVEOAK_HOME=`cd "$DIRNAME"; pwd`
-JAVA_OPTS="$JAVA_OPTS -Dliveoak.home.dir=$LIVEOAK_HOME"
+JAVA_OPTS="$JAVA_OPTS -Dio.liveoak.home.dir=$LIVEOAK_HOME"
 
 # Setup JBOSS_HOME
 RESOLVED_JBOSS_HOME=${project.build.directory}/liveoak

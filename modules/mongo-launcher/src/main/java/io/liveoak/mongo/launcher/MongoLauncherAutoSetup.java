@@ -171,9 +171,9 @@ public class MongoLauncherAutoSetup {
         ObjectNode config = result.putObject("config");
 
         config.put(ENABLED, "auto");
-        config.put(LOG_PATH, new File(dataDir, "mongod.log").getAbsolutePath());
-        config.put(PID_FILE_PATH, new File(dataDir, "mongod.pid").getAbsolutePath());
-        config.put(DB_PATH, dataDir.getAbsolutePath());
+        config.put(LOG_PATH, "${io.liveoak.home.dir}/data/mongod.log");
+        config.put(PID_FILE_PATH, "${io.liveoak.home.dir}/data/mongod.pid");
+        config.put(DB_PATH, "${io.liveoak.home.dir}/data");
         config.put(USE_SMALL_FILES, true);
 
         return result;
