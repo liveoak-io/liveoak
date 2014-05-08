@@ -28,12 +28,7 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
   };
 
   $scope.$watch('pushModel', function() {
-    if (!angular.equals($scope.pushModel, pushModelBackup)) {
-      $log.debug('Scope changed');
-      $scope.changed = true;
-    } else {
-      $scope.changed = false;
-    }
+    $scope.changed = !angular.equals($scope.pushModel, pushModelBackup);
   }, true);
 
   $scope.save = function(){

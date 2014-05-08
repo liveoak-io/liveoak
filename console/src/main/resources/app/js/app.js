@@ -60,10 +60,8 @@ loMod.config(['$routeProvider', function($routeProvider) {
             return data;
           });
         },
-        loClientRoles: function(LoRealmAppRoles, $route) {
-          return LoRealmAppRoles.query({appId: $route.current.params.appId}).$promise.then(function (data) {
-            return data;
-          });
+        loRealmAppRoles: function(LoRealmAppRolesLoader) {
+          return new LoRealmAppRolesLoader();
         },
         loRealmRoles: function(LoRealmRolesLoader){
           return new LoRealmRolesLoader();
@@ -83,8 +81,8 @@ loMod.config(['$routeProvider', function($routeProvider) {
         loRealmAppClient: function(LoRealmApp) {
           return new LoRealmApp();
         },
-        loClientRoles: function(LoRealmAppRoles) {
-          return new LoRealmAppRoles();
+        loRealmAppRoles: function(LoRealmAppRolesLoader) {
+          return new LoRealmAppRolesLoader();
         },
         loRealmRoles: function(LoRealmRolesLoader){
           return new LoRealmRolesLoader();

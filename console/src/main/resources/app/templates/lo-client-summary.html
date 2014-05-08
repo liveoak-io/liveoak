@@ -2,14 +2,14 @@
   <div class="panel-heading">
     <h2 class="panel-title"><a href="#/applications/{{app.id}}/application-clients/{{ client.name }}">{{ client.name }}</a></h2>
     <div class="pull-right">
-      <a href="#" data-toggle="modal" data-target="#delete-client"><i class="fa fa-trash-o"></i></a>
+      <a href ng-click="$parent.modalClientDelete(client.name)"><i class="fa fa-trash-o"></i></a>
     </div>
   </div>
   <div class="panel-body">
     <ul class="lo-app-opts">
       <li><i class="fa fa-rocket"></i>HTML 5</a></li>
-      <li><i class="fa fa-link"></i>{{ client.redirectUris.length > 0 && client.redirectUris.join(", ") || "No Redirect URIs defined" }}</a></li>
-      <li><i class="fa fa-unlock"></i><span ng-hide="client.realmRoles.length > 0" class="text-muted">No Roles Specified</span><span ng-repeat="realmRole in client.realmRoles">{{ realmRole.name + ($last ? '' : ', ')}}</span></a></li>
+      <li><i class="fa fa-link"></i><span ng-class="{'text-muted': client.redirectUris.length == 0}">{{ client.redirectUris.length > 0 && client.redirectUris.join(", ") || "No Redirect URIs defined" }}<span></a></li>
+      <li><i class="fa fa-unlock"></i><span ng-hide="client.realmRoles.length > 0" class="text-muted">No Roles specified</span><span ng-repeat="realmRole in client.realmRoles">{{ realmRole.name + ($last ? '' : ', ')}}</span></a></li>
     </ul>
   </div>
 </div>

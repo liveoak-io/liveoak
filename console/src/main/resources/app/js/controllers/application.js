@@ -119,7 +119,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
       }
     };
 
-    new LoRealmApp({name: $scope.appModel.id}).$create({realmId: 'liveoak-apps'},
+    new LoRealmApp({name: $scope.appModel.id, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'},
       function(/*realmApp*/) {
         LoApp.create(data,
           // success
@@ -361,7 +361,7 @@ loMod.controller('AppSettingsCtrl', function($scope, $rootScope, $log, $route, $
   };
 });
 
-loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, LoRealmAppClientScopeMapping, currentApp, loRealmAppClients) {
+loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal, Notifications, LoRealmApp, LoRealmAppClientScopeMapping, currentApp, loRealmAppClients) {
 
   $rootScope.curApp = currentApp;
 
@@ -374,20 +374,58 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, LoRealm
   $scope.appClients = $filter('filter')(loRealmAppClients, {'publicClient': true});
 
   for (var i = 0; i < $scope.appClients.length; i++) {
-    //$scope.appClients[i].realmRoles = [];
     $scope.appClients[i].realmRoles = LoRealmAppClientScopeMapping.query({appId: currentApp.name, clientId: $scope.appClients[i].name});
   }
 
+  // Delete Client
+  $scope.modalClientDelete = function(clientId) {
+    $scope.deleteClientId = clientId;
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/application/client-delete.html',
+      controller: DeleteClientModalCtrl,
+      scope: $scope
+    }).result.then(
+      function() {
+        LoRealmApp.query().$promise.then(function(data) {
+          $scope.appClients = $filter('filter')(data, {'publicClient': true});
+        });
+      }
+    );
+  };
+
+  var DeleteClientModalCtrl = function ($scope, $modalInstance, $log, LoRealmApp) {
+
+    $scope.clientDelete = function (clientId) {
+      $log.debug('Deleting client: ' + clientId);
+      LoRealmApp.delete({appId: clientId},
+        // success
+        function(/*value, responseHeaders*/) {
+          Notifications.success('Client "' + clientId + '" deleted successfully.');
+          $modalInstance.close();
+        },
+        // error
+        function (httpResponse) {
+          Notifications.httpError('Failed to delete client "' + clientId + '".', httpResponse);
+        }
+      );
+    };
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+
+  };
+
 });
 
-loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, $http, LoRealmApp, LoRealmAppRoles, LoRealmAppClientScopeMapping, currentApp, loRealmAppClient, loRealmRoles, loClientRoles, scopeMappings) {
+loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, $location, $http, Notifications, LoRealmApp, LoRealmAppRoles, LoRealmAppClientScopeMapping, currentApp, loRealmAppClient, loRealmRoles, loRealmAppRoles, scopeMappings) {
 
   $rootScope.curApp = currentApp;
 
   $scope.breadcrumbs = [
     {'label': 'Applications',  'href':'#/applications'},
     {'label': currentApp.name, 'href':'#/applications/' + currentApp.id},
-    {'label': 'Clients',      'href':'#/applications/' + currentApp.id + '/application-clients'}
+    {'label': 'Clients',       'href':'#/applications/' + currentApp.id + '/application-clients'}
   ];
 
   if (loRealmAppClient && loRealmAppClient.id) {
@@ -414,7 +452,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     $scope.settings.redirectUris.splice(index, 1);
   };
 
-  $scope.availableRoles = loClientRoles;//loRealmRoles.concat(loClientRoles);
+  $scope.availableRoles = $filter('orderBy')(loRealmAppRoles, 'name');//loRealmRoles.concat(loRealmAppRoles);
 
   $scope.settings = {
     name: $scope.appClient.name,
@@ -442,53 +480,93 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     return -1;
   };
 
-  $scope.save = function() {
-
-    if($scope.appClient.name !== $scope.settings.name || !angular.equals($scope.appClient.redirectUris, $scope.settings.redirectUris)) {
-      $scope.appClient.name = $scope.settings.name;
-      $scope.appClient.redirectUris = $scope.settings.redirectUris;
-      if($scope.create) {
-        $scope.appClient.$create();
-      }
-      else {
-        $scope.appClient.$save();
+  var saveScopeMappings = function() {
+    var smData = [];
+    for(var i = 0; i < $scope.availableRoles.length; i++) {
+      if($scope.settings.scopeMappings.indexOf($scope.availableRoles[i].id) > -1) {
+        smData.push($scope.availableRoles[i]);
       }
     }
-    if(!angular.equals($scope.settings.scopeMappings, settingsBackup.scopeMappings)) {
-      var smData = [];
-      for(var i = 0; i < $scope.availableRoles.length; i++) {
-        if($scope.settings.scopeMappings.indexOf($scope.availableRoles[i].id) > -1) {
-          smData.push($scope.availableRoles[i]);
-          console.log('Adding ' + $scope.availableRoles[i].name);
-        }
-      }
 
-      // Find which to delete, if any
-      var smDelete = [];
-      for(var j = 0; j < scopeMappings.length; j++) {
-        if(arrayObjectIndexOf(smData, scopeMappings[j]) === -1) {
-          smDelete.push(scopeMappings[j]);
-        }
+    var smDelete = [];
+    for(var j = 0; j < scopeMappings.length; j++) {
+      if(arrayObjectIndexOf(smData, scopeMappings[j]) === -1) {
+        smDelete.push(scopeMappings[j]);
       }
+    }
 
-      // FIXME: It seems DELETE cannot have payload in ng-resource...
-      // var smRes = new LoRealmAppClientScopeMapping(smDelete);
-      // smRes.$delete({appId: $route.current.params.appId, clientId: $route.current.params.clientId});
-      if(smDelete.length > 0) {
-        $http.delete('/auth/rest/admin/realms/liveoak-apps/applications/' + $route.current.params.clientId +  '/scope-mappings/applications/' + $route.current.params.appId,
-          {data: smDelete, headers : {'content-type' : 'application/json'}});
-      }
+    var scopeMappingsUrl = '/auth/rest/admin/realms/liveoak-apps/applications/' + $route.current.params.clientId +  '/scope-mappings/applications/' + $route.current.params.appId;
 
-      // FIXME: For some reason, using this is causing the [..] to be passed as JSON Object {..}
-      // var smRes = new LoRealmAppClientScopeMapping(smData);
-      // smRes.$save({appId: $route.current.params.appId, clientId: $route.current.params.clientId});
+    var scopeMappingsAdd = function() {
       if(smData.length > 0) {
-        $http.post('/auth/rest/admin/realms/liveoak-apps/applications/' + $route.current.params.clientId +  '/scope-mappings/applications/' + $route.current.params.appId,
-          smData);
+        // FIXME: For some reason, using this is causing the [..] to be passed as JSON Object {..}
+        // var smRes = new LoRealmAppClientScopeMapping(smData);
+        // smRes.$save({appId: $route.current.params.appId, clientId: $route.current.params.clientId});
+        $http.post(scopeMappingsUrl, smData).then(
+          function() {
+            onSaveSuccessful();
+          },
+          function(httpResponse) {
+            Notifications.httpError('The scope roles failed to update.', httpResponse);
+          }
+        );
       }
+    };
+
+    // FIXME: It seems DELETE cannot have payload in ng-resource...
+    // var smRes = new LoRealmAppClientScopeMapping(smDelete);
+    // smRes.$delete({appId: $route.current.params.appId, clientId: $route.current.params.clientId});
+    if(smDelete.length > 0) {
+      $http.delete(scopeMappingsUrl, {data: smDelete, headers : {'content-type' : 'application/json'}}).then(
+        function() {
+          scopeMappingsAdd();
+        },
+        function(httpResponse) {
+          Notifications.httpError('The scope roles failed to update.', httpResponse);
+        }
+      );
+    }
+    else {
+      scopeMappingsAdd();
     }
   };
 
+  $scope.save = function() {
+    if ($scope.appClient.name !== $scope.settings.name || !angular.equals($scope.appClient.redirectUris, $scope.settings.redirectUris)) {
+      var originalName = $scope.appClient.name;
+      $scope.appClient.name = $scope.settings.name;
+      $scope.appClient.redirectUris = $scope.settings.redirectUris;
+      var appClientPromise = $scope.create ? $scope.appClient.$create() : $scope.appClient.$save({appId: originalName});
+      appClientPromise.then(
+        function(appClient) {
+          $scope.appClient = appClient;
+          if(!angular.equals($scope.settings.scopeMappings, settingsBackup.scopeMappings)) {
+            saveScopeMappings();
+          }
+          else {
+            onSaveSuccessful();
+          }
+        },
+        function(httpResponse) {
+          Notifications.httpError('The client "' + originalName + '" could not be ' + ($scope.create ? 'created': 'updated') + '.', httpResponse);
+        }
+      );
+    }
+    else if (!angular.equals($scope.settings.scopeMappings, settingsBackup.scopeMappings)) {
+      saveScopeMappings();
+    }
+  };
+
+  var onSaveSuccessful = function() {
+    Notifications.success('The client "' + $scope.appClient.name + '" has been ' + ($scope.create ? 'created': 'updated') + '.');
+    var nxtLoc = 'applications/' + currentApp.name + '/application-clients/' + $scope.appClient.name;
+    if ($location.path().replace(/\/+/g, '') === nxtLoc.replace(/\/+/g, '')) {
+      $route.reload();
+    }
+    else {
+      $location.path('applications/' + currentApp.name + '/application-clients/' + $scope.appClient.name);
+    }
+  };
 });
 
 loMod.controller('NextStepsCtrl', function($scope, $rootScope, $routeParams, currentApp, loStorageList, loPush) {
