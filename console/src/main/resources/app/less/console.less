@@ -776,6 +776,7 @@ p.form-info {
   }
   
   .form-group {
+  
     &:last-child {
       margin-bottom: 0;
     }
@@ -790,6 +791,22 @@ p.form-info {
     
     .bootstrap-select:not([class*="span"]):not([class*="col-"]):not([class*="form-control"]) {
       width: 100%;
+    }
+    
+    &.multiple {
+      > div + div {
+        clear: both;
+        margin-left: 16.666666666666664%;
+        padding-left: 0.5em;
+      }   
+      
+      > div {
+        margin-bottom: 5px;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }     
     }
   }
 }
@@ -860,7 +877,7 @@ p.form-info {
     &.active{
       border-width: 3px;
       border-color: @c_green;
-      background-position: center -105px;
+      background-position: center -107px;
     }
     
     &.custom {
@@ -870,6 +887,10 @@ p.form-info {
       font-weight: 600;
       padding-top: 42px;
       line-height: 1.2em;
+      
+      &.active {
+        padding-top: 40px;
+      }
       
       input {
         visibility: hidden;
@@ -1943,6 +1964,12 @@ tr.deleted {
   .lo-form-horizontal .control-label > span, 
   form .control-label > span {
     right: 10px;
+  }
+  
+  .lo-form-horizontal .form-group.multiple > div + div, 
+  form .form-group.multiple > div + div {
+    margin-left: 0;
+    padding-left: 0;
   }
 }
 
