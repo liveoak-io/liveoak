@@ -1,5 +1,7 @@
 package io.liveoak.mongo.config;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.spi.state.ResourceState;
@@ -15,12 +17,12 @@ public abstract class BaseMongoConfigTest extends AbstractResourceTestCase {
 
     @Override
     public void loadExtensions() throws Exception {
-        loadExtension("mongo", new MongoExtension());
+        ObjectNode json = JsonNodeFactory.instance.objectNode();
+        json.put("db", "testDefaultDB");
+        loadExtension("mongo", new MongoExtension(), json);
     }
 
     protected void setUpSystem(ResourceState config) throws Exception {
         installResource("mongo", BASEPATH, config);
     }
-
-
 }
