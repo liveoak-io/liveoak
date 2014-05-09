@@ -508,7 +508,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
       }
     }
 
-    var scopeMappingsUrl = '/auth/rest/admin/realms/liveoak-apps/applications/' + $route.current.params.clientId +  '/scope-mappings/applications/' + $route.current.params.appId;
+    var scopeMappingsUrl = '/auth/admin/realms/liveoak-apps/applications/' + $route.current.params.clientId +  '/scope-mappings/applications/' + $route.current.params.appId;
 
     var scopeMappingsAdd = function() {
       if(smData.length > 0) {

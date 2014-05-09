@@ -1,6 +1,8 @@
 package io.liveoak.keycloak.server;
 
+import org.jboss.resteasy.core.Dispatcher;
 import org.keycloak.models.ApplicationModel;
+import org.keycloak.models.AuthenticationProviderModel;
 import org.keycloak.models.ClaimMask;
 import org.keycloak.models.Config;
 import org.keycloak.models.KeycloakSession;
@@ -13,20 +15,19 @@ import org.keycloak.services.resources.KeycloakApplication;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 
 public class KeycloakServerApplication extends KeycloakApplication {
 
     static {
         Config.setAdminRealm("liveoak-admin");
         Config.setModelProvider("mongo");
+        Config.setAuditProvider("mongo");
         Config.setThemeDefault("liveoak");
     }
 
-    public KeycloakServerApplication(@Context ServletContext servletContext) throws FileNotFoundException {
-        super(servletContext);
-
-        classes.add(KeycloakAdminCorsFilter.class);
-        classes.add(KeycloakAdminCorsPreflightFilter.class);
+    public KeycloakServerApplication(@Context ServletContext context, @Context Dispatcher dispatcher) throws FileNotFoundException {
+        super(context, dispatcher);
 
         KeycloakSession session = factory.createSession();
         session.getTransaction().begin();
@@ -44,7 +45,7 @@ public class KeycloakServerApplication extends KeycloakApplication {
         RealmModel adminRealm = manager.getRealm(Config.getAdminRealm());
 
         //TODO: Setting for 30min instead of 1min due to bug in KC. Should be reverted back - LIVEOAK-288
-        adminRealm.setAccessTokenLifespan(1800);
+//        adminRealm.setAccessTokenLifespan(1800);
 
         ApplicationModel consoleApp = adminRealm.getApplicationByName("console");
         if (consoleApp == null) {
@@ -52,21 +53,9 @@ public class KeycloakServerApplication extends KeycloakApplication {
             consoleApp.setPublicClient(true);
 
             consoleApp.setAllowedClaimsMask(ClaimMask.USERNAME);
-
-            String baseUrl = System.getProperty("liveoak.url");
-            if (baseUrl == null) {
-                // TODO Remove once KC supports relative redirect_uri
-                baseUrl = "http://" + System.getProperty("jboss.bind.address", "localhost");
-                String port = System.getProperty("jboss.http.port", "8080");
-                if (!port.equals("80")) {
-                    baseUrl += ":" + port;
-                }
-            }
-
-            consoleApp.addRedirectUri(baseUrl + "/admin");
-            consoleApp.addRedirectUri(baseUrl + "/admin/");
-            consoleApp.addWebOrigin(baseUrl);
-            consoleApp.setBaseUrl(baseUrl + "/admin/");
+            consoleApp.addRedirectUri("/admin");
+            consoleApp.addRedirectUri("/admin/");
+            consoleApp.setBaseUrl("/admin/");
 
             adminRealm.addScopeMapping(consoleApp, adminRealm.getRole("admin"));
         }
@@ -75,6 +64,12 @@ public class KeycloakServerApplication extends KeycloakApplication {
         if (appsRealm == null) {
             RealmManager realmManager = new RealmManager(session);
             RealmModel realm = realmManager.createRealm("liveoak-apps");
+
+            AuthenticationProviderModel authenticationProvider = new AuthenticationProviderModel();
+            authenticationProvider.setProviderName("model");
+            authenticationProvider.setPasswordUpdateSupported(true);
+            realm.setAuthenticationProviders(Collections.singletonList(authenticationProvider));
+
             realm.setEnabled(true);
             realm.setRegistrationAllowed(true);
             realm.setSslNotRequired(true);

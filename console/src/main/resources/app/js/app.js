@@ -310,6 +310,7 @@ angular.element(document).ready(function () {
   }).error(function() {
       window.location.reload();
   });
+
   /* jshint ignore:end */
 });
 
@@ -329,7 +330,7 @@ loMod.factory('authInterceptor', function($q, LiveOak) {
 
           deferred.resolve(config);
         }).error(function() {
-          deferred.reject('Failed to refresh token');
+          window.location.reload();
         });
       }
       return deferred.promise;

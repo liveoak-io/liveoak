@@ -295,7 +295,7 @@ loMod.factory('LoPush', function($resource) {
 });
 
 loMod.factory('LoRealmApp', function($resource) {
-  return $resource('/auth/rest/admin/realms/:realmId/applications/:appId', {
+  return $resource('/auth/admin/realms/:realmId/applications/:appId', {
     realmId : 'liveoak-apps',
     appId: '@appId'
   }, {
@@ -309,7 +309,7 @@ loMod.factory('LoRealmApp', function($resource) {
 });
 
 loMod.factory('LoRealmAppRoles', function($resource) {
-  return $resource('/auth/rest/admin/realms/:realmId/applications/:appId/roles/:roleName', {
+  return $resource('/auth/admin/realms/:realmId/applications/:appId/roles/:roleName', {
     realmId : 'liveoak-apps',
     appId: '@appId',
     roleName: '@roleName'
@@ -317,20 +317,20 @@ loMod.factory('LoRealmAppRoles', function($resource) {
 });
 
 loMod.factory('LoRealmRoles', function($resource) {
-  return $resource('/auth/rest/admin/realms/:realmId/roles', {
+  return $resource('/auth/admin/realms/:realmId/roles', {
     realmId : 'liveoak-apps'
   });
 });
 
 loMod.factory('LoRealmClientRoles', function($resource) {
-  return $resource('/auth/rest/admin/realms/:realmId/applications/:appId/scope-mappings/realm', {
+  return $resource('/auth/admin/realms/:realmId/applications/:appId/scope-mappings/realm', {
     realmId: 'liveoak-apps',
     appId: '@appId'
   });
 });
 
 loMod.factory('LoRealmAppClientScopeMapping', function($resource) {
-  return $resource('/auth/rest/admin/realms/:realmId/applications/:clientId/scope-mappings/applications/:appId', {
+  return $resource('/auth/admin/realms/:realmId/applications/:clientId/scope-mappings/applications/:appId', {
     realmId: 'liveoak-apps',
     appId : '@appId',
     clientId : '@clientId'

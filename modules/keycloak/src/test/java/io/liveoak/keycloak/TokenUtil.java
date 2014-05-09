@@ -1,10 +1,10 @@
 package io.liveoak.keycloak;
 
 import org.keycloak.jose.jws.JWSBuilder;
-import org.keycloak.models.RealmModel;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.util.JsonSerialization;
 import org.keycloak.util.PemUtils;
+import org.keycloak.util.Time;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -43,7 +43,7 @@ public class TokenUtil {
         token.id("token-id");
         token.subject("user-id");
         token.audience(realm);
-        token.expiration(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(300));
+        token.expiration(Time.currentTime() + 300);
         token.issuedFor("app-id");
         token.issuedNow();
 

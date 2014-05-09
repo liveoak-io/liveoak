@@ -5,6 +5,7 @@
         </exclusions>
         <dependencies>
             <module name="org.bouncycastle"/>
+            <module name="org.apache.httpcomponents"/>
             <module name="org.jboss.resteasy.resteasy-jackson-provider" services="import"/>
         </dependencies>
     </deployment>
