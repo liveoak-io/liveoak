@@ -35,7 +35,7 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
             this.ignoreUpdate = false;
             super.updateProperties(ctx, state, responder);
         } else {
-            super.updateProperties(ctx, state, new ConfigPersistingResponder(this, state, responder));
+            super.updateProperties(ctx, state, new ResourceConfigPersistingResponder(this, state, responder));
         }
     }
 

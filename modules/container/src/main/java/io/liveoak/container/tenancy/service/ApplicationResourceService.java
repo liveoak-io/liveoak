@@ -2,7 +2,7 @@ package io.liveoak.container.tenancy.service;
 
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.zero.ApplicationExtensionsResource;
-import io.liveoak.container.zero.ApplicationResource;
+import io.liveoak.container.tenancy.ApplicationResource;
 import org.jboss.msc.service.*;
 import org.jboss.msc.value.ImmediateValue;
 

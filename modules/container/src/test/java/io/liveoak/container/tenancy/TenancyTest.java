@@ -6,7 +6,6 @@ import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.service.ApplicationsDeployerService;
 import io.liveoak.container.tenancy.service.ApplicationsDirectoryService;
 import io.liveoak.container.zero.ApplicationExtensionsResource;
-import io.liveoak.container.zero.ApplicationResource;
 import io.liveoak.container.zero.ApplicationsResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
@@ -21,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.util.Collection;
 
 import static io.liveoak.spi.LiveOak.*;

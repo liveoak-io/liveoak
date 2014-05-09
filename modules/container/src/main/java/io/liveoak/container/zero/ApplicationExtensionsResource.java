@@ -1,5 +1,6 @@
 package io.liveoak.container.zero;
 
+import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.container.tenancy.SimpleResourceRegistry;
 import io.liveoak.spi.RequestContext;

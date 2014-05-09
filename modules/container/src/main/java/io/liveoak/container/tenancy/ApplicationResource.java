@@ -1,9 +1,10 @@
-package io.liveoak.container.zero;
+package io.liveoak.container.tenancy;
 
 import java.util.Collection;
 import java.util.Collections;
 
 import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.container.zero.ApplicationExtensionsResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;

@@ -11,7 +11,7 @@ import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.MountPointResource;
-import io.liveoak.container.zero.ApplicationResource;
+import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ResourcePath;
@@ -135,7 +135,7 @@ public class ApplicationService implements Service<InternalApplication> {
         target.addService(configManagerName, configManager)
                 .install();
 
-        ApplicationResourcesService resources = new ApplicationResourcesService(resourcesTree);
+        ApplicationResourcesStartupService resources = new ApplicationResourcesStartupService(resourcesTree);
 
         target.addService(LiveOak.application(this.id).append("resources"), resources)
                 .addInjectionValue(resources.applicationInjector(), this)

@@ -16,9 +16,9 @@ import org.jboss.msc.value.InjectedValue;
  * @author Bob McWhirter
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
-public class ApplicationResourcesService implements Service<Void> {
+public class ApplicationResourcesStartupService implements Service<Void> {
 
-    public ApplicationResourcesService(ResourceState resourcesTree) {
+    public ApplicationResourcesStartupService(ResourceState resourcesTree) {
         this.resourcesTree = resourcesTree;
     }
 
@@ -67,5 +67,5 @@ public class ApplicationResourcesService implements Service<Void> {
     private ResourceState resourcesTree;
     private InjectedValue<InternalApplication> applicationInjector = new InjectedValue<>();
 
-    private static final Logger log = Logger.getLogger(ApplicationResourcesService.class);
+    private static final Logger log = Logger.getLogger(ApplicationResourcesStartupService.class);
 }
