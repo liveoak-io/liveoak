@@ -4,7 +4,7 @@
       <a ng-show="storage.hasCollections" ng-href="#/applications/{{loApp.id}}/storage/{{storage.path}}/browse">{{storage.path}}</a>
     </h2>
     <h2 ng-hide="storage.hasCollections" class="panel-title">{{storage.path}}</h2>
-    <a class="edit" href="#/applications/{{loApp.id}}/storage/{{storage.path}}">Edit Settings</a>
+    <a class="edit" href="#/applications/{{loApp.id}}/storage/{{storage.path}}"><i class="fa fa-wrench" data-tooltip-placement="top" data-tooltip="Edit Settings"></i><span class="hide">Edit Settings</span></a>
     
     <div class="pull-right">
       <a href="" data-tooltip-placement="top" data-tooltip="Delete Storage" ng-click="loDelete({storageId: storage.path})"><i class="fa fa-trash-o"></i></a>

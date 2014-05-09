@@ -1,7 +1,7 @@
 <div class="panel lo-panel-app" ng-class="{'animated flipInY': created == app.id}">
   <div class="panel-heading">
     <h3 class="panel-title"><a href="#/applications/{{app.id}}">{{app.name}}</a></h3>
-    <a class="edit" href="#/applications/{{app.id}}/application-settings">Edit Settings</a>
+    <a class="edit" href="#/applications/{{app.id}}/application-settings"><i class="fa fa-wrench" data-tooltip-placement="top" data-tooltip="Edit Settings"></i><span class="hide">Edit Settings</span></a>
 
     <div class="pull-right" >
       <a href ng-click="$parent.modalApplicationDelete(app.id)"><i class="fa fa-trash-o" data-tooltip-placement="top" data-tooltip="Delete App"></i></a>
