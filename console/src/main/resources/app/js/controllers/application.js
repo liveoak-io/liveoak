@@ -445,6 +445,10 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
 
   $scope.addRedirectUri = function() {
     $scope.settings.redirectUris.push($scope.newRedirectUri);
+    if(!$scope.newWebOrigin && (/^http[s]?:\/\/[^/]*/).test($scope.newRedirectUri)) {
+      console.log("in");
+      $scope.newWebOrigin = $scope.newRedirectUri.match(/^http[s]?:\/\/[^/]*/);
+    }
     $scope.newRedirectUri = '';
   };
 
@@ -452,12 +456,22 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     $scope.settings.redirectUris.splice(index, 1);
   };
 
+  $scope.addWebOrigin = function() {
+    $scope.settings.webOrigins.push($scope.newWebOrigin);
+    $scope.newWebOrigin = '';
+  };
+
+  $scope.deleteWebOrigin = function(index) {
+    $scope.settings.webOrigins.splice(index, 1);
+  };
+
   $scope.availableRoles = $filter('orderBy')(loRealmAppRoles, 'name');//loRealmRoles.concat(loRealmAppRoles);
 
   $scope.settings = {
     name: $scope.appClient.name,
     scopeMappings: [],
-    redirectUris: angular.copy($scope.appClient.redirectUris) || []
+    redirectUris: angular.copy($scope.appClient.redirectUris) || [],
+    webOrigins: angular.copy($scope.appClient.webOrigins) || []
   };
   angular.forEach(scopeMappings, function(role) {$scope.settings.scopeMappings.push(role.id);});
 
@@ -532,10 +546,14 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
   };
 
   $scope.save = function() {
-    if ($scope.appClient.name !== $scope.settings.name || !angular.equals($scope.appClient.redirectUris, $scope.settings.redirectUris)) {
+    var nameChanged = $scope.appClient.name !== $scope.settings.name;
+    var redirectUrisChanged = !angular.equals($scope.appClient.redirectUris, $scope.settings.redirectUris);
+    var webOriginsChanged = !angular.equals($scope.appClient.webOrigins, $scope.settings.webOrigins);
+    if (nameChanged || redirectUrisChanged || webOriginsChanged) {
       var originalName = $scope.appClient.name;
       $scope.appClient.name = $scope.settings.name;
       $scope.appClient.redirectUris = $scope.settings.redirectUris;
+      $scope.appClient.webOrigins = $scope.settings.webOrigins;
       var appClientPromise = $scope.create ? $scope.appClient.$create() : $scope.appClient.$save({appId: originalName});
       appClientPromise.then(
         function(appClient) {
