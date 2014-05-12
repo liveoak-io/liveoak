@@ -340,10 +340,12 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
         $scope.columns = ['id'];
 
-        if (data._members && data._members[0]) {
-          for (var c in data._members[0]) {
-            if (c !== 'self' && c !== 'id') {
-              $scope.columns.push(c);
+        for( var rowIndex in data._members) {
+          if (data._members && data._members[rowIndex]) {
+            for (var c in data._members[rowIndex]) {
+              if (c !== 'self' && c !== 'id' && $scope.columns.indexOf(c) === -1) {
+                $scope.columns.push(c);
+              }
             }
           }
         }
@@ -714,7 +716,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       }
       // Create new items
       else {
-        $log.debug('Creating: ' + itemToSave);
+        $log.debug('Creating: ' + JSON.stringify(itemToSave));
         LoCollectionItem.create({appId: currentApp.id, storageId: $routeParams.storageId,
           collectionId: $scope.collectionId}, itemToSave);
       }
