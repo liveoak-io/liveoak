@@ -9,7 +9,6 @@ package io.liveoak.mongo;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import de.flapdoodle.embed.process.collections.Collections;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceAlreadyExistsException;
@@ -17,6 +16,7 @@ import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -250,12 +250,12 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         state.putProperty("foo", "bar");
         state.putProperty("test", 123);
         Object[] arr = { 1, 1, 2, 3, 5, 8, 13, 21 };
-        state.putProperty("arr", Collections.newArrayList(arr));
+        state.putProperty("arr", Arrays.asList(arr));
         state.putProperty("arr2", arr);
 
         ResourceState arrayObj = new DefaultResourceState();
         arrayObj.putProperty("array", "object");
-        ArrayList arrayList = Collections.newArrayList(arr);
+        ArrayList arrayList = new ArrayList(Arrays.asList(arr));
         arrayList.add(arrayObj);
         state.putProperty("arr3", arrayList);
 

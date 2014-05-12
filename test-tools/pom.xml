@@ -77,6 +77,10 @@
             <artifactId>httpclient</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-mongo-launcher</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

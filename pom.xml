@@ -83,7 +83,6 @@
         <version.gpg.plugin>1.4</version.gpg.plugin>
         <version.resourceStates.plugin>2.4.2</version.resourceStates.plugin>
         <version.vertx.plugin>2.0.1-final</version.vertx.plugin>
-        <version.embedmongo.plugin>0.1.10</version.embedmongo.plugin>
         <version.codehaus.helper.plugin>1.8</version.codehaus.helper.plugin>
         <version.google.formatter.plugin>0.3.1</version.google.formatter.plugin>
 
@@ -738,11 +737,6 @@
                     <groupId>io.vertx</groupId>
                     <artifactId>vertx-maven-plugin</artifactId>
                     <version>${version.vertx.plugin}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.github.joelittlejohn.embedmongo</groupId>
-                    <artifactId>embedmongo-maven-plugin</artifactId>
-                    <version>${version.embedmongo.plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

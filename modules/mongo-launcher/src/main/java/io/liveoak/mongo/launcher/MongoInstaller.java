@@ -14,9 +14,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.jboss.logging.Logger;
+
+import static io.liveoak.mongo.launcher.MongoLauncher.nullOrEmpty;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -42,6 +47,44 @@ public class MongoInstaller {
 
     private int lastProgress = -1;
 
+    public static String autoInstall() {
+        // Let's try to locate existing mongod on the system, and try to execute it
+        String path = MongoLauncher.findMongod();
+
+        if (nullOrEmpty(path)) {
+            // if no mongod found, launch installer to get it
+            MongoInstaller installer = new MongoInstaller();
+
+            // use ~/.liveoak/mongo for downloaded archives
+            Path mongoDir = Paths.get(System.getProperty("user.home"), ".liveoak", "mongo");
+            try {
+                if (!Files.isDirectory(mongoDir)) {
+                    Files.createDirectories(mongoDir);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to create directory: " + mongoDir);
+            }
+
+            installer.setTempDir(mongoDir.toString());
+            installer.setInstallDir(mongoDir.toString());
+            try {
+                installer.performInstall();
+            } catch (IOException e) {
+                throw new RuntimeException("MongoDB installation failed: ", e);
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+
+            // mongo should be installed under mongoDir
+            path = installer.getMongodPath();
+
+            if (nullOrEmpty(path)) {
+                throw new RuntimeException("Failed to properly install MongoDB");
+            }
+        }
+        return path;
+    }
+
     public void setVersion(String ver) {
         this.version = ver;
     }
@@ -59,11 +102,7 @@ public class MongoInstaller {
     }
 
     public void performInstall() throws IOException {
-        log.debug("attempting to install mongo!");
-        log.debug("attempting to install mongo!");
-        log.debug("attempting to install mongo!");
-        log.debug("attempting to install mongo!");
-        log.debug("attempting to install mongo!");
+
         // determine architecture
         OsArch osArch = OsUtils.determineOSAndArch();
 

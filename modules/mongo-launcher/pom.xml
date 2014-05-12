@@ -33,10 +33,6 @@
             <artifactId>liveoak-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-test-tools</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <scope>test</scope>

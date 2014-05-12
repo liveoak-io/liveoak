@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
@@ -30,6 +29,7 @@ import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
+import io.liveoak.testtools.AbstractTestCase;
 import org.jboss.logging.Logger;
 import org.junit.After;
 import org.junit.Assert;
@@ -39,7 +39,7 @@ import org.junit.Test;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class AclPolicyTestCase {
+public class AclPolicyTestCase extends AbstractTestCase {
 
     private final Logger log = Logger.getLogger(AclPolicyTestCase.class);
 
