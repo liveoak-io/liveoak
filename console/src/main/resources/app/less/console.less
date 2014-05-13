@@ -1144,6 +1144,36 @@ legend {
     }
   }
 
+  .lo-table-edit {
+    td {
+      padding: 0;
+
+      &.row-id {
+        white-space:nowrap;
+        padding: 2px 6px;
+
+        input {
+          width: 100%;
+        }
+      }
+    }
+
+    input {
+      box-shadow: none;
+      background: transparent;
+      border-color: transparent;
+    }
+
+    input:focus {
+      border-color: @c_green;
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 73, 0.6);
+    }
+
+    input:hover {
+      border-color: @c_green;
+    }
+  }
+
   .actions {
     width: 70px;
     text-align: center;
@@ -1756,7 +1786,7 @@ legend {
 
 tr.deleted {
   td {
-    span {
+    span, input {
       opacity: 0.4;
       text-decoration: line-through;
     }

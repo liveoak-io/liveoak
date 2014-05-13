@@ -420,6 +420,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
         });
 
         resetEnv();
+      } else {
+        $scope.collectionData._members = undefined;
       }
     }
   );
@@ -510,6 +512,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       collectionId: $scope.collectionId}).$promise;
     // There's a watcher on $scope.collectionId, list will be updated from there
     deletePromise.then(function(){
+      $scope.collectionId = undefined;
       loadCollectionList(selectFirst);
     });
   };
@@ -702,6 +705,16 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       var itemFromBackup = findById(itemToSave.id, $scope.collectionDataBackup._members);
       if (itemFromBackup && itemFromBackup.self) {
         delete itemFromBackup.self;
+      }
+
+      // If the JSON value could be represented as a number, auto-type the string to the number type
+      for( var fieldId in itemToSave){
+        if (fieldId !== 'id' && itemToSave.hasOwnProperty(fieldId)){
+          var fieldVal = itemToSave[fieldId];
+          if (!isNaN(fieldVal)){
+            itemToSave[fieldId] = parseFloat(fieldVal);
+          }
+        }
       }
 
       if (itemToSave.id) {
