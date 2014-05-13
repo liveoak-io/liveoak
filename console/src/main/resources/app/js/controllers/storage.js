@@ -420,6 +420,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
         });
 
         resetEnv();
+      } else {
+        $scope.collectionData._members = undefined;
       }
     }
   );
@@ -510,6 +512,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       collectionId: $scope.collectionId}).$promise;
     // There's a watcher on $scope.collectionId, list will be updated from there
     deletePromise.then(function(){
+      $scope.collectionId = undefined;
       loadCollectionList(selectFirst);
     });
   };
