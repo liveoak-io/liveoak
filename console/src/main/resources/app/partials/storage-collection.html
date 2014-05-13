@@ -169,13 +169,18 @@
               </th>
             </tr>
             </thead>
-            <tbody ng-show="collectionId && (columns.length > 0)">
+            <tbody ng-show="collectionId && (columns.length > 0)" class="lo-table-edit">
             <tr ng-repeat="item in collectionData._members | orderBy:predicate:reverse | conditional:searchQuery:filterColumns:filterConditions"
                 ng-class="{deleted: rowsToDelete.indexOf(item['id']) > -1}">
 
-              <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}" ng-click="isEdit = (true && column !== 'id')">
+              <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}"
+                  class="row-{{column}}" ng-click="isEdit = (true && column !== 'id')">
+                <!--
                 <input class="form-control" type="text" ng-show="isEdit" ng-model="item[column]"/>
                 <span ng-hide="isEdit">{{ item[column] }}</span>
+                -->
+                <span ng-show="column === 'id'">{{ item[column] }}</span>
+                <input class="form-control" type="text" ng-model="item[column]" ng-hide="column === 'id'"/>
               </td>
               <td class="actions">
 
