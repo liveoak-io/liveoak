@@ -6,17 +6,25 @@
       <div class="lo-content-area">
         <lo-breadcrumbs></lo-breadcrumbs>
         <h2><span>{{curApp.name}}</span> Storage Collections</h2>
+
+        <div class="panel" ng-hide="collectionList.length > 0">
+          <div class="panel-body text-center empty-instance">
+            <i class="fa fa-files-o"></i>
+            <p>This storage currently has no collections.</p>
+            <a ng-click="modalCollectionAdd()" class="btn btn-primary btn-lg" type="button">New Collection</a>
+          </div>
+        </div>
+
         <!-- Collections page - main page -->
-        <div class="lo-page-info clearfix">
+        <div class="lo-page-info clearfix" ng-show="collectionList.length > 0">
           <div class="pull-left">
             <!-- Collection selector -->
             <!-- TODO create a watcher on the loSelect directive to check for ngShow attr change and refreshing the widget accordingly -->
-            <span ng-show="collectionList.length > 0">
+            <span>
               <select lo-select class="select-lg selectpicker"
                     ng-model="collectionId" ng-options="o.id as o.id for o in collectionList"></select>
             </span>
 
-            <span ng-hide="collectionList.length > 0">No collections available.</span>
             <!-- TODO - Waiting for LIVEOAK-234 to be resolved.
             <button disabled class="btn btn-link btn-icon" type="button" data-toggle="tooltip" data-placement="top" title="Edit Collection Name...">
               <i class="fa fa-edit"></i>
