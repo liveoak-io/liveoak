@@ -11,8 +11,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 
 import org.jboss.logging.Logger;
 
@@ -253,6 +256,32 @@ public class MongoLauncher {
         if (process != null) {
             process.destroy();
         }
+    }
+
+    public static boolean serverRunning(int port) {
+        return serverRunning(port, null);
+    }
+
+    public static boolean serverRunning(int port, Consumer<Throwable> onError) {
+        try {
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress("localhost", port), 500);
+            if (socket.isConnected()) {
+                try {
+                    socket.close();
+                } catch (IOException ignored) {
+                    log.debug("[IGNORED] Exception closing server test socket: ", ignored);
+                }
+                return true;
+            }
+        } catch (Throwable e) {
+            if (onError != null) {
+                onError.accept(e);
+            } else {
+                log.debug("[IGNORED] Connection test: ", e);
+            }
+        }
+        return false;
     }
 
     static class ReaderThread extends Thread {

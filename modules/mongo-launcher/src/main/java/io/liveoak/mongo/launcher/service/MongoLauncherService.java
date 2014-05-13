@@ -6,8 +6,6 @@
 package io.liveoak.mongo.launcher.service;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 
 import io.liveoak.mongo.launcher.MongoLauncher;
 import io.liveoak.mongo.launcher.config.MongoLauncherConfigResource;
@@ -67,7 +65,7 @@ public class MongoLauncherService implements Service<MongoLauncher> {
                     launcher.setPort(port);
                 }
 
-                if (serverRunning(port)) {
+                if (launcher.serverRunning(port)) {
                     log.warn("It appears there is an existing server on port: " + port);
                     if (exitIfPortTaken) {
                         log.warn("Not starting mongod (you can change this behavior via 'enabled' property in conf/extensions/mongo-launcher.json)");
@@ -110,7 +108,7 @@ public class MongoLauncherService implements Service<MongoLauncher> {
                 try {
                     launcher.startMongo();
 
-                    while(!serverRunning(port)) {
+                    while(!launcher.serverRunning(port)) {
                         try {
                             Thread.sleep(300);
                         } catch (InterruptedException e) {
@@ -130,24 +128,6 @@ public class MongoLauncherService implements Service<MongoLauncher> {
                 context.failed(new StartException(t));
             }
         }, "MongoLauncherService starter").start();
-    }
-
-    private boolean serverRunning(int port) {
-        try {
-            Socket socket = new Socket();
-            socket.connect(new InetSocketAddress("localhost", port), 500);
-            if (socket.isConnected()) {
-                try {
-                    socket.close();
-                } catch (IOException ignored) {
-                    log.debug("[IGNORED] Exception closing server test socket: ", ignored);
-                }
-                return true;
-            }
-        } catch (IOException ignored) {
-            log.debug("[IGNORED] Connection test: ", ignored);
-        }
-        return false;
     }
 
     @Override

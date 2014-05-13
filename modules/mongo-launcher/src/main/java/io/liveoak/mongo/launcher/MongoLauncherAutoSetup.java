@@ -15,8 +15,6 @@ import org.jboss.logging.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static io.liveoak.mongo.launcher.MongoLauncher.nullOrEmpty;
 import static io.liveoak.mongo.launcher.config.Constants.DB_PATH;
@@ -100,41 +98,8 @@ public class MongoLauncherAutoSetup {
             }
         }
         if (mongodPath == null) {
-            // if not, set it, let's try to locate existing mongod on the system, and try to execute it
-            String path = MongoLauncher.findMongod();
-            if (nullOrEmpty(path)) {
-                // if no mongod found, launch installer to get it
-                // set path to it in mongo-launcher.json
-                MongoInstaller installer = new MongoInstaller();
-                // use ~/.liveoak/mongo for downloaded archives
-                Path mongoDir = Paths.get(System.getProperty("user.home"), ".liveoak", "mongo");
-                try {
-                    if (!Files.isDirectory(mongoDir)) {
-                        Files.createDirectories(mongoDir);
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException("Failed to create directory: " + mongoDir);
-                }
 
-                installer.setTempDir(mongoDir.toString());
-                installer.setInstallDir(mongoDir.toString());
-                try {
-                    installer.performInstall();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("MongoDB installation failed: ", e);
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                    throw t;
-                }
-
-                // mongo should be installed under mongoDir
-                path = installer.getMongodPath();
-
-                if (nullOrEmpty(path)) {
-                    throw new RuntimeException("Failed to properly install MongoDB");
-                }
-            }
+            String path = MongoInstaller.autoInstall();
 
             // if success set path in mongo-launcher.json
             // determine mongod version

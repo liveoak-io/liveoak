@@ -5,16 +5,75 @@
  */
 package io.liveoak.testtools;
 
+import io.liveoak.mongo.launcher.MongoInstaller;
+import io.liveoak.mongo.launcher.MongoLauncher;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
  */
 public class AbstractTestCase {
     protected File projectRoot;
+
+    protected static MongoLauncher mongoLauncher;
+    protected static int mongoPort = 27017;
+
+    @BeforeClass
+    public static void setupMongo() throws IOException {
+        String host = System.getProperty("mongo.host");
+        String port = System.getProperty("mongo.port");
+        String moduleDir = System.getProperty("user.dir");
+
+        if (host != null && ("localhost".equals(host) || "127.0.0.1".equals(host))) {
+
+            // make sure mongod is installed
+            String mongodPath = MongoInstaller.autoInstall();
+
+            if (mongodPath == null) {
+                throw new RuntimeException("Failed to install MongoDB!");
+            }
+
+            // launch mongod
+            mongoLauncher = new MongoLauncher();
+            mongoLauncher.setMongodPath(mongodPath);
+            mongoLauncher.setUseSmallFiles(true);
+
+            if (port != null) {
+                mongoPort = Integer.parseInt(port);
+            }
+            mongoLauncher.setPort(mongoPort);
+
+            String dataDir = new File(moduleDir, "target/data").getAbsolutePath();
+            File ddFile = new File(dataDir);
+            if (!ddFile.isDirectory()) {
+                if (!ddFile.mkdirs()) {
+                    throw new RuntimeException("Failed to create a data directory: " + dataDir);
+                }
+            }
+            String logFile = new File(dataDir, "mongod.log").getAbsolutePath();
+            mongoLauncher.setDbPath(dataDir);
+            mongoLauncher.setLogPath(logFile);
+            mongoLauncher.startMongo();
+
+            // wait for it to start
+            AtomicInteger count = new AtomicInteger();
+            while(!mongoLauncher.serverRunning(mongoPort, (e) -> { if (count.get() % 100 == 99) throw new RuntimeException(e); })) {
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException("Interrupted!");
+                }
+                count.incrementAndGet();
+            }
+        }
+    }
 
     @Before
     public void setupUserDir() {
@@ -38,6 +97,24 @@ public class AbstractTestCase {
 
         if (this.projectRoot != null) {
             System.setProperty("user.dir", this.projectRoot.getAbsolutePath());
+        }
+    }
+
+    @AfterClass
+    public static void tearDownMongo() throws IOException {
+        if (mongoLauncher != null) {
+            mongoLauncher.stopMongo();
+
+            // wait for it to stop
+            AtomicInteger count = new AtomicInteger();
+            while(mongoLauncher.serverRunning(mongoPort, (e) -> { if (count.get() % 100 == 99) throw new RuntimeException(e); })) {
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException("Interrupted!");
+                }
+                count.incrementAndGet();
+            }
         }
     }
 }

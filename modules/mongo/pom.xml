@@ -31,12 +31,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.joelittlejohn.embedmongo</groupId>
-            <artifactId>embedmongo-maven-plugin</artifactId>
-            <version>0.1.9</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-test-tools</artifactId>
         </dependency>
@@ -95,35 +89,6 @@
                 <mongo.port>27018</mongo.port>
                 <mongo.host>localhost</mongo.host>
             </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.joelittlejohn.embedmongo</groupId>
-                        <artifactId>embedmongo-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>start-mongodb</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>start</goal>
-                                </goals>
-                                <configuration>
-                                    <port>${mongo.port}</port>
-                                    <logging>file</logging>
-                                    <logFile>${project.build.directory}/mongodb.log</logFile>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>stop-mongodb</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>stop</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>

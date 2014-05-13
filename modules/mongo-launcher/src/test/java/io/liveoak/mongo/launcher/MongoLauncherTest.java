@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URL;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -12,17 +13,44 @@ import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteResult;
 
-import io.liveoak.testtools.AbstractTestCase;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class MongoLauncherTest extends AbstractTestCase {
+public class MongoLauncherTest {
 
     private static final Logger log = Logger.getLogger(MongoLauncherTest.class);
+
+    protected File projectRoot;
+
+    @Before
+    public void setupUserDir() {
+        String name = getClass().getName().replace(".", "/") + ".class";
+        URL resource = getClass().getClassLoader().getResource(name);
+
+        if (resource != null) {
+            File current = new File(resource.getFile());
+
+            while (current.exists()) {
+                if (current.isDirectory()) {
+                    if (new File(current, "pom.xml").exists()) {
+                        this.projectRoot = current;
+                        break;
+                    }
+                }
+
+                current = current.getParentFile();
+            }
+        }
+
+        if (this.projectRoot != null) {
+            System.setProperty("user.dir", this.projectRoot.getAbsolutePath());
+        }
+    }
 
     @Test
     public void testStartStop() throws IOException {
