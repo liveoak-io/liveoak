@@ -704,6 +704,16 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
         delete itemFromBackup.self;
       }
 
+      // If the JSON value could be represented as a number, auto-type the string to the number type
+      for( var fieldId in itemToSave){
+        if (fieldId !== 'id' && itemToSave.hasOwnProperty(fieldId)){
+          var fieldVal = itemToSave[fieldId];
+          if (!isNaN(fieldVal)){
+            itemToSave[fieldId] = parseFloat(fieldVal);
+          }
+        }
+      }
+
       if (itemToSave.id) {
         $log.debug('Checking for update: ' + JSON.stringify(itemToSave));
         if (itemFromBackup && !angular.equals(itemToSave, itemFromBackup)) {
