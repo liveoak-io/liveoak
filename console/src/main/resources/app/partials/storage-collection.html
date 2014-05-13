@@ -133,7 +133,7 @@
                 </div>
               </th>
             </tr>
-            <tr>
+            <tr ng-show="columns.length > 1">
               <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown caption row-{{column}}" ng-class="{'before-actions':$last}">
                 <button class="btn btn-link btn-icon btn-unhide btn-unhide-left" type="button"
                         ng-show="isNextHidden(column, true) && $first" ng-click="unhideNext(column, true)">
