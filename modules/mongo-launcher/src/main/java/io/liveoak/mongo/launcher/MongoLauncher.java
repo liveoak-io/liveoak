@@ -108,7 +108,7 @@ public class MongoLauncher {
     public void startMongo() throws IOException {
 
         StringBuilder sb = new StringBuilder();
-        String mongoVersion = "unknown version";
+
         if (nullOrEmpty(mongodPath)) {
             if (useAnyMongod) {
                 mongodPath = findMongod();
@@ -122,14 +122,17 @@ public class MongoLauncher {
         sb.append(mongodPath).append(" ");
 
         if (notNullOrEmpty(pidFilePath)) {
+            ensureParent(pidFilePath);
             sb.append(" --pidfilepath " + pidFilePath);
         }
 
         if (notNullOrEmpty(dbPath)) {
+            ensureDir(dbPath);
             sb.append(" --dbpath " + dbPath);
         }
 
         if (notNullOrEmpty(logPath)) {
+            ensureParent(logPath);
             sb.append(" --logpath " + logPath);
         }
 
@@ -160,6 +163,23 @@ public class MongoLauncher {
         new ReaderThread(
                 new BufferedReader(new InputStreamReader(stderr))
         ).start();
+    }
+
+
+    private void ensureDir(String path) {
+        ensureDir(new File(path));
+    }
+
+    private void ensureDir(File dir) {
+        if (!dir.isDirectory()) {
+            if (!dir.mkdirs()) {
+                throw new RuntimeException("Failed to create directory: " + dir.getAbsolutePath());
+            }
+        }
+    }
+
+    private void ensureParent(String path) {
+        ensureDir(new File(path).getParentFile());
     }
 
     public static String findMongod() {
