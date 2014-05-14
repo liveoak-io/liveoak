@@ -735,7 +735,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       }
     }
 
-    Notifications.info('Collection data saved.');
+    Notifications.success('The changes in \"' + $scope.collectionId + '\" have been saved.');
 
     resetEnv();
     loadCollectionData($scope.collectionId, true);
