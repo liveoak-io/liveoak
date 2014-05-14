@@ -14,7 +14,6 @@ import org.junit.BeforeClass;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
@@ -63,14 +62,13 @@ public class AbstractTestCase {
             mongoLauncher.startMongo();
 
             // wait for it to start
-            AtomicInteger count = new AtomicInteger();
-            while(!mongoLauncher.serverRunning(mongoPort, (e) -> { if (count.get() % 100 == 99) throw new RuntimeException(e); })) {
+            long start = System.currentTimeMillis();
+            while(!mongoLauncher.serverRunning(mongoPort, (e) -> { if (System.currentTimeMillis() - start > 120000) throw new RuntimeException(e); })) {
                 try {
                     Thread.sleep(300);
                 } catch (InterruptedException e) {
                     throw new RuntimeException("Interrupted!");
                 }
-                count.incrementAndGet();
             }
         }
     }
@@ -106,14 +104,13 @@ public class AbstractTestCase {
             mongoLauncher.stopMongo();
 
             // wait for it to stop
-            AtomicInteger count = new AtomicInteger();
-            while(mongoLauncher.serverRunning(mongoPort, (e) -> { if (count.get() % 100 == 99) throw new RuntimeException(e); })) {
+            long start = System.currentTimeMillis();
+            while(mongoLauncher.serverRunning(mongoPort, (e) -> { if (System.currentTimeMillis() - start > 120000) throw new RuntimeException(e); })) {
                 try {
                     Thread.sleep(300);
                 } catch (InterruptedException e) {
                     throw new RuntimeException("Interrupted!");
                 }
-                count.incrementAndGet();
             }
         }
     }
