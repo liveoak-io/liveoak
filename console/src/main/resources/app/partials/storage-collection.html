@@ -5,7 +5,7 @@
     <div class="row">
       <div class="lo-content-area">
         <lo-breadcrumbs></lo-breadcrumbs>
-        <h2><span>{{curApp.name}}</span> Storage Collections</h2>
+        <h2><span>{{storageId}}</span> Collections</h2>
 
         <div class="panel" ng-hide="collectionList.length > 0">
           <div class="panel-body text-center empty-instance">
@@ -21,7 +21,7 @@
             <!-- Collection selector -->
             <!-- TODO create a watcher on the loSelect directive to check for ngShow attr change and refreshing the widget accordingly -->
             <span>
-              <select lo-select class="select-lg selectpicker"
+              <select lo-select class="select-lg selectpicker" ng-change="changeCollection()"
                     ng-model="collectionId" ng-options="o.id as o.id for o in collectionList"></select>
             </span>
 

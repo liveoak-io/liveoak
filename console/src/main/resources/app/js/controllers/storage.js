@@ -212,16 +212,24 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
 
 loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $route, currentApp, $modal, Notifications,
                                                    currentCollectionList, LoCollection, $routeParams, LoCollectionItem,
-                                                   LiveOak) {
+                                                   LiveOak, $location) {
 
   $log.debug('StorageCollectionCtrl');
-
   $rootScope.curApp = currentApp;
 
+  $scope.storageId = $routeParams.storageId;
+
+  if ($routeParams.collectionId) {
+    $log.debug('$routeParams.collectionId: ' + $routeParams.collectionId);
+    $scope.collectionId = $routeParams.collectionId;
+  }
+
   $scope.breadcrumbs = [
-    {'label': 'Applications',  'href':'#/applications'},
-    {'label': currentApp.name, 'href':'#/applications/' + currentApp.id},
-    {'label': 'Storage',       'href':'#/applications/' + currentApp.id + '/storage'}
+    {'label': 'Applications',   'href':'#/applications'},
+    {'label': currentApp.name,  'href':'#/applications/' + currentApp.id},
+    {'label': 'Storage',        'href':'#/applications/' + currentApp.id + '/storage'},
+    {'label': $scope.storageId, 'href':'#/applications/' + currentApp.id + '/storage/' + $routeParams.storageId},
+    {'label': 'Collections',    'href':''}
   ];
 
   $scope.collectionList = currentCollectionList._members;
@@ -247,6 +255,39 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   $scope.searchQuery = '';
   $scope.filterColumns = [];
   $scope.filterConditions = [];
+
+  // Search query string
+  $scope.predicate = 'id';
+
+  if (!$scope.collectionId) {
+    selectFirst();
+  }
+
+  // Load data for selected collection
+  if ( currentCollectionList ) {
+
+    loadCollectionData($scope.collectionId, true);
+
+    LiveOak.connect(function () {
+      if ($scope.subscriptionId){
+        $log.debug('Removing subscription \"' + $scope.subscriptionId + '\"');
+        LiveOak.unsubscribe($scope.subscriptionId);
+        $scope.subscriptionId = false;
+      }
+
+      if (!$scope.subscriptionId) {
+        var urlSubscribe = '/' + currentApp.id + '/' + $routeParams.storageId + '/' + $scope.collectionId + '/*';
+        $scope.subscriptionId = LiveOak.subscribe(urlSubscribe, function (data) {
+          //Notifications.warn('Data were changed outside console: ' + JSON.stringify(data));
+          $log.debug('UPS read: ' + JSON.stringify(data));
+          loadCollectionData($scope.collectionId, true);
+          $scope.live = data;
+        });
+
+        $log.debug('Subscribe id is: ' + $scope.subscriptionId);
+      }
+    });
+  }
 
   // Filter for hidden columns
   $scope.notHidden = function(item) {
@@ -321,110 +362,15 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     return false;
   };
 
-  // Search query string
-  $scope.predicate = 'id';
-
   $scope.setFilter = function(predicate, reverse){
     $scope.predicate = predicate;
     $scope.reverse = reverse;
   };
 
-  var loadCollectionData = function(colId, loadColumns) {
-
-    $log.debug('Loading collection data.');
-
-    var dataPromise = LoCollectionItem.getList({appId: currentApp.id, storageId: $routeParams.storageId, collectionId: colId}).$promise;
-
-    dataPromise.then(function (data) {
-      if (loadColumns) {
-
-        $scope.columns = ['id'];
-
-        for( var rowIndex in data._members) {
-          if (data._members && data._members[rowIndex]) {
-            for (var c in data._members[rowIndex]) {
-              if (c !== 'self' && c !== 'id' && $scope.columns.indexOf(c) === -1) {
-                $scope.columns.push(c);
-              }
-            }
-          }
-        }
-      }
-      $scope.columnsBackup = angular.copy($scope.columns);
-      $scope.collectionData = data;
-      $scope.collectionDataBackup = angular.copy(data);
-      $scope.isDataChange = false;
-    } );
+  $scope.changeCollection = function() {
+    console.log('Selected: ' + $scope.collectionId);
+    $location.path('/applications/'+currentApp.id+'/storage/'+$routeParams.storageId+'/browse/'+$scope.collectionId);
   };
-
-  // If nothing is selected, select the 1st item from the list
-  var selectFirst = function() {
-    if ($scope.collectionList) {
-      $scope.collectionId = $scope.collectionList[0].id;
-    }
-  };
-
-  selectFirst();
-
-  var loadCollectionList = function(callback) {
-    var promise = LoCollection.getList({appId: currentApp.id, storageId: $routeParams.storageId});
-    promise.$promise.then(function (data) {
-      $scope.collectionList = data._members;
-      if (callback) {
-        callback();
-      }
-    });
-  };
-
-  loadCollectionList();
-
-  var resetEnv = function(){
-    $scope.isColumnChange = false;
-    $scope.isClearAll = false;
-    $scope.isDataChange = false;
-    $scope.rowsToDelete = [];
-    $scope.searchQuery = '';
-    $scope.filterColumns = [];
-    $scope.filterConditions = [];
-    $scope.searchColumns = [];
-    $scope.searchConditions = [{type:'EQUALS', text:''}];
-  };
-
-  $scope.$watch('collectionId', function(){
-      $log.debug('Collection ID changed: ' + $scope.collectionId);
-      if ( $scope.collectionId ) {
-
-        LiveOak.connect(function () {
-
-          if ($scope.subscriptionId){
-            $log.debug('Removing subscription \"' + $scope.subscriptionId + '\"');
-            LiveOak.unsubscribe($scope.subscriptionId);
-            $scope.subscriptionId = false;
-          }
-
-          loadCollectionData($scope.collectionId, true);
-
-          if (!$scope.subscriptionId) {
-
-            var urlSubscribe = '/' + currentApp.id + '/' + $routeParams.storageId + '/' + $scope.collectionId + '/*';
-            $scope.subscriptionId = LiveOak.subscribe(urlSubscribe, function (data) {
-              //Notifications.warn('Data were changed outside console: ' + JSON.stringify(data));
-              $log.debug('UPS read: ' + JSON.stringify(data));
-
-              loadCollectionData($scope.collectionId, true);
-              $scope.live = data;
-            });
-
-            $log.debug('Subscribe id is: ' + $scope.subscriptionId);
-          }
-        });
-
-        resetEnv();
-      } else {
-        $scope.collectionData._members = undefined;
-      }
-    }
-  );
 
   $scope.$watch('collectionData._members', function(){
       $log.debug('Collection data changed.');
@@ -501,8 +447,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       {id : collectionName}).$promise;
 
     newCollectionPromise.then(function(){
-      $scope.collectionId = collectionName;
-      loadCollectionList();
+      goToCollection(collectionName);
     });
   };
 
@@ -510,9 +455,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $log.debug('Deleting collection: ' + $scope.collectionId);
     var deletePromise = LoCollection.delete({appId: currentApp.id, storageId: $routeParams.storageId,
       collectionId: $scope.collectionId}).$promise;
-    // There's a watcher on $scope.collectionId, list will be updated from there
+
     deletePromise.then(function(){
-      $scope.collectionId = undefined;
       loadCollectionList(selectFirst);
     });
   };
@@ -735,7 +679,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       }
     }
 
-    Notifications.info('Collection data saved.');
+    Notifications.success('The changes in \"' + $scope.collectionId + '\" have been saved.');
 
     resetEnv();
     loadCollectionData($scope.collectionId, true);
@@ -751,4 +695,72 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     //loadCollectionData($scope.collectionId, true);
   };
 
+  function loadCollectionData(colId, loadColumns) {
+
+    $log.debug('Loading collection data.');
+
+    var dataPromise = LoCollectionItem.getList({appId: currentApp.id, storageId: $routeParams.storageId, collectionId: colId}).$promise;
+
+    dataPromise.then(function (data) {
+      if (loadColumns) {
+
+        $scope.columns = ['id'];
+
+        for (var rowIndex in data._members) {
+          if (data._members && data._members[rowIndex]) {
+            for (var c in data._members[rowIndex]) {
+              if (c !== 'self' && c !== 'id' && $scope.columns.indexOf(c) === -1) {
+                $scope.columns.push(c);
+              }
+            }
+          }
+        }
+      }
+      $scope.columnsBackup = angular.copy($scope.columns);
+      $scope.collectionData = data;
+      $scope.collectionDataBackup = angular.copy(data);
+      $scope.isDataChange = false;
+    });
+  }
+
+  function goToCollection(colId){
+    $log.debug('Going to: ' + colId);
+    if(colId) {
+      $location.path('/applications/' + currentApp.id + '/storage/' + $routeParams.storageId + '/browse/' + colId);
+    } else {
+      $location.path('/applications/' + currentApp.id + '/storage/' + $routeParams.storageId + '/browse');
+    }
+  }
+
+  // If nothing is selected, select the 1st item from the list
+  function selectFirst() {
+    if ($scope.collectionList) {
+      goToCollection($scope.collectionList[0].id);
+    } else {
+      goToCollection(undefined);
+    }
+  }
+
+  function loadCollectionList(callback) {
+    $log.debug('Loading collection list');
+    var promise = LoCollection.getList({appId: currentApp.id, storageId: $routeParams.storageId});
+    promise.$promise.then(function (data) {
+      $scope.collectionList = data._members;
+      if (callback) {
+        callback();
+      }
+    });
+  }
+
+  function resetEnv(){
+    $scope.isColumnChange = false;
+    $scope.isClearAll = false;
+    $scope.isDataChange = false;
+    $scope.rowsToDelete = [];
+    $scope.searchQuery = '';
+    $scope.filterColumns = [];
+    $scope.filterConditions = [];
+    $scope.searchColumns = [];
+    $scope.searchConditions = [{type:'EQUALS', text:''}];
+  }
 });
