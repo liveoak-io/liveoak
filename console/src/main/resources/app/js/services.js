@@ -264,7 +264,7 @@ loMod.factory('LoStorageListLoader', function(Loader, LoStorage, $route) {
 });
 
 loMod.factory('LoCollectionListLoader', function(Loader, LoCollection, $route) {
-  return Loader.getList(LoCollection, function() {
+  return Loader.get(LoCollection, function() {
     return {
       appId : $route.current.params.appId,
       storageId : $route.current.params.storageId

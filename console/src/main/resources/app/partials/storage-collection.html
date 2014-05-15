@@ -21,7 +21,7 @@
             <!-- Collection selector -->
             <!-- TODO create a watcher on the loSelect directive to check for ngShow attr change and refreshing the widget accordingly -->
             <span>
-              <select lo-select class="select-lg selectpicker"
+              <select lo-select class="select-lg selectpicker" ng-change="changeCollection()"
                     ng-model="collectionId" ng-options="o.id as o.id for o in collectionList"></select>
             </span>
 
