@@ -227,6 +227,10 @@ loDirectives.directive('loSelect', function($timeout) {
           element.selectpicker('refresh');
         });
       }
+
+      attrs.$observe('disabled', function() {
+        element.selectpicker('refresh');
+      });
     }
   };
 });
