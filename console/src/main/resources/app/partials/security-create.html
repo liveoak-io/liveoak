@@ -5,37 +5,22 @@
     <div class="row">
       <div class="lo-content-area col-md-9">
 
-        <ol class="breadcrumb">
-          <li><a href="#">Applications</a></li>
-          <li><a href="#">ApplicationName</a></li>
-          <li><a href="#">Security</a></li>
-          <li>CollectionName</li>
-        </ol>
+        <lo-breadcrumbs></lo-breadcrumbs>
 
-        <h2 class="pull-left"><span>CollectionName</span> Security</h2>
+        <h2 class="pull-left"><span>{{currentCollection}}</span> Security</h2>
         <p class="subtitle"><span class="required">*</span> Required fields</p>
 
-        <form class="lo-form-horizontal clearfix" name="storageForm" novalidate>
+        <form class="lo-form-horizontal clearfix" name="securityForm" novalidate>
           <fieldset>
             <legend lo-collapse class="collapsible"><span class="text">Collection Settings</span></legend>
             <div class="form-group clearfix">
               <label class="col-sm-3 control-label" for="collection">Collection <span class="required">*</span></label>
-              <select class="selectpicker col-sm-9" id="collection">
-                <option>Collection 01</option>
-                <option>Collection 02</option>
-                <option>Collection 03</option>
+              <select lo-select class="col-sm-9" id="collection" ng-options="col.id as col.id for col in collectionsList" ng-model="currentCollection">
               </select>
             </div>
             <div class="form-group clearfix">
               <label class="col-sm-3 control-label" for="access">Can access the collection <span class="required">*</span></label>
-              <select class="selectpicker col-sm-9" multiple id="access">
-                <option>todo-admin</option>
-                <option>todo-manager</option>
-                <option>todo-user</option>
-                <option>todo-alex</option>
-                <option>todo-viliam</option>
-                <option>todo-gabriel</option>
-                <option>todo-ken</option>
+              <select lo-select class="col-sm-9" id="access" ng-options="(curApp.name + '/' + role.name) as (curApp.name + '/' + role.name) for role in appRoles" ng-model="settings.accessRoles" ng-disabled="appRoles.length == 0" multiple>
               </select>
             </div>
           </fieldset>
@@ -44,18 +29,12 @@
             <legend lo-collapse class="collapsible"><span class="text">Entry Settings</span></legend>
             <div class="form-group clearfix">
               <label class="col-sm-3 control-label" for="createentry">Can create an entry <span class="required">*</span></label>
-              <select class="selectpicker col-sm-9" multiple id="createentry">
-                <option>todo-admin</option>
-                <option>todo-manager</option>
-                <option>todo-user</option>
+              <select lo-select class="col-sm-9" id="createentry" ng-options="role as role for role in settings.accessRoles" ng-model="settings.createEntryRoles" ng-disabled="settings.accessRoles.length === 0" multiple>
               </select>
             </div>
             <div class="form-group clearfix">
               <label class="col-sm-3 control-label" for="creator">Entry creator can <span class="required">*</span></label>
-              <select class="selectpicker col-sm-9" multiple id="creator">
-                <option selected>create</option>
-                <option selected>read</option>
-                <option selected>update</option>
+              <select lo-select class="col-sm-9" multiple id="creator" ng-options="permission for permission in availablePermissions" ng-model="settings.ownerPermissions">
               </select>
             </div>
           </fieldset>
@@ -63,27 +42,18 @@
           <fieldset>
             <legend lo-collapse class="collapsible"><span class="text">Super Permissions</span></legend>
             <div class="form-group clearfix">
-              <label class="col-sm-3 control-label" for="readall">Can create all entries</label>
-              <select class="selectpicker col-sm-9" multiple id="readall">
-                <option>todo-admin</option>
-                <option>todo-manager</option>
-                <option>todo-user</option>
+              <label class="col-sm-3 control-label" for="readall">Can read all entries</label>
+              <select lo-select class="col-sm-9" id="readall" ng-options="role as role for role in settings.accessRoles" ng-model="settings.readAllRoles" ng-disabled="settings.accessRoles.length == 0" multiple>
               </select>
             </div>
             <div class="form-group clearfix">
               <label class="col-sm-3 control-label" for="updateall">Can update all entries</label>
-              <select class="selectpicker col-sm-9" multiple id="updateall">
-                <option>todo-admin</option>
-                <option>todo-manager</option>
-                <option>todo-user</option>
+              <select lo-select class="col-sm-9" id="updateall" ng-options="role as role for role in settings.accessRoles" ng-model="settings.updateAllRoles" ng-disabled="settings.accessRoles.length == 0" multiple>
               </select>
             </div>
             <div class="form-group clearfix">
               <label class="col-sm-3 control-label" for="deleteall">Can delete all entries</label>
-              <select class="selectpicker col-sm-9" multiple id="deleteall">
-                <option>todo-admin</option>
-                <option>todo-manager</option>
-                <option>todo-user</option>
+              <select lo-select class="col-sm-9" id="deleteall" ng-options="role as role for role in settings.accessRoles" ng-model="settings.deleteAllRoles" ng-disabled="settings.accessRoles.length == 0" multiple>
               </select>
             </div>
 

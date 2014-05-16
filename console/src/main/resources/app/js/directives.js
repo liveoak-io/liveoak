@@ -57,6 +57,20 @@ loDirectives.directive('loClientSummary', function () {
   };
 });
 
+loDirectives.directive('loCollectionSecuritySummary', function () {
+  return {
+    scope: {
+      app: '=loApp',
+      storage: '=loStorage',
+      collection: '=loCollection',
+      created: '='
+    },
+    restrict: 'E',
+    replace: true,
+    templateUrl: '/admin/console/templates/lo-collection-security-summary.html'
+  };
+});
+
 loDirectives.directive('loStorageSummary', function (LoCollection) {
   return {
     scope: {

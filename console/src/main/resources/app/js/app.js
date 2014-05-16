@@ -7,7 +7,6 @@ var loMod = angular.module('loApp', [
   'loApp.services',
   'loApp.directives',
   'loApp.controllers',
-  'services.breadcrumbs',
   'ngResource',
   'ngAnimate',
   'ui.bootstrap'
@@ -94,20 +93,60 @@ loMod.config(['$routeProvider', function($routeProvider) {
     })
     .when('/applications/:appId/security', {
       templateUrl : '/admin/console/partials/security-list.html',
-      controller : 'SecurityCtrl',
+      controller : 'SecurityListCtrl',
       resolve: {
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
+        },
+        expApp: function(LoCollectionListLoader) {
+          return new LoCollectionListLoader();
+        },
+        expAppResources : function(LoStorageListLoader) {
+          return new LoStorageListLoader();
         }
       }
     })
-    .when('/applications/:appId/create-security', {
+    // .when('/applications/:appId/create-security', {
+    .when('/applications/:appId/security/:storageId/:collectionId', {
       templateUrl : '/admin/console/partials/security-create.html',
       controller : 'SecurityCtrl',
       resolve: {
-        currentApp: function(LoAppLoader){
+        currentApp: function(LoAppLoader) {
           return new LoAppLoader();
+        },
+        loStorageList : function(LoStorageListLoader) {
+          return new LoStorageListLoader();
+        },
+        currentCollectionList: function(LoCollectionListLoader) {
+          return new LoCollectionListLoader();
+        },
+        loRealmAppRoles: function(LoRealmAppRolesLoader) {
+          return new LoRealmAppRolesLoader();
+        },
+        uriPolicies: function(LoSecurity, $route) {
+          return LoSecurity.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return undefined;
+            }
+          );
+        },
+//        uriPolicies: function(LoSecurityLoader) {
+//          return new LoSecurityLoader();
+//        },
+        aclPolicies: function(LoACL, $route) {
+          return LoACL.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return undefined;
+            }
+          );
         }
+//        aclPolicies: function(LoACLLoader) {
+//          return new LoACLLoader();
+//        }
       }
     })
     .when('/applications/:appId/application-settings', {
