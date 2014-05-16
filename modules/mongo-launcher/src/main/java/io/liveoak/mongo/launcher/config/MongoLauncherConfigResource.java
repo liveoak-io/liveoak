@@ -24,6 +24,7 @@ public class MongoLauncherConfigResource implements ConfigResource, RootResource
     private Resource parent;
 
     private String pidFilePath;
+    private String host = "localhost";
     private Integer port = 27017;
     private String mongodPath;
     private String dbPath;
@@ -54,6 +55,10 @@ public class MongoLauncherConfigResource implements ConfigResource, RootResource
 
     public String mongodPath() {
         return mongodPath;
+    }
+
+    public String host() {
+        return host;
     }
 
     public int port() {
@@ -91,6 +96,7 @@ public class MongoLauncherConfigResource implements ConfigResource, RootResource
     @Override
     public void readConfigProperties(RequestContext ctx, PropertySink sink, Resource resource) throws Exception {
         sink.accept(MONGOD_PATH, mongodPath);
+        sink.accept(HOST, host);
         sink.accept(PORT, port );
         sink.accept(DB_PATH, dbPath);
         sink.accept(LOG_PATH, logPath);
@@ -108,6 +114,9 @@ public class MongoLauncherConfigResource implements ConfigResource, RootResource
         logPath = getStringProperty(LOG_PATH, state);
         pidFilePath = getStringProperty(PID_FILE_PATH, state);
         extraArgs = getStringProperty(EXTRA_ARGS, state);
+
+        String host = getStringProperty(HOST, state);
+        this.host = host == null ? "localhost" : host;
 
         Integer port = getIntegerProperty(PORT, state);
         this.port = port == null ? 27017 : port;

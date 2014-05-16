@@ -60,12 +60,18 @@ public class MongoLauncherService implements Service<MongoLauncher> {
 
         new Thread(() -> {
             try {
+
+                String host = config.host();
+                if (host != null) {
+                    launcher.setHost(host);
+                }
+
                 int port = config.port();
                 if (port != 0) {
                     launcher.setPort(port);
                 }
 
-                if (launcher.serverRunning(port)) {
+                if (launcher.serverRunning(host, port)) {
                     log.warn("It appears there is an existing server on port: " + port);
                     if (exitIfPortTaken) {
                         log.warn("Not starting mongod (you can change this behavior via 'enabled' property in conf/extensions/mongo-launcher.json)");
@@ -108,8 +114,9 @@ public class MongoLauncherService implements Service<MongoLauncher> {
                 try {
                     launcher.startMongo();
 
-                    while(!launcher.serverRunning(port)) {
+                    while(!launcher.serverRunning(host, port)) {
                         try {
+                            log.debug("Attempting to connect to MongoDB instance");
                             Thread.sleep(300);
                         } catch (InterruptedException e) {
                             context.failed(new StartException("Interrupted", e));

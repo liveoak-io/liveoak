@@ -28,6 +28,7 @@ public class MongoLauncher {
     private static final Logger mongoLog = Logger.getLogger("mongod");
 
     private String pidFilePath;
+    private String host;
     private int port;
     private String mongodPath;
     private boolean useAnyMongod;
@@ -44,6 +45,14 @@ public class MongoLauncher {
 
     public void setPidFilePath(String pidFilePath) {
         this.pidFilePath = pidFilePath;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
     }
 
     public int getPort() {
@@ -138,6 +147,10 @@ public class MongoLauncher {
 
         if (useSmallFiles) {
             sb.append(" --smallfiles");
+        }
+
+        if (host != null) {
+            sb.append(" --bind_ip " + host);
         }
 
         if (port != 0) {
@@ -273,19 +286,20 @@ public class MongoLauncher {
         if (stdin != null) {
             stdin.close();
         }
+
         if (process != null) {
             process.destroy();
         }
     }
 
-    public static boolean serverRunning(int port) {
-        return serverRunning(port, null);
+    public static boolean serverRunning(String host, int port) {
+        return serverRunning(host, port, null);
     }
 
-    public static boolean serverRunning(int port, Consumer<Throwable> onError) {
+    public static boolean serverRunning(String host, int port, Consumer<Throwable> onError) {
         try {
             Socket socket = new Socket();
-            socket.connect(new InetSocketAddress("localhost", port), 500);
+            socket.connect( new InetSocketAddress( host, port ), 500 );
             if (socket.isConnected()) {
                 try {
                     socket.close();
