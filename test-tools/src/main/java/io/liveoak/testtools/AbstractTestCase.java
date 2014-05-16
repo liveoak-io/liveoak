@@ -23,6 +23,7 @@ public class AbstractTestCase {
 
     protected static MongoLauncher mongoLauncher;
     protected static int mongoPort = 27017;
+    protected static String mongoHost = "localhost";
 
     @BeforeClass
     public static void setupMongo() throws IOException {
@@ -47,7 +48,12 @@ public class AbstractTestCase {
             if (port != null) {
                 mongoPort = Integer.parseInt(port);
             }
-            mongoLauncher.setPort(mongoPort);
+            mongoLauncher.setPort( mongoPort );
+
+            if (host != null) {
+                mongoHost = host;
+            }
+            mongoLauncher.setHost( mongoHost );
 
             String dataDir = new File(moduleDir, "target/data").getAbsolutePath();
             File ddFile = new File(dataDir);
@@ -63,7 +69,9 @@ public class AbstractTestCase {
 
             // wait for it to start
             long start = System.currentTimeMillis();
-            while(!mongoLauncher.serverRunning(mongoPort, (e) -> { if (System.currentTimeMillis() - start > 120000) throw new RuntimeException(e); })) {
+            while(!mongoLauncher.serverRunning(mongoHost, mongoPort, (e) -> {
+                    if (System.currentTimeMillis() - start > 120000) throw new RuntimeException(e);
+                })) {
                 try {
                     Thread.sleep(300);
                 } catch (InterruptedException e) {
@@ -105,13 +113,27 @@ public class AbstractTestCase {
 
             // wait for it to stop
             long start = System.currentTimeMillis();
-            while(mongoLauncher.serverRunning(mongoPort, (e) -> { if (System.currentTimeMillis() - start > 120000) throw new RuntimeException(e); })) {
+            while(mongoLauncher.serverRunning(mongoHost, mongoPort, (e) -> { if (System.currentTimeMillis() - start > 120000) throw new RuntimeException(e); })) {
                 try {
                     Thread.sleep(300);
                 } catch (InterruptedException e) {
                     throw new RuntimeException("Interrupted!");
                 }
             }
+
+            String moduleDir = System.getProperty("user.dir");
+            Long startTime = System.currentTimeMillis();
+            while (new File(moduleDir, "target/data/mongod.lock").length() > 0) {
+                if (System.currentTimeMillis() - startTime > 120000) {
+                    throw new RuntimeException("Lock file was not cleared after 120 seconds. Check the Mongo logs for what went wrong.");
+                }
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException("Interrupted!");
+                }
+            }
+
         }
     }
 }
