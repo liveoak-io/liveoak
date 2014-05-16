@@ -1,0 +1,16 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+    <span class="pficon pficon-close"></span>
+  </button>
+  <h4 class="modal-title">Delete Security</h4>
+</div>
+<div class="modal-body">
+  <div class="form-group">
+    <p class="primary-message">Are you sure you want to delete the Security configuration for "{{$parent.deleteCollectionId}}"?</p>
+    <p>This action can't be undone.</p>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-lg btn-default" ng-click="cancel()">Cancel</button>
+  <button type="button" class="btn btn-lg btn-danger" ng-click="collectionSecurityDelete(deleteStorageId, deleteCollectionId);">Delete</button>
+</div>

@@ -2,39 +2,6 @@
 
 var loMod = angular.module('loApp.services', []).value('version', '0.1');
 
-angular.module('services.breadcrumbs', []).factory('breadcrumbs', ['$rootScope', '$location', function($rootScope, $location){
-
-  var breadcrumbs = [];
-  var breadcrumbsService = {};
-
-  //we want to update breadcrumbs only when a route is actually changed
-  //as $location.path() will get updated immediately (even if route change fails!)
-  $rootScope.$on('$routeChangeSuccess', function(){
-
-    var pathElements = $location.path().split('/'), result = [], i;
-    var breadcrumbPath = function (index) {
-      return '/' + (pathElements.slice(0, index + 1)).join('/');
-    };
-
-    pathElements.shift();
-    for (i = 0; i < pathElements.length; i++) {
-      result.push({name: pathElements[i], path: breadcrumbPath(i)});
-    }
-
-    breadcrumbs = result;
-  });
-
-  breadcrumbsService.getAll = function() {
-    return breadcrumbs;
-  };
-
-  breadcrumbsService.getFirst = function() {
-    return breadcrumbs[0] || {};
-  };
-
-  return breadcrumbsService;
-}]);
-
 loMod.factory('Notifications', function($rootScope, $timeout, $log) {
   // time (in ms) the notifications are shown
   var delay = 5000;
@@ -167,7 +134,7 @@ loMod.factory('LoStorage', function($resource) {
 });
 
 loMod.factory('LoCollection', function($resource) {
-  return $resource('/:appId/:storageId/:collectionId', {
+  return $resource('/:appId/:storageId/:collectionId?expand=members', {
     appId : '@appId',
     storageId : '@storageId',
     collectionId : '@collectionId'
@@ -418,6 +385,48 @@ loMod.factory('LoRealmClientRolesLoader', function(Loader, LoRealmClientRoles, $
   return Loader.query(LoRealmClientRoles, function() {
     return {
       realmId: 'liveoak-apps',
+      appId : $route.current.params.appId
+    };
+  });
+});
+
+loMod.factory('LoSecurity', function($resource) {
+  return $resource('/admin/applications/:appId/resources/uri-policy', {
+    appId : '@appId'
+  }, {
+    create : {
+      method: 'PUT'
+    },
+    save : {
+      method: 'PUT'
+    }
+  });
+});
+
+loMod.factory('LoSecurityLoader', function(Loader, LoSecurity, $route) {
+  return Loader.get(LoSecurity, function() {
+    return {
+      appId : $route.current.params.appId
+    };
+  });
+});
+
+loMod.factory('LoACL', function($resource) {
+  return $resource('/admin/applications/:appId/resources/acl-policy', {
+    appId : '@appId'
+  }, {
+    create : {
+      method: 'PUT'
+    },
+    save : {
+      method: 'PUT'
+    }
+  });
+});
+
+loMod.factory('LoACLLoader', function(Loader, LoACL, $route) {
+  return Loader.get(LoACL, function() {
+    return {
       appId : $route.current.params.appId
     };
   });
