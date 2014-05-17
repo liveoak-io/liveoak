@@ -11,6 +11,14 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <files>
       <file>
+         <source>./src/main/resources/conf/standalone.sh</source>
+         <outputDirectory>/bin/</outputDirectory>
+      </file>
+      <file>
+         <source>./src/main/resources/conf/standalone.bat</source>
+         <outputDirectory>/bin/</outputDirectory>
+      </file>
+      <file>
         <source>./src/main/resources/conf/standalone.xml</source>
         <outputDirectory>/standalone/configuration/</outputDirectory>
       </file>

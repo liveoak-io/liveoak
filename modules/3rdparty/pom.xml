@@ -224,6 +224,12 @@
             <artifactId>mongo-java-driver</artifactId>
         </dependency>
 
+        <!-- org.keycloak -->
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-core</artifactId>
+        </dependency>
+
         <!-- org.quartz-scheduler -->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>

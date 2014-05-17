@@ -15,6 +15,8 @@
             <outputDirectory></outputDirectory>
             <excludes>
               <exclude>**/standalone.xml</exclude>
+              <exclude>**/standalone.sh</exclude>
+              <exclude>**/standalone.bat</exclude>
             </excludes>
         </fileSet>
     </fileSets>
