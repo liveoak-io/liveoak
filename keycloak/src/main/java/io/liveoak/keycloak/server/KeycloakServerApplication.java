@@ -53,11 +53,14 @@ public class KeycloakServerApplication extends KeycloakApplication {
 
             consoleApp.setAllowedClaimsMask(ClaimMask.USERNAME);
 
-            // TODO Remove once KC supports relative redirect_uri
-            String baseUrl = "http://" + System.getProperty("jboss.bind.address", "localhost");
-            String port = System.getProperty("jboss.http.port", "8080");
-            if (!port.equals("80")) {
-                baseUrl += ":" + port;
+            String baseUrl = System.getProperty("liveoak.url");
+            if (baseUrl == null) {
+                // TODO Remove once KC supports relative redirect_uri
+                baseUrl = "http://" + System.getProperty("jboss.bind.address", "localhost");
+                String port = System.getProperty("jboss.http.port", "8080");
+                if (!port.equals("80")) {
+                    baseUrl += ":" + port;
+                }
             }
 
             consoleApp.addRedirectUri(baseUrl + "/admin");
