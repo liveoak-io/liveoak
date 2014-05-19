@@ -7,9 +7,6 @@ rem Use --debug to activate debug mode with an optional argument to specify the 
 rem Usage : standalone.bat --debug
 rem         standalone.bat --debug 9797
 
-rem LiveOak Specific Options
-set "LIVEOAK_OPTS=-Dlocal.maven.repo.path=m2-repo"
-
 @if not "%ECHO%" == ""  echo %ECHO%
 @if "%OS%" == "Windows_NT" setlocal
 
@@ -17,7 +14,7 @@ rem By default debug mode is disable.
 set DEBUG_MODE=false
 set DEBUG_PORT=8787
 rem Set to all parameters by default
-set "SERVER_OPTS=%LIVEOAK_OPTS% %*"
+set "SERVER_OPTS=%*"
 
 rem Get the program name before using shift as the command modify the variable ~nx0
 if "%OS%" == "Windows_NT" (
@@ -80,6 +77,12 @@ if /i "%RESOLVED_JBOSS_HOME%" NEQ "%SANITIZED_JBOSS_HOME%" (
    echo       JBOSS_HOME: "%JBOSS_HOME%"
    echo.
 )
+
+rem Configure the default LIVEOAK_OPTS if not already set
+if "x%LIVEOAK_OPTS%" == "x" (
+   set "LIVEOAK_OPTS=%JBOSS_HOME%/m2-repo"
+)
+set "SERVER_OPTS=%SERVER_OPTS% %LIVEOAK_OPTS%"
 
 rem Read an optional configuration file.
 if "x%STANDALONE_CONF%" == "x" (
