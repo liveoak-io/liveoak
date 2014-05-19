@@ -67,11 +67,18 @@ var LiveOak = function( options ) {
         stomp_client.unsubscribe( id, headers );
     };
 
+    if (options.clientId) {
+        options.auth = options.auth || {};
+        options.auth.clientId = options.clientId;
+    }
+
     if (options.auth) {
+        if (!options.auth.realm) {
+            options.auth.realm = 'liveoak-apps';
+        }
+
         if (!options.auth.url) {
-            //var port = options.port ? options.port + 303 : 8383;
-            var port = options.port ? options.port : 8080;
-            options.auth.url = (options.secure ? 'https://' : 'http://') + options.host + ':' + port + '/auth';
+            options.auth.url = (options.secure ? 'https://' : 'http://') + options.host + (options.port ? ':' + options.port : '') + '/auth';
         }
 
         auth = new Keycloak(options.auth);

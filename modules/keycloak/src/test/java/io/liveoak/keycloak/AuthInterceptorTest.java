@@ -27,7 +27,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.keycloak.models.RealmModel;
 import org.keycloak.representations.AccessToken;
 
 import java.io.File;
@@ -102,7 +101,7 @@ public class AuthInterceptorTest extends AbstractKeycloakTest {
     @Test(timeout = 10000)
     public void testAuthExpired() throws Exception {
         AccessToken token = tokenUtil.createToken();
-        token.expiration((System.currentTimeMillis() / 1000) - 10);
+        token.expiration((int) ((System.currentTimeMillis() / 1000) - 10));
 
         HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/testApp/auth-test");
         httpMethod.addHeader(new BasicHeader("Authorization", "bearer " + tokenUtil.toString(token)));

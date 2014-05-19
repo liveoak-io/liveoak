@@ -79,11 +79,9 @@ public class KeycloakConfig {
     }
 
     private String loadPublicKey(String realm) throws Exception {
+        String realmUrl = baseUrl + "/realms/" + realm;
+
         CloseableHttpClient client = HttpClients.createDefault();
-        Map<String, String> realmDetails;
-
-        String realmUrl = baseUrl + "/rest/realms/" + realm;
-
         HttpGet get = new HttpGet(realmUrl);
         get.setHeader(HttpHeaders.ACCEPT, "application/json");
 
