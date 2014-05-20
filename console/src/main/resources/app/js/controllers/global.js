@@ -34,10 +34,6 @@ loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, Liv
   $rootScope.reIPv6Host = new RegExp('^' + reIPv6String + '$|^' + reHostString + '$');
   $rootScope.reIPv4IPv6Host = new RegExp('^' + reIPv4String + '$|^' + reIPv6String + '$|^' + reHostString + '$');
 
-  LoApp.getList(function(data){
-    $rootScope.applications = data._members;
-  });
-
   $scope.userLabel = function() {
     var role = '';
     if ($scope.auth.hasResourceRole('admin')) {
@@ -60,20 +56,8 @@ loMod.controller('HomeCtrl', function($log, $rootScope, $scope, $location, $filt
   }
 });
 
-angular.module('loApp.controllers').controller('AppDropdownCtrl', function() {
-  /*
-  //TODO Inspect if this code is needed and remove it respectively
-
-  $scope.applications = [];
-
-  $scope.appList2 = LoAppList.get(function(data){
-    for (var i in data._members){
-      var member = data._members[i];
-      $scope.applications.push({id: member.id, name:member.name});
-    }
+angular.module('loApp.controllers').controller('AppDropdownCtrl', function($rootScope, $filter, LoApp) {
+  LoApp.getList(function(data){
+    $rootScope.applications = $filter('filter')(data._members, {'visible': true});
   });
-
-  $scope.curApp = Current;
-  */
-
 });
