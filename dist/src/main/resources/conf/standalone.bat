@@ -80,7 +80,7 @@ if /i "%RESOLVED_JBOSS_HOME%" NEQ "%SANITIZED_JBOSS_HOME%" (
 
 rem Configure the default LIVEOAK_OPTS if not already set
 if "x%LIVEOAK_OPTS%" == "x" (
-   set "LIVEOAK_OPTS=%JBOSS_HOME%/m2-repo"
+   set "LIVEOAK_OPTS=-Dlocal.maven.repo.path=%JBOSS_HOME%\m2-repo"
 )
 set "SERVER_OPTS=%SERVER_OPTS% %LIVEOAK_OPTS%"
 

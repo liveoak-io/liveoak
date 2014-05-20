@@ -14,6 +14,13 @@ import org.junit.BeforeClass;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Random;
 
 /**
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
@@ -27,6 +34,9 @@ public class AbstractTestCase {
 
     @BeforeClass
     public static void setupMongo() throws IOException {
+        if (mongoLauncher != null) {
+            throw new IllegalStateException("Assertion failed: static mongoLauncher is not null");
+        }
         String host = System.getProperty("mongo.host");
         String port = System.getProperty("mongo.port");
         String moduleDir = System.getProperty("user.dir");
@@ -55,7 +65,7 @@ public class AbstractTestCase {
             }
             mongoLauncher.setHost( mongoHost );
 
-            String dataDir = new File(moduleDir, "target/data").getAbsolutePath();
+            String dataDir = new File(moduleDir, "target/data_" + randomName()).getAbsolutePath();
             File ddFile = new File(dataDir);
             if (!ddFile.isDirectory()) {
                 if (!ddFile.mkdirs()) {
@@ -65,6 +75,7 @@ public class AbstractTestCase {
             String logFile = new File(dataDir, "mongod.log").getAbsolutePath();
             mongoLauncher.setDbPath(dataDir);
             mongoLauncher.setLogPath(logFile);
+            mongoLauncher.setPidFilePath(new File(ddFile, "mongod.pid").getAbsolutePath());
             mongoLauncher.startMongo();
 
             // wait for it to start
@@ -79,6 +90,19 @@ public class AbstractTestCase {
                 }
             }
         }
+    }
+
+    private static String randomName() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 9; i++) {
+            int num = (int) (35 * Math.random());
+            if (num > 9) {
+                sb.append((char) ('a' + num - 9));
+            } else {
+                sb.append((char) ('0' + num));
+            }
+        }
+        return sb.toString();
     }
 
     @Before
@@ -121,19 +145,27 @@ public class AbstractTestCase {
                 }
             }
 
-            String moduleDir = System.getProperty("user.dir");
-            Long startTime = System.currentTimeMillis();
-            while (new File(moduleDir, "target/data/mongod.lock").length() > 0) {
-                if (System.currentTimeMillis() - startTime > 120000) {
-                    throw new RuntimeException("Lock file was not cleared after 120 seconds. Check the Mongo logs for what went wrong.");
+            // now delete the data dir except log file
+            Files.walkFileTree(new File(mongoLauncher.getDbPath()).toPath(), new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    if (!file.startsWith(mongoLauncher.getLogPath())) {
+                        Files.delete(file);
+                    }
+                    return FileVisitResult.CONTINUE;
                 }
-                try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException("Interrupted!");
-                }
-            }
 
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    try {
+                        Files.delete(dir);
+                    } catch (DirectoryNotEmptyException ignored) {
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+
+            mongoLauncher = null;
         }
     }
 }
