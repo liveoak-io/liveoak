@@ -241,6 +241,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
   $scope.columnsHidden = [];
   $scope.newRow = {};
+  $scope.newRows = [];
   $scope.rowsToDelete = [];
 
   // TODO - seems to be redundant because with each column change, there's a data change.
@@ -402,14 +403,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
   };
 
-  $scope.modalRowAdd = function(){
-    $modal.open({
-      templateUrl: '/admin/console/templates/modal/storage/row-add.html',
-      controller: ModalInstanceCtrl,
-      scope: $scope
-    });
-  };
-
   $scope.modalColumnAdd = function(){
     $modal.open({
       templateUrl: '/admin/console/templates/modal/storage/column-add.html',
@@ -463,13 +456,11 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
   $scope.rowAdd = function(){
     $log.debug('Creating new row ' + $scope.newRow);
+    $scope.newRows.push({});
+  };
 
-    if (!$scope.collectionData._members){
-      $scope.collectionData._members = [];
-    }
-
-    $scope.collectionData._members.push($scope.newRow);
-    $scope.newRow = {};
+  $scope.rowRemoveNew = function (index) {
+    $scope.newRows.splice(index, 1);
   };
 
   $scope.rowRemove = function(id) {
@@ -652,14 +643,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       }
 
       // If the JSON value could be represented as a number, auto-type the string to the number type
-      for( var fieldId in itemToSave){
-        if (fieldId !== 'id' && itemToSave.hasOwnProperty(fieldId)){
-          var fieldVal = itemToSave[fieldId];
-          if (!isNaN(fieldVal)){
-            itemToSave[fieldId] = parseFloat(fieldVal);
-          }
-        }
-      }
+      itemToSave = autoType(itemToSave);
 
       if (itemToSave.id) {
         $log.debug('Checking for update: ' + JSON.stringify(itemToSave));
@@ -673,10 +657,16 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       }
       // Create new items
       else {
-        $log.debug('Creating: ' + JSON.stringify(itemToSave));
-        LoCollectionItem.create({appId: currentApp.id, storageId: $routeParams.storageId,
-          collectionId: $scope.collectionId}, itemToSave);
+
       }
+    }
+
+    for (var l in $scope.newRows){
+      var newRowToSave = autoType($scope.newRows[l]);
+
+      $log.debug('Creating: ' + JSON.stringify(newRowToSave));
+      LoCollectionItem.create({appId: currentApp.id, storageId: $routeParams.storageId,
+        collectionId: $scope.collectionId}, newRowToSave);
     }
 
     Notifications.success('The changes in \"' + $scope.collectionId + '\" have been saved.');
@@ -741,6 +731,20 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     }
   }
 
+  function autoType(obj){
+    // If the JSON value could be represented as a number, auto-type the string to the number type
+    for( var fieldId in obj){
+      if (fieldId !== 'id' && obj.hasOwnProperty(fieldId)){
+        var fieldVal = obj[fieldId];
+        if (!isNaN(fieldVal)){
+          obj[fieldId] = parseFloat(fieldVal);
+        }
+      }
+    }
+
+    return obj;
+  }
+
   function loadCollectionList(callback) {
     $log.debug('Loading collection list');
     var promise = LoCollection.getList({appId: currentApp.id, storageId: $routeParams.storageId});
@@ -756,6 +760,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $scope.isColumnChange = false;
     $scope.isClearAll = false;
     $scope.isDataChange = false;
+    $scope.newRows = [];
     $scope.rowsToDelete = [];
     $scope.searchQuery = '';
     $scope.filterColumns = [];

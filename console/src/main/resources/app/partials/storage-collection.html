@@ -112,7 +112,7 @@
 
                 <div class="pull-right">
                   <button class="btn btn-default" ng-click="modalColumnAdd()">Add Column</button>
-                  <button type="button" class="btn btn-default" ng-click="modalRowAdd()" ng-disabled="!(columns.length > 1)">Add Row</button>
+                  <button type="button" class="btn btn-default" ng-click="rowAdd()" ng-disabled="!(columns.length > 1)">Add Row</button>
 
                   <div class="dropdown">
                     <button class="btn btn-default dropdown-toggle" type="button"
@@ -170,6 +170,23 @@
             </tr>
             </thead>
             <tbody ng-show="collectionId && (columns.length > 0)" class="lo-table-edit">
+
+            <!-- Newly added rows -->
+            <tr ng-repeat="item in newRows">
+              <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}"
+                  class="row-{{column}}" ng-click="isEdit = (true && column !== 'id')">
+                <span ng-show="column === 'id'">{{ item[column] }}</span>
+                <input class="form-control" type="text" ng-model="item[column]" ng-hide="column === 'id'"/>
+              </td>
+              <td class="actions">
+                <button class="btn btn-link btn-icon" tooltip="Delete Row" ng-click="rowRemoveNew($index)">
+                  <i class="fa fa-trash-o"></i>
+                  <span>Delete Row</span>
+                </button>
+              </td>
+            </tr>
+
+            <!-- Original rows, editing happens here -->
             <tr ng-repeat="item in collectionData._members | orderBy:predicate:reverse | conditional:searchQuery:filterColumns:filterConditions"
                 ng-class="{deleted: rowsToDelete.indexOf(item['id']) > -1}">
 
@@ -201,7 +218,8 @@
             </tr>
             </tbody>
           </table>
-          <div class="pull-right form-actions" ng-show="isDataChange || isClearAll || isColumnChange || rowsToDelete.length > 0">
+          <div class="pull-right form-actions" ng-show="isDataChange || isClearAll || isColumnChange
+                                                        || rowsToDelete.length > 0 || newRows.length > 0">
             <button class="btn btn-default btn-lg" ng-click="reset()">Clear changes</button>
             <button class="btn btn-primary btn-lg" ng-click="save()">Save</button>
           </div>
