@@ -340,7 +340,7 @@
                 <groupId>io.liveoak</groupId>
                 <artifactId>liveoak-keycloak-server</artifactId>
                 <type>war</type>
-                <version>${project.version}</version>
+                <version>${keycloak.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.liveoak</groupId>
