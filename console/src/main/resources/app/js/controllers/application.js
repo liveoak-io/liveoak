@@ -446,7 +446,10 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
   $scope.addRedirectUri = function() {
     $scope.settings.redirectUris.push($scope.newRedirectUri);
     if(!$scope.newWebOrigin && (/^http[s]?:\/\/[^/]*/).test($scope.newRedirectUri)) {
-      $scope.newWebOrigin = $scope.newRedirectUri.match(/^http[s]?:\/\/[^/]*/)[0];
+      var newWebOrigin = $scope.newRedirectUri.match(/^http[s]?:\/\/[^/]*/)[0];
+      if ($scope.settings.webOrigins.indexOf(newWebOrigin) === -1) {
+        $scope.newWebOrigin = newWebOrigin;
+      }
     }
     $scope.newRedirectUri = '';
   };

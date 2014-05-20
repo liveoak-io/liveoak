@@ -51,10 +51,14 @@
               </div>
             </div>
           </div>
-          <div class="col-sm-4" ng-class="{'input-group': newRedirectUri.length > 0}">
-            <input class="form-control" type="text" id="newRedirectUri" name="newRedirectUri" ng-model="newRedirectUri" placeholder="New redirect URI..."/>
-            <div class="input-group-btn" ng-show="newRedirectUri.length > 0">
-              <button class="btn btn-primary" data-ng-click="addRedirectUri()" >Add</button>
+          <div class="col-sm-4">
+            <div class="col-sm-12" style="padding: 0;">
+              <div  ng-class="{'input-group': newRedirectUri.length > 0}">
+                <input class="form-control" type="text" id="newRedirectUri" name="newRedirectUri" ng-model="newRedirectUri" placeholder="New redirect URI..."/>
+                <div class="input-group-btn" ng-show="newRedirectUri.length > 0">
+                  <button class="btn btn-primary" data-ng-click="addRedirectUri()" >Add</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -70,10 +74,14 @@
               </div>
             </div>
           </div>
-          <div class="col-sm-4" ng-class="{'input-group': newWebOrigin.length > 0}">
-            <input class="form-control" type="text" id="newWebOrigin" name="newWebOrigin" ng-model="newWebOrigin" placeholder="New Web Origin..."/>
-            <div class="input-group-btn" ng-show="newWebOrigin.length > 0">
-              <button class="btn btn-primary" data-ng-click="addWebOrigin()" >Add</button>
+          <div class="col-sm-4">
+            <div class="col-sm-12" style="padding: 0;">
+              <div  ng-class="{'input-group': newWebOrigin.length > 0}">
+                <input class="form-control" type="text" id="newWebOrigin" name="newWebOrigin" ng-model="newWebOrigin" placeholder="New Web Origin..."/>
+                <div class="input-group-btn" ng-show="newWebOrigin.length > 0">
+                  <button class="btn btn-primary" data-ng-click="addWebOrigin()" >Add</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
