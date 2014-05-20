@@ -10,11 +10,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.jboss.logging.Logger;
@@ -283,12 +285,17 @@ public class MongoLauncher {
     }
 
     public void stopMongo() throws IOException {
-        if (stdin != null) {
-            stdin.close();
-        }
-
         if (process != null) {
+            log.info("Stopping mongod");
             process.destroy();
+            try {
+                boolean exited = process.waitFor(2, TimeUnit.MINUTES);
+                if (!exited) {
+                    throw new RuntimeException("mongod process failed to stop (2m timeout)");
+                }
+            } catch (InterruptedException e) {
+                throw new InterruptedIOException("Interrupted");
+            }
         }
     }
 
