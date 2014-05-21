@@ -1172,15 +1172,23 @@ legend {
       box-shadow: none;
       background: transparent;
       border-color: transparent;
-    }
 
-    input:focus {
-      border-color: @c_green;
-      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 73, 0.6);
-    }
+      &:focus {
+        border-color: @c_green;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 73, 0.6);
+      }
 
-    input:hover {
-      border-color: @c_green;
+      &:hover {
+        border-color: @c_green;
+      }
+
+      &.ng-invalid {
+        border-color: @c_red;
+
+        &:focus {
+          box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 0, 0, 0.6);
+        }
+      }
     }
   }
 

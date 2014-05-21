@@ -290,14 +290,40 @@ loDirectives.directive('loFocused', function($timeout) {
   };
 });
 
-loDirectives.directive('loValidation', function() {
+/*
+  Directive for fields to be validated. It follows the Patternfly design pattern (setting the error class to relevant
+  elements. A function can be set as an optional parameter. If the function is set, it's used as a basic validation
+  function. You can turn on and off the validation with the loValidationEnabled attribute.
+*/
+loDirectives.directive('loValidation', function($timeout) {
   return {
     restrict: 'A',
     require: 'ngModel',
+    scope: {
+      loValidation: '&',
+      loValidationEnabled: '='
+    },
     link: function (scope, element, attrs, ctrl) {
       scope.inputCtrl = ctrl;
+      scope.valEnabled = attrs.loValidationEnabled;
 
-      if (!scope.inputCtrl.$valid && scope.inputCtrl.$dirty){
+      scope.$watch('loValidationEnabled', function(newVal){
+        scope.valEnabled = newVal;
+        if (!newVal) {
+          scope.inputCtrl.$setValidity('loValidation',true);
+          toggleErrorClass(false);
+        } else {
+          validate();
+        }
+      });
+
+      // If validation function is set
+      if(attrs.loValidation) {
+        // using $timeout(0) to get the actual $modelValue
+        $timeout(function () {
+          validate();
+        }, 0);
+      } else if (!scope.inputCtrl.$valid && scope.inputCtrl.$dirty){
         toggleErrorClass(true);
       }
 
@@ -311,8 +337,25 @@ loDirectives.directive('loValidation', function() {
         }
       });
 
-      function toggleErrorClass(add){
+      function validate() {
+        var val = scope.inputCtrl.$modelValue;
 
+        var valid = !val || scope.loValidation({'input':val})  || val === '';
+        if (scope.valEnabled && !valid){
+          toggleErrorClass(true);
+        }
+
+        scope.$watch('inputCtrl.$modelValue', function(newVal){
+          var valid = !newVal || scope.loValidation( {'input': newVal} ) || newVal === '';
+          if (!valid){
+            scope.inputCtrl.$setValidity('loValidation',false);
+          } else {
+            scope.inputCtrl.$setValidity('loValidation',true);
+          }
+        });
+      }
+
+      function toggleErrorClass(add) {
         var messageElement = element.next();
         var parentElement = element.parent();
 
@@ -326,7 +369,6 @@ loDirectives.directive('loValidation', function() {
           messageElement.addClass('ng-hide');
         }
       }
-
     }
   };
 });
