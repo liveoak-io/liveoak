@@ -173,15 +173,6 @@ loMod.config(['$routeProvider', function($routeProvider) {
         },
         loStorageList : function(LoStorageListLoader) {
           return new LoStorageListLoader();
-        },
-        loPush: function(LoPush, $route) {
-          return LoPush.get({appId: $route.current.params.appId}).$promise.then(function(data) {
-              return data;
-            },
-            function() {
-              return {};
-            }
-          );
         }
       }
     })

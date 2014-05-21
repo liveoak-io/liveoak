@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.dashboard', []);
 
-loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, currentApp, loStorageList, loPush) {
+loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, $filter, currentApp, loStorageList) {
 
   $rootScope.curApp = currentApp;
 
@@ -16,7 +16,8 @@ loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, cur
   }, $scope.storageList);
   /* jshint unused: true */
 
-  $scope.pushConfig = loPush;
+  var pushEntries = $filter('filter')(loStorageList._members, {'id': 'push'});
+  $scope.pushConfig = pushEntries.length > 0 ? pushEntries[0] : undefined;
 
   $scope.breadcrumbs = [
     {'label': 'Applications',  'href':'#/applications'},

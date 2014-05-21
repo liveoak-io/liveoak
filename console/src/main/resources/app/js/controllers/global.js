@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.global', []);
 
-loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, LiveOak, LoApp) {
+loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, LiveOak) {
 
   $log.debug('GlobalCtrl' + LiveOak);
 

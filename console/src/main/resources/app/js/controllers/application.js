@@ -15,6 +15,9 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
           if (resources._members[j].hasOwnProperty('MongoClientOptions')) {
             app.mongoStorages++;
           }
+          else if(resources._members[j].hasOwnProperty('upsURL')) {
+            app.push = resources._members[j];
+          }
         }
       }
     };
@@ -31,7 +34,6 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
 
     app.mongoStorages = 0;
     app.storage.$promise.then(increaseStorages(app));
-    app.push = LoPush.get({appId: app.id});
 
     $scope.applications.push(app);
   }
