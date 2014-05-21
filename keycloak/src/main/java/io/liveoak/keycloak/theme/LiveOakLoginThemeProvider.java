@@ -50,4 +50,8 @@ public class LiveOakLoginThemeProvider implements ThemeProvider {
         return nameSet(type).contains(name);
     }
 
+    @Override
+    public void close() {
+    }
+
 }
