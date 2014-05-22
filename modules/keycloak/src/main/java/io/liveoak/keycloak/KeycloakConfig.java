@@ -9,6 +9,7 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.codehaus.jackson.type.TypeReference;
+import org.jboss.logging.Logger;
 import org.keycloak.util.PemUtils;
 
 import java.security.PublicKey;
@@ -20,9 +21,11 @@ import java.util.Map;
  */
 public class KeycloakConfig {
 
+    private static final Logger log = Logger.getLogger(KeycloakConfig.class);
+
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    private String baseUrl = "http://localhost:8383/auth";
+    private String baseUrl;
 
     private boolean loadKeys = true;
 
@@ -81,6 +84,8 @@ public class KeycloakConfig {
     private String loadPublicKey(String realm) throws Exception {
         String realmUrl = baseUrl + "/realms/" + realm;
 
+        log.info("Retrieving public key for " + realm  + " from " + realmUrl);
+
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(realmUrl);
         get.setHeader(HttpHeaders.ACCEPT, "application/json");
@@ -89,11 +94,13 @@ public class KeycloakConfig {
         try {
             response = client.execute(get);
         } catch (Exception e) {
-            throw new Exception("Failed to load public key for realm " + realm, e);
+            log.error("Failed to retrieve public key for " + realm  + " from " + realmUrl, e);
+            throw new Exception("Failed to load public key for realm " + realm + " from " + realmUrl, e);
         }
 
         if (response.getStatusLine().getStatusCode() != 200) {
-            throw new Exception("Failed to load public key for realm " + realm + ": " + response.getStatusLine());
+            log.error("Failed to retrieve public key for " + realm  + " from " + realmUrl + ": " + response.getStatusLine() + " / " + response.getEntity().getContent());
+            throw new Exception("Failed to load public key for realm " + realm + " from " + realmUrl+ ": " + response.getStatusLine());
         }
 
         JsonNode node = objectMapper.readTree(response.getEntity().getContent());
