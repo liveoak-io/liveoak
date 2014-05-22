@@ -193,7 +193,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
 
 });
 
-loMod.controller('AppSettingsCtrl', function($scope, $rootScope, $log, $route, $modal, currentApp, LoRealmApp, LoRealmAppRoles, loRealmApp, loRealmAppRoles, Notifications) {
+loMod.controller('AppSettingsCtrl', function($scope, $rootScope, $log, $route, $modal, currentApp, LoRealmApp, LoRealmAppRoles, loRealmApp, /*loRealmAppRoles,*/ Notifications) {
 
   $rootScope.curApp = currentApp;
 
@@ -202,6 +202,9 @@ loMod.controller('AppSettingsCtrl', function($scope, $rootScope, $log, $route, $
     {'label': currentApp.name, 'href':'#/applications/' + currentApp.id},
     {'label': 'Settings',      'href':'#/applications/' + currentApp.id + '/application-settings'}
   ];
+
+  // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
+  var loRealmAppRoles = LoRealmAppRoles.query({appId: currentApp.id});
 
   var settingsBackup = {};
   var resetEnv = function() {
