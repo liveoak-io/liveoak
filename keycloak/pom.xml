@@ -77,6 +77,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-core</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>net.iharder</groupId>
@@ -85,10 +86,12 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-core-jaxrs</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-services</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.zxing</groupId>
@@ -97,10 +100,12 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-model-api</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-model-mongo</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
@@ -126,31 +131,38 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-social-core</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-social-github</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-social-google</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-social-twitter</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>org.twitter4j</groupId>
             <artifactId>twitter4j-core</artifactId>
+            <version>${twitter4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-social-facebook</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <!-- forms -->
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-forms-common-freemarker</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>org.freemarker</groupId>
@@ -159,18 +171,22 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-forms-common-themes</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-account-api</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-account-freemarker</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-login-api</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
