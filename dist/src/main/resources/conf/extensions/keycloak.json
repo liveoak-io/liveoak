@@ -1,5 +1,6 @@
 {
     module-id: 'io.liveoak.keycloak',
+    dependencies: ['mongo-launcher'],
     config: {
         keycloak-url: 'http://${jboss.bind.address:localhost}:${jboss.http.port:8080}/auth',
         load-public-keys: true

@@ -53,7 +53,7 @@ public class AclUpdaterInterceptor extends DefaultInterceptor {
             // TODO: For now it's hardcoded to 'acl-policy' . We should be able to handle the situation when resourceId is different
             client.update(aclUpdateRequest, prefix + "/acl-policy/" + AclPolicyConstants.RESOURCE_LISTENER_RESOURCE_ID, new DefaultResourceState(), (updateResponse) -> {
                 if (updateResponse.responseType() == ClientResourceResponse.ResponseType.NO_SUCH_RESOURCE) {
-                    log.warn("No resource for ACL policy creation listener available");
+                    log.info("No acl-policy resource available. Listener ignored");
                 } else {
                     log.debug("ACL Rules updated: " + updateResponse.state());
                 }
