@@ -90,7 +90,7 @@ fi
 export JBOSS_HOME
 
 #Configure the default LIVEOAK_OPTS if not already set
-if ["x$LIVEOAK_OPTS" = "x" ]; then
+if [ "x$LIVEOAK_OPTS" = "x" ]; then
   #setup the default m2 repository location for LiveOak
   LIVEOAK_OPTS="-Dlocal.maven.repo.path=$JBOSS_HOME/m2-repo"
 fi

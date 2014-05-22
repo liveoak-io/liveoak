@@ -1,0 +1,38 @@
+<!--
+  ~ Copyright 2013 Red Hat, Inc. and/or its affiliates.
+  ~
+  ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<assembly>
+    <id>openshift</id>
+    <formats>
+        <format>dir</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>${project.build.directory}/liveoak</directory>
+            <!--Note can't use ${project.version} since openshift requires a strict version format, and wont even allow letter, so no 'alpha' or 'beta' tags allowed here -->
+            <outputDirectory>versions/1.0.0</outputDirectory>
+            <excludes>
+              <exclude>**/standalone.xml</exclude>
+              <exclude>apps/admin/console/js/app.js</exclude>
+              <exclude>apps/admin/console/js/controllers/application.js</exclude>
+              <exclude>apps/admin/console/partials/storage-create.html</exclude>
+              <exclude>conf/extensions/keycloak.json</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>./src/main/resources-openshift/openshift</directory>
+            <outputDirectory></outputDirectory>
+            <excludes>
+              <exclude>versions/**</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>./src/main/resources-openshift/openshift/versions</directory>
+            <outputDirectory>versions/1.0.0</outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>
+

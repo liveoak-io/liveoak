@@ -1,0 +1,7 @@
+{
+    module-id: 'io.liveoak.keycloak',
+    config: {
+        keycloak-url: 'https://${openshift.gear.dns}/auth',
+        load-public-keys: true
+    }
+}

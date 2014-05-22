@@ -106,6 +106,20 @@
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>openshift</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/resources-openshift/assemblies/openshift.xml</descriptor>
+                            </descriptors>
+                            <finalName>openshift</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
