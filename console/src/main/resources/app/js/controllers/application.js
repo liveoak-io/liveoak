@@ -376,7 +376,11 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
     {'label': 'Clients', 'href': '#/applications/' + currentApp.id + '/application-clients'}
   ];
 
-  $scope.appClients = $filter('filter')(loRealmAppClients, {'publicClient': true});
+  var appFilter = function(element) {
+      return element.publicClient && element.name !== 'security-admin-console';
+  }
+
+  $scope.appClients = $filter('filter')(loRealmAppClients, appFilter);
 
   for (var i = 0; i < $scope.appClients.length; i++) {
     $scope.appClients[i].realmRoles = LoRealmAppClientScopeMapping.query({appId: currentApp.name, clientId: $scope.appClients[i].name});
@@ -392,7 +396,7 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
     }).result.then(
       function() {
         LoRealmApp.query().$promise.then(function(data) {
-          $scope.appClients = $filter('filter')(data, {'publicClient': true});
+          $scope.appClients = $filter('filter')(data, appFilter);
         });
       }
     );
