@@ -13,6 +13,7 @@ import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
 import org.jboss.logging.Logger;
 
+import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -30,17 +31,26 @@ public class URIPolicy {
     public AuthzDecision isAuthorized(RequestContext req) {
         ResourcePath resourcePath = req.resourcePath();
         DecisionHolder decisionHolder = new DecisionHolder();
+
         rulesTree.get().objects(resourcePath).forEach((uriPolicyRule) -> {
-            AuthzDecision currentDecision = checkPermissions(uriPolicyRule, req);
+            ResourcePath currentRuleResourcePath = uriPolicyRule.getResourcePath();
+            if (decisionHolder.decision == null || currentRuleResourcePath.equals(decisionHolder.lastResourcePath)) {
+                AuthzDecision currentDecision = checkPermissions(uriPolicyRule, req);
 
-            if (log.isTraceEnabled()) {
-                log.tracef("Checking resourcePath: %s, rule: %s, result: %s", resourcePath, uriPolicyRule.toString(), currentDecision.toString());
+                if (log.isTraceEnabled()) {
+                    log.tracef("Checking resourcePath: %s, rule: %s, result: %s", resourcePath, uriPolicyRule.toString(), currentDecision.toString());
+                }
+
+                decisionHolder.lastResourcePath = currentRuleResourcePath;
+                if (decisionHolder.decision == null) {
+                    decisionHolder.decision = currentDecision;
+                } else {
+                    decisionHolder.decision = currentDecision.mergeDecision(decisionHolder.decision);
+                }
             }
-
-            decisionHolder.decision = decisionHolder.decision.mergeDecision(currentDecision);
         });
 
-        return decisionHolder.decision;
+        return decisionHolder.decision!=null ? decisionHolder.decision : AuthzDecision.IGNORE;
     }
 
     public void setRulesTree(ObjectsTree<URIPolicyRule> rulesTree) {
@@ -65,6 +75,7 @@ public class URIPolicy {
     }
 
     private static class DecisionHolder {
-        private AuthzDecision decision = AuthzDecision.IGNORE;
+        private AuthzDecision decision;
+        private ResourcePath lastResourcePath;
     }
 }

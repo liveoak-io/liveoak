@@ -1,0 +1,24 @@
+{
+    "rules": [
+        {
+            "uriPattern": "*",
+            "requestTypes": [ "*" ],
+            "allowedUsers": [ "*" ]
+        },
+        {
+            "uriPattern": "/testApp/storage/todos",
+            "requestTypes": [ "READ" ],
+            "allowedRoles": [ "test-app/user", "test-app/admin" ]
+        },
+        {
+            "uriPattern": "/testApp/storage/todos",
+            "requestTypes": [ "CREATE" ],
+            "allowedRoles": [ "test-app/user", "test-app/admin" ]
+        },
+        {
+            "uriPattern": "/testApp/storage/todos/*",
+            "requestTypes": [ "UPDATE", "DELETE", "READ" ],
+            "allowedRoles": [ "test-app/admin" ]
+        }
+    ]
+}

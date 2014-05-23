@@ -63,7 +63,7 @@ public class ObjectsTree<T> {
         }
 
         if ( wildcardSubs != null && childSubs != null ) {
-            return Stream.concat( wildcardSubs, childSubs );
+            return Stream.concat( childSubs, wildcardSubs );
         }
 
         if ( wildcardSubs != null ) {
