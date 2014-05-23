@@ -16,7 +16,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.liveoak</groupId>
     <artifactId>liveoak</artifactId>
-    <version>1.0.0.Alpha1-SNAPSHOT</version>
+    <version>1.0.0.Alpha01-20140523-01</version>
     <name>liveoak</name>
     <packaging>pom</packaging>
     <properties>
