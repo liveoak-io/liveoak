@@ -33,11 +33,19 @@ public class URIPolicy {
         DecisionHolder decisionHolder = new DecisionHolder();
 
         rulesTree.get().objects(resourcePath).forEach((uriPolicyRule) -> {
-            if (decisionHolder.decision == null) {
-                decisionHolder.decision = checkPermissions(uriPolicyRule, req);
+            ResourcePath currentRuleResourcePath = uriPolicyRule.getResourcePath();
+            if (decisionHolder.decision == null || currentRuleResourcePath.equals(decisionHolder.lastResourcePath)) {
+                AuthzDecision currentDecision = checkPermissions(uriPolicyRule, req);
 
                 if (log.isTraceEnabled()) {
-                    log.tracef("Checking resourcePath: %s, rule: %s, result: %s", resourcePath, uriPolicyRule.toString(), decisionHolder.decision.toString());
+                    log.tracef("Checking resourcePath: %s, rule: %s, result: %s", resourcePath, uriPolicyRule.toString(), currentDecision.toString());
+                }
+
+                decisionHolder.lastResourcePath = currentRuleResourcePath;
+                if (decisionHolder.decision == null) {
+                    decisionHolder.decision = currentDecision;
+                } else {
+                    decisionHolder.decision = currentDecision.mergeDecision(decisionHolder.decision);
                 }
             }
         });
@@ -68,5 +76,6 @@ public class URIPolicy {
 
     private static class DecisionHolder {
         private AuthzDecision decision;
+        private ResourcePath lastResourcePath;
     }
 }

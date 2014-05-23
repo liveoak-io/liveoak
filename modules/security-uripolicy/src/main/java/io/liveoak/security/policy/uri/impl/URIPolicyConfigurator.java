@@ -34,7 +34,7 @@ public class URIPolicyConfigurator {
         RolesContainer rolesContainer = new RolesContainer()
                 .addAllAllowedRoles(allowedRoles).addAllDeniedRoles(deniedRoles)
                 .addAllAllowedUsers(allowedUsers).addAllDeniedUsers(deniedUsers);
-        URIPolicyRule rule = new URIPolicyRule(requestTypes, rolesContainer);
+        URIPolicyRule rule = new URIPolicyRule(resourcePath, requestTypes, rolesContainer);
 
         // We want to support '/foo/bar*' which is mapped to both '/foo/bar' and '/foo/bar/*'
         String tailName = resourcePath.tail().name();
