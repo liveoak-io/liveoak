@@ -7,7 +7,12 @@
         },
         {
             "uriPattern": "/testApp/storage/todos",
-            "requestTypes": [ "READ", "CREATE" ],
+            "requestTypes": [ "READ" ],
+            "allowedRoles": [ "test-app/user", "test-app/admin" ]
+        },
+        {
+            "uriPattern": "/testApp/storage/todos",
+            "requestTypes": [ "CREATE" ],
             "allowedRoles": [ "test-app/user", "test-app/admin" ]
         },
         {
