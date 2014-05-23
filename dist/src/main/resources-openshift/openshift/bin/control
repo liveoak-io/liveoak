@@ -66,6 +66,20 @@ function tidy() {
     echo "Tidy"
 }
 
+function deploy() {
+    echo "Deploying LiveOak Apps"
+    for APP in $(ls ${OPENSHIFT_REPO_DIR}/apps)
+    do
+        if [ ! -d "${OPENSHIFT_LIVEOAK_DIR}/versions/1.0.0/apps/$APP" ]; then
+           echo Copying $APP to the the LiveOak app directory: ${OPENSHIFT_LIVEOAK_DIR}/versions/1.0.0/apps/$APP
+           cp -r ${OPENSHIFT_REPO_DIR}/apps/$APP ${OPENSHIFT_LIVEOAK_DIR}/versions/1.0.0/apps/$APP
+        else
+           echo $APP already exists in the deploy application directory. Skipping deploying.
+        fi
+    done
+}
+
+
 case "$1" in
   start)     start ;;
   stop)      stop ;;
@@ -73,5 +87,6 @@ case "$1" in
   status)    status ;;
   reload)    reload ;;
   tidy)      tidy ;;
+  deploy)    deploy ;;
   *)         exit 0
 esac

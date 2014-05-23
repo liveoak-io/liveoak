@@ -1,4 +1,5 @@
-# OpenShift LiveOak Cartridge
-Note the the OpenShift LiveOak Cartridge does not currently support git based source repositories.
+# OpenShift LiveOak Cartridge Applications
 
-Please use the admin console to configure your application. Or SSH into the gear and made modifications there.
+Files added to the 'apps' directory will be copied over the LiveOak instance.
+
+Note that this currently can only be used to add a new application to LiveOak. For currently existing applications, you will need to use the LiveOak console to make changes or ssh into the gear running the LiveOak instance and modifying it there directly.
