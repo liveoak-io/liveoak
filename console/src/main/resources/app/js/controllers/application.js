@@ -157,6 +157,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
                 ]
               }
             }).$addResource({appId: $scope.appModel.id, resourceId: 'uri-policy'});
+            new LoApp({type: 'acl-policy', config: {autoRules: []}}).$addResource({appId: $scope.appModel.id, resourceId: 'acl-policy'});
             if($scope.setupType === 'basic') {
               var storageData = {
                 id: $scope.storagePath,
