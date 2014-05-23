@@ -40,9 +40,6 @@ public class KeycloakServerApplication extends KeycloakApplication {
         RealmManager manager = new RealmManager(session);
         RealmModel adminRealm = manager.getRealm(Config.getAdminRealm());
 
-        //TODO: Setting for 30min instead of 1min due to bug in KC. Should be reverted back - LIVEOAK-288
-//        adminRealm.setAccessTokenLifespan(1800);
-
         ApplicationModel consoleApp = adminRealm.getApplicationByName("console");
         if (consoleApp == null) {
             consoleApp = new ApplicationManager(manager).createApplication(adminRealm, "console");
@@ -70,10 +67,9 @@ public class KeycloakServerApplication extends KeycloakApplication {
 
             realm.setSsoSessionMaxLifespan(36000);
 
-            //TODO: Setting for 30min instead of 1min due to bug in KC. Should be reverted back - LIVEOAK-288
-            realm.setAccessTokenLifespan(1800);
+            realm.setAccessTokenLifespan(300);
 
-            realm.setSsoSessionIdleTimeout(3600);
+            realm.setSsoSessionIdleTimeout(600);
             realm.setAccessCodeLifespan(60);
             realm.setAccessCodeLifespanUserAction(300);
 
