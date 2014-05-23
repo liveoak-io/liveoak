@@ -179,27 +179,39 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
   };
 
   $scope.save = function() {
+    var hasUserRead, hasUserCreate, hasSuperRead, hasSuperUpdate, hasSuperDelete = false;
     for (var u = 0; u < uriPolicies.rules.length; u++) {
       if (uriPolicies.rules[u].uriPattern === userPath) {
         if (angular.equals(uriPolicies.rules[u].requestTypes, ['READ'])) {
           uriPolicies.rules[u].allowedRoles = $scope.settings.accessRoles;
+          hasUserRead = true;
         }
         else if (angular.equals(uriPolicies.rules[u].requestTypes, ['CREATE'])) {
           uriPolicies.rules[u].allowedRoles = $scope.settings.createEntryRoles;
+          hasUserCreate = true;
         }
       }
       else if (uriPolicies.rules[u].uriPattern === superuserPath) {
         if (angular.equals(uriPolicies.rules[u].requestTypes, ['READ'])) {
           uriPolicies.rules[u].allowedRoles = $scope.settings.readAllRoles;
+          hasSuperRead = true;
         }
         else if (angular.equals(uriPolicies.rules[u].requestTypes, ['UPDATE'])) {
           uriPolicies.rules[u].allowedRoles = $scope.settings.updateAllRoles;
+          hasSuperUpdate = true;
         }
         else if (angular.equals(uriPolicies.rules[u].requestTypes, ['DELETE'])) {
           uriPolicies.rules[u].allowedRoles = $scope.settings.deleteAllRoles;
+          hasSuperDelete = true;
         }
       }
     }
+
+    if(!hasUserRead) { uriPolicies.rules.push(newUriPolicyRule(userPath, ['READ'], $scope.settings.accessRoles)) };
+    if(!hasUserCreate) { uriPolicies.rules.push(newUriPolicyRule(userPath, ['CREATE'], $scope.settings.createEntryRoles)) };
+    if(!hasSuperRead) { uriPolicies.rules.push(newUriPolicyRule(superuserPath, ['READ'], $scope.settings.readAllRoles)) };
+    if(!hasSuperUpdate) { uriPolicies.rules.push(newUriPolicyRule(superuserPath, ['UPDATE'], $scope.settings.updateAllRoles)) };
+    if(!hasSuperDelete) { uriPolicies.rules.push(newUriPolicyRule(superuserPath, ['DELETE'], $scope.settings.deleteAllRoles)) };
 
     var uriSuccess = function(value/*, responseHeaders*/) {
       settingsBackup.accessRoles = $scope.settings.accessRoles;
@@ -226,10 +238,16 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
       uriPolicies.$save({appId: currentApp.name}, uriSuccess, uriFailure);
     }
 
+    var hasACLPermissions = false;
     for (var i = 0; i < aclPolicies.autoRules.length; i++) {
       if (aclPolicies.autoRules[i].resourcePath === userPath) {
         aclPolicies.autoRules[i].autoAddedOwnerPermissions = $scope.settings.ownerPermissions;
+        hasACLPermissions = true;
       }
+    }
+
+    if (!hasACLPermissions) {
+      aclPolicies.autoRules.push({resourcePath: userPath, autoAddedOwnerPermissions: $scope.settings.ownerPermissions });
     }
 
     var aclSuccess = function(value/*, responseHeaders*/) {

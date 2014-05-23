@@ -126,7 +126,38 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
         LoApp.create(data,
           // success
           function(/*value, responseHeaders*/) {
+            // Needed resources.. probably move this to server side in the future
             new LoApp({type:'aggregating-filesystem',config:{directory:'${io.liveoak.js.dir}'}}).$addResource({appId: $scope.appModel.id, resourceId: 'client'});
+            new LoApp({type:'keycloak'}).$addResource({appId: $scope.appModel.id, resourceId: 'auth'});
+            new LoApp({
+              type: 'security',
+              config:{
+                policies: [
+                  {
+                    policyName : 'URIPolicy',
+                    policyResourceEndpoint: '/' + $scope.appModel.id + '/uri-policy/authzCheck'
+                  },
+                  {
+                    policyName : 'ACLPolicy',
+                    policyResourceEndpoint: '/' + $scope.appModel.id + '/acl-policy/authzCheck',
+                    includedResourcePrefixes: [ '/' + $scope.appModel.id ]
+                  }
+                ]
+              }
+            }).$addResource({appId: $scope.appModel.id, resourceId: 'authz'});
+            new LoApp({
+              type: 'uri-policy',
+              config: {
+                rules: [
+                  {
+                    'uriPattern' : '*',
+                    'requestTypes' : [ '*' ],
+                    'allowedUsers': [ '*' ]
+                  }
+                ]
+              }
+            }).$addResource({appId: $scope.appModel.id, resourceId: 'uri-policy'});
+            new LoApp({type: 'acl-policy', config: {autoRules: []}}).$addResource({appId: $scope.appModel.id, resourceId: 'acl-policy'});
             if($scope.setupType === 'basic') {
               var storageData = {
                 id: $scope.storagePath,
@@ -377,8 +408,8 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
   ];
 
   var appFilter = function(element) {
-      return element.publicClient && element.name !== 'security-admin-console';
-  }
+    return element.publicClient && element.name !== 'security-admin-console';
+  };
 
   $scope.appClients = $filter('filter')(loRealmAppClients, appFilter);
 
