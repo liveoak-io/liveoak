@@ -9,7 +9,7 @@
     <parent>
         <groupId>io.liveoak</groupId>
         <artifactId>liveoak</artifactId>
-        <version>1.0.0.Alpha1</version>
+        <version>1.0.0.Alpha01-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>liveoak-testsuite</artifactId>
