@@ -20,8 +20,8 @@
     <name>liveoak</name>
     <packaging>pom</packaging>
     <properties>
-        <jboss.releases.repo.url>dav:https://repository-projectodd.forge.cloudbees.com/staging</jboss.releases.repo.url>
-        <jboss.snapshots.repo.url>dav:https://repository-projectodd.forge.cloudbees.com/staging</jboss.snapshots.repo.url>
+        <jboss.releases.repo.url>dav:https://repository-projectodd.forge.cloudbees.com/release</jboss.releases.repo.url>
+        <jboss.snapshots.repo.url>dav:https://repository-projectodd.forge.cloudbees.com/release</jboss.snapshots.repo.url>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <vertx.version>2.0.1-final</vertx.version>
