@@ -13,6 +13,19 @@
       <div class="panel" ng-hide="create">
         <div class="panel-heading clearfix">
           <h3 class="pull-left">Connected to <a ng-href="{{pushModel.upsURL}}/#/mobileApps/variants/{{pushModel.applicationId}}">{{pushAppName}}</a> <span class="lo-emph">in AeroGear UPS</span></h3>
+          <span data-toggle="modal" data-target="#delete-push" ng-hide="create || changed">
+            <button class="btn btn-link btn-icon pull-right" data-tooltip="Delete Push" data-tooltip-placement="top">
+              <i class="fa fa-trash-o"></i>
+              <span>Delete Push</span>
+            </button>
+          </span>        
+        </div>
+      </div>
+
+      <!--
+<div class="panel" ng-hide="create">
+        <div class="panel-heading clearfix">
+          <h3 class="pull-left">Connected to <a ng-href="{{pushModel.upsURL}}/#/mobileApps/variants/{{pushModel.applicationId}}">{{pushAppName}}</a> <span class="lo-emph">in AeroGear UPS</span></h3>
           <div class="pull-right">
             <span class="lo-field"><i class="green-circle"></i> Active</span>
           </div>
@@ -27,6 +40,7 @@
           </span>
         </div>
       </div>
+-->
 
       <form class="lo-form-horizontal clearfix" name="pushForm">
         <fieldset>

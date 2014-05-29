@@ -160,6 +160,11 @@ body > .container {
   content: "";
 }
 
+.bs-sidebar ul li:nth-child(4) a:before {
+  content: "";
+}
+
+
 @font-face {
   font-family: 'FontAwesome';
   src: url('../fonts/fontawesome-webfont.eot?v=4.0.3');
