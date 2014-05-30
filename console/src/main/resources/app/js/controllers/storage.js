@@ -228,9 +228,15 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     {'label': 'Applications',   'href':'#/applications'},
     {'label': currentApp.name,  'href':'#/applications/' + currentApp.id},
     {'label': 'Storage',        'href':'#/applications/' + currentApp.id + '/storage'},
-    {'label': $scope.storageId, 'href':'#/applications/' + currentApp.id + '/storage/' + $routeParams.storageId},
-    {'label': 'Collections',    'href':''}
+    {'label': $scope.storageId, 'href':'#/applications/' + currentApp.id + '/storage/' + $routeParams.storageId}
+
   ];
+
+  if ($scope.collectionId){
+    $scope.breadcrumbs.push({'label': $scope.collectionId,    'href':''});
+  } else {
+    $scope.breadcrumbs.push({'label': 'Collections',    'href':''});
+  }
 
   $scope.collectionList = currentCollectionList._members;
   $scope.collectionData = {};
