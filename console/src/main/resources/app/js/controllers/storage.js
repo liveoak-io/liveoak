@@ -228,9 +228,15 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     {'label': 'Applications',   'href':'#/applications'},
     {'label': currentApp.name,  'href':'#/applications/' + currentApp.id},
     {'label': 'Storage',        'href':'#/applications/' + currentApp.id + '/storage'},
-    {'label': $scope.storageId, 'href':'#/applications/' + currentApp.id + '/storage/' + $routeParams.storageId},
-    {'label': 'Collections',    'href':''}
+    {'label': $scope.storageId, 'href':'#/applications/' + currentApp.id + '/storage/' + $routeParams.storageId}
+
   ];
+
+  if ($scope.collectionId){
+    $scope.breadcrumbs.push({'label': $scope.collectionId,    'href':''});
+  } else {
+    $scope.breadcrumbs.push({'label': 'Collections',    'href':''});
+  }
 
   $scope.collectionList = currentCollectionList._members;
   $scope.collectionData = {};
@@ -440,7 +446,10 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       {id : collectionName}).$promise;
 
     newCollectionPromise.then(function(){
+      Notifications.success('New collection \"' + collectionName + '\" has been created.');
       goToCollection(collectionName);
+    }, function() {
+      Notifications.error('Not able to create new collection \"' + collectionName + '\".');
     });
   };
 
@@ -450,7 +459,10 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       collectionId: $scope.collectionId}).$promise;
 
     deletePromise.then(function(){
+      Notifications.success('Collection \"' + $scope.collectionId + '\" has been deleted.');
       loadCollectionList(selectFirst);
+    }, function() {
+      Notifications.error('Not able to delete the collection: \"' + $scope.collectionId + '\".');
     });
   };
 

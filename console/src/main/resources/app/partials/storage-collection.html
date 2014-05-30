@@ -5,7 +5,7 @@
     <div class="row">
       <div class="lo-content-area">
         <lo-breadcrumbs></lo-breadcrumbs>
-        <h2><span>{{storageId}}</span> Collections</h2>
+        <h2><span>{{storageId}}</span> <span ng-show="collectionId">{{collectionId}}</span><span ng-hide="collectionId">Collections</span></h2>
 
         <div class="panel" ng-hide="collectionList.length > 0">
           <div class="panel-body text-center empty-instance">
@@ -57,7 +57,7 @@
                 <div class="search-comp clearfix">
                   <input type="text" class="form-control search ng-pristine ng-valid" placeholder="Search..."
                          ng-model="searchQuery">
-                  <button class="btn btn-link btn-icon" tooltip="Search" type="submit">
+                  <button class="btn btn-link btn-icon" tooltip="Search" type="submit" disabled>
                     <i class="fa fa-search"></i>
                     <span>Search</span>
                   </button>
@@ -133,7 +133,12 @@
                 </div>
               </th>
             </tr>
-            <tr ng-show="columns.length > 1">
+            <tr ng-show="(!collectionData._members || collectionData._members.length < 1) && newRows.length < 1">
+              <th>
+                Collection doesn't contain any items.
+              </th>
+            </tr>
+            <tr ng-show="columns.length > 1 && (collectionData._members.length > 0 || newRows.length > 0)">
               <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown caption row-{{column}}" ng-class="{'before-actions':$last}">
                 <button class="btn btn-link btn-icon btn-unhide btn-unhide-left" type="button"
                         ng-show="isNextHidden(column, true) && $first" ng-click="unhideNext(column, true)">
