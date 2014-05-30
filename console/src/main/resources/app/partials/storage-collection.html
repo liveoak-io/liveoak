@@ -133,7 +133,12 @@
                 </div>
               </th>
             </tr>
-            <tr ng-show="columns.length > 1">
+            <tr ng-show="(!collectionData._members || collectionData._members.length < 1) && newRows.length < 1">
+              <th>
+                Collection doesn't contain any items.
+              </th>
+            </tr>
+            <tr ng-show="columns.length > 1 && (collectionData._members.length > 0 || newRows.length > 0)">
               <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown caption row-{{column}}" ng-class="{'before-actions':$last}">
                 <button class="btn btn-link btn-icon btn-unhide btn-unhide-left" type="button"
                         ng-show="isNextHidden(column, true) && $first" ng-click="unhideNext(column, true)">
