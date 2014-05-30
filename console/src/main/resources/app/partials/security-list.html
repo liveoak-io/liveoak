@@ -11,7 +11,7 @@
       <!-- In case of no collections secured -->
       <div class="panel" ng-hide="securedColls.length > 0">
         <div class="panel-body text-center empty-instance">
-          <i class="fa fa-unlock"></i>
+          <i class="fa fa-lock"></i>
 
           <span ng-hide="unsecuredColls.length > 0">
             <p>This application has no collections to be secured. Create a collection inside a storage resource first.</p>
@@ -61,7 +61,6 @@
       
       <ul>
         <li ng-repeat="c in unsecuredColls">
-          <i class="fa fa-unlock translucid"></i>
           <a href="#/applications/{{curApp.name}}/storage/{{c.storage}}/browse/{{c.collection}}">{{c.collection}}</a>
           <a class="btn-icon" href="#/applications/{{curApp.name}}/security/{{c.storage}}/{{c.collection}}" data-tooltip-placement="top" data-tooltip="Secure this Collection">
             <i class="fa fa-lock"></i>
