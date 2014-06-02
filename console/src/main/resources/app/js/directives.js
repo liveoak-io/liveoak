@@ -269,3 +269,23 @@ loDirectives.directive('loAutofocus', function($timeout) {
     }
   };
 });
+
+loDirectives.directive('loFocused', function($timeout) {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      scope.$watch(attrs.loFocused, function(newValue) {
+        $timeout(function () {
+          if (newValue) {
+            if (element[0].select) {
+              element[0].select();
+            }
+            else {
+              element[0].focus();
+            }
+          }
+        });
+      });
+    }
+  };
+});

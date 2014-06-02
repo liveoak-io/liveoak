@@ -71,155 +71,172 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
 
   };
 
-  // New Application Wizard
-
-  $scope.setupStep = 1; // current step
-  $scope.setupSteps = 3; // total steps
-  $scope.setupType = 'basic'; // setup type: basic or diy
-
-  $scope.storagePath = '';
-
-  $scope.nextStep = function() {
-    $scope.setupStep++;
+  // Create Application
+  $scope.modalApplicationCreate = function() {
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/application/application-create.html',
+      controller: CreateApplicationModalCtrl,
+      scope: $scope
+    });
   };
 
-  $scope.prevStep = function() {
-    $scope.setupStep--;
-  };
+  var CreateApplicationModalCtrl = function ($scope, $modalInstance, $log, LoApp) {
 
-  $scope.stepValid = function() {
-    // Step 1: Require name
-    switch($scope.setupStep) {
-      case 1:
-        return $scope.appModel.id;
-      case 2:
-        return $scope.storagePath;
-      case 3:
-        return !$scope.pushModel ||
-          ($scope.pushModel &&
-            ($scope.pushModel.upsURL && $scope.pushModel.applicationId && $scope.pushModel.masterSecret) ||
-            (!$scope.pushModel.upsURL && !$scope.pushModel.applicationId && !$scope.pushModel.masterSecret));
-      default:
-        return false;
-    }
-  };
+    $scope.setupStep = 1; // current step
+    $scope.setupSteps = 3; // total steps
 
-  $scope.appModel = {
-  };
+    $scope.nextStep = function() {
+      $scope.setupStep++;
+    };
 
-  var redirectOnNewAppSuccess = function() {
-    //$location.search('created', $scope.appModel.id).path('applications');
-    $location.path('applications/' + $scope.appModel.id + '/next-steps');
-  };
+    $scope.prevStep = function() {
+      $scope.setupStep--;
+    };
 
-  $scope.create = function() {
-    var data = {
-      id: $scope.appModel.id,
-      name: $scope.appModel.id,
-      type: 'application',
-      config: {
+    $scope.stepValid = function() {
+      // Step 1: Require name
+      switch($scope.setupStep) {
+        case 1:
+          return $scope.$parent.appModel.id;
+        case 2:
+          return $scope.$parent.storagePath;
+        case 3:
+          return !$scope.pushModel ||
+            ($scope.pushModel &&
+              ($scope.pushModel.upsURL && $scope.pushModel.applicationId && $scope.pushModel.masterSecret) ||
+              (!$scope.pushModel.upsURL && !$scope.pushModel.applicationId && !$scope.pushModel.masterSecret));
+        default:
+          return false;
       }
     };
 
-    new LoRealmApp({name: $scope.appModel.id, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'},
-      function(/*realmApp*/) {
-        LoApp.create(data,
-          // success
-          function(/*value, responseHeaders*/) {
-            // Needed resources.. probably move this to server side in the future
-            new LoApp({type:'aggregating-filesystem',config:{directory:'${io.liveoak.js.dir}'}}).$addResource({appId: $scope.appModel.id, resourceId: 'client'});
-            new LoApp({type:'keycloak'}).$addResource({appId: $scope.appModel.id, resourceId: 'auth'});
-            new LoApp({
-              type: 'security',
-              config:{
-                policies: [
-                  {
-                    policyName : 'URIPolicy',
-                    policyResourceEndpoint: '/' + $scope.appModel.id + '/uri-policy/authzCheck'
-                  },
-                  {
-                    policyName : 'ACLPolicy',
-                    policyResourceEndpoint: '/' + $scope.appModel.id + '/acl-policy/authzCheck',
-                    includedResourcePrefixes: [ '/' + $scope.appModel.id ]
-                  }
-                ]
-              }
-            }).$addResource({appId: $scope.appModel.id, resourceId: 'authz'});
-            new LoApp({
-              type: 'uri-policy',
-              config: {
-                rules: [
-                  {
-                    'uriPattern' : '*',
-                    'requestTypes' : [ '*' ],
-                    'allowedUsers': [ '*' ]
-                  }
-                ]
-              }
-            }).$addResource({appId: $scope.appModel.id, resourceId: 'uri-policy'});
-            new LoApp({type: 'acl-policy', config: {autoRules: []}}).$addResource({appId: $scope.appModel.id, resourceId: 'acl-policy'});
-            if($scope.setupType === 'basic') {
-              var storageData = {
-                id: $scope.storagePath,
-                type: 'mongo',
-                config: {
-                  db: $scope.appModel.id,
-                  servers: [{host: 'localhost', port: 27017}],
-                  credentials: []
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+
+    $scope.create = function() {
+      var data = {
+        id: $scope.appModel.id,
+        name: $scope.appModel.id,
+        type: 'application',
+        config: {
+        }
+      };
+
+      new LoRealmApp({name: $scope.appModel.id, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'},
+        function(/*realmApp*/) {
+          LoApp.create(data,
+            // success
+            function(/*value, responseHeaders*/) {
+              // Needed resources.. probably move this to server side in the future
+              new LoApp({type:'aggregating-filesystem',config:{directory:'${io.liveoak.js.dir}'}}).$addResource({appId: $scope.appModel.id, resourceId: 'client'});
+              new LoApp({type:'keycloak'}).$addResource({appId: $scope.appModel.id, resourceId: 'auth'});
+              new LoApp({
+                type: 'security',
+                config:{
+                  policies: [
+                    {
+                      policyName : 'URIPolicy',
+                      policyResourceEndpoint: '/' + $scope.appModel.id + '/uri-policy/authzCheck'
+                    },
+                    {
+                      policyName : 'ACLPolicy',
+                      policyResourceEndpoint: '/' + $scope.appModel.id + '/acl-policy/authzCheck',
+                      includedResourcePrefixes: [ '/' + $scope.appModel.id ]
+                    }
+                  ]
                 }
-              };
-
-              LoStorage.create({appId: $scope.appModel.id}, storageData,
-                // success
-                function(/*value, responseHeaders*/) {
-                  if($scope.pushModel && $scope.pushModel.upsURL) {
-                    var pushData = {
-                      type: 'ups',
-                      config: {
-                        upsURL: $scope.pushModel.upsURL,
-                        applicationId: $scope.pushModel.applicationId,
-                        masterSecret: $scope.pushModel.masterSecret
-                      }
-                    };
-
-                    LoPush.update({appId: $scope.appModel.id}, pushData,
-                      // success
-                      function (/*value, responseHeaders*/) {
-                        Notifications.success('The application ' + data.name + ' has been created with storage and push configured.');
-                        redirectOnNewAppSuccess();
-                      },
-                      // error
-                      function (httpResponse) {
-                        Notifications.httpError('The application ' + data.name + ' has been created with storage but failed to configure push.', httpResponse);
-                      }
-                    );
+              }).$addResource({appId: $scope.appModel.id, resourceId: 'authz'});
+              new LoApp({
+                type: 'uri-policy',
+                config: {
+                  rules: [
+                    {
+                      'uriPattern' : '*',
+                      'requestTypes' : [ '*' ],
+                      'allowedUsers': [ '*' ]
+                    }
+                  ]
+                }
+              }).$addResource({appId: $scope.appModel.id, resourceId: 'uri-policy'});
+              new LoApp({type: 'acl-policy', config: {autoRules: []}}).$addResource({appId: $scope.appModel.id, resourceId: 'acl-policy'});
+              if($scope.setupType === 'basic') {
+                var storageData = {
+                  id: $scope.storagePath,
+                  type: 'mongo',
+                  config: {
+                    db: $scope.appModel.id,
+                    servers: [{host: 'localhost', port: 27017}],
+                    credentials: []
                   }
-                  else {
-                    Notifications.success('The application ' + data.name + ' has been created with storage configured.');
+                };
+
+                LoStorage.create({appId: $scope.appModel.id}, storageData,
+                  // success
+                  function(/*value, responseHeaders*/) {
+                    if($scope.pushModel && $scope.pushModel.upsURL) {
+                      var pushData = {
+                        type: 'ups',
+                        config: {
+                          upsURL: $scope.pushModel.upsURL,
+                          applicationId: $scope.pushModel.applicationId,
+                          masterSecret: $scope.pushModel.masterSecret
+                        }
+                      };
+
+                      LoPush.update({appId: $scope.appModel.id}, pushData,
+                        // success
+                        function (/*value, responseHeaders*/) {
+                          Notifications.success('The application ' + data.name + ' has been created with storage and push configured.');
+                          redirectOnNewAppSuccess();
+                        },
+                        // error
+                        function (httpResponse) {
+                          Notifications.httpError('The application ' + data.name + ' has been created with storage but failed to configure push.', httpResponse);
+                          redirectOnNewAppSuccess();
+                        }
+                      );
+                    }
+                    else {
+                      Notifications.success('The application ' + data.name + ' has been created with storage configured.');
+                      redirectOnNewAppSuccess();
+                    }
+                  },
+                  // error
+                  function(httpResponse) {
+                    Notifications.httpError('The application ' + data.name + ' has been created but failed to configure storage.', httpResponse);
                     redirectOnNewAppSuccess();
-                  }
-                },
-                // error
-                function(httpResponse) {
-                  Notifications.httpError('The application ' + data.name + ' has been created but failed to configure storage.', httpResponse);
-                  // TODO: Rollback ?
-                });
-            }
-            else {
-              Notifications.success('The application ' + data.name + ' has been created.');
-              redirectOnNewAppSuccess();
-            }
-          },
-          // error
-          function(httpResponse) {
-            Notifications.httpError('The application ' + data.name + ' could not be created.', httpResponse);
-          });
-      },
-      function(httpResponse) {
-        Notifications.httpError('The application ' + data.name + ' could not be created.', httpResponse);
-      }
-    );
+                    // TODO: Rollback ?
+                  });
+              }
+              else {
+                Notifications.success('The application ' + data.name + ' has been created.');
+                redirectOnNewAppSuccess();
+              }
+            },
+            // error
+            function(httpResponse) {
+              Notifications.httpError('The application ' + data.name + ' could not be created.', httpResponse);
+            });
+        },
+        function(httpResponse) {
+          Notifications.httpError('The application ' + data.name + ' could not be created.', httpResponse);
+        }
+      );
 
+    };
+
+    var redirectOnNewAppSuccess = function() {
+      $modalInstance.close();
+      //$location.search('created', $scope.appModel.id).path('applications');
+      $location.path('applications/' + $scope.appModel.id + '/next-steps');
+    };
+  };
+
+  // We keep this at parent scope so it doesn't go away with [accidental] modal close
+  $scope.setupType = 'basic'; // setup type: basic or diy
+  $scope.storagePath = '';
+  $scope.appModel = {
   };
 
 });
@@ -629,7 +646,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
   };
 });
 
-loMod.controller('NextStepsCtrl', function($scope, $rootScope, $routeParams, currentApp, loStorageList, loPush) {
+loMod.controller('NextStepsCtrl', function($scope, $rootScope, $routeParams, currentApp, loStorageList) {
 
   $rootScope.curApp = currentApp;
 
@@ -640,10 +657,11 @@ loMod.controller('NextStepsCtrl', function($scope, $rootScope, $routeParams, cur
     if (value.hasOwnProperty('db')) {
       this.push({id: value.id, provider: value.hasOwnProperty('MongoClientOptions') ? 'mongoDB' : 'unknown'});
     }
+    else if(value.hasOwnProperty('upsURL')) {
+      $scope.pushConfig = value;
+    }
   }, $scope.storageList);
   /* jshint unused: true */
-
-  $scope.pushConfig = loPush;
 
   $scope.breadcrumbs = [
     {'label': 'Applications', 'href': '#/applications'},
