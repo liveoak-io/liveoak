@@ -1,0 +1,116 @@
+<div class="modal-header">
+  <button type="button" class="close" ng-click="cancel()">
+    <span class="pficon pficon-close"></span>
+  </button>
+  <h4 class="modal-title">Create Application</h4>
+</div>
+
+<form id="new-app-form" name="new-app-form" class="horizontal-form">
+  <!-- Step 1 -->
+  <div class="modal-body clearfix" id="step1" ng-show="setupStep == 1">
+    <div class="form-group clearfix">
+      <label for="application-name" class="col-sm-4 control-label">Application Name</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" id="application-name" ng-model="appModel.id" lo-focused="$parent.setupStep == 1">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-4 control-label">Type of Setup</label>
+      <div class="col-sm-6">
+        <label class="checkbox-inline">
+          <input type="radio" ng-model="$parent.setupType" value="basic"> Basic
+        </label>
+        <label class="checkbox-inline">
+          <input type="radio" ng-model="$parent.setupType" value="diy"> Do-It-Yourself
+        </label>
+      </div>
+    </div>
+    <div class="col-sm-offset-4 col-sm-8 form-inline-info">
+      <!-- For Basic -->
+      <div class="alert alert-info" ng-show="$parent.setupType == 'basic'">
+        <span class="pficon pficon-info"></span>
+        This will create an application with storage (mongoDB), security (Keycloak), and Push (AeroGear UPS) resources pre configured with defaults.
+      </div>
+
+      <!-- For Do-It-Yourself -->
+      <div class="alert alert-info" ng-show="$parent.setupType == 'diy'">
+        <span class="pficon pficon-info"></span>
+        This will create an application with no resources. Recommended for advanced users.
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="modal-body clearfix" id="step2" ng-show="setupStep == 2">
+    <fieldset>
+      <legend><span class="text">Storage</span></legend>
+      <div class="form-group clearfix">
+        <label for="dburl" class="col-sm-4 control-label">URL Path</label>
+        <div class="col-sm-6">
+          <input type="text" class="form-control" id="dburl" ng-model="$parent.$parent.storagePath" lo-focused="$parent.setupStep == 2">
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="modal-body clearfix hide" id="step3-old" ng-show="setupStep == 3">
+    <fieldset>
+      <legend><span class="text">Security</span></legend>
+      <div class="form-group clearfix">
+        <label for="dburl" class="col-sm-4 control-label">Keycloak Realm</label>
+        <div class="col-sm-6">
+          <select class="selectpicker" disabled>
+            <option selected="selected">Applications</option>
+            <option>Create Realm...</option>
+          </select>
+          <!-- Show input when option Create Realm is selected -->
+          <!-- <input type="text" class="form-control" placeholder="Realm Name"> -->
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="modal-body clearfix" id="step3" ng-show="setupStep == 3">
+    <fieldset>
+      <legend>
+        <span class="text">Push Notifications</span>
+        <p class="subtitle">This step is optional</p>
+      </legend>
+
+      <div class="form-group clearfix">
+        <label for="pushUrl" class="col-sm-4 control-label">AeroGear UPS URL</label>
+        <div class="col-sm-6">
+          <input type="text" class="form-control" id="pushUrl" ng-model="$parent.$parent.pushModel.upsURL" lo-http-prefix lo-focused="$parent.setupStep == 3">
+          <span class="help-block" ng-show="new-app-form.pushUrl.$error.url">Not a valid URL.</span>
+        </div>
+      </div>
+      <div class="form-group clearfix">
+        <label for="appId" class="col-sm-4 control-label">Application ID</label>
+        <div class="col-sm-6">
+          <input type="text" class="form-control" id="appId" ng-model="$parent.$parent.pushModel.applicationId">
+        </div>
+      </div>
+      <div class="form-group clearfix">
+        <label for="secret" class="col-sm-4 control-label">Master Secret</label>
+        <div class="col-sm-6">
+          <input type="text" class="form-control" id="secret" ng-model="$parent.$parent.pushModel.masterSecret">
+        </div>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="modal-footer">
+    <!-- First Step -->
+    <button type="button" class="btn btn-default btn-lg" ng-show="setupStep == 1" ng-click="cancel()">Cancel</button>
+    <button type="button" class="btn btn-default btn-lg" ng-show="setupStep > 1" ng-click="prevStep()"><i class="fa fa-angle-left"></i> Previous</button>
+    <button type="button" class="btn btn-primary btn-lg" ng-show="setupType == 'basic' && setupStep < setupSteps" ng-click="nextStep()" ng-disabled="!stepValid()">Next <i class="fa fa-angle-right"></i></button>
+    <!-- Last Step -->
+    <button type="button" class="btn btn-primary btn-lg" ng-show="setupStep == setupSteps || setupType == 'diy'" ng-click="create()" ng-disabled="!stepValid()" data-dismiss="modal">Create Application</button>
+  </div>
+
+  <!-- Only for Basic -->
+  <span class="steps" ng-show="setupType == 'basic'">Step {{setupStep}}/{{setupSteps}}</span>
+
+</form>
