@@ -252,7 +252,12 @@ loMod.controller('AppSettingsCtrl', function($scope, $rootScope, $log, $route, $
   ];
 
   // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
-  var loRealmAppRoles = LoRealmAppRoles.query({appId: currentApp.id});
+  var loRealmAppRoles;
+  LoRealmAppRoles.query({appId: currentApp.id}).$promise.then(function(data) {
+      loRealmAppRoles = data;
+      resetEnv();
+    }
+  );
 
   var settingsBackup = {};
   var resetEnv = function() {
@@ -265,8 +270,6 @@ loMod.controller('AppSettingsCtrl', function($scope, $rootScope, $log, $route, $
     };
     settingsBackup = angular.copy($scope.settings);
   };
-
-  resetEnv();
 
   $scope.$watch('settings', function() {
     $scope.changed = !angular.equals($scope.settings, settingsBackup);
