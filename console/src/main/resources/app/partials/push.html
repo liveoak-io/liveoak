@@ -47,7 +47,7 @@
           <div class="form-group clearfix" ng-class="{'has-error': pushForm.pushUrl.$dirty && !pushForm.pushUrl.$valid}">
             <label class="col-sm-3 control-label" for="pushUrl">AeroGear UnifiedPush URL <span class="required">*</span></label>
             <div class="col-sm-4">
-              <input class="form-control" type="url" id="pushUrl" name="pushUrl" ng-model="pushModel.upsURL" lo-http-prefix required>
+              <input class="form-control" type="url" id="pushUrl" name="pushUrl" ng-model="pushModel.upsURL" lo-http-prefix lo-focused="create" required>
               <span class="help-block" ng-show="pushForm.pushUrl.$error.url">Not a valid URL.</span>
             </div>
           </div>
