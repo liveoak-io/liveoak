@@ -8,7 +8,6 @@ var loMod = angular.module('loApp', [
   'loApp.directives',
   'loApp.controllers',
   'ngResource',
-  'ngAnimate',
   'ui.bootstrap'
 ]);
 
