@@ -33,7 +33,7 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
 
   $scope.save = function(){
     if(!$scope.pushModel.upsURL || !$scope.pushModel.applicationId || !$scope.pushModel.masterSecret){
-      Notifications.error('All fields are required for Push configuration.');
+      Notifications.error('All fields are required for push configuration.');
     }
     else {
 
@@ -49,7 +49,7 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
       LoPush.update({appId: $scope.curApp.id}, data,
         // success
         function(/*value, responseHeaders*/) {
-          Notifications.success('Push configuration created successfully.');
+          Notifications.success('The push configuration has been ' + ($scope.create ? 'created' : 'updated') + '.');
           pushModelBackup = angular.copy($scope.pushModel);
           $scope.pushAppName = $scope.pushModel.applicationId;
           $scope.changed = false;
@@ -57,7 +57,7 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
         },
         // error
         function(httpResponse) {
-          Notifications.httpError('Failed to update Push configuration', httpResponse);
+          Notifications.httpError('Failed to ' + ($scope.create ? 'create' : 'update') + ' the push configuration.', httpResponse);
         }
       );
     }
@@ -68,7 +68,7 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
     LoPush.delete({appId: $scope.curApp.id},
       // success
       function(/*value, responseHeaders*/) {
-        Notifications.success('Push configuration deleted successfully.');
+        Notifications.success('The push configuration has been deleted.');
         $scope.pushModel = {};
         pushModelBackup = angular.copy($scope.pushModel);
         $scope.changed = false;
@@ -76,7 +76,7 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
       },
       // error
       function(httpResponse) {
-        Notifications.httpError('Failed to delete Push configuration', httpResponse);
+        Notifications.httpError('Failed to delete the push configuration.', httpResponse);
       }
     );
   };

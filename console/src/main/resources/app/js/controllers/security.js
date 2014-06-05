@@ -227,7 +227,7 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
     };
 
     var uriFailure = function (httpResponse) {
-      Notifications.error('Unable to update the application URI Policies.', httpResponse);
+      Notifications.error('Failed to update the application URI Policies.', httpResponse);
     };
 
     if (newUriPolicies) {
@@ -259,7 +259,7 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
       Notifications.success('The application ACL Policies have been updated.');
     };
     var aclFailure = function (httpResponse) {
-      Notifications.error('Unable to update the application ACL Policies.', httpResponse);
+      Notifications.error('Failed to update the application ACL Policies.', httpResponse);
     };
 
     if(newAclPolicies) {

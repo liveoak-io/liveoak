@@ -55,12 +55,12 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
       LoApp.delete({appId: appId},
         // success
         function(/*value, responseHeaders*/) {
-          Notifications.success('Application "' + appId + '" deleted successfully.');
+          Notifications.success('The application "' + appId + '" has been deleted.');
           $modalInstance.close();
         },
         // error
         function (httpResponse) {
-          Notifications.httpError('Failed to delete application "' + appId + '".', httpResponse);
+          Notifications.httpError('Failed to delete the application "' + appId + '".', httpResponse);
         }
       );
     };
@@ -365,7 +365,7 @@ loMod.controller('AppSettingsCtrl', function($scope, $rootScope, $log, $route, $
 
     var deleteRoleSuccessCallback = function(value) {
       $scope.pendingTasks--;
-      Notifications.success('The application role "' +  value.name + '" was deleted.');
+      Notifications.success('The application role "' +  value.name + '" has been deleted.');
     };
 
     var deleteRoleFailureCallback = function(httpResponse) {
@@ -460,12 +460,12 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
       LoRealmApp.delete({appId: clientId},
         // success
         function(/*value, responseHeaders*/) {
-          Notifications.success('Client "' + clientId + '" deleted successfully.');
+          Notifications.success('The client "' + clientId + '" has been deleted.');
           $modalInstance.close();
         },
         // error
         function (httpResponse) {
-          Notifications.httpError('Failed to delete client "' + clientId + '".', httpResponse);
+          Notifications.httpError('Failed to delete the client "' + clientId + '".', httpResponse);
         }
       );
     };
@@ -583,7 +583,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
             onSaveSuccessful();
           },
           function(httpResponse) {
-            Notifications.httpError('The scope roles failed to update.', httpResponse);
+            Notifications.httpError('Failed to update the scope roles.', httpResponse);
           }
         );
       }
@@ -598,7 +598,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
           scopeMappingsAdd();
         },
         function(httpResponse) {
-          Notifications.httpError('The scope roles failed to update.', httpResponse);
+          Notifications.httpError('Failed to update the scope roles.', httpResponse);
         }
       );
     }
