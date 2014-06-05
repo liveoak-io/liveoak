@@ -139,6 +139,10 @@ loMod.factory('LoCollection', function($resource) {
     storageId : '@storageId',
     collectionId : '@collectionId'
   }, {
+    get : {
+      method : 'GET',
+      params: { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId'}
+    },
     getList : {
       method : 'GET',
       params: { expand : 'members' }
