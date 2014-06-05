@@ -289,3 +289,44 @@ loDirectives.directive('loFocused', function($timeout) {
     }
   };
 });
+
+loDirectives.directive('loValidation', function() {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function (scope, element, attrs, ctrl) {
+      scope.inputCtrl = ctrl;
+
+      if (!scope.inputCtrl.$valid && scope.inputCtrl.$dirty){
+        toggleErrorClass(true);
+      }
+
+      scope.$watch('inputCtrl.$valid', function(isValid){
+        if (scope.inputCtrl.$dirty) {
+          if (isValid) {
+            toggleErrorClass(false);
+          } else {
+            toggleErrorClass(true);
+          }
+        }
+      });
+
+      function toggleErrorClass(add){
+
+        var messageElement = element.next();
+        var parentElement = element.parent();
+
+        if (add && !parentElement.hasClass('has-error')){
+          parentElement.addClass('has-error');
+          messageElement.removeClass('ng-hide');
+        }
+
+        if (!add && parentElement.hasClass('has-error')){
+          parentElement.removeClass('has-error');
+          messageElement.addClass('ng-hide');
+        }
+      }
+
+    }
+  };
+});

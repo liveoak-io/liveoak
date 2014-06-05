@@ -36,8 +36,8 @@ module.exports = function (grunt) {
         tasks: ['copy','jshint']
       },
       html: {
-        files: ['<%= config.src %>/partials/*.html',
-          '<%= config.src %>/templates/*.html',
+        files: ['<%= config.src %>/partials/**',
+          '<%= config.src %>/templates/**',
           '<%= config.src %>/*.html'],
         tasks: ['copy']
       },

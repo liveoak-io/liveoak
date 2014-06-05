@@ -407,6 +407,18 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       $modalInstance.dismiss('cancel');
     };
 
+    $scope.setFormScope= function(scope){
+      $scope.modalScope = scope;
+    };
+
+    $scope.checkColName = function (collectionName) {
+      LoCollection.get({appId: currentApp.id, storageId: $routeParams.storageId, collectionId: collectionName}, function () {
+        $scope.modalScope.loCollectionCreate.collectionName.$setValidity('collectionName', false);
+      }, function() {
+        $scope.modalScope.loCollectionCreate.collectionName.$setValidity('collectionName', true);
+      });
+    };
+
   };
 
   $scope.modalColumnAdd = function(){
