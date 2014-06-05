@@ -62,10 +62,10 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
 
     if ((unameSet && !paswdSet)||(!unameSet && paswdSet)) {
 
-      Notifications.error('Fill in both username and password.');
+      Notifications.error('Please fill in both the username and password fields.');
     } else if (paswdSet && !angular.equals($scope.storageModel.credentials[0].password, $scope.passwdConfirm)) {
 
-      Notifications.error('Password does not match the password confirmation.');
+      Notifications.error('The password does not match the password confirmation.');
     } else {
 
       var credentials = [];
@@ -100,14 +100,14 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
         LoStorage.create({appId: $scope.curApp.id}, data,
           // success
           function(/*value, responseHeaders*/) {
-            Notifications.success('New storage successfully created.');
+            Notifications.success('The storage "' + data.id + '" has been created.');
             storageModelBackup = angular.copy($scope.storageModel);
             $scope.changed = false;
             $location.search('created', $scope.storageModel.id).path('applications/' + currentApp.id + '/storage');
           },
           // error
           function(httpResponse) {
-            Notifications.httpError('Failed to create new storage', httpResponse);
+            Notifications.httpError('Failed to create the storage"' + data.id + '".', httpResponse);
           });
       }
       // Update the storage resource
@@ -125,12 +125,12 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
         LoStorage.update({appId: $scope.curApp.id, storageId: storageModelBackup.id}, $scope.storageModel,
         function(){
           // Update success
-          Notifications.success('Storage successfully udpated.');
+          Notifications.success('The storage "' + storageModelBackup.id + '" has been updated.');
           $location.path('applications/' + currentApp.id + '/storage');
         },
         function(httpResponse){
           // Update failure
-          Notifications.httpError('Failed to update the storage', httpResponse);
+          Notifications.httpError('Failed to update the storage "' + storageModelBackup.id + '".', httpResponse);
         });
       }
     }
@@ -202,10 +202,10 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
   $scope.storageDelete = function(){
     LoStorage.delete({ appId : currentApp.id, storageId : $scope.storageId},
       function(){
-        Notifications.success('Storage successfully deleted.');
+        Notifications.success('The storage "' + $scope.storageId + '" has been deleted.');
       },
       function(httpResponse){
-        Notifications.httpError('Failed to delete the storage.', httpResponse);
+        Notifications.httpError('Failed to delete the storage "' + $scope.storageId + '".', httpResponse);
       });
   };
 });
@@ -277,7 +277,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
     LiveOak.connect(function () {
       if ($scope.subscriptionId){
-        $log.debug('Removing subscription \"' + $scope.subscriptionId + '\"');
+        $log.debug('Removing subscription "' + $scope.subscriptionId + '"');
         LiveOak.unsubscribe($scope.subscriptionId);
         $scope.subscriptionId = false;
       }
@@ -446,10 +446,10 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       {id : collectionName}).$promise;
 
     newCollectionPromise.then(function(){
-      Notifications.success('New collection \"' + collectionName + '\" has been created.');
+      Notifications.success('The collection "' + collectionName + '" has been created.');
       goToCollection(collectionName);
     }, function() {
-      Notifications.error('Not able to create new collection \"' + collectionName + '\".');
+      Notifications.error('Not able to create the collection "' + collectionName + '".');
     });
   };
 
@@ -459,10 +459,10 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       collectionId: $scope.collectionId}).$promise;
 
     deletePromise.then(function(){
-      Notifications.success('Collection \"' + $scope.collectionId + '\" has been deleted.');
+      Notifications.success('The collection "' + $scope.collectionId + '" has been deleted.');
       loadCollectionList(selectFirst);
     }, function() {
-      Notifications.error('Not able to delete the collection: \"' + $scope.collectionId + '\".');
+      Notifications.error('Failed to delete the collection "' + $scope.collectionId + '".');
     });
   };
 
@@ -491,7 +491,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     if (rowToRemove > -1){
       $scope.rowsToDelete.push(id);
     } else {
-      $log.error('Unable to find item to remove. The ID \"'+rowToRemove+'\" does not exist.');
+      $log.error('Unable to find item to remove. The ID "'+rowToRemove+'" does not exist.');
     }
 
     $scope.isDataChange = true;
@@ -681,7 +681,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
         collectionId: $scope.collectionId}, newRowToSave);
     }
 
-    Notifications.success('The changes in \"' + $scope.collectionId + '\" have been saved.');
+    Notifications.success('The changes in the collection "' + $scope.collectionId + '" have been saved.');
 
     resetEnv();
     loadCollectionData($scope.collectionId, true);
