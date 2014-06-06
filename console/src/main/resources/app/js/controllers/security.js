@@ -61,27 +61,33 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
   };
 });
 
-loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route, $log, $filter, $modal, Notifications, LoSecurity, LoACL, currentCollectionList, loRealmAppRoles, uriPolicies, aclPolicies, currentApp) {
+loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route, $log, $filter, $modal, Notifications, LoSecurity, LoACL, loRealmAppRoles, uriPolicies, aclPolicies, currentApp, loStorageList) {
 
   $rootScope.curApp = currentApp;
 
-  $scope.currentStorage = $route.current.params.storageId;
-  $scope.currentCollection = $route.current.params.collectionId;
+  $scope.currentCollection = $route.current.params.storageId + '/' + $route.current.params.collectionId;
 
   $scope.breadcrumbs = [
     {'label': 'Applications', 'href': '#/applications'},
     {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
     {'label': 'Security', 'href': '#/applications/' + currentApp.id + '/security'},
-    {'label': 'Secure ' + $scope.currentStorage + '/' + $scope.currentCollection, 'href': '#/applications/' + currentApp.id + '/security/...'}
+    {'label': 'Secure ' + $scope.currentCollection, 'href': '#/applications/' + currentApp.id + '/security/' + $scope.currentCollection}
   ];
 
-  $scope.collectionsList = currentCollectionList._members;
+  $scope.storageList = $filter('filter')(loStorageList._members, {'type': 'database'});
 
-  $scope.$watch('currentCollection',  function(/*newVal*/) {
-    $location.path('applications/' + currentApp.id + '/security/' + $route.current.params.storageId + '/' + $scope.currentCollection);
+  $scope.collectionsList = [];
+  angular.forEach($scope.storageList, function(storage) {
+    angular.forEach(storage._members, function(collection) {
+      $scope.collectionsList.push({id: storage.id + '/' + collection.id, name: storage.id + ' / ' + collection.id});
+    });
   });
 
-  var userPath = '/' + currentApp.id + '/' + $scope.currentStorage + '/' + $scope.currentCollection;
+  $scope.$watch('currentCollection',  function(/*newVal*/) {
+    $location.path('applications/' + currentApp.id + '/security/' + $scope.currentCollection);
+  });
+
+  var userPath = '/' + currentApp.id + '/' + $scope.currentCollection;
   var superuserPath = userPath + '/*';
 
   var newUriPolicyRule = function(uriPattern, requestTypes, allowedRoles) {

@@ -394,6 +394,26 @@ loMod.factory('LoRealmClientRolesLoader', function(Loader, LoRealmClientRoles, $
   });
 });
 
+
+loMod.factory('LoSecurityCollections', function($resource) {
+  return $resource('/:appId', {
+    appId : '@appId'
+  }, {
+    get : {
+      method: 'GET',
+      params: { expand : 'members' }
+    }
+  });
+});
+
+loMod.factory('LoSecurityCollectionsLoader', function(Loader, LoSecurityCollections, $route) {
+  return Loader.get(LoSecurityCollections, function() {
+    return {
+      appId : $route.current.params.appId
+    };
+  });
+});
+
 loMod.factory('LoSecurity', function($resource) {
   return $resource('/admin/applications/:appId/resources/uri-policy', {
     appId : '@appId'

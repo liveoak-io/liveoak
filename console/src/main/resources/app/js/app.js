@@ -123,11 +123,8 @@ loMod.config(['$routeProvider', function($routeProvider) {
         currentApp: function(LoAppLoader) {
           return new LoAppLoader();
         },
-        loStorageList : function(LoStorageListLoader) {
-          return new LoStorageListLoader();
-        },
-        currentCollectionList: function(LoCollectionListLoader) {
-          return new LoCollectionListLoader();
+        loStorageList : function(LoSecurityCollectionsLoader) {
+          return new LoSecurityCollectionsLoader();
         },
         loRealmAppRoles: function(LoRealmAppRolesLoader) {
           return new LoRealmAppRolesLoader();
