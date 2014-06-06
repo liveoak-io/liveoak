@@ -13,13 +13,18 @@
     "homepage": "https://github.com/liveoak-io/liveoak",
     "private": true,
     "dependencies": {
-        "angular": "@version.angular-main",
-        "angular-route": "@version.angular-route",
-        "angular-resource": "@version.angular-resource",
-        "bootstrap": "@version.bootstrap",
-        "less": "@version.less",
-        "select2": "@version.select2",
-        "angular-bootstrap": "@version.angular-bootstrap",
-        "angular-mocks": "@version.angular-mocks"
+        "angular": "1.2.16",
+        "angular-bootstrap": "0.11.0",
+        "angular-mocks": "1.2.16",
+        "angular-route": "1.2.16",
+        "angular-resource": "1.2.16",
+        "bootstrap": "~3.0.3",
+        "bootstrap-select": "1.5.2",
+        "font-awesome": "4.0.3",
+        "less": "~1.6.1",
+        "jquery": "~2.0.3",
+        "patternfly": "0.1.1",
+        "select2": "3.4.5",
+        "ui-bootstrap": "0.10.0"
     }
 }

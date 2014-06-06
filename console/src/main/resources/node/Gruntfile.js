@@ -6,12 +6,28 @@ module.exports = function(grunt) {
                 options: {
                     cleanTargetDir: true,
                     cleanBowerDir: true,
-                    targetDir: "@targetDir",
+                    targetDir: "app/lib",
                     verbose: true
                 }
             }
+        }    ,
+      copy: {
+        fa: {
+          cwd: 'app/lib/font-awesome/fonts',
+          src: '*',
+          dest: 'app/lib/patternfly/components/font-awesome/fonts',
+          expand: true
+        },
+        glyph: {
+          cwd: 'app/lib/bootstrap',
+          src: 'glyph*',
+          dest: 'app/lib/patternfly/components/bootstrap/dist/fonts',
+          expand: true
         }
+      }
     });
     grunt.loadNpmTasks('grunt-bower-task');
-    grunt.registerTask('build', ['bower']);
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-mkdir');
+    grunt.registerTask('build', ['bower', 'copy']);
 };

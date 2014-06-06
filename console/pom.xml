@@ -20,7 +20,7 @@
 
     <properties>
         <module-name/>
-        <console.app.res>${project.basedir}/src/main/resources/</console.app.res>
+        <console.app.res>${project.basedir}/target/</console.app.res>
         <html.unit.version>2.13</html.unit.version>
         <arquillian.version>1.1.3.Final</arquillian.version>
         <arquillian.drone.version>1.3.0.Final</arquillian.drone.version>
@@ -137,7 +137,7 @@
                         <source>${console.app.res}/app/lib/angular/angular.js</source>
                         <source>${console.app.res}/app/lib/angular-bootstrap/ui-bootstrap-tpls.js</source>
                         <source>${console.app.res}/app/lib/angular-mocks/angular-mocks.js</source>
-                        <source>${console.app.res}/test/lib/liveoak/liveoak-mocks.js</source>
+                        <source>${project.basedir}/src/main/resources/test/lib/liveoak/liveoak-mocks.js</source>
                     </preloadSources>
                     <jsSrcDir>${console.app.res}/app/js/</jsSrcDir>
                     <sourceIncludes>
@@ -232,6 +232,93 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Prepare bower related files and copy them to node plugin working directory -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <configuration>
+                            <tasks>
+                                <copy todir="${project.basedir}/target">
+                                    <fileset dir="${project.basedir}/src/main/resources/node" includes="**/*" />
+                                </copy>
+                                <!--replace file="${project.basedir}/target/package.json">
+                                    <replacefilter token="@version.bower" value="${node.version.bower}"/>
+                                    <replacefilter token="@version.grunt-main" value="${node.version.grunt}"/>
+                                    <replacefilter token="@version.grunt-bower-task" value="${node.version.grunt-bower-task}"/>
+                                    <replacefilter token="@version.grunt-cli" value="${node.version.grunt-cli}"/>
+                                </replace>
+                                <replace file="${project.basedir}/target/bower.json">
+                                    <replacefilter token="@version.angular-main" value="${bower.version.angular}"/>
+                                    <replacefilter token="@version.angular-mocks" value="${bower.version.angular-mocks}"/>
+                                    <replacefilter token="@version.angular-resource" value="${bower.version.angular-resource}"/>
+                                    <replacefilter token="@version.angular-route" value="${bower.version.angular-route}"/>
+                                    <replacefilter token="@version.bootstrap" value="${bower.version.bootstrap}"/>
+                                    <replacefilter token="@version.less" value="${bower.version.less}"/>
+                                    <replacefilter token="@version.select2" value="${bower.version.select2}"/>
+                                    <replacefilter token="@version.ui-bootstrap" value="${bower.version.ui-bootstrap}"/>
+                                </replace>
+                                <replace file="${project.basedir}/target/Gruntfile.js">
+                                    <replacefilter token="@targetDir" value="${project.basedir}/src/main/resources/app/lib2"/>
+                                </replace-->
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Download node.js and related modules to install 3rd party frontend libraries -->
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>0.0.14</version>
+
+                <configuration>
+                    <workingDirectory>target</workingDirectory>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <nodeVersion>v0.10.18</nodeVersion>
+                            <npmVersion>1.3.8</npmVersion>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <arguments>install --prefix node_modules</arguments>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>grunt build</id>
+                        <goals>
+                            <goal>grunt</goal>
+                        </goals>
+                        <phase>compile</phase>
+
+                        <configuration>
+                            <arguments>build</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
         <testResources>
             <testResource>
@@ -255,91 +342,7 @@
             <id>bowerUpdate</id>
             <build>
                 <plugins>
-                    <!-- Prepare bower related files and copy them to node plugin working directory -->
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>compile</phase>
-                                <configuration>
-                                    <tasks>
-                                        <copy todir="${project.basedir}/target">
-                                            <fileset dir="${project.basedir}/src/main/resources/node" includes="**/*" />
-                                        </copy>
-                                        <replace file="${project.basedir}/target/package.json">
-                                            <replacefilter token="@version.bower" value="${node.version.bower}"/>
-                                            <replacefilter token="@version.grunt-main" value="${node.version.grunt}"/>
-                                            <replacefilter token="@version.grunt-bower-task" value="${node.version.grunt-bower-task}"/>
-                                            <replacefilter token="@version.grunt-cli" value="${node.version.grunt-cli}"/>
-                                        </replace>
-                                        <replace file="${project.basedir}/target/bower.json">
-                                            <replacefilter token="@version.angular-main" value="${bower.version.angular}"/>
-                                            <replacefilter token="@version.angular-mocks" value="${bower.version.angular-mocks}"/>
-                                            <replacefilter token="@version.angular-resource" value="${bower.version.angular-resource}"/>
-                                            <replacefilter token="@version.angular-route" value="${bower.version.angular-route}"/>
-                                            <replacefilter token="@version.bootstrap" value="${bower.version.bootstrap}"/>
-                                            <replacefilter token="@version.less" value="${bower.version.less}"/>
-                                            <replacefilter token="@version.select2" value="${bower.version.select2}"/>
-                                            <replacefilter token="@version.ui-bootstrap" value="${bower.version.ui-bootstrap}"/>
-                                        </replace>
-                                        <replace file="${project.basedir}/target/Gruntfile.js">
-                                            <replacefilter token="@targetDir" value="${project.basedir}/src/main/resources/app/lib2"/>
-                                        </replace>
-                                    </tasks>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- Download node.js and related modules to install 3rd party frontend libraries -->
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <version>0.0.13</version>
 
-                        <configuration>
-                            <workingDirectory>target</workingDirectory>
-                        </configuration>
-
-                        <executions>
-                            <execution>
-                                <id>install node and npm</id>
-                                <goals>
-                                    <goal>install-node-and-npm</goal>
-                                </goals>
-                                <phase>install</phase>
-                                <configuration>
-                                    <nodeVersion>v0.10.18</nodeVersion>
-                                    <npmVersion>1.3.8</npmVersion>
-                                </configuration>
-                            </execution>
-
-                            <execution>
-                                <id>npm install</id>
-                                <goals>
-                                    <goal>npm</goal>
-                                </goals>
-                                <phase>install</phase>
-                                <configuration>
-                                    <arguments>install --prefix node_modules</arguments>
-                                </configuration>
-                            </execution>
-
-                            <execution>
-                                <id>grunt build</id>
-                                <goals>
-                                    <goal>grunt</goal>
-                                </goals>
-                                <phase>install</phase>
-
-                                <configuration>
-                                    <arguments>build</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                 </plugins>
             </build>
         </profile>
