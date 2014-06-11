@@ -29,22 +29,6 @@
         <version.jasmine.plugin>1.3.1.3</version.jasmine.plugin>
         <version.lesscss.plugin>1.3.3</version.lesscss.plugin>
 
-        <!-- Node.js related versions -->
-        <node.version.bower>~1.2.8</node.version.bower>
-        <node.version.grunt>~0.4.2</node.version.grunt>
-        <node.version.grunt-cli>~0.1.13</node.version.grunt-cli>
-        <node.version.grunt-bower-task>~0.3.4</node.version.grunt-bower-task>
-
-        <!-- Bower related versions -->
-        <bower.version.angular>1.2.9</bower.version.angular>
-        <bower.version.angular-route>1.2.9</bower.version.angular-route>
-        <bower.version.angular-resource>1.2.9</bower.version.angular-resource>
-        <bower.version.bootstrap>3.0.3</bower.version.bootstrap>
-        <bower.version.less>1.6.1</bower.version.less>
-        <bower.version.select2>3.4.5</bower.version.select2>
-        <bower.version.angular-bootstrap>0.10.0</bower.version.angular-bootstrap>
-        <bower.version.angular-mocks>1.2.9</bower.version.angular-mocks>
-
         <!-- Arquillian related properties -->
         <arquillian.browser>phantomjs</arquillian.browser>
     </properties>
@@ -156,21 +140,20 @@
                 <executions>
                     <execution>
                         <id>copy-resources</id>
-                        <!-- here the phase you need -->
+
                         <phase>validate</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/app</outputDirectory>
+                            <outputDirectory>${basedir}/target/</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>src/main/resources/app</directory>
+                                    <directory>src/main/resources/</directory>
                                     <excludes>
                                         <exclude>less/</exclude>
+                                        <exclude>test/</exclude>
                                         <exclude>**/.git*</exclude>
-                                        <!--<exclude>**/bower.json</exclude>-->
-                                        <!--<exclude>**/.bower.json</exclude>-->
                                         <exclude>**/*.md</exclude>
                                         <exclude>%regex[.*/\.?bower\.json]</exclude>
                                     </excludes>
@@ -233,44 +216,6 @@
                 </executions>
             </plugin>
 
-            <!-- Prepare bower related files and copy them to node plugin working directory -->
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <configuration>
-                            <tasks>
-                                <copy todir="${project.basedir}/target">
-                                    <fileset dir="${project.basedir}/src/main/resources/node" includes="**/*" />
-                                </copy>
-                                <!--replace file="${project.basedir}/target/package.json">
-                                    <replacefilter token="@version.bower" value="${node.version.bower}"/>
-                                    <replacefilter token="@version.grunt-main" value="${node.version.grunt}"/>
-                                    <replacefilter token="@version.grunt-bower-task" value="${node.version.grunt-bower-task}"/>
-                                    <replacefilter token="@version.grunt-cli" value="${node.version.grunt-cli}"/>
-                                </replace>
-                                <replace file="${project.basedir}/target/bower.json">
-                                    <replacefilter token="@version.angular-main" value="${bower.version.angular}"/>
-                                    <replacefilter token="@version.angular-mocks" value="${bower.version.angular-mocks}"/>
-                                    <replacefilter token="@version.angular-resource" value="${bower.version.angular-resource}"/>
-                                    <replacefilter token="@version.angular-route" value="${bower.version.angular-route}"/>
-                                    <replacefilter token="@version.bootstrap" value="${bower.version.bootstrap}"/>
-                                    <replacefilter token="@version.less" value="${bower.version.less}"/>
-                                    <replacefilter token="@version.select2" value="${bower.version.select2}"/>
-                                    <replacefilter token="@version.ui-bootstrap" value="${bower.version.ui-bootstrap}"/>
-                                </replace>
-                                <replace file="${project.basedir}/target/Gruntfile.js">
-                                    <replacefilter token="@targetDir" value="${project.basedir}/src/main/resources/app/lib2"/>
-                                </replace-->
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <!-- Download node.js and related modules to install 3rd party frontend libraries -->
             <plugin>
                 <groupId>com.github.eirslett</groupId>
@@ -289,8 +234,8 @@
                         </goals>
                         <phase>compile</phase>
                         <configuration>
-                            <nodeVersion>v0.10.18</nodeVersion>
-                            <npmVersion>1.3.8</npmVersion>
+                            <nodeVersion>v0.10.28</nodeVersion>
+                            <npmVersion>1.4.9</npmVersion>
                         </configuration>
                     </execution>
 
@@ -313,7 +258,7 @@
                         <phase>compile</phase>
 
                         <configuration>
-                            <arguments>build</arguments>
+                            <arguments>mvnBuild</arguments>
                         </configuration>
                     </execution>
                 </executions>

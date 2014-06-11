@@ -1,8 +1,16 @@
 'use strict';
 
 module.exports = function (grunt) {
+
   // load all grunt tasks
-  require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+  grunt.loadNpmTasks('grunt-bower-task');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   // configurable paths
   var projectConfig = {
@@ -12,6 +20,16 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     config: projectConfig,
+    bower: {
+      install: {
+        options: {
+          cleanTargetDir: true,
+          cleanBowerDir: true,
+          targetDir: 'app/lib',
+          verbose: true
+        }
+      }
+    },
     less: {
       development: {
         options: {
@@ -82,4 +100,5 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', ['build', 'watch']);
+  grunt.registerTask('mvnBuild', ['bower']);
 };
