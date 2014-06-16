@@ -1,0 +1,27 @@
+{
+    "name": "liveOak-console",
+    "version": "0.0.1",
+    "authors": [
+        "Viliam Rockai <vrockai@redhat.com>"
+    ],
+    "description": "LiveOak console interface",
+    "keywords": [
+        "LiveOak",
+        "console"
+    ],
+    "license": "Eclipse Public License - v 1.0",
+    "homepage": "https://github.com/liveoak-io/liveoak",
+    "private": true,
+    "dependencies": {
+        "angular": "1.2.16",
+        "angular-bootstrap": "0.11.0",
+        "angular-mocks": "1.2.16",
+        "angular-route": "1.2.16",
+        "angular-resource": "1.2.16",
+        "animate.css": "3.1.1",
+        "font-awesome": "4.0.3",
+        "less": "~1.6.1",
+        "jquery": "~2.0.3",
+        "patternfly": "1.0.3"
+    }
+}
