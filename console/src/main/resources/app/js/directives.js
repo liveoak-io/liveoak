@@ -7,7 +7,7 @@ loDirectives.directive('loNavbar', function () {
   return {
     restrict: 'E',
     replace: true,
-    templateUrl: '/admin/console/templates/lo-navbar.html',
+    templateUrl: '/admin/console/templates/lo-navbar.html'
   };
 });
 
