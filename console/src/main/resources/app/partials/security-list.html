@@ -3,11 +3,16 @@
 <div class="col-md-10 lo-main-pane">
   <div class="row">
     <div class="lo-content-area col-md-9">
+      <ul class="nav nav-tabs nav-tabs-pf">
+        <li class="active"><a href="">Policies</a></li>
+        <li><a href="#/applications/{{curApp.id}}/security/roles">Roles</a></li>
+        <li class="disabled"><a href="">Users</a></li>
+      </ul>
 
       <lo-breadcrumbs></lo-breadcrumbs>
       
-      <h2><span>{{curApp.name}}</span> Security</h2>
-      
+      <h2><span>{{curApp.name}}</span> Policies</h2>
+
       <!-- In case of no collections secured -->
       <div class="panel" ng-hide="securedColls.length > 0">
         <div class="panel-body text-center empty-instance">

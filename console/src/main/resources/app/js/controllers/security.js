@@ -9,7 +9,7 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
   $scope.breadcrumbs = [
     {'label': 'Applications', 'href': '#/applications'},
     {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
-    {'label': 'Security', 'href': '#/applications/' + currentApp.id + '/security'}
+    {'label': 'Security Policies', 'href': '#/applications/' + currentApp.id + '/security'}
   ];
 
   $scope.storageList = $filter('filter')(expApp._members, {'type': 'database'});
@@ -278,3 +278,175 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
   };
 
 });
+
+// -- Security Policies --------------------------------------------------------
+
+loMod.controller('SecurityRolesCtrl', function($scope, $rootScope, $log, $route, $modal, currentApp, LoRealmApp, LoRealmAppRoles, loRealmApp, /*loRealmAppRoles,*/ Notifications) {
+
+  $rootScope.curApp = currentApp;
+
+  $scope.breadcrumbs = [
+    {'label': 'Applications', 'href': '#/applications'},
+    {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
+    {'label': 'Security Roles', 'href': '#/applications/' + currentApp.id + '/security/roles'}
+  ];
+
+  // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
+  var loRealmAppRoles;
+  LoRealmAppRoles.query({appId: currentApp.id}).$promise.then(function(data) {
+      loRealmAppRoles = data;
+      resetEnv();
+    }
+  );
+
+  var settingsBackup = {};
+  var resetEnv = function() {
+    $scope.settings = {
+      roles: loRealmAppRoles,
+      defaultRoles: angular.copy(loRealmApp.defaultRoles) || [],
+      deletedRoles: [],
+      newRoles: []
+    };
+    settingsBackup = angular.copy($scope.settings);
+  };
+
+  $scope.$watch('settings', function() {
+    $scope.changed = !angular.equals($scope.settings, settingsBackup);
+  }, true);
+
+  $scope.clear = function() {
+    $scope.settings = angular.copy(settingsBackup);
+    $scope.changed = false;
+  };
+
+  $scope.toggleDefaultRole = function(roleName) {
+    var idx = $scope.settings.defaultRoles.indexOf(roleName);
+    if (idx > -1) {
+      $scope.settings.defaultRoles.splice(idx, 1);
+    }
+    else {
+      $scope.settings.defaultRoles.push(roleName);
+    }
+  };
+
+  $scope.toggleDeletedRole = function(roleName) {
+    var idx = $scope.settings.deletedRoles.indexOf(roleName);
+    if (idx > -1) {
+      $scope.settings.deletedRoles.splice(idx, 1);
+    }
+    else {
+      $scope.settings.deletedRoles.push(roleName);
+    }
+  };
+
+  var AddRoleModalCtrl = function ($scope, $modalInstance, Notifications, LoRealmAppRoles, roles) {
+
+    $scope.newRole = new LoRealmAppRoles();
+
+    $scope.addRole = function () {
+      for(var i = 0; i < roles.length; i++) {
+        if(roles[i].name === $scope.newRole.name) {
+          Notifications.error('The role with name "' + $scope.newRole.name + '" already exists.');
+          return;
+        }
+      }
+
+      $modalInstance.close($scope.newRole);
+    };
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+
+  };
+
+  $scope.modalAddRole = function() {
+    var modalAddRole = $modal.open({
+      templateUrl: '/admin/console/templates/modal/application/role-add.html',
+      controller: AddRoleModalCtrl,
+      scope: $scope,
+      resolve: {
+        roles: function () {
+          return $scope.settings.roles.concat($scope.settings.newRoles);
+        }
+      }
+    });
+
+    modalAddRole.result.then(
+      function(newRole) { // modal completion
+        $scope.settings.newRoles.push(newRole);
+      }
+    );
+  };
+
+  $scope.pendingTasks = -1;
+
+  $scope.$watch('pendingTasks', function (newVal, oldVal/*, scope*/) {
+    if(oldVal === 1 && newVal === 0) {
+      $route.reload();
+    }
+  });
+
+  $scope.save = function() {
+    // check newly added and simultaneously deleted roles..
+    // we are going backwards so splice won't affect the index we are working at
+    var idx = $scope.settings.newRoles.length;
+    while (idx--) {
+      var deletedIdx = $scope.settings.deletedRoles.indexOf($scope.settings.newRoles[idx]);
+      if (deletedIdx !== -1) {
+        $scope.settings.deletedRoles.splice(deletedIdx, 1);
+        $scope.settings.newRoles.splice(idx, 1);
+      }
+    }
+
+    var defaultRolesChanged = !angular.equals(loRealmApp.defaultRoles, $scope.settings.defaultRoles);
+    $scope.pendingTasks = $scope.settings.deletedRoles.length + $scope.settings.newRoles.length + defaultRolesChanged;
+
+    var deleteRoleSuccessCallback = function(value) {
+      $scope.pendingTasks--;
+      Notifications.success('The application role "' +  value.name + '" has been deleted.');
+    };
+
+    var deleteRoleFailureCallback = function(httpResponse) {
+      $scope.pendingTasks--;
+      Notifications.error('Unable to delete the application role "' +  httpResponse.config.data.name + '".', httpResponse);
+    };
+
+    for (var drIdx = 0; drIdx < $scope.settings.deletedRoles.length; drIdx++) {
+      $scope.settings.deletedRoles[drIdx].$delete({realmId: 'liveoak-apps', appId: currentApp.id, roleName: $scope.settings.deletedRoles[drIdx].name},
+        deleteRoleSuccessCallback, deleteRoleFailureCallback
+      );
+    }
+
+    var addRoleSuccessCallback = function(value) {
+      $scope.pendingTasks--;
+      Notifications.success('The application role "' + value.name + '" has been created.');
+    };
+
+    var addRoleFailureCallback = function(httpResponse) {
+      $scope.pendingTasks--;
+      Notifications.error('Unable to create the application role "' + httpResponse.config.data.name + '".', httpResponse);
+    };
+
+    for (var nrIdx = 0; nrIdx < $scope.settings.newRoles.length; nrIdx++) {
+      $scope.settings.newRoles[nrIdx].$save({realmId: 'liveoak-apps', appId: currentApp.id},
+        addRoleSuccessCallback, addRoleFailureCallback
+      );
+    }
+
+    if (!angular.equals(loRealmApp.defaultRoles, $scope.settings.defaultRoles)) {
+      loRealmApp.defaultRoles = $scope.settings.defaultRoles;
+      loRealmApp.$save({realmId: 'liveoak-apps', appId: currentApp.id},
+        function(value/*, responseHeaders*/) {
+          $scope.pendingTasks--;
+          Notifications.success('The application default roles have been set to: "' + value.defaultRoles + '".');
+        },
+        function (httpResponse) {
+          $scope.pendingTasks--;
+          Notifications.error('Unable to configure the application default roles.', httpResponse);
+        }
+      );
+    }
+  };
+});
+
