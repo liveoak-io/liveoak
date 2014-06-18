@@ -115,6 +115,29 @@ loMod.config(['$routeProvider', function($routeProvider) {
         }
       }
     })
+    .when('/applications/:appId/security/roles', {
+      templateUrl : '/admin/console/partials/security-roles.html',
+      controller : 'SecurityRolesCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader) {
+          return new LoAppLoader();
+        },
+        // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
+        loRealmApp : function(LoRealmApp, $route) {
+          return LoRealmApp.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              // Lazily create the application if not present
+              return new LoRealmApp({'name': $route.current.params.appId, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'});
+            }
+          );
+        }/*,
+         loRealmAppRoles : function(LoRealmAppRolesLoader) {
+         return new LoRealmAppRolesLoader();
+         }*/
+      }
+    })
     // .when('/applications/:appId/create-security', {
     .when('/applications/:appId/security/:storageId/:collectionId', {
       templateUrl : '/admin/console/partials/security-create.html',
@@ -161,21 +184,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
       resolve: {
         currentApp: function(LoAppLoader) {
           return new LoAppLoader();
-        },
-        // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
-        loRealmApp : function(LoRealmApp, $route) {
-          return LoRealmApp.get({appId: $route.current.params.appId}).$promise.then(function(data) {
-              return data;
-            },
-            function() {
-              // Lazily create the application if not present
-              return new LoRealmApp({'name': $route.current.params.appId, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'});
-            }
-          );
-        }/*,
-        loRealmAppRoles : function(LoRealmAppRolesLoader) {
-          return new LoRealmAppRolesLoader();
-        }*/
+        }
       }
     })
     .when('/applications/:appId/dashboard', {

@@ -1,0 +1,63 @@
+<lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="security" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
+
+<div class="col-md-10 lo-main-pane">
+  <div class="row">
+    <div class="lo-content-area col-md-9">
+      <ul class="nav nav-tabs nav-tabs-pf">
+        <li><a href="#/applications/{{curApp.id}}/security">Policies</a></li>
+        <li class="active"><a href="">Roles</a></li>
+        <li class="disabled"><a href="">Users</a></li>
+      </ul>
+
+      <lo-breadcrumbs></lo-breadcrumbs>
+
+      <h2><span>{{curApp.name}}</span> Roles</h2>
+
+      <form class="lo-form-horizontal clearfix">
+        <fieldset>
+          <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+              <th colspan="4" class="table-actions">
+                <div class="pull-right">
+                  <button class="btn btn-default" ng-click="modalAddRole()">Add Role</button>
+                </div>
+              </th>
+            </tr>
+            <tr ng-show="settings.roles.concat(settings.newRoles).length > 0">
+              <th>Name</th>
+              <th>Description</th>
+              <th class="actions">Default</th>
+              <th class="actions">Actions</th>
+            </tr>
+            <tr ng-show="settings.roles.concat(settings.newRoles).length === 0">
+              <th colspan="4">No Applications Roles defined.</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="role in settings.roles.concat(settings.newRoles)" ng-class="{deleted: (settings.deletedRoles.indexOf(role) > -1)}">
+              <td><span>{{ role.name }}</span></td>
+              <td><span>{{ role.description }}</span></td>
+              <td class="actions"><i class="fa fa-check clickable lo-checkbox" ng-class="{selected: (settings.defaultRoles.indexOf(role.name) > -1)}" ng-click="toggleDefaultRole(role.name)" tooltip="Toggle Default Role"></i></td>
+              <td class="actions">
+                <button class="btn btn-link btn-icon" data-tooltip-placement="top" data-tooltip="Delete Role" ng-click="toggleDeletedRole(role)" ng-hide="(settings.deletedRoles | filter: role.name).length > 0">
+                  <i class="fa fa-trash-o"></i>
+                  <span>Delete Role</span>
+                </button>
+                <button class="btn btn-link btn-icon" data-tooltip-placement="top" data-tooltip="Restore Role" ng-click="toggleDeletedRole(role)" ng-show="(settings.deletedRoles | filter: role.name).length > 0">
+                  <i class="fa fa-undo"></i>
+                  <span>Restore Role</span>
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </fieldset>
+        <div class="pull-right form-actions">
+          <button class="btn btn-default btn-lg" ng-disabled="!changed" type="button" ng-click="clear()">Clear changes</button>
+          <button class="btn btn-primary btn-lg" ng-disabled="!changed" type="submit" ng-click="save()">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
