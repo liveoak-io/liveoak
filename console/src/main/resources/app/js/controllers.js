@@ -9,5 +9,5 @@ angular.module('loApp.controllers', [
   'loApp.controllers.security',
   'loApp.controllers.global',
   'loApp.controllers.push',
-  'loApp.controllers.dashboard',
+  'loApp.controllers.dashboard'
 ]);

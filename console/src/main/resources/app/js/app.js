@@ -288,6 +288,10 @@ loMod.config(['$routeProvider', function($routeProvider) {
     });
 }]);
 
+loMod.config(['$logProvider', function($logProvider) {
+  $logProvider.debugEnabled(false);
+}]);
+
 angular.element(document).ready(function () {
   /* jshint ignore:start */
   var liveOak = new LiveOak({

@@ -239,8 +239,10 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   }
 
   $scope.collectionList = currentCollectionList._members;
-  $scope.collectionData = {};
-  $scope.collectionDataBackup = {};
+
+  $scope.collectionData = [];
+  $scope.collectionDataBackup = [];
+
   $scope.live = {};
 
   $scope.subscriptionId = false;
@@ -286,7 +288,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
         var urlSubscribe = '/' + currentApp.id + '/' + $routeParams.storageId + '/' + $scope.collectionId + '/*';
         $scope.subscriptionId = LiveOak.subscribe(urlSubscribe, function (data) {
           //Notifications.warn('Data were changed outside console: ' + JSON.stringify(data));
-          $log.debug('UPS read: ' + JSON.stringify(data));
           loadCollectionData($scope.collectionId, true);
           $scope.live = data;
         });
@@ -379,18 +380,20 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $location.path('/applications/'+currentApp.id+'/storage/'+$routeParams.storageId+'/browse/'+$scope.collectionId);
   };
 
-  $scope.$watch('collectionData._members', function(){
+  $scope.$watch('collectionData', function(){
       $log.debug('Collection data changed.');
-      if(!angular.equals($scope.collectionData._members, $scope.collectionDataBackup._members)){
+      if(!angular.equals($scope.collectionData, $scope.collectionDataBackup)){
         $log.debug('Collection data differs from original.');
         $scope.isDataChange = true;
+      } else {
+        $scope.isDataChange = false;
       }
     }, true
   );
 
   $scope.$watch('columns', function(){
       $log.debug('Columns number changed.');
-      if(!angular.equals($scope.collectionData._members, $scope.collectionDataBackup._members)){
+      if(!angular.equals($scope.collectionData, $scope.collectionDataBackup)){
         $log.debug('Column number differs from original.');
         $scope.isColumnChange = true;
       }
@@ -492,8 +495,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
     var rowToRemove = -1;
 
-    for (var k in $scope.collectionData._members){
-      var item = $scope.collectionData._members[k];
+    for (var k in $scope.collectionData){
+      var item = $scope.collectionData[k];
       if (item.id === id) {
         rowToRemove = k;
         break;
@@ -525,8 +528,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       $scope.columns.push(columnName);
     }
 
-    for (var k in $scope.collectionData._members){
-      var item = $scope.collectionData._members[k];
+    for (var k in $scope.collectionData){
+      var item = $scope.collectionData[k];
       item[columnName] = '';
     }
 
@@ -541,8 +544,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     if (index > -1) {
       $scope.columns.splice(index, 1);
 
-      for (var k in $scope.collectionData._members) {
-        var item = $scope.collectionData._members[k];
+      for (var k in $scope.collectionData) {
+        var item = $scope.collectionData[k];
         if (item.hasOwnProperty(columnName)) {
           item[columnName] = null;
         }
@@ -556,8 +559,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   $scope.columnClear = function(col){
     $log.debug('Clearing column ' + col );
 
-    for (var i in $scope.collectionData._members){
-      var row = $scope.collectionData._members[i];
+    for (var i in $scope.collectionData){
+      var row = $scope.collectionData[i];
       row[col] = '';
     }
   };
@@ -570,7 +573,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $log.debug('Clearing collection ' + $scope.collectionId );
 
     $scope.columns = ['id'];
-    $scope.collectionData._members = [];
+    $scope.collectionData = [];
     $scope.columnsHidden = [];
     $scope.isClearAll = true;
   };
@@ -612,8 +615,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
     // If Clear All was clicked, no need to delete specific rows, everything will be deleted.
     if ($scope.isClearAll) {
-      for (var j in $scope.collectionDataBackup._members){
-        var itemToClear = $scope.collectionDataBackup._members[j];
+      for (var j in $scope.collectionDataBackup){
+        var itemToClear = $scope.collectionDataBackup[j];
 
         LoCollectionItem.delete({appId: currentApp.id, storageId: $routeParams.storageId,
           collectionId: $scope.collectionId, itemId: itemToClear.id});
@@ -621,10 +624,10 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     } else {
 
       var removeFromList = function(id){
-        for (var k in $scope.collectionData._members){
-          var item = $scope.collectionData._members[k];
+        for (var k in $scope.collectionData){
+          var item = $scope.collectionData[k];
           if (item.id === id){
-            $scope.collectionDataBackup._members.splice(k,1);
+            $scope.collectionDataBackup.splice(k,1);
             return;
           }
         }
@@ -634,9 +637,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       for (var i in $scope.rowsToDelete) {
         var itemToDelete = $scope.rowsToDelete[i];
         if (itemToDelete) {
-          $log.debug('Going to delete: ' + JSON.stringify(itemToDelete));
           var deletePromise = LoCollectionItem.delete({appId: currentApp.id, storageId: $routeParams.storageId,
-            collectionId: $scope.collectionId, itemId: itemToDelete}).$promise;
+            collectionId: $scope.collectionId, itemId: itemToDelete.substring(1,itemToDelete.length-1)}).$promise;
 
           deletePromise.then(removeFromList(itemToDelete));
         }
@@ -654,29 +656,27 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     };
 
     // Then update all changed data in the table
-    for (var k in $scope.collectionData._members){
-      var item = $scope.collectionData._members[k];
+    for (var k in $scope.collectionData){
+      var item = $scope.collectionData[k];
 
       var itemToSave = angular.copy(item);
       delete itemToSave.self;
 
       // Update existing items
-      var itemFromBackup = findById(itemToSave.id, $scope.collectionDataBackup._members);
+      var itemFromBackup = findById(itemToSave.id, $scope.collectionDataBackup);
       if (itemFromBackup && itemFromBackup.self) {
         delete itemFromBackup.self;
       }
 
-      // If the JSON value could be represented as a number, auto-type the string to the number type
-      itemToSave = autoType(itemToSave);
-
       if (itemToSave.id) {
-        $log.debug('Checking for update: ' + JSON.stringify(itemToSave));
+        $log.debug('Checking for update: ' + angular.toJson(itemToSave));
         if (itemFromBackup && !angular.equals(itemToSave, itemFromBackup)) {
-          $log.debug('Updating: ' + JSON.stringify(itemToSave));
+
+          var decodedItemToSave = decodeJSON(itemToSave);
           LoCollectionItem.update({appId: currentApp.id, storageId: $routeParams.storageId,
-            collectionId: $scope.collectionId, itemId: itemToSave.id}, itemToSave);
+            collectionId: $scope.collectionId, itemId: decodedItemToSave.id}, decodedItemToSave);
         } else {
-          $log.debug('Not updating:        ' + JSON.stringify(itemToSave));
+          $log.debug('Not updating:        ' + angular.toJson(itemToSave));
         }
       }
       // Create new items
@@ -686,11 +686,12 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     }
 
     for (var l in $scope.newRows){
-      var newRowToSave = autoType($scope.newRows[l]);
+      var newRowToSave = $scope.newRows[l];
+      $log.debug('Creating: ' + newRowToSave);
+      var decodedNewRowToSave = decodeJSON(newRowToSave);
 
-      $log.debug('Creating: ' + JSON.stringify(newRowToSave));
       LoCollectionItem.create({appId: currentApp.id, storageId: $routeParams.storageId,
-        collectionId: $scope.collectionId}, newRowToSave);
+        collectionId: $scope.collectionId}, decodedNewRowToSave);
     }
 
     Notifications.success('The changes in the collection "' + $scope.collectionId + '" have been saved.');
@@ -706,7 +707,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
     $scope.columns = angular.copy($scope.columnsBackup);
     $scope.collectionData = angular.copy($scope.collectionDataBackup);
-    //loadCollectionData($scope.collectionId, true);
   };
 
   function loadCollectionData(colId, loadColumns) {
@@ -730,9 +730,16 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
           }
         }
       }
+
+      $scope.collectionData = [];
+
+      for (var rIndex in data._members){
+        var rData = data._members[rIndex];
+        $scope.collectionData.push(encodeJSON(rData));
+      }
+
+      $scope.collectionDataBackup = angular.copy($scope.collectionData);
       $scope.columnsBackup = angular.copy($scope.columns);
-      $scope.collectionData = data;
-      $scope.collectionDataBackup = angular.copy(data);
       $scope.isDataChange = false;
     });
   }
@@ -755,19 +762,65 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     }
   }
 
-  function autoType(obj){
-    // If the JSON value could be represented as a number, auto-type the string to the number type
-    for( var fieldId in obj){
-      if (fieldId !== 'id' && obj.hasOwnProperty(fieldId)){
-        var fieldVal = obj[fieldId];
-        if (!isNaN(fieldVal)){
-          obj[fieldId] = parseFloat(fieldVal);
-        }
+  function encodeJSON(rData){
+    var newObj = {};
+
+    for(var key in rData){
+      var dType = typeof rData[key];
+      if (dType === 'string'){
+        newObj[key] = '"' + rData[key] + '"';
+      } else {
+        newObj[key] = angular.toJson(rData[key]);
       }
     }
 
-    return obj;
+    return newObj;
   }
+
+  function decodeJSON(rData){
+    var newObj = {};
+
+    // The doubled casting is to trim off angular stuff like the $$hashKey from properties
+    for(var key in angular.fromJson(angular.toJson(rData))){
+
+      var value = rData[key];
+
+      console.log(value);
+      // If the value is empty
+      if(value === '') {
+        newObj[key] = value;
+      // If it's a string
+      } else if (value[0] === '"' && value[value.length - 1] === '"') {
+        newObj[key] = value.substr(1, value.length - 2);
+      // If it's a numbers
+      } else if (!isNaN(value)) {
+        newObj[key] = parseFloat(value);
+      // If it's a boolean
+      } else if (value === 'true' || value === 'false') {
+        newObj[key] = (value === 'true');
+      // If it's null
+      } else if (value === 'null') {
+        newObj[key] = null;
+      } else {
+        newObj[key] = JSON.parse(value);
+      }
+    }
+
+    return newObj;
+  }
+
+  $scope.isValidJSON = function(input) {
+
+    var valid = true;
+    try {
+      // The function is false only in case of error
+      JSON.parse(input);
+    } catch(e) {
+      valid = false;
+    }
+
+    return valid;
+  };
 
   function loadCollectionList(callback) {
     $log.debug('Loading collection list');
