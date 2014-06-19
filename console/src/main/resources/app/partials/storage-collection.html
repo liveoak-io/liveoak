@@ -116,30 +116,38 @@
                   <button type="button" class="btn btn-default" ng-click="rowAdd()" ng-disabled="!(columns.length > 1)">Add Row</button>
 
                   <div class="dropdown">
-                    <button class="btn btn-default dropdown-toggle" type="button"
-                            ng-disabled="!((collectionId && (collectionData._members.length > 0)) || (columnsHidden.length > 0))">
+                    <button class="btn btn-default dropdown-toggle" type="button">
+                            <!--ng-disabled="!((collectionId && (collectionData._members.length > 0)) || (columnsHidden.length > 0))"-->
                       <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                      <li role="presentation">
+                        <a role="menuitem" tabindex="-1" ng-click="modalCollectionImport()">Import Data...</a>
+                      </li>
+                      <!--li role="presentation">
+                        <a role="menuitem" tabindex="-1" ng-click="modalCollectionExport()">Export Data to JSON</a>
+                      </li-->
+                      <li class="separator"
+                          ng-show="(columnsHidden.length > 0) || (collectionId && (collectionData.length > 0))"></li>
                       <li role="presentation">
                         <a role="menuitem" tabindex="-1" ng-click="columnsHidden = []"
                            ng-show="columnsHidden.length > 0">Show All Columns</a>
                       </li>
                       <li role="presentation">
                         <a role="menuitem" tabindex="-1" ng-click="modalDataDeleteAll()"
-                           ng-show="(collectionId && (collectionData._members.length > 0))">Delete All Data</a>
+                           ng-show="(collectionId && (collectionData.length > 0))">Delete All Data</a>
                       </li>
                     </ul>
                   </div>
                 </div>
               </th>
             </tr>
-            <tr ng-show="(!collectionData._members || collectionData._members.length < 1) && newRows.length < 1">
+            <tr ng-show="(!collectionData || collectionData.length < 1) && newRows.length < 1">
               <th>
                 Collection doesn't contain any items.
               </th>
             </tr>
-            <tr ng-show="columns.length > 1 && (collectionData._members.length > 0 || newRows.length > 0)">
+            <tr ng-show="columns.length > 1 && (collectionData.length > 0 || newRows.length > 0)">
               <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown caption row-{{column}}" ng-class="{'before-actions':$last}">
                 <button class="btn btn-link btn-icon btn-unhide btn-unhide-left" type="button"
                         ng-show="isNextHidden(column, true) && $first" ng-click="unhideNext(column, true)">
