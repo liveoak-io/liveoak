@@ -50,7 +50,7 @@ public class KeycloakServerApplication extends KeycloakApplication {
             consoleApp.addRedirectUri("/admin/");
             consoleApp.setBaseUrl("/admin/");
 
-            adminRealm.addScopeMapping(consoleApp, adminRealm.getRole("admin"));
+            consoleApp.addScopeMapping(adminRealm.getRole("admin"));
         }
 
         RealmModel appsRealm = manager.getRealm("liveoak-apps");
