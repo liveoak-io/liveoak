@@ -277,7 +277,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
     loadCollectionData($scope.collectionId, true);
 
-    LiveOak.connect(function () {
+    var connectCallback = function() {
       if ($scope.subscriptionId){
         $log.debug('Removing subscription "' + $scope.subscriptionId + '"');
         LiveOak.unsubscribe($scope.subscriptionId);
@@ -294,6 +294,14 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
         $log.debug('Subscribe id is: ' + $scope.subscriptionId);
       }
+    };
+
+    LiveOak.auth.updateToken(5).success(function() {
+      $log.debug("Valid token found. Issuing authenticated connect");
+      LiveOak.connect( "Bearer", LiveOak.auth.token, connectCallback);
+    }).error(function() {
+      $log.debug("Can't retrieve valid token. Issuing unauthenticated connect");
+      LiveOak.connect(connectCallback);
     });
   }
 
