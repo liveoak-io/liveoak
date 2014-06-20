@@ -241,7 +241,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
 
 });
 
-loMod.controller('AppSettingsCtrl', function($scope, $rootScope, $log, $route, $modal, currentApp, Notifications) {
+loMod.controller('AppSettingsCtrl', function($scope, $rootScope, $log, $route, $modal, currentApp) {
 
   $rootScope.curApp = currentApp;
 

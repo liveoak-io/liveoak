@@ -296,10 +296,10 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     };
 
     LiveOak.auth.updateToken(5).success(function() {
-      $log.debug("Valid token found. Issuing authenticated connect");
-      LiveOak.connect( "Bearer", LiveOak.auth.token, connectCallback);
+      $log.debug('Valid token found. Issuing authenticated connect');
+      LiveOak.connect('Bearer', LiveOak.auth.token, connectCallback);
     }).error(function() {
-      $log.debug("Can't retrieve valid token. Issuing unauthenticated connect");
+      $log.debug('Can\'t retrieve valid token. Issuing unauthenticated connect');
       LiveOak.connect(connectCallback);
     });
   }
