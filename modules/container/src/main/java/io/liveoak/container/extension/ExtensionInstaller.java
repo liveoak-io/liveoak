@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.common.util.StringPropertyReplacer;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.modules.Module;
@@ -16,6 +17,8 @@ import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StabilityMonitor;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ServiceLoader;
 
 /**
@@ -31,7 +34,9 @@ public class ExtensionInstaller {
 
     public void load(File extensionDesc) throws Exception {
         ObjectMapper mapper = ObjectMapperFactory.create();
-        ObjectNode fullConfig = (ObjectNode) mapper.readTree(extensionDesc);
+        // replace the properties before trying to read it as a json document
+        // eg "number: $someValue" is not a valid json object.
+        ObjectNode fullConfig = (ObjectNode) mapper.readTree(replaceProperties(extensionDesc));
         String id = extensionDesc.getName();
         if (id.endsWith(".json")) {
             id = id.substring(0, id.length() - 5);
@@ -83,6 +88,11 @@ public class ExtensionInstaller {
         }
         builder.install();
         monitor.awaitStability();
+    }
+
+    private String replaceProperties(File file) throws IOException{
+        String original =  new String(Files.readAllBytes(file.toPath()));
+        return StringPropertyReplacer.replaceProperties(original, System.getProperties());
     }
 
     private ServiceTarget target;
