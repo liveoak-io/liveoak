@@ -1,0 +1,47 @@
+<div>
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+      <span class="pficon pficon-close"></span>
+    </button>
+    <h4 class="modal-title">Import Data</h4>
+  </div>
+
+  <form class="horizontal-form" ng-init="setFormScope(this)" name="importForm" id="importForm">
+    <div class="modal-body clearfix">
+      <div class="form-group clearfix">
+        <label for="data-file" class="col-sm-4 control-label">Upload File</label>
+        <div class="col-sm-6">
+          <!-- Before upload file -->
+          <div class="button-input-file" ng-show="!inProgress">
+            <a href="#" class="btn btn-default"><i class="fa fa-upload"></i> Choose a JSON or CSV...</a>
+            <input type="file" class="input-file" ng-file-select="onFileSelect($files)">
+          </div>
+          <div ng-show="inProgress">
+            <i class="lo-color-success fa fa-spinner fa-spin" ng-show="progress < 1 && !isError"></i>
+            <i class="lo-color-success fa fa-check" ng-show="(progress === 1) && !isError"></i>
+            <i class="lo-color-error fa fa-warning" ng-show="isError"></i>
+            {{file.name}}
+          </div>
+          <!-- File being uploaded -->
+          <div class="hide">
+            <span class="spinner spinner-xs spinner-inline"></span>
+            <span class="uploaded-file">file_name.json</span>
+          </div>
+
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-4 control-label" for="removeAll">Import Mode</label>
+        <div class="col-sm-6">
+          <input type="checkbox" name="removeAll" ng-model="removeAll"> Remove all existing data</input>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default btn-lg" ng-click="cancel()">Cancel</button>
+      <button type="button" class="btn btn-default btn-lg btn-primary" ng-disabled="progress < 1"
+              ng-click="collectionImport(removeAll, jsonData); close()">Import</button>
+    </div>
+  </form>
+</div>

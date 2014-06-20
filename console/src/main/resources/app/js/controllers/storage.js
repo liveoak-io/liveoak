@@ -189,7 +189,6 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
   };
 
   $scope.modalStorageDelete = function(id){
-    console.log('opening model '+id);
     $scope.storageId = id;
 
     $modal.open({
@@ -297,10 +296,10 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     };
 
     LiveOak.auth.updateToken(5).success(function() {
-      $log.debug("Valid token found. Issuing authenticated connect");
-      LiveOak.connect( "Bearer", LiveOak.auth.token, connectCallback);
+      $log.debug('Valid token found. Issuing authenticated connect');
+      LiveOak.connect('Bearer', LiveOak.auth.token, connectCallback);
     }).error(function() {
-      $log.debug("Can't retrieve valid token. Issuing unauthenticated connect");
+      $log.debug('Can\'t retrieve valid token. Issuing unauthenticated connect');
       LiveOak.connect(connectCallback);
     });
   }
@@ -384,7 +383,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   };
 
   $scope.changeCollection = function() {
-    console.log('Selected: ' + $scope.collectionId);
     $location.path('/applications/'+currentApp.id+'/storage/'+$routeParams.storageId+'/browse/'+$scope.collectionId);
   };
 
@@ -408,7 +406,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     }, true
   );
 
-  var ModalInstanceCtrl = function ($scope, $modalInstance) {
+  var ModalInstanceCtrl = function ($scope, $modalInstance, FileReader, Notifications) {
 
     $scope.close = function () {
       $modalInstance.close();
@@ -420,6 +418,11 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
     $scope.setFormScope= function(scope){
       $scope.modalScope = scope;
+      $scope.modalScope.progress = 0;
+
+      $scope.modalScope.$on('fileProgress', function(e, progress) {
+        $scope.modalScope.progress = progress.loaded / progress.total;
+      });
     };
 
     $scope.checkColName = function (collectionName) {
@@ -430,6 +433,24 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       });
     };
 
+    $scope.getFile = function () {
+
+      $scope.modalScope.$apply(function(){
+        $scope.modalScope.progress = 0;
+        $scope.modalScope.inProgress = true;
+      });
+      FileReader.readAsDataUrl($scope.modalScope.file, $scope.modalScope)
+        .then(function(data) {
+          try {
+            $scope.jsonData = JSON.parse(data);
+            $scope.modalScope.progress = 1;
+          } catch (e){
+            Notifications.error('An error occured during the JSON parsing: ' + e);
+            $scope.modalScope.progress = 0;
+            $scope.modalScope.isError = true;
+          }
+        });
+    };
   };
 
   $scope.modalColumnAdd = function(){
@@ -443,6 +464,14 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   $scope.modalCollectionAdd = function(){
     $modal.open({
       templateUrl: '/admin/console/templates/modal/storage/collection-add.html',
+      controller: ModalInstanceCtrl,
+      scope: $scope
+    });
+  };
+
+  $scope.modalCollectionImport = function(){
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/storage/collection-import.html',
       controller: ModalInstanceCtrl,
       scope: $scope
     });
@@ -535,12 +564,13 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     if ($scope.columnNew !== '') {
       $scope.columns.push(columnName);
     }
-
+/*
+    // Commenting because the empty string is not the same as no value.
     for (var k in $scope.collectionData){
       var item = $scope.collectionData[k];
       item[columnName] = '';
     }
-
+*/
     $scope.isDataChange = true;
     $scope.isColumnChange = true;
   };
@@ -618,6 +648,26 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $scope.showAdvanced = false;
   };
 
+  $scope.collectionImport = function(removeAll, data) {
+
+    if (removeAll) {
+      $scope.collectionClear();
+    }
+
+    for(var i in data){
+      var row = data[i];
+
+      for (var j in row){
+        if (row.hasOwnProperty(j) && ($scope.columns.indexOf(j) === -1)) {
+          $scope.columnAdd(j);
+        }
+      }
+
+      $scope.newRows.push(encodeJSON(row));
+    }
+
+  };
+
   $scope.save = function(){
     $log.debug('Saving collection.');
 
@@ -627,7 +677,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
         var itemToClear = $scope.collectionDataBackup[j];
 
         LoCollectionItem.delete({appId: currentApp.id, storageId: $routeParams.storageId,
-          collectionId: $scope.collectionId, itemId: itemToClear.id});
+          collectionId: $scope.collectionId, itemId: itemToClear.id.substring(1,itemToClear.id.length-1)});
       }
     } else {
 
@@ -677,6 +727,11 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       }
 
       if (itemToSave.id) {
+        console.log('b');
+        console.log(itemFromBackup);
+        console.log('o');
+        console.log(itemToSave);
+
         $log.debug('Checking for update: ' + angular.toJson(itemToSave));
         if (itemFromBackup && !angular.equals(itemToSave, itemFromBackup)) {
 
@@ -793,7 +848,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
       var value = rData[key];
 
-      console.log(value);
       // If the value is empty
       if(value === '') {
         newObj[key] = value;
