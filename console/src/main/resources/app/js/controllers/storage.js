@@ -727,10 +727,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       }
 
       if (itemToSave.id) {
-        console.log('b');
-        console.log(itemFromBackup);
-        console.log('o');
-        console.log(itemToSave);
 
         $log.debug('Checking for update: ' + angular.toJson(itemToSave));
         if (itemFromBackup && !angular.equals(itemToSave, itemFromBackup)) {
