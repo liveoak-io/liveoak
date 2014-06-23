@@ -124,6 +124,10 @@
                       <li role="presentation">
                         <a role="menuitem" tabindex="-1" ng-click="modalCollectionImport()">Import Data...</a>
                       </li>
+                      <li role="presentation">
+                        <a role="menuitem" tabindex="-1" ng-href="{{urlExport}}" download="{{jsonName}}"
+                           ng-show="(collectionId && (collectionData.length > 0))">Export Data to JSON</a>
+                      </li>
                       <!--li role="presentation">
                         <a role="menuitem" tabindex="-1" ng-click="modalCollectionExport()">Export Data to JSON</a>
                       </li-->
