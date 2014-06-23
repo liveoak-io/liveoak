@@ -11,6 +11,10 @@ var loMod = angular.module('loApp', [
   'ui.bootstrap'
 ]);
 
+loMod.config(function($compileProvider){
+  $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|mailto|blob):/);
+});
+
 loMod.config(['$routeProvider', function($routeProvider) {
   $routeProvider
     .when('/', {

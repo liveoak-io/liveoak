@@ -211,7 +211,7 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
 
 loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $route, currentApp, $modal, Notifications,
                                                    currentCollectionList, LoCollection, $routeParams, LoCollectionItem,
-                                                   LiveOak, $location) {
+                                                   LiveOak, $location, $window) {
 
   $log.debug('StorageCollectionCtrl');
   $rootScope.curApp = currentApp;
@@ -394,6 +394,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       } else {
         $scope.isDataChange = false;
       }
+
+      updateExportUrl();
     }, true
   );
 
@@ -517,6 +519,27 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       Notifications.error('Failed to delete the collection "' + $scope.collectionId + '".');
     });
   };
+
+  function updateExportUrl(){
+    $log.debug('Updating export url');
+    var dataObj = angular.copy($scope.collectionData);
+    var dataExportObj = [];
+    for (var row in dataObj) {
+      if (dataObj[row].hasOwnProperty('id')){
+        delete dataObj[row].id;
+      }
+      if (dataObj[row].hasOwnProperty('self')){
+        delete dataObj[row].self;
+      }
+      dataExportObj.push(angular.toJson(decodeJSON(dataObj[row])));
+    }
+
+    var blob = new Blob( ['['+dataExportObj.toString()+']'], { type : 'text/plain' });
+    var urlCreator = $window.URL || $window.webkitURL || $window.mozURL || $window.msURL;
+
+    $scope.urlExport = urlCreator.createObjectURL( blob);
+    $scope.jsonName = $scope.collectionId + '_' + (new Date()).toISOString() + '.txt';
+  }
 
   $scope.rowAdd = function(){
     $log.debug('Creating new row ' + $scope.newRow);
