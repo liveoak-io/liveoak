@@ -1,0 +1,86 @@
+<lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="security" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
+
+<div class="col-md-10 lo-main-pane">
+  <div class="row">
+    <ul class="nav nav-tabs nav-tabs-pf">
+      <li><a href="#/applications/{{curApp.id}}/security">Policies</a></li>
+      <li><a href="#/applications/{{curApp.id}}/security/roles">Roles</a></li>
+      <li class="active"><a href="">Users</a></li>
+    </ul>
+    <div class="lo-content-area col-md-9">
+
+      <lo-breadcrumbs></lo-breadcrumbs>
+
+      <h2><span>{{curApp.name}}</span> Users</h2>
+      <div class="alert alert-info">
+        <span class="pficon pficon-info"></span>
+        <strong>This user <span ng-show="create">will</span> belong<span ng-hide="create">s</span> to all applications.</strong> Any changes made here will reflect in every application you have.
+      </div>
+
+      <!--<h4>{{userModel}}</h4>-->
+
+      <form class="lo-form-horizontal clearfix" name="userForm">
+        <fieldset>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="username">Username <span class="required">*</span></label>
+            <div class="col-sm-4">
+              <input class="form-control" type="text" id="username" name="username" ng-model="userModel.profile.username" ng-readonly="!create" lo-focused="create" required>
+              <!--<span class="help-block" ng-show="pushForm.pushUrl.$error.url">Not a valid URL.</span>-->
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="firstName">First Name</label>
+            <div class="col-sm-4">
+              <input class="form-control" type="text" id="firstName" name="firstName" ng-model="userModel.profile.firstName">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="lastName">Last Name</label>
+            <div class="col-sm-4">
+              <input class="form-control" type="text" id="lastName" name="lastName" ng-model="userModel.profile.lastName">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="email">Email</label>
+            <div class="col-sm-4">
+              <input class="form-control" type="email" id="email" name="email" ng-model="userModel.profile.email">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="access">Access the application</label>
+            <div class="col-sm-4">
+              <input class="form-control" type="checkbox" id="access" name="access" ng-model="userModel.profile.enabled">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="scope">Roles</label>
+            <div class="col-sm-4">
+              <select lo-select id="scope" ng-options="role.id as role.name for role in appRoles" ng-model="userModel.roles" multiple>
+              </select>
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="password">Password</label>
+            <div class="col-sm-4">
+              <div class="search-comp clearfix" style="width: 100%;">
+              <input class="form-control" type="{{inputType}}" id="password" name="password" ng-model="userModel.password">
+              <button class="btn btn-link btn-icon ng-scope" ng-click="changeInputType()" type="button" tooltip="Show/Hide Password" >
+                <i class="fa fa-eye" ng-show="inputType === 'password'"></i>
+                <i class="fa fa-eye-slash" ng-show="inputType === 'text'"></i>
+                <span>Show/Hide Password</span>
+              </button>
+              </div>
+            </div>
+            <span><a href="" ng-show="userModel.password" ng-click="modalResetPassword()">Reset Password</a></span>
+          </div>
+        </fieldset>
+
+        <div class="pull-right form-actions">
+          <button lo-button-clear="clear()" ng-disabled="!changed">Clear changes</button>
+          <button lo-button-save="save()" ng-disabled="!changed || !userForm.$valid">Save</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

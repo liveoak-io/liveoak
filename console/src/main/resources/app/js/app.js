@@ -105,6 +105,9 @@ loMod.config(['$routeProvider', function($routeProvider) {
       }
     })
     .when('/applications/:appId/security', {
+      redirectTo: '/applications/:appId/security/policies'
+    })
+    .when('/applications/:appId/security/policies', {
       templateUrl : '/admin/console/partials/security-list.html',
       controller : 'SecurityListCtrl',
       resolve: {
@@ -143,7 +146,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
       }
     })
     // .when('/applications/:appId/create-security', {
-    .when('/applications/:appId/security/:storageId/:collectionId', {
+    .when('/applications/:appId/security/policies/:storageId/:collectionId', {
       templateUrl : '/admin/console/partials/security-create.html',
       controller : 'SecurityCtrl',
       resolve: {
@@ -180,6 +183,61 @@ loMod.config(['$routeProvider', function($routeProvider) {
 //        aclPolicies: function(LoACLLoader) {
 //          return new LoACLLoader();
 //        }
+      }
+    })
+    .when('/applications/:appId/security/users', {
+      templateUrl : '/admin/console/partials/security-users.html',
+      controller : 'SecurityUsersCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader) {
+          return new LoAppLoader();
+        },
+        realmUsers: function(LoRealmUsers) {
+          return LoRealmUsers.query();
+        }
+      }
+    })
+    .when('/applications/:appId/security/users/:userId', {
+      templateUrl : '/admin/console/partials/security-user.html',
+      controller : 'SecurityUsersAddCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader) {
+          return new LoAppLoader();
+        },
+        userProfile: function(LoRealmUserLoader) {
+          return new LoRealmUserLoader();
+        },
+        userRoles: function(LoRealmUsers, $route) {
+          return LoRealmUsers.getRoles({appId: $route.current.params.appId, userId: $route.current.params.userId}).$promise.then(function(data) {
+              console.log(data);
+              return data;
+            },
+            function() {
+              return [];
+            }
+          );
+        },
+        appRoles: function(LoRealmAppRolesLoader) {
+          return new LoRealmAppRolesLoader();
+        }
+      }
+    })
+    .when('/applications/:appId/security/add-user', {
+      templateUrl : '/admin/console/partials/security-user.html',
+      controller : 'SecurityUsersAddCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader) {
+          return new LoAppLoader();
+        },
+        userProfile: function(LoRealmUsers) {
+          return new LoRealmUsers({enabled: true});
+        },
+        userRoles: function() {
+          return [];
+        },
+        appRoles: function(LoRealmAppRolesLoader) {
+          return new LoRealmAppRolesLoader();
+        }
       }
     })
     .when('/applications/:appId/application-settings', {
@@ -321,7 +379,7 @@ angular.element(document).ready(function () {
       });
       angular.bootstrap(document, ['loApp']);
   }).error(function() {
-      window.location.reload();
+    window.location.reload();
   });
 
   /* jshint ignore:end */
