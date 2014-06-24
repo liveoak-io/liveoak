@@ -2,16 +2,17 @@
 
 <div class="col-md-10 lo-main-pane">
   <div class="row">
+    <ul class="nav nav-tabs nav-tabs-pf">
+      <li class="active"><a href="">Policies</a></li>
+      <li><a href="#/applications/{{curApp.id}}/security/roles">Roles</a></li>
+      <li><a href="#/applications/{{curApp.id}}/security/users">Users</a></li>
+    </ul>
+
     <div class="lo-content-area col-md-9">
-      <ul class="nav nav-tabs nav-tabs-pf">
-        <li class="active"><a href="">Policies</a></li>
-        <li><a href="#/applications/{{curApp.id}}/security/roles">Roles</a></li>
-        <li class="disabled"><a href="">Users</a></li>
-      </ul>
 
       <lo-breadcrumbs></lo-breadcrumbs>
-      
-      <h2><span>{{curApp.name}}</span> Policies</h2>
+
+      <h2><span>{{curApp.name}}</span> Security Policies</h2>
 
       <!-- In case of no collections secured -->
       <div class="panel" ng-hide="securedColls.length > 0">
@@ -25,7 +26,7 @@
           
           <span ng-show="unsecuredColls.length > 0">
             <p>You have not yet secured any of the collections: <span ng-repeat="c in unsecuredColls"><a href="#/applications/{{curApp.name}}/storage/{{c.storage}}/browse/{{c.collection}}">{{c.collection}}</a>{{$last ? '' : ', '}}</span>.</p>
-            <a href="#/applications/{{curApp.id}}/security/{{unsecuredColls[0].storage}}/{{unsecuredColls[0].collection}}" class="btn btn-primary btn-lg" type="button">Secure a Collection</a>
+            <a href="#/applications/{{curApp.id}}/security/policies/{{unsecuredColls[0].storage}}/{{unsecuredColls[0].collection}}" class="btn btn-primary btn-lg" type="button">Secure a Collection</a>
           </span>
         </div>
       </div>
@@ -67,7 +68,7 @@
       <ul>
         <li ng-repeat="c in unsecuredColls">
           <a href="#/applications/{{curApp.name}}/storage/{{c.storage}}/browse/{{c.collection}}">{{c.collection}}</a>
-          <a class="btn-icon" href="#/applications/{{curApp.name}}/security/{{c.storage}}/{{c.collection}}" data-tooltip-placement="top" data-tooltip="Secure this Collection">
+          <a class="btn-icon" href="#/applications/{{curApp.name}}/security/policies/{{c.storage}}/{{c.collection}}" data-tooltip-placement="top" data-tooltip="Secure this Collection">
             <i class="fa fa-lock"></i>
             <span>Secure this Collection</span>
           </a>  

@@ -1,0 +1,63 @@
+<lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="security" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
+
+<div class="col-md-10 lo-main-pane">
+  <div class="row">
+    <ul class="nav nav-tabs nav-tabs-pf">
+      <li><a href="#/applications/{{curApp.id}}/security/policies">Policies</a></li>
+      <li><a href="#/applications/{{curApp.id}}/security/roles">Roles</a></li>
+      <li class="active"><a href="">Users</a></li>
+    </ul>
+    <div class="lo-content-area col-md-9">
+
+      <lo-breadcrumbs></lo-breadcrumbs>
+
+      <h2><span>{{curApp.name}}</span> Users</h2>
+      <div class="alert alert-info">
+        <span class="pficon pficon-info"></span>
+        <strong>These users belong to all applications.</strong> Any changes made here will reflect in every application you have.
+      </div>
+      <table class="datatable table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th colspan="5" class="table-actions">
+              <div class="search-comp clearfix" ng-hide="users.length === 0">
+                <input type="text" class="form-control search" ng-model="userQuery" placeholder="Search...">
+                <button class="btn btn-link btn-icon ng-scope" tooltip="Search" type="submit" disabled>
+                  <i class="fa fa-search"></i>
+                  <span>Search</span>
+                </button>
+              </div>
+              <div class="pull-right">
+                <a href="#/applications/{{curApp.id}}/security/add-user" class="btn btn-default">Add User</a>
+              </div>
+            </th>
+          </tr>
+          <tr ng-show="users.length === 0">
+            <th colspan="4">This realm has no users defined.</th>
+          </tr>
+          <tr ng-hide="users.length === 0">
+            <th>Username</th>
+            <th>Last Name</th>
+            <th>First Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="user in users | filter: userQuery">
+            <td><a href="#/applications/{{curApp.name}}/security/users/{{user.username}}">{{user.username}}</a> <i class="fa fa-ban pull-right clearfix" style="margin-top: 4px;" tooltip="Disabled" ng-hide="user.enabled"></i> </td>
+            <td>{{user.lastName}}</td>
+            <td>{{user.firstName}}</td>
+            <td>{{user.email}}</td>
+            <td class="actions">
+              <button class="btn btn-link btn-icon" tooltip="Delete User" ng-click="modalUserDelete(user.username)">
+                <i class="fa fa-trash-o"></i>
+                <span>Delete User</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -84,7 +84,7 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
   });
 
   $scope.$watch('currentCollection',  function(/*newVal*/) {
-    $location.path('applications/' + currentApp.id + '/security/' + $scope.currentCollection);
+    $location.path('applications/' + currentApp.id + '/security/policies/' + $scope.currentCollection);
   });
 
   var userPath = '/' + currentApp.id + '/' + $scope.currentCollection;
@@ -450,3 +450,223 @@ loMod.controller('SecurityRolesCtrl', function($scope, $rootScope, $log, $route,
   };
 });
 
+// -- Security Users -----------------------------------------------------------
+
+loMod.controller('SecurityUsersCtrl', function($scope, $rootScope, $log, $route, $modal, currentApp, realmUsers, Notifications, LoRealmUsers) {
+
+  $rootScope.curApp = currentApp;
+
+  $scope.breadcrumbs = [
+    {'label': 'Applications', 'href': '#/applications'},
+    {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
+    {'label': 'Users', 'href': '#/applications/' + currentApp.id + '/security/users'}
+  ];
+
+  $scope.users = realmUsers;
+
+  // Delete Application
+  $scope.modalUserDelete = function(userId) {
+    $scope.deleteUserId = userId;
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/security/user-delete.html',
+      controller: DeleteUserModalCtrl,
+      scope: $scope
+    }).result.then(function () {
+        $scope.users = realmUsers = LoRealmUsers.query();
+      });
+  };
+
+  var DeleteUserModalCtrl = function ($scope, $modalInstance, $log, LoRealmUsers) {
+
+    $scope.userDelete = function (userId) {
+      $log.debug('Deleting user: ' + userId);
+      LoRealmUsers.delete({userId: userId},
+        // success
+        function(/*value, responseHeaders*/) {
+          Notifications.success('The user "' + userId + '" has been deleted.');
+          $modalInstance.close();
+        },
+        // error
+        function (httpResponse) {
+          Notifications.httpError('Failed to delete the user "' + userId + '".', httpResponse);
+        }
+      );
+    };
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+
+  };
+
+});
+
+loMod.controller('SecurityUsersAddCtrl', function($scope, $rootScope, $log, $route, $location, $http, $modal, currentApp, userProfile, userRoles, appRoles, LoRealmUsers, Notifications) {
+
+  $rootScope.curApp = currentApp;
+
+  $scope.breadcrumbs = [
+    {'label': 'Applications', 'href': '#/applications'},
+    {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
+    {'label': 'Users', 'href': '#/applications/' + currentApp.id + '/security/users'},
+  ];
+
+  $scope.changed = false;
+  $scope.create = !userProfile.username;
+
+  if($scope.create) {
+    $scope.breadcrumbs.push({'label': 'Add User', 'href': '#/applications/' + currentApp.id + '/security/add-user'});
+  }
+  else {
+    $scope.breadcrumbs.push({'label': userProfile.username, 'href': '#/applications/' + currentApp.id + '/security/users/' + userProfile.username});
+  }
+
+  $scope.appRoles = appRoles;
+
+  var userModel = {
+    profile: userProfile,
+    roles: []
+  };
+
+  var userModelBackup = angular.copy(userModel);
+
+  angular.forEach(userRoles, function(role) {userModelBackup.roles.push(role.id);});
+  $scope.userModel = angular.copy(userModelBackup);
+
+  $scope.clear = function() {
+    $scope.userModel = angular.copy(userModelBackup);
+    $scope.changed = false;
+  };
+
+  $scope.$watch('userModel', function() {
+    $scope.changed = !angular.equals($scope.userModel, userModelBackup);
+  }, true);
+
+  $scope.inputType = 'password';
+  $scope.changeInputType = function() {
+    if ($scope.inputType === 'password') {
+      $scope.inputType = 'text';
+    }
+    else {
+      $scope.inputType = 'password';
+    }
+  };
+
+  var userSaveSuccess = function() {
+    $scope.changed = false;
+    userProfile = angular.copy($scope.userModel.profile);
+
+    $location.url('/applications/' + currentApp.name + '/security/users');
+    Notifications.success('The user "' + $scope.userModel.profile.username + '" has been ' + ($scope.create ? 'created' : 'updated') + '.');
+
+    // Set password
+    if ($scope.userModel.password) {
+      new LoRealmUsers({type: 'password', value: $scope.userModel.password}).$resetPassword({userId: $scope.userModel.profile.username},
+        function () {
+          Notifications.success('The password for the user "' + $scope.userModel.profile.username + '" was updated.');
+        },
+        function (httpResponse) {
+          Notifications.error('Failed to set the password for user "' + $scope.userModel.profile.username + '".', httpResponse);
+        }
+      );
+    }
+
+    var roleMappingsUrl = '/auth/admin/realms/liveoak-apps/users/' + $scope.userModel.profile.username + '/role-mappings/applications/' + currentApp.name;
+
+    var rolesData = [];
+    for(var i = 0; i < appRoles.length; i++) {
+      if($scope.userModel.roles.indexOf(appRoles[i].id) > -1) {
+        rolesData.push(appRoles[i]);
+      }
+    }
+
+    $http.delete(roleMappingsUrl, {data: appRoles, headers : {'content-type' : 'application/json'}}).then(
+      function() {
+        $http.post(roleMappingsUrl, rolesData).then(
+          function() {
+            Notifications.success('The roles for the user "' + $scope.userModel.profile.username + '" have been updated.');
+          },
+          function(httpResponse) {
+            Notifications.error('Failed to set the roles for user "' + $scope.userModel.profile.username + '".', httpResponse);
+          }
+        );
+      },
+      function(httpResponse) {
+        Notifications.error('Failed to clear the roles for user "' + $scope.userModel.profile.username + '".', httpResponse);
+      }
+    );
+    /*
+     // FIXME: It seems DELETE cannot have payload in ng-resource...
+     new LoRealmUsers(appRoles).$deleteRoles({appId: currentApp.name, userId: $scope.userModel.profile.username},
+     function() {
+     // FIXME: For some reason, using this is causing the [..] to be passed as JSON Object {..}
+     new LoRealmUsers($scope.userModel.roles).$addRoles({appId: currentApp.name, userId: $scope.userModel.profile.username},
+     function() {
+     Notifications.success('The roles for the user "' + $scope.userModel.profile.username + '" have been updated.');
+     },
+     function(httpResponse) {
+     Notifications.error('Failed to set the roles for user ' + $scope.userModel.profile.username + '.', httpResponse);
+     }
+     );
+     },
+     function(httpResponse) {
+     Notifications.error('Failed to clear the roles for user ' + $scope.userModel.profile.username + '.', httpResponse);
+     }
+     );
+     */
+  };
+
+  var userSaveFailure = function(httpResponse) {
+    Notifications.error('Failed to create the user ' + $scope.userModel.profile.username + '.', httpResponse);
+  };
+
+  $scope.save = function() {
+    console.log($scope.userModel);
+    if (!$scope.userModel.profile.username) {
+      Notifications.error('The "Username" field is required for user creation.');
+    }
+    else {
+      if ($scope.create) {
+        $scope.userModel.profile.$save({}, userSaveSuccess, userSaveFailure);
+      }
+      else {
+        $scope.userModel.profile.$update({userId: $scope.userModel.profile.username}, userSaveSuccess, userSaveFailure);
+      }
+    }
+  };
+
+  // Delete Application
+  $scope.modalResetPassword = function() {
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/security/password-reset.html',
+      controller: ResetPasswordModalCtrl,
+      scope: $scope
+    });
+  };
+
+  var ResetPasswordModalCtrl = function ($scope, $modalInstance, $log, $route, LoRealmUsers) {
+
+    $scope.userId = $route.current.params.userId;
+
+    $scope.userPasswordReset = function () {
+      $log.debug('Resetting password for user: ' + $scope.userId);
+      new LoRealmUsers({type: 'password', value: $scope.$parent.userModel.password}).$resetPassword({userId: $scope.userId},
+        function () {
+          Notifications.success('The password for the user "' + $scope.userId + '" was reset.');
+          delete $scope.$parent.userModel.password;
+          $modalInstance.close();
+        },
+        function (httpResponse) {
+          Notifications.error('Failed to reset the password for user "' + $scope.userId + '".', httpResponse);
+        }
+      );
+    };
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+
+  };
+
+
+});

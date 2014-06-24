@@ -508,3 +508,39 @@ loMod.factory('LoACLLoader', function(Loader, LoACL, $route) {
     };
   });
 });
+
+loMod.factory('LoRealmUsers', function($resource) {
+  return $resource('/auth/admin/realms/:realmId/users/:userId', {
+    realmId : 'liveoak-apps',
+    userId : '@userId'
+  }, {
+    resetPassword : {
+      method: 'PUT',
+      url: '/auth/admin/realms/:realmId/users/:userId/reset-password'
+    },
+    addRoles : {
+      method: 'POST',
+      url: '/auth/admin/realms/:realmId/users/:userId/role-mappings/applications/:appId'
+    },
+    deleteRoles : {
+      method: 'DELETE',
+      url: '/auth/admin/realms/:realmId/users/:userId/role-mappings/applications/:appId'
+    },
+    getRoles: {
+      method: 'GET',
+      url: '/auth/admin/realms/:realmId/users/:userId/role-mappings/applications/:appId/composite',
+      isArray: true
+    },
+    update: {
+      method: 'PUT'
+    }
+  });
+});
+
+loMod.factory('LoRealmUserLoader', function(Loader, LoRealmUsers, $route) {
+  return Loader.get(LoRealmUsers, function() {
+    return {
+      userId : $route.current.params.userId
+    };
+  });
+});
