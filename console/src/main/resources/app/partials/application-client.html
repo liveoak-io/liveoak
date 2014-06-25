@@ -88,7 +88,9 @@
         <div class="form-group clearfix">
           <label class="col-sm-2 control-label" for="scope">Scope</label>
           <div class="col-sm-4">
-            <select lo-select id="scope" ng-options="role.id as role.name for role in availableRoles" ng-model="settings.scopeMappings" multiple>
+            <select lo-select id="scope" ng-options="role.id as role.name for role in availableRoles" ng-model="settings.scopeMappings" ng-hide="availableRoles.length === 0" multiple>
+            </select>
+            <select lo-select id="scope-noroles" ng-options="role as role for role in noRoles" ng-model="noRoles" ng-show="availableRoles.length === 0" multiple disabled>
             </select>
           </div>
         </div>

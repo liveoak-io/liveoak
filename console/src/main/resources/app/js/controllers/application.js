@@ -390,6 +390,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
   };
 
   $scope.availableRoles = $filter('orderBy')(loRealmAppRoles, 'name');//loRealmRoles.concat(loRealmAppRoles);
+  $scope.noRoles = ['The application has no Roles'];
 
   $scope.settings = {
     name: $scope.appClient.name,
