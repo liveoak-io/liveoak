@@ -1,6 +1,6 @@
 <lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="security" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
 
-<div class="col-md-10 lo-main-pane">
+<div class="col-md-10 lo-main-pane security-user">
   <div class="row">
     <ul class="nav nav-tabs nav-tabs-pf">
       <li><a href="#/applications/{{curApp.id}}/security">Policies</a></li>
@@ -11,18 +11,24 @@
 
       <lo-breadcrumbs></lo-breadcrumbs>
 
-      <h2><span>{{curApp.name}}</span> Users</h2>
+      <h2 class="pull-left">Add User</h2>
+      <p class="subtitle" ng-show="create"><span class="required">*</span> Required fields</p>
       <div class="alert alert-info">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+          <span class="pficon pficon-close"></span>
+        </button>
         <span class="pficon pficon-info"></span>
         <strong>This user <span ng-show="create">will</span> belong<span ng-hide="create">s</span> to all applications.</strong> Any changes made here will reflect in every application you have.
       </div>
+      
+      <hr/>
 
       <!--<h4>{{userModel}}</h4>-->
 
       <form class="lo-form-horizontal clearfix" name="userForm">
         <fieldset>
           <div class="form-group clearfix">
-            <label class="col-sm-3 control-label" for="username">Username <span class="required">*</span></label>
+            <label class="col-sm-3 control-label" for="username">Username <span class="required" ng-show="create">*</span></label>
             <div class="col-sm-4">
               <input class="form-control" type="text" id="username" name="username" ng-model="userModel.profile.username" ng-readonly="!create" lo-focused="create" required>
               <!--<span class="help-block" ng-show="pushForm.pushUrl.$error.url">Not a valid URL.</span>-->
@@ -49,7 +55,16 @@
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="access">Access the application</label>
             <div class="col-sm-4">
-              <input class="form-control" type="checkbox" id="access" name="access" ng-model="userModel.profile.enabled">
+              <div class="onoffswitch">
+                <input type="checkbox" id="access" name="access" class="onoffswitch-checkbox" checked ng-model="userModel.profile.enabled">
+                <label class="onoffswitch-label" for="access">
+                  <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active ng-binding">ON</span>
+                    <span class="onoffswitch-inactive ng-binding">OFF</span></span>
+                  </span>
+                  <span class="onoffswitch-switch"></span>
+                </label>
+              </div>
             </div>
           </div>
           <div class="form-group clearfix">
@@ -65,8 +80,8 @@
               <div class="search-comp clearfix" style="width: 100%;">
               <input class="form-control" type="{{inputType}}" id="password" name="password" ng-model="userModel.password">
               <button class="btn btn-link btn-icon ng-scope" ng-click="changeInputType()" type="button" tooltip="Show/Hide Password" >
-                <i class="fa fa-eye" ng-show="inputType === 'password'"></i>
-                <i class="fa fa-eye-slash" ng-show="inputType === 'text'"></i>
+                <i class="fa fa-eye-slash" ng-show="inputType === 'password'"></i>
+                <i class="fa fa-eye" ng-show="inputType === 'text'"></i>
                 <span>Show/Hide Password</span>
               </button>
               </div>

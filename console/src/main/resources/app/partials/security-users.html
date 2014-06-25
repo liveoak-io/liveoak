@@ -1,6 +1,6 @@
 <lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="security" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
 
-<div class="col-md-10 lo-main-pane">
+<div class="col-md-10 lo-main-pane security-users">
   <div class="row">
     <ul class="nav nav-tabs nav-tabs-pf">
       <li><a href="#/applications/{{curApp.id}}/security/policies">Policies</a></li>
@@ -13,9 +13,13 @@
 
       <h2><span>{{curApp.name}}</span> Users</h2>
       <div class="alert alert-info">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+          <span class="pficon pficon-close"></span>
+        </button>
         <span class="pficon pficon-info"></span>
         <strong>These users belong to all applications.</strong> Any changes made here will reflect in every application you have.
       </div>
+      <hr/>
       <table class="datatable table table-striped table-bordered">
         <thead>
           <tr>
