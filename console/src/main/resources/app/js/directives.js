@@ -213,7 +213,6 @@ loDirectives.directive('loSelect', function($timeout) {
       element.selectpicker();
 
       ngModel.$render = function() {
-        element.val(ngModel.$viewValue || '');
         $timeout(function() {
           element.selectpicker('refresh');
         },0,false);
