@@ -93,8 +93,17 @@ loMod.config(['$routeProvider', function($routeProvider) {
         loRealmAppClient: function(LoRealmApp) {
           return new LoRealmApp();
         },
-        loRealmAppRoles: function(LoRealmAppRolesLoader) {
-          return new LoRealmAppRolesLoader();
+        loRealmAppRoles: function(LoRealmApp, LoRealmAppRolesLoader, $route) {
+          // FIXME: LIVEOAK-339 & 373 - Remove this once it's done properly on server-side
+          return LoRealmApp.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return new LoRealmAppRolesLoader();
+            },
+            function() {
+              // Lazily create the application if not present
+              return new LoRealmApp({'name': $route.current.params.appId, 'bearerOnly': true}).
+                $create({realmId: 'liveoak-apps'}).then(function(){ return new LoRealmAppRolesLoader();});
+            }
+          );
         },
         loRealmRoles: function(LoRealmRolesLoader){
           return new LoRealmRolesLoader();
