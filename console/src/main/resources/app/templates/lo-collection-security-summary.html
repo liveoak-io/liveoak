@@ -7,9 +7,9 @@
   </div>
   <div class="panel-body">
     <ul class="lo-app-opts">
-      <li><i class="fa fa-users"></i>{{ ($parent.uriPolicies | filter: {'uriPattern': '/'+app.id+'/'+storage+'/'+collection} | filter: {'uriPattern': '!/'+app.id+'/'+storage+'/'+collection+'/*'} | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
-      <li><i class="fa fa-plus"></i>{{ ($parent.uriPolicies | filter: {'uriPattern': '/'+app.id+'/'+storage+'/'+collection} | filter: {'uriPattern': '!/'+app.id+'/'+storage+'/'+collection+'/*'} | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
-      <li><i class="fa fa-unlock"></i>{{ ($parent.acl | filter: {'resourcePath': '/'+app.id+'/'+storage+'/'+collection})[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</a></li>
+      <li tooltip="Can Access"><i class="fa fa-users"></i>{{ ($parent.uriPolicies | filter: {'uriPattern': '/'+app.id+'/'+storage+'/'+collection} | filter: {'uriPattern': '!/'+app.id+'/'+storage+'/'+collection+'/*'} | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
+      <li tooltip="Can Create"><i class="fa fa-plus"></i>{{ ($parent.uriPolicies | filter: {'uriPattern': '/'+app.id+'/'+storage+'/'+collection} | filter: {'uriPattern': '!/'+app.id+'/'+storage+'/'+collection+'/*'} | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
+      <li tooltip="Entry Creator"><i class="fa fa-unlock"></i>{{ ($parent.acl | filter: {'resourcePath': '/'+app.id+'/'+storage+'/'+collection})[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</a></li>
     </ul>
   </div>
 </div>
