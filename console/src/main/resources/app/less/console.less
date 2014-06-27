@@ -389,6 +389,14 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
       }
     }
     
+    .pull-right a {
+      color: @c_gray;
+      
+      &:hover {
+        color: @c_greendark;
+      }
+    }
+    
     .edit {
       margin-left: 15px;
     }
@@ -404,12 +412,8 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
     
     .dropdown,
     .pull-right > a {
+      display: block;
       margin-top: 8px;
-      visibility: hidden;
-      
-      &.open {
-        visibility: visible;
-      }
       
       .dropdown-toggle {
 
@@ -428,12 +432,6 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
     + .panel-body {
       padding-top: 2px;
     }
-  }
-  
-  &:hover .dropdown,
-  &:hover .pull-right > a {
-    visibility: visible;
-    display: block;
   }
 
   .panel-body {
@@ -1360,6 +1358,11 @@ legend {
 
   tr:hover td.actions .btn {
     visibility: visible;
+  }
+  
+  td > i {
+    margin-top: 4px;
+    color: @c_graylight;
   }
 }
 

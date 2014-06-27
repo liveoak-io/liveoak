@@ -13,9 +13,6 @@
 
       <h2><span>{{curApp.name}}</span> Users</h2>
       <div class="alert alert-info">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
-          <span class="pficon pficon-close"></span>
-        </button>
         <span class="pficon pficon-info"></span>
         <strong>These users belong to all applications.</strong> Any changes made here will reflect in every application you have.
       </div>
@@ -49,7 +46,7 @@
         </thead>
         <tbody>
           <tr ng-repeat="user in users | filter: userQuery">
-            <td><a href="#/applications/{{curApp.name}}/security/users/{{user.username}}">{{user.username}}</a> <i class="fa fa-ban pull-right clearfix" style="margin-top: 4px;" tooltip="Disabled" ng-hide="user.enabled"></i> </td>
+            <td><a href="#/applications/{{curApp.name}}/security/users/{{user.username}}">{{user.username}}</a> <i class="fa fa-ban pull-right clearfix" tooltip="No Access" ng-hide="user.enabled"></i></td>
             <td>{{user.lastName}}</td>
             <td>{{user.firstName}}</td>
             <td>{{user.email}}</td>
