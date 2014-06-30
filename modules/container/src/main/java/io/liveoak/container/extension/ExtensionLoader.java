@@ -28,7 +28,7 @@ public class ExtensionLoader implements Service<Void> {
             context.asynchronous();
             new Thread(() -> {
                 try {
-                    File[] configs = this.configDir.listFiles();
+                    File[] configs = this.configDir.listFiles(configFile -> !configFile.getName().startsWith(".") && configFile.getName().endsWith(".json"));
                     for (File config : configs) {
                         try {
                             this.extensionInstaller.getValue().load(config);
