@@ -4,8 +4,6 @@
       <a ng-show="storage.hasCollections" ng-href="#/applications/{{loApp.id}}/storage/{{storage.path}}/browse">{{storage.path}}</a>
     </h2>
     <h2 ng-hide="storage.hasCollections" class="panel-title">{{storage.path}}</h2>
-    <a class="edit" href="#/applications/{{loApp.id}}/storage/{{storage.path}}"><i class="fa fa-wrench" data-tooltip-placement="top" data-tooltip="Edit Settings"></i><span class="hide">Edit Settings</span></a>
-    
     <div class="pull-right">
       <a href="" data-tooltip-placement="top" data-tooltip="Delete Storage" ng-click="loDelete({storageId: storage.path})"><i class="fa fa-trash-o"></i></a>
     </div>
@@ -13,10 +11,10 @@
 
   <div class="panel-body">
     <ul class="lo-app-opts">
-      <li><i class="fa fa-briefcase"></i>{{storage.provider}}</li>
-      <li><i class="fa fa-link"></i>/{{storage.path}}</li>
-      <li><i class="fa fa-desktop"></i>{{storage.host}}</li>
-      <li><i class="fa fa-thumb-tack"></i>{{storage.port}}</li>
+      <li><i class="fa fa-briefcase" tooltip="Storage resource"></i>{{storage.provider}}</li>
+      <li><i class="fa fa-link" tooltip="URL Path"></i>/{{storage.path}}</li>
+      <li><i class="fa fa-desktop" tooltip="Host"></i>{{storage.host}}</li>
+      <li><i class="fa fa-thumb-tack" tooltip="Port"></i>{{storage.port}}</li>
     </ul>
   </div>
 </div>

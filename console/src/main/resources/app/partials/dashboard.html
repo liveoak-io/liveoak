@@ -65,14 +65,6 @@
           </div>
           -->
           <div>
-            <span class="lo-label">Security Realm</span>
-            <span class="lo-field">{{auth.realm}}</span>
-            <!-- <button class="lo-icon-button" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy"><i class="fa fa-copy"></i><span>Copy</span></button> -->
-          </div>
-          <a href="#">View <strong>Security Settings</strong> »</a>
-        </section>
-        <section>
-          <div>
             <span class="lo-label">Storage</span>
             <ul>
               <li ng-repeat="storage in storageList"><span class="lo-field">{{storage}}</span></li>
@@ -84,19 +76,20 @@
         </section>
         <section>
           <div>
+            <span class="lo-label">Security Realm</span>
+            <span class="lo-field">{{auth.realm}}</span>
+            <!-- <button class="lo-icon-button" data-toggle="tooltip" data-placement="bottom" data-original-title="Copy"><i class="fa fa-copy"></i><span>Copy</span></button> -->
+          </div>
+          <a href="#/applications/{{curApp.id}}/security/policies">View <strong>Security Settings</strong> »</a>
+        </section>
+        <section>
+          <div>
             <span class="lo-label">Push Notifications</span>
             <span class="lo-field">{{pushConfig.upsURL ? 'Set up' : 'Not set up'}}</span>
           </div>
           <a href="#/applications/{{curApp.id}}/push" ng-show="pushConfig.upsURL">View <strong>Push Settings</strong> »</a>
           <a href="#/applications/{{curApp.id}}/push" ng-hide="pushConfig.upsURL">Set up <strong>Push</strong> »</a>
         </section>
-        <section>
-          <a href="#/applications/{{curApp.id}}/application-settings">Edit <strong>Settings</strong> »</a>
-        </section>
-        <section>
-          <a href="#/applications/{{curApp.id}}/application-clients">Edit <strong>Clients</strong> »</a>
-        </section>
-        
       </section>
     </div>
   </div>

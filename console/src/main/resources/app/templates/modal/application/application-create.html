@@ -103,11 +103,11 @@
 
   <div class="modal-footer">
     <!-- First Step -->
-    <button type="button" class="btn btn-default btn-lg" ng-show="setupStep == 1" ng-click="cancel()">Cancel</button>
-    <button type="button" class="btn btn-default btn-lg" ng-show="setupStep > 1" ng-click="prevStep()"><i class="fa fa-angle-left"></i> Previous</button>
-    <button type="button" class="btn btn-primary btn-lg" ng-show="setupType == 'basic' && setupStep < setupSteps" ng-click="nextStep()" ng-disabled="!stepValid()">Next <i class="fa fa-angle-right"></i></button>
+    <button type="button" class="btn btn-default" ng-show="setupStep == 1" ng-click="cancel()">Cancel</button>
+    <button type="button" class="btn btn-default" ng-show="setupStep > 1" ng-click="prevStep()"><i class="fa fa-angle-left"></i> Previous</button>
+    <button type="button" class="btn btn-primary" ng-show="setupType == 'basic' && setupStep < setupSteps" ng-click="nextStep()" ng-disabled="!stepValid()">Next <i class="fa fa-angle-right"></i></button>
     <!-- Last Step -->
-    <button type="button" class="btn btn-primary btn-lg" ng-show="setupStep == setupSteps || setupType == 'diy'" ng-click="create()" ng-disabled="!stepValid()" data-dismiss="modal">Create Application</button>
+    <button type="button" class="btn btn-primary" ng-show="setupStep == setupSteps || setupType == 'diy'" ng-click="create()" ng-disabled="!stepValid()" data-dismiss="modal">Create Application</button>
   </div>
 
   <!-- Only for Basic -->

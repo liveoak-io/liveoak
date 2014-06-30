@@ -42,8 +42,6 @@
   background: #61b272 url("../img/login-bg-flat.png") center center no-repeat;
 }
 
-
-
 #kc-header-wrapper {
 	margin-bottom: 10px;
 	line-height: 1.3em;
@@ -122,3 +120,13 @@
   }
 }
 
+@media (min-width: 1200px) {
+  
+  .login-pf form .col-lg-3 {
+    width: 30%;
+  }
+  
+  .login-pf form .col-lg-9 {
+    width: 70%;
+  }  
+}
