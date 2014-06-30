@@ -95,7 +95,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
         },
         loRealmAppRoles: function(LoRealmApp, LoRealmAppRolesLoader, $route) {
           // FIXME: LIVEOAK-339 & 373 - Remove this once it's done properly on server-side
-          return LoRealmApp.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+          return LoRealmApp.get({appId: $route.current.params.appId}).$promise.then(function() {
               return new LoRealmAppRolesLoader();
             },
             function() {

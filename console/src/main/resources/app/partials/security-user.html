@@ -11,8 +11,8 @@
 
       <lo-breadcrumbs></lo-breadcrumbs>
 
-      <!-- <h2 class="pull-left">Add User</h2> -->
-      <h2 class="pull-left">username<span>'s Attributes</span></h2>
+      <h2 class="pull-left" ng-show="create">Add User</h2>
+      <h2 class="pull-left" ng-hide="create">{{userModel.profile.username}}<span>'s Attributes</span></h2>
       
       <p class="subtitle" ng-show="create"><span class="required">*</span> Required fields</p>
       <div class="alert alert-info">
@@ -75,9 +75,12 @@
           </div>
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="password">Password</label>
-            <div class="col-sm-4">
+            <div class="col-sm-4" ng-show="!create && !resetPassword">
+              <span><a style="vertical-align: sub;" href="" ng-click="resetPassword = true">Reset Password</a></span>
+            </div>
+            <div class="col-sm-4" ng-show="create || resetPassword">
               <div class="search-comp clearfix" style="width: 100%;">
-              <input class="form-control" type="{{inputType}}" id="password" name="password" ng-model="userModel.password">
+              <input class="form-control" type="{{inputType}}" id="password" name="password" ng-model="userModel.password" lo-focused="resetPassword">
               <button class="btn btn-link btn-icon ng-scope" ng-click="changeInputType()" type="button" tooltip="Show/Hide Password" >
                 <i class="fa fa-eye-slash" ng-show="inputType === 'password'"></i>
                 <i class="fa fa-eye" ng-show="inputType === 'text'"></i>
@@ -85,7 +88,6 @@
               </button>
               </div>
             </div>
-            <span><a href="" ng-show="userModel.password" ng-click="modalResetPassword()">Reset Password</a></span>
           </div>
         </fieldset>
 

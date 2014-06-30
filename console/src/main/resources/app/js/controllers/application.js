@@ -235,7 +235,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
 
   // We keep this at parent scope so it doesn't go away with [accidental] modal close
   $scope.setupType = 'basic'; // setup type: basic or diy
-  $scope.storagePath = '';
+  $scope.storagePath = 'storage';
   $scope.appModel = {
   };
 
