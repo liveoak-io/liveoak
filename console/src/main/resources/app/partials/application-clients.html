@@ -1,57 +1,27 @@
-<div class="row">
-  <ul class="nav nav-tabs nav-tabs-pf">
-    <li><a href="#/applications/{{curApp.id}}/application-settings">General Settings</a></li>
-    <li class="active"><a href="">Clients</a></li>
-  </ul>
-  <div class="lo-content-area col-md-12">
-    <lo-breadcrumbs></lo-breadcrumbs>
-    <h2><span>{{curApp.name}}</span> Clients</h2>
+<lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="clients" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
 
-    <div class="lo-page-info clearfix">
-      <p ng-show="appClients"><span class="lo-emph">You have</span> <strong>{{ appClients.length }}</strong> client(s).</p>
-      <div class="pull-right" ng-show="appClients">
-        <a class="btn btn-primary btn-lg" href="#/applications/{{curApp.id}}/create-client">Add Client</a>
-      </div>
-    </div>
-
-    <div class="panel" ng-hide="appClients">
-      <div class="panel-body text-center empty-instance">
-        <i class="fa fa-globe"></i>
-        <p>This application currently has no clients configured.</p>
-        <a class="btn btn-primary btn-lg" href="#/applications/{{curApp.id}}/create-client">Add Client</a>
-      </div>
-    </div>
-
-    <lo-client-summary ng-repeat="client in appClients" lo-app="curApp" lo-client="client" created="createdId"></lo-client-summary>
-  </div>
-</div>
-
-<!-- Add Platform Modal -->
-<div class="modal fade" id="add-platform" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-          <span class="pficon pficon-close"></span>
-        </button>
-        <h4 class="modal-title">Add Platform</h4>
-      </div>
-      <form class="horizontal-form">
-        <div class="modal-body">
-          <fieldset>
-            <div class="form-group clearfix">
-              <label for="pfname" class="col-sm-3 control-label">Platform Name <span class="required">*</span></label>
-              <div class="col-sm-7">
-                <input type="text" class="form-control" id="pfname">
-              </div>
-            </div>
-          </fieldset>
+<div class="col-md-9 lo-main-pane">
+  <div class="row">
+    <div class="lo-content-area col-md-12">
+      <lo-breadcrumbs></lo-breadcrumbs>
+      <h2><span>{{curApp.name}}</span> Clients</h2>
+  
+      <div class="lo-page-info clearfix">
+        <p ng-show="appClients"><span class="lo-emph">You have</span> <strong>{{ appClients.length }}</strong> client(s).</p>
+        <div class="pull-right" ng-show="appClients">
+          <a class="btn btn-primary btn-lg" href="#/applications/{{curApp.id}}/create-client">Add Client</a>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Add</button>
+      </div>
+  
+      <div class="panel" ng-hide="appClients">
+        <div class="panel-body text-center empty-instance">
+          <i class="fa fa-globe"></i>
+          <p>This application currently has no clients configured.</p>
+          <a class="btn btn-primary btn-lg" href="#/applications/{{curApp.id}}/create-client">Add Client</a>
         </div>
-      </form>
+      </div>
+  
+      <lo-client-summary ng-repeat="client in appClients" lo-app="curApp" lo-client="client" created="createdId"></lo-client-summary>
     </div>
   </div>
 </div>

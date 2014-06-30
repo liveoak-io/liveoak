@@ -1,8 +1,6 @@
 <div class="panel lo-panel-app" ng-class="{'animated flipInY': created == app.id}">
   <div class="panel-heading">
     <h3 class="panel-title"><a href="#/applications/{{app.id}}">{{app.name}}</a></h3>
-    <a class="edit" href="#/applications/{{app.id}}/application-settings"><i class="fa fa-wrench" data-tooltip-placement="top" data-tooltip="Edit Settings"></i><span class="hide">Edit Settings</span></a>
-
     <!--
     <div class="pull-right" >
       <a href ng-click="$parent.modalApplicationDelete(app.id)"><i class="fa fa-trash-o" data-tooltip-placement="top" data-tooltip="Delete App"></i></a>
@@ -12,11 +10,11 @@
   <div class="panel-body">
     <ul class="lo-app-opts">
       <!--<li ng-repeat="s in app.storage._members" ng-show="s.MongoClientOptions"><a href="#/applications/{{app.id}}/storage/{{s.id}}/browse"><i class="fa fa-briefcase"></i>{{app.mongo_storages}} Mongo DB</a></li>-->
-      <li ng-show="app.mongoStorages > 0"><a href="#/applications/{{app.id}}/storage/"><i class="fa fa-cloud"></i>{{app.mongoStorages}} mongoDB</a></li>
-      <li ng-show="app.mongoStorages <= 0" class="empty"><a href="#/applications/{{app.id}}/storage/"><i class="fa fa-cloud"></i>No Storage</a></li>
-      <li ng-show="app.push.upsURL"><a href="#/applications/{{app.id}}/push"><i class="fa fa-mobile"></i>Push set up</a></li>
-      <li ng-hide="app.push.upsURL" class="empty"><a href="#/applications/{{app.id}}/push"><i class="fa fa-mobile"></i>No Push set up</a></li>
-      <li ng-show="true"><a href="#/applications/{{app.id}}/security"><i class="fa fa-lock"></i>Secured by {{$parent.auth.realm}}</a></li>
+      <li ng-show="app.mongoStorages > 0"><a href="#/applications/{{app.id}}/storage/"><i class="fa fa-cloud" tooltip="Storage databases"></i>{{app.mongoStorages}} mongoDB</a></li>
+      <li ng-show="app.mongoStorages <= 0" class="empty"><a href="#/applications/{{app.id}}/storage/"><i class="fa fa-cloud" tooltip="Storage databases"></i>No Storage</a></li>
+      <li ng-show="true"><a href="#/applications/{{app.id}}/security"><i class="fa fa-lock" tooltip="Security"></i>Secured by {{$parent.auth.realm}}</a></li>
+      <li ng-show="app.push.upsURL"><a href="#/applications/{{app.id}}/push"><i class="fa fa-mobile" tooltip="Push"></i>Push set up</a></li>
+      <li ng-hide="app.push.upsURL" class="empty"><a href="#/applications/{{app.id}}/push"><i class="fa fa-mobile" tooltip="Push"></i>No Push set up</a></li>
     </ul>
   </div>
 </div>

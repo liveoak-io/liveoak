@@ -365,6 +365,12 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   color: @c_green;
 } 
 
+.nav-tabs > li.active > a, 
+.nav-tabs > li.active > a:hover, 
+.nav-tabs > li.active > a:focus {
+  cursor: pointer;
+}
+
 
 /* Panel */
 .panel {
@@ -691,6 +697,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   i {
     float: left;
     color: @c_graylight;
+    font-size: 3.5em;
   }
   
   p, a {
@@ -887,12 +894,14 @@ p.form-info {
     right: 0;
     width: 300px;
   }
+  
+  .btn {
+    margin-left: 0;
+  }
 }
 
 .uploaded-file {
-  float: left;
   font-weight: bold;
-  margin-right: 10px;
   padding-top: 4px;
   line-height: 1.4em;
 }
@@ -903,6 +912,10 @@ p.form-info {
 
 .lo-color-error {
   color: @c_red;
+}
+
+label + div > label {
+  margin-top: 3px;
 }
 
 
@@ -1778,6 +1791,7 @@ legend {
 
     span .btn-icon {
       margin-left: 5px;
+      margin-top: -7px;
     }
   }
 
