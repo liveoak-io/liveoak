@@ -107,7 +107,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
           },
           // error
           function(httpResponse) {
-            Notifications.httpError('Failed to create the storage"' + data.id + '".', httpResponse);
+            Notifications.httpError('Failed to create the storage "' + data.id + '".', httpResponse);
           });
       }
       // Update the storage resource
@@ -166,7 +166,7 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
 
       if (resource.hasOwnProperty('db')) {
         $scope.resources.push({
-          provider: 'Mongo DB',
+          provider: 'mongoDB',
           path: resource.id,
           host: resource.servers[0].host,
           port: resource.servers[0].port,
