@@ -85,7 +85,7 @@
         <section>
           <div>
             <span class="lo-label">Push Notifications</span>
-            <span class="lo-field">{{pushConfig.upsURL ? 'Set up' : 'Not set up'}}</span>
+            <span class="lo-field">{{pushConfig.upsURL ? pushConfig.applicationId : 'Not set up'}}</span>
           </div>
           <a href="#/applications/{{curApp.id}}/push" ng-show="pushConfig.upsURL">View <strong>Push Settings</strong> »</a>
           <a href="#/applications/{{curApp.id}}/push" ng-hide="pushConfig.upsURL">Set up <strong>Push</strong> »</a>

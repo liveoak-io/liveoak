@@ -1,6 +1,6 @@
 <lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="clients" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
 
-<div class="col-md-9 lo-main-pane next-steps">
+<div class="col-md-9 lo-main-pane application-client">
 
   <div class="row">
     <div class="lo-content-area col-md-12">
@@ -52,7 +52,7 @@
               </div>
             </div>
             <div class="col-sm-4">
-              <div class="col-sm-12" style="padding: 0;">
+              <div class="col-sm-12">
                 <div  ng-class="{'input-group': newRedirectUri.length > 0}">
                   <input class="form-control" type="text" id="newRedirectUri" name="newRedirectUri" ng-model="newRedirectUri" placeholder="New redirect URI..."/>
                   <div class="input-group-btn" ng-show="newRedirectUri.length > 0">
@@ -75,7 +75,7 @@
               </div>
             </div>
             <div class="col-sm-4">
-              <div class="col-sm-12" style="padding: 0;">
+              <div class="col-sm-12">
                 <div  ng-class="{'input-group': newWebOrigin.length > 0}">
                   <input class="form-control" type="text" id="newWebOrigin" name="newWebOrigin" ng-model="newWebOrigin" placeholder="New Web Origin..."/>
                   <div class="input-group-btn" ng-show="newWebOrigin.length > 0">
