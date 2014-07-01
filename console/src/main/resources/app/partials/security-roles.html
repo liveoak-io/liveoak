@@ -27,38 +27,36 @@
                 </div>
               </th>
             </tr>
-            <tr ng-show="settings.roles.concat(settings.newRoles).length > 0">
+            <tr ng-show="settings.roles.length > 0">
               <th>Name</th>
               <th>Description</th>
               <th class="actions">Default</th>
               <th class="actions">Actions</th>
             </tr>
-            <tr ng-show="settings.roles.concat(settings.newRoles).length === 0">
+            <tr ng-show="settings.roles.length === 0">
               <th colspan="4">No Applications Roles defined.</th>
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="role in settings.roles.concat(settings.newRoles)" ng-class="{deleted: (settings.deletedRoles.indexOf(role) > -1)}">
+            <tr ng-repeat="role in settings.roles">
               <td><span>{{ role.name }}</span></td>
               <td><span>{{ role.description }}</span></td>
               <td class="actions"><i class="fa fa-check clickable lo-checkbox" ng-class="{selected: (settings.defaultRoles.indexOf(role.name) > -1)}" ng-click="toggleDefaultRole(role.name)" tooltip="Toggle Default Role"></i></td>
               <td class="actions">
-                <button class="btn btn-link btn-icon" data-tooltip-placement="top" data-tooltip="Delete Role" ng-click="toggleDeletedRole(role)" ng-hide="(settings.deletedRoles | filter: role.name).length > 0">
+                <button class="btn btn-link btn-icon" data-tooltip-placement="top" data-tooltip="Delete Role" ng-click="modalDeleteRole(role)">
                   <i class="fa fa-trash-o"></i>
                   <span>Delete Role</span>
-                </button>
-                <button class="btn btn-link btn-icon" data-tooltip-placement="top" data-tooltip="Restore Role" ng-click="toggleDeletedRole(role)" ng-show="(settings.deletedRoles | filter: role.name).length > 0">
-                  <i class="fa fa-undo"></i>
-                  <span>Restore Role</span>
                 </button>
               </td>
             </tr>
             </tbody>
           </table>
+          <!--
           <div class="pull-right form-actions">
             <button class="btn btn-default btn-lg" ng-disabled="!changed" type="button" ng-click="clear()">Clear changes</button>
             <button class="btn btn-primary btn-lg" ng-disabled="!changed" type="submit" ng-click="save()">Save</button>
           </div>
+          -->
         </fieldset>
       </form>
     </div>

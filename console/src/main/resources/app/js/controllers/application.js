@@ -241,44 +241,6 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
 
 });
 
-loMod.controller('AppSettingsCtrl', function($scope, $rootScope, $log, $route, $modal, currentApp) {
-
-  $rootScope.curApp = currentApp;
-
-  $scope.breadcrumbs = [
-    {'label': 'Applications',  'href':'#/applications'},
-    {'label': currentApp.name, 'href':'#/applications/' + currentApp.id},
-    {'label': 'Settings',      'href':'#/applications/' + currentApp.id + '/application-settings'}
-  ];
-
-  var settingsBackup = {};
-  var resetEnv = function() {
-    $scope.settings = {
-      name: currentApp.name
-    };
-    settingsBackup = angular.copy($scope.settings);
-  };
-
-  resetEnv();
-
-  $scope.$watch('settings', function() {
-    $scope.changed = !angular.equals($scope.settings, settingsBackup);
-  }, true);
-
-  $scope.clear = function() {
-    $scope.settings = angular.copy(settingsBackup);
-    $scope.changed = false;
-  };
-
-  $scope.save = function() {
-    // FIXME: Check this once REST works for renaming
-    if(currentApp.name !== $scope.settings.name) {
-      currentApp.name = $scope.settings.name;
-      currentApp.$save();
-    }
-  };
-});
-
 loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal, Notifications, LoRealmApp, LoRealmAppClientScopeMapping, currentApp, loRealmAppClients) {
 
   $rootScope.curApp = currentApp;
