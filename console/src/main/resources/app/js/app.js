@@ -58,12 +58,14 @@ loMod.config(['$routeProvider', function($routeProvider) {
           return new LoAppLoader();
         },
         // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
-        loRealmApp : function(LoRealmApp, $route, $location) {
+        loRealmApp: function(LoRealmApp, $route) {
           return LoRealmApp.get({appId: $route.current.params.appId}).$promise.then(function(data) {
               return data;
             },
             function() {
-              $location.path('/applications/' + $route.current.params.appId + '/application-settings');
+              // Lazily create the application if not present
+              return new LoRealmApp({'name': $route.current.params.appId, 'bearerOnly': true}).
+                $create({realmId: 'liveoak-apps'}).then(function(data){ return data;});
             }
           );
         },
@@ -72,14 +74,28 @@ loMod.config(['$routeProvider', function($routeProvider) {
             return data;
           });
         },
-        loRealmAppRoles: function(LoRealmAppRolesLoader) {
-          return new LoRealmAppRolesLoader();
+        loRealmAppRoles: function(LoRealmAppRoles, $route) {
+          // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
+          return LoRealmAppRoles.query({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return [];
+            }
+          );
         },
         loRealmRoles: function(LoRealmRolesLoader){
           return new LoRealmRolesLoader();
         },
-        scopeMappings: function(LoRealmAppClientScopeMappingLoader){
-          return new LoRealmAppClientScopeMappingLoader();
+        scopeMappings: function(LoRealmAppClientScopeMapping, $route){
+          // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
+          return LoRealmAppClientScopeMapping.query({appId: $route.current.params.appId, clientId: $route.current.params.clientId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return [];
+            }
+          );
         }
       }
     })
@@ -246,15 +262,6 @@ loMod.config(['$routeProvider', function($routeProvider) {
         },
         appRoles: function(LoRealmAppRolesLoader) {
           return new LoRealmAppRolesLoader();
-        }
-      }
-    })
-    .when('/applications/:appId/application-settings', {
-      templateUrl : '/admin/console/partials/application-settings.html',
-      controller : 'AppSettingsCtrl',
-      resolve: {
-        currentApp: function(LoAppLoader) {
-          return new LoAppLoader();
         }
       }
     })
