@@ -1,5 +1,7 @@
 package io.liveoak.pgsql;
 
+import java.sql.Connection;
+
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.DefaultRootResource;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -9,8 +11,15 @@ import io.liveoak.spi.resource.async.PropertySink;
  */
 public class PgSqlRootResource extends DefaultRootResource {
 
+    private final PgSqlRootConfigResource configResource;
+
     public PgSqlRootResource(String id) {
         super(id);
+        configResource = new PgSqlRootConfigResource(id);
+    }
+
+    public PgSqlRootConfigResource configuration() {
+        return configResource;
     }
 
     @Override
