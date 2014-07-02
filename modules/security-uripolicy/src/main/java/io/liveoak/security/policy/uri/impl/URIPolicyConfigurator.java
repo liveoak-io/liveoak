@@ -26,7 +26,7 @@ public class URIPolicyConfigurator {
         }
 
         policy.setRulesTree(this.rulesTree);
-        log.info("URIPolicy configuration updated successfully");
+        log.debug("URIPolicy configuration updated successfully");
     }
 
     protected void addURIPolicyRule(ResourcePath resourcePath, Collection<String> requestTypes, Collection<String> allowedRoles, Collection<String> deniedRoles,

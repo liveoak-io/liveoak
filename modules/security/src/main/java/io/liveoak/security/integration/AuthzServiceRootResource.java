@@ -36,7 +36,7 @@ public class AuthzServiceRootResource implements RootResource {
 
     public void setConfig(AuthzServiceConfig config) {
         this.config.set(config);
-        log.info("Security configuration updated: " + config);
+        log.debug("Security configuration updated: " + config);
     }
 
     public AuthzServiceConfig getConfig() {

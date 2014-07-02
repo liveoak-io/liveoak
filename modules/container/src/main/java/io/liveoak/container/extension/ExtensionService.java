@@ -42,7 +42,7 @@ public class ExtensionService implements Service<Extension> {
         } catch (Exception e) {
             throw new StartException(e);
         }
-        log.info("** Extension activated: " + this.id);
+        log.debug("** Extension activated: " + this.id);
     }
 
     @Override

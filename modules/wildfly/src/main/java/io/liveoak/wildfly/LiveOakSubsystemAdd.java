@@ -69,8 +69,8 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
             }
         }, OperationContext.Stage.RUNTIME);
 
-        log.debug("BOOT MODEL: " + model);
-        log.debug("BOOT OP: " + operation);
+        log.trace("BOOT MODEL: " + model);
+        log.trace("BOOT OP: " + operation);
 
 
         String propVal = System.getProperty(LIVEOAK_HOME_PROPERTY);
@@ -97,7 +97,7 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 .addDependency(LIVEOAK_HOME, String.class, mongo.liveoakDirInjector())
                 .install();
 
-        log.info("installed mongo auto-setup");
+        log.debug("installed mongo auto-setup");
 
         String socketBinding = model.get("socket-binding").asString();
 

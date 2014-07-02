@@ -135,7 +135,7 @@ public class MongoInstaller {
         boolean skipDownload = false;
         if (matches.length == 1) {
             if (matches[0].isDirectory()) {
-                log.info("MongoDB already installed at: " + matches[0].getAbsolutePath());
+                log.debug("MongoDB already installed at: " + matches[0].getAbsolutePath());
                 skipDownload = true;
             } else {
                 throw new RuntimeException("Installation can't continue. Please remove the file: " + matches[0].getAbsolutePath());
