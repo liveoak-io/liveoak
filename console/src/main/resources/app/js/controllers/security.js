@@ -300,6 +300,15 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
     );
   };
 
+  $scope.toggleItem = function(item, array) {
+    var found = $.inArray(item, array);
+    if (found >= 0) {
+      array.splice(found, 1);
+    }
+    else {
+      array.push(item);
+    }
+  }
 });
 
 // -- Security Roles -----------------------------------------------------------
