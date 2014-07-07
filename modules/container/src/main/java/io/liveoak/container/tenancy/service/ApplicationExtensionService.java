@@ -72,6 +72,10 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
 
         try {
             this.extensionInjector.getValue().extend(extensionContext);
+
+            if (this.appExtension.exception() != null) {
+                throw this.appExtension.exception();
+            }
         } catch (Exception e) {
             throw new StartException(e);
         }

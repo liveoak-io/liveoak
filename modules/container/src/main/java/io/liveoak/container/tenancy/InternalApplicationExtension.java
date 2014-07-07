@@ -101,6 +101,7 @@ public class InternalApplicationExtension implements Consumer<Exception> {
     @Override
     public void accept(Exception e) {
         this.exception = e;
+        log.error("Exception during application initialization (/" + app.id() + "/" + resourceId + "): ", e);
     }
 
     public Exception exception() {
