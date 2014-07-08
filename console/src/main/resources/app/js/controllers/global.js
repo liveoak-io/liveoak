@@ -61,3 +61,7 @@ angular.module('loApp.controllers').controller('AppDropdownCtrl', function($root
     $rootScope.applications = $filter('filter')(data._members, {'visible': true});
   });
 });
+
+loMod.controller('ErrorCtrl', function() {
+  window.location.href = '/admin/console/error.html';
+});

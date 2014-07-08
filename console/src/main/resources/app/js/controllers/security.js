@@ -308,7 +308,7 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
     else {
       array.push(item);
     }
-  }
+  };
 });
 
 // -- Security Roles -----------------------------------------------------------
