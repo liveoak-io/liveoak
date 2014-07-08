@@ -368,7 +368,8 @@ loMod.config(['$routeProvider', function($routeProvider) {
       templateUrl: '/admin/console/partials/storage-collection.html'
     })
     .when('/error', {
-      templateUrl : '/admin/console/partials/notfound.html'
+      controller: 'ErrorCtrl',
+      template: '<div></div>'
     })
     .otherwise({
       templateUrl : '/admin/console/partials/notfound.html'
@@ -381,23 +382,24 @@ loMod.config(['$logProvider', function($logProvider) {
 
 angular.element(document).ready(function () {
   /* jshint ignore:start */
-  var liveOak = new LiveOak({
-    auth: {
-      realm: 'liveoak-admin',
-      clientId: 'console',
-      onload: 'login-required'
-    }
-  });
+  if(typeof LiveOak != "undefined") {
+    var liveOak = new LiveOak({
+      auth: {
+        realm: 'liveoak-admin',
+        clientId: 'console',
+        onload: 'login-required'
+      }
+    });
 
-  liveOak.auth.init({ onLoad: 'login-required' }).success(function () {
-      loMod.factory('LiveOak', function () {
-          return liveOak;
-      });
-      angular.bootstrap(document, ['loApp']);
-  }).error(function() {
-    window.location.reload();
-  });
-
+    liveOak.auth.init({ onLoad: 'login-required' }).success(function () {
+        loMod.factory('LiveOak', function () {
+            return liveOak;
+        });
+        angular.bootstrap(document, ['loApp']);
+    }).error(function() {
+      window.location.reload();
+    });
+  }
   /* jshint ignore:end */
 });
 
