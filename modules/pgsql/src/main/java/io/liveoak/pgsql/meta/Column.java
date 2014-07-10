@@ -1,5 +1,9 @@
 package io.liveoak.pgsql.meta;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
+
 public class Column {
 
     Table table;
@@ -42,5 +46,56 @@ public class Column {
 
     public boolean notNull() {
         return notNull;
+    }
+
+    public void bindValue(PreparedStatement ps, int i, Object value) throws SQLException {
+        if (value == null) {
+            ps.setNull(i, sqlType());
+        } else {
+            switch (type) {
+                case "int4":
+                    ps.setInt(i, ValueConverter.toInt(value));
+                    return;
+                default:
+                    ps.setObject(i, value);
+            }
+/*
+                case "varchar":
+                    return Types.VARCHAR;
+                case "nvarchar":
+                    return Types.NVARCHAR;
+                case "char":
+                    return Types.CHAR;
+                case "nchar":
+                    return Types.NCHAR;
+                case "binary":
+                    return Types.BINARY;
+                case "varbinary":
+                    return Types.VARBINARY;
+
+*/
+
+        }
+    }
+
+    public int sqlType() {
+        switch (type) {
+            case "int8":
+                return Types.INTEGER;
+            case "varchar":
+                return Types.VARCHAR;
+            case "nvarchar":
+                return Types.NVARCHAR;
+            case "char":
+                return Types.CHAR;
+            case "nchar":
+                return Types.NCHAR;
+            case "binary":
+                return Types.BINARY;
+            case "varbinary":
+                return Types.VARBINARY;
+            default:
+                throw new IllegalStateException("Unknown type: " + type);
+        }
     }
 }

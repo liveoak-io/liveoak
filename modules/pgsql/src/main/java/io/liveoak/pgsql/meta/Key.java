@@ -1,5 +1,6 @@
 package io.liveoak.pgsql.meta;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,7 +9,7 @@ public class Key {
 
     Key(List<Column> cols) {
         if (cols != null) {
-            this.cols = Collections.unmodifiableList(cols);
+            this.cols = Collections.unmodifiableList(new ArrayList(cols));
         }
     }
 

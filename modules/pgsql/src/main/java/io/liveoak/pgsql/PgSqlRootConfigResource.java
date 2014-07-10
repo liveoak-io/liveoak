@@ -34,6 +34,8 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
     private static Logger log = Logger.getLogger(PgSqlRootConfigResource.class);
     private PGPoolingDataSource ds;
     private Catalog catalog;
+    private List<String> schemas;
+    private List<String> blockedSchemas;
 
     public PgSqlRootConfigResource(String id) {
         super(id);
@@ -77,6 +79,12 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
         sink.accept("password", ds.getPassword());
         sink.accept("max-connections", ds.getMaxConnections());
         sink.accept("initial-connections", ds.getInitialConnections());
+        if (schemas != null && schemas.size() > 0) {
+            sink.accept("schemas", schemas);
+        }
+        if (blockedSchemas != null && blockedSchemas.size() > 0) {
+            sink.accept("blocked-schemas", blockedSchemas);
+        }
         sink.close();
     }
 
@@ -111,6 +119,15 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
             initialConnections = 1;
         }
 
+        List<String> schemas = (List<String>) state.getProperty("schemas");
+        if (schemas != null) {
+            this.schemas = schemas;
+        }
+
+        List<String> blockedSchemas = (List<String>) state.getProperty("blocked-schemas");
+        if (blockedSchemas != null) {
+            this.blockedSchemas = blockedSchemas;
+        }
 
         PGPoolingDataSource old = this.ds;
         boolean recreate = old == null
@@ -145,7 +162,7 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
             }
 
             try (Connection c = getConnection()) {
-                catalog = new Catalog(reverseEngineerSchema(c, dbName));
+                catalog = new Catalog(reverseEngineerSchema(c, dbName, schemas, blockedSchemas));
             }
         }
 
@@ -156,14 +173,38 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
         return ds != null ? ds.getDatabaseName() : null;
     }
 
-    private Map<TableRef, Table> reverseEngineerSchema(Connection c, String catalog) throws SQLException {
+    private static Map<TableRef, Table> reverseEngineerSchema(Connection c, String catalog, List<String> schemas, List<String> blockedSchemas) throws SQLException {
 
         HashMap<TableRef, Table> tables = new HashMap<>();
 
         try (ResultSet rs = c.getMetaData().getTables(catalog, null, null, new String[]{"TABLE"})) {
+            tables:
             while (rs.next()) {
                 String schema = rs.getString("table_schem");
                 String table = rs.getString("table_name");
+
+                // check for allowed schemas
+                schema_check:
+                if (schemas != null && schemas.size() > 0) {
+                    for (String s: schemas) {
+                        if (s.equals(schema)) {
+                            // process this table it's one of the allowed schemas
+                            break schema_check;
+                        }
+                    }
+                    // skip this table - it's not allowed
+                    continue tables;
+                }
+
+                // check for blocked schemas
+                if (blockedSchemas != null && blockedSchemas.size() > 0) {
+                    for (String s: blockedSchemas) {
+                        if (s.equals(schema)) {
+                            // skip this table - it's blocked
+                            continue tables;
+                        }
+                    }
+                }
 
                 HashSet<String> uniques = new HashSet<>();
                 try (ResultSet idxrs = c.getMetaData().getIndexInfo(catalog, schema, table, false, true)) {

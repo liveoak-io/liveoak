@@ -10,8 +10,10 @@ import java.util.LinkedList;
 
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
+import io.liveoak.pgsql.meta.Catalog;
 import io.liveoak.pgsql.meta.QueryBuilder;
 
+import io.liveoak.pgsql.meta.Table;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
@@ -86,12 +88,14 @@ public class PgSqlTableResource implements Resource {
     }
 
     private QueryResults queryTable(String table, String id, RequestContext ctx) throws SQLException {
+        Catalog cat = parent.getCatalog();
+        Table t = cat.tableById(table);
         try (Connection con = parent.getConnection()) {
-            QueryBuilder qb = new QueryBuilder(parent.getCatalog());
+            QueryBuilder qb = new QueryBuilder(cat);
             if (id == null) {
-                return qb.querySelectFromTable(ctx, con, table);
+                return qb.querySelectFromTable(ctx, con, t);
             } else {
-                return qb.querySelectFromTableWhereIds(ctx, con, table, new String[] {id});
+                return qb.querySelectFromTableWhereIds(ctx, con, t, new String[] {id});
             }
         }
     }

@@ -11,6 +11,11 @@ public class QueryResults {
     private List<String> columnNames;
     private List<Row> rows;
 
+    public QueryResults() {
+        this.columnNames = Collections.emptyList();
+        this.rows = Collections.emptyList();
+    }
+
     public QueryResults(List<String> columnNames, List<Row> rows) {
         this.columnNames = Collections.unmodifiableList(columnNames);
         this.rows = Collections.unmodifiableList(rows);

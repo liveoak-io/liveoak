@@ -9,11 +9,21 @@ import java.util.Map;
  */
 public class Table {
 
+    private String id;
     private String schema;
     private String name;
     private List<Column> columns;
     private PrimaryKey pk;
     private List<ForeignKey> foreignKeys;
+
+    public Table(String id, Table table) {
+        this.id = id;
+        this.schema = table.schema;
+        this.name = table.name;
+        this.columns = table.columns;
+        this.pk = table.pk;
+        this.foreignKeys = table.foreignKeys;
+    }
 
     public Table(String schema, String name, List<Column> columns, PrimaryKey key, List<ForeignKey> foreignKeys) {
         this.schema = schema;
@@ -39,12 +49,35 @@ public class Table {
         return null;
     }
 
+    public String id() {
+        return id;
+    }
+
     public String schema() {
         return schema;
     }
 
     public String name() {
         return name;
+    }
+
+    public String schemaName() {
+        StringBuilder sb = new StringBuilder();
+        if (schema != null) {
+            sb.append(schema).append(".");
+        }
+        sb.append(name);
+        return sb.toString();
+    }
+
+    public String quotedSchemaName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\"");
+        if (schema != null) {
+            sb.append(schema).append("\".\"");
+        }
+        sb.append(name).append("\"");
+        return sb.toString();
     }
 
     public List<Column> columns() {
