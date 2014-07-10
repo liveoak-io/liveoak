@@ -41,11 +41,9 @@ public class HTMLEncoder implements StateEncoder {
         attribute("href", "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css");
         endTag("link");
 
-        startTag("link");
-        attribute("rel", "stylesheet");
-        attribute("type", "text/css");
-        attribute("href", "/admin/css/liveoak.css");
-        endTag("link");
+        startTag("style");
+        text(getCss());
+        endTag("style");
 
 
         endTag("head");
@@ -227,6 +225,67 @@ public class HTMLEncoder implements StateEncoder {
             endTag("a");
             endTag("div");
         }
+    }
+
+    private String getCss() {
+        return ".resource {\n" +
+                "    padding: 1em;\n" +
+                "}\n" +
+                "\n" +
+                ".resource .self {\n" +
+                "    border: 1px solid black;\n" +
+                "    padding: 1ex;\n" +
+                "    margin-bottom: 1em;\n" +
+                "}\n" +
+                "\n" +
+                ".resource .content {\n" +
+                "    margin-left: 1em;\n" +
+                "}\n" +
+                "\n" +
+                ".resource .resource {\n" +
+                "    border-bottom: 1px solid #ccc;\n" +
+                "    padding: 0;\n" +
+                "    margin-bottom: .5ex;\n" +
+                "}\n" +
+                "\n" +
+                ".resource .resource .self {\n" +
+                "    border: none;\n" +
+                "    padding: 0;\n" +
+                "    margin: 0;\n" +
+                "}\n" +
+                "\n" +
+                ".resource table {\n" +
+                "    border: 1px solid #ccc;\n" +
+                "    font-size: 90%;\n" +
+                "    margin-bottom: 1em;\n" +
+                "}\n" +
+                "\n" +
+                ".resource table tr {\n" +
+                "    border-bottom: 1px solid #666;\n" +
+                "}\n" +
+                "\n" +
+                ".resource table tr th {\n" +
+                "    padding: .5ex;\n" +
+                "    background-color: #ddd;\n" +
+                "    border: 1px solid #666;\n" +
+                "}\n" +
+                "\n" +
+                ".resource table tr td {\n" +
+                "    padding: .5ex;\n" +
+                "    border: 1px solid #666;\n" +
+                "}\n" +
+                "\n" +
+                ".resource .members {\n" +
+                "    padding: 1ex;\n" +
+                "    border: 1px solid #ccc;\n" +
+                "}\n" +
+                "\n" +
+                ".footer {\n" +
+                "    border-top: 1px solid #ddd;\n" +
+                "    padding-left: 1em;\n" +
+                "    color: #999;\n" +
+                "    font-size: 80%;\n" +
+                "}\n";
     }
 
     private XMLEventWriter writer;

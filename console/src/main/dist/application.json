@@ -17,13 +17,6 @@
       }
     },
 
-    css: {
-      type: 'filesystem',
-      config: {
-        directory: "${application.dir}/css"
-      }
-    },
-
     auth: {
       type: 'keycloak'
     },
