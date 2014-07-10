@@ -1,5 +1,6 @@
 package io.liveoak.spi.extension;
 
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.*;
 import org.jboss.msc.value.InjectedValue;
 
@@ -7,6 +8,8 @@ import org.jboss.msc.value.InjectedValue;
  * @author Bob McWhirter
  */
 public abstract class Task implements Service<Void> {
+
+    private static final Logger log = Logger.getLogger(Task.class);
 
     protected abstract void perform() throws Exception;
 
@@ -17,7 +20,7 @@ public abstract class Task implements Service<Void> {
             context.complete();
             context.getController().setMode(ServiceController.Mode.REMOVE);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unable to start scheduler task", e);
             throw new StartException( e );
         }
     }

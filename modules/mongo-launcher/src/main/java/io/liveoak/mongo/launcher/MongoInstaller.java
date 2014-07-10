@@ -207,7 +207,7 @@ public class MongoInstaller {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("Thread was interrupted.", e);
             }
             consoleProgress(i, total);
         }

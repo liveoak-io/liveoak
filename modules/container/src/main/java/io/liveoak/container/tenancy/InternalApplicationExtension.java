@@ -4,6 +4,7 @@ import io.liveoak.container.tenancy.service.ApplicationExtensionRemovalService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.resource.async.Resource;
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.AbstractServiceListener;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceRegistry;
@@ -17,6 +18,8 @@ import java.util.function.Consumer;
  * @author Ken Finnigan
  */
 public class InternalApplicationExtension implements Consumer<Exception> {
+
+    private static final Logger log = Logger.getLogger(InternalApplicationExtension.class);
 
     public InternalApplicationExtension(ServiceRegistry registry, InternalApplication app, String extensionId, String resourceId) {
         this.registry = registry;
@@ -71,7 +74,7 @@ public class InternalApplicationExtension implements Consumer<Exception> {
         try {
             latch.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("Unable to remove extension: " + this.extensionId, e);
         }
     }
 

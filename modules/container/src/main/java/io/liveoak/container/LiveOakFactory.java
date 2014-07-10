@@ -144,7 +144,6 @@ public class LiveOakFactory {
             public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
                 if (transition.getAfter().equals(ServiceController.Substate.START_FAILED)) {
                     log.errorf(controller.getStartException(), "Unable to start service: %s", controller.getName());
-                    controller.getStartException().printStackTrace();
                 }
             }
         });

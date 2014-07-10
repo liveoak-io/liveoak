@@ -85,13 +85,13 @@ public class AuthInterceptor extends DefaultInterceptor {
                             context.forward();
                         }
                     } catch (Throwable t) {
-                        t.printStackTrace();
+                        log.error("Error processing ResourceResponse", t);
                         context.replyWith(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
                     }
                 }
             });
         } catch (Throwable t) {
-            t.printStackTrace();
+            log.error("Error initializing the security context", t);
             context.replyWith(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
         }
     }

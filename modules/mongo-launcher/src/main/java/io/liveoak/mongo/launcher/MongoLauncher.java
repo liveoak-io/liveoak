@@ -341,7 +341,7 @@ public class MongoLauncher {
                     mongoLog.info(line);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Error writing to Mongo log", e);
             }
         }
     }
@@ -364,7 +364,7 @@ public class MongoLauncher {
         try {
             Thread.sleep(30000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("Error waiting for Mongo to start", e);
         }
 
         mongo.stopMongo();

@@ -87,7 +87,7 @@ public class ApplicationService implements Service<InternalApplication> {
                     resourcesTree = (ResourceState) value;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Error decoding content of application.json for " + appName, e);
             }
         } else {
             ObjectMapper mapper = ObjectMapperFactory.create();

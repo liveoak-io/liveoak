@@ -19,6 +19,7 @@ import io.liveoak.spi.state.ResourceState;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
+import org.jboss.logging.Logger;
 
 import java.util.concurrent.Executor;
 
@@ -27,6 +28,8 @@ import java.util.concurrent.Executor;
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
 public class ResourceStateHandler extends ChannelOutboundHandlerAdapter {
+
+    private static final Logger log = Logger.getLogger(ResourceStateHandler.class);
 
     private Executor workerPool;
 
@@ -79,7 +82,7 @@ public class ResourceStateHandler extends ChannelOutboundHandlerAdapter {
         try {
             driver.encode();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, e);
             ctx.writeAndFlush( new DefaultResourceErrorResponse( response.inReplyTo(), ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, e.getMessage(), e ) );
             ctx.fireUserEventTriggered(new RequestCompleteEvent(response.requestId()));
         }

@@ -19,11 +19,14 @@ import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.container.Subscription;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public class SecuredSubscriptionManager extends DefaultSubscriptionManager {
+
+    private static final Logger log = Logger.getLogger(SecuredSubscriptionManager.class);
 
     public SecuredSubscriptionManager(Client client) {
         this.client = client;
@@ -94,11 +97,11 @@ public class SecuredSubscriptionManager extends DefaultSubscriptionManager {
                         sendError(subscription, errorStatus, origResourceResponse);
                     }
                 } catch (Throwable t) {
-                    t.printStackTrace();
+                    log.error("Error occurred during authorization of subscription", t);
                 }
             });
         } catch (Throwable t) {
-            t.printStackTrace();
+            log.error("Error occurred during authorization of subscription", t);
         }
     }
 

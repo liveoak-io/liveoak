@@ -157,12 +157,10 @@ public class SecuredStompServerContext extends ContainerStompServerContext {
                             triggerAuthz();
                         }
                     } catch (Throwable t) {
-                        t.printStackTrace();
                         sendError(null, t, HttpResponseStatus.INTERNAL_SERVER_ERROR.code());
                     }
                 });
             } catch (Throwable t) {
-                t.printStackTrace();
                 sendError(null, t, HttpResponseStatus.INTERNAL_SERVER_ERROR.code());
             }
         }
@@ -213,6 +211,7 @@ public class SecuredStompServerContext extends ContainerStompServerContext {
         }
 
         private void sendError(String message, Throwable cause, int status) {
+            log.error(message, cause);
             SecuredStompServerContext.this.sendError(connection, message, cause, subscriptionId, status);
         }
     }

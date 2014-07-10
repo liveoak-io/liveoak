@@ -1,5 +1,6 @@
 package io.liveoak.scheduler.service;
 
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -14,6 +15,8 @@ import java.util.Properties;
  * @author Bob McWhirter
  */
 public class SchedulerService implements Service<Scheduler> {
+
+    private static final Logger log = Logger.getLogger(SchedulerService.class);
 
     public SchedulerService(String name) {
         this.name = name;
@@ -35,7 +38,7 @@ public class SchedulerService implements Service<Scheduler> {
         try {
             this.scheduler.shutdown();
         } catch (SchedulerException e) {
-            e.printStackTrace();
+            log.error("Unable to shutdown the scheduler", e);
         }
     }
 
