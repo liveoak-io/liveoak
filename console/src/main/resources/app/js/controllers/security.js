@@ -57,7 +57,45 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
     $scope.cancel = function () {
       $modalInstance.dismiss('cancel');
     };
+  };
 
+  $scope.collStorage = $scope.storageList.length > 0 ? $scope.storageList[0].id : undefined;
+
+  // Create Collection Modal ---------------------------------------------------
+  $scope.modalCollectionAdd = function() {
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/security/collection-add.html',
+      controller: 'AddCollectionModalCtrl',
+      scope: $scope,
+      resolve: {
+        currentApp: function () {
+          return currentApp;
+        }
+      }
+    });
+  };
+});
+
+loMod.controller('AddCollectionModalCtrl', function ($scope, $modalInstance, $location, LoCollection, Notifications, currentApp) {
+
+  $scope.collectionCreate = function(collectionName) {
+    var newCollectionPromise = LoCollection.create({appId: currentApp.id, storageId: $scope.collStorage},
+      {id : collectionName}).$promise;
+
+    newCollectionPromise.then(
+      function() {
+        Notifications.success('The collection "' + $scope.collStorage + ' / ' + collectionName + '" has been created. Secure it.');
+        $modalInstance.close();
+        $location.path('applications/' + currentApp.id + '/security/policies/' + $scope.collStorage + '/' + collectionName);
+      },
+      function() {
+        Notifications.error('Not able to create the collection "' + $scope.collStorage + ' / ' + collectionName + '".');
+      }
+    );
+  };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
   };
 });
 
@@ -294,8 +332,9 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
     });
 
     modalAddRole.result.then(
-      function() { // modal completion
+      function(newRole) { // modal completion
         $scope.appRoles = LoRealmAppRoles.query({appId: currentApp.id});
+        $scope.settings.accessRoles.push(currentApp.name + '/' + newRole);
       }
     );
   };
@@ -308,6 +347,22 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
     else {
       array.push(item);
     }
+  };
+
+  $scope.collStorage = $route.current.params.storageId;
+
+  // Create Collection Modal ---------------------------------------------------
+  $scope.modalCollectionAdd = function(){
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/security/collection-add.html',
+      controller: 'AddCollectionModalCtrl',
+      scope: $scope,
+      resolve: {
+        currentApp: function () {
+          return currentApp;
+        }
+      }
+    });
   };
 });
 
@@ -431,7 +486,7 @@ loMod.controller('AddRoleModalCtrl', function($scope, $modalInstance, Notificati
 
     var addRoleSuccessCallback = function(value) {
       Notifications.success('The application role "' + value.name + '" has been created.');
-      $modalInstance.close();
+      $modalInstance.close(value.name);
     };
 
     var addRoleFailureCallback = function(httpResponse) {

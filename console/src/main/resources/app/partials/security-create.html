@@ -26,12 +26,29 @@
             <legend lo-collapse class="collapsible"><span class="text">Collection Settings</span></legend>
             <div class="form-group clearfix">
               <label class="col-sm-3 control-label" for="collection">Collection <span class="required">*</span></label>
-              <select lo-select class="col-sm-9" id="collection" ng-options="col.id as col.name for col in collectionsList" ng-model="currentCollection">
-              </select>
+              <div class="dropdown btn-group bootstrap-select col-sm-9" style="z-index: 999;">
+                <button class="btn btn-default col-sm-12" id ="collection" type="button" data-toggle="dropdown">
+                  <span class="pull-left">{{currentCollection}}</span>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li ng-repeat="col in collectionsList" ng-class="{'active' : col.id===currentCollection}" >
+                    <a role="menuitem" tabindex="-1" ng-click="$parent.currentCollection = col.id">
+                      <span class="text">{{col.id}}</span>
+                    </a>
+                  </li>
+                  <li role="presentation" class="divider"></li>
+                  <li role="presentation">
+                    <a role="menuitem" tabindex="-1" ng-click="modalCollectionAdd()">Add Collection...</a>
+                  </li>
+                </ul>
+              </div>
+              <!--<select lo-select class="col-sm-9" id="collectionX" ng-options="col.id as col.name for col in collectionsList" ng-model="currentCollection">
+              </select>-->
             </div>
             <div class="form-group clearfix">
               <label class="col-sm-3 control-label" for="access">Can access the collection <span class="required">*</span></label>
-              <div class="dropdown btn-group bootstrap-select col-sm-9" style="z-index: 1040;">
+              <div class="dropdown btn-group bootstrap-select col-sm-9" style="z-index: 998;">
                 <button class="btn btn-default dropdown-toggle col-sm-12" id ="access" type="button">
                   <span class="pull-left" ng-show="appRoles.length === 0">The application has no roles</span>
                   <span class="pull-left" ng-show="appRoles.length > 0 && settings.accessRoles.length === 0">Nothing selected</span>

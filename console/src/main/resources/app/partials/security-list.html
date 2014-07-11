@@ -19,11 +19,16 @@
         <div class="panel-body text-center empty-instance">
           <i class="fa fa-lock"></i>
 
-          <span ng-hide="unsecuredColls.length > 0">
-            <p>This application has no collections to be secured. Create a collection inside a storage resource first.</p>
+          <span ng-show="storageList.length === 0">
+            <p>This application has no storage resources. Create a storage resource first.</p>
             <a href="#/applications/{{curApp.id}}/storage" class="btn btn-primary btn-lg" type="button">View Storage</a>
           </span>
-          
+
+          <span ng-hide="(storageList.length === 0) || (unsecuredColls.length > 0)">
+            <p>This application has no collections to be secured. Start creating a collection to secure it.</p>
+            <a href="" class="btn btn-primary btn-lg" type="button" ng-click="modalCollectionAdd()">Create Collection</a>
+          </span>
+
           <span ng-show="unsecuredColls.length > 0">
             <p>You have not yet secured any of the collections: <span ng-repeat="c in unsecuredColls"><a href="#/applications/{{curApp.name}}/security/policies/{{c.storage}}/{{c.collection}}">{{c.storage}} / {{c.collection}}</a>{{$last ? '' : ', '}}</span>.</p>
             <a href="#/applications/{{curApp.id}}/security/policies/{{unsecuredColls[0].storage}}/{{unsecuredColls[0].collection}}" class="btn btn-primary btn-lg" type="button">Secure a Collection</a>
