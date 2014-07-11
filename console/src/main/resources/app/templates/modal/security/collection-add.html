@@ -1,0 +1,51 @@
+<form lo-autofocus name="loCollectionCreate" id="loCollectionCreate" ng-init="setFormScope(this)" novalidate="">
+  <div class="modal-header">
+    <button type="button" class="close" ng-click="cancel()">
+      <span class="pficon pficon-close"></span>
+    </button>
+    <h4 class="modal-title">Create New Collection</h4>
+  </div>
+  <div class="modal-body">
+    <div class="form-group clearfix">
+      <label for="collectionName" class="col-sm-3 control-label">Storage Resource</label>
+      <div class="col-sm-7">
+        <!--<select lo-select id="storage" ng-options="storage.id for storage in $parent.$parent.storageList" ng-model="createCollection">
+        </select>-->
+        <div class="dropdown btn-group bootstrap-select" style="margin-bottom: 0;">
+          <button class="btn btn-default col-sm-12" id ="access" type="button" data-toggle="dropdown">
+            <span class="pull-left" ng-hide="collStorage">Select a storage</span>
+            <span class="pull-left" ng-show="collStorage">{{collStorage}}</span>
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" >
+            <li role="presentation" ng-repeat="storage in $parent.$parent.storageList">
+              <a href="" role="menuitem" tabindex="-1" ng-click="$parent.collStorage = storage.id">
+                <span class="text">{{storage.id}}</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <span class="help-block ng-hide">
+          <span ng-show="loCollectionCreate.collectionName.$error.required">Collection name is required.</span>
+          <span ng-show="!loCollectionCreate.collectionName.$error.required && loCollectionCreate.collectionName.$error.collectionName">Collection name already exists.</span>
+        </span>
+      </div>
+    </div>
+    <div class="form-group clearfix">
+      <label for="collectionName" class="col-sm-3 control-label">Collection Name</label>
+      <div class="col-sm-7">
+        <input type="text" class="form-control" id="collectionName" name="collectionName" ng-model="collectionName"
+               required autofocus ng-change="checkColName(collectionName)" lo-validation/>
+        <span class="help-block ng-hide">
+          <span ng-show="loCollectionCreate.collectionName.$error.required">Collection name is required.</span>
+          <span ng-show="!loCollectionCreate.collectionName.$error.required && loCollectionCreate.collectionName.$error.collectionName">Collection name already exists.</span>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button type="submit" class="btn btn-primary" ng-click="collectionCreate(collectionName); close()" ng-disabled="!(collectionName && loCollectionCreate.collectionName.$valid)">Add</button>
+  </div>
+</form>
