@@ -6,20 +6,24 @@ import java.sql.Types;
 
 public class Column {
 
-    Table table;
+    TableRef table;
     String name;
     String type;
     int size;
     boolean notNull;
     boolean unique;
 
-    public Column(Table table, String name, String type, int size, boolean notNull, boolean unique) {
+    public Column(TableRef table, String name, String type, int size, boolean notNull, boolean unique) {
         this.table = table;
         this.name = name;
         this.type = type;
         this.size = size;
         this.notNull = notNull;
         this.unique = unique;
+    }
+
+    public TableRef tableRef() {
+        return table;
     }
 
     public String name() {

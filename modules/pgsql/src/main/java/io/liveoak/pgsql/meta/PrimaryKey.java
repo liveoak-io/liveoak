@@ -11,6 +11,16 @@ public class PrimaryKey extends Key {
         return value.split("\\.");
     }
 
+    public static String spliceId(List<Object> ids) {
+        String [] svals = new String[ids.size()];
+        int i = 0;
+        for (Object o: ids) {
+            svals[i] = String.valueOf(o);
+            i++;
+        }
+        return spliceId(svals);
+    }
+
     public static String spliceId(String[] ids) {
         StringBuilder sb = new StringBuilder();
         for (String v: ids) {

@@ -1,14 +1,18 @@
 package io.liveoak.pgsql;
 
+import java.sql.Connection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
 import io.liveoak.pgsql.meta.Catalog;
 import io.liveoak.pgsql.meta.Column;
 import io.liveoak.pgsql.meta.ForeignKey;
 import io.liveoak.pgsql.meta.PrimaryKey;
+import io.liveoak.pgsql.meta.QueryBuilder;
 import io.liveoak.pgsql.meta.Table;
 import io.liveoak.pgsql.meta.TableRef;
 import io.liveoak.spi.RequestContext;
@@ -102,6 +106,35 @@ public class PgSqlRowResource implements Resource {
             sink.accept(fkTable, new PgSqlResourceRef(
                     new PgSqlTableResource(parent.parent(), fkTable),
                     PrimaryKey.spliceId(ent.getValue())));
+        }
+
+        // if there are any referredKeys write synthetic object
+        //HashMap<ForeignKey, String[]> refFkMap = new HashMap<>();
+        // address has address_id PK, orders has address_id fk
+        // Here we have Row of select from addresses
+        // we have to make a query select from orders where address_id = row.get(pk)
+        for (ForeignKey fk: table.referredKeys()) {
+            QueryBuilder builder = new QueryBuilder(cat);
+            try (Connection con = parent.parent().getConnection()) {
+                List<Column> cols = fk.columns();
+                Table tab = cat.table(cols.get(0).tableRef());
+
+                LinkedList<Object> vals = new LinkedList();
+                for (Column c: table.pk().columns()) {
+                    vals.add(row.value(c.name()));
+                }
+                if (cols.size() != vals.size()) {
+                    throw new IllegalStateException("Primary key column count on " + table.id() + " doesn't match foreign key column count on " + tab.id());
+                }
+
+                QueryResults results = builder.querySelectFromTable(ctx, con, tab, cols, vals);
+                LinkedList ls = new LinkedList();
+                for (Row r: results.rows()) {
+                    ls.add(new PgSqlRowResource(
+                            new PgSqlTableResource(parent.parent(), tab.id()), r));
+                }
+                sink.accept(tab.id(), ls);
+            }
         }
 
         sink.close();

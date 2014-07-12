@@ -16,6 +16,7 @@ public class Catalog {
 
     public Catalog(Map<TableRef, Table> tables) {
         Map<TableRef, Table> tablesWithIds = new HashMap<>();
+        Map<TableRef, List<ForeignKey>> referredKeys = new HashMap<>();
 
         // group by name (same name in multiple schemas)
         LinkedHashMap<String, List<TableRef>> seenNames = new LinkedHashMap<>();
@@ -26,17 +27,28 @@ public class Catalog {
                 seenNames.put(ref.name(), fullNames);
             }
             fullNames.add(ref);
+
+            // compile referred keys
+            List<ForeignKey> reffk = tables.get(ref).foreignKeys();
+            for (ForeignKey fk: reffk) {
+                List<ForeignKey> reffks = referredKeys.get(fk.tableRef());
+                if (reffks == null) {
+                    reffks = new LinkedList<>();
+                    referredKeys.put(fk.tableRef(), reffks);
+                }
+                reffks.add(fk);
+            }
         }
 
         // set ids as either short (name) or long (schema.name)
         for (Map.Entry<String, List<TableRef>> e: seenNames.entrySet()) {
             if (e.getValue().size() > 1) {
                 for (TableRef ref: e.getValue()) {
-                    tablesWithIds.put(ref, new Table(ref.asUnquotedIdentifier(), tables.get(ref)));
+                    tablesWithIds.put(ref, new Table(ref.asUnquotedIdentifier(), tables.get(ref), referredKeys.get(ref)));
                 }
             } else {
                 TableRef ref = e.getValue().get(0);
-                tablesWithIds.put(ref, new Table(e.getKey(), tables.get(ref)));
+                tablesWithIds.put(ref, new Table(e.getKey(), tables.get(ref), referredKeys.get(ref)));
             }
         }
 

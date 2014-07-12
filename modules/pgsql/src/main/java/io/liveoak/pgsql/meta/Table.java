@@ -16,13 +16,21 @@ public class Table {
     private PrimaryKey pk;
     private List<ForeignKey> foreignKeys;
 
-    public Table(String id, Table table) {
+    /**
+     * In all referredKeys the ForeignKey.tableRef points to this table.
+     * Origin table can be retrieved from Column instances.
+     */
+    private List<ForeignKey> referredKeys;
+
+
+    public Table(String id, Table table, List<ForeignKey> referredKeys) {
         this.id = id;
         this.schema = table.schema;
         this.name = table.name;
         this.columns = table.columns;
         this.pk = table.pk;
         this.foreignKeys = table.foreignKeys;
+        this.referredKeys = referredKeys != null ? referredKeys : Collections.emptyList();
     }
 
     public Table(String schema, String name, List<Column> columns, PrimaryKey key, List<ForeignKey> foreignKeys) {
@@ -30,13 +38,17 @@ public class Table {
         this.name = name;
         if (columns != null) {
             for (Column c : columns) {
-                c.table = this;
+                c.table = new TableRef(schema, name);
             }
             this.columns = Collections.unmodifiableList(columns);
+        } else {
+            this.columns = Collections.emptyList();
         }
         this.pk = key;
         if (foreignKeys != null) {
             this.foreignKeys = Collections.unmodifiableList(foreignKeys);
+        } else {
+            this.foreignKeys = Collections.emptyList();
         }
     }
 
@@ -90,6 +102,10 @@ public class Table {
 
     public List<ForeignKey> foreignKeys() {
         return foreignKeys;
+    }
+
+    public List<ForeignKey> referredKeys() {
+        return referredKeys;
     }
 
     public String ddl(Map<TableRef, Table> tables) {

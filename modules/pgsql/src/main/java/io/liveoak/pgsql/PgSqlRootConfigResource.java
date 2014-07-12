@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -223,7 +222,7 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
                         int size = colrs.getInt("column_size");
                         boolean isNullable = colrs.getBoolean("is_nullable");
 
-                        Column col = new Column(null, name, type, size, !isNullable, uniques.contains(name));
+                        Column col = new Column(new TableRef(schema, table), name, type, size, !isNullable, uniques.contains(name));
                         cols.add(col);
                     }
                 }

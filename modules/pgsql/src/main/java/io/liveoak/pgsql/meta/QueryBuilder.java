@@ -113,6 +113,40 @@ public class QueryBuilder {
         return ps;
     }
 
+
+    public PreparedStatement prepareSelectFromTableWhere(Connection con, Table table, List<Column> columns, List<Object> values) throws SQLException {
+        if (values == null || values.size() == 0) {
+            throw new IllegalArgumentException("values is null or empty");
+        }
+
+        if (columns.size() != values.size()) {
+            throw new IllegalStateException("Values size doesn't match columns size: (columns: " + columns + ", values: " + values + ")");
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(selectAllFromTable(table) + " WHERE ");
+
+        //List<Column> cols = null;
+        int i = 0;
+        for (Column col: columns) {
+            if (i > 0) {
+                sb.append(" AND ");
+            }
+
+            sb.append(col.quotedName()).append("=?");
+        }
+
+        PreparedStatement ps = con.prepareStatement(sb.toString());
+
+        i = 0;
+        for (Object val: values) {
+            columns.get(i).bindValue(ps, i + 1, val);
+            i++;
+        }
+
+        return ps;
+    }
+
     public QueryResults querySelectFromTableWhereIds(RequestContext ctx, Connection con, Table table, String [] ids) throws SQLException {
         if (ids != null && ids.length > 0) {
             return query(ctx, prepareSelectFromTableWhereIds(con, table, ids));
@@ -135,6 +169,10 @@ public class QueryBuilder {
 
     public QueryResults querySelectFromTable(RequestContext ctx, Connection con, String table) throws SQLException {
         return query(ctx, prepareSelectAllFromTable(con, table));
+    }
+
+    public QueryResults querySelectFromTable(RequestContext ctx, Connection con, Table table, List<Column> columns, List<Object> values) throws SQLException {
+        return query(ctx, prepareSelectFromTableWhere(con, table, columns, values));
     }
 
     public QueryResults query(RequestContext ctx, PreparedStatement ps) throws SQLException {
