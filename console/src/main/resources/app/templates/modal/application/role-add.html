@@ -4,7 +4,7 @@
   </button>
   <h4 class="modal-title">Add Role</h4>
 </div>
-<form lo-autofocus class="horizontal-form">
+<form class="horizontal-form">
   <div class="modal-body">
     <fieldset>
       <legend>
@@ -14,7 +14,7 @@
       <div class="form-group clearfix">
         <label for="rolename" class="col-sm-3 control-label">Role Name <span class="required">*</span></label>
         <div class="col-sm-7">
-          <input type="text" class="form-control" id="rolename" ng-model="newRole.name" autofocus>
+          <input type="text" class="form-control" id="rolename" ng-model="newRole.name" pf-focused="true">
         </div>
       </div>
       <div class="form-group clearfix">

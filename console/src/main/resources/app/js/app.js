@@ -8,6 +8,10 @@ var loMod = angular.module('loApp', [
   'loApp.directives',
   'loApp.controllers',
   'ngResource',
+  'patternfly.autofocus',
+  'patternfly.notification',
+  'patternfly.select',
+  'patternfly.validation',
   'ui.bootstrap'
 ]);
 
