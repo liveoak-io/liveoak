@@ -84,7 +84,7 @@ public class LoginTest {
         guardHttp(loginButton).click();
 
         assertEquals("Check that page title is the LiveOak Admin Console",
-                "LiveOak - LiveOak Admin Console", browser.getTitle());
+                "LiveOak -", browser.getTitle());
         assertTrue("Check that page contains logged user element", loggedUser.isDisplayed());
         assertEquals("Check that logged user is 'admin'", "admin", loggedUser.getText().trim());
     }
@@ -97,7 +97,7 @@ public class LoginTest {
         waitGui().until().element(loggedUser).is().visible();
 
         assertEquals("Check that page title is the LiveOak Admin Console",
-                "LiveOak - LiveOak Admin Console", browser.getTitle());
+                "LiveOak -", browser.getTitle());
         assertTrue("Check that page contains logged user element", loggedUser.isDisplayed());
         assertEquals("Check that logged user is 'admin'", "admin", loggedUser.getText().trim());
     }
