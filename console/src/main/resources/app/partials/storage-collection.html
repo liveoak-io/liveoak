@@ -27,7 +27,7 @@
             <!-- Collection selector -->
             <!-- TODO create a watcher on the loSelect directive to check for ngShow attr change and refreshing the widget accordingly -->
             <span>
-              <select lo-select class="select-lg selectpicker" ng-change="changeCollection()"
+              <select pf-select class="select-lg selectpicker" ng-change="changeCollection()"
                     ng-model="collectionId" ng-options="o.id as o.id for o in collectionList"></select>
             </span>
 
@@ -78,7 +78,7 @@
                     <div class="arrow"></div>
                     <div class="form-group">
                       <label for="columns-select">Search in Columns</label>
-                      <select lo-select class="select selectpicker" multiple id="columns-select"
+                      <select pf-select class="select selectpicker" multiple id="columns-select"
                               ng-model="searchColumns" ng-options="o as o for o in columns"></select>
                       </select>
                     </div>
@@ -87,7 +87,7 @@
 
                       <div class="inline-items" ng-repeat="condition in searchConditions">
 
-                        <select lo-select="false" class="select selectpicker inline"
+                        <select pf-select="false" class="select selectpicker inline"
                                 ng-model="condition.type">
                           <option value="EQUALS">Equals</option>
                           <option value="EQUALS_NOT">Not equal</option>
@@ -199,7 +199,7 @@
               <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}"
                   class="row-{{column}}" ng-click="isEdit = (true && column !== 'id')">
                 <span ng-if="column === 'id'">{{ item[column] }}</span>
-                <input class="form-control" type="text" ng-model="item[column]" lo-validation="isValidJSON(input)" ng-if="column !== 'id'"/>
+                <input class="form-control" type="text" ng-model="item[column]" pf-validation="isValidJSON(input)" ng-if="column !== 'id'"/>
               </td>
               <td class="actions">
                 <button class="btn btn-link btn-icon" tooltip="Delete Row" ng-click="rowRemoveNew($index)">
@@ -221,7 +221,7 @@
                 -->
                 <span ng-if="column === 'id'">{{ item[column] }}</span>
                 <input class="form-control" type="text" ng-model="item[column]" ng-if="column !== 'id'"
-                       lo-validation="isValidJSON(input)" lo-validation-enabled="rowsToDelete.indexOf(item['id']) < 0"/>
+                       pf-validation="isValidJSON(input)" pf-validation-disabled="rowsToDelete.indexOf(item['id']) > -1"/>
               </td>
               <td class="actions">
 

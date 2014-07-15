@@ -29,7 +29,7 @@
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="username">Username <span class="required" ng-show="create">*</span></label>
             <div class="col-sm-4">
-              <input class="form-control" type="text" id="username" name="username" ng-model="userModel.profile.username" ng-readonly="!create" lo-focused="create" required>
+              <input class="form-control" type="text" id="username" name="username" ng-model="userModel.profile.username" ng-readonly="!create" pf-focused="create" required>
               <!--<span class="help-block" ng-show="pushForm.pushUrl.$error.url">Not a valid URL.</span>-->
             </div>
           </div>
@@ -69,7 +69,7 @@
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="scope">Roles</label>
             <div class="col-sm-4">
-              <select lo-select id="scope" ng-options="role.id as role.name for role in appRoles" ng-model="userModel.roles" multiple>
+              <select pf-select id="scope" ng-options="role.id as role.name for role in appRoles" ng-model="userModel.roles" multiple>
               </select>
             </div>
           </div>
@@ -80,7 +80,7 @@
             </div>
             <div class="col-sm-4" ng-show="create || resetPassword">
               <div class="search-comp clearfix" style="width: 100%;">
-              <input class="form-control" type="{{inputType}}" id="password" name="password" ng-model="userModel.password" lo-focused="resetPassword">
+              <input class="form-control" type="{{inputType}}" id="password" name="password" ng-model="userModel.password" pf-focused="resetPassword">
               <button class="btn btn-link btn-icon ng-scope" ng-click="changeInputType()" type="button" tooltip="Show/Hide Password" >
                 <i class="fa fa-eye-slash" ng-show="inputType === 'password'"></i>
                 <i class="fa fa-eye" ng-show="inputType === 'text'"></i>

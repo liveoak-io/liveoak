@@ -16,7 +16,7 @@
           <div class="form-group clearfix">
             <label class="col-sm-2 control-label" for="clientname">Client Name</label>
             <div class="col-sm-4">
-              <input class="form-control" type="text" id="clientname" ng-model="settings.name" required lo-focused="!settings.name" >
+              <input class="form-control" type="text" id="clientname" ng-model="settings.name" required pf-focused="!settings.name" >
             </div>
           </div>
           <div class="form-group clearfix">
@@ -88,9 +88,9 @@
           <div class="form-group clearfix">
             <label class="col-sm-2 control-label" for="scope">Scope</label>
             <div class="col-sm-4">
-              <select lo-select id="scope" ng-options="role.id as role.name for role in availableRoles" ng-model="settings.scopeMappings" ng-hide="availableRoles.length === 0" multiple>
+              <select pf-select id="scope" ng-options="role.id as role.name for role in availableRoles" ng-model="settings.scopeMappings" ng-hide="availableRoles.length === 0" multiple>
               </select>
-              <select lo-select id="scope-noroles" ng-options="role as role for role in noRoles" ng-model="noRoles" ng-show="availableRoles.length === 0" multiple disabled>
+              <select pf-select id="scope-noroles" ng-options="role as role for role in noRoles" ng-model="noRoles" ng-show="availableRoles.length === 0" multiple disabled>
               </select>
             </div>
           </div>
