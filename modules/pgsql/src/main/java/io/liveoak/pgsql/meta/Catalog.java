@@ -6,15 +6,21 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 public class Catalog {
 
+    private final Set<String> schemas;
+    private final String defaultSchema;
     private Map<TableRef, Table> tables;
 
-    public Catalog(Map<TableRef, Table> tables) {
+    public Catalog(Set<String> schemas, String defaultSchema, Map<TableRef, Table> tables) {
+        this.schemas = Collections.unmodifiableSet(schemas);
+        this.defaultSchema = defaultSchema;
+
         Map<TableRef, Table> tablesWithIds = new HashMap<>();
         Map<TableRef, List<ForeignKey>> referredKeys = new HashMap<>();
 
@@ -74,6 +80,14 @@ public class Catalog {
             ret.add(t.id());
         }
         return ret;
+    }
+
+    public Set<String> schemas() {
+        return schemas;
+    }
+
+    public String defaultSchema() {
+        return defaultSchema;
     }
 
     public Table tableById(String id) {

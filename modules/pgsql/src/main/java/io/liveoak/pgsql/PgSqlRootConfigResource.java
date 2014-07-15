@@ -2,6 +2,7 @@ package io.liveoak.pgsql;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.liveoak.pgsql.meta.Catalog;
 import io.liveoak.pgsql.meta.Column;
@@ -33,8 +35,9 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
     private static Logger log = Logger.getLogger(PgSqlRootConfigResource.class);
     private PGPoolingDataSource ds;
     private Catalog catalog;
-    private List<String> schemas;
+    private List<String> exposedSchemas;
     private List<String> blockedSchemas;
+    private String defaultSchema;
 
     public PgSqlRootConfigResource(String id) {
         super(id);
@@ -78,11 +81,14 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
         sink.accept("password", ds.getPassword());
         sink.accept("max-connections", ds.getMaxConnections());
         sink.accept("initial-connections", ds.getInitialConnections());
-        if (schemas != null && schemas.size() > 0) {
-            sink.accept("schemas", schemas);
+        if (exposedSchemas != null && exposedSchemas.size() > 0) {
+            sink.accept("schemas", exposedSchemas);
         }
         if (blockedSchemas != null && blockedSchemas.size() > 0) {
             sink.accept("blocked-schemas", blockedSchemas);
+        }
+        if (defaultSchema != null) {
+            sink.accept("default-schema", defaultSchema);
         }
         sink.close();
     }
@@ -118,15 +124,17 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
             initialConnections = 1;
         }
 
-        List<String> schemas = (List<String>) state.getProperty("schemas");
-        if (schemas != null) {
-            this.schemas = schemas;
+        List<String> exposedSchemas = (List<String>) state.getProperty("schemas");
+        if (exposedSchemas != null) {
+            this.exposedSchemas = exposedSchemas;
         }
 
         List<String> blockedSchemas = (List<String>) state.getProperty("blocked-schemas");
         if (blockedSchemas != null) {
             this.blockedSchemas = blockedSchemas;
         }
+
+        this.defaultSchema = state.getPropertyAsString("default-schema");
 
         PGPoolingDataSource old = this.ds;
         boolean recreate = old == null
@@ -160,49 +168,77 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
                 }
             }
 
-            try (Connection c = getConnection()) {
-                catalog = new Catalog(reverseEngineerSchema(c, dbName, schemas, blockedSchemas));
-            }
+            reloadSchema();
         }
 
         responder.resourceUpdated(this);
+    }
+
+    private Set<String> calculateEffectiveSchemas(Connection c, String catalog, List<String> exposedSchemas, List<String> blockedSchemas) {
+        List<String> schemas = new LinkedList<>();
+        try (ResultSet rs = c.getMetaData().getSchemas(catalog, null)) {
+            while (rs.next()) {
+                schemas.add(rs.getString("table_schem"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        Set<String> effectiveSchemas = new HashSet<>();
+
+        if (exposedSchemas != null && exposedSchemas.size() > 0) {
+            for (String schema: schemas) {
+                if (exposedSchemas.contains(schema)) {
+                    effectiveSchemas.add(schema);
+                }
+            }
+        } else {
+            effectiveSchemas.addAll(schemas);
+        }
+
+        if (blockedSchemas != null && blockedSchemas.size() > 0) {
+            effectiveSchemas.removeAll(blockedSchemas);
+        }
+
+        return effectiveSchemas;
     }
 
     public String getDBName() {
         return ds != null ? ds.getDatabaseName() : null;
     }
 
-    private static Map<TableRef, Table> reverseEngineerSchema(Connection c, String catalog, List<String> schemas, List<String> blockedSchemas) throws SQLException {
+    private String determineDefaultSchema(String user, Set<String> schemas) throws SQLException {
+        String schema = schemas.contains(user) ? user : schemas.contains("public") ? "public" : null;
+
+        if (schema == null) {
+            throw new RuntimeException("Could not determine default schema - specify 'default-schema' in config JSON");
+        }
+        return schema;
+    }
+
+    public void reloadSchema() throws SQLException {
+        try (Connection c = getConnection()) {
+            Set<String> schemas = calculateEffectiveSchemas(c, ds.getDatabaseName(), exposedSchemas, blockedSchemas);
+            if (defaultSchema == null) {
+                defaultSchema = determineDefaultSchema(ds.getUser(), schemas);
+            }
+            Map<TableRef, Table> tables = reverseEngineerTableInfo(c, ds.getDatabaseName(), schemas);
+            catalog = new Catalog(schemas, defaultSchema, tables);
+        }
+    }
+
+    private static Map<TableRef, Table> reverseEngineerTableInfo(Connection c, String catalog, Set<String> schemas) throws SQLException {
 
         HashMap<TableRef, Table> tables = new HashMap<>();
 
-        try (ResultSet rs = c.getMetaData().getTables(catalog, null, null, new String[]{"TABLE"})) {
-            tables:
+        try (ResultSet rs = c.getMetaData().getTables(catalog, null, null, new String[] {"TABLE"})) {
             while (rs.next()) {
                 String schema = rs.getString("table_schem");
                 String table = rs.getString("table_name");
 
                 // check for allowed schemas
-                schema_check:
-                if (schemas != null && schemas.size() > 0) {
-                    for (String s: schemas) {
-                        if (s.equals(schema)) {
-                            // process this table it's one of the allowed schemas
-                            break schema_check;
-                        }
-                    }
-                    // skip this table - it's not allowed
-                    continue tables;
-                }
-
-                // check for blocked schemas
-                if (blockedSchemas != null && blockedSchemas.size() > 0) {
-                    for (String s: blockedSchemas) {
-                        if (s.equals(schema)) {
-                            // skip this table - it's blocked
-                            continue tables;
-                        }
-                    }
+                if (!schemas.contains(schema)) {
+                    continue;
                 }
 
                 HashSet<String> uniques = new HashSet<>();

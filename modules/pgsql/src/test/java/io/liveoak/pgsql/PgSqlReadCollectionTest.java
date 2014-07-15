@@ -26,8 +26,6 @@ import static org.fest.assertions.Assertions.assertThat;
  */
 public class PgSqlReadCollectionTest extends BasePgSqlTest {
 
-    private SimpleDateFormat iso = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.S");
-
     @Test
     public void testReadCollection() throws Exception {
 
@@ -71,12 +69,6 @@ public class PgSqlReadCollectionTest extends BasePgSqlTest {
         result = client.read(ctx("*(*(*))"), endpoint);
         System.out.println(result);
         checkOrders(endpoint, result, 3);
-    }
-
-    private RequestContext ctx(String pat) {
-        return new RequestContext.Builder()
-                .returnFields(new DefaultReturnFields(pat))
-                .build();
     }
 
     private void checkOrders(String endpoint, ResourceState result, int expandDepth) throws URISyntaxException, ParseException {
@@ -209,85 +201,5 @@ public class PgSqlReadCollectionTest extends BasePgSqlTest {
                 }));
 
         checkResource(result, expected);
-    }
-
-    private Timestamp time(String dt) throws ParseException {
-        return new Timestamp(iso.parse(dt).getTime());
-    }
-
-    private List list(Object... objs) {
-        return new ArrayList(Arrays.asList(objs));
-    }
-
-    private void checkResource(ResourceState actual, ResourceState expected) {
-        // We could simply do:
-        //   assertThat(actual).isEqualTo(expected);
-        //
-        // But that makes it more difficult to pin down the exact point of difference.
-        // Therefore we iterate ourselves ...
-
-        assertThat(actual.id()).isEqualTo(expected.id());
-        assertThat(actual.uri()).isEqualTo(expected.uri());
-        assertThat(actual.getPropertyNames()).isEqualTo(expected.getPropertyNames());
-        for (String key: actual.getPropertyNames()) {
-            Object exval = expected.getProperty(key);
-            Object val = actual.getProperty(key);
-            if (exval instanceof ResourceState) {
-                assertThat(val).isInstanceOf(DefaultResourceState.class);
-                checkResource((ResourceState) val, (ResourceState) exval);
-            } else if (exval instanceof List) {
-                List exls = (List) exval;
-                assertThat(val).isInstanceOf(ArrayList.class);
-                checkList((List) val, exls);
-            } else {
-                assertThat(val).isEqualTo(exval);
-            }
-        }
-
-        List<ResourceState> exmembers = expected.members();
-        List<ResourceState> members = actual.members();
-        assertThat(members.size()).isEqualTo(exmembers.size());
-
-        int i = 0;
-        for (ResourceState member: members) {
-            checkResource(member, exmembers.get(i));
-            i++;
-        }
-    }
-
-    private void checkList(List actual, List expected) {
-        assertThat(actual.size()).isEqualTo(expected.size());
-        int i = 0;
-        for (Object val: actual) {
-            Object exval = expected.get(i);
-            if (val instanceof ResourceState) {
-                assertThat(exval).isInstanceOf(ResourceState.class);
-                checkResource((ResourceState) val, (ResourceState) exval);
-            } else {
-                assertThat(val).isEqualTo(exval);
-            }
-            i++;
-        }
-    }
-
-    private ResourceState resource(String endpoint, Object[] properties, ResourceState ... members) throws URISyntaxException {
-        ResourcePath path = new ResourcePath(endpoint);
-        return resource(path.tail().toString(), path.parent().toString(), properties, members);
-    }
-
-    private ResourceState resource(String id, String parentUri, Object[] properties, ResourceState ... members) throws URISyntaxException {
-        DefaultResourceState state = new DefaultResourceState(id);
-        state.uri(new URI(parentUri + "/" + id));
-        assertThat(properties.length % 2).isEqualTo(0);
-        int count = properties.length / 2;
-        for (int i = 0; i < count; i++) {
-            String key = (String) properties[2*i];
-            Object val = properties[2*i + 1];
-            state.putProperty(key, val);
-        }
-        for (ResourceState resource: members) {
-            state.members().add(resource);
-        }
-        return state;
     }
 }

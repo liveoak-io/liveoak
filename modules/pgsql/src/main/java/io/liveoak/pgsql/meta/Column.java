@@ -34,6 +34,14 @@ public class Column {
         return "\"" + name + "\"";
     }
 
+    public String type() {
+        return type;
+    }
+
+    public int size() {
+        return size;
+    }
+
     public String typeSpec() {
         switch (type) {
             case "char":

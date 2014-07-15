@@ -108,7 +108,7 @@ public class Table {
         return referredKeys;
     }
 
-    public String ddl(Map<TableRef, Table> tables) {
+    public String ddl(Catalog catalog) {
 
         StringBuilder sb = new StringBuilder("CREATE TABLE \"").append(schema()).append("\".\"").append(name()).append("\" ( \n    ");
         int i = 0;
@@ -153,7 +153,7 @@ public class Table {
             }
             sb.append(") REFERENCES \"").append(fk.tableRef().schema()).append("\".\"").append(fk.tableRef().name()).append("\" (");
 
-            Table refTable = tables.get(fk.tableRef());
+            Table refTable = catalog.table(fk.tableRef());
             if (refTable != null) {
                 i = 0;
                 for (Column col : refTable.pk().columns()) {

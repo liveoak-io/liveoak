@@ -12,6 +12,7 @@ import java.util.List;
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 
 /**

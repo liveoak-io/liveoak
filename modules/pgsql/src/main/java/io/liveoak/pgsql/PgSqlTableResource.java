@@ -19,13 +19,12 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 public class PgSqlTableResource implements Resource {
-
-    private static final String QUERY_RESULTS = "pg.query.results";
 
     private PgSqlRootResource parent;
     private String id;
@@ -52,20 +51,13 @@ public class PgSqlTableResource implements Resource {
         // perform select and store it for readMembers
         results = queryTable(id, null, ctx);
 
-        // store to ctx attributes to pass on to readMembers
-        //ctx.requestAttributes().setAttribute(QUERY_RESULTS, results);
-
-        // here only set num of tables as size
         sink.accept("count", results.count());
-
-        // maybe some other things to do with db as a whole
         sink.accept("type", "collection");
         sink.close();
     }
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        //QueryResults results = (QueryResults) ctx.requestAttributes().getAttribute(QUERY_RESULTS);
         for (Row row: results.rows()) {
             sink.accept(new PgSqlRowResource(this, row));
         }
@@ -81,6 +73,13 @@ public class PgSqlTableResource implements Resource {
         } else {
             responder.resourceRead(new PgSqlRowResource(this, results.rows().get(0)));
         }
+    }
+
+    @Override
+    public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        // insert a new record into a table
+        Resource.super.createMember(ctx, state, responder);
+        // also handle expanded many-to-one / one-to-many
     }
 
     QueryResults queryResults() {

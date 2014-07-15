@@ -8,14 +8,21 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import io.liveoak.common.DefaultRequestAttributes;
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.common.codec.DefaultResourceRef;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.pgsql.extension.PgSqlExtension;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
 import org.jboss.logging.Logger;
@@ -23,6 +30,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.postgresql.ds.PGPoolingDataSource;
 import org.postgresql.jdbc2.optional.PoolingDataSource;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * In order to run this test first prepare a local postgresql instance:
@@ -46,7 +55,8 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
     protected static String schema;
     protected static String schema_two;
 
-    protected static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+    private SimpleDateFormat iso = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.S");
 
     @BeforeClass
     public static void initDriver() throws Exception {
@@ -127,6 +137,7 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
         config.putProperty("max-connections", maxConnections);
         config.putProperty("initial-connections", initialConnections);
         config.putProperty("schemas", Arrays.asList( new String[] { schema, schema_two } ));
+        config.putProperty("default-schema", schema);
 
         return config;
     }
@@ -205,5 +216,104 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
 
     protected ResourceState resourceRef(String uri) throws URISyntaxException {
         return new DefaultResourceRef(new URI(uri));
+    }
+
+    protected RequestContext ctx(String pat) {
+        return new RequestContext.Builder()
+                .requestAttributes(new DefaultRequestAttributes())
+                .returnFields(new DefaultReturnFields(pat))
+                .build();
+    }
+
+    protected Timestamp time(String dt) throws ParseException {
+        return new Timestamp(iso.parse(dt).getTime());
+    }
+
+    protected List list(Object... objs) {
+        return new ArrayList(Arrays.asList(objs));
+    }
+
+    protected void checkResource(ResourceState actual, ResourceState expected) {
+        // We could simply do:
+        //   assertThat(actual).isEqualTo(expected);
+        //
+        // But that makes it more difficult to pin down the exact point of difference.
+        // Therefore we iterate ourselves ...
+
+        assertThat(actual.id()).isEqualTo(expected.id());
+        assertThat(actual.uri()).isEqualTo(expected.uri());
+        assertThat(actual.getPropertyNames()).isEqualTo(expected.getPropertyNames());
+        for (String key: actual.getPropertyNames()) {
+            Object exval = expected.getProperty(key);
+            Object val = actual.getProperty(key);
+            if (exval instanceof ResourceState) {
+                assertThat(val).isInstanceOf(DefaultResourceState.class);
+                checkResource((ResourceState) val, (ResourceState) exval);
+            } else if (exval instanceof List) {
+                List exls = (List) exval;
+                assertThat(val).isInstanceOf(ArrayList.class);
+                checkList((List) val, exls);
+            } else {
+                assertThat(val).isEqualTo(exval);
+            }
+        }
+
+        List<ResourceState> exmembers = expected.members();
+        List<ResourceState> members = actual.members();
+        assertThat(members.size()).isEqualTo(exmembers.size());
+
+        int i = 0;
+        for (ResourceState member: members) {
+            checkResource(member, exmembers.get(i));
+            i++;
+        }
+    }
+
+    private void checkList(List actual, List expected) {
+        assertThat(actual.size()).isEqualTo(expected.size());
+        int i = 0;
+        for (Object val: actual) {
+            Object exval = expected.get(i);
+            if (val instanceof ResourceState) {
+                assertThat(exval).isInstanceOf(ResourceState.class);
+                checkResource((ResourceState) val, (ResourceState) exval);
+            } else {
+                assertThat(val).isEqualTo(exval);
+            }
+            i++;
+        }
+    }
+
+    protected ResourceState resource(String endpoint, Object[] properties, ResourceState... members) throws URISyntaxException {
+        ResourcePath path = new ResourcePath(endpoint);
+        return resource(path.tail().toString(), path.parent().toString(), properties, members);
+    }
+
+    protected ResourceState resource(String id, String parentUri, Object[] properties, ResourceState... members) throws URISyntaxException {
+        DefaultResourceState state = new DefaultResourceState(id);
+        state.uri(new URI(parentUri + "/" + id));
+        assertThat(properties.length % 2).isEqualTo(0);
+        int count = properties.length / 2;
+        for (int i = 0; i < count; i++) {
+            String key = (String) properties[2*i];
+            Object val = properties[2*i + 1];
+            state.putProperty(key, val);
+        }
+        for (ResourceState resource: members) {
+            state.members().add(resource);
+        }
+        return state;
+    }
+
+    protected ResourceState obj(Object ... properties) {
+        DefaultResourceState state = new DefaultResourceState();
+        assertThat(properties.length % 2).isEqualTo(0);
+        int count = properties.length / 2;
+        for (int i = 0; i < count; i++) {
+            String key = (String) properties[2*i];
+            Object val = properties[2*i + 1];
+            state.putProperty(key, val);
+        }
+        return state;
     }
 }
