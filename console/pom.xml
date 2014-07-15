@@ -141,7 +141,7 @@
                     <execution>
                         <id>copy-resources</id>
 
-                        <phase>validate</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -163,7 +163,7 @@
                     </execution>
                     <execution>
                         <id>copy-dist-resources</id>
-                        <phase>validate</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -223,7 +223,7 @@
                 <version>0.0.14</version>
 
                 <configuration>
-                    <workingDirectory>target</workingDirectory>
+                    <workingDirectory>src/main/resources</workingDirectory>
                 </configuration>
 
                 <executions>
