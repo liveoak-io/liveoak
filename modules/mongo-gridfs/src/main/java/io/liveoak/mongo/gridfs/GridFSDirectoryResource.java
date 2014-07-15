@@ -23,6 +23,7 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import io.liveoak.spi.resource.MapResource;
 import org.bson.types.ObjectId;
 
 /**

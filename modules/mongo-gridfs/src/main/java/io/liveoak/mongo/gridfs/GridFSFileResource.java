@@ -12,6 +12,7 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import io.liveoak.spi.resource.MapResource;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>

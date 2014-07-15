@@ -117,6 +117,12 @@ public interface Resource {
     /**
      * Update this object's state.
      *
+     * If we assume this resource's uri is /app/service/id then this method is invoked if
+     *
+     *   PUT /app/service/id
+     *
+     * is issued with JSON body. Presence of id property and its value in JSON body is irrelevant for invocation mechanics.
+     *
      * @param state     The inbound representation of the state.
      * @param responder To respond to the action.
      */
@@ -126,6 +132,12 @@ public interface Resource {
 
     /**
      * Create a new child resource of this collection.
+     *
+     * If we assume this resource's uri is /app/service then this method is invoked if
+     *
+     *   POST /app/service
+     *
+     * is issued with JSON body. Presence of id property and its value in JSON body is irrelevant for invocation mechanics.
      *
      * @param state     The state for the child, which may include an ID.
      * @param responder To respond to the action.
