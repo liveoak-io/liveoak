@@ -155,6 +155,9 @@
                                         <exclude>test/</exclude>
                                         <exclude>**/.git*</exclude>
                                         <exclude>**/*.md</exclude>
+                                        <exclude>node/</exclude>
+                                        <exclude>node_modules/</exclude>
+                                        <exclude>Gruntfile.js</exclude>
                                         <exclude>%regex[.*/\.?bower\.json]</exclude>
                                     </excludes>
                                 </resource>
