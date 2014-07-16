@@ -141,7 +141,7 @@
                     <execution>
                         <id>copy-resources</id>
 
-                        <phase>validate</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -155,6 +155,9 @@
                                         <exclude>test/</exclude>
                                         <exclude>**/.git*</exclude>
                                         <exclude>**/*.md</exclude>
+                                        <exclude>node/</exclude>
+                                        <exclude>node_modules/</exclude>
+                                        <exclude>Gruntfile.js</exclude>
                                         <exclude>%regex[.*/\.?bower\.json]</exclude>
                                     </excludes>
                                 </resource>
@@ -163,7 +166,7 @@
                     </execution>
                     <execution>
                         <id>copy-dist-resources</id>
-                        <phase>validate</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -223,7 +226,7 @@
                 <version>0.0.14</version>
 
                 <configuration>
-                    <workingDirectory>target</workingDirectory>
+                    <workingDirectory>src/main/resources</workingDirectory>
                 </configuration>
 
                 <executions>

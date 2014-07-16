@@ -17,7 +17,7 @@
           <div class="panel-body text-center empty-instance">
             <i class="fa fa-files-o"></i>
             <p>This storage resource currently has no collections.</p>
-            <a ng-click="modalCollectionAdd()" class="btn btn-primary btn-lg" type="button">New Collection</a>
+            <a ng-click="modalCollectionAdd()" class="btn btn-primary btn-lg">New Collection</a>
           </div>
         </div>
 
@@ -83,12 +83,12 @@
                       </select>
                     </div>
                     <div class="form-group">
-                      <label for="condition-input1">Condition</label>
+                      <label for="condition-input">Condition</label>
 
                       <div class="inline-items" ng-repeat="condition in searchConditions">
 
                         <select pf-select="false" class="select selectpicker inline"
-                                ng-model="condition.type">
+                                ng-model="condition.type" id="condition-input">
                           <option value="EQUALS">Equals</option>
                           <option value="EQUALS_NOT">Not equal</option>
                         </select>
