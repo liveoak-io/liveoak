@@ -1,5 +1,6 @@
 package io.liveoak.pgsql.meta;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class PrimaryKey extends Key {
@@ -9,6 +10,10 @@ public class PrimaryKey extends Key {
 
     public static String[] splitId(String value) {
         return value.split("\\.");
+    }
+
+    public static List<String> splitIdAsList(String value) {
+        return Arrays.asList(splitId(value));
     }
 
     public static String spliceId(List<Object> ids) {

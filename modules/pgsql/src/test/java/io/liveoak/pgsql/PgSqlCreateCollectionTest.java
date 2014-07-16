@@ -1,5 +1,7 @@
 package io.liveoak.pgsql;
 
+import java.net.URI;
+
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
 
@@ -17,7 +19,7 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
         ResourceState result = client.read(ctx("*"), endpoint);
         System.out.println(result);
 
-        ResourceState body = resource("items", "/testApp/" + BASEPATH, new Object[]{
+        ResourceState body = resource("items", endpoint, new Object[]{
                 "columns", list(
                     obj("name", "item_id",
                             "type", "varchar",
@@ -61,9 +63,32 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
 
 
         // create a new item, linking to the first order
-        body = resource("", "", new Object[] {});
-        result = client.create(ctx("*"), endpoint + "/items", body);
+        endpoint = endpoint + "/items";
+        body = resource("I39845355", endpoint, new Object[] {
+                "name", "The Gadget",
+                "quantity", 1,
+                "price", 39900,
+                "vat", 20,
+                schema_two + ".orders", resource("014-2004096", "/testApp/" + BASEPATH + "/" + schema_two + ".orders", new Object[] {})
+        });
+        result = client.create(ctx("*(*)"), endpoint, body);
+        System.out.println(result);
 
-        // list order expanded, to see its items
+        ResourceState expected = resource("I39845355", endpoint, new Object[] {
+                "item_id", "I39845355",
+                "name", "The Gadget",
+                "quantity", 1,
+                "price", 39900,
+                "vat", 20,
+                schema_two + ".orders", resource("014-2004096", "/testApp/" + BASEPATH + "/" + schema_two + ".orders", new Object[]{
+                        "order_id", "014-2004096",
+                        "create_date", time("2014-04-02 11:06:12.0"),
+                        "total", 43800L,
+                        "addresses", resourceRef("/testApp/" + BASEPATH + "/addresses/2"),
+                        "items", list(resourceRef("/testApp/" + BASEPATH + "/items/I39845355"))
+                })
+        });
+
+        checkResource(result, expected);
     }
 }

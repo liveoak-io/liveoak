@@ -6,12 +6,14 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 
@@ -148,6 +150,100 @@ public class QueryBuilder {
         return ps;
     }
 
+    public PreparedStatement prepareInsert(Connection con, Table table, ResourceState state) throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO " + table.quotedSchemaName() + " (");
+        int i = 0;
+        for (Column c: table.columns()) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(c.quotedName());
+            i++;
+        }
+        sb.append(") VALUES (");
+
+        for (i = 0; i < table.columns().size(); i++) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append("?");
+        }
+        sb.append(")");
+
+        // For PK columns we have to use state.id(), parse it into column values and then set
+        // If PK column values are specified via properties as well, then they need to be equal to id
+        // If not, that can either be marked as an error, or they can be simply ignored
+        // Or they can be used if id() is null
+        List<Object> pkvals = new ArrayList<>();
+        String id = state.id();
+        if (id != null) {
+            pkvals.addAll(PrimaryKey.splitIdAsList(id));
+        } else {
+            for (Column c: table.pk().columns()) {
+                Object val = state.getProperty(c.name());
+                if (val == null) {
+                    throw new RuntimeException("Neither id, nor primary key column is set: " + c.name());
+                }
+                pkvals.add(val);
+            }
+        }
+
+        PreparedStatement ps = con.prepareStatement(sb.toString());
+        i = 1;
+        PrimaryKey pk = table.pk();
+        for (Column c: table.columns()) {
+            Object val = null;
+
+            Key key = table.keyForColumnName(c.name());
+
+            if (key instanceof ForeignKey) {
+                // if it's a FK then extract referenced id
+                String fkField = catalog.table(((ForeignKey) key).tableRef()).id();
+                val = selfHrefId(fkField, state.getProperty(fkField));
+
+            } else if (key instanceof PrimaryKey) {
+                // if it's a PK column use appropriate value
+                int idx = 0;
+                for (Column pkc : pk.columns()) {
+                    if (pkc.name().equals(c.name())) {
+                        val = pkvals.get(idx);
+                        break;
+                    }
+                    idx++;
+                }
+            } else {
+                // any other column - non-pk, non-fk column
+                val = state.getProperty(c.name());
+            }
+
+            // bindValue will convert from String to appropriate value if needed
+            c.bindValue(ps, i, val);
+            i++;
+        }
+
+        return ps;
+    }
+
+    private String selfHrefId(String field, Object val) {
+        if (val == null || val instanceof ResourceState == false) {
+            throw new RuntimeException("Invalid value for '" + field + "': " + val);
+        }
+        /*
+        Object self = ((ResourceState) val).getProperty("self");
+        if (self == null || self instanceof ResourceState == false) {
+            throw new RuntimeException("Not a valid resource reference - no 'self' - for '" + field + "': " + val);
+        }
+
+        String href = ((ResourceState) val).getPropertyAsString("href");
+        if (href == null) {
+            throw new RuntimeException("Not a valid resource reference - no 'self/href' - for '" + field + "': " + val);
+        }
+        return new ResourcePath(href).tail().toString();
+        */
+        return new ResourcePath(((ResourceState) val).uri().toString()).tail().toString();
+    }
+
     public QueryResults querySelectFromTableWhereIds(RequestContext ctx, Connection con, Table table, String [] ids) throws SQLException {
         if (ids != null && ids.length > 0) {
             return query(ctx, prepareSelectFromTableWhereIds(con, table, ids));
@@ -203,5 +299,30 @@ public class QueryBuilder {
             }
         }
         return new QueryResults();
+    }
+
+    public String executeInsert(RequestContext ctx, Connection con, Table table, ResourceState state) throws SQLException {
+        String id = extractId(table, state);
+        try (PreparedStatement ps = prepareInsert(con, table, state)) {
+            ps.execute();
+        }
+        return id;
+    }
+
+    private String extractId(Table table, ResourceState state) {
+        String id = state.id();
+        if (id != null) {
+            return id;
+        } else {
+            List<Object> pkvals = new ArrayList<>();
+            for (Column c: table.pk().columns()) {
+                Object val = state.getProperty(c.name());
+                if (val == null) {
+                    throw new RuntimeException("Neither id, nor primary key column is set: " + c.name());
+                }
+                pkvals.add(val);
+            }
+            return PrimaryKey.spliceId(pkvals);
+        }
     }
 }

@@ -78,8 +78,17 @@ public class PgSqlTableResource implements Resource {
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         // insert a new record into a table
-        Resource.super.createMember(ctx, state, responder);
-        // also handle expanded many-to-one / one-to-many
+        Catalog cat = parent.getCatalog();
+        Table table = cat.tableById(id());
+
+        String itemId = null;
+        try (Connection c = parent.getConnection()) {
+            itemId = new QueryBuilder(cat).executeInsert(ctx, c, table, state);
+
+            // TODO: also handle expanded many-to-one / one-to-many
+        }
+
+        readMember(ctx, itemId, responder);
     }
 
     QueryResults queryResults() {

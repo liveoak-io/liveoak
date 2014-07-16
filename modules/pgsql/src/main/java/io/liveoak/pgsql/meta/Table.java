@@ -171,6 +171,23 @@ public class Table {
         return sb.toString();
     }
 
+    public Key keyForColumnName(String name) {
+        Key ret = pkForColumnName(name);
+        if (ret == null) {
+            ret = foreignKeyForColumnName(name);
+        }
+        return ret;
+    }
+
+    public PrimaryKey pkForColumnName(String name) {
+        for (Column c: pk.columns()) {
+            if (c.name().equals(name)) {
+                return pk;
+            }
+        }
+        return null;
+    }
+
     public ForeignKey foreignKeyForColumnName(String name) {
         for (ForeignKey fk: foreignKeys) {
             for (Column c: fk.columns()) {
