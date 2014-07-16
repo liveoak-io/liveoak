@@ -50,11 +50,11 @@ public class DefaultResourceErrorResponse extends DefaultResourceResponse implem
     }
 
     public String message() {
-        if ( this.message != null ) {
+        if (this.message != null) {
             return this.message;
         }
 
-        if ( this.cause != null ) {
+        if (this.cause != null) {
             return this.cause.getMessage();
         }
         return null;
@@ -72,15 +72,15 @@ public class DefaultResourceErrorResponse extends DefaultResourceResponse implem
         ResourceState state = new DefaultResourceState();
 
         if (errorType != null) {
-            state.putProperty( "error-type", errorType.toString() );
+            state.putProperty("error-type", errorType.toString());
         }
 
         if (message != null) {
-        state.putProperty( "message", message);
+            state.putProperty("message", message);
         }
 
         if (cause != null) {
-            state.putProperty( "cause", cause.toString());
+            state.putProperty("cause", cause.toString());
         }
 
         return state;

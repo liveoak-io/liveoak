@@ -5,6 +5,10 @@
  */
 package io.liveoak.common.codec.json;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.Map;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -13,10 +17,6 @@ import io.liveoak.common.codec.StateEncoder;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
 
 /**
  * @author Bob McWhirter
@@ -47,16 +47,16 @@ public class JSONEncoder implements StateEncoder {
     // ----------------------------------------
 
     @Override
-    public void startResource( ResourceState resourceState ) throws Exception {
+    public void startResource(ResourceState resourceState) throws Exception {
         this.generator.writeStartObject();
-        if ( resourceState.id() != null && !this.inhibitIds ) {
-            this.generator.writeFieldName( "id" );
-            this.generator.writeString( resourceState.id() );
-            if ( resourceState.uri() != null ) {
-                this.generator.writeFieldName( "self" );
+        if (resourceState.id() != null && !this.inhibitIds) {
+            this.generator.writeFieldName("id");
+            this.generator.writeString(resourceState.id());
+            if (resourceState.uri() != null) {
+                this.generator.writeFieldName("self");
                 this.generator.writeStartObject();
-                this.generator.writeFieldName( "href" );
-                this.generator.writeString( resourceState.uri().toString() );
+                this.generator.writeFieldName("href");
+                this.generator.writeString(resourceState.uri().toString());
                 this.generator.writeEndObject();
             }
         }
@@ -132,13 +132,13 @@ public class JSONEncoder implements StateEncoder {
     }
 
     @Override
-    public void writeValue( Long value ) throws Exception {
+    public void writeValue(Long value) throws Exception {
         this.generator.writeNumber(value);
     }
 
     @Override
-    public void writeValue( Boolean value ) throws Exception {
-        this.generator.writeBoolean( value );
+    public void writeValue(Boolean value) throws Exception {
+        this.generator.writeBoolean(value);
     }
 
     @Override
@@ -152,27 +152,27 @@ public class JSONEncoder implements StateEncoder {
     }
 
     protected void writeValue(Object value) throws Exception {
-        if ( value instanceof String ) {
-            writeValue( (String) value );
-        } else if ( value instanceof Integer ) {
-            writeValue( (Integer) value );
-        } else if ( value instanceof Double ) {
-            writeValue( (Double) value);
-        } else if ( value instanceof Long ) {
-            writeValue( (Long) value);
-        } else if ( value instanceof Boolean ) {
-            writeValue( (Boolean) value );
+        if (value instanceof String) {
+            writeValue((String) value);
+        } else if (value instanceof Integer) {
+            writeValue((Integer) value);
+        } else if (value instanceof Double) {
+            writeValue((Double) value);
+        } else if (value instanceof Long) {
+            writeValue((Long) value);
+        } else if (value instanceof Boolean) {
+            writeValue((Boolean) value);
         } else {
-            throw new NonEncodableValueException( value );
+            throw new NonEncodableValueException(value);
         }
     }
 
     @Override
     public void writeValue(Map value) throws Exception {
         this.generator.writeStartObject();
-        for ( Object key : value.keySet() ) {
-            this.generator.writeFieldName( key.toString() );
-            writeValue( value.get( key ) );
+        for (Object key : value.keySet()) {
+            this.generator.writeFieldName(key.toString());
+            writeValue(value.get(key));
         }
         this.generator.writeEndObject();
     }

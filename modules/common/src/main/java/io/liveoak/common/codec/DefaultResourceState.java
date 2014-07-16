@@ -5,15 +5,14 @@
  */
 package io.liveoak.common.codec;
 
-import io.liveoak.spi.state.ResourceState;
-
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter

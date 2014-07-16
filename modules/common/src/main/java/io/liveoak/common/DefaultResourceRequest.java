@@ -16,7 +16,6 @@ import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ReturnFields;
-import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.Sorting;
 import io.liveoak.spi.state.ResourceState;
 
@@ -93,10 +92,10 @@ public class DefaultResourceRequest implements ResourceRequest {
         }
 
         public Builder(ResourceRequest original) {
-            obj = new DefaultResourceRequest( original );
-            mediaTypeMatcher( original.mediaTypeMatcher() );
-            pagination( original.requestContext().pagination() );
-            resourceState( original.state() );
+            obj = new DefaultResourceRequest(original);
+            mediaTypeMatcher(original.mediaTypeMatcher());
+            pagination(original.requestContext().pagination());
+            resourceState(original.state());
         }
 
         public Builder resourceParams(ResourceParams params) {

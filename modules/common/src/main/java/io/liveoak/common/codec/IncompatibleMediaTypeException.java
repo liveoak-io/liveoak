@@ -5,11 +5,8 @@
  */
 package io.liveoak.common.codec;
 
-import io.liveoak.spi.MediaType;
 import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.resource.async.BinaryResource;
-
-import java.util.List;
 
 /**
  * @author Bob McWhirter

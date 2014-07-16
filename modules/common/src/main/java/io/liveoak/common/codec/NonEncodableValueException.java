@@ -6,7 +6,7 @@ package io.liveoak.common.codec;
 public class NonEncodableValueException extends Exception {
 
     public NonEncodableValueException(Object value) {
-        super( "Unable to encode: " + value );
+        super("Unable to encode: " + value);
         this.value = value;
     }
 

@@ -1,15 +1,14 @@
-
 package io.liveoak.common.codec.driver;
-
-import io.liveoak.common.codec.NonEncodableValueException;
-import io.liveoak.common.codec.StateEncoder;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.state.ResourceState;
 
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
+
+import io.liveoak.common.codec.NonEncodableValueException;
+import io.liveoak.common.codec.StateEncoder;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -19,7 +18,7 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
     protected StateEncoder stateEncoder;
 
     public StateEncodingDriver(RequestContext ctx, StateEncoder stateEncoder, ResourceState resourceState) {
-        super (resourceState, ctx.returnFields());
+        super(resourceState, ctx.returnFields());
         this.stateEncoder = stateEncoder;
     }
 
@@ -37,62 +36,61 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
         encoder().startResource(state());
         encodeProperties(state());
         encodeMembers(state());
-        encoder().endResource( state() );
+        encoder().endResource(state());
     }
 
     protected void encodeMembers(ResourceState resourceState) throws Exception {
-        if ( resourceState.members() != null && !resourceState.members().isEmpty() ) {
+        if (resourceState.members() != null && !resourceState.members().isEmpty()) {
             encoder().startMembers();
-            for (ResourceState memberState :resourceState.members()) {
-                encodeValue( memberState );
+            for (ResourceState memberState : resourceState.members()) {
+                encodeValue(memberState);
             }
             encoder().endMembers();
         }
     }
 
-    protected void encodeProperties( ResourceState resourceState ) throws Exception {
-        if ( !resourceState.getPropertyNames().isEmpty() ) {
+    protected void encodeProperties(ResourceState resourceState) throws Exception {
+        if (!resourceState.getPropertyNames().isEmpty()) {
             encoder().startProperties();
-            for ( String propertyName : resourceState.getPropertyNames() ) {
-                encodeProperty( propertyName, resourceState.getProperty( propertyName ) );
+            for (String propertyName : resourceState.getPropertyNames()) {
+                encodeProperty(propertyName, resourceState.getProperty(propertyName));
             }
             encoder().endProperties();
         }
     }
 
-    protected void encodeProperty(String propertyName, Object property) throws Exception{
-        encoder().startProperty( propertyName ) ;
-        encodeValue( property );
-        encoder().endProperty( propertyName );
+    protected void encodeProperty(String propertyName, Object property) throws Exception {
+        encoder().startProperty(propertyName);
+        encodeValue(property);
+        encoder().endProperty(propertyName);
     }
 
     protected void encodeValue(Object value) throws Exception {
         if (value instanceof ResourceState) {
-            encodeState( ( ResourceState ) value );
-        }
-        else if (value instanceof String) {
+            encodeState((ResourceState) value);
+        } else if (value instanceof String) {
             encoder().writeValue((String) value);
         } else if (value instanceof Integer) {
             encoder().writeValue((Integer) value);
         } else if (value instanceof Double) {
             encoder().writeValue((Double) value);
         } else if (value instanceof Long) {
-            encoder().writeValue( ( Long ) value );
-        } else if (value instanceof Date ) {
-            encoder().writeValue( ( Date ) value );
-       //TODO: figure out when writing a link should be used....
+            encoder().writeValue((Long) value);
+        } else if (value instanceof Date) {
+            encoder().writeValue((Date) value);
+            //TODO: figure out when writing a link should be used....
 //        } else if (value instanceof URI ) {
 ////        } else if (property instanceof ResourceState) {
 //            encoder().writeLink((URI) property);
 //        }
         } else if (value instanceof URI) {
-            encoder().writeValue(((URI)value).getPath());
+            encoder().writeValue(((URI) value).getPath());
         } else if (value instanceof Boolean) {
-            encoder().writeValue( ( Boolean ) value );
-        } else if (value instanceof Map ) {
-            encoder().writeValue( ( Map ) value );
-        } else if (value instanceof Collection ) {
-            encodeList((Collection)value);
+            encoder().writeValue((Boolean) value);
+        } else if (value instanceof Map) {
+            encoder().writeValue((Map) value);
+        } else if (value instanceof Collection) {
+            encodeList((Collection) value);
         } else if (value == null) {
             encoder().writeNullValue();
         } else {
@@ -101,10 +99,10 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
     }
 
     protected void encodeState(ResourceState resourceState) throws Exception {
-        encoder().startResource( resourceState );
-        encodeProperties( resourceState );
-        encodeMembers( resourceState );
-        encoder().endResource( resourceState );
+        encoder().startResource(resourceState);
+        encodeProperties(resourceState);
+        encodeMembers(resourceState);
+        encoder().endResource(resourceState);
 
     }
 
@@ -114,7 +112,7 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
             if (element instanceof ResourceState) {
 
             }
-            encodeValue( element );
+            encodeValue(element);
         }
         encoder().endList();
     }

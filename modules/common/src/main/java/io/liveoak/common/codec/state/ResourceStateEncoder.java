@@ -5,17 +5,17 @@
  */
 package io.liveoak.common.codec.state;
 
-import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.common.codec.ResourceEncoder;
-import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
-import io.netty.buffer.ByteBuf;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Stack;
+
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.common.codec.ResourceEncoder;
+import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceState;
+import io.netty.buffer.ByteBuf;
 
 /**
  * @author Bob McWhirter
@@ -138,12 +138,12 @@ public class ResourceStateEncoder implements ResourceEncoder {
     }
 
     @Override
-    public void writeValue( Long value ) throws Exception {
+    public void writeValue(Long value) throws Exception {
         write(value);
     }
 
     @Override
-    public void writeValue( Boolean value ) throws Exception {
+    public void writeValue(Boolean value) throws Exception {
         write(value);
     }
 
@@ -192,7 +192,7 @@ public class ResourceStateEncoder implements ResourceEncoder {
         public Object value;
     }
 
-    private void write(Object value) throws Exception{
+    private void write(Object value) throws Exception {
         Object top = this.stack.peek();
 
         if (top instanceof Collection) {

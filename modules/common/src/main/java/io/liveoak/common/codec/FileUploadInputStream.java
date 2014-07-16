@@ -17,8 +17,10 @@ import io.netty.handler.codec.http.multipart.FileUpload;
  */
 public class FileUploadInputStream extends BufferedInputStream {
 
+    public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
+
     public FileUploadInputStream(FileUpload fileUpload) {
-        this(fileUpload, 8 * 1024);
+        this(fileUpload, DEFAULT_BUFFER_SIZE);
     }
 
     public FileUploadInputStream(FileUpload fileUpload, int bufSize) {

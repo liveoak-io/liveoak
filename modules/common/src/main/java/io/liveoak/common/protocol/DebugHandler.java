@@ -5,14 +5,14 @@
  */
 package io.liveoak.common.protocol;
 
+import java.nio.charset.Charset;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.ReferenceCountUtil;
 import org.jboss.logging.Logger;
-
-import java.nio.charset.Charset;
 
 /**
  * @author Bob McWhirter
@@ -56,8 +56,8 @@ public class DebugHandler extends ChannelDuplexHandler {
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         log.debugf("%s write: %s", this.name, msg);
-        if ( msg instanceof ByteBuf) {
-            log.debug( ((ByteBuf)msg).toString( Charset.defaultCharset() ));
+        if (msg instanceof ByteBuf) {
+            log.debug(((ByteBuf) msg).toString(Charset.defaultCharset()));
         }
         super.write(ctx, msg, promise);
     }
@@ -65,8 +65,8 @@ public class DebugHandler extends ChannelDuplexHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         log.debugf("%s read : %s // %s", this.name, msg, msg.getClass());
-        if ( msg instanceof ByteBuf ) {
-            log.debug( ((ByteBuf) msg).toString( Charset.defaultCharset() ));
+        if (msg instanceof ByteBuf) {
+            log.debug(((ByteBuf) msg).toString(Charset.defaultCharset()));
         }
         ReferenceCountUtil.retain(msg);
         super.channelRead(ctx, msg);

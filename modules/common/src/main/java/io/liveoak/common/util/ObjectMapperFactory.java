@@ -11,11 +11,11 @@ public class ObjectMapperFactory {
 
     public static ObjectMapper create() {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.configure( JsonParser.Feature.ALLOW_COMMENTS, true );
-        mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true );
-        mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true );
+        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+        mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
         //mapper.configure( JsonGenerator.Feature.QUOTE_FIELD_NAMES, false );
-        mapper.configure( SerializationFeature.INDENT_OUTPUT, true);
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 
         return mapper;
     }

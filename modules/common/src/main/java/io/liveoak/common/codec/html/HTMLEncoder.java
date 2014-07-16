@@ -5,17 +5,18 @@
  */
 package io.liveoak.common.codec.html;
 
-import io.liveoak.common.codec.StateEncoder;
-import io.liveoak.spi.state.ResourceState;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufOutputStream;
+import java.util.Date;
+import java.util.Map;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import java.util.Date;
-import java.util.Map;
+
+import io.liveoak.common.codec.StateEncoder;
+import io.liveoak.spi.state.ResourceState;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufOutputStream;
 
 /**
  * @author Bob McWhirter
@@ -44,7 +45,6 @@ public class HTMLEncoder implements StateEncoder {
         startTag("style");
         text(getCss());
         endTag("style");
-
 
         endTag("head");
         startTag("body");
@@ -88,13 +88,13 @@ public class HTMLEncoder implements StateEncoder {
     }
 
     protected void resourceLink(ResourceState resourcestate) throws XMLStreamException {
-          if ( resourcestate.uri() != null) {
-              startTag("a");
-              attribute("href", resourcestate.uri().toString());
-              text(resourcestate.id());
-              endTag("a");
-              text(" / ");
-          }
+        if (resourcestate.uri() != null) {
+            startTag("a");
+            attribute("href", resourcestate.uri().toString());
+            text(resourcestate.id());
+            endTag("a");
+            text(" / ");
+        }
     }
 
 
@@ -186,10 +186,10 @@ public class HTMLEncoder implements StateEncoder {
     }
 
     protected void writeValue(Object value) throws Exception {
-        if ( value instanceof Map ) {
-            writeValue( (Map) value );
+        if (value instanceof Map) {
+            writeValue((Map) value);
         } else {
-            writeValue( value.toString() );
+            writeValue(value.toString());
         }
     }
 
@@ -197,12 +197,12 @@ public class HTMLEncoder implements StateEncoder {
     public void writeValue(Map value) throws Exception {
         startTag("dl");
 
-        for ( Object key : value.keySet() ) {
-            startTag( "dt" );
-            text( key.toString() );
-            endTag( "dt" );
+        for (Object key : value.keySet()) {
+            startTag("dt");
+            text(key.toString());
+            endTag("dt");
 
-            writeValue( value.get( key ) );
+            writeValue(value.get(key));
         }
 
         endTag("dl");
@@ -220,8 +220,8 @@ public class HTMLEncoder implements StateEncoder {
             startTag("div");
             attribute("class", "resource");
             startTag("a");
-            attribute( "href", resourcestate.uri().toString() );
-            text( resourcestate.id() );
+            attribute("href", resourcestate.uri().toString());
+            text(resourcestate.id());
             endTag("a");
             endTag("div");
         }

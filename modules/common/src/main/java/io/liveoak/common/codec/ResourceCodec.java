@@ -5,16 +5,11 @@
  */
 package io.liveoak.common.codec;
 
-import io.liveoak.common.codec.driver.EncodingDriver;
-import io.liveoak.common.codec.driver.RootEncodingDriver;
 import io.liveoak.common.codec.driver.StateEncodingDriver;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Bob McWhirter
@@ -39,7 +34,7 @@ public class ResourceCodec {
         ByteBuf buffer = Unpooled.buffer();
         StateEncoder encoder = this.encoderClass.newInstance();
         encoder.initialize(buffer);
-        StateEncodingDriver driver = new StateEncodingDriver(ctx,encoder, resourceState );
+        StateEncodingDriver driver = new StateEncodingDriver(ctx, encoder, resourceState);
         driver.encode();
         driver.close();
         return buffer;

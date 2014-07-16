@@ -5,7 +5,6 @@
  */
 package io.liveoak.common.codec.driver;
 
-import io.liveoak.common.codec.Encoder;
 import io.liveoak.common.codec.ResourceEncoder;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
