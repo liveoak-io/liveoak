@@ -1,9 +1,7 @@
 package io.liveoak.spi.container.interceptor;
 
-import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
-import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter

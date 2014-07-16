@@ -13,19 +13,19 @@ public class NotAcceptableException extends ResourceException {
     protected String message;
 
     public NotAcceptableException(String path) {
-        super(path, "Request not acceptable" );
+        super(path, "Request not acceptable");
     }
 
     public NotAcceptableException(String path, String errorCode) {
         this(path, errorCode, null);
     }
 
-    public NotAcceptableException (String path, String message, Throwable cause) {
-        super(path, "The request to resource at '" + path + " as not acceptable:" + message , cause);
+    public NotAcceptableException(String path, String message, Throwable cause) {
+        super(path, "The request to resource at '" + path + " as not acceptable:" + message, cause);
         this.message = message;
     }
 
     public String message() {
-         return this.message;
+        return this.message;
     }
 }

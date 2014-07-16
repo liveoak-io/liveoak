@@ -71,22 +71,22 @@ public class DelegatingResponder implements Responder {
 
     @Override
     public void internalError(Throwable cause) {
-        delegate.internalError( cause );
+        delegate.internalError(cause);
     }
 
     @Override
-    public void invalidRequest( String message ) {
-        delegate.invalidRequest( message );
+    public void invalidRequest(String message) {
+        delegate.invalidRequest(message);
     }
 
     @Override
-    public void invalidRequest( Throwable cause ) {
+    public void invalidRequest(Throwable cause) {
         delegate.invalidRequest(cause);
     }
 
     @Override
-    public void invalidRequest( String message, Throwable cause ) {
-        delegate.invalidRequest( message, cause );
+    public void invalidRequest(String message, Throwable cause) {
+        delegate.invalidRequest(message, cause);
     }
 
     private Responder delegate;

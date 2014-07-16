@@ -40,53 +40,53 @@ public class LiveOak {
     public static final ServiceName GLOBAL_CONTEXT = GLOBAL.append("context");
 
     private static final ServiceName APPLICATION = LIVEOAK.append("application");
-    public static final ServiceName APPLICATION_REGISTRY = GLOBAL.append( "application-registry" );
-    public static final ServiceName APPLICATIONS_DIR = LIVEOAK.append( "dir", "applications" );
+    public static final ServiceName APPLICATION_REGISTRY = GLOBAL.append("application-registry");
+    public static final ServiceName APPLICATIONS_DIR = LIVEOAK.append("dir", "applications");
     public static final ServiceName APPLICATIONS_DEPLOYER = LIVEOAK.append("applications", "deployer");
 
-    public static final ServiceName SERVICE_REGISTRY = LIVEOAK.append( "msc", "service-registry" );
-    public static final ServiceName SERVICE_CONTAINER = LIVEOAK.append( "msc", "service-container" );
-    public static final ServiceName EXTENSION_LOADER = LIVEOAK.append( "extension-loader" );
-    public static final ServiceName EXTENSION_INSTALLER = LIVEOAK.append( "extension-installer" );
+    public static final ServiceName SERVICE_REGISTRY = LIVEOAK.append("msc", "service-registry");
+    public static final ServiceName SERVICE_CONTAINER = LIVEOAK.append("msc", "service-container");
+    public static final ServiceName EXTENSION_LOADER = LIVEOAK.append("extension-loader");
+    public static final ServiceName EXTENSION_INSTALLER = LIVEOAK.append("extension-installer");
 
     public static ServiceName application(String appId) {
-        return LIVEOAK.append( "application", appId );
+        return APPLICATION.append(appId);
     }
 
     public static ServiceName applicationConfigurationManager(String appId) {
-        return LIVEOAK.append( "application-config-managers", appId );
+        return LIVEOAK.append("application-config-managers", appId);
     }
 
     public static ServiceName applicationContext(String appId) {
-        return LIVEOAK.append( "application-context", appId );
+        return LIVEOAK.append("application-context", appId);
     }
 
     public static ServiceName applicationAdminResource(String appId) {
-        return LIVEOAK.append( "application-admin", appId );
+        return LIVEOAK.append("application-admin", appId);
     }
 
     public static ServiceName resource(String appId, String resourceId) {
-        return LIVEOAK.append( "application-resource", appId, resourceId );
+        return LIVEOAK.append("application-resource", appId, resourceId);
     }
 
     public static ServiceName adminResource(String appId, String resourceId) {
-        return LIVEOAK.append( "application-admin-resource", appId, resourceId );
+        return LIVEOAK.append("application-admin-resource", appId, resourceId);
     }
 
     public static ServiceName extension(String extensionId) {
-        return LIVEOAK.append( "extension", extensionId );
+        return LIVEOAK.append("extension", extensionId);
     }
 
     public static ServiceName extensionAdminResource(String extensionId) {
-        return LIVEOAK.append( "extension-admin", extensionId );
+        return LIVEOAK.append("extension-admin", extensionId);
     }
 
     public static ServiceName applicationExtension(String appId, String extensionId) {
-        return LIVEOAK.append( "application-extension", extensionId, appId );
+        return LIVEOAK.append("application-extension", extensionId, appId);
     }
 
     public static ServiceName systemResource(String id) {
-        return LIVEOAK.append( "system-resource", id );
+        return LIVEOAK.append("system-resource", id);
     }
 
     public static ServiceName server(String name, boolean network) {

@@ -1,6 +1,5 @@
 package io.liveoak.spi.client;
 
-import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.state.ResourceState;
 
 /**
@@ -25,6 +24,8 @@ public interface ClientResourceResponse {
     }
 
     String path();
+
     ResponseType responseType();
+
     ResourceState state();
 }

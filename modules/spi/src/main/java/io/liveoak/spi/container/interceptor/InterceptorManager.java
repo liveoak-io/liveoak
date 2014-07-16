@@ -23,7 +23,7 @@ public interface InterceptorManager {
 
     void unregister(Interceptor interceptor);
 
-    public ResourceState getInterceptorsConfig() throws IOException;
+    ResourceState getInterceptorsConfig() throws IOException;
 
     void setInterceptorsConfig(ResourceState resourceState) throws IOException;
 }

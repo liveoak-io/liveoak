@@ -5,8 +5,6 @@
  */
 package io.liveoak.spi.resource;
 
-import io.liveoak.spi.InitializationException;
-import io.liveoak.spi.ResourceContext;
 import io.liveoak.spi.resource.async.Resource;
 
 /**

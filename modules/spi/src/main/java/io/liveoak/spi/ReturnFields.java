@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface ReturnFields extends Iterable<String> {
 
-    public static ReturnFields ALL = new ReturnFields() {
+    static ReturnFields ALL = new ReturnFields() {
         @Override
         public ReturnFields child(String field) {
             return NONE;
@@ -45,7 +45,7 @@ public interface ReturnFields extends Iterable<String> {
         }
     };
 
-    public static ReturnFields NONE = new ReturnFields() {
+    static ReturnFields NONE = new ReturnFields() {
         @Override
         public ReturnFields child(String field) {
             return this;
@@ -78,7 +78,7 @@ public interface ReturnFields extends Iterable<String> {
         }
     };
 
-    public static ReturnFields ALL_RECURSIVELY = new ReturnFields() {
+    static ReturnFields ALL_RECURSIVELY = new ReturnFields() {
         @Override
         public ReturnFields child(String field) {
             return this;

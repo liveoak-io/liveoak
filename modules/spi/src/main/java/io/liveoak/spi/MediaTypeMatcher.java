@@ -11,8 +11,8 @@ public interface MediaTypeMatcher {
         return new MediaTypeMatcher() {
             @Override
             public MediaType findBestMatch(List<MediaType> types) {
-                for ( MediaType other : types ) {
-                    if ( other.isCompatible( mediaType ) ) {
+                for (MediaType other : types) {
+                    if (other.isCompatible(mediaType)) {
                         return other;
                     }
                 }

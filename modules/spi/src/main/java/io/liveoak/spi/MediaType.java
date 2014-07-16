@@ -14,6 +14,12 @@ import java.util.Map;
  */
 public class MediaType {
 
+    private static final String WILDCARD = "*";
+    private static final String FORWARD_SLASH = "/";
+    private static final String PLUS = "+";
+    private static final String SEMI_COLON = ";";
+    private static final String EQUALS = "=";
+
     public static final MediaType JSON = new MediaType("application/json");
     public static final MediaType XML = new MediaType("text/xml");
 
@@ -75,15 +81,15 @@ public class MediaType {
         if (type == null) {
             type = "application/json";
         }
-        int slashLoc = type.indexOf("/");
+        int slashLoc = type.indexOf(FORWARD_SLASH);
         if (slashLoc < 0) {
             throw new IllegalArgumentException("media-type must be in the form of 'type/subtype'");
         }
 
         this.type = type.substring(0, slashLoc);
 
-        int plusLoc = type.indexOf("+", slashLoc);
-        int semiLoc = type.indexOf(";", slashLoc);
+        int plusLoc = type.indexOf(PLUS, slashLoc);
+        int semiLoc = type.indexOf(SEMI_COLON, slashLoc);
 
         if (semiLoc > 0) {
             this.parameters = new HashMap<>();
@@ -94,7 +100,7 @@ public class MediaType {
                 this.subtype = type.substring(slashLoc + 1, semiLoc);
             }
 
-            int end = type.indexOf(";", semiLoc + 1);
+            int end = type.indexOf(SEMI_COLON, semiLoc + 1);
             if (end < 0) {
                 end = type.length();
             }
@@ -102,7 +108,7 @@ public class MediaType {
             while (semiLoc > 0) {
                 String param = type.substring(semiLoc + 1, end);
 
-                int equalLoc = param.indexOf("=");
+                int equalLoc = param.indexOf(EQUALS);
                 if (equalLoc < 0) {
                     break;
                 }
@@ -111,9 +117,9 @@ public class MediaType {
 
                 this.parameters.put(key, value);
 
-                semiLoc = type.indexOf(";", semiLoc + 1);
+                semiLoc = type.indexOf(SEMI_COLON, semiLoc + 1);
 
-                end = type.indexOf(";", semiLoc + 1);
+                end = type.indexOf(SEMI_COLON, semiLoc + 1);
                 if (end < 0) {
                     end = type.length();
                 }
@@ -154,7 +160,7 @@ public class MediaType {
 
     public boolean isCompatible(MediaType other) {
         if (!this.type.equals(other.type)) {
-            if (!this.type.equals("*") && !other.type.equals("*")) {
+            if (!this.type.equals(WILDCARD) && !other.type.equals(WILDCARD)) {
                 return false;
             }
         }
@@ -170,7 +176,7 @@ public class MediaType {
                 return true;
             }
             return false;
-        } else if (this.subtype.equals("*") || other.subtype.equals("*")) {
+        } else if (this.subtype.equals(WILDCARD) || other.subtype.equals(WILDCARD)) {
             return true;
         }
 
@@ -215,10 +221,10 @@ public class MediaType {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(this.type);
-        builder.append("/");
+        builder.append(FORWARD_SLASH);
         builder.append(this.subtype);
         if (this.suffix != null) {
-            builder.append("+");
+            builder.append(PLUS);
             builder.append(this.suffix);
         }
         return builder.toString();

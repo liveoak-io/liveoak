@@ -1,8 +1,6 @@
 package io.liveoak.spi.container;
 
-import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceResponse;
-import io.liveoak.spi.resource.async.Resource;
 
 /**
  * @author Bob McWhirter

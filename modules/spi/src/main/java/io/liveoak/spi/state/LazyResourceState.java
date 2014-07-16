@@ -12,19 +12,19 @@ import io.netty.handler.codec.http.multipart.FileUpload;
  */
 public interface LazyResourceState extends ResourceState {
 
-    public long getContentLength();
+    long getContentLength();
 
-    public MediaType getContentType();
+    MediaType getContentType();
 
-    public boolean hasBigContent();
+    boolean hasBigContent();
 
-    public File contentAsFile();
+    File contentAsFile();
 
-    public InputStream contentAsStream();
+    InputStream contentAsStream();
 
-    public ByteBuf contentAsByteBuf();
+    ByteBuf contentAsByteBuf();
 
     void fileUpload(FileUpload fileUpload);
 
-    public void content(ByteBuf content);
+    void content(ByteBuf content);
 }

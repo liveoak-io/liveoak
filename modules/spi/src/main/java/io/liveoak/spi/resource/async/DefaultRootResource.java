@@ -30,7 +30,7 @@ public class DefaultRootResource implements RootResource {
 
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        responder.resourceUpdated( this );
+        responder.resourceUpdated(this);
     }
 
     private final String id;
