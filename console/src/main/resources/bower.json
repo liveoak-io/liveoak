@@ -21,8 +21,20 @@
         "angular-resource": "1.2.16",
         "animate.css": "3.1.1",
         "font-awesome": "4.0.3",
-        "less": "~1.6.1",
-        "jquery": "~2.0.3",
+        "less": "1.6.1",
+        "jquery": "2.0.3",
         "patternfly": "1.0.3"
+    },
+  "exportsOverride": {
+    "font-awesome": {
+      "css": "css/*.css",
+      "fonts": "fonts/*"
+    },
+    "patternfly": {
+      "dist/css": "dist/css/*",
+      "dist/fonts": "dist/fonts/*",
+      "components/bootstrap/dist/js": "components/bootstrap/dist/js/bootstrap.js",
+      "components/bootstrap-select": "components/bootstrap-select/bootstrap-select.js"
     }
+  }
 }

@@ -7,3 +7,4 @@ tmp
 .bower-*
 app/lib/
 node/
+bower_components/
