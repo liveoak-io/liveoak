@@ -65,9 +65,9 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<DefaultH
     @Override
     protected void decode(ChannelHandlerContext ctx, DefaultHttpRequest msg, List<Object> out) throws Exception {
 
-        URI uri = new URI( msg.getUri() );
+        URI uri = new URI(msg.getUri());
         String query = uri.getRawQuery();
-        if ( query == null ) {
+        if (query == null) {
             query = "?";
         } else {
             query = "?" + query;

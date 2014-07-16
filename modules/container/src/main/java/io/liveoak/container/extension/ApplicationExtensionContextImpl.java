@@ -1,5 +1,7 @@
 package io.liveoak.container.extension;
 
+import java.util.Properties;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
@@ -9,10 +11,11 @@ import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
-
-import java.util.Properties;
 
 /**
  * @author Bob McWhirter
@@ -83,7 +86,7 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
                 .addInjection(configFilter.configurationInjector(), this.configuration)
                 .install();
 
-        AdminResourceWrappingResourceService wrapper = new AdminResourceWrappingResourceService( this.appExtension, this.boottime );
+        AdminResourceWrappingResourceService wrapper = new AdminResourceWrappingResourceService(this.appExtension, this.boottime);
         target.addService(privateName.append("wrapper"), wrapper)
                 .addDependency(privateName.append("filter-config"))
                 .addDependency(privateName, RootResource.class, wrapper.resourceInjector())
@@ -92,7 +95,7 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
 
         UpdateResourceService configApply = new UpdateResourceService(this.appExtension);
         target.addService(privateName.append("apply-config"), configApply)
-                .addDependency(privateName.append( "wrapper" ), Resource.class, configApply.resourceInjector())
+                .addDependency(privateName.append("wrapper"), Resource.class, configApply.resourceInjector())
                 .addDependency(privateName.append("filter-config"), ObjectNode.class, configApply.configurationInjector())
                 .install();
 

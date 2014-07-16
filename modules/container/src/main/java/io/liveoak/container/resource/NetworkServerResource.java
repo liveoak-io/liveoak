@@ -2,7 +2,6 @@ package io.liveoak.container.resource;
 
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.container.NetworkServer;
-import io.liveoak.spi.container.Server;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 
@@ -29,9 +28,9 @@ public class NetworkServerResource implements Resource {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept( "name", this.name );
-        sink.accept( "host", this.server.host().toString() );
-        sink.accept( "port", this.server.port() );
+        sink.accept("name", this.name);
+        sink.accept("host", this.server.host().toString());
+        sink.accept("port", this.server.port());
         sink.close();
     }
 

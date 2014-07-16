@@ -6,8 +6,6 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 
-import java.net.InetAddress;
-
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */

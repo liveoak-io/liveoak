@@ -21,7 +21,7 @@ public class CodecInstallationService implements Service<Void> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.codecManagerInjector.getValue().registerResourceCodec( this.mediaType, this.codecInjector.getValue() );
+        this.codecManagerInjector.getValue().registerResourceCodec(this.mediaType, this.codecInjector.getValue());
     }
 
     @Override

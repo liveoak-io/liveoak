@@ -1,22 +1,39 @@
 package io.liveoak.container.service.bootstrap;
 
-import io.liveoak.common.codec.ResourceCodecManager;
-import io.liveoak.container.interceptor.InterceptorManagerImpl;
-import io.liveoak.container.protocols.PipelineConfigurator;
-import io.liveoak.container.service.*;
-import io.liveoak.container.tenancy.GlobalContext;
-import io.liveoak.spi.client.Client;
-import io.liveoak.spi.container.Address;
-import io.liveoak.spi.container.SubscriptionManager;
-import org.jboss.msc.inject.Injector;
-import org.jboss.msc.service.*;
-import org.jboss.msc.value.ImmediateValue;
-import org.jboss.msc.value.InjectedValue;
-
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executor;
 
-import static io.liveoak.spi.LiveOak.*;
+import io.liveoak.common.codec.ResourceCodecManager;
+import io.liveoak.container.interceptor.InterceptorManagerImpl;
+import io.liveoak.container.protocols.PipelineConfigurator;
+import io.liveoak.container.service.LocalServerService;
+import io.liveoak.container.service.NotifierService;
+import io.liveoak.container.service.PipelineConfiguratorService;
+import io.liveoak.container.service.SubscriptionManagerService;
+import io.liveoak.container.service.UnsecureServerService;
+import io.liveoak.container.service.WorkerPoolService;
+import io.liveoak.container.tenancy.GlobalContext;
+import io.liveoak.spi.client.Client;
+import io.liveoak.spi.container.SubscriptionManager;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
+import org.jboss.msc.service.ValueService;
+import org.jboss.msc.value.ImmediateValue;
+
+import static io.liveoak.spi.LiveOak.CLIENT;
+import static io.liveoak.spi.LiveOak.CODEC_MANAGER;
+import static io.liveoak.spi.LiveOak.GLOBAL_CONTEXT;
+import static io.liveoak.spi.LiveOak.INTERCEPTOR_MANAGER;
+import static io.liveoak.spi.LiveOak.NOTIFIER;
+import static io.liveoak.spi.LiveOak.PIPELINE_CONFIGURATOR;
+import static io.liveoak.spi.LiveOak.SOCKET_BINDING;
+import static io.liveoak.spi.LiveOak.SUBSCRIPTION_MANAGER;
+import static io.liveoak.spi.LiveOak.WORKER_POOL;
+import static io.liveoak.spi.LiveOak.server;
 
 /**
  * @author Bob McWhirter

@@ -1,9 +1,8 @@
 package io.liveoak.container.tenancy;
 
-import io.liveoak.spi.Application;
-
-import java.io.File;
 import java.util.Collection;
+
+import io.liveoak.spi.Application;
 
 /**
  * @author Bob McWhirter
@@ -11,5 +10,6 @@ import java.util.Collection;
 public interface ApplicationRegistry {
 
     public Collection<? extends Application> applications();
+
     public Application application(String id) throws InterruptedException;
 }

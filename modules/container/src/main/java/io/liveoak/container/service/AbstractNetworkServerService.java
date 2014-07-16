@@ -1,8 +1,9 @@
 package io.liveoak.container.service;
 
+import java.net.InetSocketAddress;
+
 import io.liveoak.container.protocols.PipelineConfigurator;
 import io.liveoak.container.server.AbstractNetworkServer;
-import io.liveoak.spi.container.Address;
 import io.liveoak.spi.container.NetworkServer;
 import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
@@ -11,9 +12,6 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 
 /**
  * @author Bob McWhirter
@@ -29,12 +27,12 @@ public abstract class AbstractNetworkServerService implements Service<NetworkSer
     public void start(StartContext context) throws StartException {
         this.server = newServer();
         try {
-            this.server.host( this.bindingInjector.getValue().getAddress() );
-            this.server.port( this.bindingInjector.getValue().getPort() );
-            this.server.pipelineConfigurator( this.pipelineConfiguratorInjector.getValue() );
+            this.server.host(this.bindingInjector.getValue().getAddress());
+            this.server.port(this.bindingInjector.getValue().getPort());
+            this.server.pipelineConfigurator(this.pipelineConfiguratorInjector.getValue());
             this.server.start();
         } catch (Exception e) {
-            context.failed( new StartException(e) );
+            context.failed(new StartException(e));
         }
     }
 

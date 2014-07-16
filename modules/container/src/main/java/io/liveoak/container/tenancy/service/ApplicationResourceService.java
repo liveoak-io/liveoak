@@ -1,9 +1,15 @@
 package io.liveoak.container.tenancy.service;
 
+import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.zero.ApplicationExtensionsResource;
-import io.liveoak.container.tenancy.ApplicationResource;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
+import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 
 /**
@@ -23,7 +29,7 @@ public class ApplicationResourceService implements Service<ApplicationResource> 
         ServiceTarget target = context.getChildTarget();
         ServiceName name = context.getController().getName();
 
-        target.addService( name.append( "extensions" ), new ValueService<ApplicationExtensionsResource>( new ImmediateValue<>( this.resource.extensionsResource() ) ) )
+        target.addService(name.append("extensions"), new ValueService<ApplicationExtensionsResource>(new ImmediateValue<>(this.resource.extensionsResource())))
                 .install();
     }
 

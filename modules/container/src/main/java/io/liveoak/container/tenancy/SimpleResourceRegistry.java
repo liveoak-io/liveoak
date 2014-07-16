@@ -1,13 +1,12 @@
 package io.liveoak.container.tenancy;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Bob McWhirter

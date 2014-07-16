@@ -9,7 +9,13 @@ import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.inject.Injector;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
+import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 import org.jboss.msc.value.InjectedValue;
 
@@ -30,10 +36,10 @@ public class ZeroResourcesService implements Service<Void> {
 
         ServiceName applicationsName = LiveOak.resource(ZeroExtension.APPLICATION_ID, "applications");
         ApplicationsResourceService applicationsResource = new ApplicationsResourceService();
-        target.addService( applicationsName, applicationsResource )
+        target.addService(applicationsName, applicationsResource)
                 .addDependency(LiveOak.APPLICATION_REGISTRY, InternalApplicationRegistry.class, applicationsResource.applicationRegistryInjector())
                 .install();
-         mount(target, applicationsName );
+        mount(target, applicationsName);
     }
 
     protected void mount(ServiceTarget target, ServiceName resourceName) {

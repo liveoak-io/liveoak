@@ -1,18 +1,26 @@
 package io.liveoak.container.service.bootstrap;
 
+import java.io.File;
+
 import io.liveoak.container.tenancy.GlobalContext;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.container.tenancy.service.ApplicationRegistryService;
 import io.liveoak.container.tenancy.service.ApplicationsDeployerService;
 import io.liveoak.container.tenancy.service.ApplicationsDirectoryService;
 import org.jboss.msc.inject.Injector;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
+import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 import org.jboss.msc.value.InjectedValue;
 
-import java.io.File;
-
-import static io.liveoak.spi.LiveOak.*;
+import static io.liveoak.spi.LiveOak.APPLICATIONS_DEPLOYER;
+import static io.liveoak.spi.LiveOak.APPLICATIONS_DIR;
+import static io.liveoak.spi.LiveOak.APPLICATION_REGISTRY;
+import static io.liveoak.spi.LiveOak.GLOBAL_CONTEXT;
 
 /**
  * @author Bob McWhirter
@@ -22,7 +30,7 @@ public class TenancyBootstrappingService implements Service<Void> {
     public void start(StartContext context) throws StartException {
         ServiceTarget target = context.getChildTarget();
 
-        target.addService(APPLICATIONS_DIR, new ApplicationsDirectoryService( new File( this.applicationsDirectoryInjector.getValue() ).getAbsoluteFile() ) )
+        target.addService(APPLICATIONS_DIR, new ApplicationsDirectoryService(new File(this.applicationsDirectoryInjector.getValue()).getAbsoluteFile()))
                 .install();
 
         target.addService(APPLICATION_REGISTRY, new ApplicationRegistryService())
@@ -52,5 +60,6 @@ public class TenancyBootstrappingService implements Service<Void> {
     public Injector<String> applicationsDirectoryInjector() {
         return this.applicationsDirectoryInjector;
     }
+
     private InjectedValue<String> applicationsDirectoryInjector = new InjectedValue<>();
 }

@@ -1,5 +1,8 @@
 package io.liveoak.container.tenancy.service;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -9,9 +12,9 @@ import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.ApplicationContext;
+import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.MountPointResource;
-import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ResourcePath;
@@ -25,9 +28,6 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * @author Bob McWhirter
@@ -51,12 +51,12 @@ public class ApplicationService implements Service<InternalApplication> {
             appDir = new File(this.applicationsDirectoryInjector.getValue(), this.id);
         }
 
-        if ( !appDir.exists() ) {
+        if (!appDir.exists()) {
             log.debug("attempt to create: " + appDir);
             appDir.mkdirs();
         }
 
-        if ( !appDir.exists() ) {
+        if (!appDir.exists()) {
             log.error("FAILED TO CREATE: " + appDir);
         }
 

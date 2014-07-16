@@ -1,5 +1,10 @@
 package io.liveoak.container.extension;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ServiceLoader;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -15,11 +20,6 @@ import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StabilityMonitor;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ServiceLoader;
 
 /**
  * @author Bob McWhirter
@@ -59,30 +59,30 @@ public class ExtensionInstaller {
 
         for (Extension extension : extensions) {
             if (found) {
-                throw new Exception("Only one extension allowed per module: " + moduleId );
+                throw new Exception("Only one extension allowed per module: " + moduleId);
             }
-            load(id, extension, fullConfig );
+            load(id, extension, fullConfig);
             found = true;
         }
 
-        if ( ! found ) {
-            throw new Exception( "No extension found in module: " + moduleId  );
+        if (!found) {
+            throw new Exception("No extension found in module: " + moduleId);
         }
     }
 
     public void load(String id, Extension extension) throws Exception {
-        load( id, extension, JsonNodeFactory.instance.objectNode() );
+        load(id, extension, JsonNodeFactory.instance.objectNode());
     }
 
     public void load(String id, Extension extension, ObjectNode config) throws Exception {
         StabilityMonitor monitor = new StabilityMonitor();
         ServiceTarget target = this.target.subTarget();
-        target.addMonitor( monitor );
+        target.addMonitor(monitor);
         ServiceBuilder builder = target.addService(LiveOak.extension(id), new ExtensionService(id, extension, config));
 
         JsonNode deps = config.get("dependencies");
         if (deps != null) {
-            for (JsonNode node: deps) {
+            for (JsonNode node : deps) {
                 builder.addDependency(LiveOak.extension(node.asText()));
             }
         }
@@ -90,8 +90,8 @@ public class ExtensionInstaller {
         monitor.awaitStability();
     }
 
-    private String replaceProperties(File file) throws IOException{
-        String original =  new String(Files.readAllBytes(file.toPath()));
+    private String replaceProperties(File file) throws IOException {
+        String original = new String(Files.readAllBytes(file.toPath()));
         return StringPropertyReplacer.replaceProperties(original, System.getProperties());
     }
 

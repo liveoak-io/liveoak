@@ -88,7 +88,7 @@ public class SecuredStompServerContext extends ContainerStompServerContext {
     private void sendError(StompConnection connection, String message, Throwable cause, String subscriptionId, int status) {
         StompMessage errorMessage = new DefaultStompMessage(true);
         errorMessage.headers().put("status", String.valueOf(status));
-        String errorMessageContent = (message!=null) ? message : cause.getClass().getName() + ": " + cause.getMessage();
+        String errorMessageContent = (message != null) ? message : cause.getClass().getName() + ": " + cause.getMessage();
         errorMessage.content(errorMessageContent);
         errorMessage.headers().put(Headers.RECEIPT_ID, subscriptionId);
 

@@ -1,10 +1,8 @@
 package io.liveoak.container.interceptor;
 
-import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.container.interceptor.InboundInterceptorContext;
-import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
@@ -22,7 +20,7 @@ public class InboundInterceptorContextImpl implements InboundInterceptorContext 
 
     @Override
     public void forward(ResourceRequest request) {
-        this.chain.forward( request );
+        this.chain.forward(request);
     }
 
     @Override

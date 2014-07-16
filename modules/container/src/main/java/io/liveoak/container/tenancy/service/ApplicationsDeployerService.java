@@ -21,7 +21,7 @@ public class ApplicationsDeployerService implements Service<Void> {
     @Override
     public void start(final StartContext context) throws StartException {
         context.asynchronous();
-        new Thread( () -> {
+        new Thread(() -> {
             try {
                 File[] appDirs = this.appDirInjector.getValue().listFiles(pathname -> pathname.isDirectory());
 

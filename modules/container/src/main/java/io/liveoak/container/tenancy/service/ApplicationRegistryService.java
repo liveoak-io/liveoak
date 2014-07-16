@@ -14,7 +14,7 @@ public class ApplicationRegistryService implements Service<InternalApplicationRe
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.registry = new InternalApplicationRegistry( context.getChildTarget() );
+        this.registry = new InternalApplicationRegistry(context.getChildTarget());
     }
 
     @Override

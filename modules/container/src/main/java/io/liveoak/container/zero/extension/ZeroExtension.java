@@ -24,7 +24,7 @@ public class ZeroExtension implements Extension {
 
         ZeroResourcesService appResources = new ZeroResourcesService();
 
-        target.addService( ZeroServices.BOOTSTRAP.append( "resources" ), appResources )
+        target.addService(ZeroServices.BOOTSTRAP.append("resources"), appResources)
                 .addDependency(LiveOak.application(APPLICATION_ID), InternalApplication.class, appResources.applicationInjector())
                 .install();
 

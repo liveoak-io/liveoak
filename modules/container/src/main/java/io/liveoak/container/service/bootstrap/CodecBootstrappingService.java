@@ -11,7 +11,12 @@ import io.liveoak.container.service.CodecInstallationService;
 import io.liveoak.container.service.CodecManagerService;
 import io.liveoak.container.service.CodecService;
 import io.liveoak.spi.MediaType;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
 
 import static io.liveoak.spi.LiveOak.CODEC_MANAGER;
 import static io.liveoak.spi.LiveOak.codec;

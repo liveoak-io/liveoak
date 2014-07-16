@@ -9,17 +9,11 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import io.liveoak.container.protocols.PipelineConfigurator;
 import io.liveoak.spi.container.NetworkServer;
-import io.liveoak.spi.container.Server;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.util.concurrent.Future;
 
 /**
  * Base networkServer capable of connecting a container to a network ports.
@@ -44,7 +38,7 @@ public abstract class AbstractNetworkServer extends AbstractServer implements Ne
 
     @Override
     public SocketAddress localAddress() {
-        return new InetSocketAddress( this.host, this.port );
+        return new InetSocketAddress(this.host, this.port);
     }
 
     @Override

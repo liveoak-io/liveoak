@@ -36,10 +36,10 @@ public class SystemExtensionContextImpl implements SystemExtensionContext {
 
     @Override
     public void mountPrivate(RootResource resource) {
-        target.addService(LiveOak.systemResource( this.id ), new ValueService<RootResource>( new ImmediateValue<>( resource ) ) )
+        target.addService(LiveOak.systemResource(this.id), new ValueService<RootResource>(new ImmediateValue<>(resource)))
                 .install();
 
-        mountPrivate( LiveOak.systemResource( this.id ) );
+        mountPrivate(LiveOak.systemResource(this.id));
     }
 
     @Override
@@ -48,20 +48,20 @@ public class SystemExtensionContextImpl implements SystemExtensionContext {
 
         ConfigFilteringService configFilter = new ConfigFilteringService();
 
-        target.addService( privateName.append( "filter-config" ), configFilter )
-                .addInjection( configFilter.configurationInjector(), this.configuration )
+        target.addService(privateName.append("filter-config"), configFilter)
+                .addInjection(configFilter.configurationInjector(), this.configuration)
                 .install();
 
         UpdateResourceService configApply = new UpdateResourceService();
         target.addService(privateName.append("apply-config"), configApply)
                 .addDependency(privateName, Resource.class, configApply.resourceInjector())
-                .addDependency( privateName.append( "filter-config"), ObjectNode.class, configApply.configurationInjector() )
+                .addDependency(privateName.append("filter-config"), ObjectNode.class, configApply.configurationInjector())
                 .install();
 
         RootResourceLifecycleService lifecycle = new RootResourceLifecycleService();
-        target.addService(privateName.append( "lifecycle" ), lifecycle )
-                .addDependency( privateName.append( "apply-config" ) )
-                .addDependency( privateName, RootResource.class, lifecycle.resourceInjector() )
+        target.addService(privateName.append("lifecycle"), lifecycle)
+                .addDependency(privateName.append("apply-config"))
+                .addDependency(privateName, RootResource.class, lifecycle.resourceInjector())
                 .install();
 
         ServiceController<? extends Resource> controller = this.target.addService(privateName.append("mount"), mount)

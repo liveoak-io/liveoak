@@ -17,7 +17,7 @@ public class NotifierService implements Service<Notifier> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.notifier = new NotifierImpl( this.subscriptionManagerInjector.getValue() );
+        this.notifier = new NotifierImpl(this.subscriptionManagerInjector.getValue());
     }
 
     @Override

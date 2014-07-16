@@ -2,21 +2,15 @@ package io.liveoak.container.service.bootstrap;
 
 import io.liveoak.container.service.PlatformManagerService;
 import io.liveoak.container.service.VertxService;
-import io.liveoak.container.tenancy.GlobalContext;
-import io.liveoak.container.tenancy.InternalApplicationRegistry;
-import io.liveoak.container.tenancy.service.ApplicationRegistryService;
-import io.liveoak.container.tenancy.service.ApplicationsDeployerService;
-import io.liveoak.container.tenancy.service.ApplicationsDirectoryService;
-import org.jboss.msc.inject.Injector;
-import org.jboss.msc.service.*;
-import org.jboss.msc.value.ImmediateValue;
-import org.jboss.msc.value.InjectedValue;
-import org.vertx.java.core.Vertx;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
 import org.vertx.java.platform.PlatformManager;
 
-import java.io.File;
-
-import static io.liveoak.spi.LiveOak.*;
+import static io.liveoak.spi.LiveOak.VERTX;
+import static io.liveoak.spi.LiveOak.VERTX_PLATFORM_MANAGER;
 
 /**
  * @author Bob McWhirter

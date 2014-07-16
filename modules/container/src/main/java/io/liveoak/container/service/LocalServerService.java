@@ -1,9 +1,7 @@
 package io.liveoak.container.service;
 
 import io.liveoak.container.protocols.PipelineConfigurator;
-import io.liveoak.container.server.AbstractNetworkServer;
 import io.liveoak.container.server.LocalServer;
-import io.liveoak.container.server.UnsecureServer;
 import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;

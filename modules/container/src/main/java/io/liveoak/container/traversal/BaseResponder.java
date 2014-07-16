@@ -100,7 +100,7 @@ public class BaseResponder implements Responder {
     @Override
     public void internalError(String message) {
         log.error(message, new RuntimeException("Stack trace: "));
-        this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, DefaultResourceErrorResponse.ErrorType.INTERNAL_ERROR, message ));
+        this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, DefaultResourceErrorResponse.ErrorType.INTERNAL_ERROR, message));
         resumeRead();
     }
 
@@ -119,14 +119,14 @@ public class BaseResponder implements Responder {
     }
 
     @Override
-    public void invalidRequest( Throwable cause ) {
+    public void invalidRequest(Throwable cause) {
         log.debug("Invalid request: ", cause);
         this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, cause));
         resumeRead();
     }
 
     @Override
-    public void invalidRequest( String message, Throwable cause ) {
+    public void invalidRequest(String message, Throwable cause) {
         log.debug(message, cause);
         this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, cause));
         resumeRead();

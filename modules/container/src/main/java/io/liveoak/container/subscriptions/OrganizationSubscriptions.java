@@ -1,10 +1,11 @@
 package io.liveoak.container.subscriptions;
 
-import io.liveoak.spi.Application;
-import io.liveoak.spi.ResourcePath;
-import io.liveoak.spi.container.Subscription;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.util.*;
+import io.liveoak.spi.container.Subscription;
 
 /**
  * @author Bob McWhirter
@@ -39,10 +40,10 @@ public class OrganizationSubscriptions {
 
     ApplicationSubscriptions findOrCreateApplication(Subscription subscription) {
         String appId = subscription.resourcePath().segments().get(1).name();
-        ApplicationSubscriptions subscriptions = findApplication( appId );
-        if ( subscriptions == null ) {
+        ApplicationSubscriptions subscriptions = findApplication(appId);
+        if (subscriptions == null) {
             subscriptions = new ApplicationSubscriptions();
-            this.applicationSubscriptions.put( appId, subscriptions );
+            this.applicationSubscriptions.put(appId, subscriptions);
         }
 
         return subscriptions;

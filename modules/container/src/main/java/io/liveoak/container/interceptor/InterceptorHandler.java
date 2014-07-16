@@ -37,7 +37,7 @@ public class InterceptorHandler extends ChannelDuplexHandler {
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if ( evt instanceof RequestCompleteEvent) {
+        if (evt instanceof RequestCompleteEvent) {
             this.manager.fireComplete(chainName, ((RequestCompleteEvent) evt).requestId());
         }
         super.userEventTriggered(ctx, evt);

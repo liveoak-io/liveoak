@@ -4,8 +4,8 @@ import java.io.File;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.container.tenancy.service.ApplicationExtensionService;
 import io.liveoak.common.util.ConversionUtils;
+import io.liveoak.container.tenancy.service.ApplicationExtensionService;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ResourcePath;
@@ -62,7 +62,7 @@ public class InternalApplication implements Application {
     }
 
     public File configurationFile() {
-        return new File( this.directory, "application.json" );
+        return new File(this.directory, "application.json");
     }
 
     public ResourcePath htmlApplicationResourcePath() {
@@ -70,7 +70,7 @@ public class InternalApplication implements Application {
     }
 
     public InternalApplicationExtension extend(String resourceId, ResourceState resourceDefinition) throws Exception {
-        return extend( resourceId, resourceDefinition, false );
+        return extend(resourceId, resourceDefinition, false);
     }
 
     public InternalApplicationExtension extend(String resourceId, ResourceState resourceDefinition, boolean boottime) throws Exception {
@@ -97,7 +97,7 @@ public class InternalApplication implements Application {
     }
 
     public InternalApplicationExtension extend(String extensionId, String resourceId, ObjectNode configuration) throws Exception {
-        return extend( extensionId, resourceId, configuration, false );
+        return extend(extensionId, resourceId, configuration, false);
     }
 
     public InternalApplicationExtension extend(String extensionId, String resourceId, ObjectNode configuration, boolean boottime) throws Exception {

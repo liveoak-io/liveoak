@@ -5,6 +5,8 @@
  */
 package io.liveoak.container.protocols;
 
+import java.util.concurrent.Executor;
+
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.ErrorHandler;
 import io.liveoak.container.RequestContextDisposerHandler;
@@ -13,7 +15,11 @@ import io.liveoak.container.ResourceStateHandler;
 import io.liveoak.container.auth.SecuredStompServerContext;
 import io.liveoak.container.interceptor.InterceptorHandler;
 import io.liveoak.container.interceptor.InterceptorManagerImpl;
-import io.liveoak.container.protocols.http.*;
+import io.liveoak.container.protocols.http.CORSHandler;
+import io.liveoak.container.protocols.http.CORSPreflightOptionsHandler;
+import io.liveoak.container.protocols.http.HttpRequestBodyHandler;
+import io.liveoak.container.protocols.http.HttpResourceRequestDecoder;
+import io.liveoak.container.protocols.http.HttpResourceResponseEncoder;
 import io.liveoak.container.protocols.local.LocalResourceResponseEncoder;
 import io.liveoak.container.protocols.websocket.WebSocketHandshakerHandler;
 import io.liveoak.container.protocols.websocket.WebSocketStompFrameDecoder;
@@ -27,13 +33,17 @@ import io.liveoak.stomp.common.StompFrameEncoder;
 import io.liveoak.stomp.common.StompMessageDecoder;
 import io.liveoak.stomp.common.StompMessageEncoder;
 import io.liveoak.stomp.server.StompServerContext;
-import io.liveoak.stomp.server.protocol.*;
+import io.liveoak.stomp.server.protocol.ConnectHandler;
+import io.liveoak.stomp.server.protocol.DisconnectHandler;
+import io.liveoak.stomp.server.protocol.ReceiptHandler;
+import io.liveoak.stomp.server.protocol.SendHandler;
+import io.liveoak.stomp.server.protocol.StompErrorHandler;
+import io.liveoak.stomp.server.protocol.SubscribeHandler;
+import io.liveoak.stomp.server.protocol.UnsubscribeHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
-
-import java.util.concurrent.Executor;
 
 /**
  * @author Bob McWhirter

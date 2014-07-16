@@ -1,5 +1,8 @@
 package io.liveoak.container.tenancy;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
+
 import io.liveoak.container.tenancy.service.ApplicationExtensionRemovalService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
@@ -9,9 +12,6 @@ import org.jboss.msc.service.AbstractServiceListener;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ServiceTarget;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.function.Consumer;
 
 /**
  * @author Bob McWhirter
@@ -56,12 +56,12 @@ public class InternalApplicationExtension implements Consumer<Exception> {
 
         ServiceTarget target = extController.getServiceContainer().subTarget();
 
-        CountDownLatch latch = new CountDownLatch( 1 );
+        CountDownLatch latch = new CountDownLatch(1);
 
-        target.addListener( new AbstractServiceListener<Object>() {
+        target.addListener(new AbstractServiceListener<Object>() {
             @Override
             public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
-                if ( transition.getAfter().equals(ServiceController.Substate.REMOVED ) ) {
+                if (transition.getAfter().equals(ServiceController.Substate.REMOVED)) {
                     latch.countDown();
                 }
             }

@@ -1,15 +1,11 @@
 package io.liveoak.container.service;
 
 import io.liveoak.client.DefaultClient;
-import io.liveoak.container.server.LocalServer;
-import io.liveoak.spi.client.Client;
 import org.jboss.logging.Logger;
-import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.jboss.msc.value.InjectedValue;
 
 /**
  * @author Bob McWhirter

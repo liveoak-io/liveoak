@@ -15,7 +15,7 @@ import org.jboss.msc.value.InjectedValue;
 public class ApplicationsResourceService implements Service<ApplicationsResource> {
     @Override
     public void start(StartContext context) throws StartException {
-        this.resource = new ApplicationsResource( this.applicationRegistryInjector.getValue() );
+        this.resource = new ApplicationsResource(this.applicationRegistryInjector.getValue());
     }
 
     @Override

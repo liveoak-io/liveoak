@@ -4,7 +4,13 @@ import io.liveoak.client.DefaultClient;
 import io.liveoak.container.service.ClientConnectorService;
 import io.liveoak.container.service.ClientService;
 import org.jboss.logging.Logger;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.AbstractServiceListener;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
 
 import static io.liveoak.spi.LiveOak.CLIENT;
 import static io.liveoak.spi.LiveOak.server;
@@ -19,12 +25,12 @@ public class ClientBootstrappingService implements Service<Void> {
         log.debug("bootstrap client");
         ServiceTarget target = context.getChildTarget();
 
-        target.addListener( new AbstractServiceListener<Object>() {
+        target.addListener(new AbstractServiceListener<Object>() {
             @Override
             public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
                 log.trace(controller.getName() + " // " + transition);
             }
-        } );
+        });
 
         ClientService client = new ClientService();
         target.addService(CLIENT, client)

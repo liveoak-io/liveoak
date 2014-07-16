@@ -22,16 +22,16 @@ public class LocalResourceResponseEncoder extends ChannelOutboundHandlerAdapter 
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (msg instanceof ResourceResponse ) {
+        if (msg instanceof ResourceResponse) {
             ResourceResponse response = (ResourceResponse) msg;
             if (msg instanceof ResourceErrorResponse) {
                 ClientResourceResponse.ResponseType responseType = decodeResponseType(((ResourceErrorResponse) msg).errorType());
-                ctx.writeAndFlush( new ClientResourceResponseImpl(response.inReplyTo(), responseType, response.inReplyTo().resourcePath().toString(), null));
+                ctx.writeAndFlush(new ClientResourceResponseImpl(response.inReplyTo(), responseType, response.inReplyTo().resourcePath().toString(), null));
             } else {
                 encode(ctx, response);
             }
         } else {
-            super.write( ctx, msg, promise );
+            super.write(ctx, msg, promise);
         }
     }
 
@@ -63,7 +63,6 @@ public class LocalResourceResponseEncoder extends ChannelOutboundHandlerAdapter 
     /**
      * Encode (for some cheap value of 'encode') a resulting resource into a ResourceState.
      *
-     *
      * @param ctx
      * @param response The response to encode.
      * @throws Exception
@@ -71,12 +70,12 @@ public class LocalResourceResponseEncoder extends ChannelOutboundHandlerAdapter 
     protected void encode(ChannelHandlerContext ctx, ResourceResponse response) {
         final ClientResourceResponse.ResponseType responseType = ClientResourceResponse.ResponseType.OK;
         if (response.resource() == null) {
-            ctx.writeAndFlush( new ClientResourceResponseImpl(response.inReplyTo(), responseType, response.inReplyTo().resourcePath().toString(), null ));
+            ctx.writeAndFlush(new ClientResourceResponseImpl(response.inReplyTo(), responseType, response.inReplyTo().resourcePath().toString(), null));
             ctx.fireUserEventTriggered(new RequestCompleteEvent(response.requestId()));
             return;
         }
 
-        ctx.writeAndFlush( new ClientResourceResponseImpl( response.inReplyTo(), responseType, response.inReplyTo().resourcePath().toString(), response.state() ) );
+        ctx.writeAndFlush(new ClientResourceResponseImpl(response.inReplyTo(), responseType, response.inReplyTo().resourcePath().toString(), response.state()));
         ctx.fireUserEventTriggered(new RequestCompleteEvent(response.requestId()));
 
     }

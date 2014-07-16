@@ -7,7 +7,11 @@ import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.spi.LiveOak;
 import org.jboss.msc.inject.Injector;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 import org.vertx.java.core.Vertx;
 

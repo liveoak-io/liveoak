@@ -59,22 +59,22 @@ public class InterceptorManagerImpl implements InterceptorManager {
     @Override
     public void fireInbound(String chainName, ChannelHandlerContext ctx, ResourceRequest request) {
         List<Interceptor> interceptors = getInterceptors(chainName, request);
-        InterceptorChain chain = new InterceptorChain( ctx, interceptors, request );
+        InterceptorChain chain = new InterceptorChain(ctx, interceptors, request);
         chain.fireInbound();
     }
 
     @Override
     public void fireOutbound(String chainName, ChannelHandlerContext ctx, ResourceResponse response) {
         List<Interceptor> interceptors = getInterceptors(chainName, response.inReplyTo());
-        InterceptorChain chain = new InterceptorChain( ctx, interceptors, response );
+        InterceptorChain chain = new InterceptorChain(ctx, interceptors, response);
         chain.fireOutbound();
     }
 
     @Override
     public void fireComplete(String chainName, UUID requestId) {
         List<Interceptor> interceptors = getInterceptors(chainName, null);
-        for ( Interceptor each : interceptors ) {
-            each.onComplete( requestId );
+        for (Interceptor each : interceptors) {
+            each.onComplete(requestId);
         }
     }
 

@@ -1,12 +1,12 @@
 package io.liveoak.container.tenancy.service;
 
+import java.io.File;
+
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-
-import java.io.File;
 
 /**
  * @author Bob McWhirter
@@ -19,7 +19,7 @@ public class ApplicationConfigurationService implements Service<ApplicationConfi
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.manager = new ApplicationConfigurationManager( this.configFile );
+        this.manager = new ApplicationConfigurationManager(this.configFile);
     }
 
     @Override

@@ -1,16 +1,21 @@
 package io.liveoak.container.service.bootstrap;
 
+import java.io.File;
+
 import io.liveoak.container.extension.ExtensionInstaller;
 import io.liveoak.container.extension.ExtensionLoader;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.container.zero.service.ZeroBootstrapper;
 import io.liveoak.spi.LiveOak;
 import org.jboss.msc.inject.Injector;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
+import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 import org.jboss.msc.value.InjectedValue;
-
-import java.io.File;
 
 import static io.liveoak.spi.LiveOak.EXTENSION_INSTALLER;
 import static io.liveoak.spi.LiveOak.EXTENSION_LOADER;
@@ -25,7 +30,7 @@ public class ExtensionsBootstrappingService implements Service<Void> {
         ServiceTarget target = context.getChildTarget();
 
 
-        ExtensionLoader extensionLoader = new ExtensionLoader(new File( this.extensionsDirectoryInjector.getValue()).getAbsoluteFile());
+        ExtensionLoader extensionLoader = new ExtensionLoader(new File(this.extensionsDirectoryInjector.getValue()).getAbsoluteFile());
 
         target.addService(EXTENSION_LOADER, extensionLoader)
                 .addDependency(EXTENSION_INSTALLER, ExtensionInstaller.class, extensionLoader.extensionInstallerInjector())

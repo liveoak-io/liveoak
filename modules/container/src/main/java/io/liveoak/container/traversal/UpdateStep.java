@@ -17,7 +17,7 @@ public class UpdateStep implements TraversalPlan.Step {
         if (complete) {
             if (resource instanceof BinaryResource) {
                 ((BinaryResource) resource)
-                    .updateContent(context.requestContext(), context.state(), context.responder());
+                        .updateContent(context.requestContext(), context.state(), context.responder());
             } else {
                 resource.updateProperties(context.requestContext(), context.state(), context.responder());
             }
@@ -55,9 +55,9 @@ public class UpdateStep implements TraversalPlan.Step {
         return new DelegatingResponder(responder) {
             @Override
             public void noSuchResource(String id) {
-                responder.inReplyTo().state().id( id );
-                responder.replaceStep( UpdateStep.this, new CreateStep() );
-                responder.doNextStep( responder.currentResource() );
+                responder.inReplyTo().state().id(id);
+                responder.replaceStep(UpdateStep.this, new CreateStep());
+                responder.doNextStep(responder.currentResource());
             }
         };
     }

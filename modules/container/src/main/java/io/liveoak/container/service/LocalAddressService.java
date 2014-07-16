@@ -1,14 +1,10 @@
 package io.liveoak.container.service;
 
-import io.liveoak.container.protocols.PipelineConfigurator;
-import io.liveoak.container.server.LocalServer;
 import io.netty.channel.local.LocalAddress;
-import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.jboss.msc.value.InjectedValue;
 
 /**
  * @author Bob McWhirter

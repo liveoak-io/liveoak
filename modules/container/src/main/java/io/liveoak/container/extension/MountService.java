@@ -24,20 +24,20 @@ public class MountService<T extends RootResource> implements Service<T> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        if ( this.verifyId != null ) {
-            if ( !this.resourceInjector.getValue().id().equals( this.verifyId ) ) {
-                throw new StartException( "Invalid ID for resource '" + this.resourceInjector.getValue().id() + "' must be '" + this.verifyId + "'" );
+        if (this.verifyId != null) {
+            if (!this.resourceInjector.getValue().id().equals(this.verifyId)) {
+                throw new StartException("Invalid ID for resource '" + this.resourceInjector.getValue().id() + "' must be '" + this.verifyId + "'");
             }
         }
 
 
-        this.mountableInjector.getValue().registerResource( this.resourceInjector.getValue() );
+        this.mountableInjector.getValue().registerResource(this.resourceInjector.getValue());
         this.resourceInjector.getValue().parent(this.mountableInjector.getValue());
     }
 
     @Override
     public void stop(StopContext context) {
-        this.resourceInjector.getValue().parent( null );
+        this.resourceInjector.getValue().parent(null);
         this.mountableInjector.getValue().unregisterResource(this.resourceInjector.getValue());
     }
 

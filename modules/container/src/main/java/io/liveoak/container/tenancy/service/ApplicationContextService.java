@@ -1,12 +1,13 @@
 package io.liveoak.container.tenancy.service;
 
-import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.ApplicationContext;
-import io.liveoak.container.tenancy.GlobalContext;
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.tenancy.MountPointResource;
-import io.liveoak.spi.LiveOak;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
 
 /**
  * @author Bob McWhirter

@@ -1,5 +1,7 @@
 package io.liveoak.container.server;
 
+import java.net.SocketAddress;
+
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -8,8 +10,6 @@ import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalChannel;
 import io.netty.channel.local.LocalServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
-
-import java.net.SocketAddress;
 
 /**
  * @author Bob McWhirter
@@ -39,7 +39,7 @@ public class LocalServer extends AbstractServer {
     protected ChannelHandler createChildHandler() {
         return new ChannelInitializer<LocalChannel>() {
             protected void initChannel(LocalChannel ch) throws Exception {
-                pipelineConfigurator().setupLocal( ch.pipeline() );
+                pipelineConfigurator().setupLocal(ch.pipeline());
             }
         };
     }

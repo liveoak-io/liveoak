@@ -12,8 +12,6 @@ import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.container.Subscription;
-import io.liveoak.spi.container.SubscriptionManager;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.stomp.Headers;
@@ -96,7 +94,7 @@ public class StompSubscription implements Subscription {
         message.headers().put("status", "" + status);
         message.headers().put("location", resource.uri().toString());
         RequestContext requestContext = new RequestContext.Builder().build();
-        
+
 
         message.content(this.codec.encode(requestContext, resourceResponse.state()));
         return message;

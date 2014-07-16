@@ -5,7 +5,12 @@ import io.liveoak.container.subscriptions.DefaultSubscriptionManager;
 import io.liveoak.container.subscriptions.resource.ApplicationSubscriptionsResourceService;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.spi.LiveOak;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
 import org.vertx.java.core.Vertx;
 
 /**
@@ -22,17 +27,17 @@ public class ApplicationContextBootstrapService implements Service<Void> {
         ServiceTarget target = context.getChildTarget();
         ServiceName name = context.getController().getName();
 
-        bootstrapSubscriptions( target, name.append( "subscriptions" ) );
+        bootstrapSubscriptions(target, name.append("subscriptions"));
     }
 
     protected void bootstrapSubscriptions(ServiceTarget target, ServiceName name) {
 
-        ApplicationSubscriptionsResourceService subscriptions = new ApplicationSubscriptionsResourceService( this.app );
+        ApplicationSubscriptionsResourceService subscriptions = new ApplicationSubscriptionsResourceService(this.app);
 
-        target.addService( name, subscriptions )
-                .addDependency( LiveOak.VERTX, Vertx.class, subscriptions.vertxInjector() )
-                .addDependency( LiveOak.SUBSCRIPTION_MANAGER, DefaultSubscriptionManager.class, subscriptions.subscriptionManagerInjector() )
-                .addDependency( LiveOak.CODEC_MANAGER, ResourceCodecManager.class, subscriptions.codecManagerInjector() )
+        target.addService(name, subscriptions)
+                .addDependency(LiveOak.VERTX, Vertx.class, subscriptions.vertxInjector())
+                .addDependency(LiveOak.SUBSCRIPTION_MANAGER, DefaultSubscriptionManager.class, subscriptions.subscriptionManagerInjector())
+                .addDependency(LiveOak.CODEC_MANAGER, ResourceCodecManager.class, subscriptions.codecManagerInjector())
                 .install();
     }
 

@@ -1,5 +1,7 @@
 package io.liveoak.container.tenancy.service;
 
+import java.util.Properties;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.extension.ApplicationExtensionContextImpl;
 import io.liveoak.container.tenancy.InternalApplication;
@@ -8,10 +10,13 @@ import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceRegistry;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-
-import java.util.Properties;
 
 /**
  * @author Bob McWhirter
@@ -29,7 +34,7 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
     @Override
     public void start(StartContext context) throws StartException {
 
-        log.debug( "** Activate " + this.extensionId + " as " + resourceId + " for " + this.applicationInjector.getValue().id() );
+        log.debug("** Activate " + this.extensionId + " as " + resourceId + " for " + this.applicationInjector.getValue().id());
 
         ServiceTarget target = context.getChildTarget();
 
@@ -62,7 +67,7 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
                 target,
                 this.appExtension,
                 LiveOak.applicationContext(appId),
-                LiveOak.applicationAdminResource(appId).append( "extensions" ),
+                LiveOak.applicationAdminResource(appId).append("extensions"),
                 this.configuration,
                 this.boottime);
 
@@ -98,11 +103,11 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
         InternalApplication app = this.applicationInjector.getValue();
 
         Properties props = new Properties();
-        props.put( "application.name", app.name() );
-        props.put( "application.id", app.id() );
-        props.put( "application.url",  "/" + app.id() );
+        props.put("application.name", app.name());
+        props.put("application.id", app.id());
+        props.put("application.url", "/" + app.id());
 
-        props.put( "application.dir", app.directory().getAbsolutePath() );
+        props.put("application.dir", app.directory().getAbsolutePath());
 
         return props;
     }

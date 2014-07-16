@@ -1,14 +1,20 @@
 package io.liveoak.container.tenancy.service;
 
+import java.util.concurrent.CountDownLatch;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.container.extension.ApplicationExtensionContextImpl;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.msc.inject.Injector;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StabilityMonitor;
+import org.jboss.msc.service.StartContext;
+import org.jboss.msc.service.StartException;
+import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-
-import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Bob McWhirter

@@ -1,9 +1,11 @@
 package io.liveoak.container.service;
 
+import java.util.concurrent.Executor;
+
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.interceptor.InterceptorManagerImpl;
-import io.liveoak.container.tenancy.GlobalContext;
 import io.liveoak.container.protocols.PipelineConfigurator;
+import io.liveoak.container.tenancy.GlobalContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.SubscriptionManager;
 import org.jboss.msc.inject.Injector;
@@ -13,8 +15,6 @@ import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 
-import java.util.concurrent.Executor;
-
 /**
  * @author Bob McWhirter
  */
@@ -22,12 +22,12 @@ public class PipelineConfiguratorService implements Service<PipelineConfigurator
     @Override
     public void start(StartContext context) throws StartException {
         this.pipelineConfigurator = new PipelineConfigurator();
-        this.pipelineConfigurator.globalContext( this.globalContextInjector.getValue() );
+        this.pipelineConfigurator.globalContext(this.globalContextInjector.getValue());
         this.pipelineConfigurator.codecManager(this.codecManagerInjector.getValue());
         this.pipelineConfigurator.subscriptionManager(this.subscriptionManagerInjector.getValue());
         this.pipelineConfigurator.workerPool(this.workerPoolInjector.getValue());
         this.pipelineConfigurator.interceptorManager(this.interceptorManagerInjector.getValue());
-        this.pipelineConfigurator.client( this.clientInjector.getValue() );
+        this.pipelineConfigurator.client(this.clientInjector.getValue());
     }
 
     @Override

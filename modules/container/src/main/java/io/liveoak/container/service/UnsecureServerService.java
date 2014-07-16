@@ -1,7 +1,6 @@
 package io.liveoak.container.service;
 
 import io.liveoak.container.server.AbstractNetworkServer;
-import io.liveoak.container.server.AbstractServer;
 import io.liveoak.container.server.UnsecureServer;
 
 /**
