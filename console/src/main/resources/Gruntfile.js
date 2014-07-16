@@ -24,9 +24,10 @@ module.exports = function (grunt) {
       install: {
         options: {
           cleanTargetDir: true,
-          cleanBowerDir: true,
+          cleanBowerDir: false,
           targetDir: 'app/lib',
-          verbose: true
+          verbose: true,
+          layout: 'byComponent'
         }
       }
     },
@@ -92,6 +93,15 @@ module.exports = function (grunt) {
         },
         src: ['test/{,*/}*.js']
       }
+    },
+    clean: {
+      cache: [
+        ".bower-*",
+        "bower_components",
+        "node",
+        "node_modules",
+        "app/lib"
+      ]
     }
   });
 
