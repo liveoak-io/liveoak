@@ -9,7 +9,7 @@ import org.jboss.logging.Logger;
 /**
  * @author Bob McWhirter
  */
-public class LiveOakSubsystemRemove extends AbstractRemoveStepHandler{
+public class LiveOakSubsystemRemove extends AbstractRemoveStepHandler {
     static final LiveOakSubsystemRemove INSTANCE = new LiveOakSubsystemRemove();
 
     private final Logger log = Logger.getLogger(LiveOakSubsystemRemove.class);

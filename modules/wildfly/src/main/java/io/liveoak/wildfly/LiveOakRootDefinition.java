@@ -1,13 +1,16 @@
 package io.liveoak.wildfly;
 
-import org.jboss.as.controller.*;
-import org.jboss.as.controller.descriptions.ResourceDescriptionResolver;
+import java.util.Collection;
+import java.util.Collections;
+
+import org.jboss.as.controller.AttributeDefinition;
+import org.jboss.as.controller.PersistentResourceDefinition;
+import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
+import org.jboss.as.controller.SimpleAttributeDefinition;
+import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.registry.AttributeAccess;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author Bob McWhirter

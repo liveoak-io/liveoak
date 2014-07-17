@@ -1,9 +1,19 @@
 package io.liveoak.wildfly;
 
-import io.liveoak.container.service.bootstrap.*;
+import java.util.List;
+
+import io.liveoak.container.service.bootstrap.ClientBootstrappingService;
+import io.liveoak.container.service.bootstrap.CodecBootstrappingService;
+import io.liveoak.container.service.bootstrap.ExtensionsBootstrappingService;
+import io.liveoak.container.service.bootstrap.ServersBootstrappingService;
+import io.liveoak.container.service.bootstrap.TenancyBootstrappingService;
+import io.liveoak.container.service.bootstrap.VertxBootstrappingService;
 import io.liveoak.mongo.launcher.service.MongoLauncherAutoSetupService;
 import io.liveoak.spi.LiveOak;
-import org.jboss.as.controller.*;
+import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
+import org.jboss.as.controller.OperationContext;
+import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.network.SocketBinding;
 import org.jboss.as.server.AbstractDeploymentChainStep;
@@ -16,8 +26,6 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
-
-import java.util.List;
 
 /**
  * @author Bob McWhirter
@@ -122,7 +130,7 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
         TenancyBootstrappingService tenancy = new TenancyBootstrappingService();
         context.getServiceTarget().addService(LIVEOAK_SUB.append("tenancy"), tenancy)
                 .addDependency(APPS_PATH, String.class, tenancy.applicationsDirectoryInjector())
-                .addDependency(LIVEOAK_SUB.append("mongo-autosetup" ))
+                .addDependency(LIVEOAK_SUB.append("mongo-autosetup"))
                 .install();
 
         context.getServiceTarget().addService(LIVEOAK_SUB.append("servers"), new ServersBootstrappingService()).install();
@@ -138,7 +146,7 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
         context.getServiceTarget().addService(LIVEOAK_SUB.append("extensions"), extensions)
                 .addDependency(EXTS_PATH, String.class, extensions.extensionsDirectoryInjector())
                 .addDependency(LIVEOAK_SUB.append("properties"))
-                .addDependency(LIVEOAK_SUB.append("mongo-autosetup" ))
+                .addDependency(LIVEOAK_SUB.append("mongo-autosetup"))
                 .install();
 
         context.getServiceTarget().addService(LiveOak.SERVICE_REGISTRY, new ValueService<ServiceRegistry>(new ImmediateValue<>(context.getServiceRegistry(false))))

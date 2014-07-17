@@ -1,13 +1,13 @@
 package io.liveoak.wildfly;
 
+import java.io.File;
+
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-
-import java.io.File;
 
 /**
  * @author Bob McWhirter
@@ -17,9 +17,9 @@ public class PropertiesManagerService implements Service<Void> {
     public void start(StartContext context) throws StartException {
         String jbossHome = this.jbossHomeInjector.getValue();
 
-        String clientDir = new File( jbossHome, "client" ).getAbsolutePath();
+        String clientDir = new File(jbossHome, "client").getAbsolutePath();
 
-        System.setProperty( "io.liveoak.js.dir", clientDir );
+        System.setProperty("io.liveoak.js.dir", clientDir);
     }
 
     @Override
@@ -36,5 +36,5 @@ public class PropertiesManagerService implements Service<Void> {
         return jbossHomeInjector;
     }
 
-    private InjectedValue<String> jbossHomeInjector =  new InjectedValue<>();
+    private InjectedValue<String> jbossHomeInjector = new InjectedValue<>();
 }

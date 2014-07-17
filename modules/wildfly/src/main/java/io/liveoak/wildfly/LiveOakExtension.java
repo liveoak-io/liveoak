@@ -20,10 +20,14 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUB
 public class LiveOakExtension implements Extension {
     private static final Logger log = Logger.getLogger(LiveOakExtension.class);
 
-    /** The name space used for the {@code substystem} element */
+    /**
+     * The name space used for the {@code substystem} element
+     */
     public static final String NAMESPACE = "urn:liveoak:liveoak:1.0";
 
-    /** The name of our subsystem within the model. */
+    /**
+     * The name of our subsystem within the model.
+     */
     public static final String SUBSYSTEM_NAME = "liveoak";
 
     private static final String RESOURCE_NAME = LiveOakExtension.class.getPackage().getName() + ".LocalDescriptions";

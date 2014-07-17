@@ -1,17 +1,23 @@
 package io.liveoak.wildfly;
 
-import io.liveoak.spi.LiveOak;
-import org.jboss.as.ee.structure.DeploymentType;
-import org.jboss.as.ee.structure.DeploymentTypeMarker;
-import org.jboss.as.server.deployment.*;
-import org.jboss.logging.Logger;
-import org.jboss.msc.service.ServiceName;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import io.liveoak.spi.LiveOak;
+import org.jboss.as.ee.structure.DeploymentType;
+import org.jboss.as.ee.structure.DeploymentTypeMarker;
+import org.jboss.as.server.deployment.DeploymentPhaseContext;
+import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
+import org.jboss.as.server.deployment.DeploymentUnitProcessor;
+import org.jboss.as.server.deployment.Phase;
+import org.jboss.as.server.deployment.SetupAction;
+import org.jboss.logging.Logger;
+import org.jboss.msc.service.ServiceName;
+
 import static org.jboss.as.ee.component.Attachments.WEB_SETUP_ACTIONS;
+
 /**
  * @author Bob McWhirter
  */
@@ -31,7 +37,7 @@ public class MongoAutoSetupDependencyProcessor implements DeploymentUnitProcesso
             return; // Skip non web deployments
         }
         log.info("adding dependency on mongo to: " + deploymentUnit.getServiceName());
-        deploymentUnit.addToAttachmentList( WEB_SETUP_ACTIONS,  new DependencySetupAction() );
+        deploymentUnit.addToAttachmentList(WEB_SETUP_ACTIONS, new DependencySetupAction());
     }
 
     @Override
@@ -59,7 +65,7 @@ public class MongoAutoSetupDependencyProcessor implements DeploymentUnitProcesso
         @Override
         public Set<ServiceName> dependencies() {
             ServiceName name = LiveOak.LIVEOAK.append("mongo-launcher");
-            return Collections.singleton( name );
+            return Collections.singleton(name);
         }
     }
 }

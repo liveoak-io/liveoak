@@ -1,5 +1,10 @@
 package io.liveoak.wildfly;
 
+import java.util.List;
+
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PersistentResourceXMLDescription;
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
@@ -8,10 +13,6 @@ import org.jboss.staxmapper.XMLElementReader;
 import org.jboss.staxmapper.XMLElementWriter;
 import org.jboss.staxmapper.XMLExtendedStreamReader;
 import org.jboss.staxmapper.XMLExtendedStreamWriter;
-
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import java.util.List;
 
 import static org.jboss.as.controller.PersistentResourceXMLDescription.builder;
 
@@ -40,7 +41,7 @@ public class LiveOakSubsystemParser implements XMLStreamConstants, XMLElementRea
     public void writeContent(XMLExtendedStreamWriter writer, SubsystemMarshallingContext value) throws XMLStreamException {
         ModelNode model = new ModelNode();
         //model.get(UndertowRootDefinition.INSTANCE.getPathElement().getKeyValuePair()).set(context.getModelNode());//this is bit of workaround for SPRD to work properly
-        xmlDescription.persist(writer, model, LiveOakExtension.NAMESPACE );
+        xmlDescription.persist(writer, model, LiveOakExtension.NAMESPACE);
 
     }
 }
