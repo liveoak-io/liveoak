@@ -79,7 +79,7 @@ public class GridFSDirectoryResource extends GridFSResource {
             DBObject result = null;
             GridFSDBObject last = null;
             int count = 0;
-            for (ResourcePath.Segment segment: segments) {
+            for (ResourcePath.Segment segment : segments) {
                 count++;
 
                 // first segment represents root - root file has empty string for a name, and null parent

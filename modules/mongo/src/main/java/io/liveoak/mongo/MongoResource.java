@@ -5,6 +5,9 @@
  */
 package io.liveoak.mongo;
 
+import java.util.Collection;
+import java.util.Set;
+
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -15,9 +18,6 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import org.bson.types.ObjectId;
 import org.jboss.logging.Logger;
-
-import java.util.Collection;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
@@ -49,7 +49,7 @@ public abstract class MongoResource implements Resource, BlockingResource {
     }
 
     protected DBObject getMongoID(String liveOakID) {
-        if (liveOakID.startsWith(MBAAS_MONGO_OBJECT_ID_PREFIX) && liveOakID.endsWith( MBAAS_MONGO_OBJECT_ID_SUFFIX)) {
+        if (liveOakID.startsWith(MBAAS_MONGO_OBJECT_ID_PREFIX) && liveOakID.endsWith(MBAAS_MONGO_OBJECT_ID_SUFFIX)) {
             String id = liveOakID.substring(MBAAS_MONGO_OBJECT_ID_PREFIX.length(), liveOakID.length() - MBAAS_MONGO_OBJECT_ID_SUFFIX.length());
             return new BasicDBObject(MONGO_ID_FIELD, new ObjectId(id));
         } else {
@@ -94,8 +94,7 @@ public abstract class MongoResource implements Resource, BlockingResource {
             if (key.equalsIgnoreCase("$dbref")) {
                 DBRef dbRef = getDBRef((String) resourceState.getProperty("$dbref"));
                 basicDBObject.append(key, dbRef);
-            }
-            else if (!key.equals(MBAAS_ID_FIELD)) { // don't append the ID field again
+            } else if (!key.equals(MBAAS_ID_FIELD)) { // don't append the ID field again
                 Object value = resourceState.getProperty(key);
                 if (value instanceof ResourceState) {
                     Object dbrefObject = ((ResourceState) value).getProperty("$dbref");

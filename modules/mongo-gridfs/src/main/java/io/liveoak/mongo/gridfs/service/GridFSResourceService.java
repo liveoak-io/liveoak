@@ -1,5 +1,7 @@
 package io.liveoak.mongo.gridfs.service;
 
+import java.io.File;
+
 import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.mongo.gridfs.GridFSRootResource;
 import org.jboss.msc.inject.Injector;
@@ -9,8 +11,6 @@ import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 import org.vertx.java.core.Vertx;
-
-import java.io.File;
 
 /**
  * @author Bob McWhirter
@@ -28,7 +28,7 @@ public class GridFSResourceService implements Service<GridFSRootResource> {
                 this.id,
                 this.configResourceInjector.getValue(),
                 this.tmpDirInjector.getValue(),
-                this.vertxInjector.getValue() );
+                this.vertxInjector.getValue());
     }
 
     @Override

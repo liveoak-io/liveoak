@@ -27,7 +27,7 @@ public class MongoLauncherExtension implements Extension {
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
         // mount config resource so we can get access to extension configuration
-        MongoLauncherConfigResource configResource = new MongoLauncherConfigResource( context.id() );
+        MongoLauncherConfigResource configResource = new MongoLauncherConfigResource(context.id());
         ValueService<RootResource> configService = new ValueService(new ImmediateValue(configResource));
         context.target().addService(MONGO_LAUNCHER_CONFIG_NAME, configService).install();
         context.mountPrivate(MONGO_LAUNCHER_CONFIG_NAME);

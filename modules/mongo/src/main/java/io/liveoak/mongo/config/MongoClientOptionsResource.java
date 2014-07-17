@@ -29,7 +29,8 @@ public class MongoClientOptionsResource implements Resource {
 
 
         private final String propertyName;
-        Options(String propertyName){
+
+        Options(String propertyName) {
             this.propertyName = propertyName;
         }
 
@@ -47,7 +48,7 @@ public class MongoClientOptionsResource implements Resource {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept(Options.DESCRIPTION.toString(), mongoClientOptions.getDescription() );
+        sink.accept(Options.DESCRIPTION.toString(), mongoClientOptions.getDescription());
         sink.accept(Options.CONNECTIONS_PER_HOST.toString(), mongoClientOptions.getConnectionsPerHost());
         sink.accept(Options.THREADS_ALLOWED_TO_BLOCK_FOR_CONNECTION_MULTIPLIER.toString(), mongoClientOptions.getThreadsAllowedToBlockForConnectionMultiplier());
         sink.accept(Options.MAX_WAIT_TIME.toString(), mongoClientOptions.getMaxWaitTime());
@@ -70,74 +71,74 @@ public class MongoClientOptionsResource implements Resource {
         } else if (mongoClientOptions.getDescription() != null) {
             builder.description(mongoClientOptions.getDescription());
         } else {
-            builder.description( "liveoak" ); //TODO: don't hard code this here
+            builder.description("liveoak"); //TODO: don't hard code this here
         }
 
         Integer connectionsPerHost = (Integer) state.getProperty(Options.CONNECTIONS_PER_HOST.toString());
         if (connectionsPerHost != null) {
             builder.connectionsPerHost(connectionsPerHost);
         } else {
-            builder.connectionsPerHost( mongoClientOptions.getConnectionsPerHost());
+            builder.connectionsPerHost(mongoClientOptions.getConnectionsPerHost());
         }
 
         Integer threadsAllowedToBlockForConnectionMultiplier = (Integer) state.getProperty(Options.THREADS_ALLOWED_TO_BLOCK_FOR_CONNECTION_MULTIPLIER.toString());
         if (threadsAllowedToBlockForConnectionMultiplier != null) {
-            builder.threadsAllowedToBlockForConnectionMultiplier( threadsAllowedToBlockForConnectionMultiplier );
+            builder.threadsAllowedToBlockForConnectionMultiplier(threadsAllowedToBlockForConnectionMultiplier);
         } else {
-            builder.threadsAllowedToBlockForConnectionMultiplier( mongoClientOptions.getThreadsAllowedToBlockForConnectionMultiplier() );
+            builder.threadsAllowedToBlockForConnectionMultiplier(mongoClientOptions.getThreadsAllowedToBlockForConnectionMultiplier());
         }
 
         Integer maxWaitTime = (Integer) state.getProperty(Options.MAX_WAIT_TIME.toString());
         if (maxWaitTime != null) {
-            builder.maxWaitTime( maxWaitTime );
+            builder.maxWaitTime(maxWaitTime);
         } else {
-            builder.maxWaitTime( mongoClientOptions.getMaxWaitTime() );
+            builder.maxWaitTime(mongoClientOptions.getMaxWaitTime());
         }
 
         Integer connectionTimeout = (Integer) state.getProperty(Options.CONNECT_TIMEOUT.toString());
         if (connectionTimeout != null) {
-            builder.connectTimeout( connectionTimeout );
+            builder.connectTimeout(connectionTimeout);
         } else {
-            builder.connectTimeout( mongoClientOptions.getConnectTimeout() );
+            builder.connectTimeout(mongoClientOptions.getConnectTimeout());
         }
 
         Boolean socketKeepAlive = (Boolean) state.getProperty(Options.SOCKET_KEEP_ALIVE.toString());
         if (socketKeepAlive != null) {
-            builder.socketKeepAlive( socketKeepAlive );
+            builder.socketKeepAlive(socketKeepAlive);
         } else {
-            builder.socketKeepAlive( mongoClientOptions.isSocketKeepAlive() );
+            builder.socketKeepAlive(mongoClientOptions.isSocketKeepAlive());
         }
 
         Boolean autoConnectRetry = (Boolean) state.getProperty(Options.AUTOCONNECT_RETRY.toString());
         if (autoConnectRetry != null) {
-            builder.autoConnectRetry( autoConnectRetry );
+            builder.autoConnectRetry(autoConnectRetry);
         } else {
-            builder.autoConnectRetry( mongoClientOptions.isAutoConnectRetry() );
+            builder.autoConnectRetry(mongoClientOptions.isAutoConnectRetry());
         }
 
         Object maxAutoConnectRetryTime = state.getProperty(Options.MAX_AUTOCONNECT_RETRY_TIME.toString());
         if (maxAutoConnectRetryTime != null) {
             if (maxAutoConnectRetryTime instanceof Integer) {
-                builder.maxAutoConnectRetryTime((int)maxAutoConnectRetryTime);
+                builder.maxAutoConnectRetryTime((int) maxAutoConnectRetryTime);
             } else {
-                builder.maxAutoConnectRetryTime((long)maxAutoConnectRetryTime);
+                builder.maxAutoConnectRetryTime((long) maxAutoConnectRetryTime);
             }
         } else {
-            builder.maxAutoConnectRetryTime( mongoClientOptions.getMaxAutoConnectRetryTime() );
+            builder.maxAutoConnectRetryTime(mongoClientOptions.getMaxAutoConnectRetryTime());
         }
 
         Boolean cursorFinalizerEnabled = (Boolean) state.getProperty(Options.CURSOR_FINALIZER_ENABLED.toString());
         if (cursorFinalizerEnabled != null) {
-            builder.cursorFinalizerEnabled( cursorFinalizerEnabled );
+            builder.cursorFinalizerEnabled(cursorFinalizerEnabled);
         } else {
-            builder.cursorFinalizerEnabled( mongoClientOptions.isCursorFinalizerEnabled());
+            builder.cursorFinalizerEnabled(mongoClientOptions.isCursorFinalizerEnabled());
         }
 
         Boolean alwaysUseMBeans = (Boolean) state.getProperty(Options.ALWAYS_USE_MBEANS.toString());
         if (alwaysUseMBeans != null) {
-            builder.alwaysUseMBeans( alwaysUseMBeans );
+            builder.alwaysUseMBeans(alwaysUseMBeans);
         } else {
-            builder.alwaysUseMBeans( mongoClientOptions.isAlwaysUseMBeans());
+            builder.alwaysUseMBeans(mongoClientOptions.isAlwaysUseMBeans());
         }
 
         this.mongoClientOptions = builder.build();

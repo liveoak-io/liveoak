@@ -31,20 +31,20 @@ public class MongoExtension implements Extension {
 
         InternalMongoService internalMongoService = new InternalMongoService();
 
-        context.target().addService(INTERNAL_MONGO_SERVICE_NAME, internalMongoService )
+        context.target().addService(INTERNAL_MONGO_SERVICE_NAME, internalMongoService)
                 .addDependency(INTERNAL_MONGO_CONFIG_SERVICE_NAME.append("mount"))
-                .addInjection( internalMongoService.configResourceInjector, rootMongoConfigResource )
+                .addInjection(internalMongoService.configResourceInjector, rootMongoConfigResource)
                 .install();
 
     }
 
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
-        RootMongoResource publicResource = new RootMongoResource( context.resourceId() );
+        RootMongoResource publicResource = new RootMongoResource(context.resourceId());
         RootMongoConfigResource privateResource = publicResource.configuration();
 
-        context.mountPublic( publicResource );
-        context.mountPrivate( privateResource );
+        context.mountPublic(publicResource);
+        context.mountPrivate(privateResource);
     }
 
 

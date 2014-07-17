@@ -5,16 +5,13 @@
  */
 package io.liveoak.mongo.gridfs;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.mongodb.DBObject;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-import org.bson.types.ObjectId;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>

@@ -5,7 +5,15 @@
  */
 package io.liveoak.mongo;
 
-import com.mongodb.*;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import com.mongodb.DBRef;
+import com.mongodb.MongoClient;
 import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
@@ -16,9 +24,6 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-
-import java.util.UUID;
-import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
@@ -62,7 +67,7 @@ public class RootMongoResource extends MongoResource implements RootResource {
     public String id() {
         return this.id;
     }
-    
+
     public void destroy() {
         if (client() != null) {
             client().close();
@@ -109,27 +114,27 @@ public class RootMongoResource extends MongoResource implements RootResource {
 
             BasicDBObject options = new BasicDBObject();
 
-            Object capped = state.getProperty( "capped" );
-            if ( capped != null) {
-                options.put( "capped", capped);
+            Object capped = state.getProperty("capped");
+            if (capped != null) {
+                options.put("capped", capped);
             }
 
-            Object autoIndexId = state.getProperty( "autoIndexId" );
-            if ( autoIndexId != null) {
-                options.put( "autoIndexId", autoIndexId);
+            Object autoIndexId = state.getProperty("autoIndexId");
+            if (autoIndexId != null) {
+                options.put("autoIndexId", autoIndexId);
             }
 
-            Object size = state.getProperty( "size" );
-            if ( size != null) {
-                options.put( "size", size);
+            Object size = state.getProperty("size");
+            if (size != null) {
+                options.put("size", size);
             }
 
-            Object max = state.getProperty( "max" );
-            if ( max != null) {
-                options.put( "max", max);
+            Object max = state.getProperty("max");
+            if (max != null) {
+                options.put("max", max);
             }
 
-            DBCollection collection = db().createCollection(id,options); // send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
+            DBCollection collection = db().createCollection(id, options); // send an empty DBOBject instead of null, since setting null will not actually create the collection until a write
 
             responder.resourceCreated(new MongoCollectionResource(this, collection));
         } else {
@@ -150,8 +155,7 @@ public class RootMongoResource extends MongoResource implements RootResource {
 
     @Override
     protected MongoObjectResource getResource(DBRef dbRef, boolean byReference) throws ResourceProcessingException {
-        if (dbRef != null)
-        {
+        if (dbRef != null) {
             if (dbRef.getDB() == null) {
                 throw new ResourceProcessingException("Invalid Reference. Reference Database is null.");
             }
@@ -205,8 +209,7 @@ public class RootMongoResource extends MongoResource implements RootResource {
                 throw new ResourceProcessingException("$DBRefs are only supported under the same context root. URL specified ('" + uri + "')should start with " + rootURI
                         + ".");
             }
-        }
-        else {
+        } else {
             throw new ResourceProcessingException("$DBRefs must be URL, they cannot be null.");
         }
     }

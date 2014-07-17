@@ -5,7 +5,6 @@
  */
 package io.liveoak.mongo.gridfs;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import io.liveoak.spi.RequestContext;

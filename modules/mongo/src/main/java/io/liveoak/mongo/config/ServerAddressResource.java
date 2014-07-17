@@ -1,11 +1,11 @@
 package io.liveoak.mongo.config;
 
+import java.net.URI;
+
 import com.mongodb.ServerAddress;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-
-import java.net.URI;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -15,7 +15,7 @@ public class ServerAddressResource implements Resource {
     RootMongoConfigResource parent;
     ServerAddress serverAddress;
 
-    public ServerAddressResource(RootMongoConfigResource parent, ServerAddress serverAddress ) {
+    public ServerAddressResource(RootMongoConfigResource parent, ServerAddress serverAddress) {
         this.parent = parent;
         this.serverAddress = serverAddress;
     }

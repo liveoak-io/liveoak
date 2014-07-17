@@ -1,13 +1,13 @@
 package io.liveoak.mongo.internal;
 
+import java.net.UnknownHostException;
+
 import io.liveoak.mongo.config.RootMongoConfigResource;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-
-import java.net.UnknownHostException;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -26,7 +26,7 @@ public class InternalMongoService implements Service<InternalStorageManager> {
     }
 
     @Override
-    public void stop( StopContext context ) {
+    public void stop(StopContext context) {
         // do nothing for now.
     }
 

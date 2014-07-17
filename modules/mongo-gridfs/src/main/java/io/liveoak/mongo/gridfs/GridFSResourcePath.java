@@ -6,7 +6,6 @@
 package io.liveoak.mongo.gridfs;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 
 import io.liveoak.spi.RequestContext;
@@ -62,7 +61,7 @@ public class GridFSResourcePath extends ResourcePath {
         if (obj instanceof ResourcePath == false) {
             return false;
         }
-        return segments().equals(((ResourcePath)obj).segments());
+        return segments().equals(((ResourcePath) obj).segments());
     }
 
     public int hashCode() {

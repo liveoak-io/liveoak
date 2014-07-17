@@ -13,7 +13,16 @@ import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.resource.config.ConfigResource;
 import io.liveoak.spi.state.ResourceState;
 
-import static io.liveoak.mongo.launcher.config.Constants.*;
+import static io.liveoak.mongo.launcher.config.Constants.DB_PATH;
+import static io.liveoak.mongo.launcher.config.Constants.ENABLED;
+import static io.liveoak.mongo.launcher.config.Constants.EXTRA_ARGS;
+import static io.liveoak.mongo.launcher.config.Constants.HOST;
+import static io.liveoak.mongo.launcher.config.Constants.LOG_PATH;
+import static io.liveoak.mongo.launcher.config.Constants.MONGOD_PATH;
+import static io.liveoak.mongo.launcher.config.Constants.PID_FILE_PATH;
+import static io.liveoak.mongo.launcher.config.Constants.PORT;
+import static io.liveoak.mongo.launcher.config.Constants.USE_ANY_MONGOD;
+import static io.liveoak.mongo.launcher.config.Constants.USE_SMALL_FILES;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -97,7 +106,7 @@ public class MongoLauncherConfigResource implements ConfigResource, RootResource
     public void readConfigProperties(RequestContext ctx, PropertySink sink, Resource resource) throws Exception {
         sink.accept(MONGOD_PATH, mongodPath);
         sink.accept(HOST, host);
-        sink.accept(PORT, port );
+        sink.accept(PORT, port);
         sink.accept(DB_PATH, dbPath);
         sink.accept(LOG_PATH, logPath);
         sink.accept(PID_FILE_PATH, pidFilePath);

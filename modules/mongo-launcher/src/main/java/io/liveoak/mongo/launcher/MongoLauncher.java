@@ -217,14 +217,14 @@ public class MongoLauncher {
                 result = findMongodInHome("mongod");
                 if (result == null) {
                     try {
-                        result = OsUtils.execWithOneLiner(new String[] {"which", "mongod"}, null, false);
+                        result = OsUtils.execWithOneLiner(new String[]{"which", "mongod"}, null, false);
                     } catch (Exception ignored) {
                         log.debug("[IGNORED] Command execution failed: which mongod", ignored);
                     }
                     if (nullOrEmpty(result)) {
                         try {
-                            String results = OsUtils.execWithResult(new String[] {"sh", "-c", "locate mongod | grep /mongod$"}, null, false);
-                            for (String line: results.split("\\n")) {
+                            String results = OsUtils.execWithResult(new String[]{"sh", "-c", "locate mongod | grep /mongod$"}, null, false);
+                            for (String line : results.split("\\n")) {
                                 line = line.trim();
                                 // check that file exists since 'locate' is rarely in sync with current affairs
                                 if (new File(line).isFile()) {
@@ -260,7 +260,7 @@ public class MongoLauncher {
         Path mongo = Paths.get(home.toString(), ".liveoak", "mongo");
         if (mongo.toFile().isDirectory()) {
             // list any subdirectory until you find one containing bin/mongod
-            for (File item: mongo.toFile().listFiles()) {
+            for (File item : mongo.toFile().listFiles()) {
                 if (item.isDirectory()) {
                     File mongod = Paths.get(item.getAbsolutePath(), "bin", mongodName).toFile();
                     if (mongod.isFile()) {
@@ -306,7 +306,7 @@ public class MongoLauncher {
     public static boolean serverRunning(String host, int port, Consumer<Throwable> onError) {
         try {
             Socket socket = new Socket();
-            socket.connect( new InetSocketAddress( host, port ), 500 );
+            socket.connect(new InetSocketAddress(host, port), 500);
             if (socket.isConnected()) {
                 try {
                     socket.close();
@@ -347,7 +347,7 @@ public class MongoLauncher {
     }
 
 
-    public static void main(String [] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         MongoLauncher mongo = new MongoLauncher();
         String home = System.getProperty("user.home");
         File dbFile = new File(home, "mongo-data");

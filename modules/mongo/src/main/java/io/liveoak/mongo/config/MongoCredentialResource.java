@@ -34,9 +34,9 @@ public class MongoCredentialResource implements Resource {
         sink.accept("username", credential.getUserName());
 
         //only the MONGODB CR has a password and database option, the GSS one only accepts a username
-        if (credential.getMechanism().equals( MongoCredential.MONGODB_CR_MECHANISM )) {
-            sink.accept( "password", new String(credential.getPassword()));
-            sink.accept( "database", credential.getSource());
+        if (credential.getMechanism().equals(MongoCredential.MONGODB_CR_MECHANISM)) {
+            sink.accept("password", new String(credential.getPassword()));
+            sink.accept("database", credential.getSource());
         }
         sink.close();
     }

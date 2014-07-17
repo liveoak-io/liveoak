@@ -1,5 +1,9 @@
 package io.liveoak.mongo.config;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.ReadPreference;
@@ -9,10 +13,6 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -28,7 +28,8 @@ public class ReadPreferenceResource implements Resource {
         TAGS("tags");
 
         private final String propertyName;
-        Options(String propertyName){
+
+        Options(String propertyName) {
             this.propertyName = propertyName;
         }
 
@@ -45,7 +46,8 @@ public class ReadPreferenceResource implements Resource {
         NEAREST("nearest");
 
         private final String propertyName;
-        Types(String propertyName){
+
+        Types(String propertyName) {
             this.propertyName = propertyName;
         }
 
@@ -63,8 +65,7 @@ public class ReadPreferenceResource implements Resource {
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept(Options.TYPE.toString(), this.readPreference.getName());
 
-        if (this.readPreference instanceof TaggableReadPreference )
-        {
+        if (this.readPreference instanceof TaggableReadPreference) {
             TaggableReadPreference taggedReadPreference = (TaggableReadPreference) this.readPreference;
             List<DBObject> tags = taggedReadPreference.getTagSets();
 
@@ -75,56 +76,56 @@ public class ReadPreferenceResource implements Resource {
                     tagResources.add(tagResource);
                 }
             }
-            sink.accept( Options.TAGS.toString(), tagResources );
+            sink.accept(Options.TAGS.toString(), tagResources);
         }
 
         sink.close();
     }
 
     public void updateReadPreference(ResourceState state) throws Exception {
-        String name = (String)state.getProperty(Options.TYPE.toString());
+        String name = (String) state.getProperty(Options.TYPE.toString());
         if (name == null) {
             name = this.readPreference.getName();
         }
 
-        Object tagsObject = state.getProperty( Options.TAGS.toString() );
+        Object tagsObject = state.getProperty(Options.TAGS.toString());
         if (tagsObject != null) {
             ResourceState tags = (ResourceState) tagsObject;
             DBObject dbObjectTag = new BasicDBObject();
             Set<String> propertyNames = tags.getPropertyNames();
-            for (String propertyName: propertyNames) {
-                dbObjectTag.put(propertyName, tags.getProperty( propertyName ));
+            for (String propertyName : propertyNames) {
+                dbObjectTag.put(propertyName, tags.getProperty(propertyName));
             }
 
-            if ( name.equals(Types.PRIMARY_PREFERRED.toString()) ) {
+            if (name.equals(Types.PRIMARY_PREFERRED.toString())) {
                 this.readPreference = ReadPreference.primaryPreferred(dbObjectTag);
-            } else if ( name.equals(Types.SECONDARY.toString()) ) {
+            } else if (name.equals(Types.SECONDARY.toString())) {
                 this.readPreference = ReadPreference.secondary(dbObjectTag);
-            } else if ( name.equals(Types.SECONDARY_PREFERRED.toString()) ) {
+            } else if (name.equals(Types.SECONDARY_PREFERRED.toString())) {
                 this.readPreference = ReadPreference.secondaryPreferred(dbObjectTag);
-            } else if ( name.equals(Types.NEAREST.toString()) ) {
+            } else if (name.equals(Types.NEAREST.toString())) {
                 this.readPreference = ReadPreference.nearest(dbObjectTag);
             } else {
-                throw new InitializationException("Unknown read preference type : [" + name  + "]");
+                throw new InitializationException("Unknown read preference type : [" + name + "]");
             }
         } else {
 
-            if ( name.equals(Types.PRIMARY.toString()) ) {
+            if (name.equals(Types.PRIMARY.toString())) {
                 this.readPreference = ReadPreference.primary();
-            } else if ( name.equals(Types.PRIMARY_PREFERRED.toString())) {
+            } else if (name.equals(Types.PRIMARY_PREFERRED.toString())) {
                 this.readPreference = ReadPreference.primaryPreferred();
-            } else if ( name.equals(Types.SECONDARY.toString())) {
+            } else if (name.equals(Types.SECONDARY.toString())) {
                 this.readPreference = ReadPreference.secondary();
-            } else if ( name.equals(Types.SECONDARY_PREFERRED.toString())) {
-                this.readPreference=  ReadPreference.secondaryPreferred();
-            } else if ( name.equals(Types.NEAREST.toString()) ) {
-                this.readPreference =  ReadPreference.nearest();
+            } else if (name.equals(Types.SECONDARY_PREFERRED.toString())) {
+                this.readPreference = ReadPreference.secondaryPreferred();
+            } else if (name.equals(Types.NEAREST.toString())) {
+                this.readPreference = ReadPreference.nearest();
             } else {
-                throw new InitializationException("Unknown read preference type : [" + name  + "]");
+                throw new InitializationException("Unknown read preference type : [" + name + "]");
             }
         }
 
-        parent.getMongoClient().setReadPreference( this.readPreference );
+        parent.getMongoClient().setReadPreference(this.readPreference);
     }
 
 

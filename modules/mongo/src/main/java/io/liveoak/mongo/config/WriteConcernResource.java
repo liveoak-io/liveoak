@@ -10,7 +10,7 @@ import io.liveoak.spi.state.ResourceState;
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class WriteConcernResource implements Resource{
+public class WriteConcernResource implements Resource {
 
     WriteConcern writeConcern;
     RootMongoConfigResource parent;
@@ -24,7 +24,8 @@ public class WriteConcernResource implements Resource{
         CONTINUEONERRORFORINSERT("continueOnErrorForInsert");
 
         private final String propertyName;
-        Options(String propertyName){
+
+        Options(String propertyName) {
             this.propertyName = propertyName;
         }
 
@@ -76,13 +77,13 @@ public class WriteConcernResource implements Resource{
             continueOnErrorForInsert = writeConcern.getContinueOnErrorForInsert();
         }
 
-        WriteConcern  updatedWriteConcern;
+        WriteConcern updatedWriteConcern;
         if (w instanceof String) {
-            updatedWriteConcern = new WriteConcern((String)w, wTimeout, fSync, j, continueOnErrorForInsert);
+            updatedWriteConcern = new WriteConcern((String) w, wTimeout, fSync, j, continueOnErrorForInsert);
         } else if (w instanceof Integer) {
-            updatedWriteConcern = new WriteConcern((Integer)w, wTimeout, fSync, j, continueOnErrorForInsert);
+            updatedWriteConcern = new WriteConcern((Integer) w, wTimeout, fSync, j, continueOnErrorForInsert);
         } else {
-            throw new InitializationException("Invalid value for parameter 'w'. Expecting a String or integer, received [" + w + "]" );
+            throw new InitializationException("Invalid value for parameter 'w'. Expecting a String or integer, received [" + w + "]");
 
         }
 

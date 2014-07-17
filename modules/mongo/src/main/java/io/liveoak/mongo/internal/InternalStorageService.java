@@ -9,18 +9,18 @@ import org.jboss.msc.value.InjectedValue;
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class InternalStorageService  implements Service<InternalStorage> {
+public class InternalStorageService implements Service<InternalStorage> {
 
     InternalStorage internalStorage;
 
     @Override
-    public void start( StartContext context ) throws StartException {
+    public void start(StartContext context) throws StartException {
         InternalStorageManager internalStorageManager = internalStorageManagerInjector.getValue();
-        this.internalStorage = internalStorageManager.getInternalStorage( appNameInjector.getValue(), resourceIdInjector.getValue() );
+        this.internalStorage = internalStorageManager.getInternalStorage(appNameInjector.getValue(), resourceIdInjector.getValue());
     }
 
     @Override
-    public void stop( StopContext context ) {
+    public void stop(StopContext context) {
 
     }
 

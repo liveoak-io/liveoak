@@ -15,8 +15,8 @@ public class InternalStorageFactory {
      * the ServiceName the resource needs to use for dependency injection.
      *
      * @param serviceContainer
-     * @param appName The name of the application requesting the InternalStorage
-     * @param resourceId The resource id of the resource requesting the InternalStorage
+     * @param appName          The name of the application requesting the InternalStorage
+     * @param resourceId       The resource id of the resource requesting the InternalStorage
      * @return A ServiceName for the resource to use as a dependency.
      */
     public static ServiceName createService(ServiceTarget serviceContainer, String appName, String resourceId) {
@@ -41,7 +41,7 @@ public class InternalStorageFactory {
      * @return The ServiceName for the resource to use as a dependency
      */
     public static ServiceName createService(ApplicationExtensionContext context) {
-        return createService( context.target(), context.application().id(), context.resourceId() );
+        return createService(context.target(), context.application().id(), context.resourceId());
     }
 
 
