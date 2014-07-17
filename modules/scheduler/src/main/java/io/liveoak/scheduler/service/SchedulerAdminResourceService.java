@@ -1,8 +1,6 @@
 package io.liveoak.scheduler.service;
 
 import io.liveoak.scheduler.SchedulerAdminResource;
-import io.liveoak.scheduler.SchedulerResource;
-import io.liveoak.spi.resource.async.Notifier;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -24,7 +22,7 @@ public class SchedulerAdminResourceService implements Service<SchedulerAdminReso
     public void start(StartContext context) throws StartException {
         this.resource = new SchedulerAdminResource(
                 this.id,
-                this.schedulerInjector.getValue() );
+                this.schedulerInjector.getValue());
     }
 
     @Override

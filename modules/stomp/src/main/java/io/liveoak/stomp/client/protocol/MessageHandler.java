@@ -5,18 +5,17 @@
  */
 package io.liveoak.stomp.client.protocol;
 
-import io.liveoak.stomp.Headers;
-import io.liveoak.stomp.StompMessage;
-import io.liveoak.stomp.client.Subscription;
-import io.liveoak.stomp.client.SubscriptionImpl;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
+
+import io.liveoak.stomp.Headers;
+import io.liveoak.stomp.StompMessage;
+import io.liveoak.stomp.client.SubscriptionImpl;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 
 /**
  * @author Bob McWhirter
@@ -40,12 +39,12 @@ public class MessageHandler extends ChannelDuplexHandler {
         if (msg instanceof StompMessage) {
             StompMessage stompMessage = (StompMessage) msg;
             String subscriptionId = stompMessage.headers().get(Headers.SUBSCRIPTION);
-            SubscriptionImpl subscription = this.subscriptions.get( subscriptionId );
-            if ( subscription != null ) {
+            SubscriptionImpl subscription = this.subscriptions.get(subscriptionId);
+            if (subscription != null) {
                 this.executor.execute(() -> {
                     Consumer<StompMessage> onMessage = subscription.onMessage();
-                    if ( onMessage != null ) {
-                        onMessage.accept( stompMessage );
+                    if (onMessage != null) {
+                        onMessage.accept(stompMessage);
                     }
                 });
             } else {

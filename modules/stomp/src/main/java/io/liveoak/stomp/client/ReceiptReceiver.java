@@ -5,5 +5,6 @@ package io.liveoak.stomp.client;
  */
 public interface ReceiptReceiver {
     String receiptId();
+
     void receivedReceipt();
 }

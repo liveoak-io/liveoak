@@ -5,11 +5,11 @@
  */
 package io.liveoak.stomp.common;
 
+import java.util.List;
+
 import io.liveoak.stomp.StompMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
-
-import java.util.List;
 
 /**
  * @author Bob McWhirter

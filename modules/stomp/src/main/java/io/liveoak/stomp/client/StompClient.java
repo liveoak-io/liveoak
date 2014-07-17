@@ -5,6 +5,15 @@
  */
 package io.liveoak.stomp.client;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.Stomp;
 import io.liveoak.stomp.StompException;
@@ -18,7 +27,6 @@ import io.liveoak.stomp.client.protocol.StompErrorClientHandler;
 import io.liveoak.stomp.client.protocol.SubscriptionEncoder;
 import io.liveoak.stomp.common.DefaultStompMessage;
 import io.liveoak.stomp.common.HeadersImpl;
-import io.liveoak.stomp.common.StompControlFrame;
 import io.liveoak.stomp.common.StompFrame;
 import io.liveoak.stomp.common.StompFrameDecoder;
 import io.liveoak.stomp.common.StompFrameEncoder;
@@ -31,15 +39,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.jboss.logging.Logger;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 /**
  * STOMP client.
@@ -85,8 +84,8 @@ public class StompClient {
                 //ch.pipeline().addLast( new DebugHandler( "client-head" ) );
                 ch.pipeline().addLast(new StompFrameEncoder());
                 ch.pipeline().addLast(new StompFrameDecoder());
-                ch.pipeline().addLast( new SubscriptionEncoder() );
-                ch.pipeline().addLast( new ReceiptHandler(executor));
+                ch.pipeline().addLast(new SubscriptionEncoder());
+                ch.pipeline().addLast(new ReceiptHandler(executor));
                 //ch.pipeline().addLast( new DebugHandler( "client-frames" ) );
                 ch.pipeline().addLast(new ConnectionNegotiatingHandler(clientContext, callback));
                 ch.pipeline().addLast(new StompMessageEncoder(false));
@@ -141,12 +140,12 @@ public class StompClient {
     /**
      * Connect synchronously with credentials included
      *
-     * @param host Host to connect to.
-     * @param port Port to connect to.
-     * @param login Login (username) to use for secured connection.
+     * @param host     Host to connect to.
+     * @param port     Port to connect to.
+     * @param login    Login (username) to use for secured connection.
      * @param passcode Passcode (password) to use for secured connection.
      * @throws InterruptedException If the connection times out.
-     * @throws StompException If an error occurs during connection.
+     * @throws StompException       If an error occurs during connection.
      */
     public void connectSync(String host, int port, String login, String passcode) throws InterruptedException, StompException {
         this.login = login;
@@ -157,9 +156,9 @@ public class StompClient {
     /**
      * Connect asynchronously with credentials included
      *
-     * @param host Host to connect to.
-     * @param port Port to connect to.
-     * @param login Login (username) to use for secured connection.
+     * @param host     Host to connect to.
+     * @param port     Port to connect to.
+     * @param login    Login (username) to use for secured connection.
      * @param passcode Passcode (password) to use for secured connection.
      * @param callback Callback to fire after successfully connecting.
      */
@@ -264,7 +263,7 @@ public class StompClient {
     /**
      * Subscribe to a destination.
      *
-     * @param destination The destination to subscribe to.
+     * @param destination       The destination to subscribe to.
      * @param subscriptionSetup Code to setup subscription
      */
     public void subscribe(String destination, Consumer<Subscription> subscriptionSetup) {
@@ -278,14 +277,14 @@ public class StompClient {
      * The {@code destination} paramter will be added to the headers on
      * your behalf.</p>
      *
-     * @param destination The destination to subscribe to.
-     * @param headers     Additional headers.
+     * @param destination       The destination to subscribe to.
+     * @param headers           Additional headers.
      * @param subscriptionSetup Code to setup subscription
      */
     public void subscribe(String destination, Headers headers, Consumer<Subscription> subscriptionSetup) {
-        SubscriptionImpl subscription = new SubscriptionImpl( destination, headers );
+        SubscriptionImpl subscription = new SubscriptionImpl(destination, headers);
         subscriptionSetup.accept(subscription);
-        this.channel.writeAndFlush( subscription );
+        this.channel.writeAndFlush(subscription);
     }
 
     private String host;

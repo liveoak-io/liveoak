@@ -5,6 +5,8 @@
  */
 package io.liveoak.stomp.client.protocol;
 
+import java.util.function.Consumer;
+
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.Stomp;
 import io.liveoak.stomp.client.StompClient;
@@ -12,8 +14,6 @@ import io.liveoak.stomp.common.AbstractControlFrameHandler;
 import io.liveoak.stomp.common.StompControlFrame;
 import io.liveoak.stomp.server.StompServerException;
 import io.netty.channel.ChannelHandlerContext;
-
-import java.util.function.Consumer;
 
 /**
  * @author Bob McWhirter

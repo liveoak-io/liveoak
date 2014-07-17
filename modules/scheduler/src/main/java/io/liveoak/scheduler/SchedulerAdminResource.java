@@ -14,6 +14,7 @@ public class SchedulerAdminResource implements RootResource, SynchronousResource
         this.id = id;
         this.scheduler = scheduler;
     }
+
     @Override
     public void parent(Resource parent) {
         this.parent = parent;

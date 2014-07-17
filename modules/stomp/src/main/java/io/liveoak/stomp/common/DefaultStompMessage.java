@@ -5,14 +5,14 @@
  */
 package io.liveoak.stomp.common;
 
+import java.nio.charset.Charset;
+
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.StompException;
 import io.liveoak.stomp.StompMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufHolder;
 import io.netty.buffer.Unpooled;
-
-import java.nio.charset.Charset;
 
 /**
  * @author Bob McWhirter

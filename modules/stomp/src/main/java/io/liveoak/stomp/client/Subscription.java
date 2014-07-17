@@ -10,5 +10,6 @@ import io.liveoak.stomp.StompMessage;
 public interface Subscription {
 
     Subscription onMessage(Consumer<StompMessage> onMessage);
+
     Subscription onReceipt(Runnable onReceipt);
 }

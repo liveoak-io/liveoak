@@ -5,6 +5,8 @@
  */
 package io.liveoak.stomp.server.protocol;
 
+import java.util.regex.Pattern;
+
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.Stomp;
 import io.liveoak.stomp.common.AbstractControlFrameHandler;
@@ -16,8 +18,6 @@ import io.liveoak.stomp.server.StompServerContext;
 import io.liveoak.stomp.server.StompServerException;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
-
-import java.util.regex.Pattern;
 
 /**
  * @author Bob McWhirter

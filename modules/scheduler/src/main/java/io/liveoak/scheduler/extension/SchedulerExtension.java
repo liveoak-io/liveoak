@@ -21,7 +21,7 @@ public class SchedulerExtension implements Extension {
 
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
-        context.mountPrivate( new DefaultRootResource( context.id() ));
+        context.mountPrivate(new DefaultRootResource(context.id()));
     }
 
     @Override
@@ -30,29 +30,28 @@ public class SchedulerExtension implements Extension {
 
         ServiceTarget target = context.target();
         ServiceName name = SchedulerServices.scheduler(appId, context.resourceId());
-        SchedulerService scheduler = new SchedulerService(appId + "/" + context.resourceId() );
+        SchedulerService scheduler = new SchedulerService(appId + "/" + context.resourceId());
 
         target.addService(name, scheduler)
                 .install();
 
-        SchedulerResourceService publicResource = new SchedulerResourceService( context.resourceId() );
+        SchedulerResourceService publicResource = new SchedulerResourceService(context.resourceId());
 
-        target.addService(LiveOak.resource( appId, context.resourceId() ), publicResource)
+        target.addService(LiveOak.resource(appId, context.resourceId()), publicResource)
                 .addDependency(LiveOak.NOTIFIER, Notifier.class, publicResource.notifierInjector())
                 .addDependency(name, Scheduler.class, publicResource.schedulerInjector())
                 .install();
 
         context.mountPublic();
 
-        SchedulerAdminResourceService privateResource = new SchedulerAdminResourceService( context.resourceId() );
+        SchedulerAdminResourceService privateResource = new SchedulerAdminResourceService(context.resourceId());
 
-        target.addService(LiveOak.adminResource( appId, context.resourceId() ), privateResource)
+        target.addService(LiveOak.adminResource(appId, context.resourceId()), privateResource)
                 .addDependency(name, Scheduler.class, privateResource.schedulerInjector())
                 .install();
 
         context.mountPrivate();
     }
-
 
 
     @Override

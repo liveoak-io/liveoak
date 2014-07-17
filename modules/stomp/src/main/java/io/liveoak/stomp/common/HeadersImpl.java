@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2013 Red Hat, Inc. and/or its affiliates.
  *
@@ -7,11 +6,11 @@
 
 package io.liveoak.stomp.common;
 
-import io.liveoak.stomp.Headers;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import io.liveoak.stomp.Headers;
 
 public class HeadersImpl extends HashMap<String, String> implements Headers {
 

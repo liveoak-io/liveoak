@@ -50,7 +50,7 @@ public class SubscriptionImpl implements Subscription, ReceiptReceiver {
 
     @Override
     public void receivedReceipt() {
-        if ( this.onReceipt != null ) {
+        if (this.onReceipt != null) {
             this.onReceipt.run();
         }
     }

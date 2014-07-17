@@ -1,11 +1,11 @@
 package io.liveoak.scheduler;
 
+import java.util.Date;
+
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import org.quartz.JobExecutionContext;
-
-import java.util.Date;
 
 /**
  * @author Bob McWhirter

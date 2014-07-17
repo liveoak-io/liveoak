@@ -8,15 +8,11 @@ package io.liveoak.stomp.client.protocol;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.Stomp;
-import io.liveoak.stomp.StompMessage;
 import io.liveoak.stomp.client.ReceiptReceiver;
-import io.liveoak.stomp.client.SubscriptionImpl;
 import io.liveoak.stomp.common.StompControlFrame;
-import io.liveoak.stomp.common.StompFrame;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;

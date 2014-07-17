@@ -24,7 +24,7 @@ public class SchedulerResourceService implements Service<SchedulerResource> {
         this.resource = new SchedulerResource(
                 this.id,
                 this.schedulerInjector.getValue(),
-                this.notifierInjector.getValue() );
+                this.notifierInjector.getValue());
     }
 
     @Override

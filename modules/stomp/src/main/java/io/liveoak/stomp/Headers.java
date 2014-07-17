@@ -23,24 +23,24 @@ public interface Headers {
     Headers duplicate();
 
 
-    public static final String CONTENT_LENGTH = "content-length";
-    public static final String CONTENT_TYPE = "content-type";
-    public static final String SESSION = "session";
-    public static final String DESTINATION = "destination";
-    public static final String ID = "id";
-    public static final String RECEIPT = "receipt";
-    public static final String RECEIPT_ID = "receipt-id";
-    public static final String ACK = "ack";
-    public static final String SELECTOR = "selector";
-    public static final String TRANSACTION = "transaction";
-    public static final String SUBSCRIPTION = "subscription";
-    public static final String MESSAGE_ID = "message-id";
-    public static final String HOST = "host";
-    public static final String ACCEPT_VERSION = "accept-version";
-    public static final String VERSION = "version";
-    public static final String SERVER = "server";
-    public static final String MESSAGE = "message";
-    public static final String HEARTBEAT = "heart-beat";
-    public static final String LOGIN = "login";
-    public static final String PASSCODE = "passcode";
+    String CONTENT_LENGTH = "content-length";
+    String CONTENT_TYPE = "content-type";
+    String SESSION = "session";
+    String DESTINATION = "destination";
+    String ID = "id";
+    String RECEIPT = "receipt";
+    String RECEIPT_ID = "receipt-id";
+    String ACK = "ack";
+    String SELECTOR = "selector";
+    String TRANSACTION = "transaction";
+    String SUBSCRIPTION = "subscription";
+    String MESSAGE_ID = "message-id";
+    String HOST = "host";
+    String ACCEPT_VERSION = "accept-version";
+    String VERSION = "version";
+    String SERVER = "server";
+    String MESSAGE = "message";
+    String HEARTBEAT = "heart-beat";
+    String LOGIN = "login";
+    String PASSCODE = "passcode";
 }

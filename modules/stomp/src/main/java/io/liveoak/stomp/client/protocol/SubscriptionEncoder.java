@@ -26,10 +26,10 @@ public class SubscriptionEncoder extends MessageToMessageEncoder<SubscriptionImp
     protected void encode(ChannelHandlerContext ctx, SubscriptionImpl msg, List<Object> out) throws Exception {
         StompControlFrame frame = new StompControlFrame(Stomp.Command.SUBSCRIBE);
         frame.headers().putAll(msg.headers());
-        frame.headers().put(Headers.ID, msg.subscriptionId() );
+        frame.headers().put(Headers.ID, msg.subscriptionId());
         frame.headers().put(Headers.DESTINATION, msg.destination());
         frame.headers().put(Headers.RECEIPT, msg.subscriptionId());
-        out.add( frame );
+        out.add(frame);
     }
 
     private boolean server;

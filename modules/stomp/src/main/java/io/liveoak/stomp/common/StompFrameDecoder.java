@@ -5,14 +5,14 @@
  */
 package io.liveoak.stomp.common;
 
+import java.nio.charset.Charset;
+import java.util.List;
+
 import io.liveoak.stomp.Stomp;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
-
-import java.nio.charset.Charset;
-import java.util.List;
 
 /**
  * @author Bob McWhirter

@@ -5,10 +5,10 @@
  */
 package io.liveoak.stomp;
 
+import java.nio.charset.Charset;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufHolder;
-
-import java.nio.charset.Charset;
 
 /**
  * @author Bob McWhirter

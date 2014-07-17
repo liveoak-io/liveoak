@@ -5,10 +5,10 @@
  */
 package io.liveoak.stomp.server;
 
+import java.util.UUID;
+
 import io.liveoak.stomp.StompMessage;
 import io.netty.channel.Channel;
-
-import java.util.UUID;
 
 /**
  * @author Bob McWhirter

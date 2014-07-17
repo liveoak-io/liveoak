@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2013 Red Hat, Inc. and/or its affiliates.
  *
@@ -7,10 +6,10 @@
 
 package io.liveoak.stomp.common;
 
+import java.util.Set;
+
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.Stomp;
-
-import java.util.Set;
 
 /**
  * A Frame-header encompasses the STOMP command keyword, along with

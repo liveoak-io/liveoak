@@ -8,10 +8,10 @@ import org.jboss.msc.service.ServiceName;
  */
 public class SchedulerServices {
 
-    private static ServiceName SCHEDULER = LiveOak.LIVEOAK.append( "scheduler" );
+    private static ServiceName SCHEDULER = LiveOak.LIVEOAK.append("scheduler");
 
     public static ServiceName scheduler(String appId, String resourceId) {
-        return SCHEDULER.append( appId, resourceId );
+        return SCHEDULER.append(appId, resourceId);
     }
 
 }

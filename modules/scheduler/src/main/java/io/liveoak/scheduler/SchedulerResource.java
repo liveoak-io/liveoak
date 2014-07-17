@@ -1,15 +1,26 @@
 package io.liveoak.scheduler;
 
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.*;
-import io.liveoak.spi.state.ResourceState;
-import org.jboss.logging.Logger;
-import org.quartz.*;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Notifier;
+import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.async.ResourceSink;
+import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerMetaData;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 
 /**
  * @author Bob McWhirter

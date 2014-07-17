@@ -1,5 +1,7 @@
 package io.liveoak.scheduler;
 
+import java.util.LinkedList;
+
 import io.liveoak.common.DefaultResourceResponse;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceResponse;
@@ -11,8 +13,6 @@ import org.quartz.CronTrigger;
 import org.quartz.JobExecutionContext;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
-
-import java.util.LinkedList;
 
 /**
  * @author Bob McWhirter
