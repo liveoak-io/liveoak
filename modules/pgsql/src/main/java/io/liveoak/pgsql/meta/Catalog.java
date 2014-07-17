@@ -1,12 +1,13 @@
 package io.liveoak.pgsql.meta;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -21,8 +22,8 @@ public class Catalog {
         this.schemas = Collections.unmodifiableSet(schemas);
         this.defaultSchema = defaultSchema;
 
-        Map<TableRef, Table> tablesWithIds = new HashMap<>();
-        Map<TableRef, List<ForeignKey>> referredKeys = new HashMap<>();
+        Map<TableRef, Table> tablesWithIds = new LinkedHashMap<>();
+        Map<TableRef, List<ForeignKey>> referredKeys = new LinkedHashMap<>();
 
         // group by name (same name in multiple schemas)
         LinkedHashMap<String, List<TableRef>> seenNames = new LinkedHashMap<>();
@@ -46,18 +47,28 @@ public class Catalog {
             }
         }
 
+        Collection<Table> unordered = new LinkedList<>();
         // set ids as either short (name) or long (schema.name)
         for (Map.Entry<String, List<TableRef>> e: seenNames.entrySet()) {
             if (e.getValue().size() > 1) {
                 for (TableRef ref: e.getValue()) {
-                    tablesWithIds.put(ref, new Table(ref.asUnquotedIdentifier(), tables.get(ref), referredKeys.get(ref)));
+                    unordered.add(new Table(ref.asUnquotedIdentifier(), tables.get(ref), referredKeys.get(ref)));
                 }
             } else {
                 TableRef ref = e.getValue().get(0);
-                tablesWithIds.put(ref, new Table(e.getKey(), tables.get(ref), referredKeys.get(ref)));
+                unordered.add(new Table(e.getKey(), tables.get(ref), referredKeys.get(ref)));
             }
         }
 
+        // order by table.id() - exposed table identifier which may or may not contain schema component
+        Collection<Table> ordered = new TreeSet<>((o1, o2) -> {
+            return o1.id().compareTo(o2.id());
+        });
+        ordered.addAll(unordered);
+
+        for (Table t: ordered) {
+            tablesWithIds.put(t.tableRef(), t);
+        }
         this.tables = Collections.unmodifiableMap(tablesWithIds);
     }
 

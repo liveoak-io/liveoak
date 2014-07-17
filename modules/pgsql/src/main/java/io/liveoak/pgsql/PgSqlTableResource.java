@@ -1,12 +1,7 @@
 package io.liveoak.pgsql;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;

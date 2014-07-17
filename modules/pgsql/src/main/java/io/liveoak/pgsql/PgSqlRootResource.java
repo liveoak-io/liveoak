@@ -86,10 +86,20 @@ public class PgSqlRootResource extends DefaultRootResource {
     }
 
     public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
+        String tableId = id;
+        boolean schemaReq = false;
+
+        ResourcePath.Segment tail = ctx.resourcePath() != null ? ctx.resourcePath().tail() : null;
+        if (tail != null && tail.matrixParameters().containsKey("schema")) {
+            tableId = tail.name();
+            schemaReq = true;
+        }
         List<String> tables = getCatalog().tableIds();
-        int pos = tables.indexOf(id);
+        int pos = tables.indexOf(tableId);
         if (pos == -1) {
-            responder.noSuchResource( id );
+            responder.noSuchResource(tableId);
+        } else if (schemaReq) {
+            responder.resourceRead(new PgSqlTableSchemaResource(this, tail.name()));
         } else {
             responder.resourceRead(new PgSqlTableResource(this, tables.get(pos)));
         }

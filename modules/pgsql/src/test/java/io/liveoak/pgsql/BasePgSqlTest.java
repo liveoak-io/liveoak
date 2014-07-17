@@ -12,6 +12,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -225,6 +227,14 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
                 .build();
     }
 
+    protected RequestContext ctx(String pat, ResourcePath path) {
+        return new RequestContext.Builder()
+                .requestAttributes(new DefaultRequestAttributes())
+                .resourcePath(path)
+                .returnFields(new DefaultReturnFields(pat))
+                .build();
+    }
+
     protected Timestamp time(String dt) throws ParseException {
         return new Timestamp(iso.parse(dt).getTime());
     }
@@ -290,6 +300,10 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
     }
 
     protected ResourceState resource(String id, String parentUri, Object[] properties, ResourceState... members) throws URISyntaxException {
+        return resource(id, parentUri, properties, Arrays.asList(members));
+    }
+
+    protected ResourceState resource(String id, String parentUri, Object[] properties, List<ResourceState> members) throws URISyntaxException {
         DefaultResourceState state = new DefaultResourceState(id);
         state.uri(new URI(parentUri + "/" + id));
         assertThat(properties.length % 2).isEqualTo(0);
@@ -303,6 +317,12 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
             state.members().add(resource);
         }
         return state;
+    }
+
+    protected List<ResourceState> sorted(Comparator<ResourceState> cmp, ResourceState... members) {
+        ArrayList ls = new ArrayList(Arrays.asList(members));
+        Collections.sort(ls, cmp);
+        return ls;
     }
 
     protected ResourceState obj(Object ... properties) {

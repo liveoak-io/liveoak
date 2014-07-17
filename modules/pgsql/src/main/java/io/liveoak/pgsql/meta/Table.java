@@ -73,6 +73,10 @@ public class Table {
         return name;
     }
 
+    public TableRef tableRef() {
+        return new TableRef(schema, name);
+    }
+
     public String schemaName() {
         StringBuilder sb = new StringBuilder();
         if (schema != null) {
