@@ -3,14 +3,12 @@ package io.liveoak.client;
 import java.net.SocketAddress;
 
 import io.liveoak.client.protocol.LocalResponseHandler;
-import io.liveoak.common.protocol.DebugHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 

@@ -1,5 +1,8 @@
 package io.liveoak.git;
 
+import java.io.File;
+import java.io.IOException;
+
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -8,9 +11,6 @@ import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * @author Bob McWhirter
@@ -42,7 +42,7 @@ public class GitRepoAdminResource implements RootResource {
 
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        responder.resourceUpdated( this );
+        responder.resourceUpdated(this);
     }
 
     @Override

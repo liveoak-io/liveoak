@@ -14,15 +14,13 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import org.vertx.java.core.Vertx;
 
-import java.io.File;
-
 /**
  * @author Bob McWhirter
  */
 public class AggregatingFilesystemResource extends FilesystemResource {
 
     public AggregatingFilesystemResource(FileSystemAdminResource adminResource, String id, Vertx vertx) {
-        super( adminResource, id, vertx );
+        super(adminResource, id, vertx);
     }
 
     @Override

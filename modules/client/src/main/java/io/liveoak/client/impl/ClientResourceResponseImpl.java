@@ -1,6 +1,5 @@
 package io.liveoak.client.impl;
 
-import io.liveoak.client.ClientRequest;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.state.ResourceState;

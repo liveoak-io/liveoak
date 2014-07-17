@@ -9,7 +9,7 @@ import io.liveoak.spi.Application;
  */
 public interface ApplicationRegistry {
 
-    public Collection<? extends Application> applications();
+    Collection<? extends Application> applications();
 
-    public Application application(String id) throws InterruptedException;
+    Application application(String id) throws InterruptedException;
 }

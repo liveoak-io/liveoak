@@ -8,9 +8,9 @@ import org.jboss.msc.service.ServiceName;
  */
 public class GitServices {
 
-    private static final ServiceName GIT = LiveOak.LIVEOAK.append( "git" );
+    private static final ServiceName GIT = LiveOak.LIVEOAK.append("git");
 
     public static ServiceName repository(String orgId, String appId, String id) {
-        return GIT.append( "repo", orgId, appId, id );
+        return GIT.append("repo", orgId, appId, id);
     }
 }

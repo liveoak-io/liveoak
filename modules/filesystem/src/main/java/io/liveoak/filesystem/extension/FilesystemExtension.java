@@ -1,5 +1,7 @@
 package io.liveoak.filesystem.extension;
 
+import java.io.File;
+
 import io.liveoak.filesystem.FileSystemAdminResource;
 import io.liveoak.filesystem.service.FilesystemResourceService;
 import io.liveoak.spi.LiveOak;
@@ -9,8 +11,6 @@ import io.liveoak.spi.extension.SystemExtensionContext;
 import io.liveoak.spi.resource.async.DefaultRootResource;
 import org.vertx.java.core.Vertx;
 
-import java.io.File;
-
 /**
  * @author Bob McWhirter
  */
@@ -18,27 +18,27 @@ public class FilesystemExtension implements Extension {
 
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
-        context.mountPrivate( new DefaultRootResource( context.id() ));
+        context.mountPrivate(new DefaultRootResource(context.id()));
     }
 
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
-        File initialDir = new File( context.application().directory(), context.resourceId() );
-        FileSystemAdminResource privateResource = new FileSystemAdminResource( context.resourceId(), initialDir );
+        File initialDir = new File(context.application().directory(), context.resourceId());
+        FileSystemAdminResource privateResource = new FileSystemAdminResource(context.resourceId(), initialDir);
 
-        context.mountPrivate( privateResource );
+        context.mountPrivate(privateResource);
 
-        FilesystemResourceService publicResource = new FilesystemResourceService( context.resourceId() );
-        context.target().addService( LiveOak.resource( context.application().id(), context.resourceId() ), publicResource )
-                .addDependency( LiveOak.VERTX, Vertx.class, publicResource.vertxInjector() )
-                .addInjection( publicResource.adminResourceInjector(), privateResource )
+        FilesystemResourceService publicResource = new FilesystemResourceService(context.resourceId());
+        context.target().addService(LiveOak.resource(context.application().id(), context.resourceId()), publicResource)
+                .addDependency(LiveOak.VERTX, Vertx.class, publicResource.vertxInjector())
+                .addInjection(publicResource.adminResourceInjector(), privateResource)
                 .install();
 
-        context.mountPublic( LiveOak.resource( context.application().id(), context.resourceId() ));
+        context.mountPublic(LiveOak.resource(context.application().id(), context.resourceId()));
     }
 
     @Override
     public void unextend(ApplicationExtensionContext context) throws Exception {
-     }
+    }
 
 }

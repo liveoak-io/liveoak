@@ -2,7 +2,6 @@ package io.liveoak.git.service;
 
 import io.liveoak.git.GitRepoAdminResource;
 import io.liveoak.git.GitRepoResource;
-import org.eclipse.jgit.lib.Repository;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;

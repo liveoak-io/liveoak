@@ -1,17 +1,13 @@
 package io.liveoak.filesystem.aggregating.extension;
 
+import java.io.File;
+
 import io.liveoak.filesystem.FileSystemAdminResource;
-import io.liveoak.filesystem.FilesystemServices;
 import io.liveoak.filesystem.aggregating.service.AggregatingFilesystemResourceService;
 import io.liveoak.filesystem.extension.FilesystemExtension;
-import io.liveoak.filesystem.service.FilesystemResourceService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
-import org.jboss.msc.service.ServiceName;
-import org.jboss.msc.service.ServiceTarget;
 import org.vertx.java.core.Vertx;
-
-import java.io.File;
 
 /**
  * @author Bob McWhirter

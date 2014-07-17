@@ -10,8 +10,6 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 import org.vertx.java.core.Vertx;
 
-import java.io.File;
-
 /**
  * @author Bob McWhirter
  */
@@ -26,7 +24,7 @@ public class FilesystemResourceService implements Service<FilesystemResource> {
         this.resource = new FilesystemResource(
                 this.adminResourceInjector.getValue(),
                 this.id,
-                this.vertxInjector.getValue() );
+                this.vertxInjector.getValue());
     }
 
     @Override
