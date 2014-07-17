@@ -34,7 +34,8 @@
       "dist/css": "dist/css/*",
       "dist/fonts": "dist/fonts/*",
       "components/bootstrap/dist/js": "components/bootstrap/dist/js/bootstrap.js",
-      "components/bootstrap-select": "components/bootstrap-select/bootstrap-select.js"
+      "components/bootstrap-select": "components/bootstrap-select/bootstrap-select.js",
+      "components/font-awesome/fonts": "components/font-awesome/fonts/*"
     }
   }
 }
