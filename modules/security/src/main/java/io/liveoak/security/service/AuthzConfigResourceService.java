@@ -8,7 +8,6 @@ package io.liveoak.security.service;
 
 import io.liveoak.security.integration.AuthzServiceConfigResource;
 import io.liveoak.security.integration.AuthzServiceRootResource;
-import io.liveoak.spi.client.Client;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;

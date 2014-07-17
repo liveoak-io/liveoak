@@ -1,5 +1,7 @@
 package io.liveoak.security.integration;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.security.spi.AuthzServiceConfig;
 import io.liveoak.spi.RequestContext;
@@ -9,8 +11,6 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import org.jboss.logging.Logger;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Root resource to be registered in DefaultContainer

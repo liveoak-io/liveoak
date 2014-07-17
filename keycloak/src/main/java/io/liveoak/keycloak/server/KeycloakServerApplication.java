@@ -1,5 +1,11 @@
 package io.liveoak.keycloak.server;
 
+import java.io.FileNotFoundException;
+import java.util.Arrays;
+
+import javax.servlet.ServletContext;
+import javax.ws.rs.core.Context;
+
 import io.liveoak.keycloak.theme.LiveOakLoginThemeProviderFactory;
 import org.jboss.resteasy.core.Dispatcher;
 import org.keycloak.Config;
@@ -13,11 +19,6 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.services.managers.ApplicationManager;
 import org.keycloak.services.managers.RealmManager;
 import org.keycloak.services.resources.KeycloakApplication;
-
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.Context;
-import java.io.FileNotFoundException;
-import java.util.Arrays;
 
 public class KeycloakServerApplication extends KeycloakApplication {
 

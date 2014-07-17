@@ -5,14 +5,14 @@
  */
 package io.liveoak.security.policy.uri.impl;
 
-import io.liveoak.common.security.AuthzDecision;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.SecurityContext;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.SecurityContext;
 
 /**
  * Holds info about allowed and denied roles and users for particular policy entry.

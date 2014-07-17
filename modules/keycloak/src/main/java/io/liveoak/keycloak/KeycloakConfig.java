@@ -1,5 +1,9 @@
 package io.liveoak.keycloak;
 
+import java.security.PublicKey;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -7,14 +11,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.type.TypeFactory;
-import org.codehaus.jackson.type.TypeReference;
 import org.jboss.logging.Logger;
 import org.keycloak.util.PemUtils;
-
-import java.security.PublicKey;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -84,7 +82,7 @@ public class KeycloakConfig {
     private String loadPublicKey(String realm) throws Exception {
         String realmUrl = baseUrl + "/realms/" + realm;
 
-        log.info("Retrieving public key for " + realm  + " from " + realmUrl);
+        log.info("Retrieving public key for " + realm + " from " + realmUrl);
 
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(realmUrl);
@@ -94,13 +92,13 @@ public class KeycloakConfig {
         try {
             response = client.execute(get);
         } catch (Exception e) {
-            log.error("Failed to retrieve public key for " + realm  + " from " + realmUrl, e);
+            log.error("Failed to retrieve public key for " + realm + " from " + realmUrl, e);
             throw new Exception("Failed to load public key for realm " + realm + " from " + realmUrl, e);
         }
 
         if (response.getStatusLine().getStatusCode() != 200) {
-            log.error("Failed to retrieve public key for " + realm  + " from " + realmUrl + ": " + response.getStatusLine() + " / " + response.getEntity().getContent());
-            throw new Exception("Failed to load public key for realm " + realm + " from " + realmUrl+ ": " + response.getStatusLine());
+            log.error("Failed to retrieve public key for " + realm + " from " + realmUrl + ": " + response.getStatusLine() + " / " + response.getEntity().getContent());
+            throw new Exception("Failed to load public key for realm " + realm + " from " + realmUrl + ": " + response.getStatusLine());
         }
 
         JsonNode node = objectMapper.readTree(response.getEntity().getContent());

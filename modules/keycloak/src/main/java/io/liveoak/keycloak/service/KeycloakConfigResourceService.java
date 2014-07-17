@@ -24,7 +24,7 @@ public class KeycloakConfigResourceService implements Service<KeycloakConfigRoot
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.resource = new KeycloakConfigRootResource( this.id, this.address.getValue() );
+        this.resource = new KeycloakConfigRootResource(this.id, this.address.getValue());
     }
 
     @Override

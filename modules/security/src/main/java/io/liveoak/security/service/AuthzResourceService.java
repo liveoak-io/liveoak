@@ -20,10 +20,10 @@ public class AuthzResourceService implements Service<AuthzServiceRootResource> {
 
     @Override
     public void start(StartContext context) throws StartException {
-       this.resource = new AuthzServiceRootResource(
-               this.id,
-               this.clientInjector.getValue()
-       );
+        this.resource = new AuthzServiceRootResource(
+                this.id,
+                this.clientInjector.getValue()
+        );
     }
 
     @Override

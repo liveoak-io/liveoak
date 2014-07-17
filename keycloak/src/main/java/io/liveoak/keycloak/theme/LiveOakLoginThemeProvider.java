@@ -1,13 +1,13 @@
 package io.liveoak.keycloak.theme;
 
-import org.keycloak.freemarker.Theme;
-import org.keycloak.freemarker.ThemeProvider;
-import org.keycloak.theme.ClassLoaderTheme;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.keycloak.freemarker.Theme;
+import org.keycloak.freemarker.ThemeProvider;
+import org.keycloak.theme.ClassLoaderTheme;
 
 /**
  * @author Alexandre Mendonca

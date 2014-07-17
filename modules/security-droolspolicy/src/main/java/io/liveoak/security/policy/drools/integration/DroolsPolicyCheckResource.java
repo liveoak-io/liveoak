@@ -7,8 +7,8 @@
 package io.liveoak.security.policy.drools.integration;
 
 import io.liveoak.common.security.AuthzConstants;
-import io.liveoak.security.policy.drools.impl.DroolsPolicy;
 import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.security.policy.drools.impl.DroolsPolicy;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;

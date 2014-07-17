@@ -6,6 +6,8 @@
 package io.liveoak.security.policy.uri.impl;
 
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.common.util.ObjectsTree;
 import io.liveoak.spi.RequestContext;
@@ -13,11 +15,7 @@ import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
 import org.jboss.logging.Logger;
 
-import java.util.Comparator;
-import java.util.concurrent.atomic.AtomicReference;
-
 /**
- *
  * Simple URI policy, which allows just wildcards (no custom patterns) in ResourcePath segments. Doesn't check request parameters
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -50,7 +48,7 @@ public class URIPolicy {
             }
         });
 
-        return decisionHolder.decision!=null ? decisionHolder.decision : AuthzDecision.IGNORE;
+        return decisionHolder.decision != null ? decisionHolder.decision : AuthzDecision.IGNORE;
     }
 
     public void setRulesTree(ObjectsTree<URIPolicyRule> rulesTree) {

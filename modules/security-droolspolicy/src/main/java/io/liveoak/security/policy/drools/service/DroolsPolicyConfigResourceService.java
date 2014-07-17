@@ -26,7 +26,7 @@ public class DroolsPolicyConfigResourceService implements Service<DroolsPolicyCo
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.resource = new DroolsPolicyConfigResource( this.id, this.policyInjector.getValue() );
+        this.resource = new DroolsPolicyConfigResource(this.id, this.policyInjector.getValue());
     }
 
     @Override

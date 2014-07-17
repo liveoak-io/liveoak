@@ -11,11 +11,9 @@ import io.liveoak.security.policy.acl.AclPolicyConstants;
 import io.liveoak.security.policy.acl.impl.AclPolicy;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceResponse;
-import io.liveoak.spi.container.interceptor.OutboundInterceptorContext;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>

@@ -28,7 +28,7 @@ public class AclPolicyService implements Service<AclPolicy> {
     public void start(StartContext context) throws StartException {
         InternalStorage mongoStorage = this.mongoStorageInjector.getValue();
         DBCollection aclCollection = mongoStorage.getCollection();
-        this.aclPolicy = new AclPolicy( aclCollection );
+        this.aclPolicy = new AclPolicy(aclCollection);
     }
 
     @Override

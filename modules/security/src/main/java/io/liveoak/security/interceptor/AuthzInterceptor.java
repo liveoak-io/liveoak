@@ -5,11 +5,22 @@
  */
 package io.liveoak.security.interceptor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+
 import io.liveoak.common.DefaultRequestAttributes;
 import io.liveoak.common.DefaultResourceErrorResponse;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.AuthzConstants;
-import io.liveoak.spi.*;
+import io.liveoak.spi.RequestAttributes;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.RequestType;
+import io.liveoak.spi.ResourceErrorResponse;
+import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.ResourceRequest;
+import io.liveoak.spi.ResourceResponse;
+import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.container.interceptor.DefaultInterceptor;
@@ -17,11 +28,6 @@ import io.liveoak.spi.container.interceptor.InboundInterceptorContext;
 import io.liveoak.spi.container.interceptor.OutboundInterceptorContext;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 /**
  * Interceptor for checking authorization of current request. It's independent of protocol.

@@ -5,6 +5,12 @@
  */
 package io.liveoak.keycloak.interceptor;
 
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Consumer;
+
 import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.common.DefaultSecurityContext;
 import io.liveoak.spi.RequestContext;
@@ -18,12 +24,6 @@ import io.liveoak.spi.container.interceptor.InboundInterceptorContext;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.jboss.logging.Logger;
-
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -59,7 +59,7 @@ public class AuthInterceptor extends DefaultInterceptor {
 
     private void initSecurityContext(final InboundInterceptorContext context, final ResourceRequest req, final DefaultSecurityContext securityContext, String token) {
         final RequestContext tokenRequestContext = new RequestContext.Builder().build();
-        String prefix = getPrefix( req.resourcePath() );
+        String prefix = getPrefix(req.resourcePath());
         try {
             client.read(tokenRequestContext, prefix + "/auth/token-info/" + token, new Consumer<ClientResourceResponse>() {
                 @Override

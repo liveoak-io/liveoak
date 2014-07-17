@@ -4,7 +4,6 @@ import org.keycloak.Config;
 import org.keycloak.freemarker.ThemeProvider;
 import org.keycloak.freemarker.ThemeProviderFactory;
 import org.keycloak.provider.ProviderSession;
-import org.keycloak.theme.DefaultKeycloakThemeProvider;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>

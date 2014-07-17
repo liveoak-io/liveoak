@@ -5,11 +5,11 @@
  */
 package io.liveoak.security.policy.drools.impl;
 
-import io.liveoak.common.security.AuthzDecision;
-import org.jboss.logging.Logger;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import io.liveoak.common.security.AuthzDecision;
+import org.jboss.logging.Logger;
 
 /**
  * Object bound to Drools engine, which encapsulate info about authorization decision, all processed rules and rule

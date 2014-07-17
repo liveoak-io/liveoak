@@ -8,23 +8,24 @@ import org.jboss.msc.service.ServiceName;
  */
 public class KeycloakServices {
 
-    private static final ServiceName KEYCLOAK = LiveOak.LIVEOAK.append( "keycloak" );
+    private static final ServiceName KEYCLOAK = LiveOak.LIVEOAK.append("keycloak");
 
-    private static final ServiceName UNDERTOW = KEYCLOAK.append( "undertow" );
+    private static final ServiceName UNDERTOW = KEYCLOAK.append("undertow");
 
     public static final ServiceName undertow(String id) {
-        return UNDERTOW.append( "server", id );
+        return UNDERTOW.append("server", id);
     }
 
     public static final ServiceName keycloak(String id) {
-        return KEYCLOAK.append( "server", id );
+        return KEYCLOAK.append("server", id);
     }
 
     public static final ServiceName sessionFactory() {
-        return KEYCLOAK.append( "session-factory" );
+        return KEYCLOAK.append("session-factory");
     }
+
     public static final ServiceName address() {
-        return KEYCLOAK.append( "address" );
+        return KEYCLOAK.append("address");
     }
 
     public static final ServiceName realmRepresentation(String appId) {

@@ -1,11 +1,11 @@
 package io.liveoak.security.policy.drools.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.liveoak.common.util.ObjectMapperFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -20,7 +20,8 @@ public class JsonParsingUtils {
         }
 
         try {
-            return mapper.readValue(input, new TypeReference<Map<String, Object>>() {});
+            return mapper.readValue(input, new TypeReference<Map<String, Object>>() {
+            });
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

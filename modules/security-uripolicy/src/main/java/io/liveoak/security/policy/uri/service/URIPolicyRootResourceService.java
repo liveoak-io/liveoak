@@ -1,7 +1,6 @@
 package io.liveoak.security.policy.uri.service;
 
 import io.liveoak.security.policy.uri.impl.URIPolicy;
-import io.liveoak.security.policy.uri.integration.URIPolicyConfigResource;
 import io.liveoak.security.policy.uri.integration.URIPolicyRootResource;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -21,7 +20,7 @@ public class URIPolicyRootResourceService implements Service<URIPolicyRootResour
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.resource = new URIPolicyRootResource( this.id, this.policyInjector.getValue() );
+        this.resource = new URIPolicyRootResource(this.id, this.policyInjector.getValue());
     }
 
     @Override

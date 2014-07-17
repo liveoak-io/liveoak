@@ -6,20 +6,14 @@
 
 package io.liveoak.security.policy.acl.impl;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestContext;
@@ -27,7 +21,6 @@ import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.SecurityContext;
-import io.liveoak.spi.container.interceptor.OutboundInterceptorContext;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 
@@ -135,7 +128,7 @@ public class AclPolicy {
 
         AuthzDecision decision = AuthzDecision.IGNORE;
         for (DBObject result : results) {
-            boolean currentDec = (Boolean)result.get(ACE_PERMITTED);
+            boolean currentDec = (Boolean) result.get(ACE_PERMITTED);
 
             // For now, always merge. No rule priorities...
             AuthzDecision currentDecision = currentDec ? AuthzDecision.ACCEPT : AuthzDecision.REJECT;

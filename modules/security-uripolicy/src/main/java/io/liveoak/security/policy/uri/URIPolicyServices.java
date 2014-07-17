@@ -8,10 +8,10 @@ import org.jboss.msc.service.ServiceName;
  */
 public class URIPolicyServices {
 
-    private static final ServiceName URI_POLICY = LiveOak.LIVEOAK.append( "uri-policy" );
+    private static final ServiceName URI_POLICY = LiveOak.LIVEOAK.append("uri-policy");
 
     public static ServiceName policy(String appId, String resourceId) {
-        return URI_POLICY.append( "policy", appId, resourceId );
+        return URI_POLICY.append("policy", appId, resourceId);
     }
 
 }

@@ -30,7 +30,7 @@ public class URIPolicyConfigurator {
     }
 
     protected void addURIPolicyRule(ResourcePath resourcePath, Collection<String> requestTypes, Collection<String> allowedRoles, Collection<String> deniedRoles,
-                                 Collection<String> allowedUsers, Collection<String> deniedUsers) {
+                                    Collection<String> allowedUsers, Collection<String> deniedUsers) {
         RolesContainer rolesContainer = new RolesContainer()
                 .addAllAllowedRoles(allowedRoles).addAllDeniedRoles(deniedRoles)
                 .addAllAllowedUsers(allowedUsers).addAllDeniedUsers(deniedUsers);

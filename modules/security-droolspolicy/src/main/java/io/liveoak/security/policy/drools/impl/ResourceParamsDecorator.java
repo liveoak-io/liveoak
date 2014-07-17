@@ -5,10 +5,10 @@
  */
 package io.liveoak.security.policy.drools.impl;
 
-import io.liveoak.spi.ResourceParams;
-
 import java.util.Collection;
 import java.util.List;
+
+import io.liveoak.spi.ResourceParams;
 
 /**
  * Decorator of {@link ResourceParams} with some added methods to allow safe processing of request parameters by drools engine

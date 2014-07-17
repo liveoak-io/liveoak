@@ -5,6 +5,8 @@
  */
 package io.liveoak.security.policy.drools.impl;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestContext;
@@ -12,8 +14,6 @@ import io.liveoak.spi.state.ResourceState;
 import org.drools.RuleBase;
 import org.drools.WorkingMemory;
 import org.jboss.logging.Logger;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Policy for authorization of resources based on drools engine

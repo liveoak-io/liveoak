@@ -26,7 +26,7 @@ public class AclPolicyConfigResourceService implements Service<AclPolicyConfigRe
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.resource = new AclPolicyConfigResource( this.id, this.policyInjector.getValue() );
+        this.resource = new AclPolicyConfigResource(this.id, this.policyInjector.getValue());
     }
 
     @Override

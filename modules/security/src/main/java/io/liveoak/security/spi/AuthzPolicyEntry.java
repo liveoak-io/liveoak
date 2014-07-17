@@ -6,9 +6,9 @@
 package io.liveoak.security.spi;
 
 
-import io.liveoak.spi.ResourcePath;
-
 import java.util.List;
+
+import io.liveoak.spi.ResourcePath;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>

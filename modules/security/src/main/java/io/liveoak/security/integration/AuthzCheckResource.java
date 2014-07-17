@@ -6,6 +6,11 @@
 
 package io.liveoak.security.integration;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.Consumer;
+
 import io.liveoak.common.DefaultRequestAttributes;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
@@ -20,11 +25,6 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.function.Consumer;
-
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
@@ -36,7 +36,7 @@ public class AuthzCheckResource implements Resource {
     private final AuthzServiceRootResource parent;
     private final Client client;
 
-    public AuthzCheckResource(AuthzServiceRootResource parent, String id, Client client){
+    public AuthzCheckResource(AuthzServiceRootResource parent, String id, Client client) {
         this.id = id;
         this.parent = parent;
         this.client = client;

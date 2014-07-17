@@ -1,5 +1,9 @@
 package io.liveoak.security.policy.uri.integration;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
@@ -11,10 +15,6 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -55,7 +55,7 @@ public class URIPolicyConfigResource implements RootResource, SynchronousResourc
         String str = om.writeValueAsString(this.uriPolicyConfig);
         ObjectNode objectNode = om.readValue(str, ObjectNode.class);
         ResourceState resourceState = ConversionUtils.convert(objectNode);
-        List<ResourceState> childResourceStates = (List<ResourceState>)resourceState.getProperty(RULES_PROPERTY);
+        List<ResourceState> childResourceStates = (List<ResourceState>) resourceState.getProperty(RULES_PROPERTY);
         List<Resource> childResources = ResourceConversionUtils.convertList(childResourceStates, this);
         resourceState.putProperty(RULES_PROPERTY, childResources);
         return resourceState;

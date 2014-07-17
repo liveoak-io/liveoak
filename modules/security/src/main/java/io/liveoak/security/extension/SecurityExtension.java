@@ -15,8 +15,6 @@ import io.liveoak.spi.resource.async.DefaultRootResource;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceTarget;
 
-import java.io.File;
-
 /**
  * @author Bob McWhirter
  */

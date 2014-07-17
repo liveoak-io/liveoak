@@ -1,5 +1,12 @@
 package io.liveoak.keycloak;
 
+import java.io.IOException;
+import java.security.PublicKey;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
@@ -7,14 +14,6 @@ import org.keycloak.VerificationException;
 import org.keycloak.jose.jws.JWSInput;
 import org.keycloak.jose.jws.crypto.RSAProvider;
 import org.keycloak.representations.AccessToken;
-
-import java.io.IOException;
-import java.security.PublicKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -25,7 +24,7 @@ public class TokenResource implements Resource {
     private KeycloakConfig config;
     private final String id;
 
-    public  TokenResource(String id, TokensResource parent, KeycloakConfig config) {
+    public TokenResource(String id, TokensResource parent, KeycloakConfig config) {
         this.parent = parent;
         this.config = config;
         this.id = id;

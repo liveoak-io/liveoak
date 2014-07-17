@@ -40,7 +40,7 @@ public class DroolsPolicyRule {
     }
 
     public static DroolsPolicyRule createRule(int id, int priority, String uriPattern, String queryParamsCondition, String requestType,
-                                           String allowedRoles, String deniedRoles, String allowedUsers, String deniedUsers) {
+                                              String allowedRoles, String deniedRoles, String allowedUsers, String deniedUsers) {
 
         // From uriPattern from "user-friendly" form to "drools-friendly" form
         String formattedPattern = DroolsFormattingUtils.formatStringToDrools(uriPattern);

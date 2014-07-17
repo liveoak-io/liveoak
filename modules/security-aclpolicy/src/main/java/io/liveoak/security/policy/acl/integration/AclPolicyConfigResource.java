@@ -62,7 +62,7 @@ public class AclPolicyConfigResource implements RootResource, SynchronousResourc
         String str = om.writeValueAsString(this.aclPolicyConfig);
         ObjectNode objectNode = om.readValue(str, ObjectNode.class);
         ResourceState resourceState = ConversionUtils.convert(objectNode);
-        List<ResourceState> childResourceStates = (List<ResourceState>)resourceState.getProperty(AUTO_RULES_PROPERTY);
+        List<ResourceState> childResourceStates = (List<ResourceState>) resourceState.getProperty(AUTO_RULES_PROPERTY);
         List<Resource> childResources = ResourceConversionUtils.convertList(childResourceStates, this);
         resourceState.putProperty(AUTO_RULES_PROPERTY, childResources);
         return resourceState;
