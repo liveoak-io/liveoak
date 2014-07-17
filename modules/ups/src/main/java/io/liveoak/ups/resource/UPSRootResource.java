@@ -24,7 +24,7 @@ public class UPSRootResource implements RootResource {
     UPSRootConfigResource configResource;
     SubscriptionManager subscriptionManager;
     AliasesResource aliasesResource;
-    SubscriptionsResource  subscriptionsResource;
+    SubscriptionsResource subscriptionsResource;
     InternalStorage internalStorage;
 
     UPS upsService;
@@ -38,24 +38,24 @@ public class UPSRootResource implements RootResource {
         //setup the service to handle communication with a UPS instance
         upsService = new UPS(configResource);
 
-        DBCollection subscriptionsCollections = internalStorage.getCollection( "subscriptions" );
-        subscriptionsCollections.ensureIndex(new BasicDBObject( "resource-path", 1 ));
+        DBCollection subscriptionsCollections = internalStorage.getCollection("subscriptions");
+        subscriptionsCollections.ensureIndex(new BasicDBObject("resource-path", 1));
         subscriptionManager.addSubscription(new BaseUPSSubscription(subscriptionsCollections, upsService));
 
         this.subscriptionsResource = new SubscriptionsResource(this, subscriptionsCollections);
 
         DBCollection aliasesCollection = internalStorage.getCollection("aliases");
         // adds the index if it doesn't already exist
-        aliasesCollection.ensureIndex( new BasicDBObject("subscriptions.resource-path", 1));
+        aliasesCollection.ensureIndex(new BasicDBObject("subscriptions.resource-path", 1));
 
-        subscriptionManager.addSubscription( new AliasUPSSubscription( aliasesCollection, upsService ) );
+        subscriptionManager.addSubscription(new AliasUPSSubscription(aliasesCollection, upsService));
 
-        this.aliasesResource = new AliasesResource( this, aliasesCollection);
+        this.aliasesResource = new AliasesResource(this, aliasesCollection);
 
     }
 
     @Override
-    public void parent( Resource parent ) {
+    public void parent(Resource parent) {
         this.parent = parent;
     }
 
@@ -70,17 +70,17 @@ public class UPSRootResource implements RootResource {
     }
 
     @Override
-    public void readMembers( RequestContext ctx, ResourceSink sink ) throws Exception {
+    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         sink.accept(aliasesResource);
         sink.accept(subscriptionsResource);
         sink.close();
     }
 
     @Override
-    public void readMember( RequestContext ctx, String id, Responder responder ) throws Exception {
-        if (id.equals( AliasesResource.ID )) {
-            responder.resourceRead( this.aliasesResource);
-        } else if (id.equals( SubscriptionsResource.ID)) {
+    public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
+        if (id.equals(AliasesResource.ID)) {
+            responder.resourceRead(this.aliasesResource);
+        } else if (id.equals(SubscriptionsResource.ID)) {
             responder.resourceRead(this.subscriptionsResource);
         } else {
             responder.noSuchResource(id);

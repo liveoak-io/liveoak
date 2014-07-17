@@ -16,14 +16,14 @@ import org.jboss.msc.service.ServiceName;
 public class UPSExtension implements Extension {
 
     @Override
-    public void extend( SystemExtensionContext context ) throws Exception {
+    public void extend(SystemExtensionContext context) throws Exception {
         //Do nothing for now
     }
 
     @Override
-    public void extend( ApplicationExtensionContext context ) throws Exception {
+    public void extend(ApplicationExtensionContext context) throws Exception {
         // create the configuration resource for the UPSRootResource
-        UPSRootConfigResource upsRootConfigResource = new UPSRootConfigResource( context.resourceId() );
+        UPSRootConfigResource upsRootConfigResource = new UPSRootConfigResource(context.resourceId());
         // making changes to the configuration is restricted and must be added under private
         context.mountPrivate(upsRootConfigResource);
 
@@ -31,18 +31,18 @@ public class UPSExtension implements Extension {
 
         // setup the main UPSRootResource and add in its dependency on the SubscriptionManager
         UPSResourceService upsResourceService = new UPSResourceService(context.resourceId());
-        context.target().addService( LiveOak.resource( context.application().id(), context.resourceId() ), upsResourceService )
-                .addDependency( LiveOak.SUBSCRIPTION_MANAGER, SubscriptionManager.class, upsResourceService.subscriptionManagerInjector )
-                .addDependency( storageServiceName, InternalStorage.class, upsResourceService.internalStorageInjector)
-                .addInjection( upsResourceService.configResourceInjector, upsRootConfigResource )
+        context.target().addService(LiveOak.resource(context.application().id(), context.resourceId()), upsResourceService)
+                .addDependency(LiveOak.SUBSCRIPTION_MANAGER, SubscriptionManager.class, upsResourceService.subscriptionManagerInjector)
+                .addDependency(storageServiceName, InternalStorage.class, upsResourceService.internalStorageInjector)
+                .addInjection(upsResourceService.configResourceInjector, upsRootConfigResource)
                 .install();
 
-        context.mountPublic( LiveOak.resource( context.application().id(), context.resourceId() ));
+        context.mountPublic(LiveOak.resource(context.application().id(), context.resourceId()));
 
     }
 
     @Override
-    public void unextend( ApplicationExtensionContext context ) throws Exception {
+    public void unextend(ApplicationExtensionContext context) throws Exception {
         //Do nothing for now
     }
 }

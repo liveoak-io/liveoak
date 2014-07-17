@@ -51,7 +51,7 @@ public class SubscriptionResource implements Resource {
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept(this.RESOURCE_PATH, this.subscription.resourcePath().toString());
         sink.accept(this.VARIANTS, subscription.variants());
-        sink.accept(this.ALIASES ,subscription.aliases());
+        sink.accept(this.ALIASES, subscription.aliases());
         sink.accept(this.CATEGORIES, subscription.categories());
         sink.accept(this.DEVICES, subscription.deviceTypes());
         sink.accept(this.SIMPLE_PUSH, subscription.simplePush());
@@ -76,6 +76,6 @@ public class SubscriptionResource implements Resource {
     @Override
     public void delete(RequestContext ctx, Responder responder) throws Exception {
         parent.deleteSubscription(subscription.id());
-        responder.resourceDeleted( this );
+        responder.resourceDeleted(this);
     }
 }

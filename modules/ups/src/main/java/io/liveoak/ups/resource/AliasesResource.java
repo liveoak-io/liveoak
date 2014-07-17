@@ -1,5 +1,7 @@
 package io.liveoak.ups.resource;
 
+import java.util.UUID;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -12,8 +14,6 @@ import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.ups.Alias;
-
-import java.util.UUID;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -42,22 +42,22 @@ public class AliasesResource implements Resource {
     }
 
     @Override
-    public void readProperties( RequestContext ctx, PropertySink sink ) throws Exception {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.close();
     }
 
     @Override
-    public void updateProperties( RequestContext ctx, ResourceState state, Responder responder ) throws Exception {
+    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         responder.updateNotSupported(this);
     }
 
     @Override
-    public void delete( RequestContext ctx, Responder responder ) throws Exception {
-        responder.deleteNotSupported( this );
+    public void delete(RequestContext ctx, Responder responder) throws Exception {
+        responder.deleteNotSupported(this);
     }
 
     @Override
-    public void createMember( RequestContext ctx, ResourceState state, Responder responder ) throws Exception {
+    public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         SecurityContext sCtx = ctx.securityContext();
         String subjectId = null;
 
@@ -66,11 +66,11 @@ public class AliasesResource implements Resource {
             return;
         }
 
-        if ( sCtx != null && sCtx.isAuthenticated() ) {
+        if (sCtx != null && sCtx.isAuthenticated()) {
             subjectId = sCtx.getSubject();
 
             //TODO: add in index to force subject to be a unique field
-            DBObject dbObject = collection.findOne( new BasicDBObject( "subject", subjectId ));
+            DBObject dbObject = collection.findOne(new BasicDBObject("subject", subjectId));
             if (dbObject != null) {
                 responder.resourceCreated(new AliasResource(this, Alias.create(dbObject)));
                 return;
@@ -78,16 +78,16 @@ public class AliasesResource implements Resource {
         }
 
         // if we didn't find the userid in the list or the user is not authenticated, create a new alias
-        DBObject newAlias = new BasicDBObject( "_id", UUID.randomUUID().toString());
+        DBObject newAlias = new BasicDBObject("_id", UUID.randomUUID().toString());
         if (subjectId != null) {
-           newAlias.put("subject", subjectId);
+            newAlias.put("subject", subjectId);
         }
-        collection.insert( newAlias );
-        responder.resourceCreated( new AliasResource( this, Alias.create( newAlias ) ) );
+        collection.insert(newAlias);
+        responder.resourceCreated(new AliasResource(this, Alias.create(newAlias)));
     }
 
     @Override
-    public void readMembers( RequestContext ctx, ResourceSink sink ) throws Exception {
+    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         DBCursor cursor = collection.find();
         while (cursor.hasNext()) {
             sink.accept(new AliasResource(this, Alias.create(cursor.next())));
@@ -96,12 +96,12 @@ public class AliasesResource implements Resource {
     }
 
     @Override
-    public void readMember( RequestContext ctx, String id, Responder responder ) throws Exception {
-        DBObject dbObject = collection.findOne( new BasicDBObject( "_id", id ));
+    public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
+        DBObject dbObject = collection.findOne(new BasicDBObject("_id", id));
         if (dbObject != null) {
-            responder.resourceRead(new AliasResource(this, Alias.create( dbObject )));
+            responder.resourceRead(new AliasResource(this, Alias.create(dbObject)));
         } else {
-            responder.noSuchResource( id );
+            responder.noSuchResource(id);
         }
     }
 
@@ -110,9 +110,9 @@ public class AliasesResource implements Resource {
     }
 
     public void deleteAlias(String id) {
-        DBObject dbObject = collection.findOne( new BasicDBObject( "_id", id ));
+        DBObject dbObject = collection.findOne(new BasicDBObject("_id", id));
         if (dbObject != null) {
-            collection.remove( dbObject );
+            collection.remove(dbObject);
         }
     }
 }

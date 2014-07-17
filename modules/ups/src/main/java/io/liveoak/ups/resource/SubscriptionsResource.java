@@ -22,7 +22,7 @@ public class SubscriptionsResource implements SubscriptionResourceParent {
     protected UPSRootResource parent;
     protected DBCollection collection;
 
-    public SubscriptionsResource (UPSRootResource parent, DBCollection collection) {
+    public SubscriptionsResource(UPSRootResource parent, DBCollection collection) {
         this.parent = parent;
         this.collection = collection;
     }
@@ -53,7 +53,7 @@ public class SubscriptionsResource implements SubscriptionResourceParent {
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        DBObject dbObject = collection.findOne( new BasicDBObject( "_id", id ) );
+        DBObject dbObject = collection.findOne(new BasicDBObject("_id", id));
         if (dbObject != null) {
             UPSSubscription subscription = UPSSubscription.create(dbObject);
             if (subscription != null) {
@@ -68,8 +68,8 @@ public class SubscriptionsResource implements SubscriptionResourceParent {
 
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        UPSSubscription subscription = UPSSubscription.create( state ) ;
-        if (subscription != null ) {
+        UPSSubscription subscription = UPSSubscription.create(state);
+        if (subscription != null) {
             this.collection.insert(subscription.dbObject());
             responder.resourceCreated(new SubscriptionResource(this, subscription));
         } else {
@@ -83,6 +83,6 @@ public class SubscriptionsResource implements SubscriptionResourceParent {
     }
 
     public void deleteSubscription(String id) {
-        collection.remove(new BasicDBObject( "_id", id ));
+        collection.remove(new BasicDBObject("_id", id));
     }
 }

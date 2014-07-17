@@ -8,8 +8,8 @@ import io.liveoak.ups.UPSSubscription;
  */
 public interface SubscriptionResourceParent extends Resource {
 
-   void updateSubscription(UPSSubscription upsSubscription);
+    void updateSubscription(UPSSubscription upsSubscription);
 
-   void deleteSubscription(String id);
+    void deleteSubscription(String id);
 
 }

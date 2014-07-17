@@ -1,5 +1,9 @@
 package io.liveoak.ups;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -10,10 +14,6 @@ import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.container.Subscription;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -60,31 +60,31 @@ public class BaseUPSSubscription implements Subscription {
 
     // Not sure why we have to have this method here...
     @Override
-    public void sendAuthzError( ResourceState errorState, Resource resource, int status ) throws Exception {
+    public void sendAuthzError(ResourceState errorState, Resource resource, int status) throws Exception {
         throw new IllegalStateException("Authorization error not expected for SubscriptionResource");
     }
 
     @Override
-    public void resourceCreated( ResourceResponse resourceResponse ) throws Exception {
-        sendNotification( resourceResponse, UPS.EventType.CREATED );
+    public void resourceCreated(ResourceResponse resourceResponse) throws Exception {
+        sendNotification(resourceResponse, UPS.EventType.CREATED);
     }
 
     @Override
-    public void resourceUpdated( ResourceResponse resourceResponse ) throws Exception {
-        sendNotification( resourceResponse, UPS.EventType.UPDATED );
+    public void resourceUpdated(ResourceResponse resourceResponse) throws Exception {
+        sendNotification(resourceResponse, UPS.EventType.UPDATED);
     }
 
     @Override
-    public void resourceDeleted( ResourceResponse resourceResponse ) throws Exception {
-        sendNotification( resourceResponse, UPS.EventType.DELETED );
+    public void resourceDeleted(ResourceResponse resourceResponse) throws Exception {
+        sendNotification(resourceResponse, UPS.EventType.DELETED);
     }
 
 
-    private void sendNotification( ResourceResponse resourceResponse, UPS.EventType eventType ) {
-        URI resourceURI =   resourceResponse.resource().uri();
+    private void sendNotification(ResourceResponse resourceResponse, UPS.EventType eventType) {
+        URI resourceURI = resourceResponse.resource().uri();
         List<UPSSubscription> subscriptions = getSubscriptions(resourceURI.toString());
 
-        for (UPSSubscription subscription: subscriptions) {
+        for (UPSSubscription subscription : subscriptions) {
             ups.send(resourceURI, eventType, subscription);
         }
     }
@@ -95,11 +95,11 @@ public class BaseUPSSubscription implements Subscription {
         List<String> listenerPaths = generatePaths(uri);
 
         DBObject query = new BasicDBObject();
-        query.put("resource-path", new BasicDBObject( "$in", listenerPaths ) );
+        query.put("resource-path", new BasicDBObject("$in", listenerPaths));
         query.put("enabled", true);
 
         DBCursor cursor = collection.find(query);
-        while ( cursor.hasNext() ) {
+        while (cursor.hasNext()) {
             DBObject dbObject = cursor.next();
             UPSSubscription subscription = UPSSubscription.create(dbObject);
             if (subscription != null) {

@@ -23,12 +23,12 @@ public class UPSResourceService implements Service<UPSRootResource> {
     }
 
     @Override
-    public void start( StartContext context ) throws StartException {
+    public void start(StartContext context) throws StartException {
         this.upsRootResource = new UPSRootResource(this.id, configResourceInjector.getValue(), subscriptionManagerInjector.getValue(), internalStorageInjector.getValue());
     }
 
     @Override
-    public void stop( StopContext context ) {
+    public void stop(StopContext context) {
         this.upsRootResource = null;
     }
 

@@ -29,7 +29,7 @@ public class UPSRootConfigResource implements ConfigResource, RootResource {
     }
 
     @Override
-    public void parent( Resource parent ) {
+    public void parent(Resource parent) {
         this.parent = parent;
     }
 
@@ -45,34 +45,34 @@ public class UPSRootConfigResource implements ConfigResource, RootResource {
 
     @Override
     public void readConfigProperties(RequestContext ctx, PropertySink sink, Resource resource) throws Exception {
-       sink.accept(UPS_SERVER_URL, upsServerURL);
-       sink.accept(APPLICATION_ID, applicationId);
-       sink.accept( MASTER_SECRET, masterSecret );
+        sink.accept(UPS_SERVER_URL, upsServerURL);
+        sink.accept(APPLICATION_ID, applicationId);
+        sink.accept(MASTER_SECRET, masterSecret);
     }
 
     @Override
     public void updateConfigProperties(RequestContext ctx, ResourceState state, Responder responder, Resource resource) throws Exception {
-       Object upsServerURLProperty = state.getProperty( UPS_SERVER_URL );
-       Object applicationIdProperty = state.getProperty( APPLICATION_ID );
-       Object masterKeyProperty = state.getProperty( MASTER_SECRET );
+        Object upsServerURLProperty = state.getProperty(UPS_SERVER_URL);
+        Object applicationIdProperty = state.getProperty(APPLICATION_ID);
+        Object masterKeyProperty = state.getProperty(MASTER_SECRET);
 
-       if (upsServerURLProperty instanceof String) {
-           this.upsServerURL = (String) upsServerURLProperty;
-       } else if (upsServerURLProperty != null) { // if it is null, it wasn't specified in the json, so keep old value
-           responder.invalidRequest("The " + UPS_SERVER_URL + " property must be a String.");
-       }
+        if (upsServerURLProperty instanceof String) {
+            this.upsServerURL = (String) upsServerURLProperty;
+        } else if (upsServerURLProperty != null) { // if it is null, it wasn't specified in the json, so keep old value
+            responder.invalidRequest("The " + UPS_SERVER_URL + " property must be a String.");
+        }
 
-       if (applicationIdProperty instanceof String) {
-           this.applicationId = (String)applicationIdProperty;
-       }  else if (applicationIdProperty != null) { // if it is null, it wasn't specified in the json, so keep old value
-           responder.invalidRequest("The " + APPLICATION_ID + " property must be a String.");
-       }
+        if (applicationIdProperty instanceof String) {
+            this.applicationId = (String) applicationIdProperty;
+        } else if (applicationIdProperty != null) { // if it is null, it wasn't specified in the json, so keep old value
+            responder.invalidRequest("The " + APPLICATION_ID + " property must be a String.");
+        }
 
-       if (masterKeyProperty instanceof String) {
-           this.masterSecret = (String) masterKeyProperty;
-       }  else if (masterKeyProperty != null) { // if it is null, it wasn't specified in the json, so keep old value
-           responder.invalidRequest("The " + MASTER_SECRET + " property must be a String.");
-       }
+        if (masterKeyProperty instanceof String) {
+            this.masterSecret = (String) masterKeyProperty;
+        } else if (masterKeyProperty != null) { // if it is null, it wasn't specified in the json, so keep old value
+            responder.invalidRequest("The " + MASTER_SECRET + " property must be a String.");
+        }
     }
 
 

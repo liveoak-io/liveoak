@@ -1,13 +1,13 @@
 package io.liveoak.ups;
 
+import java.net.URI;
+
 import io.liveoak.ups.resource.config.UPSRootConfigResource;
 import org.jboss.aerogear.unifiedpush.JavaSender;
 import org.jboss.aerogear.unifiedpush.SenderClient;
 import org.jboss.aerogear.unifiedpush.message.MessageResponseCallback;
 import org.jboss.aerogear.unifiedpush.message.UnifiedMessage;
 import org.jboss.logging.Logger;
-
-import java.net.URI;
 
 /**
  * Handles the communication between the LiveOak instances and a UPS instance.
@@ -32,6 +32,7 @@ public class UPS {
         DELETED("deleted");
 
         private final String name;
+
         private EventType(String name) {
             this.name = name;
         }
@@ -44,7 +45,7 @@ public class UPS {
 
     UPSRootConfigResource upsRootConfigResource;
 
-    public UPS( UPSRootConfigResource upsRootConfigResource ) {
+    public UPS(UPSRootConfigResource upsRootConfigResource) {
         this.upsRootConfigResource = upsRootConfigResource;
     }
 
@@ -52,8 +53,8 @@ public class UPS {
     /**
      * Sends a message to the UPS instance to send out push notifications to registered applications
      *
-     * @param URI The URI of the updated resource
-     * @param eventType The type of event which occurred
+     * @param URI          The URI of the updated resource
+     * @param eventType    The type of event which occurred
      * @param subscription The object containing the message and specified recipients
      */
     public void send(URI URI, EventType eventType, UPSSubscription subscription) {
@@ -68,7 +69,7 @@ public class UPS {
         builder.variants(subscription.variants());
         builder.aliases(subscription.aliases());
         builder.categories(subscription.categories());
-        builder.deviceType( subscription.deviceTypes());
+        builder.deviceType(subscription.deviceTypes());
 
         if (subscription.simplePush() != null) {
             builder.simplePush(subscription.simplePush().toString());
@@ -81,23 +82,23 @@ public class UPS {
 
         builder.attributes(subscription.message());
         // specify the liveoak specifics of the message, overwrite if needed.
-        builder.attribute( LIVEOAK_RESOURCE_URL, URI.toString());
-        builder.attribute( LIVEOAK_RESOURCE_EVENT, eventType.toString());
+        builder.attribute(LIVEOAK_RESOURCE_URL, URI.toString());
+        builder.attribute(LIVEOAK_RESOURCE_EVENT, eventType.toString());
 
 
-        sender.send( builder.build(), new MessageResponseCallback() {
+        sender.send(builder.build(), new MessageResponseCallback() {
             @Override
-            public void onComplete( int i ) {
+            public void onComplete(int i) {
                 //do nothing for now
             }
 
             @Override
-            public void onError( Throwable throwable ) {
+            public void onError(Throwable throwable) {
                 //TODO: how to handle when there is an error between LiveOak and UPS?
                 // should we just log the error, try again after x many seconds and y many retries?
-                log.error( "Error trying to send notification to UPS server", throwable );
+                log.error("Error trying to send notification to UPS server", throwable);
             }
-        } );
+        });
     }
 
 }
