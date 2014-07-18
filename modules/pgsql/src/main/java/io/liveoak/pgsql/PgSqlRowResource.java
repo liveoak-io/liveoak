@@ -18,6 +18,8 @@ import io.liveoak.pgsql.meta.TableRef;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -98,45 +100,56 @@ public class PgSqlRowResource implements Resource {
                     sink.accept(ent.getKey(), ent.getValue());
                 }
             }
-        }
 
-        // if there are any fks it's time to process them
-        for (Map.Entry<ForeignKey, String[]> ent: fkMap.entrySet()) {
-            String fkTable = cat.table(ent.getKey().tableRef()).id();
-            sink.accept(fkTable, new PgSqlResourceRef(
-                    new PgSqlTableResource(parent.parent(), fkTable),
-                    PrimaryKey.spliceId(ent.getValue())));
-        }
 
-        // if there are any referredKeys write synthetic object
-        //HashMap<ForeignKey, String[]> refFkMap = new HashMap<>();
-        // address has address_id PK, orders has address_id fk
-        // Here we have Row of select from addresses
-        // we have to make a query select from orders where address_id = row.get(pk)
-        for (ForeignKey fk: table.referredKeys()) {
-            QueryBuilder builder = new QueryBuilder(cat);
-            try (Connection con = parent.parent().getConnection()) {
-                List<Column> cols = fk.columns();
-                Table tab = cat.table(cols.get(0).tableRef());
+            // if there are any fks it's time to process them
+            for (Map.Entry<ForeignKey, String[]> ent : fkMap.entrySet()) {
+                String fkTable = cat.table(ent.getKey().tableRef()).id();
+                sink.accept(fkTable, new PgSqlResourceRef(
+                        new PgSqlTableResource(parent.parent(), fkTable),
+                        PrimaryKey.spliceId(ent.getValue())));
+            }
 
-                LinkedList<Object> vals = new LinkedList();
-                for (Column c: table.pk().columns()) {
-                    vals.add(row.value(c.name()));
+            // if there are any referredKeys write synthetic object
+            //HashMap<ForeignKey, String[]> refFkMap = new HashMap<>();
+            // address has address_id PK, orders has address_id fk
+            // Here we have Row of select from addresses
+            // we have to make a query select from orders where address_id = row.get(pk)
+            for (ForeignKey fk : table.referredKeys()) {
+                QueryBuilder builder = new QueryBuilder(cat);
+                try (Connection con = parent.parent().getConnection()) {
+                    List<Column> cols = fk.columns();
+                    Table tab = cat.table(cols.get(0).tableRef());
+
+                    LinkedList<Object> vals = new LinkedList();
+                    for (Column c : table.pk().columns()) {
+                        vals.add(row.value(c.name()));
+                    }
+                    if (cols.size() != vals.size()) {
+                        throw new IllegalStateException("Primary key column count on " + table.id() + " doesn't match foreign key column count on " + tab.id());
+                    }
+
+                    QueryResults results = builder.querySelectFromTable(ctx, con, tab, cols, vals);
+                    LinkedList ls = new LinkedList();
+                    for (Row r : results.rows()) {
+                        ls.add(new PgSqlRowResource(
+                                new PgSqlTableResource(parent.parent(), tab.id()), r));
+                    }
+                    sink.accept(tab.id(), ls);
                 }
-                if (cols.size() != vals.size()) {
-                    throw new IllegalStateException("Primary key column count on " + table.id() + " doesn't match foreign key column count on " + tab.id());
-                }
-
-                QueryResults results = builder.querySelectFromTable(ctx, con, tab, cols, vals);
-                LinkedList ls = new LinkedList();
-                for (Row r: results.rows()) {
-                    ls.add(new PgSqlRowResource(
-                            new PgSqlTableResource(parent.parent(), tab.id()), r));
-                }
-                sink.accept(tab.id(), ls);
             }
         }
-
         sink.close();
+    }
+
+    @Override
+    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        Catalog cat = parent.parent().getCatalog();
+        Table table = cat.table(new TableRef(parent.id()));
+        try (Connection c = parent.parent().getConnection()) {
+            new QueryBuilder(cat).executeUpdate(ctx, c, table, state);
+        }
+        //responder.resourceUpdated(this);
+        responder.resourceUpdated(new PgSqlRowResource(parent, parent.queryTable(parent.id(), id, ctx).rows().get(0)));
     }
 }

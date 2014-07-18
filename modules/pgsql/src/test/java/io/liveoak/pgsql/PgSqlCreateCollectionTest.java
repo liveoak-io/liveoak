@@ -173,5 +173,33 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
         });
 
         checkResource(result, expected);
+
+        // update the item to link to the second order, and have smaller price
+        body = resource("I39845355", endpoint, new Object[] {
+                "name", "The Gadget",
+                "quantity", 1,
+                "price", 32500,
+                "vat", 20,
+                schema_two + ".orders", resource("014-2004345", "/testApp/" + BASEPATH + "/" + schema_two + ".orders", new Object[] {})
+        });
+        result = client.update(ctx("*(*)"), endpoint + "/I39845355", body);
+        System.out.println(result);
+
+        expected = resource("I39845355", endpoint, new Object[] {
+                "item_id", "I39845355",
+                "name", "The Gadget",
+                "quantity", 1,
+                "price", 32500,
+                "vat", 20,
+                schema_two + ".orders", resource("014-2004345", "/testApp/" + BASEPATH + "/" + schema_two + ".orders", new Object[]{
+                        "order_id", "014-2004345",
+                        "create_date", time("2014-06-01 18:06:12.0"),
+                        "total", 32500L,
+                        "addresses", resourceRef("/testApp/" + BASEPATH + "/addresses/2"),
+                        "items", list(resourceRef("/testApp/" + BASEPATH + "/items/I39845355"))
+                })
+        });
+
+        checkResource(result, expected);
     }
 }

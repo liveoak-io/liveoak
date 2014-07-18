@@ -6,10 +6,13 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import io.liveoak.pgsql.data.Id;
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
 import io.liveoak.spi.RequestContext;
@@ -225,6 +228,67 @@ public class QueryBuilder {
         return ps;
     }
 
+    public PreparedStatement prepareUpdate(Connection con, Table table, ResourceState state) throws SQLException {
+        StringBuilder sb = new StringBuilder("UPDATE " + table.quotedSchemaName() + " SET ");
+
+        int i = 0;
+        List<Object> values = new LinkedList<>();
+        List<Column> columns = new LinkedList<>();
+        Map<ForeignKey, Integer> processedFks = new IdentityHashMap<>();
+
+        for (Column c: table.columns()) {
+            if (table.pkForColumnName(c.name()) != null) {
+                // skip if it's a PK
+                continue;
+            }
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(c.quotedName()).append("=?");
+
+            ForeignKey fk = table.foreignKeyForColumnName(c.name());
+            if (fk != null) {
+                String field = catalog.table(fk.tableRef()).id();
+                Object resRef = state.getProperty(field);
+                if (resRef instanceof ResourceState) {
+                    Id fkId = new Id(catalog.table(fk.tableRef()).pk(), ((ResourceState) resRef).id());
+                    values.add(fkId.valueForIndex(fk.indexForColumn(c.name())));
+                } else {
+                    throw new RuntimeException("Invalid value for field: " + field);
+                }
+            } else {
+                values.add(state.getProperty(c.name()));
+            }
+            columns.add(c);
+            i++;
+        }
+        sb.append(" WHERE ");
+
+        i = 0;
+        Id tableId = new Id(table.pk(), state.id());
+        for (Column c: table.pk().columns()) {
+            if (i > 0) {
+                sb.append(" AND ");
+            }
+            sb.append(c.quotedName()).append("=?");
+            values.add(tableId.valueForIndex(i));
+            columns.add(c);
+            i++;
+        }
+
+        PreparedStatement ps = con.prepareStatement(sb.toString());
+
+        Iterator valIt = values.iterator();
+        Iterator<Column> colIt = columns.iterator();
+        i = 1;
+        while(colIt.hasNext() && valIt.hasNext()) {
+            colIt.next().bindValue(ps, i, valIt.next());
+            i++;
+        }
+
+        return ps;
+    }
+
     private String selfHrefId(String field, Object val) {
         if (val == null || val instanceof ResourceState == false) {
             throw new RuntimeException("Invalid value for '" + field + "': " + val);
@@ -323,6 +387,12 @@ public class QueryBuilder {
                 pkvals.add(val);
             }
             return PrimaryKey.spliceId(pkvals);
+        }
+    }
+
+    public void executeUpdate(RequestContext ctx, Connection con, Table table, ResourceState state) throws SQLException {
+        try (PreparedStatement ps = prepareUpdate(con, table, state)) {
+            ps.executeUpdate();
         }
     }
 }

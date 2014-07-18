@@ -19,13 +19,25 @@ public class Key {
 
     public Column getColumn(String name) {
         for (Column c : cols) {
-            if (c.name().equals(name))
+            if (c.name().equals(name)) {
                 return c;
+            }
         }
         return null;
     }
 
     public List<Column> columns() {
         return cols;
+    }
+
+    public int indexForColumn(String name) {
+        int i = 0;
+        for (Column c : cols) {
+            if (c.name().equals(name)) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
     }
 }

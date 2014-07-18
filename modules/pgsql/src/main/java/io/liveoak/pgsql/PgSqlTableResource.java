@@ -83,14 +83,23 @@ public class PgSqlTableResource implements Resource {
             // TODO: also handle expanded many-to-one / one-to-many
         }
 
-        readMember(ctx, itemId, responder);
+        //readMember(ctx, itemId, responder);
+        QueryResults results = queryTable(id, itemId, ctx);
+        responder.resourceCreated(new PgSqlRowResource(this, results.rows().get(0)));
     }
 
-    QueryResults queryResults() {
+
+    @Override
+    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        System.out.println("Table updateProperties");
+        Resource.super.updateProperties(ctx, state, responder);
+    }
+
+    public QueryResults queryResults() {
         return results;
     }
 
-    private QueryResults queryTable(String table, String id, RequestContext ctx) throws SQLException {
+    public QueryResults queryTable(String table, String id, RequestContext ctx) throws SQLException {
         Catalog cat = parent.getCatalog();
         Table t = cat.tableById(table);
         try (Connection con = parent.getConnection()) {
