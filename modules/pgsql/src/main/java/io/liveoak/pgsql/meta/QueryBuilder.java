@@ -234,7 +234,6 @@ public class QueryBuilder {
         int i = 0;
         List<Object> values = new LinkedList<>();
         List<Column> columns = new LinkedList<>();
-        Map<ForeignKey, Integer> processedFks = new IdentityHashMap<>();
 
         for (Column c: table.columns()) {
             if (table.pkForColumnName(c.name()) != null) {
@@ -287,6 +286,42 @@ public class QueryBuilder {
         }
 
         return ps;
+    }
+
+    private PreparedStatement prepareDelete(Connection con, Table table, String id) throws SQLException {
+
+        Id tableId = new Id(table.pk(), id);
+        StringBuilder sb = new StringBuilder("DELETE FROM " + table.quotedSchemaName() + " WHERE ");
+
+        List<Object> values = new LinkedList<>();
+        List<Column> columns = new LinkedList<>();
+
+        int i = 0;
+        for (Column c: table.pk().columns()) {
+            if (i > 0) {
+                sb.append(" AND ");
+            }
+            sb.append(c.quotedName()).append("=?");
+            values.add(tableId.valueForIndex(i));
+            columns.add(c);
+            i++;
+        }
+
+        PreparedStatement ps = con.prepareStatement(sb.toString());
+        Iterator valIt = values.iterator();
+        Iterator<Column> colIt = columns.iterator();
+
+        i = 1;
+        while(colIt.hasNext() && valIt.hasNext()) {
+            colIt.next().bindValue(ps, i, valIt.next());
+            i++;
+        }
+        return ps;
+    }
+
+    private PreparedStatement prepareDeleteTable(Connection con, Table t) throws SQLException {
+        StringBuilder sb = new StringBuilder("DROP TABLE " + t.quotedSchemaName());
+        return con.prepareStatement(sb.toString());
     }
 
     private String selfHrefId(String field, Object val) {
@@ -392,6 +427,18 @@ public class QueryBuilder {
 
     public void executeUpdate(RequestContext ctx, Connection con, Table table, ResourceState state) throws SQLException {
         try (PreparedStatement ps = prepareUpdate(con, table, state)) {
+            ps.executeUpdate();
+        }
+    }
+
+    public void executeDelete(RequestContext ctx, Connection con, Table table, String id) throws SQLException {
+        try (PreparedStatement ps = prepareDelete(con, table, id)) {
+            ps.executeUpdate();
+        }
+    }
+
+    public void executeDeleteTable(Connection con, Table t) throws SQLException {
+        try (PreparedStatement ps = prepareDeleteTable(con, t)) {
             ps.executeUpdate();
         }
     }

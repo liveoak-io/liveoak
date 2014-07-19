@@ -152,4 +152,14 @@ public class PgSqlRowResource implements Resource {
         //responder.resourceUpdated(this);
         responder.resourceUpdated(new PgSqlRowResource(parent, parent.queryTable(parent.id(), id, ctx).rows().get(0)));
     }
+
+    @Override
+    public void delete(RequestContext ctx, Responder responder) throws Exception {
+        Catalog cat = parent.parent().getCatalog();
+        Table table = cat.table(new TableRef(parent.id()));
+        try (Connection c = parent.parent().getConnection()) {
+            new QueryBuilder(cat).executeDelete(ctx, c, table, id);
+        }
+        responder.resourceDeleted(this);
+    }
 }

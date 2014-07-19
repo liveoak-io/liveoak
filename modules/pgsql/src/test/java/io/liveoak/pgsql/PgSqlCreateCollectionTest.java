@@ -3,8 +3,10 @@ package io.liveoak.pgsql;
 import java.net.URI;
 import java.util.Comparator;
 
+import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.state.ResourceState;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -174,7 +176,9 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
 
         checkResource(result, expected);
 
+
         // update the item to link to the second order, and have smaller price
+
         body = resource("I39845355", endpoint, new Object[] {
                 "name", "The Gadget",
                 "quantity", 1,
@@ -182,6 +186,7 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                 "vat", 20,
                 schema_two + ".orders", resource("014-2004345", "/testApp/" + BASEPATH + "/" + schema_two + ".orders", new Object[] {})
         });
+
         result = client.update(ctx("*(*)"), endpoint + "/I39845355", body);
         System.out.println(result);
 
@@ -199,6 +204,44 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                         "items", list(resourceRef("/testApp/" + BASEPATH + "/items/I39845355"))
                 })
         });
+
+        checkResource(result, expected);
+
+        // remove the item
+        result = client.delete(ctx("*(*)"), endpoint + "/I39845355");
+        System.out.println(result);
+
+        // try read it
+        try {
+            result = client.read(ctx("*(*)"), endpoint + "/I39845355");
+            Assert.fail("Failed to delete item.");
+        } catch (ResourceNotFoundException ignored) {}
+
+
+        // remove items table
+        result = client.delete(ctx("*"), endpoint);
+        System.out.println(result);
+
+
+        // list tables again
+        endpoint = "/testApp/" + BASEPATH;
+
+        // list existing tables as unexpanded members
+        result = client.read(ctx("*"), endpoint);
+        System.out.println(result);
+
+        expected = resource(BASEPATH, "/testApp", new Object[] {
+                "count", 3,
+                "type", "database"},
+
+                sorted((o1, o2) -> {
+                            return o1.id().compareTo(o2.id());
+                        },
+
+                        resource("addresses", endpoint, new Object[]{}),
+                        resource(schema + ".orders", endpoint, new Object[]{}),
+                        resource(schema_two + ".orders", endpoint, new Object[]{}))
+        );
 
         checkResource(result, expected);
     }

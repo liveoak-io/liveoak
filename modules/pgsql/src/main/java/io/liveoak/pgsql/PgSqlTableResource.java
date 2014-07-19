@@ -95,6 +95,18 @@ public class PgSqlTableResource implements Resource {
         Resource.super.updateProperties(ctx, state, responder);
     }
 
+    @Override
+    public void delete(RequestContext ctx, Responder responder) throws Exception {
+        Catalog cat = parent.getCatalog();
+        Table t = cat.tableById(id);
+        try (Connection c = parent.getConnection()) {
+            new QueryBuilder(cat).executeDeleteTable(c, t);
+        }
+        // trigger schema reload
+        parent.configuration().reloadSchema();
+        responder.resourceDeleted(null);
+    }
+
     public QueryResults queryResults() {
         return results;
     }
