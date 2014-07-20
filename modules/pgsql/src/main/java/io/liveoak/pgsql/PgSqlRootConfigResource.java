@@ -42,6 +42,7 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
     private List<String> exposedSchemas;
     private List<String> blockedSchemas;
     private String defaultSchema;
+    private boolean allowCreateSchema;
 
     public PgSqlRootConfigResource(String id) {
         super(id);
@@ -55,6 +56,28 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
         if ( ds != null ) {
             ds.close();
         }
+    }
+
+    public String defaultSchema() {
+        return defaultSchema;
+    }
+
+    public List<String> exposedSchemas() {
+        if (exposedSchemas == null) {
+            return null;
+        }
+        return Collections.unmodifiableList(exposedSchemas);
+    }
+
+    public List<String> blockedSchemas() {
+        if (blockedSchemas == null) {
+            return null;
+        }
+        return Collections.unmodifiableList(blockedSchemas);
+    }
+
+    public boolean allowCreateSchema() {
+        return allowCreateSchema;
     }
 
     /**
@@ -94,6 +117,7 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
         if (defaultSchema != null) {
             sink.accept("default-schema", defaultSchema);
         }
+        sink.accept("allow-create-schema", allowCreateSchema);
         sink.close();
     }
 
@@ -139,6 +163,11 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
         }
 
         this.defaultSchema = state.getPropertyAsString("default-schema");
+
+        Boolean bval = state.getPropertyAsBoolean("allow-create-schema");
+        if (bval != null) {
+            allowCreateSchema = bval;
+        }
 
         PGPoolingDataSource old = this.ds;
         boolean recreate = old == null

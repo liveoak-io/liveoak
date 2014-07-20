@@ -52,6 +52,11 @@ public class TableRef {
         return table;
     }
 
+
+    public String quotedSchema() {
+        return "\"" + schema + "\"";
+    }
+
     public String asQuotedIdentifier() {
         StringBuilder sb = new StringBuilder();
         sb.append("\"");

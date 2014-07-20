@@ -52,7 +52,9 @@ public class PgSqlTableSchemaResource  implements Resource {
             col.put("name", c.name());
             col.put("type", c.type());
             col.put("size", c.size());
-
+            col.put("nullable", !c.notNull());
+            col.put("unique", c.unique());
+            /*
             if (c.notNull() || c.unique()) {
                 List<String> modifiers = new LinkedList<>();
                 if (c.notNull()) {
@@ -63,6 +65,7 @@ public class PgSqlTableSchemaResource  implements Resource {
                 }
                 col.put("modifiers", modifiers);
             }
+            */
             cols.add(col);
         }
 

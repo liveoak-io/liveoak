@@ -247,8 +247,30 @@ public class PgSqlRootResource extends DefaultRootResource {
         table = new Table(tableRef.schema(), tableRef.name(), cols, pk, fks);
         String ddl = table.ddl(getCatalog());
 
+        // check if schema exists. if it doesn't, check that config allows us to create a new schema
+        // also check if the schema we're trying to create isn't deliberately hidden in config
+        boolean createNewSchema = false;
+        if (!getCatalog().schemas().contains(tableRef.schema())) {
+            PgSqlRootConfigResource conf = configuration();
+            List<String> exposed = conf.exposedSchemas();
+            List<String> blocked = conf.blockedSchemas();
+            createNewSchema = (blocked == null || !blocked.contains(tableRef.schema())) &&
+                    (exposed == null || exposed.isEmpty() || exposed.contains(tableRef.schema()));
+
+            if (!createNewSchema || !conf.allowCreateSchema()) {
+                responder.invalidRequest("Not allowed to create a new schema");
+                return;
+            }
+        }
+
         // execute ddl
         try (Connection c = getConnection()) {
+            // if schema may need to be created now is the time
+            if (createNewSchema) {
+                try (PreparedStatement ps = c.prepareStatement("CREATE SCHEMA IF NOT EXISTS " + tableRef.quotedSchema())) {
+                    ps.execute();
+                }
+            }
             try (PreparedStatement ps = c.prepareStatement(ddl)) {
                 ps.execute();
             }
@@ -267,6 +289,15 @@ public class PgSqlRootResource extends DefaultRootResource {
         if (size == null) {
             size = -1;
         }
+        Boolean nullable = col.getPropertyAsBoolean("nullable");
+        if (nullable == null) {
+            nullable = Boolean.TRUE;
+        }
+        Boolean unique = col.getPropertyAsBoolean("unique");
+        if (unique == null) {
+            unique = Boolean.FALSE;
+        }
+        /*
         boolean notNull = false;
         boolean unique = false;
 
@@ -291,8 +322,8 @@ public class PgSqlRootResource extends DefaultRootResource {
                 }
             }
         }
-
-        return new Column(table, name, type, size, notNull, unique);
+        */
+        return new Column(table, name, type, size, !nullable, unique);
     }
 
     @Override
