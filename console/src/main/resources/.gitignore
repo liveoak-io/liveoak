@@ -4,7 +4,3 @@ node_modules/
 tmp
 .DS_Store
 .idea
-.bower-*
-app/lib/
-node/
-bower_components/

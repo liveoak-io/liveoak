@@ -14,8 +14,8 @@ module.exports = function (grunt) {
 
   // configurable paths
   var projectConfig = {
-    src: 'app',
-    dist: '../../../../dist/target/liveoak/apps/admin/console/'
+    src: '../src/main/resources/app',
+    dist: '../../dist/target/liveoak/apps/admin/console/'
   };
 
   grunt.initConfig({
@@ -96,11 +96,11 @@ module.exports = function (grunt) {
     },
     clean: {
       cache: [
-        ".bower-*",
-        "bower_components",
-        "node",
-        "node_modules",
-        "app/lib"
+        '.bower-*',
+        'bower_components',
+        'node',
+        'node_modules',
+        'app/lib'
       ]
     }
   });
