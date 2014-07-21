@@ -2,10 +2,15 @@ package io.liveoak.pgsql;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 
 import org.apache.http.entity.ContentType;
@@ -13,7 +18,6 @@ import org.apache.http.entity.StringEntity;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.vertx.java.core.json.JsonObject;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -24,6 +28,44 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
     protected static final String APPLICATION_JSON = "application/json";
 
+    @Test
+    public void testAll() throws IOException {
+        System.out.println("testAll");
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH);
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        String result = getRequest(get);
+        System.out.println(result);
+
+        String expected = "{                                                     \n" +
+                "  'id' : 'sqldata',                                             \n" +
+                "  'self' : {                                                    \n" +
+                "    'href' : '/testApp/sqldata'                                 \n" +
+                "  },                                                            \n" +
+                "  'count' : 3,                                                  \n" +
+                "  'type' : 'database',                                          \n" +
+                "  'members' : [ {                                              \n" +
+                "    'id' : 'addresses',                                         \n" +
+                "    'self' : {                                                  \n" +
+                "      'href' : '/testApp/sqldata/addresses'                     \n" +
+                "    }                                                           \n" +
+                "  }, {                                                          \n" +
+                "    'id' : '" + schema + ".orders',                             \n" +
+                "    'self' : {                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema + ".orders'         \n" +
+                "    }                                                           \n" +
+                "  }, {                                                          \n" +
+                "    'id' : '" + schema_two + ".orders',                         \n" +
+                "    'self' : {                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders'     \n" +
+                "    }                                                           \n" +
+                "  } ]                                                           \n" +
+                "}";
+
+        checkResult(result, expected);
+    }
+
+
     @Before
     public void init() throws IOException {
 
@@ -32,56 +74,287 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
         post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
-        String json = "{" +
-                "  \"id\": \"addresses\",\n" +
-                "  \"columns\": [\n" +
-                "     {\n" +
-                "       \"name\": \"address_id\",\n" +
-                "       \"type\": \"integer\"\n" +
-                "     },\n" +
-                "     {\n" +
-                "       \"name\": \"name\",\n" +
-                "       \"type\": \"varchar\",\n" +
-                "       \"size\": 255,\n" +
-                "       \"nullable\": false\n" +
-                "     },\n" +
-                "     {\n" +
-                "       \"name\": \"street\",\n" +
-                "       \"type\": \"varchar\",\n" +
-                "       \"size\": 255,\n" +
-                "       \"nullable\": false\n" +
-                "     },\n" +
-                "     {\n" +
-                "       \"name\": \"postcode\",\n" +
-                "       \"type\": \"varchar\",\n" +
-                "       \"size\": 10\n" +
-                "     },\n" +
-                "     {\n" +
-                "       \"name\": \"city\",\n" +
-                "       \"type\": \"varchar\",\n" +
-                "       \"size\": 60,\n" +
-                "       \"nullable\": false\n" +
-                "     },\n" +
-                "     {\n" +
-                "       \"name\": \"country_iso\",\n" +
-                "       \"type\": \"char\",\n" +
-                "       \"size\": 2\n" +
-                "     },\n" +
-                "     {\n" +
-                "       \"name\": \"is_company\",\n" +
-                "       \"type\": \"boolean\",\n" +
-                "       \"nullable\": false,\n" +
-                "       \"default\": false\n" +
-                "     }],\n" +
-                "  \"primary-key\": [\"address_id\"]\n" +
+        String json = "{                                                         \n" +
+                "  'id': 'addresses',                                            \n" +
+                "  'columns': [                                                  \n" +
+                "     {                                                          \n" +
+                "       'name': 'address_id',                                    \n" +
+                "       'type': 'integer'                                        \n" +
+                "     },                                                         \n" +
+                "     {                                                          \n" +
+                "       'name': 'name',                                          \n" +
+                "       'type': 'varchar',                                       \n" +
+                "       'size': 255,                                             \n" +
+                "       'nullable': false                                        \n" +
+                "     },                                                         \n" +
+                "     {                                                          \n" +
+                "       'name': 'street',                                        \n" +
+                "       'type': 'varchar',                                       \n" +
+                "       'size': 255,                                             \n" +
+                "       'nullable': false                                        \n" +
+                "     },                                                         \n" +
+                "     {                                                          \n" +
+                "       'name': 'postcode',                                      \n" +
+                "       'type': 'varchar',                                       \n" +
+                "       'size': 10                                               \n" +
+                "     },                                                         \n" +
+                "     {                                                          \n" +
+                "       'name': 'city',                                          \n" +
+                "       'type': 'varchar',                                       \n" +
+                "       'size': 60,                                              \n" +
+                "       'nullable': false                                        \n" +
+                "     },                                                         \n" +
+                "     {                                                          \n" +
+                "       'name': 'country_iso',                                   \n" +
+                "       'type': 'char',                                          \n" +
+                "       'size': 2                                                \n" +
+                "     },                                                         \n" +
+                "     {                                                          \n" +
+                "       'name': 'is_company',                                    \n" +
+                "       'type': 'boolean',                                       \n" +
+                "       'nullable': false,                                       \n" +
+                "       'default': false                                         \n" +
+                "     }],                                                        \n" +
+                "  'primary-key': ['address_id']                                 \n" +
                 "}";
 
-        System.out.println("Creating table: " + json);
+        String result = postRequest(post, json);
+
+        String expected = "{                                                     \n" +
+                "  'id' : 'addresses;schema',                                    \n" +
+                "  'self' : {                                                    \n" +
+                "    'href' : '/testApp/sqldata/addresses;schema'                \n" +
+                "  },                                                            \n" +     // TODO: Add 'name': '$schema.address'
+                "  'columns' : [ {                                               \n" +
+                "    'name' : 'address_id',                                      \n" +
+                "    'type' : 'int4',                                            \n" +
+                "    'size' : 10,                                                \n" +
+                "    'nullable' : false,                                         \n" +
+                "    'unique' : true                                             \n" +
+                "  }, {                                                          \n" +
+                "    'name' : 'name',                                            \n" +
+                "    'type' : 'varchar',                                         \n" +
+                "    'size' : 255,                                               \n" +
+                "    'nullable' : false,                                         \n" +
+                "    'unique' : false                                            \n" +
+                "  }, {                                                          \n" +
+                "    'name' : 'street',                                          \n" +
+                "    'type' : 'varchar',                                         \n" +
+                "    'size' : 255,                                               \n" +
+                "    'nullable' : false,                                         \n" +
+                "    'unique' : false                                            \n" +
+                "  }, {                                                          \n" +
+                "    'name' : 'postcode',                                        \n" +
+                "    'type' : 'varchar',                                         \n" +
+                "    'size' : 10,                                                \n" +
+                "    'nullable' : false,                                         \n" +
+                "    'unique' : false                                            \n" +
+                "  }, {                                                          \n" +
+                "    'name' : 'city',                                            \n" +
+                "    'type' : 'varchar',                                         \n" +
+                "    'size' : 60,                                                \n" +
+                "    'nullable' : false,                                         \n" +
+                "    'unique' : false                                            \n" +
+                "  }, {                                                          \n" +
+                "    'name' : 'country_iso',                                     \n" +
+                "    'type' : 'bpchar',                                          \n" +
+                "    'size' : 2,                                                 \n" +
+                "    'nullable' : false,                                         \n" +
+                "    'unique' : false                                            \n" +
+                "  }, {                                                          \n" +
+                "    'name' : 'is_company',                                      \n" +
+                "    'type' : 'bool',                                            \n" +
+                "    'size' : 1,                                                 \n" +
+                "    'nullable' : false,                                         \n" +
+                "    'unique' : false                                            \n" +
+                "  } ],                                                          \n" +
+                "  'primary-key' : [ 'address_id' ]                              \n" +
+                "}";                                                                      // TODO: Add 'ddl': 'CREATE TABLE ...'
+
+        checkResult(result, expected);
+
+
+        // create orders
+        json = "{                                                                \n" +
+                "  'id': 'orders',                                               \n" +
+                "  'columns': [                                                  \n" +
+                "     {                                                          \n" +
+                "       'name': 'order_id',                                      \n" +
+                "       'type': 'varchar',                                       \n" +
+                "       'size': 40                                               \n" +
+                "     },                                                         \n" +
+                "     {                                                          \n" +
+                "       'name': 'create_date',                                   \n" +
+                "       'type': 'timestamp',                                     \n" +
+                "       'nullable': false                                        \n" +
+                "     },                                                         \n" +
+                "     {                                                          \n" +
+                "       'name': 'total',                                         \n" +
+                "       'type': 'int8',                                          \n" +
+                "       'nullable': false                                        \n" +
+                "     },                                                         \n" +
+                "     {                                                          \n" +
+                "       'name': 'address_id',                                    \n" +
+                "       'type': 'int4',                                          \n" +     // TODO - should work for integer as well
+                "       'nullable': false                                        \n" +
+                "     }],                                                        \n" +
+                "  'primary-key': ['order_id'],                                  \n" +
+                "  'foreign-keys': {                                             \n" +
+                "     'table': 'addresses',                                      \n" +
+                "     'columns': ['address_id']                                  \n" +
+                "  }                                                             \n" +
+                "}";
+
+        result = postRequest(post, json);
+
+        expected = "{                                                            \n" +
+                "  'id' : 'orders;schema',                                       \n" +
+                "  'self' : {                                                    \n" +
+                "    'href' : '/testApp/sqldata/orders;schema'                   \n" +
+                "  },                                                            \n" +
+                "  'columns' : [                                                 \n" +
+                "    {                                                           \n" +
+                "      'name' : 'order_id',                                      \n" +
+                "      'type' : 'varchar',                                       \n" +
+                "      'size' : 40,                                              \n" +
+                "      'nullable' : false,                                       \n" +
+                "      'unique' : true                                           \n" +
+                "    },                                                          \n" +
+                "    {                                                           \n" +
+                "      'name': 'create_date',                                    \n" +
+                "      'type': 'timestamp',                                      \n" +
+                "      'size' : 29,                                              \n" +
+                "      'nullable' : false,                                       \n" +
+                "      'unique' : false                                          \n" +
+                "    },                                                          \n" +
+                "    {                                                           \n" +
+                "      'name': 'total',                                          \n" +
+                "      'type': 'int8',                                           \n" +
+                "      'size' : 19,                                              \n" +
+                "      'nullable': false,                                        \n" +
+                "      'unique' : false                                          \n" +
+                "    },                                                          \n" +
+                "    {                                                           \n" +
+                "      'name': 'address_id',                                     \n" +
+                "      'type': 'int4',                                           \n" +     // TODO - should work for integer as well
+                "      'size' : 10,                                              \n" +
+                "      'nullable': false,                                        \n" +
+                "      'unique' : false                                          \n" +
+                "    }],                                                         \n" +
+                "  'primary-key': ['order_id'],                                  \n" +
+                "  'foreign-keys': [{                                            \n" +
+                "    'table': '" + schema + ".addresses',                        \n" +
+                "    'columns': ['address_id']                                   \n" +
+                "  }]                                                            \n" +
+                "}";
+
+        checkResult(result, expected);
+
+        // create another orders in a different schema
+        json = "{                                                                \n" +
+                "  'id': '" + schema_two + ".orders',                            \n" +
+                "  'columns': [                                                  \n" +
+                "     {                                                          \n" +
+                "       'name': 'order_id',                                      \n" +
+                "       'type': 'varchar',                                       \n" +
+                "       'size': 40                                               \n" +
+                "     },                                                         \n" +
+                "     {                                                          \n" +
+                "       'name': 'create_date',                                   \n" +
+                "       'type': 'timestamp',                                     \n" +
+                "       'nullable': false                                        \n" +
+                "     },                                                         \n" +
+                "     {                                                          \n" +
+                "       'name': 'total',                                         \n" +
+                "       'type': 'int8',                                          \n" +
+                "       'nullable': false                                        \n" +
+                "     },                                                         \n" +
+                "     {                                                          \n" +
+                "       'name': 'address_id',                                    \n" +
+                "       'type': 'int4',                                          \n" +     // TODO - should work for integer as well
+                "       'nullable': false                                        \n" +
+                "     }],                                                        \n" +
+                "  'primary-key': ['order_id'],                                  \n" +
+                "  'foreign-keys': {                                             \n" +
+                "     'table': 'addresses',                                      \n" +
+                "     'columns': ['address_id']                                  \n" +
+                "  }                                                             \n" +
+                "}";
+
+        result = postRequest(post, json);
+
+        expected = "{                                                            \n" +
+                "  'id' : '" + schema_two + ".orders;schema',                    \n" +
+                "  'self' : {                                                    \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders;schema'\n" +
+                "  },                                                            \n" +
+                "  'columns' : [                                                 \n" +
+                "    {                                                           \n" +
+                "      'name' : 'order_id',                                      \n" +
+                "      'type' : 'varchar',                                       \n" +
+                "      'size' : 40,                                              \n" +
+                "      'nullable' : false,                                       \n" +
+                "      'unique' : true                                           \n" +
+                "    },                                                          \n" +
+                "    {                                                           \n" +
+                "      'name': 'create_date',                                    \n" +
+                "      'type': 'timestamp',                                      \n" +
+                "      'size' : 29,                                              \n" +
+                "      'nullable' : false,                                       \n" +
+                "      'unique' : false                                          \n" +
+                "    },                                                          \n" +
+                "    {                                                           \n" +
+                "      'name': 'total',                                          \n" +
+                "      'type': 'int8',                                           \n" +
+                "      'size' : 19,                                              \n" +
+                "      'nullable': false,                                        \n" +
+                "      'unique' : false                                          \n" +
+                "    },                                                          \n" +
+                "    {                                                           \n" +
+                "      'name': 'address_id',                                     \n" +
+                "      'type': 'int4',                                           \n" +     // TODO - should work for integer as well
+                "      'size' : 10,                                              \n" +
+                "      'nullable': false,                                        \n" +
+                "      'unique' : false                                          \n" +
+                "    }],                                                         \n" +
+                "  'primary-key': ['order_id'],                                  \n" +
+                "  'foreign-keys': [{                                            \n" +
+                "    'table': '" + schema + ".addresses',                        \n" +
+                "    'columns': ['address_id']                                   \n" +
+                "  }]                                                            \n" +
+                "}";
+
+        checkResult(result, expected);
+    }
+
+    @After
+    public void cleanup() throws SQLException {
+        // delete schemas
+        try (Connection c = datasource.getConnection()) {
+            try (CallableStatement s = c.prepareCall("drop schema " + schema_two + " cascade")) {
+                s.execute();
+            }
+
+            try (CallableStatement s = c.prepareCall("drop schema " + schema + " cascade")) {
+                s.execute();
+            }
+        }
+    }
+
+    private void checkResult(String result, String expected) throws IOException {
+        JsonNode resultNode = parseJson(result);
+        JsonNode expectedNode = parseJson(expected);
+
+        assertThat((Object) resultNode).isEqualTo(expectedNode);
+    }
+
+    private String postRequest(HttpPost post, String json) throws IOException {
 
         StringEntity entity = new StringEntity(json, ContentType.create(APPLICATION_JSON, "UTF-8"));
         post.setEntity(entity);
 
-        System.err.println("DO PUT - " + post.getURI());
+        System.err.println("DO POST - " + post.getURI());
+        System.out.println("\n" + json);
 
         CloseableHttpResponse result = httpClient.execute(post);
 
@@ -97,19 +370,29 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
         String resultStr = new String(baos.toByteArray());
         System.err.println(resultStr);
-        JsonObject resultJson = new JsonObject(resultStr);
-
-        System.out.println("resultJson: " + resultJson);
         System.err.println("\n<<<=============");
+        return resultStr;
     }
 
-    @After
-    public void cleanup() {
+    public String getRequest(HttpGet get) throws IOException {
 
-    }
+        System.err.println("DO GET - " + get.getURI());
 
-    @Test
-    public void testAll() {
-        System.out.println("testAll");
+        CloseableHttpResponse result = httpClient.execute(get);
+
+        System.err.println("=============>>>");
+        System.err.println(result);
+
+        HttpEntity resultEntity = result.getEntity();
+
+        assertThat(resultEntity.getContentLength()).isGreaterThan(0);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        resultEntity.writeTo(baos);
+
+        String resultStr = new String(baos.toByteArray());
+        System.err.println(resultStr);
+        System.err.println("\n<<<=============");
+        return resultStr;
     }
 }

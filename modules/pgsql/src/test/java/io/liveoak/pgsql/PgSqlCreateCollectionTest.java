@@ -27,13 +27,9 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                 "count", 3,
                 "type", "database"},
 
-                sorted((o1, o2) -> {
-                           return o1.id().compareTo(o2.id());
-                       },
-
-                       resource("addresses", endpoint, new Object[]{}),
-                       resource(schema + ".orders", endpoint, new Object[]{}),
-                       resource(schema_two + ".orders", endpoint, new Object[]{}))
+               resource("addresses", endpoint, new Object[]{}),
+               resource(schema + ".orders", endpoint, new Object[]{}),
+               resource(schema_two + ".orders", endpoint, new Object[]{})
         );
 
         checkResource(result, expected);
@@ -47,20 +43,20 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                     obj("name", "name",
                             "type", "varchar",
                             "size", 255,
-                            "modifiers", list("NOT NULL")),
+                            "nullable", false),
                     obj("name", "quantity",
                             "type", "int4",
-                            "modifiers", list("NOT NULL")),
+                            "nullable", false),
                     obj("name", "price",
                             "type", "int4",
-                            "modifiers", list("NOT NULL")),
+                            "nullable", false),
                     obj("name", "vat",
                             "type", "int4",
-                            "modifiers", list("NOT NULL")),
+                            "nullable", false),
                     obj("name", "order_id",
                             "type", "varchar",
                             "size", 40,
-                            "modifiers", list("NOT NULL"))
+                            "nullable", false)
 
                 ),
 
@@ -81,27 +77,33 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                         obj("name", "item_id",
                                 "type", "varchar",
                                 "size", 40,
-                                "modifiers", list("NOT NULL", "UNIQUE")),
+                                "nullable", false,
+                                "unique", true),
                         obj("name", "name",
                                 "type", "varchar",
                                 "size", 255,
-                                "modifiers", list("NOT NULL")),
+                                "nullable", false,
+                                "unique", false),
                         obj("name", "quantity",
                                 "type", "int4",
                                 "size", 10,
-                                "modifiers", list("NOT NULL")),
+                                "nullable", false,
+                                "unique", false),
                         obj("name", "price",
                                 "type", "int4",
                                 "size", 10,
-                                "modifiers", list("NOT NULL")),
+                                "nullable", false,
+                                "unique", false),
                         obj("name", "vat",
                                 "type", "int4",
                                 "size", 10,
-                                "modifiers", list("NOT NULL")),
+                                "nullable", false,
+                                "unique", false),
                         obj("name", "order_id",
                                 "type", "varchar",
                                 "size", 40,
-                                "modifiers", list("NOT NULL"))
+                                "nullable", false,
+                                "unique", false)
 
                 ),
 
@@ -126,13 +128,10 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                         "count", 4,
                         "type", "database"},
 
-                sorted((o1, o2) -> {
-                            return o1.id().compareTo(o2.id());
-                        },
                         resource("addresses", endpoint, new Object[]{}),
                         resource("items", endpoint, new Object[]{}),
                         resource(schema + ".orders", endpoint, new Object[]{}),
-                        resource(schema_two + ".orders", endpoint, new Object[]{}))
+                        resource(schema_two + ".orders", endpoint, new Object[]{})
         );
         checkResource(result, expected);
 
@@ -234,13 +233,9 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                 "count", 3,
                 "type", "database"},
 
-                sorted((o1, o2) -> {
-                            return o1.id().compareTo(o2.id());
-                        },
-
-                        resource("addresses", endpoint, new Object[]{}),
-                        resource(schema + ".orders", endpoint, new Object[]{}),
-                        resource(schema_two + ".orders", endpoint, new Object[]{}))
+                resource("addresses", endpoint, new Object[]{}),
+                resource(schema + ".orders", endpoint, new Object[]{}),
+                resource(schema_two + ".orders", endpoint, new Object[]{})
         );
 
         checkResource(result, expected);

@@ -75,9 +75,13 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
         ds.initialize();
         datasource = ds;
 
-        schema = "lo_test_" + UUID.randomUUID().toString().substring(0, 8);
-        schema_two = "lo_test_" + UUID.randomUUID().toString().substring(0, 8);
-
+        schema = "xlo_test_" + UUID.randomUUID().toString().substring(0, 8);
+        schema_two = "xlo_test_" + UUID.randomUUID().toString().substring(0, 8);
+        if (schema.compareTo(schema_two) > 1) {
+            String tmp = schema;
+            schema = schema_two;
+            schema_two = tmp;
+        }
         // first
         try {
             cleanup();
@@ -101,7 +105,7 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
 
     @AfterClass
     public static void cleanup() throws SQLException {
-        // create schema for the test
+        // delete schemas for the test
         try (Connection c = datasource.getConnection()) {
             try (CallableStatement s = c.prepareCall("drop schema " + schema_two + " cascade")) {
                 s.execute();
