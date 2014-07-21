@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-  ~ Copyright 2013 Red Hat, Inc. and/or its affiliates.
+  ~ Copyright 2014 Red Hat, Inc. and/or its affiliates.
   ~
   ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
   -->
@@ -23,16 +23,6 @@
         <dependency>
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-spi</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-common</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-container</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

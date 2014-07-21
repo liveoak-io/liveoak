@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-  ~ Copyright 2013 Red Hat, Inc. and/or its affiliates.
+  ~ Copyright 2014 Red Hat, Inc. and/or its affiliates.
   ~
   ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
   -->
@@ -21,23 +21,8 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.jboss.modules</groupId>
-            <artifactId>jboss-modules</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.msc</groupId>
-            <artifactId>jboss-msc</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-spi</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -54,20 +39,6 @@
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-test-tools</artifactId>
         </dependency>
     </dependencies>
     <build>

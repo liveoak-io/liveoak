@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-  ~ Copyright 2013 Red Hat, Inc. and/or its affiliates.
+  ~ Copyright 2014 Red Hat, Inc. and/or its affiliates.
   ~
   ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
   -->
@@ -20,11 +20,6 @@
         <module-name>io.liveoak.autosetup</module-name>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-mongo-launcher</artifactId>
