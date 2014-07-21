@@ -141,7 +141,7 @@
                     <execution>
                         <id>copy-resources</id>
 
-                        <phase>package</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -155,10 +155,10 @@
                                         <exclude>test/</exclude>
                                         <exclude>**/.git*</exclude>
                                         <exclude>**/*.md</exclude>
-                                        <exclude>node/</exclude>
+                                        <!--exclude>node/</exclude>
                                         <exclude>node_modules/</exclude>
                                         <exclude>Gruntfile.js</exclude>
-                                        <exclude>%regex[.*/\.?bower\.json]</exclude>
+                                        <exclude>%regex[.*/\.?bower\.json]</exclude-->
                                     </excludes>
                                 </resource>
                             </resources>
@@ -226,7 +226,7 @@
                 <version>0.0.14</version>
 
                 <configuration>
-                    <workingDirectory>src/main/resources</workingDirectory>
+                    <workingDirectory>target</workingDirectory>
                 </configuration>
 
                 <executions>
@@ -267,7 +267,16 @@
                 </executions>
             </plugin>
 
+            <!-- Tests are temporarily disabled until test-suite LO starting is resolved -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
         </plugins>
+
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
@@ -276,35 +285,27 @@
         </testResources>
     </build>
 
-    <!--
-        Profile used to update new version of frontend 3rd party libs.
-        Libs are located in src/main/resources/app/lib and are managed by bower.
-        Everything is handled by maven, no external dependencies are needed.
-
-        Usage:  $ mvn clean install -PbowerUpdate
-        Result: Your 3rd party frontend libs are updated (copied on top over existing) according to versions set in the
-                top of this file.
-     -->
+    <!-- Use this profile to keep cache directories downloaded with frontend-maven-plugin in the target directory -->
     <profiles>
         <profile>
-            <id>consolePurge</id>
+            <id>development</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-clean-plugin</artifactId>
-                        <version>2.4.1</version>
+                        <version>2.5</version>
                         <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
                             <filesets>
                                 <fileset>
-                                    <directory>src/main/resources</directory>
-                                    <includes>
-                                        <include>.bower-*/**</include>
-                                        <include>bower_components/**</include>
-                                        <include>node/**</include>
-                                        <include>node_modules/**</include>
-                                        <include>app/lib/**</include>
-                                    </includes>
+                                    <directory>target</directory>
+                                    <excludes>
+                                        <exclude>node/**</exclude>
+                                        <exclude>node_modules/**</exclude>
+                                        <exclude>bower_components/**</exclude>
+                                        <exclude>app/lib/**</exclude>
+                                        <exclude>.bower-*/**</exclude>
+                                    </excludes>
                                     <followSymlinks>false</followSymlinks>
                                 </fileset>
                             </filesets>
@@ -315,45 +316,53 @@
         </profile>
 
         <profile>
-            <id>bowerUpdate</id>
-            <build>
-                <plugins>
-
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>development</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+            <id>e2e-tests</id>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <skipTests>true</skipTests>
+                            <skipTests>false</skipTests>
                         </configuration>
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>e2e-tests</id>
+
         </profile>
         <profile>
             <id>e2e-tests-firefox</id>
             <properties>
                 <arquillian.browser>firefox</arquillian.browser>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>false</skipTests>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>e2e-tests-chrome</id>
             <properties>
                 <arquillian.browser>chrome</arquillian.browser>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>false</skipTests>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 

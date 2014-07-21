@@ -15,7 +15,9 @@ Currently, these tasks are provided:
 
 ## Getting started
 
-You have to install required software before you're able to use grunt:
+After successful build, most (everything excluding global installation of node.js) of the needed tools are already in the
+target directory. Don't use the grunt script from the src directory, always run it in the target directory.
+In case of troubles, you may have to install required software before you're able to use grunt:
 
 * Install npm - Find more information on https://www.npmjs.org/
 * Install grunt - Find more information on http://gruntjs.com/
@@ -34,7 +36,10 @@ grunt build
 
 When developing, run the grunt default tasks to watch your code for changes. After each change (file save) in all
 relevant project files, they get compiled (if needed, i.e. the LESS files must be compiled) and copied to the relevant
-target directory. The JS code is checked for errors and project code-style practices. To run the default task, simply
+target directory. Please note, that you run the grunt task from the target directory, but the files watched are actual 
+files from the src directory. Each changed file is processed into the dist directory. If you have the LO server running
+from the 'dist/target/liveoak/' directory, you can see your changes after refresh in your browser.
+The JS code is checked for errors and project code-style practices. To run the default task, simply
 run the grunt command:
 ```shell
 grunt
