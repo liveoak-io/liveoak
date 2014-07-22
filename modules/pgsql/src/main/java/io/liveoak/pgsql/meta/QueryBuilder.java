@@ -328,19 +328,19 @@ public class QueryBuilder {
         if (val == null || val instanceof ResourceState == false) {
             throw new RuntimeException("Invalid value for '" + field + "': " + val);
         }
-        /*
+
         Object self = ((ResourceState) val).getProperty("self");
         if (self == null || self instanceof ResourceState == false) {
             throw new RuntimeException("Not a valid resource reference - no 'self' - for '" + field + "': " + val);
         }
 
-        String href = ((ResourceState) val).getPropertyAsString("href");
+        String href = ((ResourceState) self).getPropertyAsString("href");
         if (href == null) {
             throw new RuntimeException("Not a valid resource reference - no 'self/href' - for '" + field + "': " + val);
         }
         return new ResourcePath(href).tail().toString();
-        */
-        return new ResourcePath(((ResourceState) val).uri().toString()).tail().toString();
+
+        //return new ResourcePath(((ResourceState) val).uri().toString()).tail().toString();
     }
 
     public QueryResults querySelectFromTableWhereIds(RequestContext ctx, Connection con, Table table, String [] ids) throws SQLException {

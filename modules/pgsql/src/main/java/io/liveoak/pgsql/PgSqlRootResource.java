@@ -138,6 +138,10 @@ public class PgSqlRootResource extends DefaultRootResource {
         Set<String> seenNames = new HashSet<>();
         List<Column> cols = new LinkedList<>();
         List columns = state.getPropertyAsList("columns");
+        if (columns == null) {
+            responder.invalidRequest("Invalid JSON message - 'columns' missing");
+            return;
+        }
         for (Object o: columns) {
             if (o instanceof ResourceState == false) {
                 responder.invalidRequest("Invalid JSON message - 'columns' item not an object: " + o);

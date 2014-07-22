@@ -47,7 +47,7 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
 
         schema = "xlo_test_" + UUID.randomUUID().toString().substring(0, 8);
         schema_two = "xlo_test_" + UUID.randomUUID().toString().substring(0, 8);
-        if (schema.compareTo(schema_two) > 1) {
+        if (schema.compareTo(schema_two) > 0) {
             String tmp = schema;
             schema = schema_two;
             schema_two = tmp;
