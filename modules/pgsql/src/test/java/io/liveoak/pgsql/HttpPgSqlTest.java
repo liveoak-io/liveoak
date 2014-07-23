@@ -31,6 +31,22 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
     @Test
     public void testAll() throws IOException {
         System.out.println("testAll");
+        testInitialCollections();
+
+        // create an address
+        testCreateFirstAddress();
+
+        // create an order
+        testCreateFirstOrder();
+
+        // create items table
+        testCreateItemsCollection();
+
+        // create a new item
+        testCreateFirstOrderItem();
+    }
+
+    private void testInitialCollections() throws IOException {
         HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH);
         get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
@@ -63,13 +79,11 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "}";
 
         checkResult(result, expected);
+    }
 
-        // create an address instance
-
-        // create an order instance
-
-        // create items table
-        HttpPost post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH);
+    private void testCreateItemsCollection() throws IOException {
+        String result;
+        String expected;HttpPost post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH);
         post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
         post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
@@ -167,12 +181,13 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  } ]                                                               \n" +
                 "}";
         checkResult(result, expected);
+    }
 
+    private void testCreateFirstOrderItem() throws IOException {
 
-        // create a new item
         String endpoint = "/testApp/" + BASEPATH + "/items";
 
-        json = "{                                                                                \n" +
+        String json = "{                                                                         \n" +
                 "  'id': 'I39845355',                                                            \n" +
                 "  'name': 'The Gadget',                                                         \n" +
                 "  'quantity': 1,                                                                \n" +
@@ -186,16 +201,94 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  }                                                                             \n" +
                 "}";
 
-        post = new HttpPost("http://localhost:8080" + endpoint);
+        HttpPost post = new HttpPost("http://localhost:8080" + endpoint);
         post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
         post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
-        result = postRequest(post, json);
+        String result = postRequest(post, json);
         System.out.println(result);
 
-        expected = "";
-        checkResult(result, json);
+        String expected = "";
+        checkResult(result, expected);
+    }
 
+
+    private void testCreateFirstAddress() throws IOException {
+        String endpoint = "/testApp/" + BASEPATH + "/addresses";
+
+        String json = "{                                                             \n" +
+                "  'id': 1,                                                          \n" +
+                "  'name': 'John F. Doe',                                            \n" +
+                "  'street': 'Liveoak street 7',                                     \n" +
+                "  'city': 'London',                                                 \n" +
+                "  'country_iso': 'UK',                                              \n" +
+                "  'is_company': false                                               \n" +
+                "}";
+
+        HttpPost post = new HttpPost("http://localhost:8080" + endpoint);
+        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
+        post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        String result = postRequest(post, json);
+        System.out.println(result);
+
+        String expected = "{                                                         \n" +
+                "  'id': '1',                                                        \n" +
+                "  'self': {                                                         \n" +
+                "    'href': '/testApp/" + BASEPATH + "/addresses/1'                 \n" +
+                "  },                                                                \n" +
+                "  'address_id': 1,                                                  \n" +
+                "  'name': 'John F. Doe',                                            \n" +
+                "  'street': 'Liveoak street 7',                                     \n" +
+                "  'postcode': null,                                                 \n" +
+                "  'city': 'London',                                                 \n" +
+                "  'country_iso': 'UK',                                              \n" +
+                "  'is_company': false,                                              \n" +
+                "  '" + schema + ".orders': [],                                      \n" +
+                "  '" + schema_two + ".orders': []                                   \n" +
+                "}";
+
+        checkResult(result, expected);
+    }
+
+
+    private void testCreateFirstOrder() throws IOException {
+        String endpoint = "/testApp/" + BASEPATH + "/" + schema_two + ".orders";
+
+        String json = "{                                                             \n" +
+                "  'id': '014-1003095',                                              \n" +
+                "  'create_date': '2014-06-07T15:10:15',                             \n" +
+                "  'total': 18990,                                                   \n" +
+                "  'addresses': {                                                    \n" +
+                "    'self': {                                                       \n" +
+                "      'href': '/testApp/" + BASEPATH + "/addresses/1'               \n" +
+                "    }                                                               \n" +
+                "  }                                                                 \n" +
+                "}";
+
+        HttpPost post = new HttpPost("http://localhost:8080" + endpoint);
+        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
+        post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        String result = postRequest(post, json);
+        System.out.println(result);
+
+        String expected =  "{                                                        \n" +
+                "  'id': '014-1003095',                                              \n" +
+                "  'self': {                                                         \n" +
+                "    'href': '/testApp/" + BASEPATH + "/" + schema_two + ".orders/014-1003095'          \n" +
+                "  },                                                                \n" +
+                "  'order_id': '014-1003095',                                        \n" +
+                "  'create_date': 1402146615000,                                     \n" +
+                "  'total': 18990,                                                   \n" +
+                "  'addresses': {                                                    \n" +
+                "    'self': {                                                       \n" +
+                "      'href': '/testApp/" + BASEPATH + "/addresses/1'               \n" +
+                "    }                                                               \n" +
+                "  }                                                                 \n" +
+                "}";
+
+        checkResult(result, expected);
     }
 
     @Before
@@ -245,7 +338,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "       'name': 'is_company',                                        \n" +
                 "       'type': 'boolean',                                           \n" +
                 "       'nullable': false,                                           \n" +
-                "       'default': false                                             \n" +
+                "       'default': false                                             \n" +     // TODO: handle 'default'
                 "     }],                                                            \n" +
                 "  'primary-key': ['address_id']                                     \n" +
                 "}";
@@ -299,9 +392,9 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "    'size' : 1,                                                     \n" +
                 "    'nullable' : false,                                             \n" +
                 "    'unique' : false                                                \n" +
-                "  } ],                                                              \n" +
+                "  } ],                                                              \n" +     // TODO: handle 'default'
                 "  'primary-key' : [ 'address_id' ]                                  \n" +
-                "}";                                                                      // TODO: Add 'ddl': 'CREATE TABLE ...'
+                "}";                                                                           // TODO: Add 'ddl': 'CREATE TABLE ...'
 
         checkResult(result, expected);
 

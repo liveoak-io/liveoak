@@ -68,6 +68,9 @@ public class Column {
                 case "int4":
                     ps.setInt(i, ValueConverter.toInt(value));
                     return;
+                case "timestamp":
+                    ps.setTimestamp(i, ValueConverter.toTimestamp(value));
+                    return;
                 default:
                     ps.setObject(i, value);
             }
