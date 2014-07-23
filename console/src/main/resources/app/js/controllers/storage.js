@@ -257,7 +257,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   $scope.isDataChange = false;
 
   $scope.searchColumns = [];
-  $scope.searchConditions = [{type:'EQUALS', text:''}];
+  $scope.searchConditions = [{type:'E', text:''}];
   $scope.showAdvanced = false;
 
   $scope.searchQuery = '';
@@ -394,8 +394,9 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       } else {
         $scope.isDataChange = false;
       }
-
-      updateExportUrl();
+      if ($scope.collectionForm.$valid) {
+        updateExportUrl();
+      }
     }, true
   );
 
@@ -645,12 +646,26 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $scope.filterConditions = [];
 
     $scope.searchColumns = [];
-    $scope.searchConditions = [{type:'EQUALS', text:''}];
+    $scope.searchConditions = [{type:'E', text:''}];
   };
 
   $scope.searchConditionAdd = function(){
     $scope.searchConditions.push({type:'E', text:''});
   };
+
+  $scope.searchConditionsEmpty = true;
+
+  $scope.$watch('searchConditions', function(){
+    for (var index in $scope.searchConditions){
+      var condition = $scope.searchConditions[index];
+
+      if (!condition.text || condition.text === ''){
+        $scope.searchConditionsEmpty = true;
+        return;
+      }
+    }
+    $scope.searchConditionsEmpty = false;
+  }, true);
 
   $scope.searchConditionRemove = function(index){
     $log.debug('Going to remove '+index);
@@ -924,6 +939,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $scope.filterColumns = [];
     $scope.filterConditions = [];
     $scope.searchColumns = [];
-    $scope.searchConditions = [{type:'EQUALS', text:''}];
+    $scope.searchConditions = [{type:'E', text:''}];
   }
 });

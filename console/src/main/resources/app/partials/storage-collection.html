@@ -74,7 +74,7 @@
                   <a class="dropdown-toggle-button search-clear" href
                      ng-show="searchQuery !== '' || filterColumns.length !== 0"
                      ng-click="searchClear()">Clear Search</a>
-                  <div class="asearch popover bottom" ng-show="showAdvanced">
+                  <div class="asearch popover bottom" ng-show="showAdvanced" lo-autoclose>
                     <div class="arrow"></div>
                     <div class="form-group">
                       <label for="columns-select">Search in Columns</label>
@@ -89,14 +89,15 @@
 
                         <select pf-select="false" class="select selectpicker inline"
                                 ng-model="condition.type" id="condition-input">
-                          <option value="EQUALS">Equals</option>
-                          <option value="EQUALS_NOT">Not equal</option>
+                          <option value="E">Equals</option>
+                          <option value="N">Not equal</option>
                         </select>
 
                         <input class="inline form-control" type="text" placeholder="Contains text"
                                ng-model="condition.text">
 
-                        <button type="button" ng-click="searchConditionRemove($index)" class="btn btn-link btn-icon inline add-condition">
+                        <button type="button" ng-click="searchConditionRemove($index)" ng-show="$index > 0"
+                                class="btn btn-link btn-icon inline add-condition">
                           <i class="fa fa-minus-circle" data-tooltip-placement="top" data-tooltip="Remove Condition"></i><span>Remove Condition</span></button>
 
                         <!--
@@ -108,10 +109,13 @@
                       </div>
                     </div>
 
-                    <a href class="lo-condition-add" ng-click="searchConditionAdd()">Add Condition</a>
+                    <a href class="lo-condition-add" ng-click="searchConditionAdd()"
+                       tooltip-placement="right" tooltip="On the Right!" tooltip-trigger="{{myFoo}}">Add Condition</a>
 
-                    <div class="pull-right form-actions">
-                      <button class="btn btn-primary btn-lg" ng-click="advancedSearch()">Search</button>
+                    <div class="pull-right form-actions" tooltip-placement="top"
+                         tooltip="{{ (searchConditionsEmpty || (searchColumns.length === 0)) ? 'No columns set or conditions missing.' : '' }}">
+                      <button type="submit" class="btn btn-primary btn-lg" ng-disabled="searchConditionsEmpty || (searchColumns.length === 0)"
+                              ng-click="advancedSearch()">Search</button>
                     </div>
                   </div>
                 </div>

@@ -265,3 +265,21 @@ loDirectives.directive('ngFileSelect', function() {
     }
   };
 });
+
+/* Directive used to autoclose the advanced search pop-up when clicked outside the pop-up. */
+loDirectives.directive('loAutoclose', function($document, $compile) {
+  return {
+    link: function(scope, e, att){
+
+      var body = $document.find('body').eq(0);
+
+      scope.close = function() {
+        scope[att.ngShow] = false;
+      };
+
+      var backdrop = $compile('<div ng-if="' + att.ngShow + '" id="advancedBackdrop" ng-click="close()"></div>')(scope);
+
+      body.append(backdrop);
+    }
+  };
+});
