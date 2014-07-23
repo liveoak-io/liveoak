@@ -120,6 +120,13 @@
   }
 }
 
+@media (max-width: 640px) {
+  
+  #kc-header-wrapper {
+    font-size: 24px;
+  }
+}
+
 @media (min-width: 1200px) {
   
   .login-pf form .col-lg-3 {

@@ -97,7 +97,7 @@ html, body {
 }
 
 #lo-content-row {
-  min-height: calc(~"100% - 79px");
+  min-height: calc(~"100% - 80px");
 }
 
 #lo-content-row {
@@ -171,6 +171,14 @@ hr {
   margin-top: 15px;
   margin-bottom: 19px;
   clear: both;
+}
+
+.or-separator {
+  display: block;
+  color: @c_graylight;
+  font-size: 15px;
+  margin: 10px 0 14px;
+  font-weight: 300;
 }
 
 /* Apply to make color slightly lighter */
@@ -434,6 +442,10 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
       a {
         color: @c_green;
       }
+      
+      + .label {
+        margin-left: 15px;
+      }
     }
     
     .pull-right a {
@@ -538,6 +550,175 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   
   .form-actions {
     margin-bottom: 5px;
+  }
+}
+
+.applications-list .panel:last-child {
+  margin-bottom: 30px;
+} 
+
+.transition {
+  -webkit-transition: all .25s ease;
+  -moz-transition: none;
+}
+
+.example-apps {
+
+  margin-top: 20px;
+
+  &.hover .panel {
+    .transition;
+    opacity: 0.75;
+    
+    &.clicked {
+      opacity: 1;
+    }
+  }
+
+  .panel {
+  
+    margin: 0 10px 20px 10px;
+    .transition;
+    
+    .panel-body {
+      padding: 20px 0;
+      
+      .pull-left {
+        width: 107px;
+        height: 107px;
+        margin-top: 10px;
+        overflow: hidden;
+      }
+      
+      img {
+        width: 107px;
+        height: 107px;
+      }
+      
+      .btn {
+        margin: 10px 0 0 0;
+        width: 100%;
+        opacity: 0;
+        .transition;
+        outline: 0 none;
+        
+        .spinner.spinner-inline {
+          display: none;
+          vertical-align: baseline;
+        }
+      }
+      
+      .pull-right {
+        width: calc(~"100% - 127px");
+      }
+        
+      h3 {
+        margin-top: 0;
+        margin-bottom: 5px;
+      }
+      
+      p {
+        font-size: 12px;
+        height: 99px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+    
+    &:hover {
+      cursor: pointer;
+      opacity: 1;
+    }
+    
+    &:hover, &.clicked {
+      margin: -5px 5px 15px 5px;
+      padding: 5px 20px;
+      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.20);
+      
+      .panel-body {
+        padding-bottom: 12px;
+        .transition;
+      }
+
+      .panel-body p {
+        font-size: 13px;
+        height: 107px;
+        .transition;
+      }
+    }
+    
+    &.clicked {
+      .panel-body {
+        .pull-left {
+          height: auto;
+        }
+        
+        .btn {
+          opacity: 1;
+          
+          &.installing {
+            .spinner.spinner-inline {
+              display: inline-block;
+            }
+          }
+        }
+        
+        p {
+          height: 296px;
+        }  
+      }
+      
+      &:hover {
+      
+        cursor: default;
+      
+        .panel-body p {
+          height: 296px;
+        }   
+      } 
+    }
+    
+    @media (max-width: 640px) {
+    
+      margin-left: 0;
+      margin-right: 0;
+      
+      &:hover,
+      &.clicked {
+        margin-left: -5px;
+        margin-right: -5px;
+      }
+    
+    }
+    
+    @media (max-width: 767px) {
+      &.clicked .panel-body p,
+      &.clicked:hover .panel-body p {
+        height: auto;
+        padding-bottom: 10px;
+      }
+    }
+    
+    @media (min-width: 768px) {
+      &.col-sm-6 {
+        width: calc(~"50% - 20px");
+        
+        &:hover, &.clicked {
+          width: calc(~"50% - 10px");
+        }
+      }
+    }
+    
+    @media (min-width: 1200px) {
+    
+      &.col-lg-4 {
+        width: calc(~"33.33333333333333% - 20px");
+        
+        &:hover, &.clicked {
+          width: calc(~"33.33333333333333% - 10px");
+        }
+      }
+    }
   }
 }
 
@@ -743,7 +924,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   p, a {
 	  display:block;
     font-size: @fsizebig;
-    padding-left: 48px;
+    padding-left: 51px;
   }
   
   p {
@@ -1142,6 +1323,19 @@ label + div > label {
 
 /* Collapsible forms */
 
+.collapsible:before{
+  content: "";
+  color: @c_graylight;
+  display: inline-block;
+  font-family: "FontAwesome";
+  font-weight: normal;
+  margin-right: .5em;
+}
+
+.collapsible.collapsed:before {
+    content: "";
+}
+
 legend {
   border-width: 1px 0 0 0;
   border-color: @c_border;
@@ -1158,21 +1352,17 @@ legend {
     cursor: pointer;
   }
 
-  &.collapsible:before{
-    content: "";
-    color: @c_graylight;
-    display: inline-block;
-    font-family: "FontAwesome";
-    font-weight: normal;
-    margin-right: .5em;
-  }
-
   &.collapsible.collapsed {
     margin-bottom: 0;
-    
-    &:before{
-      content: "";
-    }
+  }
+}
+
+.applications .collapsible {
+  cursor: pointer;
+  
+  &:before {
+    font-size: 15px;
+    margin-left: 1px;
   }
 }
 

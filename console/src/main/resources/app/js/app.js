@@ -39,6 +39,15 @@ loMod.config(['$routeProvider', function($routeProvider) {
         }
       }
     })
+    .when('/example-applications', {
+      templateUrl : '/admin/console/partials/applications-example.html',
+      controller : 'AppListCtrl',
+      resolve: {
+        loAppList : function(LoAppListLoader) {
+          return new LoAppListLoader();
+        }
+      }
+    })
     .when('/applications/:appId', {
       redirectTo: '/applications/:appId/dashboard'
     })
