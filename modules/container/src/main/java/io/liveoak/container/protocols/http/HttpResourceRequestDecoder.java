@@ -181,7 +181,7 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<DefaultH
         if (spec != null) {
             return new Sorting(spec);
         }
-        return null;
+        return new Sorting();
     }
 
     private static int limit(int value, int lower, int upper) {

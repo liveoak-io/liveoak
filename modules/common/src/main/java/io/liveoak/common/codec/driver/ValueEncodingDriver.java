@@ -42,6 +42,8 @@ public class ValueEncodingDriver extends AbstractEncodingDriver {
             encoder().writeValue((Map) o);
         } else if (o == null) {
             encoder().writeNullValue();
+        } else if (o instanceof Enum) {
+            encoder().writeValue(o.toString());
         } else {
             throw new NonEncodableValueException(o);
         }

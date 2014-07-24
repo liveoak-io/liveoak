@@ -17,4 +17,8 @@ public class InvalidPropertyTypeException extends Exception {
     private String name;
     private Class<?> requestedType;
 
+    @Override
+    public String getMessage() {
+        return "Invalid property type. The property named '" + name + "' expects a type of " + requestedType.getSimpleName();
+    }
 }

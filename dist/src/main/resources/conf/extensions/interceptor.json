@@ -20,6 +20,9 @@
                 },
                 {
                     interceptor-name: 'acl-updater'
+                },
+                {
+                    interceptor-name: 'script-interceptor'
                 }
             ]
     }
