@@ -2,6 +2,8 @@ package io.liveoak.pgsql;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -46,10 +48,110 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         testCreateFirstOrderItem();
 
         // read all orders expanded
+        testReadOrdersExpanded();
+        testReadOrdersDoubleExpanded();
 
-        // delete an order cascading - include all the order items
+    }
 
-        // delete items collection, and orders collection
+    private void testReadOrdersExpanded() throws IOException {
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?fields=*(*)");
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        String result = getRequest(get);
+        System.out.println(result);
+
+        String expected = "{                                                                     \n" +
+                "  'id' : '" + schema_two + ".orders',                                           \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
+                "  },                                                                            \n" +
+                "  'count' : 1,                                                                  \n" +
+                "  'type' : 'collection',                                                        \n" +
+                "  'members' : [ {                                                               \n" +
+                "    'id' : '014-1003095',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'         \n" +
+                "    },                                                                          \n" +
+                "    'order_id' : '014-1003095',                                                 \n" +
+                "    'create_date' : 1402146615000,                                              \n" +
+                "    'total' : 18990,                                                            \n" +
+                "    'addresses' : {                                                             \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      }                                                                         \n" +
+                "    },                                                                          \n" +
+                "    'items' : [ {                                                               \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/items/I39845355'                             \n" +
+                "      }                                                                         \n" +
+                "    } ]                                                                         \n" +
+                "  } ]                                                                           \n" +
+                "}";
+
+        checkResult(result, expected);
+    }
+
+    private void testReadOrdersDoubleExpanded() throws IOException {
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?fields=*(*(*))");
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        String result = getRequest(get);
+        System.out.println(result);
+
+        String expected = "{                                                                     \n" +
+                "  'id' : '" + schema_two + ".orders',                                           \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
+                "  },                                                                            \n" +
+                "  'count' : 1,                                                                  \n" +
+                "  'type' : 'collection',                                                        \n" +
+                "  'members' : [ {                                                               \n" +
+                "    'id' : '014-1003095',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'         \n" +
+                "    },                                                                          \n" +
+                "    'order_id' : '014-1003095',                                                 \n" +
+                "    'create_date' : 1402146615000,                                              \n" +
+                "    'total' : 18990,                                                            \n" +
+                "    'addresses' : {                                                             \n" +
+                "      'id': '1',                                                                \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      },                                                                        \n" +
+                "      'address_id': 1,                                                          \n" +
+                "      'name': 'John F. Doe',                                                    \n" +
+                "      'street': 'Liveoak street 7',                                             \n" +
+                "      'postcode': null,                                                         \n" +
+                "      'city': 'London',                                                         \n" +
+                "      'country_iso': 'UK',                                                      \n" +
+                "      'is_company': false,                                                      \n" +
+                "      '" + schema + ".orders': [ ],                                             \n" +
+                "      '" + schema_two + ".orders' : [ {                                         \n" +
+                "        'self': {                                                               \n" +
+                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-1003095'     \n" +
+                "        }                                                                       \n" +
+                "      } ]                                                                       \n" +
+                "    },                                                                          \n" +
+                "    'items' : [ {                                                               \n" +
+                "      'id': 'I39845355',                                                        \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/items/I39845355'                             \n" +
+                "      },                                                                        \n" +
+                "      'item_id': 'I39845355',                                                   \n" +
+                "      'name': 'The Gadget',                                                     \n" +
+                "      'quantity': 1,                                                            \n" +
+                "      'price': 39900,                                                           \n" +
+                "      'vat': 20,                                                                \n" +
+                "      '" + schema_two + ".orders' : {                                           \n" +
+                "        'self' : {                                                              \n" +
+                "          'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'     \n" +
+                "        }                                                                       \n" +
+                "      }                                                                         \n" +
+                "    } ]                                                                         \n" +
+                "  } ]                                                                           \n" +
+                "}";
+
+        checkResult(result, expected);
     }
 
     private void testInitialCollections() throws IOException {
@@ -66,7 +168,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  },                                                                \n" +
                 "  'count' : 3,                                                      \n" +
                 "  'type' : 'database',                                              \n" +
-                "  'members' : [ {                                                  \n" +
+                "  'members' : [ {                                                   \n" +
                 "    'id' : 'addresses',                                             \n" +
                 "    'self' : {                                                      \n" +
                 "      'href' : '/testApp/sqldata/addresses'                         \n" +
