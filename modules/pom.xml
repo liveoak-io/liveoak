@@ -114,6 +114,7 @@
         <module>security-uripolicy</module>
         <module>security-aclpolicy</module>
         <module>security-droolspolicy</module>
+        <module>scripts</module>
         <module>ups</module>
     </modules>
 </project>

@@ -243,6 +243,13 @@
             <artifactId>org.eclipse.jgit</artifactId>
             <scope>compile</scope>
         </dependency>
+
+        <!-- DynJS -->
+        <dependency>
+            <groupId>org.dynjs</groupId>
+            <artifactId>dynjs</artifactId>
+        </dependency>
+
     </dependencies>
     <build>
         <pluginManagement>

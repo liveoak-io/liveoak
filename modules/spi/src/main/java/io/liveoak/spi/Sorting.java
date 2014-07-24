@@ -28,6 +28,10 @@ public class Sorting implements Iterable<Sorting.Spec> {
 
     private List<Spec> specs = new LinkedList<>();
 
+
+    //TODO: remove this. This exposes the implementation details of how the client specifies the
+    // sorting in the request. This class should only deal with Specs directly, not a specialized string.
+    // The class which reads the query parameter is the one which should be separating out the values.
     public Sorting(String sortingSpec) {
         String[] spec = sortingSpec.split(",");
 
@@ -47,6 +51,17 @@ public class Sorting implements Iterable<Sorting.Spec> {
         }
     }
 
+    public Sorting() {
+    }
+
+    public Sorting(List<Spec> specs) {
+        this.specs = new LinkedList<>(specs);
+    }
+
+    public List<Spec> specs() {
+        return this.specs;
+    }
+
     public Iterator<Spec> iterator() {
         return Collections.unmodifiableList(specs).iterator();
     }
@@ -55,7 +70,7 @@ public class Sorting implements Iterable<Sorting.Spec> {
         private String name;
         private boolean ascending;
 
-        private Spec(String name, boolean ascending) {
+        public Spec(String name, boolean ascending) {
             this.name = name;
             this.ascending = ascending;
         }
@@ -64,8 +79,16 @@ public class Sorting implements Iterable<Sorting.Spec> {
             return ascending;
         }
 
+        public void ascending(boolean ascending) {
+            this.ascending = ascending;
+        }
+
         public String name() {
             return name;
+        }
+
+        public void name(String name) {
+            this.name = name;
         }
     }
 }
