@@ -6,17 +6,16 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import io.liveoak.pgsql.data.Id;
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.state.ResourceRef;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 
@@ -249,12 +248,17 @@ public class QueryBuilder {
             if (fk != null) {
                 String field = catalog.table(fk.tableRef()).id();
                 Object resRef = state.getProperty(field);
-                if (resRef instanceof ResourceState) {
-                    Id fkId = new Id(catalog.table(fk.tableRef()).pk(), ((ResourceState) resRef).id());
-                    values.add(fkId.valueForIndex(fk.indexForColumn(c.name())));
-                } else {
+                String id = null;
+                if (resRef instanceof ResourceRef) {
+                    id = ((ResourceRef) resRef).resourcePath().tail().toString();
+                } else if (resRef instanceof ResourceState) {
+                    id = ((ResourceState) resRef).id();
+                }
+                if (id == null) {
                     throw new RuntimeException("Invalid value for field: " + field);
                 }
+                Id fkId = new Id(catalog.table(fk.tableRef()).pk(), id);
+                values.add(fkId.valueForIndex(fk.indexForColumn(c.name())));
             } else {
                 values.add(state.getProperty(c.name()));
             }
@@ -329,18 +333,24 @@ public class QueryBuilder {
             throw new RuntimeException("Invalid value for '" + field + "': " + val);
         }
 
-        Object self = ((ResourceState) val).getProperty("self");
-        if (self == null || self instanceof ResourceState == false) {
-            throw new RuntimeException("Not a valid resource reference - no 'self' - for '" + field + "': " + val);
-        }
+        String href = null;
+        if (val instanceof ResourceRef) {
+            href = ((ResourceRef) val).uri().toString();
+            if (href == null) {
+                throw new RuntimeException("Not a valid resource reference - empty uri - for '" + field + "': " + val);
+            }
+        } else {
+            Object self = ((ResourceState) val).getProperty("self");
+            if (self == null || self instanceof ResourceState == false) {
+                throw new RuntimeException("Not a valid resource reference - no 'self' - for '" + field + "': " + val);
+            }
 
-        String href = ((ResourceState) self).getPropertyAsString("href");
-        if (href == null) {
-            throw new RuntimeException("Not a valid resource reference - no 'self/href' - for '" + field + "': " + val);
+            href = ((ResourceState) self).getPropertyAsString("href");
+            if (href == null) {
+                throw new RuntimeException("Not a valid resource reference - no 'self/href' - for '" + field + "': " + val);
+            }
         }
         return new ResourcePath(href).tail().toString();
-
-        //return new ResourcePath(((ResourceState) val).uri().toString()).tail().toString();
     }
 
     public QueryResults querySelectFromTableWhereIds(RequestContext ctx, Connection con, Table table, String [] ids) throws SQLException {

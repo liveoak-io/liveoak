@@ -1,22 +1,9 @@
 package io.liveoak.pgsql;
 
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import io.liveoak.common.DefaultReturnFields;
-import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * See superclass JavaDoc for how to set up PostgreSQL for this test.
@@ -103,8 +90,8 @@ public class PgSqlReadCollectionTest extends BasePgSqlTest {
                     "is_company", true,
                     schema + ".orders", list(),
                     schema_two + ".orders", list(
-                    resourceRef("/testApp/sqldata/" + schema_two + ".orders/014-2004096"),
-                    resourceRef("/testApp/sqldata/" + schema_two + ".orders/014-2004345"))
+                        resourceRef("/testApp/sqldata/" + schema_two + ".orders/014-2004096"),
+                        resourceRef("/testApp/sqldata/" + schema_two + ".orders/014-2004345"))
             });
         }
         ResourceState expected = resource(endpoint, new Object[] {

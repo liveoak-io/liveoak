@@ -1,8 +1,5 @@
 package io.liveoak.pgsql;
 
-import java.net.URI;
-import java.util.Comparator;
-
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.state.ResourceState;
@@ -153,7 +150,7 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                 "quantity", 1,
                 "price", 39900,
                 "vat", 20,
-                schema_two + ".orders", resource("014-2004096", "/testApp/" + BASEPATH + "/" + schema_two + ".orders", new Object[] {})
+                schema_two + ".orders", resourceRef("/testApp/" + BASEPATH + "/" + schema_two + ".orders/014-2004096")
         });
         result = client.create(ctx("*(*)"), endpoint, body);
         System.out.println(result);
@@ -183,7 +180,7 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                 "quantity", 1,
                 "price", 32500,
                 "vat", 20,
-                schema_two + ".orders", resource("014-2004345", "/testApp/" + BASEPATH + "/" + schema_two + ".orders", new Object[] {})
+                schema_two + ".orders", resourceRef("014-2004345", "/testApp/" + BASEPATH + "/" + schema_two + ".orders")
         });
 
         result = client.update(ctx("*(*)"), endpoint + "/I39845355", body);

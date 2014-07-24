@@ -216,14 +216,6 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
         ps.execute();
     }
 
-    protected ResourceState resourceRef(String id, String parent) throws URISyntaxException {
-        return resourceRef(parent + "/" + id);
-    }
-
-    protected ResourceState resourceRef(String uri) throws URISyntaxException {
-        return new DefaultResourceRef(new URI(uri));
-    }
-
     protected RequestContext ctx(String pat) {
         return new RequestContext.Builder()
                 .requestAttributes(new DefaultRequestAttributes())
@@ -321,6 +313,14 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
             state.members().add(resource);
         }
         return state;
+    }
+
+    protected ResourceState resourceRef(String id, String parent) throws URISyntaxException {
+        return resourceRef(parent + "/" + id);
+    }
+
+    protected ResourceState resourceRef(String uri) throws URISyntaxException {
+        return new DefaultResourceRef(new URI(uri));
     }
 
     protected List<ResourceState> sorted(Comparator<ResourceState> cmp, ResourceState... members) {

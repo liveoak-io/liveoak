@@ -44,6 +44,12 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
         // create a new item
         testCreateFirstOrderItem();
+
+        // read all orders expanded
+
+        // delete an order cascading - include all the order items
+
+        // delete items collection, and orders collection
     }
 
     private void testInitialCollections() throws IOException {
@@ -194,9 +200,9 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'price': 39900,                                                               \n" +
                 "  'vat': 20,                                                                    \n" +
                 "  '" + schema_two + ".orders': {                                                \n" +
-                "    'id': '014-2004096',                                                        \n" +
+                "    'id': '014-2004096',                                                        \n" +   // TODO: 'id' is silently ignored - maybe not ok
                 "    'self': {                                                                   \n" +
-                "      'href': '/testApp/" + BASEPATH + "/" + schema_two + ".orders/014-2004096' \n" +
+                "      'href': '/testApp/" + BASEPATH + "/" + schema_two + ".orders/014-1003095' \n" +
                 "    }                                                                           \n" +
                 "  }                                                                             \n" +
                 "}";
@@ -208,7 +214,23 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         String result = postRequest(post, json);
         System.out.println(result);
 
-        String expected = "";
+        String expected = "{                                                                     \n" +
+                "  'id': 'I39845355',                                                            \n" +
+                "  'self': {                                                                     \n" +
+                "    'href': '/testApp/" + BASEPATH + "/items/I39845355'                         \n" +
+                "  },                                                                            \n" +
+                "  'item_id': 'I39845355',                                                       \n" +
+                "  'name': 'The Gadget',                                                         \n" +
+                "  'quantity': 1,                                                                \n" +
+                "  'price': 39900,                                                               \n" +
+                "  'vat': 20,                                                                    \n" +
+                "  '" + schema_two + ".orders': {                                                \n" +
+                "    'self': {                                                                   \n" +
+                "      'href': '/testApp/" + BASEPATH + "/" + schema_two + ".orders/014-1003095' \n" +
+                "    }                                                                           \n" +
+                "  }                                                                             \n" +
+                "}";
+
         checkResult(result, expected);
     }
 
@@ -276,7 +298,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         String expected =  "{                                                        \n" +
                 "  'id': '014-1003095',                                              \n" +
                 "  'self': {                                                         \n" +
-                "    'href': '/testApp/" + BASEPATH + "/" + schema_two + ".orders/014-1003095'          \n" +
+                "    'href': '/testApp/" + BASEPATH + "/" + schema_two + ".orders/014-1003095'   \n" +
                 "  },                                                                \n" +
                 "  'order_id': '014-1003095',                                        \n" +
                 "  'create_date': 1402146615000,                                     \n" +
