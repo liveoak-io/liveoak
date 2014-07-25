@@ -15,7 +15,7 @@
 
         <div class="panel" ng-hide="collectionList.length > 0">
           <div class="panel-body text-center empty-instance">
-            <i class="fa fa-files-o"></i>
+            <i class="fa fa-table"></i>
             <p>This storage resource currently has no collections.</p>
             <a ng-click="modalCollectionAdd()" class="btn btn-primary btn-lg">New Collection</a>
           </div>
@@ -49,12 +49,22 @@
 
           <div class="pull-right">
             <!-- Add Collection Modal -->
-            <button class="btn btn-default btn-lg" ng-click="modalCollectionAdd()">Add Collection</button>
+            <button class="btn btn-default btn-lg" ng-click="modalCollectionAdd()">New Collection</button>
           </div>
         </div>
 
         <hr ng-show="collectionList.length > 0"/>
-
+        
+        <div class="alert alert-info" ng-show="collectionList.length > 0">
+<!--
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+            <span class="pficon pficon-close"></span>
+          </button>
+-->
+          <span class="pficon pficon-info"></span>
+          <strong>Use JSON Syntax in the table cells.</strong> Learn more about <a href="http://www.w3schools.com/json/json_syntax.asp" target="_blank">JSON Syntax</a>.
+        </div>
+        
         <form name="collectionForm" class="lo-form-horizontal clearfix" ng-show="collectionList.length > 0">
           <table class="table table-striped table-bordered">
             <thead>

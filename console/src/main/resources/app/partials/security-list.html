@@ -26,7 +26,7 @@
 
           <span ng-hide="(storageList.length === 0) || (unsecuredColls.length > 0)">
             <p>This application has no collections to be secured. Start creating a collection to secure it.</p>
-            <a href="" class="btn btn-primary btn-lg" type="button" ng-click="modalCollectionAdd()">Create Collection</a>
+            <a href="" class="btn btn-primary btn-lg" type="button" ng-click="modalCollectionAdd()">New Collection</a>
           </span>
 
           <span ng-show="unsecuredColls.length > 0">
@@ -53,14 +53,13 @@
 
     <div class="lo-info-pane col-md-3 clearfix">
     
-      <!-- In case of no collections in this app -->
+      <!-- In case of no unsecured collections in this app -->
+      
       <section class="lo-tutorials" ng-hide="unsecuredColls.length > 0">
-        <h3><span>LiveOak</span> Tutorials</h3>
-        <i class="fa fa-file-text-o fa-4x"></i>
-        <p>
-          Explore LiveOak Documentation and learn how to set up Security Data and Push.
-        </p>
-        <a href="#">How to start your own app »</a>
+        <h3><span>{{curApp.name}}</span> Unsecured Collections</h3>
+        <i class="fa fa-table fa-4x"></i>
+        <p>You have no unsecured collections in this application.</p>
+        <a href="#/applications/{{curApp.id}}/storage">View storage »</a>
       </section>
 
       <!-- In case of have collections not secured -->
@@ -68,7 +67,7 @@
       
       <ul ng-show="unsecuredColls.length > 0">
         <li ng-repeat="c in unsecuredColls">
-          <i class="fa fa-chevron-right" style="font-size: 11px;"></i> <a href="#/applications/{{curApp.name}}/security/policies/{{c.storage}}/{{c.collection}}">{{c.storage}} / {{c.collection}}</a>
+          <i class="fa fa-chevron-right"></i> <a href="#/applications/{{curApp.name}}/security/policies/{{c.storage}}/{{c.collection}}">{{c.storage}} / {{c.collection}}</a>
           <a class="btn-icon" href="#/applications/{{curApp.name}}/storage/{{c.storage}}/browse/{{c.collection}}" data-tooltip-placement="top" data-tooltip="View Collection">
             <i class="fa fa-table"></i>
             <span>View Collection</span>

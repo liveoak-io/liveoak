@@ -913,6 +913,11 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   }
 }
 
+.security-list .lo-info-pane .fa-chevron-right {
+  font-size: 11px;
+  color: @c_graylight;
+}
+
 .lo-tutorials {
 
   i {
@@ -1054,11 +1059,6 @@ p.form-info {
   }
 }
 
-.security-user .bootstrap-select.btn-group:not(.input-group-btn), 
-.security-user .bootstrap-select.btn-group[class*="span"] {
-  margin-bottom: 0;
-}
-
 .radio-inline, .checkbox-inline {
   padding-left: 0;
 }
@@ -1071,6 +1071,14 @@ p.form-info {
   .alert {
     margin-bottom: 0;
     z-index: 1051;
+  }
+}
+
+.security-user,
+.storage-collections {
+  .bootstrap-select.btn-group:not(.input-group-btn),
+  .bootstrap-select.btn-group[class*="span"] {
+    margin-bottom: 0;
   }
 }
 
@@ -2025,7 +2033,6 @@ legend {
 
     span .btn-icon {
       margin-left: 5px;
-      margin-top: -7px;
     }
   }
 

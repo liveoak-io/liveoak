@@ -3,7 +3,7 @@
     <button type="button" class="close" ng-click="cancel()">
       <span class="pficon pficon-close"></span>
     </button>
-    <h4 class="modal-title">Create New Collection</h4>
+    <h4 class="modal-title">New Collection</h4>
   </div>
   <div class="modal-body">
     <div class="form-group clearfix">
@@ -20,6 +20,6 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button type="submit" class="btn btn-primary" ng-click="collectionCreate(collectionName); close()" ng-disabled="!(collectionName && loCollectionCreate.collectionName.$valid)">Add</button>
+    <button type="submit" class="btn btn-primary" ng-click="collectionCreate(collectionName); close()" ng-disabled="!(collectionName && loCollectionCreate.collectionName.$valid)">Create</button>
   </div>
 </form>
