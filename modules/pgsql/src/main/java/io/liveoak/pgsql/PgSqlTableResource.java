@@ -44,6 +44,10 @@ public class PgSqlTableResource implements Resource {
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
 
         // perform select and store it for readMembers
+        if (results != null) {
+            sink.close();
+            return;
+        }
         results = queryTable(id, null, ctx);
 
         sink.accept("count", results.count());
@@ -104,7 +108,11 @@ public class PgSqlTableResource implements Resource {
         }
         // trigger schema reload
         parent.configuration().reloadSchema();
-        responder.resourceDeleted(null);
+
+        // TODO - does it make sense to return a body here at all? Container fails to set Content-Length if resourceDeleted(null)
+        // only return id and uri in response - no members
+        results = new QueryResults();
+        responder.resourceDeleted(this);
     }
 
     public QueryResults queryResults() {
@@ -119,7 +127,7 @@ public class PgSqlTableResource implements Resource {
             if (id == null) {
                 return qb.querySelectFromTable(ctx, con, t);
             } else {
-                return qb.querySelectFromTableWhereIds(ctx, con, t, new String[] {id});
+                return qb.querySelectFromTableWhereId(ctx, con, t, id);
             }
         }
     }

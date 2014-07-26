@@ -16,6 +16,7 @@ import io.liveoak.pgsql.meta.QueryBuilder;
 import io.liveoak.pgsql.meta.Table;
 import io.liveoak.pgsql.meta.TableRef;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -65,78 +66,81 @@ public class PgSqlRowResource implements Resource {
     }
 
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+        if (row == null) {
+            sink.close();
+            return;
+        }
+
         Catalog cat = parent.parent().getCatalog();
         Table table = cat.table(new TableRef(parent.id()));
         HashMap<ForeignKey, String[]> fkMap = new HashMap<>();
 
-        if (row != null) {
-            for (Map.Entry<String, Object> ent : row.asMap().entrySet()) {
-                // encode FKs as ResourceRefs
-                // use container? to expand ResourceRefs - to optimize we need to expand many ResourceRefs in one call
-                // That requires a direct api - e.g. readMembers(List<String> ids)
-                // Or ids query param that is a generalized queryById
-                // or a specific query param or url syntax e.g. /test/orders/0001|0002|0003|0004
+        for (Map.Entry<String, Object> ent : row.asMap().entrySet()) {
+            // encode FKs as ResourceRefs
+            // use container? to expand ResourceRefs - to optimize we need to expand many ResourceRefs in one call
+            // That requires a direct api - e.g. readMembers(List<String> ids)
+            // Or ids query param that is a generalized queryById
+            // or a specific query param or url syntax e.g. /test/orders/0001|0002|0003|0004
 
-                // Naming convention - we use table name as a key for ResourceRef rather than a FK column name
-                // since there may be multiple columns involved in construction of the reference
+            // Naming convention - we use table name as a key for ResourceRef rather than a FK column name
+            // since there may be multiple columns involved in construction of the reference
 
-                // We withold FK columns until we make a full pass, and then process them at the end where we have all the
-                // FK column values ready, and can construct identifiers
-                ForeignKey fk = table.foreignKeyForColumnName(ent.getKey());
-                if (fk != null) {
-                    String[] cols = fkMap.get(fk);
-                    if (cols == null) {
-                        cols = new String[fk.columns().size()];
-                        fkMap.put(fk, cols);
-                    }
-                    int i = 0;
-                    for (Column col : fk.columns()) {
-                        if (col.name().equals(ent.getKey())) {
-                            cols[i] = String.valueOf(ent.getValue()); // TODO: helper method asString
-                        }
-                        i++;
-                    }
-                } else {
-                    sink.accept(ent.getKey(), ent.getValue());
+            // We withold FK columns until we make a full pass, and then process them at the end where we have all the
+            // FK column values ready, and can construct identifiers
+            ForeignKey fk = table.foreignKeyForColumnName(ent.getKey());
+            if (fk != null) {
+                String[] cols = fkMap.get(fk);
+                if (cols == null) {
+                    cols = new String[fk.columns().size()];
+                    fkMap.put(fk, cols);
                 }
-            }
-
-
-            // if there are any fks it's time to process them
-            for (Map.Entry<ForeignKey, String[]> ent : fkMap.entrySet()) {
-                String fkTable = cat.table(ent.getKey().tableRef()).id();
-                sink.accept(fkTable, new PgSqlResourceRef(
-                        new PgSqlTableResource(parent.parent(), fkTable),
-                        PrimaryKey.spliceId(ent.getValue())));
-            }
-
-            // if there are any referredKeys write synthetic object
-            //HashMap<ForeignKey, String[]> refFkMap = new HashMap<>();
-            // address has address_id PK, orders has address_id fk
-            // Here we have Row of select from addresses
-            // we have to make a query select from orders where address_id = row.get(pk)
-            for (ForeignKey fk : table.referredKeys()) {
-                QueryBuilder builder = new QueryBuilder(cat);
-                try (Connection con = parent.parent().getConnection()) {
-                    List<Column> cols = fk.columns();
-                    Table tab = cat.table(cols.get(0).tableRef());
-
-                    LinkedList<Object> vals = new LinkedList();
-                    for (Column c : table.pk().columns()) {
-                        vals.add(row.value(c.name()));
+                int i = 0;
+                for (Column col : fk.columns()) {
+                    if (col.name().equals(ent.getKey())) {
+                        cols[i] = String.valueOf(ent.getValue()); // TODO: helper method asString
                     }
-                    if (cols.size() != vals.size()) {
-                        throw new IllegalStateException("Primary key column count on " + table.id() + " doesn't match foreign key column count on " + tab.id());
-                    }
-
-                    QueryResults results = builder.querySelectFromTable(ctx, con, tab, cols, vals);
-                    LinkedList ls = new LinkedList();
-                    for (Row r : results.rows()) {
-                        ls.add(new PgSqlRowResource(
-                                new PgSqlTableResource(parent.parent(), tab.id()), r));
-                    }
-                    sink.accept(tab.id(), ls);
+                    i++;
                 }
+            } else {
+                sink.accept(ent.getKey(), ent.getValue());
+            }
+        }
+
+
+        // if there are any fks it's time to process them
+        for (Map.Entry<ForeignKey, String[]> ent : fkMap.entrySet()) {
+            String fkTable = cat.table(ent.getKey().tableRef()).id();
+            sink.accept(fkTable, new PgSqlResourceRef(
+                    new PgSqlTableResource(parent.parent(), fkTable),
+                    PrimaryKey.spliceId(ent.getValue())));
+        }
+
+        // if there are any referredKeys write synthetic object
+        //HashMap<ForeignKey, String[]> refFkMap = new HashMap<>();
+        // address has address_id PK, orders has address_id fk
+        // Here we have Row of select from addresses
+        // we have to make a query select from orders where address_id = row.get(pk)
+        for (ForeignKey fk : table.referredKeys()) {
+            QueryBuilder builder = new QueryBuilder(cat);
+            try (Connection con = parent.parent().getConnection()) {
+                List<Column> cols = fk.columns();
+                Table tab = cat.table(cols.get(0).tableRef());
+
+                LinkedList<Object> vals = new LinkedList();
+                for (Column c : table.pk().columns()) {
+                    vals.add(row.value(c.name()));
+                }
+                if (cols.size() != vals.size()) {
+                    throw new IllegalStateException("Primary key column count on " + table.id() + " doesn't match foreign key column count on " + tab.id());
+                }
+
+                QueryResults results = builder.querySelectFromTable(ctx, con, tab, cols, vals);
+                LinkedList ls = new LinkedList();
+                for (Row r : results.rows()) {
+                    ls.add(new PgSqlRowResource(
+                            new PgSqlTableResource(parent.parent(), tab.id()), r));
+                }
+                sink.accept(tab.id(), ls);
             }
         }
         sink.close();
@@ -155,11 +159,16 @@ public class PgSqlRowResource implements Resource {
 
     @Override
     public void delete(RequestContext ctx, Responder responder) throws Exception {
+        ResourceParams params = ctx.resourceParams();
+        boolean cascade = params != null && params.contains("cascade");
+
         Catalog cat = parent.parent().getCatalog();
         Table table = cat.table(new TableRef(parent.id()));
         try (Connection c = parent.parent().getConnection()) {
-            new QueryBuilder(cat).executeDelete(ctx, c, table, id);
+            new QueryBuilder(cat).executeDelete(ctx, c, table, id, cascade);
         }
+
+        this.row = null;
         responder.resourceDeleted(this);
     }
 }

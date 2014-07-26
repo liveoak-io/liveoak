@@ -13,6 +13,7 @@ import java.util.List;
 import io.liveoak.pgsql.data.Id;
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
+import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.state.ResourceRef;
@@ -31,7 +32,7 @@ public class QueryBuilder {
     public QueryBuilder(Catalog catalog) {
         this.catalog = catalog;
     }
-
+/*
     public String selectAllFromTable(String table) {
         Table tableDef = catalog.table(new TableRef(table));
         if (tableDef == null) {
@@ -40,86 +41,42 @@ public class QueryBuilder {
 
         return selectAllFromTable(tableDef);
     }
-
+*/
     public String selectAllFromTable(Table table) {
         return "SELECT * FROM " + table.quotedSchemaName();
     }
 
-    public PreparedStatement prepareSelectAllFromTable(Connection con, Table table) throws SQLException {
-        return con.prepareStatement(selectAllFromTable(table));
+    public PreparedStatement prepareSelectAllFromTable(Connection con, Pagination pagination, String table) throws SQLException {
+        Table tableDef = catalog.table(new TableRef(table));
+        if (tableDef == null) {
+            throw new IllegalStateException("No such table: " + table);
+        }
+        return prepareSelectAllFromTable(con, pagination, tableDef);
     }
 
-    public PreparedStatement prepareSelectAllFromTable(Connection con, String table) throws SQLException {
-        return con.prepareStatement(selectAllFromTable(table));
+    public PreparedStatement prepareSelectAllFromTable(Connection con, Pagination pagination, Table table) throws SQLException {
+        String offset = pagination.offset() > 0 ? " OFFSET " + pagination.offset() : "";
+        return con.prepareStatement(selectAllFromTable(table) + " LIMIT " + pagination.limit() + offset);
     }
 
-    public PreparedStatement prepareSelectFromTableWhereId(Connection con, String table, String id) throws SQLException {
-        return prepareSelectFromTableWhereIds(con, table, new String[]{id});
-    }
-
-    public PreparedStatement prepareSelectFromTableWhereIds(Connection con, String table, String[] ids) throws SQLException {
+    public PreparedStatement prepareSelectFromTableWhereId(Connection con, Pagination pagination, String table, String id) throws SQLException {
         Table tableDef = catalog.table(new TableRef(table));
         if (tableDef == null) {
             throw new IllegalStateException("No such table: " + table);
         }
 
-        return prepareSelectFromTableWhereIds(con, tableDef, ids);
+        return prepareSelectFromTableWhereId(con, pagination, tableDef, id);
     }
 
-    public PreparedStatement prepareSelectFromTableWhereIds(Connection con, Table table, String[] ids) throws SQLException {
-
-        if (ids == null || ids.length == 0) {
-            throw new IllegalArgumentException("ids is null or empty");
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append(selectAllFromTable(table) + " WHERE ");
-
-        LinkedList<String[]> parsed = new LinkedList<>();
-        List<Column> cols = null;
-        int i = 0;
-        for (String id: ids) {
-            if (i > 0) {
-                sb.append(" OR ");
-            }
-            String[] vals = PrimaryKey.splitId(id);
-            parsed.add(vals);
-
-            cols = table.pk().columns();
-
-            if (cols.size() != vals.length) {
-                throw new IllegalStateException("Id is incompatible with table definition: " + table + " contains "
-                        + cols.size() + " columns, while id " + id + " contains " + vals.length + " components");
-            }
-            int j = 0;
-            for (Column c : cols) {
-                if (j > 0) {
-                    sb.append(" AND ");
-                } else if (ids.length > 1) {
-                    sb.append(" (");
-                }
-                sb.append(c.quotedName()).append("=?");
-                j++;
-            }
-            if (ids.length > 1) {
-                sb.append(")");
-            }
+    public PreparedStatement prepareSelectFromTableWhereId(Connection con, Pagination pagination, Table table, String id) throws SQLException {
+        if (id == null || id.length() == 0) {
+            throw new IllegalArgumentException("id is null or empty");
         }
 
-        PreparedStatement ps = con.prepareStatement(sb.toString());
-
-        i = 1;
-        for (String[] vals: parsed) {
-            for (String v: vals) {
-                cols.get(i % cols.size()).bindValue(ps, i, v);
-                i++;
-            }
-        }
-
-        return ps;
+        return prepareSelectFromTableWhere(con, pagination, table, table.pk().columns(), PrimaryKey.splitIdAsList(id));
     }
 
-
-    public PreparedStatement prepareSelectFromTableWhere(Connection con, Table table, List<Column> columns, List<Object> values) throws SQLException {
+    public PreparedStatement prepareSelectFromTableWhere(Connection con, Pagination pagination, Table table, List<Column> columns, List<?> values) throws SQLException {
         if (values == null || values.size() == 0) {
             throw new IllegalArgumentException("values is null or empty");
         }
@@ -131,7 +88,6 @@ public class QueryBuilder {
         StringBuilder sb = new StringBuilder();
         sb.append(selectAllFromTable(table) + " WHERE ");
 
-        //List<Column> cols = null;
         int i = 0;
         for (Column col: columns) {
             if (i > 0) {
@@ -140,6 +96,9 @@ public class QueryBuilder {
 
             sb.append(col.quotedName()).append("=?");
         }
+
+        String offset = pagination.offset() > 0 ? " OFFSET " + pagination.offset() : "";
+        sb.append(" LIMIT " + pagination.limit() + offset);
 
         PreparedStatement ps = con.prepareStatement(sb.toString());
 
@@ -292,34 +251,38 @@ public class QueryBuilder {
         return ps;
     }
 
-    private PreparedStatement prepareDelete(Connection con, Table table, String id) throws SQLException {
+    /**
+     *  ForeignKey identifies the table, and id fields to use for the delete
+     */
+    private PreparedStatement prepareDeleteWhere(Connection con, Table table, List<Column> columns, List<Object> values) throws SQLException {
+        if (values == null || values.size() == 0) {
+            throw new IllegalArgumentException("values is null or empty");
+        }
 
-        Id tableId = new Id(table.pk(), id);
-        StringBuilder sb = new StringBuilder("DELETE FROM " + table.quotedSchemaName() + " WHERE ");
+        if (columns.size() != values.size()) {
+            throw new IllegalStateException("Values size doesn't match columns size: (columns: " + columns + ", values: " + values + ")");
+        }
 
-        List<Object> values = new LinkedList<>();
-        List<Column> columns = new LinkedList<>();
+        StringBuilder sb = new StringBuilder();
+        sb.append("DELETE FROM " + table.quotedSchemaName() + " WHERE ");
 
         int i = 0;
-        for (Column c: table.pk().columns()) {
+        for (Column col: columns) {
             if (i > 0) {
                 sb.append(" AND ");
             }
-            sb.append(c.quotedName()).append("=?");
-            values.add(tableId.valueForIndex(i));
-            columns.add(c);
-            i++;
+
+            sb.append(col.quotedName()).append("=?");
         }
 
         PreparedStatement ps = con.prepareStatement(sb.toString());
-        Iterator valIt = values.iterator();
-        Iterator<Column> colIt = columns.iterator();
 
-        i = 1;
-        while(colIt.hasNext() && valIt.hasNext()) {
-            colIt.next().bindValue(ps, i, valIt.next());
+        i = 0;
+        for (Object val: values) {
+            columns.get(i).bindValue(ps, i + 1, val);
             i++;
         }
+
         return ps;
     }
 
@@ -353,32 +316,32 @@ public class QueryBuilder {
         return new ResourcePath(href).tail().toString();
     }
 
-    public QueryResults querySelectFromTableWhereIds(RequestContext ctx, Connection con, Table table, String [] ids) throws SQLException {
-        if (ids != null && ids.length > 0) {
-            return query(ctx, prepareSelectFromTableWhereIds(con, table, ids));
+    public QueryResults querySelectFromTableWhereId(RequestContext ctx, Connection con, Table table, String id) throws SQLException {
+        if (id != null && id.length() > 0) {
+            return query(ctx, prepareSelectFromTableWhereId(con, ctx.pagination(), table, id));
         } else {
-            return query(ctx, prepareSelectAllFromTable(con, table));
+            return query(ctx, prepareSelectAllFromTable(con, ctx.pagination(), table));
         }
     }
 
-    public QueryResults querySelectFromTableWhereIds(RequestContext ctx, Connection con, String table, String [] ids) throws SQLException {
-        if (ids != null && ids.length > 0) {
-            return query(ctx, prepareSelectFromTableWhereIds(con, table, ids));
+    public QueryResults querySelectFromTableWhereId(RequestContext ctx, Connection con, String table, String id) throws SQLException {
+        if (id != null && id.length() > 0) {
+            return query(ctx, prepareSelectFromTableWhereId(con, ctx.pagination(), table, id));
         } else {
-            return query(ctx, prepareSelectAllFromTable(con, table));
+            return query(ctx, prepareSelectAllFromTable(con, ctx.pagination(), table));
         }
     }
 
     public QueryResults querySelectFromTable(RequestContext ctx, Connection con, Table table) throws SQLException {
-        return query(ctx, prepareSelectAllFromTable(con, table));
+        return query(ctx, prepareSelectAllFromTable(con, ctx.pagination(), table));
     }
 
     public QueryResults querySelectFromTable(RequestContext ctx, Connection con, String table) throws SQLException {
-        return query(ctx, prepareSelectAllFromTable(con, table));
+        return query(ctx, prepareSelectAllFromTable(con, ctx.pagination(), table));
     }
 
     public QueryResults querySelectFromTable(RequestContext ctx, Connection con, Table table, List<Column> columns, List<Object> values) throws SQLException {
-        return query(ctx, prepareSelectFromTableWhere(con, table, columns, values));
+        return query(ctx, prepareSelectFromTableWhere(con, ctx.pagination(), table, columns, values));
     }
 
     public QueryResults query(RequestContext ctx, PreparedStatement ps) throws SQLException {
@@ -441,8 +404,31 @@ public class QueryBuilder {
         }
     }
 
-    public void executeDelete(RequestContext ctx, Connection con, Table table, String id) throws SQLException {
-        try (PreparedStatement ps = prepareDelete(con, table, id)) {
+    public void executeDelete(RequestContext ctx, Connection con, Table table, String id, boolean cascade) throws SQLException {
+
+        Id tableId = new Id(table.pk(), id);
+
+        List<Object> values = new LinkedList<>();
+        List<Column> columns = new LinkedList<>();
+
+        int i = 0;
+        for (Column c: table.pk().columns()) {
+            values.add(tableId.valueForIndex(i));
+            columns.add(c);
+            i++;
+        }
+
+        if (cascade) {
+            // first take care of references
+            for(ForeignKey ref: table.referredKeys()) {
+                TableRef refTableRef = ref.columns().get(0).tableRef();
+                Table refTable = catalog.table(refTableRef);
+                try (PreparedStatement ps = prepareDeleteWhere(con, refTable, ref.columns(), values)) {
+                    ps.executeUpdate();
+                }
+            }
+        }
+        try (PreparedStatement ps = prepareDeleteWhere(con, table, columns, values)) {
             ps.executeUpdate();
         }
     }

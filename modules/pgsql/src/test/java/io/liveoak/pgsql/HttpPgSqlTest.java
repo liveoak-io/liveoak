@@ -2,8 +2,6 @@ package io.liveoak.pgsql;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -12,9 +10,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.junit.After;
@@ -51,6 +51,84 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         testReadOrdersExpanded();
         testReadOrdersDoubleExpanded();
 
+        // delete an order cascading - include all the order items
+        testDeleteFirstOrderCascading();
+
+        // delete items collection
+        testDeleteOrderItemsCollection();
+
+        // GET all items and send them back to DELETE
+        //testBulkOrdersDeleteBySendingGetResponse();
+
+        // GET all collections and send response back to DELETE
+        //testBulkTablesDeleteBySendingGetResponse();
+    }
+
+    private void testDeleteOrderItemsCollection() throws IOException {
+        HttpDelete delete = new HttpDelete("http://localhost:8080/testApp/" + BASEPATH + "/items");
+        delete.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        String result = deleteRequest(delete);
+        System.out.println(result);
+
+        String expected = "{ \n" +
+                "  'id': 'items', \n" +
+                "  'self': { \n" +
+                "    'href': '/testApp/sqldata/items' \n" +
+                "  } \n" +
+                "}";
+
+        checkResult(result, expected);
+    }
+
+    private void testDeleteFirstOrderCascading() throws IOException {
+        HttpDelete delete = new HttpDelete("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders/014-1003095?cascade");
+        delete.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        String result = deleteRequest(delete);
+        System.out.println(result);
+        String expected = "{                                                                     \n" +
+                "  'id': '014-1003095',                                                          \n" +
+                "  'self': {                                                                     \n" +
+                "    'href': '/testApp/sqldata/" + schema_two + ".orders/014-1003095'            \n" +
+                "  }                                                                             \n" +
+                "}";
+
+        checkResult(result, expected);
+
+        // query orders - should get back no items
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?fields=*(*)");
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        result = getRequest(get);
+        System.out.println(result);
+
+        expected = "{                                                                     \n" +
+                "  'id' : '" + schema_two + ".orders',                                           \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
+                "  },                                                                            \n" +
+                "  'count' : 0,                                                                  \n" +
+                "  'type' : 'collection'                                                         \n" +
+                "}";
+        checkResult(result, expected);
+
+        // query order items - should get back no items
+        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/items?fields=*(*)");
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        result = getRequest(get);
+        System.out.println(result);
+
+        expected = "{                                                                            \n" +
+                "  'id' : 'items',                                                               \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/items'                                           \n" +
+                "  },                                                                            \n" +
+                "  'count' : 0,                                                                  \n" +
+                "  'type' : 'collection'                                                         \n" +
+                "}";
+        checkResult(result, expected);
     }
 
     private void testReadOrdersExpanded() throws IOException {
@@ -128,7 +206,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "      '" + schema + ".orders': [ ],                                             \n" +
                 "      '" + schema_two + ".orders' : [ {                                         \n" +
                 "        'self': {                                                               \n" +
-                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-1003095'     \n" +
+                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-1003095'      \n" +
                 "        }                                                                       \n" +
                 "      } ]                                                                       \n" +
                 "    },                                                                          \n" +
@@ -724,10 +802,17 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
     }
 
     public String getRequest(HttpGet get) throws IOException {
-
         System.err.println("DO GET - " + get.getURI());
+        return request(get);
+    }
 
-        CloseableHttpResponse result = httpClient.execute(get);
+    public String deleteRequest(HttpDelete delete) throws IOException {
+        System.err.println("DO DELETE - " + delete.getURI());
+        return request(delete);
+    }
+
+    private String request(HttpRequestBase request) throws IOException {
+        CloseableHttpResponse result = httpClient.execute(request);
 
         System.err.println("=============>>>");
         System.err.println(result);
