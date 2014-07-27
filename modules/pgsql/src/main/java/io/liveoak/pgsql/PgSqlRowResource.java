@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
@@ -15,6 +16,7 @@ import io.liveoak.pgsql.meta.PrimaryKey;
 import io.liveoak.pgsql.meta.QueryBuilder;
 import io.liveoak.pgsql.meta.Table;
 import io.liveoak.pgsql.meta.TableRef;
+import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -120,6 +122,7 @@ public class PgSqlRowResource implements Resource {
         // address has address_id PK, orders has address_id fk
         // Here we have Row of select from addresses
         // we have to make a query select from orders where address_id = row.get(pk)
+        HashMap<String, List<Resource>> stacked = new HashMap<>();
         for (ForeignKey fk : table.referredKeys()) {
             QueryBuilder builder = new QueryBuilder(cat);
             try (Connection con = parent.parent().getConnection()) {
@@ -134,14 +137,18 @@ public class PgSqlRowResource implements Resource {
                     throw new IllegalStateException("Primary key column count on " + table.id() + " doesn't match foreign key column count on " + tab.id());
                 }
 
-                QueryResults results = builder.querySelectFromTable(ctx, con, tab, cols, vals);
+                QueryResults results = builder.querySelectFromTable(con, tab, cols, vals, null, Pagination.NONE);
                 LinkedList ls = new LinkedList();
                 for (Row r : results.rows()) {
                     ls.add(new PgSqlRowResource(
                             new PgSqlTableResource(parent.parent(), tab.id()), r));
                 }
-                sink.accept(tab.id(), ls);
+                stacked.put(tab.id(), ls);
             }
+        }
+
+        for (Map.Entry<String, List<Resource>> ent: new TreeMap<>(stacked).entrySet()) {
+            sink.accept(ent.getKey(), ent.getValue());
         }
         sink.close();
     }

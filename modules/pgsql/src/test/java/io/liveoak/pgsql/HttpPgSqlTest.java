@@ -41,6 +41,11 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         // create an order
         testCreateFirstOrder();
 
+        // create another order
+        testCreateSecondOrder();
+
+        testSortLimitAndOffset();
+
         // create items table
         testCreateItemsCollection();
 
@@ -64,6 +69,71 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         //testBulkTablesDeleteBySendingGetResponse();
     }
 
+    private void testSortLimitAndOffset() throws IOException {
+        // get orders with limit 1, offset 1, sorted by total
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?sort=total&offset=1&limit=1&fields=*(*)");
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        String result = getRequest(get);
+        System.out.println(result);
+
+        String expected = "{                                                                     \n" +
+                "  'id' : '" + schema_two + ".orders',                                           \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
+                "  },                                                                            \n" +
+                "  'count' : 1,                                                                  \n" +
+                "  'type' : 'collection',                                                        \n" +
+                "  'members' : [ {                                                              \n" +
+                "    'id' : '014-2004096',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-2004096'         \n" +
+                "    },                                                                          \n" +
+                "    'order_id' : '014-2004096',                                                 \n" +
+                "    'create_date' : 1396429572000,                                              \n" +
+                "    'total' : 43800,                                                            \n" +
+                "    'addresses' : {                                                             \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      }                                                                         \n" +
+                "    }                                                                           \n" +
+                "  } ]                                                                           \n" +
+                "}";
+
+        checkResult(result, expected);
+
+        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?sort=-total&offset=1&limit=1&fields=*(*)");
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        result = getRequest(get);
+        System.out.println(result);
+
+        expected = "{                                                                            \n" +
+                "  'id' : '" + schema_two + ".orders',                                           \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
+                "  },                                                                            \n" +
+                "  'count' : 1,                                                                  \n" +
+                "  'type' : 'collection',                                                        \n" +
+                "  'members' : [ {                                                              \n" +
+                "    'id' : '014-1003095',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'         \n" +
+                "    },                                                                          \n" +
+                "    'order_id' : '014-1003095',                                                 \n" +
+                "    'create_date' : 1402146615000,                                              \n" +
+                "    'total' : 18990,                                                            \n" +
+                "    'addresses' : {                                                             \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      }                                                                         \n" +
+                "    }                                                                           \n" +
+                "  } ]                                                                           \n" +
+                "}";
+
+        checkResult(result, expected);
+    }
+
     private void testDeleteOrderItemsCollection() throws IOException {
         HttpDelete delete = new HttpDelete("http://localhost:8080/testApp/" + BASEPATH + "/items");
         delete.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
@@ -71,14 +141,17 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         String result = deleteRequest(delete);
         System.out.println(result);
 
-        String expected = "{ \n" +
-                "  'id': 'items', \n" +
-                "  'self': { \n" +
-                "    'href': '/testApp/sqldata/items' \n" +
-                "  } \n" +
+        String expected = "{                                                         \n" +
+                "  'id': 'items',                                                    \n" +
+                "  'self': {                                                         \n" +
+                "    'href': '/testApp/sqldata/items'                                \n" +
+                "  }                                                                 \n" +
                 "}";
 
         checkResult(result, expected);
+
+        // check current collections ... there should be no more /items
+        testInitialCollections();
     }
 
     private void testDeleteFirstOrderCascading() throws IOException {
@@ -96,20 +169,35 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
         checkResult(result, expected);
 
-        // query orders - should get back no items
+        // query orders - should get back the second order only
         HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?fields=*(*)");
         get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
         result = getRequest(get);
         System.out.println(result);
 
-        expected = "{                                                                     \n" +
+        expected = "{                                                                            \n" +
                 "  'id' : '" + schema_two + ".orders',                                           \n" +
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
                 "  },                                                                            \n" +
-                "  'count' : 0,                                                                  \n" +
-                "  'type' : 'collection'                                                         \n" +
+                "  'count' : 1,                                                                  \n" +
+                "  'type' : 'collection',                                                        \n" +
+                "  'members' : [ {                                                              \n" +
+                "    'id' : '014-2004096',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-2004096'         \n" +
+                "    },                                                                          \n" +
+                "    'order_id' : '014-2004096',                                                 \n" +
+                "    'create_date' : 1396429572000,                                              \n" +
+                "    'total' : 43800,                                                            \n" +
+                "    'addresses' : {                                                             \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      }                                                                         \n" +
+                "    },                                                                          \n" +
+                "    'items' : [ ]                                                               \n" +
+                "  } ]                                                                           \n" +
                 "}";
         checkResult(result, expected);
 
@@ -132,7 +220,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
     }
 
     private void testReadOrdersExpanded() throws IOException {
-        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?fields=*(*)");
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?sort=total&fields=*(*)");
         get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
         String result = getRequest(get);
@@ -143,7 +231,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
                 "  },                                                                            \n" +
-                "  'count' : 1,                                                                  \n" +
+                "  'count' : 2,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
                 "  'members' : [ {                                                               \n" +
                 "    'id' : '014-1003095',                                                       \n" +
@@ -163,6 +251,20 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "        'href' : '/testApp/sqldata/items/I39845355'                             \n" +
                 "      }                                                                         \n" +
                 "    } ]                                                                         \n" +
+                "  }, {                                                                          \n" +
+                "    'id' : '014-2004096',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-2004096'         \n" +
+                "    },                                                                          \n" +
+                "    'order_id' : '014-2004096',                                                 \n" +
+                "    'create_date' : 1396429572000,                                              \n" +
+                "    'total' : 43800,                                                            \n" +
+                "    'addresses' : {                                                             \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      }                                                                         \n" +
+                "    },                                                                          \n" +
+                "    'items' : [ ]                                                               \n" +
                 "  } ]                                                                           \n" +
                 "}";
 
@@ -181,7 +283,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
                 "  },                                                                            \n" +
-                "  'count' : 1,                                                                  \n" +
+                "  'count' : 2,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
                 "  'members' : [ {                                                               \n" +
                 "    'id' : '014-1003095',                                                       \n" +
@@ -208,6 +310,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "        'self': {                                                               \n" +
                 "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-1003095'      \n" +
                 "        }                                                                       \n" +
+                "      },{                                                                       \n" +
+                "        'self': {                                                               \n" +
+                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-2004096'      \n" +
+                "        }                                                                       \n" +
                 "      } ]                                                                       \n" +
                 "    },                                                                          \n" +
                 "    'items' : [ {                                                               \n" +
@@ -226,6 +332,38 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "        }                                                                       \n" +
                 "      }                                                                         \n" +
                 "    } ]                                                                         \n" +
+                "  }, {                                                                          \n" +
+                "    'id' : '014-2004096',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-2004096'         \n" +
+                "    },                                                                          \n" +
+                "    'order_id' : '014-2004096',                                                 \n" +
+                "    'create_date' : 1396429572000,                                              \n" +
+                "    'total' : 43800,                                                            \n" +
+                "    'addresses' : {                                                             \n" +
+                "      'id': '1',                                                                \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      },                                                                        \n" +
+                "      'address_id': 1,                                                          \n" +
+                "      'name': 'John F. Doe',                                                    \n" +
+                "      'street': 'Liveoak street 7',                                             \n" +
+                "      'postcode': null,                                                         \n" +
+                "      'city': 'London',                                                         \n" +
+                "      'country_iso': 'UK',                                                      \n" +
+                "      'is_company': false,                                                      \n" +
+                "      '" + schema + ".orders': [ ],                                             \n" +
+                "      '" + schema_two + ".orders' : [ {                                         \n" +
+                "        'self': {                                                               \n" +
+                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-1003095'      \n" +
+                "        }                                                                       \n" +
+                "      },{                                                                       \n" +
+                "        'self': {                                                               \n" +
+                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-2004096'      \n" +
+                "        }                                                                       \n" +
+                "      } ]                                                                       \n" +
+                "    },                                                                          \n" +
+                "    'items' : [ ]                                                               \n" +
                 "  } ]                                                                           \n" +
                 "}";
 
@@ -483,6 +621,45 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'order_id': '014-1003095',                                        \n" +
                 "  'create_date': 1402146615000,                                     \n" +
                 "  'total': 18990,                                                   \n" +
+                "  'addresses': {                                                    \n" +
+                "    'self': {                                                       \n" +
+                "      'href': '/testApp/" + BASEPATH + "/addresses/1'               \n" +
+                "    }                                                               \n" +
+                "  }                                                                 \n" +
+                "}";
+
+        checkResult(result, expected);
+    }
+
+    private void testCreateSecondOrder() throws IOException {
+        String endpoint = "/testApp/" + BASEPATH + "/" + schema_two + ".orders";
+
+        String json = "{                                                             \n" +
+                "  'id': '014-2004096',                                              \n" +
+                "  'create_date': '2014-04-02T11:06:12',                             \n" +
+                "  'total': 43800,                                                   \n" +
+                "  'addresses': {                                                    \n" +
+                "    'self': {                                                       \n" +
+                "      'href': '/testApp/" + BASEPATH + "/addresses/1'               \n" +
+                "    }                                                               \n" +
+                "  }                                                                 \n" +
+                "}";
+
+        HttpPost post = new HttpPost("http://localhost:8080" + endpoint);
+        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
+        post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        String result = postRequest(post, json);
+        System.out.println(result);
+
+        String expected =  "{                                                        \n" +
+                "  'id': '014-2004096',                                              \n" +
+                "  'self': {                                                         \n" +
+                "    'href': '/testApp/" + BASEPATH + "/" + schema_two + ".orders/014-2004096'   \n" +
+                "  },                                                                \n" +
+                "  'order_id': '014-2004096',                                        \n" +
+                "  'create_date': 1396429572000,                                     \n" +
+                "  'total': 43800,                                                   \n" +
                 "  'addresses': {                                                    \n" +
                 "    'self': {                                                       \n" +
                 "      'href': '/testApp/" + BASEPATH + "/addresses/1'               \n" +

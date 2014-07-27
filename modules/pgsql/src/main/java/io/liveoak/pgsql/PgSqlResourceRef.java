@@ -25,7 +25,7 @@ public class PgSqlResourceRef extends PgSqlRowResource {
         QueryResults results;
         try (Connection con = parent().parent().getConnection()) {
             QueryBuilder qb = new QueryBuilder(parent().parent().getCatalog());
-            results = qb.querySelectFromTableWhereId(ctx, con, parent().id(), id());
+            results = qb.querySelectFromTableWhereId(con, parent().id(), id());
         }
 
         for (Row row: results.rows()) {

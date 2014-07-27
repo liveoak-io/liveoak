@@ -125,9 +125,9 @@ public class PgSqlTableResource implements Resource {
         try (Connection con = parent.getConnection()) {
             QueryBuilder qb = new QueryBuilder(cat);
             if (id == null) {
-                return qb.querySelectFromTable(ctx, con, t);
+                return qb.querySelectFromTable(con, t, ctx.sorting(), ctx.pagination());
             } else {
-                return qb.querySelectFromTableWhereId(ctx, con, t, id);
+                return qb.querySelectFromTableWhereId(con, t, id);
             }
         }
     }

@@ -16,6 +16,7 @@ import io.liveoak.pgsql.data.Row;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.Sorting;
 import io.liveoak.spi.state.ResourceRef;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
@@ -46,37 +47,57 @@ public class QueryBuilder {
         return "SELECT * FROM " + table.quotedSchemaName();
     }
 
-    public PreparedStatement prepareSelectAllFromTable(Connection con, Pagination pagination, String table) throws SQLException {
+    public PreparedStatement prepareSelectAllFromTable(Connection con, String table, Sorting sorting, Pagination pagination) throws SQLException {
         Table tableDef = catalog.table(new TableRef(table));
         if (tableDef == null) {
             throw new IllegalStateException("No such table: " + table);
         }
-        return prepareSelectAllFromTable(con, pagination, tableDef);
+        return prepareSelectAllFromTable(con, tableDef, sorting, pagination);
     }
 
-    public PreparedStatement prepareSelectAllFromTable(Connection con, Pagination pagination, Table table) throws SQLException {
-        String offset = pagination.offset() > 0 ? " OFFSET " + pagination.offset() : "";
-        return con.prepareStatement(selectAllFromTable(table) + " LIMIT " + pagination.limit() + offset);
+    public PreparedStatement prepareSelectAllFromTable(Connection con, Table table, Sorting sorting, Pagination pagination) throws SQLException {
+        StringBuilder sb = new StringBuilder(selectAllFromTable(table));
+
+        if (sorting != null && sorting.specs().size() > 0) {  // TODO: that's ugly
+            sb.append(" ORDER BY ");
+            int i = 0;
+            for (Sorting.Spec spec: sorting) {
+                if (i > 0) {
+                    sb.append(",");
+                }
+                sb.append(spec.name());
+                if (!spec.ascending()) {
+                    sb.append(" DESC");
+                }
+                i++;
+            }
+        }
+        sb.append(" LIMIT " + pagination.limit());
+
+        if (pagination.offset() > 0) {
+            sb.append(" OFFSET " + pagination.offset());
+        }
+        return con.prepareStatement(sb.toString());
     }
 
-    public PreparedStatement prepareSelectFromTableWhereId(Connection con, Pagination pagination, String table, String id) throws SQLException {
+    public PreparedStatement prepareSelectFromTableWhereId(Connection con, String table, String id, Pagination pagination) throws SQLException {
         Table tableDef = catalog.table(new TableRef(table));
         if (tableDef == null) {
             throw new IllegalStateException("No such table: " + table);
         }
 
-        return prepareSelectFromTableWhereId(con, pagination, tableDef, id);
+        return prepareSelectFromTableWhereId(con, tableDef, id, pagination);
     }
 
-    public PreparedStatement prepareSelectFromTableWhereId(Connection con, Pagination pagination, Table table, String id) throws SQLException {
+    public PreparedStatement prepareSelectFromTableWhereId(Connection con, Table table, String id, Pagination pagination) throws SQLException {
         if (id == null || id.length() == 0) {
             throw new IllegalArgumentException("id is null or empty");
         }
 
-        return prepareSelectFromTableWhere(con, pagination, table, table.pk().columns(), PrimaryKey.splitIdAsList(id));
+        return prepareSelectFromTableWhere(con, table, table.pk().columns(), PrimaryKey.splitIdAsList(id), (Sorting) null, pagination);
     }
 
-    public PreparedStatement prepareSelectFromTableWhere(Connection con, Pagination pagination, Table table, List<Column> columns, List<?> values) throws SQLException {
+    public PreparedStatement prepareSelectFromTableWhere(Connection con, Table table, List<Column> columns, List<?> values, Sorting sorting, Pagination pagination) throws SQLException {
         if (values == null || values.size() == 0) {
             throw new IllegalArgumentException("values is null or empty");
         }
@@ -97,8 +118,25 @@ public class QueryBuilder {
             sb.append(col.quotedName()).append("=?");
         }
 
-        String offset = pagination.offset() > 0 ? " OFFSET " + pagination.offset() : "";
-        sb.append(" LIMIT " + pagination.limit() + offset);
+        if (sorting != null) {
+            sb.append(" ORDER BY ");
+            int j = 0;
+            for (Sorting.Spec spec: sorting) {
+                if (j > 0) {
+                    sb.append(",");
+                }
+                sb.append(spec.name());
+                if (!spec.ascending()) {
+                    sb.append(" DESC");
+                }
+                j++;
+            }
+        }
+
+        if (pagination != null) {
+            String offset = pagination.offset() > 0 ? " OFFSET " + pagination.offset() : "";
+            sb.append(" LIMIT " + pagination.limit() + offset);
+        }
 
         PreparedStatement ps = con.prepareStatement(sb.toString());
 
@@ -316,37 +354,39 @@ public class QueryBuilder {
         return new ResourcePath(href).tail().toString();
     }
 
-    public QueryResults querySelectFromTableWhereId(RequestContext ctx, Connection con, Table table, String id) throws SQLException {
+    public QueryResults querySelectFromTableWhereId(Connection con, Table table, String id) throws SQLException {
         if (id != null && id.length() > 0) {
-            return query(ctx, prepareSelectFromTableWhereId(con, ctx.pagination(), table, id));
+            return query(prepareSelectFromTableWhereId(con, table, id, (Pagination) null), (Pagination) null);
         } else {
-            return query(ctx, prepareSelectAllFromTable(con, ctx.pagination(), table));
+            return query(prepareSelectAllFromTable(con, table, (Sorting) null, Pagination.NONE), Pagination.NONE);
         }
     }
 
-    public QueryResults querySelectFromTableWhereId(RequestContext ctx, Connection con, String table, String id) throws SQLException {
+    public QueryResults querySelectFromTableWhereId(Connection con, String table, String id) throws SQLException {
         if (id != null && id.length() > 0) {
-            return query(ctx, prepareSelectFromTableWhereId(con, ctx.pagination(), table, id));
+            return query(prepareSelectFromTableWhereId(con, table, id, (Pagination) null), (Pagination) null);
         } else {
-            return query(ctx, prepareSelectAllFromTable(con, ctx.pagination(), table));
+            return query(prepareSelectAllFromTable(con, table, (Sorting) null, Pagination.NONE), Pagination.NONE);
         }
     }
 
-    public QueryResults querySelectFromTable(RequestContext ctx, Connection con, Table table) throws SQLException {
-        return query(ctx, prepareSelectAllFromTable(con, ctx.pagination(), table));
+    public QueryResults querySelectFromTable(Connection con, Table table, Sorting sorting, Pagination pagination) throws SQLException {
+        return query(prepareSelectAllFromTable(con, table, sorting, pagination), pagination);
     }
 
-    public QueryResults querySelectFromTable(RequestContext ctx, Connection con, String table) throws SQLException {
-        return query(ctx, prepareSelectAllFromTable(con, ctx.pagination(), table));
+    public QueryResults querySelectFromTable(Connection con, String table, Sorting sorting, Pagination pagination) throws SQLException {
+        return query(prepareSelectAllFromTable(con, table, sorting, pagination), pagination);
     }
 
-    public QueryResults querySelectFromTable(RequestContext ctx, Connection con, Table table, List<Column> columns, List<Object> values) throws SQLException {
-        return query(ctx, prepareSelectFromTableWhere(con, ctx.pagination(), table, columns, values));
+    public QueryResults querySelectFromTable(Connection con, Table table, List<Column> columns, List<Object> values, Sorting sorting, Pagination pagination) throws SQLException {
+        return query(prepareSelectFromTableWhere(con, table, columns, values, sorting, pagination), pagination);
     }
 
-    public QueryResults query(RequestContext ctx, PreparedStatement ps) throws SQLException {
+    public QueryResults query(PreparedStatement ps, Pagination pagination) throws SQLException {
         try (PreparedStatement s = ps) {
-            s.setMaxRows(ctx.pagination().limit());
+            if (pagination != null) {
+                s.setMaxRows(pagination.limit());
+            }
             try (ResultSet rs = s.executeQuery()) {
                 ResultSetMetaData meta = rs.getMetaData();
                 int count = meta.getColumnCount();

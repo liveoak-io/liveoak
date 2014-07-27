@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class Table {
+public class Table implements Comparable<Table> {
 
     private String id;
     private String schema;
@@ -201,5 +201,18 @@ public class Table {
             }
         }
         return null;
+    }
+
+    @Override
+    public int compareTo(Table o) {
+        if (o == this) {
+            return 0;
+        }
+
+        if (o == null) {
+            return -1;
+        }
+
+        return id.compareTo(o.id);
     }
 }
