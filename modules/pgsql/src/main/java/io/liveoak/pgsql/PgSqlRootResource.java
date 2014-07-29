@@ -33,6 +33,8 @@ public class PgSqlRootResource extends DefaultRootResource {
 
     private static final String TABLE_NAMES = "pg.table.names";
 
+    private static final String BATCH_ENDPOINT = "_batch";
+
     private final PgSqlRootConfigResource configResource;
 
     public PgSqlRootResource(String id) {
@@ -69,7 +71,7 @@ public class PgSqlRootResource extends DefaultRootResource {
         ctx.requestAttributes().setAttribute(TABLE_NAMES, tables);
 
         // here only set num of tables as size
-        sink.accept("count", tables.size());
+        sink.accept("count", tables.size() + 1);
 
         // maybe some other things to do with db as a whole
         sink.accept("type", "database");
@@ -78,6 +80,7 @@ public class PgSqlRootResource extends DefaultRootResource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
+        sink.accept(new PgSqlBatchResource(this, BATCH_ENDPOINT));
         List<String> tables = (List<String>) ctx.requestAttributes().getAttribute(TABLE_NAMES);
         for (String table: tables) {
             sink.accept(new PgSqlTableResource(this, table));
@@ -86,6 +89,11 @@ public class PgSqlRootResource extends DefaultRootResource {
     }
 
     public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
+        if (BATCH_ENDPOINT.equals(id)) {
+            responder.resourceRead(new PgSqlBatchResource(this, BATCH_ENDPOINT));
+            return;
+        }
+
         String tableId = id;
         boolean schemaReq = false;
 

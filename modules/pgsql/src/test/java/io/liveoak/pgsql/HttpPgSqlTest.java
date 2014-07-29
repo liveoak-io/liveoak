@@ -52,6 +52,9 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         // create a new item
         testCreateFirstOrderItem();
 
+        // update first order expanded - also update items, and address as sent
+        // testUpdateOrderExpanded();
+
         // read all orders expanded
         testReadOrdersExpanded();
         testReadOrdersDoubleExpanded();
@@ -62,11 +65,221 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         // delete items collection
         testDeleteOrderItemsCollection();
 
-        // GET all items and send them back to DELETE
-        //testBulkOrdersDeleteBySendingGetResponse();
+        // GET all orders and send them back to DELETE
+        testBulkOrdersDeleteBySendingGetResponse();
 
         // GET all collections and send response back to DELETE
         //testBulkTablesDeleteBySendingGetResponse();
+    }
+
+    private void testBulkOrdersDeleteBySendingGetResponse() throws IOException {
+        // create first order again
+        testCreateFirstOrder();
+
+        // get all orders
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?sort=id&fields=*(*)");
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        String result = getRequest(get);
+        System.out.println(result);
+
+        String orders = result;
+        String expected = "{                                                                     \n" +
+                "  'id' : '" + schema_two + ".orders',                                           \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
+                "  },                                                                            \n" +
+                "  'count' : 2,                                                                  \n" +
+                "  'type' : 'collection',                                                        \n" +
+                "  'members' : [ {                                                               \n" +
+                "    'id' : '014-1003095',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'         \n" +
+                "    },                                                                          \n" +
+                "    'order_id' : '014-1003095',                                                 \n" +
+                "    'create_date' : 1402146615000,                                              \n" +
+                "    'total' : 18990,                                                            \n" +
+                "    'addresses' : {                                                             \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      }                                                                         \n" +
+                "    }                                                                           \n" +
+                "  }, {                                                                          \n" +
+                "    'id' : '014-2004096',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-2004096'         \n" +
+                "    },                                                                          \n" +
+                "    'order_id' : '014-2004096',                                                 \n" +
+                "    'create_date' : 1396429572000,                                              \n" +
+                "    'total' : 43800,                                                            \n" +
+                "    'addresses' : {                                                             \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      }                                                                         \n" +
+                "    }                                                                           \n" +
+                "  } ]                                                                           \n" +
+                "}";
+
+        checkResult(result, expected);
+
+        // send the response as a POST to /_batch endpoint
+        HttpPost post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH + "/_batch?action=delete");
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+        get.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
+
+        result = postRequest(post, result);
+        System.out.println(result);
+
+        String expectedBatch = "{                                                                \n" +
+                "  'id' : '_batch',                                                              \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/_batch'                                          \n" +
+                "  }                                                                             \n" +
+                "}";
+
+        checkResult(result, expectedBatch);
+
+
+        // fetch all orders again - there should be none
+        result = getRequest(get);
+        System.out.println(result);
+
+        expected = "{                                                                            \n" +
+                "  'id' : '" + schema_two + ".orders',                                           \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
+                "  },                                                                            \n" +
+                "  'count' : 0,                                                                  \n" +
+                "  'type' : 'collection'                                                         \n" +
+                "}";
+
+        checkResult(result, expected);
+
+
+        // now recreate them
+        post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH + "/_batch?action=create");
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+        get.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
+        result = orders;
+        result = postRequest(post, result);
+        System.out.println(result);
+
+        checkResult(result, expectedBatch);   // we should get results back - all created members
+
+        // fetch all orders again - there should be two, like when we started
+        result = getRequest(get);
+        System.out.println(result);
+
+        checkResult(result, orders);
+
+        // recreate items table
+        testCreateItemsCollection();
+
+        // update orders via members only object with members having expanded items
+        String updatedOrders = "{                                                                \n" +
+                "  'id' : '" + schema_two + ".orders',                                           \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
+                "  },                                                                            \n" +
+                "  'count' : 2,                                                                  \n" +
+                "  'members' : [ {                                                               \n" +
+                "    'id' : '014-1003095',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'         \n" +
+                "    },                                                                          \n" +
+                "    'order_id' : '014-1003095',                                                 \n" +
+                "    'create_date' : 1402146615000,                                              \n" +
+                "    'total' : 18990,                                                            \n" +
+                "    'addresses' : {                                                             \n" +
+                "      'id': '1',                                                                \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      },                                                                        \n" +
+                "      'address_id': 1,                                                          \n" +
+                "      'name': 'John F. Doe',                                                    \n" +
+                "      'street': 'Liveoak street 7',                                             \n" +
+                "      'postcode': null,                                                         \n" +
+                "      'city': 'London',                                                         \n" +
+                "      'country_iso': 'UK',                                                      \n" +
+                "      'is_company': false,                                                      \n" +
+                "      '" + schema + ".orders': [ ],                                             \n" +
+                "      '" + schema_two + ".orders' : [ {                                         \n" +
+                "        'self': {                                                               \n" +
+                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-1003095'      \n" +
+                "        }                                                                       \n" +
+                "      },{                                                                       \n" +
+                "        'self': {                                                               \n" +
+                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-2004096'      \n" +
+                "        }                                                                       \n" +
+                "      } ]                                                                       \n" +
+                "    },                                                                          \n" +
+                "    'items' : [ {                                                               \n" +
+                "      'id': 'I39845355',                                                        \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/items/I39845355'                             \n" +
+                "      },                                                                        \n" +
+                "      'item_id': 'I39845355',                                                   \n" +
+                "      'name': 'The Gadget',                                                     \n" +
+                "      'quantity': 1,                                                            \n" +
+                "      'price': 39900,                                                           \n" +
+                "      'vat': 20,                                                                \n" +
+                "      '" + schema_two + ".orders' : {                                           \n" +
+                "        'self' : {                                                              \n" +
+                "          'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'     \n" +
+                "        }                                                                       \n" +
+                "      }                                                                         \n" +
+                "    } ]                                                                         \n" +
+                "  }, {                                                                          \n" +
+                "    'id' : '014-2004096',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-2004096'         \n" +
+                "    },                                                                          \n" +
+                "    'order_id' : '014-2004096',                                                 \n" +
+                "    'create_date' : 1396429572000,                                              \n" +
+                "    'total' : 43800,                                                            \n" +
+                "    'addresses' : {                                                             \n" +
+                "      'id': '1',                                                                \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      },                                                                        \n" +
+                "      'address_id': 1,                                                          \n" +
+                "      'name': 'John F. Doe',                                                    \n" +
+                "      'street': 'Liveoak street 7',                                             \n" +
+                "      'postcode': null,                                                         \n" +
+                "      'city': 'London',                                                         \n" +
+                "      'country_iso': 'UK',                                                      \n" +
+                "      'is_company': false,                                                      \n" +
+                "      '" + schema + ".orders': [ ],                                             \n" +
+                "      '" + schema_two + ".orders' : [ {                                         \n" +
+                "        'self': {                                                               \n" +
+                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-1003095'      \n" +
+                "        }                                                                       \n" +
+                "      },{                                                                       \n" +
+                "        'self': {                                                               \n" +
+                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-2004096'      \n" +
+                "        }                                                                       \n" +
+                "      } ]                                                                       \n" +
+                "    },                                                                          \n" +
+                "    'items' : [ ]                                                               \n" +
+                "  } ]                                                                           \n" +
+                "}";
+
+        post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH + "/_batch?action=update");
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+        get.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
+
+        result = postRequest(post, updatedOrders);
+        System.out.println(result);
+
+        checkResult(result, expectedBatch);   // we should get results back - all updated members
+
+
+        // get all orders, must be the same as the value of 'updatedOrders' - including 'addresses', and 'items'
+        result = getRequest(get);
+        System.out.println(result);
+
+        checkResult(result, updatedOrders);
+
     }
 
     private void testSortLimitAndOffset() throws IOException {
@@ -382,9 +595,14 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                        \n" +
                 "    'href' : '/testApp/sqldata'                                     \n" +
                 "  },                                                                \n" +
-                "  'count' : 3,                                                      \n" +
+                "  'count' : 4,                                                      \n" +
                 "  'type' : 'database',                                              \n" +
                 "  'members' : [ {                                                   \n" +
+                "    'id' : '_batch',                                                \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/_batch'                            \n" +
+                "    }                                                               \n" +
+                "  }, {                                                              \n" +
                 "    'id' : 'addresses',                                             \n" +
                 "    'self' : {                                                      \n" +
                 "      'href' : '/testApp/sqldata/addresses'                         \n" +

@@ -6,10 +6,12 @@ import java.sql.SQLException;
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
 import io.liveoak.pgsql.meta.Catalog;
+import io.liveoak.pgsql.meta.Column;
 import io.liveoak.pgsql.meta.QueryBuilder;
 
 import io.liveoak.pgsql.meta.Table;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.Sorting;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
@@ -125,10 +127,29 @@ public class PgSqlTableResource implements Resource {
         try (Connection con = parent.getConnection()) {
             QueryBuilder qb = new QueryBuilder(cat);
             if (id == null) {
-                return qb.querySelectFromTable(con, t, ctx.sorting(), ctx.pagination());
+                return qb.querySelectFromTable(con, t, replaceIdsWithColumnNames(ctx.sorting()), ctx.pagination());
             } else {
                 return qb.querySelectFromTableWhereId(con, t, id);
             }
         }
+    }
+
+    private Sorting replaceIdsWithColumnNames(Sorting sorting) {
+        if (sorting == null) {
+            return null;
+        }
+        Catalog cat = parent.getCatalog();
+        Sorting.Builder builder = new Sorting.Builder();
+        for (Sorting.Spec f: sorting) {
+            if (f.name().equals("id")) {
+                Table table = cat.tableById(id);
+                for (Column col: table.pk().columns()) {
+                    builder.addSpec(col.name(), f.ascending());
+                }
+            } else {
+                builder.addSpec(f.name(), f.ascending());
+            }
+        }
+        return builder.build();
     }
 }
