@@ -1,7 +1,10 @@
 package io.liveoak.pgsql.meta;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+
+import io.liveoak.pgsql.data.Row;
 
 public class PrimaryKey extends Key {
     public PrimaryKey(List<Column> cols) {
@@ -29,5 +32,17 @@ public class PrimaryKey extends Key {
             sb.append(v);
         }
         return sb.toString();
+    }
+
+    public String idFromRow(Row row) {
+        List<Object> vals = new LinkedList<>();
+        for (Column c: columns()) {
+            Object val = row.value(c.name());
+            if (val == null) {
+                throw new RuntimeException("Key column value should not be null: " + c.name());
+            }
+            vals.add(val);
+        }
+        return PrimaryKey.spliceId(vals);
     }
 }

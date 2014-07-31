@@ -175,7 +175,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         // recreate items table
         testCreateItemsCollection();
 
-        // update orders via members only object with members having expanded items
+        // create attachments table
+        testCreateAttachmentsCollection();
+
+        // update orders by passing a collection object (container doesn't support top level arrays)
         String updatedOrders = "{                                                                \n" +
                 "  'id' : '" + schema_two + ".orders',                                           \n" +
                 "  'self' : {                                                                    \n" +
@@ -223,6 +226,14 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "      'quantity': 1,                                                            \n" +
                 "      'price': 39900,                                                           \n" +
                 "      'vat': 20,                                                                \n" +
+                "      'attachments': [ {                                                        \n" +
+                "        'id': 'att000001',                                                      \n" +
+                "        'self' : {                                                              \n" +
+                "          'href' : '/testApp/sqldata/attachments/att000001'                     \n" +
+                "        },                                                                      \n" +
+                "        'name' : 'specs.doc',                                                   \n" +
+                "        'content' : 'Lorem Ipsum ...'                                           \n" +
+                "      } ],                                                                      \n" +
                 "      '" + schema_two + ".orders' : {                                           \n" +
                 "        'self' : {                                                              \n" +
                 "          'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'     \n" +
@@ -275,11 +286,96 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
 
         // get all orders, must be the same as the value of 'updatedOrders' - including 'addresses', and 'items'
+        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?sort=id&fields=*(*(*(*)))");
         result = getRequest(get);
         System.out.println(result);
 
         checkResult(result, updatedOrders);
 
+    }
+
+    private void testCreateAttachmentsCollection() throws IOException {
+        HttpPost post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH);
+        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
+        post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        String json = "{                                                             \n" +
+                "  'id': 'attachments',                                              \n" +
+                "  'columns': [                                                      \n" +
+                "     {                                                              \n" +
+                "       'name': 'attachment_id',                                     \n" +
+                "       'type': 'varchar',                                           \n" +
+                "       'size': 40                                                   \n" +
+                "     },                                                             \n" +
+                "     {                                                              \n" +
+                "       'name': 'name',                                              \n" +
+                "       'type': 'varchar',                                           \n" +
+                "       'size': 255,                                                 \n" +
+                "       'nullable': false                                            \n" +
+                "     },                                                             \n" +
+                "     {                                                              \n" +
+                "       'name': 'content',                                           \n" +
+                "       'type': 'text',                                              \n" +
+                "       'nullable': false                                            \n" +
+                "     },                                                             \n" +
+                "     {                                                              \n" +
+                "       'name': 'item_id',                                           \n" +
+                "       'type': 'varchar',                                           \n" +
+                "       'size': 40,                                                  \n" +
+                "       'nullable': false                                            \n" +
+                "     }],                                                            \n" +
+                "  'primary-key': ['attachment_id'],                                 \n" +
+                "  'foreign-keys': [{                                                \n" +
+                "      'table': 'items',                                             \n" +
+                "      'columns': ['item_id']                                        \n" +
+                "   }]                                                               \n" +
+                "}";
+
+        String result = postRequest(post, json);
+        System.out.println(result);
+
+        String expected = "{                                                         \n" +
+                "  'id': 'attachments;schema',                                       \n" +
+                "  'self' : {                                                        \n" +
+                "    'href' : '/testApp/sqldata/attachments;schema'                  \n" +
+                "   },                                                               \n" +
+                "  'columns': [                                                      \n" +
+                "     {                                                              \n" +
+                "       'name': 'attachment_id',                                     \n" +
+                "       'type': 'varchar',                                           \n" +
+                "       'size': 40,                                                  \n" +
+                "       'nullable': false,                                           \n" +
+                "       'unique': true                                               \n" +
+                "     },                                                             \n" +
+                "     {                                                              \n" +
+                "       'name': 'name',                                              \n" +
+                "       'type': 'varchar',                                           \n" +
+                "       'size': 255,                                                 \n" +
+                "       'nullable': false,                                           \n" +
+                "       'unique': false                                              \n" +
+                "     },                                                             \n" +
+                "     {                                                              \n" +
+                "       'name': 'content',                                           \n" +
+                "       'type': 'text',                                              \n" +
+                "       'size': 2147483647,                                          \n" +
+                "       'nullable': false,                                           \n" +
+                "       'unique': false                                              \n" +
+                "     },                                                             \n" +
+                "     {                                                              \n" +
+                "       'name': 'item_id',                                           \n" +
+                "       'type': 'varchar',                                           \n" +
+                "       'size': 40,                                                  \n" +
+                "       'nullable': false,                                           \n" +
+                "       'unique': false                                              \n" +
+                "     }],                                                            \n" +
+                "  'primary-key': ['attachment_id'],                                 \n" +
+                "  'foreign-keys': [{                                                \n" +
+                "      'table': '" + schema + ".items',                              \n" +
+                "      'columns': ['item_id']                                        \n" +
+                "   }]                                                               \n" +
+                "}";
+
+        checkResult(result, expected);
     }
 
     private void testSortLimitAndOffset() throws IOException {
@@ -624,8 +720,8 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
     }
 
     private void testCreateItemsCollection() throws IOException {
-        String result;
-        String expected;HttpPost post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH);
+
+        HttpPost post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH);
         post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
         post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
@@ -671,10 +767,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "   }]                                                               \n" +
                 "}";
 
-        result = postRequest(post, json);
+        String result = postRequest(post, json);
         System.out.println(result);
 
-        expected = "{                                                                \n" +
+        String expected = "{                                                         \n" +
                 "  'id' : 'items;schema',                                            \n" +
                 "  'self' : {                                                        \n" +
                 "    'href' : '/testApp/sqldata/items;schema'                        \n" +

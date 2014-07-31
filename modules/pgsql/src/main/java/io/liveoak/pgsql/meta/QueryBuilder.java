@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.liveoak.common.codec.DefaultResourceRef;
 import io.liveoak.pgsql.data.Id;
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
@@ -19,6 +20,7 @@ import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.Sorting;
 import io.liveoak.spi.state.ResourceRef;
 import io.liveoak.spi.state.ResourceState;
+
 import org.jboss.logging.Logger;
 
 /**
@@ -45,6 +47,25 @@ public class QueryBuilder {
 */
     public String selectAllFromTable(Table table) {
         return "SELECT * FROM " + table.quotedSchemaName();
+    }
+
+    public String selectFromTable(Table table, List<Column> columns) {
+        if (columns == null) {
+            throw new IllegalArgumentException("columns == null");
+        }
+
+        StringBuilder sb = new StringBuilder("SELECT ");
+        int i = 0;
+        for (Column c: columns) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(c.quotedName());
+            i++;
+        }
+        sb.append(" FROM " + table.quotedSchemaName());
+
+        return sb.toString();
     }
 
     public PreparedStatement prepareSelectAllFromTable(Connection con, String table, Sorting sorting, Pagination pagination) throws SQLException {
@@ -94,23 +115,28 @@ public class QueryBuilder {
             throw new IllegalArgumentException("id is null or empty");
         }
 
-        return prepareSelectFromTableWhere(con, table, table.pk().columns(), PrimaryKey.splitIdAsList(id), (Sorting) null, pagination);
+        return prepareSelectFromTableWhere(con, table, null, table.pk().columns(), PrimaryKey.splitIdAsList(id), (Sorting) null, pagination);
     }
 
-    public PreparedStatement prepareSelectFromTableWhere(Connection con, Table table, List<Column> columns, List<?> values, Sorting sorting, Pagination pagination) throws SQLException {
-        if (values == null || values.size() == 0) {
+    public PreparedStatement prepareSelectFromTableWhere(Connection con, Table table, List<Column> resultColumns, List<Column> whereColumns, List<?> whereValues, Sorting sorting, Pagination pagination) throws SQLException {
+        if (whereValues == null || whereValues.size() == 0) {
             throw new IllegalArgumentException("values is null or empty");
         }
 
-        if (columns.size() != values.size()) {
-            throw new IllegalStateException("Values size doesn't match columns size: (columns: " + columns + ", values: " + values + ")");
+        if (whereColumns.size() != whereValues.size()) {
+            throw new IllegalStateException("Values size doesn't match columns size: (columns: " + whereColumns + ", values: " + whereValues + ")");
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(selectAllFromTable(table) + " WHERE ");
+        if (resultColumns == null) {
+            sb.append(selectAllFromTable(table));
+        } else {
+            sb.append(selectFromTable(table, resultColumns));
+        }
+        sb.append(" WHERE ");
 
         int i = 0;
-        for (Column col: columns) {
+        for (Column col: whereColumns) {
             if (i > 0) {
                 sb.append(" AND ");
             }
@@ -141,8 +167,8 @@ public class QueryBuilder {
         PreparedStatement ps = con.prepareStatement(sb.toString());
 
         i = 0;
-        for (Object val: values) {
-            columns.get(i).bindValue(ps, i + 1, val);
+        for (Object val: whereValues) {
+            whereColumns.get(i).bindValue(ps, i + 1, val);
             i++;
         }
 
@@ -378,8 +404,12 @@ public class QueryBuilder {
         return query(prepareSelectAllFromTable(con, table, sorting, pagination), pagination);
     }
 
-    public QueryResults querySelectFromTable(Connection con, Table table, List<Column> columns, List<Object> values, Sorting sorting, Pagination pagination) throws SQLException {
-        return query(prepareSelectFromTableWhere(con, table, columns, values, sorting, pagination), pagination);
+    public QueryResults querySelectFromTableWhere(Connection con, Table table, List<Column> whereColumns, List<Object> whereValues, Sorting sorting, Pagination pagination) throws SQLException {
+        return query(prepareSelectFromTableWhere(con, table, null, whereColumns, whereValues, sorting, pagination), pagination);
+    }
+
+    public QueryResults querySelectFromTableWhere(Connection con, Table table, List<Column> resultColumns, List<Column> whereColumns, List<Object> whereValues, Sorting sorting, Pagination pagination) throws SQLException {
+        return query(prepareSelectFromTableWhere(con, table, resultColumns, whereColumns, whereValues, sorting, pagination), pagination);
     }
 
     public QueryResults query(PreparedStatement ps, Pagination pagination) throws SQLException {
@@ -421,6 +451,34 @@ public class QueryBuilder {
         return id;
     }
 
+    public String executeCreate(RequestContext ctx, Connection con, Table table, ResourceState state) throws SQLException {
+
+        String id = extractId(table, state);
+
+        // first create new record in master table
+        // if item exists already this will fail
+        try (PreparedStatement ps = prepareInsert(con, table, state)) {
+            ps.execute();
+        }
+
+        // now take care of references
+        for(ForeignKey ref: table.referredKeys()) {
+            TableRef refTableRef = ref.columns().get(0).tableRef();
+            Table refTable = catalog.table(refTableRef);
+
+            // create children / there can't be any existing yet
+            List<Object> listOfNew = state.getPropertyAsList(refTable.id());
+
+            for (Object item: listOfNew) {
+                ResourceState newState = ((ResourceState) item);
+                newState.putProperty(table.id(), new DefaultResourceRef(state.uri()));
+                executeCreate(ctx, con, refTable, newState);
+            }
+        }
+
+        return id;
+    }
+
     private String extractId(Table table, ResourceState state) {
         String id = state.id();
         if (id != null) {
@@ -439,9 +497,101 @@ public class QueryBuilder {
     }
 
     public void executeUpdate(RequestContext ctx, Connection con, Table table, ResourceState state) throws SQLException {
+
+        Id tableId = new Id(table.pk(), state.id());
+
+        List<Object> values = new LinkedList<>();
+        List<Column> columns = new LinkedList<>();
+
+        int i = 0;
+        for (Column c: table.pk().columns()) {
+            values.add(tableId.valueForIndex(i));
+            columns.add(c);
+            i++;
+        }
+
+        // first take care of references
+        for(ForeignKey ref: table.referredKeys()) {
+            TableRef refTableRef = ref.columns().get(0).tableRef();
+            Table refTable = catalog.table(refTableRef);
+
+            // check if refTable has any referredKeys
+            if (refTable.referredKeys().size() > 0) {
+                // if yes, then load ids of referring refTable items first
+                QueryResults results = querySelectFromTableWhere(con, refTable, refTable.pk().columns(), ref.columns(), values, null, null);
+                String prefix = new ResourcePath(state.uri().toString()).parent().parent().toString() + "/" + refTable.id();
+                List<String> currentUris = prefixElements(extractPksFromResults(results, refTable), prefix);
+
+                List<Object> listOfNew = state.getPropertyAsList(refTable.id());
+                List<String> newUris = new LinkedList<>();
+                for (Object item: listOfNew) {
+                    if (item instanceof ResourceState == false) {
+                        throw new RuntimeException("Invalid JSON message - unexpected content of " + refTable.id() + " - item should be a JSON object: " + item);
+                    }
+                    ResourceState itemState = (ResourceState) item;
+                    newUris.add(itemState.uri().toString());
+                }
+
+                List<ResourceState> updated = new LinkedList<>();
+
+                // compare newUris with currentUris
+                List<String> addedUris = new ArrayList(newUris);
+                addedUris.removeAll(currentUris);
+
+                // first create newly added
+                for (Object item: listOfNew) {
+                    ResourceState newState = ((ResourceState) item);
+                    if (addedUris.contains(newState.uri().toString())) {
+                        executeCreate(ctx, con, refTable, newState);
+                    } else {
+                        updated.add(newState);
+                    }
+                }
+
+                // now remove those that are to be removed
+                List<String> removedUris = new ArrayList(currentUris);
+                removedUris.removeAll(newUris);
+
+                for (String uri: removedUris) {
+                    executeDelete(ctx, con, refTable, uri.substring(prefix.length()), true);
+                }
+
+                // update existing
+                for (ResourceState item: updated) {
+                    // only update if there are some properties present other than just self
+                    for (String name: item.getPropertyNames()) {
+                        if (!"self".equals(name)) {
+                            executeUpdate(ctx, con, refTable, item);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         try (PreparedStatement ps = prepareUpdate(con, table, state)) {
             ps.executeUpdate();
         }
+    }
+
+    private List<String> prefixElements(List<String> els, String prefix) {
+        List<String> prefixed = new ArrayList<>(els.size());
+        for (String el: els) {
+            prefixed.add(prefix + el);
+        }
+        return prefixed;
+    }
+
+    private List<String> extractPksFromResults(QueryResults results, Table table) {
+        List<String> ids = new LinkedList<>();
+        for (Row row: results.rows()) {
+            List<Object> cols = new LinkedList<>();
+            for (Column c: table.pk().columns()) {
+                cols.add(row.value(c.name()));
+            }
+            ids.add(PrimaryKey.spliceId(cols));
+        }
+        return ids;
     }
 
     public void executeDelete(RequestContext ctx, Connection con, Table table, String id, boolean cascade) throws SQLException {
@@ -463,8 +613,19 @@ public class QueryBuilder {
             for(ForeignKey ref: table.referredKeys()) {
                 TableRef refTableRef = ref.columns().get(0).tableRef();
                 Table refTable = catalog.table(refTableRef);
-                try (PreparedStatement ps = prepareDeleteWhere(con, refTable, ref.columns(), values)) {
-                    ps.executeUpdate();
+
+                // check if refTable has any referredKeys
+                if (refTable.referredKeys().size() > 0) {
+                    // if yes, then load ids of referring refTable items first
+                    QueryResults results = querySelectFromTableWhere(con, refTable, refTable.pk().columns(), ref.columns(), values, null, null);
+                    for (Row row: results.rows()) {
+                        // and invoke executeDelete for each of them
+                        executeDelete(ctx, con, refTable, refTable.pk().idFromRow(row), cascade);
+                    }
+                } else {
+                    try (PreparedStatement ps = prepareDeleteWhere(con, refTable, ref.columns(), values)) {
+                        ps.executeUpdate();
+                    }
                 }
             }
         }

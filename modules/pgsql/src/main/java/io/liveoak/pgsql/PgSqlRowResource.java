@@ -137,7 +137,7 @@ public class PgSqlRowResource implements Resource {
                     throw new IllegalStateException("Primary key column count on " + table.id() + " doesn't match foreign key column count on " + tab.id());
                 }
 
-                QueryResults results = builder.querySelectFromTable(con, tab, cols, vals, null, Pagination.NONE);
+                QueryResults results = builder.querySelectFromTableWhere(con, tab, cols, vals, null, Pagination.NONE);
                 LinkedList ls = new LinkedList();
                 for (Row r : results.rows()) {
                     ls.add(new PgSqlRowResource(
