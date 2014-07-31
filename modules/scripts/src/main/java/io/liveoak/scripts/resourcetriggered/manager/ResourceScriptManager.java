@@ -126,11 +126,17 @@ public class ResourceScriptManager {
                 resourceFunction = ScriptFileResource.RESOURCE_FUNCTION.PREUPDATE;
                 break;
             case DELETE:
-                resourceFunction = ScriptFileResource.RESOURCE_FUNCTION.POSTDELETE;
+                resourceFunction = ScriptFileResource.RESOURCE_FUNCTION.PREDELETE;
                 break;
         }
 
         List<String> paths = generatePaths(resourcePath);
+
+        //special case on CREATE, since its a POST to the parent!
+        if (resourceFunction == ScriptFileResource.RESOURCE_FUNCTION.PRECREATE) {
+            paths.add(resourcePath + "/*");
+        }
+
         for (String path : paths) {
             ScriptKey key = new ScriptKey(path, resourceFunction.getFunctionName());
             List<String> ids = scriptPathMap.get(key);
@@ -179,6 +185,12 @@ public class ResourceScriptManager {
         }
 
         List<String> paths = generatePaths(resourcePath);
+
+        //special case on CREATE, since its a POST to the parent!
+        if (resourceFunction == ScriptFileResource.RESOURCE_FUNCTION.POSTCREATE) {
+            paths.add(resourcePath + "/*");
+        }
+
         for (String path : paths) {
             ScriptKey key = new ScriptKey(path, resourceFunction.getFunctionName());
             List<String> ids = scriptPathMap.get(key);
@@ -206,9 +218,11 @@ public class ResourceScriptManager {
 
         ResourcePath resourcePath = new ResourcePath(uri);
         paths.add(resourcePath.toString());
+        paths.add(resourcePath.toString() + "*");
         while (!resourcePath.segments().isEmpty()) {
             resourcePath = resourcePath.parent();
             paths.add(resourcePath.toString() + "/*");
+            paths.add(resourcePath.toString() + "*");
         }
         return paths;
     }

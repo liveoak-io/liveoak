@@ -5,25 +5,23 @@
  */
 package io.liveoak.common.codec;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+
 import io.liveoak.common.DefaultMediaTypeMatcher;
 import io.liveoak.common.codec.binary.DefaultBinaryResourceState;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourceResponse;
-import io.liveoak.spi.resource.async.BinaryContentSink;
 import io.liveoak.spi.resource.async.BinaryResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 /**
  * @author Bob McWhirter
@@ -66,7 +64,8 @@ public class ResourceCodecManager {
             return e.mediaType;
         }).collect(Collectors.toList()));
 
-        if (bestMatch == null) {
+        // if we don't have a match and the response isn't already an error response, then return a error response
+        if (bestMatch == null && !(response instanceof ResourceErrorResponse)) {
             throw new UnsupportedMediaTypeException(mediaTypeMatcher);
         }
 

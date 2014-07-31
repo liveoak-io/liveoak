@@ -7,6 +7,7 @@ import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.scripts.objects.LocalClient;
 import io.liveoak.scripts.objects.RequestContext;
 import io.liveoak.scripts.objects.Resource;
+import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.state.ResourceState;
 
@@ -23,26 +24,42 @@ public class LiveOakClient implements LocalClient {
 
     @Override
     public Resource create(String path, Resource resource) throws Exception {
-        ResourceState resourceState = client.create(new io.liveoak.spi.RequestContext.Builder().build(), path, toResourceState(resource));
-        return new LiveOakResource(resourceState);
+        try {
+            ResourceState resourceState = client.create(new io.liveoak.spi.RequestContext.Builder().build(), path, toResourceState(resource));
+            return new LiveOakResource(resourceState);
+        } catch (ResourceNotFoundException e) {
+            return null;
+        }
     }
 
     @Override
     public Resource read(String path) throws Exception {
-        ResourceState resourceState = client.read(new io.liveoak.spi.RequestContext.Builder().build(), path);
-        return new LiveOakResource(resourceState);
+        try {
+            ResourceState resourceState = client.read(new io.liveoak.spi.RequestContext.Builder().build(), path);
+            return new LiveOakResource(resourceState);
+        } catch (ResourceNotFoundException e) {
+            return null;
+        }
     }
 
     @Override
     public Resource update(String path, Resource resource) throws Exception {
-        ResourceState resourceState = client.update(new io.liveoak.spi.RequestContext.Builder().build(), path, toResourceState(resource));
-        return new LiveOakResource(resourceState);
+        try {
+            ResourceState resourceState = client.update(new io.liveoak.spi.RequestContext.Builder().build(), path, toResourceState(resource));
+            return new LiveOakResource(resourceState);
+        } catch (ResourceNotFoundException e) {
+            return null;
+        }
     }
 
     @Override
     public Resource delete(String path) throws Exception {
-        ResourceState resourceState = client.delete(new io.liveoak.spi.RequestContext.Builder().build(), path);
-        return new LiveOakResource(resourceState);
+        try {
+            ResourceState resourceState = client.delete(new io.liveoak.spi.RequestContext.Builder().build(), path);
+            return new LiveOakResource(resourceState);
+        } catch (ResourceNotFoundException e) {
+            return null;
+        }
     }
 
     @Override
@@ -67,7 +84,7 @@ public class LiveOakClient implements LocalClient {
 
 
     private ResourceState toResourceState(Resource resource) throws Exception {
-        ResourceState resourceState = new DefaultResourceState(resource.getID());
+        ResourceState resourceState = new DefaultResourceState(resource.getId());
 
         String uri = resource.getURI();
         if (uri != null) {
