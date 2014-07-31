@@ -52,9 +52,6 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         // create a new item
         testCreateFirstOrderItem();
 
-        // update first order expanded - also update items, and address as sent
-        // testUpdateOrderExpanded();
-
         // read all orders expanded
         testReadOrdersExpanded();
         testReadOrdersDoubleExpanded();
@@ -65,16 +62,26 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         // delete items collection
         testDeleteOrderItemsCollection();
 
-        // GET all orders and send them back to DELETE
-        testBulkOrdersDeleteBySendingGetResponse();
+        // create first order again
+        testCreateFirstOrder();
+
+        // GET all orders and send them back to _batch?action=delete, then send them to _batch?action=create
+        testBulkOrdersDeleteAndCreateBySendingGetResponse();
+
+        // recreate items table
+        testCreateItemsCollection();
+
+        // create attachments table
+        testCreateAttachmentsCollection();
+
+        // Bulk update by sending deeply nested to _batch?action=update
+        testBulkUpdateNested();
 
         // GET all collections and send response back to DELETE
         //testBulkTablesDeleteBySendingGetResponse();
     }
 
-    private void testBulkOrdersDeleteBySendingGetResponse() throws IOException {
-        // create first order again
-        testCreateFirstOrder();
+    private void testBulkOrdersDeleteAndCreateBySendingGetResponse() throws IOException {
 
         // get all orders
         HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?sort=id&fields=*(*)");
@@ -124,8 +131,8 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
         // send the response as a POST to /_batch endpoint
         HttpPost post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH + "/_batch?action=delete");
-        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
-        get.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
+        post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
 
         result = postRequest(post, result);
         System.out.println(result);
@@ -171,12 +178,13 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         System.out.println(result);
 
         checkResult(result, orders);
+    }
 
-        // recreate items table
-        testCreateItemsCollection();
+    private void testBulkUpdateNested() throws IOException {
 
-        // create attachments table
-        testCreateAttachmentsCollection();
+        HttpPost post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH + "/_batch?action=update");
+        post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
 
         // update orders by passing a collection object (container doesn't support top level arrays)
         String updatedOrders = "{                                                                \n" +
@@ -277,23 +285,27 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  } ]                                                                           \n" +
                 "}";
 
-        post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH + "/_batch?action=update");
-        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
-        get.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
-
-        result = postRequest(post, updatedOrders);
+        String result = postRequest(post, updatedOrders);
         System.out.println(result);
+
+        String expectedBatch = "{                                                                \n" +
+                "  'id' : '_batch',                                                              \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/_batch'                                          \n" +
+                "  }                                                                             \n" +
+                "}";
 
         checkResult(result, expectedBatch);   // we should get results back - all updated members
 
 
         // get all orders, must be the same as the value of 'updatedOrders' - including 'addresses', and 'items'
-        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?sort=id&fields=*(*(*),items(*,attachments(*,-items)," + schema + ".orders," + schema_two + ".orders),addresses(*," + schema + ".orders," + schema_two + ".orders))");
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?sort=id&fields=*(*(*),items(*,attachments(*,-items)," + schema + ".orders," + schema_two + ".orders),addresses(*," + schema + ".orders," + schema_two + ".orders))");
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
         result = getRequest(get);
         System.out.println(result);
 
         checkResult(result, updatedOrders);
-
     }
 
     private void testCreateAttachmentsCollection() throws IOException {
