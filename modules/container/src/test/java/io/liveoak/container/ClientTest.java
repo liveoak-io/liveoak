@@ -5,6 +5,9 @@
  */
 package io.liveoak.container;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.tenancy.InternalApplication;
@@ -12,14 +15,14 @@ import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.client.Client;
+import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
-
 import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.Fail.fail;
 
 /**
  * @author Bob McWhirter
@@ -196,5 +199,81 @@ public class ClientTest {
 
     }
     */
+
+    @Test(timeout = 10000)
+    public void testSimpleASync() throws Exception {
+        RequestContext requestContext = new RequestContext.Builder().build();
+        CompletableFuture<ClientResourceResponse> future = new CompletableFuture<>();
+
+        this.client.read(requestContext, "/testApp/db/dogs", clientResourceResponse -> {
+            future.complete(clientResourceResponse);
+        });
+
+        ClientResourceResponse response = future.get();
+
+        assertThat(response).isNotNull();
+        assertThat(response.state().id()).isEqualTo("dogs");
+    }
+
+    @Test(timeout = 10000)
+    public void testNestedASync() throws Exception {
+        RequestContext requestContext = new RequestContext.Builder().build();
+        CompletableFuture<ClientResourceResponse> future = new CompletableFuture<>();
+
+        this.client.read(requestContext, "/testApp/db/dogs", clientResourceResponse1 -> {
+            assertThat(clientResourceResponse1.state().id()).isEqualTo("dogs");
+
+            this.client.read(requestContext, "/testApp/db/people", clientResourceResponse2 -> {
+                assertThat(clientResourceResponse2.state().id()).isEqualTo("people");
+
+                this.client.read(requestContext, "/testApp/db/dogs", clientResourceResponse3 -> {
+                    assertThat(clientResourceResponse3.state().id()).isEqualTo("dogs");
+
+                    this.client.read(requestContext, "/testApp/db/people", clientResourceResponse4 -> {
+                        future.complete(clientResourceResponse4);
+                    });
+                });
+            });
+
+
+
+        });
+
+        ClientResourceResponse response = future.get();
+
+        assertThat(response).isNotNull();
+        assertThat(response.state().id()).isEqualTo("people");
+    }
+
+    @Test(timeout = 10000)
+    public void testNestedSync() throws Exception {
+        RequestContext requestContext = new RequestContext.Builder().build();
+        CompletableFuture<ResourceState> future = new CompletableFuture<>();
+
+        this.client.read(requestContext, "/testApp/db/dogs", clientResourceResponse1 -> {
+            assertThat(clientResourceResponse1.state().id()).isEqualTo("dogs");
+
+            this.client.read(requestContext, "/testApp/db/people", clientResourceResponse2 -> {
+                assertThat(clientResourceResponse2.state().id()).isEqualTo("people");
+
+                this.client.read(requestContext, "/testApp/db/dogs", clientResourceResponse3 -> {
+                    assertThat(clientResourceResponse3.state().id()).isEqualTo("dogs");
+
+                    try {
+                        future.complete(this.client.read(requestContext, "/testApp/db/people"));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        fail();
+                    }
+                });
+            });
+        });
+
+
+        ResourceState state = future.get();
+
+        assertThat(state).isNotNull();
+        assertThat(state.id()).isEqualTo("people");
+    }
 
 }
