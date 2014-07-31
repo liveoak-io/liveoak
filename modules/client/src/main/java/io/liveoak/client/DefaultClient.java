@@ -1,5 +1,10 @@
 package io.liveoak.client;
 
+import java.net.SocketAddress;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
+
 import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.spi.CreateNotSupportedException;
 import io.liveoak.spi.DeleteNotSupportedException;
@@ -17,12 +22,8 @@ import io.liveoak.spi.UpdateNotSupportedException;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.state.ResourceState;
+import io.netty.channel.local.LocalAddress;
 import org.jboss.logging.Logger;
-
-import java.net.SocketAddress;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 
 /**
  * @author Bob McWhirter
@@ -43,6 +44,22 @@ public class DefaultClient implements Client {
     //@Override
     public void close() {
         this.connection.close();
+    }
+
+    /**
+     * Creates a new client to be used with synchronous calls.
+     *
+     * Note: A new client is required for synchronous calls since since
+     * if a synchronous call occurs within an asynchronous one it will block.
+     *
+     * @return A new client for performing synchronous calls
+     * @throws Exception
+     */
+    private DefaultClient createSyncClient() throws Exception {
+        DefaultClient syncClient = new DefaultClient();
+        syncClient.connect(new LocalAddress("liveoak"));
+
+        return syncClient;
     }
 
     /**
@@ -74,10 +91,11 @@ public class DefaultClient implements Client {
      * @throws InterruptedException
      */
     @Override
-    public ResourceState create(RequestContext context, String path, ResourceState state) throws ResourceException, ExecutionException, InterruptedException {
+    public ResourceState create(RequestContext context, String path, ResourceState state) throws Exception {
         CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
-        create(context, path, state, (response) -> {
+        DefaultClient syncClient = createSyncClient();
+        syncClient.create(context, path, state, (response) -> {
             if (response.responseType() == ClientResourceResponse.ResponseType.OK) {
                 future.complete(response.state());
             } else {
@@ -86,7 +104,9 @@ public class DefaultClient implements Client {
         });
 
         try {
-            return future.get();
+            ResourceState resourceState = future.get();
+            syncClient.close();
+            return resourceState;
         } catch (ExecutionException e) {
             e.getCause().fillInStackTrace();
             if (e.getCause() instanceof ResourceException) {
@@ -122,10 +142,11 @@ public class DefaultClient implements Client {
      * @throws InterruptedException
      */
     @Override
-    public ResourceState read(RequestContext context, String path) throws ResourceException, ExecutionException, InterruptedException {
+    public ResourceState read(RequestContext context, String path) throws Exception {
         CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
-        read(context, path, (response) -> {
+        DefaultClient syncClient = createSyncClient();
+        syncClient.read(context, path, (response) -> {
             if (response.responseType() == ClientResourceResponse.ResponseType.OK) {
                 future.complete(response.state());
             } else {
@@ -134,7 +155,9 @@ public class DefaultClient implements Client {
         });
 
         try {
-            return future.get();
+            ResourceState resourceState = future.get();
+            syncClient.close();
+            return resourceState;
         } catch (ExecutionException e) {
             if (e.getCause() != null) {
                 e.getCause().fillInStackTrace();
@@ -185,10 +208,11 @@ public class DefaultClient implements Client {
      * @throws InterruptedException
      */
     @Override
-    public ResourceState update(RequestContext context, String path, ResourceState state) throws ResourceException, ExecutionException, InterruptedException {
+    public ResourceState update(RequestContext context, String path, ResourceState state) throws Exception {
         CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
-        update(context, path, state, (response) -> {
+        DefaultClient syncClient = createSyncClient();
+        syncClient.update(context, path, state, (response) -> {
             if (response.responseType() == ClientResourceResponse.ResponseType.OK) {
                 future.complete(response.state());
             } else {
@@ -197,7 +221,9 @@ public class DefaultClient implements Client {
         });
 
         try {
-            return future.get();
+            ResourceState resourceState = future.get();
+            syncClient.close();
+            return resourceState;
         } catch (ExecutionException e) {
             e.getCause().fillInStackTrace();
             if (e.getCause() instanceof ResourceException) {
@@ -233,10 +259,11 @@ public class DefaultClient implements Client {
      * @throws InterruptedException
      */
     @Override
-    public ResourceState delete(RequestContext context, String path) throws ResourceException, ExecutionException, InterruptedException {
+    public ResourceState delete(RequestContext context, String path) throws Exception {
         CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
-        delete(context, path, (response) -> {
+        DefaultClient syncClient = createSyncClient();
+        syncClient.delete(context, path, (response) -> {
             if (response.responseType() == ClientResourceResponse.ResponseType.OK) {
                 future.complete(response.state());
             } else {
@@ -245,7 +272,9 @@ public class DefaultClient implements Client {
         });
 
         try {
-            return future.get();
+            ResourceState resourceState = future.get();
+            syncClient.close();
+            return resourceState;
         } catch (ExecutionException e) {
             e.getCause().fillInStackTrace();
             if (e.getCause() instanceof ResourceException) {
