@@ -21,9 +21,10 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
         System.out.println(result);
 
         ResourceState expected = resource(BASEPATH, "/testApp", new Object[] {
-                "count", 3,
+                "count", 4,
                 "type", "database"},
 
+               resource("_batch", endpoint, new Object[]{}),
                resource("addresses", endpoint, new Object[]{}),
                resource(schema + ".orders", endpoint, new Object[]{}),
                resource(schema_two + ".orders", endpoint, new Object[]{})
@@ -122,9 +123,10 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
         System.out.println(result);
 
         expected = resource(BASEPATH, "/testApp", new Object[] {
-                        "count", 4,
+                        "count", 5,
                         "type", "database"},
 
+                        resource("_batch", endpoint, new Object[]{}),
                         resource("addresses", endpoint, new Object[]{}),
                         resource("items", endpoint, new Object[]{}),
                         resource(schema + ".orders", endpoint, new Object[]{}),
@@ -227,9 +229,10 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
         System.out.println(result);
 
         expected = resource(BASEPATH, "/testApp", new Object[] {
-                "count", 3,
+                "count", 4,
                 "type", "database"},
 
+                resource("_batch", endpoint, new Object[]{}),
                 resource("addresses", endpoint, new Object[]{}),
                 resource(schema + ".orders", endpoint, new Object[]{}),
                 resource(schema_two + ".orders", endpoint, new Object[]{})

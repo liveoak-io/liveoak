@@ -108,15 +108,6 @@ public class PgSqlRowResource implements Resource {
             }
         }
 
-
-        // if there are any fks it's time to process them
-        for (Map.Entry<ForeignKey, String[]> ent : fkMap.entrySet()) {
-            String fkTable = cat.table(ent.getKey().tableRef()).id();
-            sink.accept(fkTable, new PgSqlResourceRef(
-                    new PgSqlTableResource(parent.parent(), fkTable),
-                    PrimaryKey.spliceId(ent.getValue())));
-        }
-
         // if there are any referredKeys write synthetic object
         //HashMap<ForeignKey, String[]> refFkMap = new HashMap<>();
         // address has address_id PK, orders has address_id fk
@@ -150,6 +141,16 @@ public class PgSqlRowResource implements Resource {
         for (Map.Entry<String, List<Resource>> ent: new TreeMap<>(stacked).entrySet()) {
             sink.accept(ent.getKey(), ent.getValue());
         }
+
+
+        // if there are any fks process them
+        for (Map.Entry<ForeignKey, String[]> ent : fkMap.entrySet()) {
+            String fkTable = cat.table(ent.getKey().tableRef()).id();
+            sink.accept(fkTable, new PgSqlResourceRef(
+                    new PgSqlTableResource(parent.parent(), fkTable),
+                    PrimaryKey.spliceId(ent.getValue())));
+        }
+
         sink.close();
     }
 

@@ -185,6 +185,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
                 "  },                                                                            \n" +
                 "  'count' : 2,                                                                  \n" +
+                "  'type' : 'collection',                                                        \n" +
                 "  'members' : [ {                                                               \n" +
                 "    'id' : '014-1003095',                                                       \n" +
                 "    'self' : {                                                                  \n" +
@@ -193,29 +194,6 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "    'order_id' : '014-1003095',                                                 \n" +
                 "    'create_date' : 1402146615000,                                              \n" +
                 "    'total' : 18990,                                                            \n" +
-                "    'addresses' : {                                                             \n" +
-                "      'id': '1',                                                                \n" +
-                "      'self' : {                                                                \n" +
-                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
-                "      },                                                                        \n" +
-                "      'address_id': 1,                                                          \n" +
-                "      'name': 'John F. Doe',                                                    \n" +
-                "      'street': 'Liveoak street 7',                                             \n" +
-                "      'postcode': null,                                                         \n" +
-                "      'city': 'London',                                                         \n" +
-                "      'country_iso': 'UK',                                                      \n" +
-                "      'is_company': false,                                                      \n" +
-                "      '" + schema + ".orders': [ ],                                             \n" +
-                "      '" + schema_two + ".orders' : [ {                                         \n" +
-                "        'self': {                                                               \n" +
-                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-1003095'      \n" +
-                "        }                                                                       \n" +
-                "      },{                                                                       \n" +
-                "        'self': {                                                               \n" +
-                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-2004096'      \n" +
-                "        }                                                                       \n" +
-                "      } ]                                                                       \n" +
-                "    },                                                                          \n" +
                 "    'items' : [ {                                                               \n" +
                 "      'id': 'I39845355',                                                        \n" +
                 "      'self' : {                                                                \n" +
@@ -231,6 +209,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "        'self' : {                                                              \n" +
                 "          'href' : '/testApp/sqldata/attachments/att000001'                     \n" +
                 "        },                                                                      \n" +
+                "        'attachment_id': 'att000001',                                           \n" +
                 "        'name' : 'specs.doc',                                                   \n" +
                 "        'content' : 'Lorem Ipsum ...'                                           \n" +
                 "      } ],                                                                      \n" +
@@ -239,15 +218,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "          'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'     \n" +
                 "        }                                                                       \n" +
                 "      }                                                                         \n" +
-                "    } ]                                                                         \n" +
-                "  }, {                                                                          \n" +
-                "    'id' : '014-2004096',                                                       \n" +
-                "    'self' : {                                                                  \n" +
-                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-2004096'         \n" +
-                "    },                                                                          \n" +
-                "    'order_id' : '014-2004096',                                                 \n" +
-                "    'create_date' : 1396429572000,                                              \n" +
-                "    'total' : 43800,                                                            \n" +
+                "    } ],                                                                        \n" +
                 "    'addresses' : {                                                             \n" +
                 "      'id': '1',                                                                \n" +
                 "      'self' : {                                                                \n" +
@@ -270,8 +241,39 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-2004096'      \n" +
                 "        }                                                                       \n" +
                 "      } ]                                                                       \n" +
+                "    }                                                                           \n" +
+                "  }, {                                                                          \n" +
+                "    'id' : '014-2004096',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-2004096'         \n" +
                 "    },                                                                          \n" +
-                "    'items' : [ ]                                                               \n" +
+                "    'order_id' : '014-2004096',                                                 \n" +
+                "    'create_date' : 1396429572000,                                              \n" +
+                "    'total' : 43800,                                                            \n" +
+                "    'items' : [ ],                                                              \n" +
+                "    'addresses' : {                                                             \n" +
+                "      'id': '1',                                                                \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      },                                                                        \n" +
+                "      'address_id': 1,                                                          \n" +
+                "      'name': 'John F. Doe',                                                    \n" +
+                "      'street': 'Liveoak street 7',                                             \n" +
+                "      'postcode': null,                                                         \n" +
+                "      'city': 'London',                                                         \n" +
+                "      'country_iso': 'UK',                                                      \n" +
+                "      'is_company': false,                                                      \n" +
+                "      '" + schema + ".orders': [ ],                                             \n" +
+                "      '" + schema_two + ".orders' : [ {                                         \n" +
+                "        'self': {                                                               \n" +
+                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-1003095'      \n" +
+                "        }                                                                       \n" +
+                "      },{                                                                       \n" +
+                "        'self': {                                                               \n" +
+                "          'href': '/testApp/sqldata/" + schema_two + ".orders/014-2004096'      \n" +
+                "        }                                                                       \n" +
+                "      } ]                                                                       \n" +
+                "    }                                                                           \n" +
                 "  } ]                                                                           \n" +
                 "}";
 
@@ -286,7 +288,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
 
         // get all orders, must be the same as the value of 'updatedOrders' - including 'addresses', and 'items'
-        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?sort=id&fields=*(*(*(*)))");
+        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?sort=id&fields=*(*(*),items(*,attachments(*,-items)," + schema + ".orders," + schema_two + ".orders),addresses(*," + schema + ".orders," + schema_two + ".orders))");
         result = getRequest(get);
         System.out.println(result);
 
