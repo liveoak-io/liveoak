@@ -139,13 +139,16 @@ public class DefaultReturnFields implements ReturnFields {
             if (current == null) {
                 return false;
             }
+            if (current.fields.containsKey("-" + path)) {
+                return false;
+            }
             if (current.fields.containsKey("*")) {
                 return true;
             }
             if (!current.fields.containsKey(path)) {
                 return false;
             }
-            current = (DefaultReturnFields) current.fields.get(path);
+            current = current.fields.get(path);
         }
         return true;
     }
