@@ -482,3 +482,15 @@ loMod.factory('LoRealmUserLoader', function(Loader, LoRealmUsers, $route) {
     };
   });
 });
+
+loMod.factory('LoAppExamples', function($resource) {
+  return $resource('/admin/console/resources/example-applications.json',
+    {},
+    {
+      get: {
+        method: 'GET',
+        url: '/admin/console/resources/:parentId/:exampleId/application.json'
+      }
+    });
+});
+

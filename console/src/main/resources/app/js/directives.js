@@ -96,7 +96,7 @@ loDirectives.directive('appVersion', ['version', function(version) {
   };
 }]);
 
-/* Collapsible forms - Apply the lo-collapse attribute the the <legend> element. Aplly lo-collapse='true' to auto-hide
+/* Collapsible forms - Apply the lo-collapse attribute the the <legend> element. Apply lo-collapse='true' to auto-hide
    current form elements.
  */
 loDirectives.directive('loCollapse', function() {
@@ -109,7 +109,8 @@ loDirectives.directive('loCollapse', function() {
       element.addClass('clickable');
       var collapse = function(){
         element.toggleClass('collapsed');
-        element.parent().find('.form-group').toggleClass('hidden');
+        // TODO: vrockai, review.. trying to make it usable outside forms (see applications / examples)
+        element.nextAll().toggleClass('hidden');
       };
 
       if (scope.loCollapse){

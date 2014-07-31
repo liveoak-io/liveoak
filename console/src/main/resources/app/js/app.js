@@ -36,13 +36,19 @@ loMod.config(['$routeProvider', function($routeProvider) {
       resolve: {
         loAppList : function(LoAppListLoader) {
           return new LoAppListLoader();
+        },
+        examplesList : function(LoAppExamples) {
+          return LoAppExamples.query().$promise;
         }
       }
     })
     .when('/example-applications', {
       templateUrl : '/admin/console/partials/applications-example.html',
-      controller : 'AppListCtrl',
+      controller : 'ExampleListCtrl',
       resolve: {
+        examplesList : function(LoAppExamples) {
+          return LoAppExamples.query().$promise;
+        },
         loAppList : function(LoAppListLoader) {
           return new LoAppListLoader();
         }

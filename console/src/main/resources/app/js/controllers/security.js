@@ -15,10 +15,10 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
   $scope.storageList = $filter('filter')(expApp._members, {'type': 'database'});
 
   var _uriPolicies = $filter('filter')(expAppResources._members, {'id': 'uri-policy' });
-  $scope.uriPolicies = _uriPolicies.length > 0 ? _uriPolicies[0].rules : [];
+  $scope.uriPolicies = _uriPolicies && _uriPolicies.length > 0 ? _uriPolicies[0].rules : [];
 
   var _aclPolicies = $filter('filter')(expAppResources._members, {'id': 'acl-policy' });
-  $scope.acl = _aclPolicies.length > 0 ? _aclPolicies[0].autoRules : [];
+  $scope.acl = _aclPolicies && _aclPolicies.length > 0 ? _aclPolicies[0].autoRules : [];
 
   $scope.securedColls = [];
   $scope.unsecuredColls = [];
