@@ -2,33 +2,24 @@
 
   <!-- When there are applications -->
 
-  <div class="lo-content-area col-md-9" ng-show="applications">
+  <div class="lo-content-area col-md-9" ng-show="applications.length > 0 || exampleApplications.length > 0">
     <h2>Applications</h2>
     <div class="lo-page-info clearfix">
-      <p><span class="lo-emph">You have</span> <strong>{{applications.length}}</strong> application(s).</p>
-      <div class="pull-right" ng-show="applications">
-        <button class="btn btn-primary btn-lg" type="button" ng-click="modalApplicationCreate()" >New Application</button>
+      <p><span class="lo-emph">You have</span> <strong>{{applications.length + exampleApplications.length}}</strong> application(s).</p>
+      <div class="pull-right" ng-show="applications.length > 0 || exampleApplications.length > 0">
+        <button id="btn-create-app" class="btn btn-primary btn-lg" type="button" ng-click="modalApplicationCreate()" >New Application</button>
       </div>
     </div>
     <div class="applications-list">
       <lo-app-summary ng-repeat="app in applications" lo-app="app" created="createdId"></lo-app-summary>
     </div>
-    <h3 lo-collapse class="collapsible">Example Applications</h3>
-    <div class="panel lo-panel-app">
-      <div class="panel-heading">
-        <h3 class="panel-title"><a href="#">ExampleApp 1</a></h3>
-        <span class="label label-default">Example</span>
-      </div>
-      <div class="panel-body">
-        <ul class="lo-app-opts">
-          <li><a href="#"><i class="fa fa-cloud ng-scope" tooltip="Storage databases"></i>1 mongoDB</a></li>
-          <li><a href="#"><i class="fa fa-lock ng-scope" tooltip="Security"></i>Secured by liveoak-admin</a></li>
-          <li><a href="#"><i class="fa fa-mobile ng-scope" tooltip="Push"></i>Push set up</a></li>
-        </ul>
-      </div>
+
+    <h3 class="collapsible" ng-show="exampleApplications" lo-collapse>Example Applications</h3>
+    <div class="applications-list">
+      <lo-app-summary ng-repeat="app in exampleApplications" lo-app="app" created="createdId"></lo-app-summary>
     </div>
   </div>
-  <div class="lo-info-pane col-md-3 clearfix" ng-show="applications">
+  <div class="lo-info-pane col-md-3 clearfix" ng-show="applications.length > 0 || exampleApplications.length > 0">
     <section class="lo-tutorials">
       <h3>Example Applications</h3>
       <i class="fa fa-rocket fa-4x"></i>
@@ -39,13 +30,13 @@
   
   <!-- When there is no application -->
 
-  <div class="lo-content-area col-md-12" ng-hide="applications">
+  <div class="lo-content-area col-md-12" ng-hide="applications.length > 0 || exampleApplications.length > 0">
     <h2>Applications</h2>
     <div class="panel" >
       <div class="panel-body text-center empty-instance">
         <i class="fa fa-rocket"></i>
         <p>LiveOak currently has no applications installed.</p>
-        <button class="btn btn-primary btn-lg" type="button" ng-click="modalApplicationCreate()">New Application</button>
+        <button id="btn-create-app-noapps" class="btn btn-primary btn-lg" type="button" ng-click="modalApplicationCreate()">New Application</button>
         <a class="btn btn-default btn-lg" href="#/example-applications">Install Example Application</a>
       </div>
     </div>

@@ -17,7 +17,7 @@ loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, $fi
   /* jshint unused: true */
 
   var pushEntries = $filter('filter')(loStorageList._members, {'id': 'push'});
-  $scope.pushConfig = pushEntries.length > 0 ? pushEntries[0] : undefined;
+  $scope.pushConfig = pushEntries && pushEntries.length > 0 ? pushEntries[0] : undefined;
 
   $scope.breadcrumbs = [
     {'label': 'Applications',  'href':'#/applications'},

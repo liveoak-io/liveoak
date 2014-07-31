@@ -18,10 +18,10 @@
       <label class="col-sm-4 control-label">Type of Setup</label>
       <div class="col-sm-6">
         <label class="checkbox-inline">
-          <input type="radio" ng-model="$parent.setupType" value="basic"> Basic
+          <input id="radio-app-basic" type="radio" ng-model="$parent.setupType" value="basic"> Basic
         </label>
         <label class="checkbox-inline">
-          <input type="radio" ng-model="$parent.setupType" value="diy"> Do-It-Yourself
+          <input id="radio-app-diy" type="radio" ng-model="$parent.setupType" value="diy"> Do-It-Yourself
         </label>
       </div>
     </div>
@@ -103,11 +103,11 @@
 
   <div class="modal-footer">
     <!-- First Step -->
-    <button type="button" class="btn btn-default" ng-show="setupStep == 1" ng-click="cancel()">Cancel</button>
-    <button type="button" class="btn btn-default" ng-show="setupStep > 1" ng-click="prevStep()"><i class="fa fa-angle-left"></i> Previous</button>
-    <button type="submit" class="btn btn-primary" ng-if="setupType == 'basic' && setupStep < setupSteps" ng-click="nextStep()" ng-disabled="!stepValid()">Next <i class="fa fa-angle-right"></i></button>
+    <button id="btn-setup-cancel" type="button" class="btn btn-default" ng-show="setupStep == 1" ng-click="cancel()">Cancel</button>
+    <button id="btn-setup-prev" type="button" class="btn btn-default" ng-show="setupStep > 1" ng-click="prevStep()"><i class="fa fa-angle-left"></i> Previous</button>
+    <button id="btn-setup-next" type="submit" class="btn btn-primary" ng-if="setupType == 'basic' && setupStep < setupSteps" ng-click="nextStep()" ng-disabled="!stepValid()">Next <i class="fa fa-angle-right"></i></button>
     <!-- Last Step -->
-    <button type="submit" class="btn btn-primary" ng-if="setupStep == setupSteps || setupType == 'diy'" ng-click="create()" ng-disabled="!stepValid()" data-dismiss="modal">Create Application</button>
+    <button id="btn-setup-create" type="submit" class="btn btn-primary" ng-if="setupStep == setupSteps || setupType == 'diy'" ng-click="create()" ng-disabled="!stepValid()" data-dismiss="modal">Create Application</button>
   </div>
 
   <!-- Only for Basic -->

@@ -1,150 +1,28 @@
 <div class="row">
   <div class="lo-content-area col-md-12">
-    <ol class="breadcrumb">
-      <li><a href="#/applications">Applications</a></li>
-      <li>Example Applications</li>
-    </ol>
+    <lo-breadcrumbs></lo-breadcrumbs>
     <h2>Example Applications</h2>
+
     <div class="row example-apps">
-      
-      <div class="panel col-lg-4 col-sm-6">
+      <div class="panel col-lg-4 col-sm-6" ng-repeat="example in examples" ng-class="{clicked: example.clicked}" ng-click="example.clicked = !example.clicked">
         <div class="panel-body row">
           <div class="pull-left">
-            <!-- <img alt="Illustration: Two keys" src="console/img/example-apps/auth.svg"> -->
-            <img alt="Illustration: Two keys" src="https://dl.dropboxusercontent.com/u/2730435/example-apps/auth.svg">
-            <button class="btn btn-default btn-lg" type="button"><span class="spinner spinner-xs spinner-inline"></span><span class="text">Install<span></button>
-          </div>
-          <div class="pull-right">
-           <h3>Auth</h3>
-           <p>Basic functionality related to authentication to Keycloak/LiveOak. It's simple Javascript application, which you can use to login into Keycloak and obtain OAuth access token in JWT format from Keycloak. You can also try to send ajax request to 'storage' resource with access token attached in Authorization header. Storage request will be successful just in case that you are authenticated.</p>    
-          </div>
-        </div>
-      </div>
+            <img alt="{{ example['icon-alt'] }}" src="/admin/console/img/example-apps/{{example.icon}}">
 
-      <div class="panel col-lg-4 col-sm-6">
-        <div class="panel-body row">
-          <div class="pull-left">
-            <!-- <img alt="Illustration: Ballons with the Android logo" src="console/img/example-apps/chat-android.svg"> -->
-            <img alt="Illustration: Ballons with the Android logo" src="https://dl.dropboxusercontent.com/u/2730435/example-apps/chat-android.svg">
-            <button class="btn btn-primary btn-lg" type="button"><span class="text">Open<span></button>
+            <button class="btn btn-lg" type="button" onclick="event.stopPropagation();" ng-class="{installing: example.installing, 'btn-default': !example.installed, 'btn-primary': example.installed}" ng-click="example.installed ? goto(example) : install(example)" ng-disabled="example.installing">
+              <span class="spinner spinner-xs spinner-inline"></span>
+              <span class="text" ng-hide="example.installing || example.installed">Install</span>
+              <span class="text" ng-show="example.installing">Installing...</span>
+              <span class="text" ng-show="example.installed">Open</span>
+            </button>
           </div>
           <div class="pull-right">
-           <h3>Android Chat</h3>
-           <p>Get native Android integration with resources stored in a LiveOak instance; Native notifications of resource subscription from Google Cloud Messaging (GCM) via integration with the Aerogear Unified Push Server (UPS); System notifications when the application is in the background; Uses GCM for updated chats when the application has focus.
-</p>    
-          </div>
-        </div>
-      </div>
-
-      <div class="panel col-lg-4 col-sm-6">
-        <div class="panel-body row">
-          <div class="pull-left">
-            <!-- <img alt="Illustration: Ballons with the HTML5 logo" src="console/img/example-apps/chat-html.svg"> -->
-            <img alt="Illustration: Ballons with the HTML5 logo" src="https://dl.dropboxusercontent.com/u/2730435/example-apps/chat-html.svg">
-            <button class="btn btn-primary btn-lg" type="button"><span class="text">Open<span></button>
-          </div>
-          <div class="pull-right">
-           <h3>HTML Chat</h3>
-           <p>Get HTTP REST for creating new chat messages and receive list of existing messages; Stomp over Websockets used for subscription request to receive notifications about changes.</p>    
-          </div>
-        </div>
-      </div>
-
-      <div class="panel col-lg-4 col-sm-6">
-        <div class="panel-body row">
-          <div class="pull-left">
-            <!-- <img alt="Illustration: Ballons with a lock symbol" src="console/img/example-apps/chat-secured.svg"> -->
-            <img alt="Illustration: Ballons with a lock symbol" src="https://dl.dropboxusercontent.com/u/2730435/example-apps/chat-secured.svg">
-            <button class="btn btn-primary btn-lg" type="button"><span class="text">Open<span></button>
-          </div>
-          <div class="pull-right">
-           <h3>Secured Chat</h3>
-           <p>HTTP REST including authentication and authorization. Keycloak integration. Stomp over websockets used for subscription requests. Subscription requests allowed just for authorized users; Authorized subscription responses received for newly added chat messages and also for deleted or updated messages. Users with role _admin_ can delete any chat message.</p>    
-          </div>
-        </div>
-      </div>
-
-      <div class="panel col-lg-4 col-sm-6">
-        <div class="panel-body row">
-          <div class="pull-left">
-            <!-- <img alt="Illustration: A series of pictures" src="console/img/example-apps/gallery.svg"> -->
-            <img alt="Illustration: A series of pictures" src="https://dl.dropboxusercontent.com/u/2730435/example-apps/gallery.svg">
-            <button class="btn btn-primary btn-lg" type="button"><span class="text">Open<span></button>
-          </div>
-          <div class="pull-right">
-           <h3>Gallery</h3>
-           <p>The Gallery demo application runs in desktop, and mobile browser, and also provides REST endpoints for gallery-cordova application.</p>    
-          </div>
-        </div>
-      </div>
-      
-      <div class="panel col-lg-4 col-sm-6">
-        <div class="panel-body row">
-          <div class="pull-left">
-            <!-- <img alt="Illustration: Pictures with the Android logo" src="console/img/example-apps/gallery-android.svg"> -->
-            <img alt="Illustration: Pictures with the Android logo" src="https://dl.dropboxusercontent.com/u/2730435/example-apps/gallery-android.svg">
-            <button class="btn btn-primary btn-lg" type="button"><span class="text">Open<span></button>
-          </div>
-          <div class="pull-right">
-           <h3>Android Gallery</h3>
-           <p>The Android Gallery demo application runs as a native application on a mobile device or emulator. It connects remotely to LiveOak endpoints provided by 'gallery' example application.</p>    
-          </div>
-        </div>
-      </div>
-
-      <div class="panel col-lg-4 col-sm-6">
-        <div class="panel-body row">
-          <div class="pull-left">
-            <!-- <img alt="Illustration: A list with one item checked" src="console/img/example-apps/todomvc.svg"> -->
-            <img alt="Illustration: A list with one item checked" src="https://dl.dropboxusercontent.com/u/2730435/example-apps/todomvc.svg">
-            <button class="btn btn-primary btn-lg" type="button"><span class="text">Open<span></button>
-          </div>
-          <div class="pull-right">
-           <h3>TodoMVC</h3>
-           <p>The TodoMVC example is based on the example http://todomvc.com/architecture-examples/angularjs/#/ . Our example is integrated with [Keycloak](http://www.keycloak.org) and it's showing security possibilities of [LiveOak](http://liveoak.io) (among other things).</p>    
-          </div>
-        </div>
-      </div>
-      
-      <div class="panel col-lg-4 col-sm-6">
-        <div class="panel-body row">
-          <div class="pull-left">
-            <!-- <img alt="Illustration: A list with the Android logo" src="console/img/example-apps/todomvc-android.svg"> -->
-            <img alt="Illustration: A list with the Android logo" src="https://dl.dropboxusercontent.com/u/2730435/example-apps/todomvc-android.svg">
-            <button class="btn btn-primary btn-lg" type="button"><span class="text">Open<span></button>
-          </div>
-          <div class="pull-right">
-           <h3>TodoMVC (Cordova)</h3>
-           <p></p>    
+            <span class="label label-success pull-right" style="width: auto; opacity: 0.9;" ng-show="example.installed"><i class="fa fa-check"></i> Installed</span>
+            <h3>{{example.name}}</h3>
+            <p>{{example.description}}</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-<script type="text/javascript">
-  $( document ).ready(function() {
-    $('.example-apps .panel').hover(
-      function() {
-        $(this).parent().addClass('hover');
-      }, function() {
-        $(this).parent().removeClass('hover');
-      }
-    );
-    $('.example-apps .panel').click(
-      function() {
-        $(this).addClass('clicked');
-      }
-    );
-    $('.example-apps .panel .btn-default').click(
-      function() {
-        $(this).addClass('installing').find('.text').text('Installing...');
-        
-        var delay = setTimeout(function(){
-          $('.installing').removeClass('btn-default installing').addClass('btn-primary').find('.text').text('Open');
-       }, 2000)
-      }
-    );
-  });
-</script>

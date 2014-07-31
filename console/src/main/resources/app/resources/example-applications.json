@@ -1,0 +1,67 @@
+[
+  {
+    "id": "auth",
+    "path": "auth",
+    "name": "Auth",
+    "description": "Basic functionality related to authentication to Keycloak/LiveOak. It's simple Javascript application, which you can use to login into Keycloak and obtain OAuth access token in JWT format from Keycloak. You can also try to send ajax request to 'storage' resource with access token attached in Authorization header. Storage request will be successful just in case that you are authenticated.",
+    "icon": "auth.svg",
+    "icon-alt": "Illustration: Two keys"
+  },
+  {
+    "id": "chat-android",
+    "path": "chat/chat-android",
+    "name": "Android Chat",
+    "description": "Get native Android integration with resources stored in a LiveOak instance; Native notifications of resource subscription from Google Cloud Messaging (GCM) via integration with the Aerogear Unified Push Server (UPS); System notifications when the application is in the background; Uses GCM for updated chats when the application has focus.",
+    "icon": "chat-android.svg",
+    "icon-alt": "Illustration: Ballons with the Android logo"
+  },
+  {
+    "id": "chat-html",
+    "path": "chat/chat-html",
+    "name": "HTML Chat",
+    "description": "Get HTTP REST for creating new chat messages and receive list of existing messages; Stomp over Websockets used for subscription request to receive notifications about changes.",
+    "icon": "chat-html.svg",
+    "icon-alt": "Illustration: Ballons with the HTML5 logo"
+  },
+  {
+    "id": "chat-html-secured",
+    "path": "chat/chat-html-secured",
+    "name": "Secured Chat",
+    "description": "HTTP REST including authentication and authorization. Keycloak integration. Stomp over websockets used for subscription requests. Subscription requests allowed just for authorized users; Authorized subscription responses received for newly added chat messages and also for deleted or updated messages. Users with role _admin_ can delete any chat message.",
+    "icon": "chat-secured.svg",
+    "icon-alt": "Illustration: Ballons with a lock symbol"
+  },
+  {
+    "id": "gallery",
+    "path": "gallery",
+    "name": "Gallery",
+    "description": "The Gallery demo application runs in desktop, and mobile browser, and also provides REST endpoints for gallery-cordova application.",
+    "icon": "gallery.svg",
+    "icon-alt": "Illustration: A series of pictures"
+  },
+  {
+    "id": "gallery-cordova",
+    "path": "gallery-cordova",
+    "name": "Android Gallery",
+    "description": "The Android Gallery demo application runs as a native application on a mobile device or emulator. It connects remotely to LiveOak endpoints provided by 'gallery' example application.",
+    "icon": "gallery-android.svg",
+    "icon-alt": "Illustration: Pictures with the Android logo"
+  },
+  {
+    "id": "todomvc",
+    "path": "todomvc",
+    "name": "TodoMVC",
+    "description": "The TodoMVC example is based on the example http://todomvc.com/architecture-examples/angularjs/#/ . Our example is integrated with [Keycloak](http://www.keycloak.org) and it's showing security possibilities of [LiveOak](http://liveoak.io) (among other things).",
+    "icon": "todomvc.svg",
+    "icon-alt": "Illustration: A list with one item checked"
+  },
+  {
+    "id": "todomvc-cordova",
+    "path": "todomvc-cordova",
+    "name": "TodoMVC (Cordova)",
+    "description": "TBD",
+    "icon": "todomvc-android.svg",
+    "icon-alt": "Illustration: A list with the Android logo"
+  }
+
+]

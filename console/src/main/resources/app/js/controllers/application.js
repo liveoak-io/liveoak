@@ -2,9 +2,10 @@
 
 var loMod = angular.module('loApp.controllers.application', []);
 
-loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal, $filter, Notifications, loAppList, LoApp, LoStorage, LoPush, LoRealmApp) {
+loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal, $filter, Notifications, examplesList, loAppList, LoApp, LoStorage, LoPush, LoRealmApp) {
 
   $scope.applications = [];
+  $scope.exampleApplications = [];
 
   $scope.createdId = $routeParams.created;
 
@@ -23,7 +24,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
     };
   };
 
-  var filtered = $filter('filter')(loAppList._members, {'visible': true});
+  var filtered = $filter('orderBy')($filter('filter')(loAppList._members, {'visible': true}), 'name');
   for (var i = 0; i < filtered.length; i++) {
     var app = {
       id: filtered[i].id,
@@ -35,8 +36,15 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
     app.mongoStorages = 0;
     app.storage.$promise.then(increaseStorages(app));
 
-    $scope.applications.push(app);
+    if ($filter('filter')(examplesList, {'id': app.id}, true).length > 0) {
+      app.example = true;
+      $scope.exampleApplications.push(app);
+    }
+    else {
+      $scope.applications.push(app);
+    }
   }
+
 
   // Delete Application
   $scope.modalApplicationDelete = function(appId) {
@@ -498,3 +506,60 @@ loMod.controller('NextStepsCtrl', function($scope, $rootScope, $routeParams, cur
   ];
 
 });
+
+loMod.controller('ExampleListCtrl', function($scope, $location, $filter, Notifications, LoAppExamples, LoApp, examplesList, loAppList) {
+
+  $scope.breadcrumbs = [
+    {'label': 'Applications', 'href': '#/applications'},
+    {'label': 'Example Applications', 'href': '#/example-applications'}
+  ];
+
+  $scope.examples = examplesList;
+
+  for (var i = 0; i < examplesList.length; i++) {
+    var example = examplesList[i];
+    if ($filter('filter')(loAppList._members, {'id': example.id}, true).length > 0) {
+      example.installed = true;
+    }
+  }
+
+  $scope.goto = function(example) {
+    $location.path('applications/' +  example.id);
+  };
+
+  $scope.install = function(example) {
+    example.installing = true;
+
+    var parentId = example.path.substr(0, example.path.indexOf('/'));
+    var exampleId = example.path.substr(example.path.indexOf('/') + 1);
+    var data = {
+      id: example.id,
+      name: example.id,
+      type: 'application'
+    };
+    var config = LoAppExamples.get({parentId: parentId, exampleId: exampleId},
+      function() {
+        // FIXME: need to adapt config to match paths, etc...
+        new LoApp($.extend(data, config)).$create({},
+          function(value/*, responseHeaders*/) {
+            new LoApp({}).$addResource({appId: example.id}, function() {
+              Notifications.success('The example application "' + example.id + '" has been installed.');
+              example.installing = false;
+              example.installed = true;
+            });
+          },
+          function(httpResponse) {
+            Notifications.httpError('Failed to install the example application "' + example.id + '".', httpResponse);
+            example.installing = false;
+          }
+        );
+      },
+      function(httpResponse) {
+        Notifications.httpError('Failed to retrieve the example application "' + example.id + '" configuration.', httpResponse);
+        example.installing = false;
+      }
+    );
+  }
+
+});
+
