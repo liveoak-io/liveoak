@@ -46,8 +46,9 @@ public class ScriptInterceptor extends DefaultInterceptor {
                 } else {
                     context.forward();
                 }
+            }  else {
+                context.forward();
             }
-            context.forward();
 
         } catch (Exception e) {
             e.printStackTrace();

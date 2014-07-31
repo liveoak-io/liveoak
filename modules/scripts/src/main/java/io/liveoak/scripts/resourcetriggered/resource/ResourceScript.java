@@ -183,8 +183,7 @@ public class ResourceScript extends GenericScriptResource implements Comparable<
             responder.resourceCreated(scriptFileResource);
             return;
         }
-
-        responder.createNotSupported(this);
+        responder.invalidRequest("The uploaded script must be a binary javascript file.");
     }
 
     @Override

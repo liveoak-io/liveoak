@@ -25,6 +25,12 @@ public class LiveOakResource implements Resource {
         this.members = new ArrayList<>();
     }
 
+    public LiveOakResource(String id) {
+        this.state = new DefaultResourceState(id);
+        this.properties = new HashMap<>();
+        this.members = new ArrayList<>();
+    }
+
     public LiveOakResource(ResourceState state) {
         this.state = state;
         this.properties = new LiveOakStateProperties(state);
@@ -36,12 +42,12 @@ public class LiveOakResource implements Resource {
     }
 
     @Override
-    public String getID() {
+    public String getId() {
         return state.id();
     }
 
     @Override
-    public void setID(String id) {
+    public void setId(String id) {
         state.id(id);
     }
 
@@ -62,6 +68,14 @@ public class LiveOakResource implements Resource {
     @Override
     public Map<String, Object> getProperties() {
         return properties;
+    }
+
+    public void setProperties (Map<String, Object> properties) {
+        //TODO: remove this section once DynJS implements .entrySet
+        this.properties = new HashMap<String, Object>();
+        for (String key: properties.keySet()) {
+            this.properties.put(key, properties.get(key));
+        }
     }
 
     @Override
