@@ -28,7 +28,7 @@ public class ApplicationsDeployerService implements Service<Void> {
                 for (File appDir : appDirs) {
                     if ((new File(appDir, "application.json")).exists()) {
                         try {
-                            this.registryInjector.getValue().createApplication(appDir.getName(), appDir.getName());
+                            this.registryInjector.getValue().createApplication(appDir.getName(), appDir.getName(), appDir);
                         } catch (InterruptedException e) {
                             context.failed(new StartException(e));
                             return;
