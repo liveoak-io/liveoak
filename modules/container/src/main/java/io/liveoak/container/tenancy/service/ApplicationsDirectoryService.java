@@ -20,14 +20,6 @@ public class ApplicationsDirectoryService implements Service<File> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        if (appsDir == null) {
-            try {
-                this.appsDir = Files.createTempDirectory("liveoak").toFile();
-            } catch (IOException e) {
-                throw new StartException(e);
-            }
-        }
-
         this.appsDir.mkdirs();
     }
 
