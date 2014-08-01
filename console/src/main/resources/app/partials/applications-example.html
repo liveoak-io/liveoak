@@ -15,6 +15,12 @@
               <span class="text" ng-show="example.installing">Installing...</span>
               <span class="text" ng-show="example.installed">Open</span>
             </button>
+
+            <button class="btn btn-lg" type="button" onclick="event.stopPropagation();" ng-hide="example.installed" ng-class="{installing: example.importing, 'btn-default': !example.installed, 'btn-primary': example.installed}" ng-click="import(example)" ng-disabled="example.importing">
+              <span class="spinner spinner-xs spinner-inline"></span>
+              <span class="text" ng-hide="example.importing">Import</span>
+              <span class="text" ng-show="example.importing">Importing...</span>
+            </button>
           </div>
           <div class="pull-right">
             <span class="label label-success pull-right" style="width: auto; opacity: 0.9;" ng-show="example.installed"><i class="fa fa-check"></i> Installed</span>

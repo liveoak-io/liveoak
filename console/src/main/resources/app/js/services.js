@@ -489,7 +489,14 @@ loMod.factory('LoAppExamples', function($resource) {
     {
       get: {
         method: 'GET',
-        url: '/admin/console/resources/:parentId/:exampleId/application.json'
+        url: '/admin/console/resources/liveoak-examples/:parentId/:exampleId/application.json'
+      },
+      install: {
+        method : 'POST',
+        url: '/admin/applications/',
+        headers: {
+          'Content-Type':'application/liveoak-local-app+json'
+        }
       }
     });
 });

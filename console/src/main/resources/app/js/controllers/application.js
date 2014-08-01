@@ -527,8 +527,8 @@ loMod.controller('ExampleListCtrl', function($scope, $location, $filter, Notific
     $location.path('applications/' +  example.id);
   };
 
-  $scope.install = function(example) {
-    example.installing = true;
+  $scope.import = function(example) {
+    example.importing = true;
 
     var parentId = example.path.substr(0, example.path.indexOf('/'));
     var exampleId = example.path.substr(example.path.indexOf('/') + 1);
@@ -541,25 +541,41 @@ loMod.controller('ExampleListCtrl', function($scope, $location, $filter, Notific
       function() {
         // FIXME: need to adapt config to match paths, etc...
         new LoApp($.extend(data, config)).$create({},
-          function(value/*, responseHeaders*/) {
+          function(/*value, responseHeaders*/) {
             new LoApp({}).$addResource({appId: example.id}, function() {
               Notifications.success('The example application "' + example.id + '" has been installed.');
-              example.installing = false;
+              example.importing = false;
               example.installed = true;
             });
           },
           function(httpResponse) {
             Notifications.httpError('Failed to install the example application "' + example.id + '".', httpResponse);
-            example.installing = false;
+            example.importing = false;
           }
         );
       },
       function(httpResponse) {
         Notifications.httpError('Failed to retrieve the example application "' + example.id + '" configuration.', httpResponse);
+        example.importing = false;
+      }
+    );
+  };
+
+  $scope.install = function(example) {
+    example.installing = true;
+
+    new LoAppExamples({ name: example.id, localPath: example.path }).$install({},
+      function(/*value, responseHeaders*/) {
+        Notifications.success('The example application "' + example.id + '" has been installed.');
+        example.installing = false;
+        example.installed = true;
+      },
+      function(httpResponse) {
+        Notifications.httpError('Failed to install the example application "' + example.id + '".', httpResponse);
         example.installing = false;
       }
     );
-  }
+  };
 
 });
 
