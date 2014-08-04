@@ -5,6 +5,7 @@
 
     <div class="row example-apps">
       <div class="panel col-lg-4 col-sm-6" ng-repeat="example in examples" ng-class="{clicked: example.clicked}" ng-click="example.clicked = !example.clicked">
+        <span class="label label-success" ng-show="example.installed"><i class="fa fa-check"></i> Installed</span>
         <div class="panel-body row">
           <div class="pull-left">
             <img alt="{{ example['icon-alt'] }}" src="/admin/console/img/example-apps/{{example.icon}}">
@@ -23,7 +24,6 @@
             </button>
           </div>
           <div class="pull-right">
-            <span class="label label-success pull-right" style="width: auto; opacity: 0.9;" ng-show="example.installed"><i class="fa fa-check"></i> Installed</span>
             <h3>{{example.name}}</h3>
             <p>{{example.description}}</p>
           </div>

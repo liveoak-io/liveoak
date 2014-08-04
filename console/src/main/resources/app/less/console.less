@@ -553,9 +553,16 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   }
 }
 
+.applications .panel .panel-body.empty-instance p {
+  margin-bottom: 15px;
+}
+
 .applications-list .panel:last-child {
   margin-bottom: 30px;
-} 
+}
+
+
+/* Example-applications */
 
 .transition {
   -webkit-transition: all .25s ease;
@@ -579,6 +586,17 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   
     margin: 0 10px 20px 10px;
     .transition;
+    position: relative;
+    
+    .label-success {
+      position: absolute;
+      right: -1px;
+      top: -1px;
+      
+      i {
+        font-size: inherit;
+      }
+    }
     
     .panel-body {
       padding: 20px 0;
@@ -621,7 +639,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
         font-size: 12px;
         height: 99px;
         overflow: hidden;
-        text-overflow: ellipsis;
+        .transition;
       }
     }
     
@@ -630,27 +648,21 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
       opacity: 1;
     }
     
-    &:hover, &.clicked {
+    &:hover, 
+    &.clicked {
       margin: -5px 5px 15px 5px;
       padding: 5px 20px;
       box-shadow: 0 2px 3px rgba(0, 0, 0, 0.20);
-      
-      .panel-body {
-        padding-bottom: 12px;
-        .transition;
-      }
-
-      .panel-body p {
-        font-size: 13px;
-        height: 107px;
-        .transition;
-      }
     }
     
     &.clicked {
       .panel-body {
+        padding-bottom: 12px;
+        .transition;
+      
         .pull-left {
-          height: auto;
+          height: 195px;
+          .transition;
         }
         
         .btn {
@@ -665,17 +677,18 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
         
         p {
           height: 296px;
+          font-size: 13px;
+          -webkit-transition: all .25s ease;
         }  
       }
       
       &:hover {
-      
-        cursor: default;
+        cursor: pointer;
       
         .panel-body p {
           height: 296px;
         }   
-      } 
+      }
     }
     
     @media (max-width: 640px) {
@@ -688,13 +701,17 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
         margin-left: -5px;
         margin-right: -5px;
       }
-    
     }
     
     @media (max-width: 767px) {
+    
+      .panel-body p {
+        .transition;
+      }
+    
       &.clicked .panel-body p,
       &.clicked:hover .panel-body p {
-        height: auto;
+        height: 173px;
         padding-bottom: 10px;
       }
     }
@@ -1769,6 +1786,10 @@ legend {
   background-color: @c_greenmedium;
   border-color: @c_greendark ;
   background-image: none;
+}
+
+.applications .panel-body .btn {
+  margin-top: 10px; 
 }
 
 /* Breadcrumb */
