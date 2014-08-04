@@ -113,12 +113,22 @@ public class Table implements Comparable<Table> {
     }
 
     public String ddl(Catalog catalog) {
+        return ddlPretty(catalog, false);
+    }
 
-        StringBuilder sb = new StringBuilder("CREATE TABLE \"").append(schema()).append("\".\"").append(name()).append("\" ( \n    ");
+    public String ddlPretty(Catalog catalog, boolean multiline) {
+
+        StringBuilder sb = new StringBuilder("CREATE TABLE \"").append(schema()).append("\".\"").append(name()).append("\" ( ");
+        if (multiline) {
+            sb.append("\n    ");
+        }
         int i = 0;
         for (Column col : columns()) {
             if (i > 0) {
-                sb.append(",\n    ");
+                sb.append(",");
+                if (multiline) {
+                    sb.append("\n    ");
+                }
             }
             sb.append("\"").append(col.name()).append("\" ").append(col.typeSpec());
             boolean partOfPk = pk().getColumn(col.name()) != null;
@@ -132,7 +142,11 @@ public class Table implements Comparable<Table> {
         }
         List<Column> pkcols = pk().columns();
         if (pkcols.size() > 0) {
-            sb.append(",\n    PRIMARY KEY (");
+            sb.append(",");
+            if (multiline) {
+                sb.append("\n   ");
+            }
+            sb.append(" PRIMARY KEY (");
             i = 0;
             for (Column col : pkcols) {
                 if (i > 0) {
@@ -146,7 +160,11 @@ public class Table implements Comparable<Table> {
 
         List<ForeignKey> fkeys = foreignKeys();
         for (ForeignKey fk : fkeys) {
-            sb.append(",\n    FOREIGN KEY (");
+            sb.append(",");
+            if (multiline) {
+                sb.append("\n   ");
+            }
+            sb.append(" FOREIGN KEY (");
             i = 0;
             for (Column col : fk.columns()) {
                 if (i > 0) {
@@ -171,7 +189,7 @@ public class Table implements Comparable<Table> {
             sb.append(")");
         }
 
-        sb.append("\n)\n");
+        sb.append(multiline ? "\n)\n" : ")");
         return sb.toString();
     }
 

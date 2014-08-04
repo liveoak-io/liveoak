@@ -77,7 +77,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         // Bulk update by sending deeply nested to _batch?action=update
         testBulkUpdateNested();
 
-        // GET all collections and send response back to DELETE
+        // GET all collections and send response back to _batch?action=delete
         testBulkTablesDeleteBySendingGetResponse();
     }
 
@@ -482,7 +482,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'foreign-keys': [{                                                \n" +
                 "      'table': '" + schema + ".items',                              \n" +
                 "      'columns': ['item_id']                                        \n" +
-                "   }]                                                               \n" +
+                "   }],                                                              \n" +
+                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"attachments\" ( \"attachment_id\" varchar (40),\"name\" varchar (255) NOT NULL," +
+                        "\"content\" text NOT NULL,\"item_id\" varchar (40) NOT NULL, PRIMARY KEY (\"attachment_id\"), FOREIGN KEY (\"item_id\") " +
+                        "REFERENCES \"" + schema + "\".\"items\" (\"item_id\"))'     \n" +
                 "}";
 
         checkResult(result, expected);
@@ -926,7 +929,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'foreign-keys' : [ {                                              \n" +
                 "    'table' : '" + schema_two + ".orders',                          \n" +
                 "    'columns' : [ 'order_id' ]                                      \n" +
-                "  } ]                                                               \n" +
+                "  } ],                                                              \n" +
+                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"items\" ( \"item_id\" varchar (40),\"name\" varchar (255) NOT NULL," +
+                        "\"quantity\" int4 NOT NULL,\"price\" int4 NOT NULL,\"vat\" int4 NOT NULL,\"order_id\" varchar (40) NOT NULL, " +
+                        "PRIMARY KEY (\"item_id\"), FOREIGN KEY (\"order_id\") REFERENCES \"" + schema_two + "\".\"orders\" (\"order_id\"))' \n" +
                 "}";
         checkResult(result, expected);
     }
@@ -1273,7 +1279,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'foreign-keys': [{                                                \n" +
                 "    'table': '" + schema + ".addresses',                            \n" +
                 "    'columns': ['address_id']                                       \n" +
-                "  }]                                                                \n" +
+                "  }],                                                                \n" +
+                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"orders\" ( " +
+                        "\"order_id\" varchar (40),\"create_date\" timestamp NOT NULL,\"total\" int8 NOT NULL,\"address_id\" int4 NOT NULL, " +
+                        "PRIMARY KEY (\"order_id\"), FOREIGN KEY (\"address_id\") REFERENCES \"" + schema + "\".\"addresses\" (\"address_id\"))' \n" +
                 "}";
 
         checkResult(result, expected);
@@ -1349,7 +1358,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'foreign-keys': [{                                                \n" +
                 "    'table': '" + schema + ".addresses',                            \n" +
                 "    'columns': ['address_id']                                       \n" +
-                "  }]                                                                \n" +
+                "  }],                                                               \n" +
+                "  'ddl' : 'CREATE TABLE \"" + schema_two + "\".\"orders\" ( " +
+                        "\"order_id\" varchar (40),\"create_date\" timestamp NOT NULL,\"total\" int8 NOT NULL,\"address_id\" int4 NOT NULL, " +
+                        "PRIMARY KEY (\"order_id\"), FOREIGN KEY (\"address_id\") REFERENCES \"" + schema + "\".\"addresses\" (\"address_id\"))' \n" +
                 "}";
 
         checkResult(result, expected);

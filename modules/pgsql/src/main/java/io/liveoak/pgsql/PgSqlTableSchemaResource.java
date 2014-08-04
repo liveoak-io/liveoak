@@ -97,6 +97,7 @@ public class PgSqlTableSchemaResource  implements Resource {
             }
 
             sink.accept("foreign-keys", fkspecs);
+            sink.accept("ddl", table.ddl(parent.getCatalog()));
         }
 
         sink.close();

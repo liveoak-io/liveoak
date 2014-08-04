@@ -24,10 +24,10 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                 "count", 4,
                 "type", "database"},
 
-               resource("_batch", endpoint, new Object[]{}),
-               resource("addresses", endpoint, new Object[]{}),
-               resource(schema + ".orders", endpoint, new Object[]{}),
-               resource(schema_two + ".orders", endpoint, new Object[]{})
+                resource("_batch", endpoint, new Object[]{}),
+                resource("addresses", endpoint, new Object[]{}),
+                resource(schema + ".orders", endpoint, new Object[]{}),
+                resource(schema_two + ".orders", endpoint, new Object[]{})
         );
 
         checkResource(result, expected);
@@ -110,7 +110,9 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                 "foreign-keys", list(
                         obj("table", schema_two + ".orders",
                         "columns", list("order_id"))
-                )}
+                ),
+                "ddl", "CREATE TABLE \"" + schema + "\".\"items\" ( \"item_id\" varchar (40),\"name\" varchar (255) NOT NULL,\"quantity\" int4 NOT NULL,\"price\" int4 NOT NULL,\"vat\" int4 NOT NULL,\"order_id\" varchar (40) NOT NULL, PRIMARY KEY (\"item_id\"), FOREIGN KEY (\"order_id\") REFERENCES \"" + schema_two + "\".\"orders\" (\"order_id\"))"
+                }
         );
         expected = schemaBody;
         checkResource(result, expected);
