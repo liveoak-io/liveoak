@@ -1,6 +1,7 @@
 package io.liveoak.pgsql;
 
 import java.sql.Connection;
+import java.util.LinkedList;
 import java.util.List;
 
 import io.liveoak.pgsql.meta.Catalog;
@@ -47,15 +48,19 @@ public class PgSqlBatchResource implements Resource {
 
         List<ResourcePath.Segment> thisPath = ctx.resourcePath().segments();
 
+        // for delete operation uris that identify tables require special handling
+        // as we have to delete them in order of dependencies
+        List<Table> deleteList = new LinkedList<>();
+
+        Catalog cat = parent.getCatalog();
         try (Connection c = parent.getConnection()) {
             // iterate through members one by one, and perform operation on each
             for (ResourceState member : state.members()) {
-                // insert a new record into a table
-                Catalog cat = parent.getCatalog();
+                // parse uri
                 ResourcePath uri = new ResourcePath(member.uri().toString());
 
                 List<ResourcePath.Segment> pathSegments = uri.segments();
-                if (pathSegments.size() != 4) {
+                if (pathSegments.size() != 4 && pathSegments.size() != 3) {
                     throw new IllegalArgumentException("Uri out of scope: " + uri);
                 }
                 if (!pathSegments.get(0).name().equals(thisPath.get(0).name())) {
@@ -66,21 +71,39 @@ public class PgSqlBatchResource implements Resource {
                 }
 
                 String tableName = pathSegments.get(2).name();
+                if (tableName.equals(this.id)) {
+                    continue;
+                }
                 Table table = cat.tableById(tableName);
                 if (table == null) {
                     throw new IllegalArgumentException("Table not found: " + tableName + " (uri: " + uri + ")");
                 }
-                String itemId = pathSegments.get(3).name();
 
-                if (action.equals("create")) {
-                    new QueryBuilder(cat).executeInsert(ctx, c, table, member);
-                } else if (action.equals("delete")) {
-                    new QueryBuilder(cat).executeDelete(ctx, c, table, itemId, ctx.resourceParams().contains("cascade"));
-                } else if (action.equals("update")) {
-                    new QueryBuilder(cat).executeUpdate(ctx, c, table, member);
+                if (pathSegments.size() == 4) {
+                    String itemId = pathSegments.get(3).name();
+
+                    if (action.equals("create")) {
+                        new QueryBuilder(cat).executeInsert(ctx, c, table, member);
+                    } else if (action.equals("delete")) {
+                        new QueryBuilder(cat).executeDelete(ctx, c, table, itemId, ctx.resourceParams().contains("cascade"));
+                    } else if (action.equals("update")) {
+                        new QueryBuilder(cat).executeUpdate(ctx, c, table, member);
+                    }
+                } else {
+                    if (action.equals("delete")) {
+                        deleteList.add(table);
+                    } else {
+                        responder.invalidRequest("'action' parameter value not supported for collection uri (" + uri + "): " + action);
+                        return;
+                    }
                 }
 
                 // TODO: also handle expanded many-to-one / one-to-many
+            }
+            if (deleteList.size() > 0) {
+                new QueryBuilder(cat).executeDeleteTables(c, deleteList);
+                // trigger schema reload
+                parent.configuration().reloadSchema();
             }
         }
         responder.resourceRead(this);

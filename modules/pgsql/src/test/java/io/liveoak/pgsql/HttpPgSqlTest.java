@@ -78,7 +78,103 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         testBulkUpdateNested();
 
         // GET all collections and send response back to DELETE
-        //testBulkTablesDeleteBySendingGetResponse();
+        testBulkTablesDeleteBySendingGetResponse();
+    }
+
+    private void testBulkTablesDeleteBySendingGetResponse() throws IOException {
+
+        // send the response as a POST to /_batch endpoint
+        HttpPost post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH + "/_batch?action=delete");
+        post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
+
+
+        // first try to delete one table with dependencies so it should fail
+        String json = "{                                                         \n" +
+                "  'members' : [ {                                                   \n" +
+                "    'id' : 'addresses',                                             \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/addresses'                         \n" +
+                "    }                                                               \n" +
+                "  } ]                                                               \n" +
+                "}";
+
+        String result = postRequest(post, json);
+        System.out.println(result);
+
+        // Check that there are still all the tables
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH);
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        result = getRequest(get);
+        System.out.println(result);
+
+        String expected = "{                                                         \n" +
+                "  'id' : 'sqldata',                                                 \n" +
+                "  'self' : {                                                        \n" +
+                "    'href' : '/testApp/sqldata'                                     \n" +
+                "  },                                                                \n" +
+                "  'count' : 6,                                                      \n" +
+                "  'type' : 'database',                                              \n" +
+                "  'members' : [ {                                                   \n" +
+                "    'id' : '_batch',                                                \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/_batch'                            \n" +
+                "    }                                                               \n" +
+                "  }, {                                                              \n" +
+                "    'id' : 'addresses',                                             \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/addresses'                         \n" +
+                "    }                                                               \n" +
+                "  }, {                                                              \n" +
+                "    'id' : 'attachments',                                           \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/attachments'                       \n" +
+                "    }                                                               \n" +
+                "  }, {                                                              \n" +
+                "    'id' : 'items',                                                 \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/items'                             \n" +
+                "    }                                                               \n" +
+                "  }, {                                                              \n" +
+                "    'id' : '" + schema + ".orders',                                 \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/" + schema + ".orders'             \n" +
+                "    }                                                               \n" +
+                "  }, {                                                              \n" +
+                "    'id' : '" + schema_two + ".orders',                             \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders'         \n" +
+                "    }                                                               \n" +
+                "  } ]                                                               \n" +
+                "}";
+
+        checkResult(result, expected);
+
+        // delete them all now
+        result = postRequest(post, expected);
+        System.out.println(result);
+
+        // check that they are deleted
+        result = getRequest(get);
+        System.out.println(result);
+
+        expected = "{                                                         \n" +
+                "  'id' : 'sqldata',                                                 \n" +
+                "  'self' : {                                                        \n" +
+                "    'href' : '/testApp/sqldata'                                     \n" +
+                "  },                                                                \n" +
+                "  'count' : 1,                                                      \n" +
+                "  'type' : 'database',                                              \n" +
+                "  'members' : [ {                                                   \n" +
+                "    'id' : '_batch',                                                \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/_batch'                            \n" +
+                "    }                                                               \n" +
+                "  } ]                                                               \n" +
+                "}";
+
+        checkResult(result, expected);
     }
 
     private void testBulkOrdersDeleteAndCreateBySendingGetResponse() throws IOException {

@@ -6,9 +6,12 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import io.liveoak.common.codec.DefaultResourceRef;
 import io.liveoak.pgsql.data.Id;
@@ -638,5 +641,50 @@ public class QueryBuilder {
         try (PreparedStatement ps = prepareDeleteTable(con, t)) {
             ps.executeUpdate();
         }
+    }
+
+    public void executeDeleteTables(Connection c, List<Table> deleteList) throws SQLException {
+
+        // check that all the referrers are also in deleteList
+        // if not - don't even start deleting
+        for (Table t: deleteList) {
+            for (ForeignKey fk: t.referredKeys()) {
+                Table dep = catalog.table(fk.columns().get(0).tableRef());
+                if (! deleteList.contains(dep)) {
+                    throw new IllegalArgumentException("Table " + dep.id() + " has dependency on " + t.id() + " and should be included for deletion as well");
+                }
+            }
+        }
+
+        // first find all dependencies, and order them properly
+        Set<Table> sorted = new TreeSet<>(new Comparator<Table>() {
+            @Override
+            public int compare(Table t1, Table t2) {
+                if (t1 == t2) {
+                    return 0;
+                }
+                if (transitivelyReferredBy(t1, t2)) {
+                    return 1;
+                }
+
+                return -1;
+            }
+        });
+        sorted.addAll(deleteList);
+
+        for (Table t: sorted) {
+            executeDeleteTable(c, t);
+        }
+    }
+
+    private boolean transitivelyReferredBy(Table t1, Table t2) {
+        for (ForeignKey fk: t1.referredKeys()) {
+            Table dep = catalog.table(fk.columns().get(0).tableRef());
+            if (dep.id().equals(t2.id())) {
+                return true;
+            }
+            return transitivelyReferredBy(dep, t2);
+        }
+        return false;
     }
 }
