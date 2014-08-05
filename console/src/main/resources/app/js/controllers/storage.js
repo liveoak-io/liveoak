@@ -631,6 +631,15 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $scope.columnsHidden.push(col);
   };
 
+  $scope.columnAvailable = function(input){
+
+    if ($scope.columns.indexOf(input) > -1){
+      return false;
+    }
+
+    return true;
+  };
+
   $scope.collectionClear = function(){
     $log.debug('Clearing collection ' + $scope.collectionId );
 
