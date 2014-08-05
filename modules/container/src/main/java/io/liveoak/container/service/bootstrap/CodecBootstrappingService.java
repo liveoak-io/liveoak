@@ -23,6 +23,7 @@ import static io.liveoak.spi.LiveOak.codec;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class CodecBootstrappingService implements Service<Void> {
     @Override
@@ -35,6 +36,9 @@ public class CodecBootstrappingService implements Service<Void> {
 
         installCodec(target, MediaType.JSON, JSONEncoder.class, new JSONDecoder());
         installCodec(target, MediaType.HTML, HTMLEncoder.class, null);
+
+        // Custom Media Types
+        installCodec(target, MediaType.LOCAL_APP_JSON, JSONEncoder.class, new JSONDecoder());
     }
 
     @Override
