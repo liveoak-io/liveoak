@@ -1,5 +1,6 @@
 package io.liveoak.pgsql;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -121,13 +122,19 @@ public class PgSqlTableResource implements Resource {
         return results;
     }
 
-    public QueryResults queryTable(String table, String id, RequestContext ctx) throws SQLException {
+    public QueryResults queryTable(String table, String id, RequestContext ctx) throws SQLException, IOException {
         Catalog cat = parent.getCatalog();
         Table t = cat.tableById(table);
         try (Connection con = parent.getConnection()) {
             QueryBuilder qb = new QueryBuilder(cat);
+            String q = ctx.resourceParams().value("q");
+
             if (id == null) {
-                return qb.querySelectFromTable(con, t, replaceIdsWithColumnNames(ctx.sorting()), ctx.pagination());
+                if (q != null) {
+                    return qb.querySelectFromTable(con, t, replaceIdsWithColumnNames(ctx.sorting()), ctx.pagination(), q);
+                } else {
+                    return qb.querySelectFromTable(con, t, replaceIdsWithColumnNames(ctx.sorting()), ctx.pagination());
+                }
             } else {
                 return qb.querySelectFromTableWhereId(con, t, id);
             }

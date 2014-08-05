@@ -1,5 +1,6 @@
 package io.liveoak.pgsql.meta;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,10 +14,28 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.liveoak.common.codec.DefaultResourceRef;
 import io.liveoak.pgsql.data.Id;
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
+import io.liveoak.pgsql.sql.And;
+import io.liveoak.pgsql.sql.Expression;
+import io.liveoak.pgsql.sql.GreaterThan;
+import io.liveoak.pgsql.sql.GreaterThanOrEqual;
+import io.liveoak.pgsql.sql.Identifier;
+import io.liveoak.pgsql.sql.LessThan;
+import io.liveoak.pgsql.sql.LessThanOrEqual;
+import io.liveoak.pgsql.sql.LogicalOperator;
+import io.liveoak.pgsql.sql.NotEqual;
+import io.liveoak.pgsql.sql.Operator;
+import io.liveoak.pgsql.sql.Or;
+import io.liveoak.pgsql.sql.RelationalOperand;
+import io.liveoak.pgsql.sql.RelationalOperator;
+import io.liveoak.pgsql.sql.Value;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
@@ -686,5 +705,138 @@ public class QueryBuilder {
             return transitivelyReferredBy(dep, t2);
         }
         return false;
+    }
+
+    public QueryResults querySelectFromTable(Connection con, Table table, Sorting specs, Pagination pagination, String query) throws IOException {
+        // if query can't be parsed to JSON throw exception
+        JsonNode q = parseJson(query);
+
+        if (!q.isObject()) {
+            throw new IllegalArgumentException("Invalid query: not an object (" + query + ")");
+        }
+
+        // convert Mongo query to SQL WHERE expression
+        Expression e = parseRelational(q);
+
+        return null; // TODO
+    }
+
+    private Expression parseRelational(JsonNode parent) {
+        if (!parent.isObject()) {
+            throw new IllegalArgumentException("Invalid query: not an object (" + parent + ")");
+        }
+
+        And root = new And();
+        Iterator<String> it = parent.fieldNames();
+        while (it.hasNext()) {
+            String name = it.next();
+            if (name.startsWith("$")) {
+                // it's an operator
+                JsonNode node = parent.get(name);
+                Operator op;
+                switch (name) {
+                    case "$or":
+                        op = new Or();
+                        parseLogical((LogicalOperator) op, node);
+                        break;
+                    case "$and":
+                        op = new And();
+                        parseLogical((LogicalOperator) op, node);
+                        break;
+                    case "$gt":
+                        op = new GreaterThan();
+                        op.right(parseRelationalOperand(node));
+                        break;
+                    case "$lt":
+                        op = new LessThan();
+                        op.right(parseRelationalOperand(node));
+                        break;
+                    case "$gte":
+                        op = new GreaterThanOrEqual();
+                        op.right(parseRelationalOperand(node));
+                        break;
+                    case "$lte":
+                        op = new LessThanOrEqual();
+                        op.right(parseRelationalOperand(node));
+                        break;
+                    case "$ne":
+                        op = new NotEqual();
+                        op.right(parseRelationalOperand(node));
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unsupported operator: " + name);
+                }
+                System.out.println(op);  // TODO
+                root.next(op);
+            } else {
+                // it's a field name
+                JsonNode node = parent.get(name);
+                if (node.isObject()) {
+                    Expression op = parseRelational(node).normalize();
+                    if (op instanceof RelationalOperator) {
+                        ((RelationalOperator) op).left(new Identifier(name));
+                    }
+                    root.next(op);
+                } else {
+                    try {
+                        RelationalOperand value = parseRelationalOperand(node);
+                        root.next(new Identifier(name).equalTo(value));
+                    } catch (IllegalArgumentException e) {
+                        throw new IllegalArgumentException("Unexpected value of " + name + ": " + node);
+                    }
+                }
+            }
+        }
+        return root.normalize(); // TODO
+    }
+
+    private RelationalOperand parseRelationalOperand(JsonNode node) {
+        Object value;
+        if (node.isTextual()) {
+            value = node.textValue();
+        } else if (node.isBoolean()) {
+            value = node.booleanValue();
+        } else if (node.isInt()) {
+            value = node.intValue();
+        } else if (node.isLong()) {
+            value = node.longValue();
+        } else if (node.isBigInteger()) {
+            value = node.bigIntegerValue();
+        } else if (node.isFloat()) {
+            value = node.floatValue();
+        } else if (node.isDouble()) {
+            value = node.doubleValue();
+        } else if (node.isBigDecimal()) {
+            value = node.decimalValue();
+        } else if (node.isNull()) {
+            value = null;
+        } else {
+            throw new IllegalArgumentException("Unexpected value of: " + node);
+        }
+        return new Value(value);
+    }
+
+    private void parseLogical(LogicalOperator op, JsonNode node) {
+        if (!node.isArray()) {
+            throw new IllegalArgumentException("Value must be a JSON array - " + op + ": " + node);
+        }
+
+        // iterate over items, convert them to Expressions, and attach them to op ...
+        for (JsonNode el: node) {
+            op = op.next(parseRelational(el));
+        }
+    }
+
+    private JsonNode parseJson(String jsonString) throws IOException {
+        ObjectMapper mapper = new ObjectMapper(JSON_FACTORY);
+        JsonParser jp = JSON_FACTORY.createParser(jsonString);
+        return mapper.readTree(jp);
+    }
+
+    private static final JsonFactory JSON_FACTORY = new JsonFactory();
+
+    static {
+        JSON_FACTORY.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+        JSON_FACTORY.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     }
 }

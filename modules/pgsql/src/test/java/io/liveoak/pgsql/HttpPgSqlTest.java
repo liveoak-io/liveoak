@@ -2,6 +2,7 @@ package io.liveoak.pgsql;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -56,6 +57,9 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         testReadOrdersExpanded();
         testReadOrdersDoubleExpanded();
 
+        // query orders
+        testQueryOrders();
+
         // delete an order cascading - include all the order items
         testDeleteFirstOrderCascading();
 
@@ -79,6 +83,76 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
         // GET all collections and send response back to _batch?action=delete
         testBulkTablesDeleteBySendingGetResponse();
+    }
+
+    private void testQueryOrders() throws IOException {
+        // we use Mongo query syntax
+        String query = "{total: {$gt: 30000}}";
+
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?q=" + URLEncoder.encode(query, "utf-8"));
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        String result = getRequest(get);
+        System.out.println(result);
+
+
+        query = "{$or: [{create_date: {$gt: '2014-04-03'}}, {total: {$gt: 30000}}]}";
+
+        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?q=" + URLEncoder.encode(query, "utf-8"));
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        result = getRequest(get);
+        System.out.println(result);
+
+
+        //
+        query = "{$and: [{create_date: {$lt: '2014-04-03'}}, {total: {$gt: 30000}}]}";
+
+        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?q=" + URLEncoder.encode(query, "utf-8"));
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        result = getRequest(get);
+        System.out.println(result);
+
+
+        // this query is equivalent to the previous one
+        query = "{create_date: {$lt: '2014-04-03'}, total: {$gt: 30000}}";
+
+        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?q=" + URLEncoder.encode(query, "utf-8"));
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        result = getRequest(get);
+        System.out.println(result);
+
+
+        // condition requiring joins
+        query = "{'addresses.country_iso': 'UK'}";
+
+        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?q=" + URLEncoder.encode(query, "utf-8"));
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        result = getRequest(get);
+        System.out.println(result);
+
+
+        // condition requiring joins
+        query = "{'items.name': 'The Gadget'}";
+
+        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?q=" + URLEncoder.encode(query, "utf-8"));
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        result = getRequest(get);
+        System.out.println(result);
+
+
+        // condition requiring multiple joins
+        query = "{'items.name': 'The Gadget', 'addresses.country_iso': 'UK'}";
+
+        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?q=" + URLEncoder.encode(query, "utf-8"));
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        result = getRequest(get);
+        System.out.println(result);
     }
 
     private void testBulkTablesDeleteBySendingGetResponse() throws IOException {
