@@ -221,6 +221,20 @@ public class Table implements Comparable<Table> {
         return null;
     }
 
+    public Key joinKeyForTable(Table table) {
+        for (ForeignKey fk: foreignKeys) {
+            if (fk.tableRef().equals(table.tableRef())) {
+                return fk;
+            }
+        }
+        for (ForeignKey rfk: referredKeys) {
+            if (rfk.columns().get(0).tableRef().equals(table.tableRef())) {
+                return pk;
+            }
+        }
+        return null;
+    }
+
     @Override
     public int compareTo(Table o) {
         if (o == this) {

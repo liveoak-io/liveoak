@@ -13,6 +13,10 @@ public class Value extends RelationalOperand {
         this.value = val;
     }
 
+    public Object value() {
+        return value;
+    }
+
     @Override
     public String toString() {
         return "?";

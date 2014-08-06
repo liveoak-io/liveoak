@@ -8,7 +8,9 @@ public class Key {
     private List<Column> cols;
 
     Key(List<Column> cols) {
-        if (cols != null) {
+        if (cols == null) {
+            this.cols = Collections.emptyList();
+        } else {
             this.cols = Collections.unmodifiableList(new ArrayList(cols));
         }
     }
@@ -39,5 +41,22 @@ public class Key {
             i++;
         }
         return -1;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Key key = (Key) o;
+
+        if (!cols.equals(key.cols)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return cols.hashCode();
     }
 }

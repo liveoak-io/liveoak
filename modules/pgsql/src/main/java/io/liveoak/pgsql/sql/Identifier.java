@@ -11,6 +11,14 @@ public class Identifier extends RelationalOperand {
         this.name = name;
     }
 
+    public String name() {
+        return name;
+    }
+
+    public void name(String name) {
+        this.name = name;
+    }
+
     @Override
     public String toString() {
         return name;

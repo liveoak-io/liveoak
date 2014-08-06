@@ -8,6 +8,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,11 +20,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.liveoak.common.codec.DefaultResourceRef;
+import io.liveoak.pgsql.data.Pair;
 import io.liveoak.pgsql.data.Id;
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
 import io.liveoak.pgsql.sql.And;
 import io.liveoak.pgsql.sql.Expression;
+import io.liveoak.pgsql.sql.ExpressionWalker;
 import io.liveoak.pgsql.sql.GreaterThan;
 import io.liveoak.pgsql.sql.GreaterThanOrEqual;
 import io.liveoak.pgsql.sql.Identifier;
@@ -707,7 +710,7 @@ public class QueryBuilder {
         return false;
     }
 
-    public QueryResults querySelectFromTable(Connection con, Table table, Sorting specs, Pagination pagination, String query) throws IOException {
+    public QueryResults querySelectFromTable(Connection con, Table table, Sorting sorting, Pagination pagination, String query) throws IOException, SQLException {
         // if query can't be parsed to JSON throw exception
         JsonNode q = parseJson(query);
 
@@ -716,9 +719,110 @@ public class QueryBuilder {
         }
 
         // convert Mongo query to SQL WHERE expression
-        Expression e = parseRelational(q);
+        Expression expression = parseRelational(q);
 
-        return null; // TODO
+        PreparedStatement ps = prepareSelectFromTableWhere(con, table, expression, sorting, pagination);
+        return query(ps, pagination);
+    }
+
+    private PreparedStatement prepareSelectFromTableWhere(Connection con, Table table, Expression expression, Sorting sorting, Pagination pagination) throws SQLException {
+        List<Pair<Key, Key>> joins = new LinkedList<>();
+
+        Column[] col = new Column[1];
+        List<Pair<Column, Value>> values = new LinkedList<>();
+
+        // identify columns / tables in expression
+
+        new ExpressionWalker().traverse(expression, (node) -> {
+
+            if (node instanceof Identifier) {
+                String name = ((Identifier) node).name();
+                String [] segments = name.split("\\.");
+                Table colTable = table;
+                Column c = null;
+                int i = 0;
+                for (String segment: segments) {
+                    c = colTable.column(segment);
+                    if (c == null) {
+                        // it might be a reference to related table
+                        colTable = catalog.table(new TableRef(segment));
+                        if (colTable == null) {
+                            throw new IllegalArgumentException("Query refers to non-existent field: " + name + " ('" + segment + "' not found)");
+                        }
+                        Key leftKey = table.joinKeyForTable(colTable);
+                        Key rightKey = colTable.joinKeyForTable(table);
+                        joins.add(new Pair(leftKey, rightKey));
+                    } else if (i != segments.length - 1) {
+                        throw new IllegalArgumentException("Query refers to non-existent field: " + name + " (good up to '" + segment + "')");
+                    }
+                    i++;
+                }
+                if (c == null) {
+                    throw new IllegalArgumentException("Query refers to invalid field name: " + name);
+                }
+                col[0] = c;
+
+                // convert ORM scoped field name to table scoped column name
+                ((Identifier) node).name(colTable.quotedSchemaName() + "." + c.name());
+
+            } else if (node instanceof Value) {
+                values.add(new Pair<>(col[0], (Value) node));
+            }
+        });
+
+        // prepare join part of the query
+        StringBuilder select = new StringBuilder()
+                .append(selectJoinTables(table, joins))
+                .append(" WHERE ")
+                .append(expression.toString());
+
+        // TODO: add sorting and pagination settings
+
+        PreparedStatement ps = con.prepareStatement(select.toString());
+
+        // bind values
+        int i = 1;
+        for (Pair<Column, Value> pair: values) {
+            pair.key().bindValue(ps, i, pair.value().value());
+            i++;
+        }
+
+        return ps;
+    }
+
+    private String selectJoinTables(Table table, List<Pair<Key, Key>> joins) {
+        StringBuilder sb = new StringBuilder("SELECT " + table.quotedSchemaName() + ".* FROM " + table.quotedSchemaName());
+
+        // track processed joins to avoid duplicates
+        HashSet<Pair<Key, Key>> processed = new HashSet<>();
+
+        // We assume that joins are properly ordered so any transitive intermediaries
+        // have already been taken care of by pairs earlier in the list
+        for (Pair<Key, Key> pair: joins) {
+
+            if (processed.contains(pair)) {
+                continue;
+            }
+            List<Column> cols = pair.key().columns();
+            List<Column> cols2 = pair.value().columns();
+
+            if (cols.size() != cols2.size()) {
+                throw new RuntimeException("Join columns mismatch: " + pair.key() + " vs. " + pair.value());
+            }
+            for (int i = 0; i < cols.size(); i++) {
+                Table tab = catalog.table(cols.get(i).tableRef());
+                Table tab2 = catalog.table(cols2.get(i).tableRef());
+                if (i == 0) {
+                    sb.append(" JOIN " + tab2.quotedSchemaName() + " ON ");
+                } else {
+                    sb.append(" AND ");
+                }
+                sb.append(tab.quotedSchemaName() + "." + cols.get(i).name() + "=" + tab2.quotedSchemaName() + "." + cols2.get(i).name());
+            }
+            processed.add(pair);
+        }
+
+        return sb.toString();
     }
 
     private Expression parseRelational(JsonNode parent) {
@@ -766,7 +870,6 @@ public class QueryBuilder {
                     default:
                         throw new IllegalArgumentException("Unsupported operator: " + name);
                 }
-                System.out.println(op);  // TODO
                 root.next(op);
             } else {
                 // it's a field name
@@ -787,7 +890,7 @@ public class QueryBuilder {
                 }
             }
         }
-        return root.normalize(); // TODO
+        return root.normalize();
     }
 
     private RelationalOperand parseRelationalOperand(JsonNode node) {
