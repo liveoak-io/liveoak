@@ -565,8 +565,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
 /* Example-applications */
 
 .transition {
-  -webkit-transition: all .25s ease;
-  -moz-transition: none;
+  transition: all .25s ease;
 }
 
 .example-apps {
@@ -729,10 +728,10 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
     @media (min-width: 1200px) {
     
       &.col-lg-4 {
-        width: calc(~"33.33333333333333% - 20px");
+        width: calc(~"33.3% - 20px");
         
         &:hover, &.clicked {
-          width: calc(~"33.33333333333333% - 10px");
+          width: calc(~"33.3% - 10px");
         }
       }
     }
