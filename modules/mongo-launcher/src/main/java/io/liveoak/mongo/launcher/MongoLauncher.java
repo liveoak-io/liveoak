@@ -285,7 +285,7 @@ public class MongoLauncher {
     }
 
     public void stopMongo() throws IOException {
-        if (process != null) {
+        if (started()) {
             log.info("Stopping mongod");
             process.destroy();
             try {

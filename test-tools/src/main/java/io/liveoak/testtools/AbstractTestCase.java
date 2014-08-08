@@ -138,6 +138,10 @@ public class AbstractTestCase {
             // wait for it to stop
             long start = System.currentTimeMillis();
             while(mongoLauncher.serverRunning(mongoHost, mongoPort, (e) -> { if (System.currentTimeMillis() - start > 120000) throw new RuntimeException(e); })) {
+
+                if (System.currentTimeMillis() - start > 120000) {
+                    throw new RuntimeException("mongod process still seems to be running (2m timeout)");
+                }
                 try {
                     Thread.sleep(300);
                 } catch (InterruptedException e) {
