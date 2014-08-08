@@ -211,7 +211,7 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
 
 loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $route, currentApp, $modal, Notifications,
                                                    currentCollectionList, LoCollection, $routeParams, LoCollectionItem,
-                                                   LiveOak, $location, $window) {
+                                                   LiveOak, $location, $window, $cookieStore, $q) {
 
   $log.debug('StorageCollectionCtrl');
   $rootScope.curApp = currentApp;
@@ -408,6 +408,13 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       }
     }, true
   );
+
+  $scope.isInfoClosed = $cookieStore.get($scope.username + '_isInfoClosed');
+
+  $scope.infoClose = function() {
+    $cookieStore.put($scope.username + '_isInfoClosed', true);
+    $scope.isInfoClosed = true;
+  };
 
   var ModalInstanceCtrl = function ($scope, $modalInstance, FileReader, Notifications) {
 
@@ -718,13 +725,17 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   $scope.save = function(){
     $log.debug('Saving collection.');
 
+    var promises = [];
+
     // If Clear All was clicked, no need to delete specific rows, everything will be deleted.
     if ($scope.isClearAll) {
       for (var j in $scope.collectionDataBackup){
         var itemToClear = $scope.collectionDataBackup[j];
 
-        LoCollectionItem.delete({appId: currentApp.id, storageId: $routeParams.storageId,
-          collectionId: $scope.collectionId, itemId: itemToClear.id.substring(1,itemToClear.id.length-1)});
+        var deleteAllPromise = LoCollectionItem.delete({appId: currentApp.id, storageId: $routeParams.storageId,
+          collectionId: $scope.collectionId, itemId: itemToClear.id.substring(1,itemToClear.id.length-1)}).$promise;
+
+        promises.push(deleteAllPromise);
       }
     } else {
 
@@ -744,6 +755,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
         if (itemToDelete) {
           var deletePromise = LoCollectionItem.delete({appId: currentApp.id, storageId: $routeParams.storageId,
             collectionId: $scope.collectionId, itemId: itemToDelete.substring(1,itemToDelete.length-1)}).$promise;
+
+          promises.push(deletePromise);
 
           deletePromise.then(removeFromList(itemToDelete));
         }
@@ -779,8 +792,10 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
         if (itemFromBackup && !angular.equals(itemToSave, itemFromBackup)) {
 
           var decodedItemToSave = decodeJSON(itemToSave);
-          LoCollectionItem.update({appId: currentApp.id, storageId: $routeParams.storageId,
-            collectionId: $scope.collectionId, itemId: decodedItemToSave.id}, decodedItemToSave);
+          var updatePromise = LoCollectionItem.update({appId: currentApp.id, storageId: $routeParams.storageId,
+            collectionId: $scope.collectionId, itemId: decodedItemToSave.id}, decodedItemToSave).$promise;
+
+          promises.push(updatePromise);
         } else {
           $log.debug('Not updating:        ' + angular.toJson(itemToSave));
         }
@@ -791,16 +806,30 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       }
     }
 
+    function errorCreate(result){
+      var errorType = result.data['error-type'];
+      var object = result.config.data;
+      Notifications.error('Error ' + errorType + ' during saving "' + JSON.stringify(object) + '" to the collection \"' + $scope.collectionId + '\".');
+    }
+
     for (var l in $scope.newRows){
       var newRowToSave = $scope.newRows[l];
       $log.debug('Creating: ' + newRowToSave);
       var decodedNewRowToSave = decodeJSON(newRowToSave);
 
-      LoCollectionItem.create({appId: currentApp.id, storageId: $routeParams.storageId,
-        collectionId: $scope.collectionId}, decodedNewRowToSave);
+      console.log(decodedNewRowToSave);
+
+      var promiseCreate = LoCollectionItem.create({appId: currentApp.id, storageId: $routeParams.storageId,
+        collectionId: $scope.collectionId}, decodedNewRowToSave, angular.noop, errorCreate).$promise;
+
+      promises.push(promiseCreate);
     }
 
-    Notifications.success('The changes in the collection "' + $scope.collectionId + '" have been saved.');
+    $q.all(promises).then(function() {
+      Notifications.success('The changes in the collection "' + $scope.collectionId + '" have been saved.');
+    }, function() {
+      Notifications.warn('There were some errors during update of the collection "' + $scope.collectionId + '".');
+    });
 
     resetEnv();
     loadCollectionData($scope.collectionId, true);
