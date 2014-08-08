@@ -29,8 +29,6 @@ import static org.fest.assertions.Assertions.assertThat;
  */
 public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
-    protected static final String APPLICATION_JSON = "application/json";
-
     @Test
     public void testAll() throws IOException {
         System.out.println("testAll");
@@ -1453,67 +1451,5 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 s.execute();
             }
         }
-    }
-
-    private void checkResult(String result, String expected) throws IOException {
-        JsonNode resultNode = parseJson(result);
-        JsonNode expectedNode = parseJson(expected);
-
-        assertThat((Object) resultNode).isEqualTo(expectedNode);
-    }
-
-    private String postRequest(HttpPost post, String json) throws IOException {
-
-        StringEntity entity = new StringEntity(json, ContentType.create(APPLICATION_JSON, "UTF-8"));
-        post.setEntity(entity);
-
-        System.err.println("DO POST - " + post.getURI());
-        System.out.println("\n" + json);
-
-        CloseableHttpResponse result = httpClient.execute(post);
-
-        System.err.println("=============>>>");
-        System.err.println(result);
-
-        HttpEntity resultEntity = result.getEntity();
-
-        assertThat(resultEntity.getContentLength()).isGreaterThan(0);
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        resultEntity.writeTo(baos);
-
-        String resultStr = new String(baos.toByteArray());
-        System.err.println(resultStr);
-        System.err.println("\n<<<=============");
-        return resultStr;
-    }
-
-    public String getRequest(HttpGet get) throws IOException {
-        System.err.println("DO GET - " + get.getURI());
-        return request(get);
-    }
-
-    public String deleteRequest(HttpDelete delete) throws IOException {
-        System.err.println("DO DELETE - " + delete.getURI());
-        return request(delete);
-    }
-
-    private String request(HttpRequestBase request) throws IOException {
-        CloseableHttpResponse result = httpClient.execute(request);
-
-        System.err.println("=============>>>");
-        System.err.println(result);
-
-        HttpEntity resultEntity = result.getEntity();
-
-        assertThat(resultEntity.getContentLength()).isGreaterThan(0);
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        resultEntity.writeTo(baos);
-
-        String resultStr = new String(baos.toByteArray());
-        System.err.println(resultStr);
-        System.err.println("\n<<<=============");
-        return resultStr;
     }
 }

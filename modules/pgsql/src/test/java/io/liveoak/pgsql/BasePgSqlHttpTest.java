@@ -1,5 +1,6 @@
 package io.liveoak.pgsql;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -14,8 +15,18 @@ import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.pgsql.extension.PgSqlExtension;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.jboss.logging.Logger;
 import org.postgresql.jdbc2.optional.PoolingDataSource;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -24,6 +35,7 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
 
     private static final Logger log = Logger.getLogger(BasePgSqlHttpTest.class);
 
+    protected static final String APPLICATION_JSON = "application/json";
     protected static final String BASEPATH = "sqldata";
     protected static final JsonFactory JSON_FACTORY = new JsonFactory();
 
@@ -40,6 +52,69 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
         ObjectMapper mapper = new ObjectMapper(JSON_FACTORY);
         JsonParser jp = JSON_FACTORY.createParser(jsonString);
         return mapper.readTree(jp);
+    }
+
+
+    protected void checkResult(String result, String expected) throws IOException {
+        JsonNode resultNode = parseJson(result);
+        JsonNode expectedNode = parseJson(expected);
+
+        assertThat((Object) resultNode).isEqualTo(expectedNode);
+    }
+
+    protected String postRequest(HttpPost post, String json) throws IOException {
+
+        StringEntity entity = new StringEntity(json, ContentType.create(APPLICATION_JSON, "UTF-8"));
+        post.setEntity(entity);
+
+        System.err.println("DO POST - " + post.getURI());
+        System.out.println("\n" + json);
+
+        CloseableHttpResponse result = httpClient.execute(post);
+
+        System.err.println("=============>>>");
+        System.err.println(result);
+
+        HttpEntity resultEntity = result.getEntity();
+
+        assertThat(resultEntity.getContentLength()).isGreaterThan(0);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        resultEntity.writeTo(baos);
+
+        String resultStr = new String(baos.toByteArray());
+        System.err.println(resultStr);
+        System.err.println("\n<<<=============");
+        return resultStr;
+    }
+
+    protected String getRequest(HttpGet get) throws IOException {
+        System.err.println("DO GET - " + get.getURI());
+        return request(get);
+    }
+
+    protected String deleteRequest(HttpDelete delete) throws IOException {
+        System.err.println("DO DELETE - " + delete.getURI());
+        return request(delete);
+    }
+
+    protected String request(HttpRequestBase request) throws IOException {
+        CloseableHttpResponse result = httpClient.execute(request);
+
+        System.err.println("=============>>>");
+        System.err.println(result);
+
+        HttpEntity resultEntity = result.getEntity();
+
+        assertThat(resultEntity.getContentLength()).isGreaterThan(0);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        resultEntity.writeTo(baos);
+
+        String resultStr = new String(baos.toByteArray());
+        System.err.println(resultStr);
+        System.err.println("\n<<<=============");
+        return resultStr;
     }
 
     @Override
