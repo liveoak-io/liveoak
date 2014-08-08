@@ -209,8 +209,7 @@
             <tr ng-repeat="item in newRows">
               <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}"
                   class="row-{{column}}" ng-click="isEdit = (true && column !== 'id')">
-                <span ng-if="column === 'id'">{{ item[column] }}</span>
-                <input class="form-control" type="text" ng-model="item[column]" pf-validation="isValidJSON(input)" ng-if="column !== 'id'"/>
+                <input class="form-control" type="text" ng-model="item[column]" pf-validation="isValidJSON(input)"/>
               </td>
               <td class="actions">
                 <button class="btn btn-link btn-icon" tooltip="Delete Row" ng-click="rowRemoveNew($index)">
