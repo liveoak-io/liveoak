@@ -211,7 +211,7 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
 
 loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $route, currentApp, $modal, Notifications,
                                                    currentCollectionList, LoCollection, $routeParams, LoCollectionItem,
-                                                   LiveOak, $location, $window) {
+                                                   LiveOak, $location, $window, $cookieStore) {
 
   $log.debug('StorageCollectionCtrl');
   $rootScope.curApp = currentApp;
@@ -408,6 +408,13 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       }
     }, true
   );
+
+  $scope.isInfoClosed = $cookieStore.get($scope.username + '_isInfoClosed');
+
+  $scope.infoClose = function() {
+    $cookieStore.put($scope.username + '_isInfoClosed', true);
+    $scope.isInfoClosed = true;
+  };
 
   var ModalInstanceCtrl = function ($scope, $modalInstance, FileReader, Notifications) {
 

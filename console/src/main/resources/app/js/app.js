@@ -8,6 +8,7 @@ var loMod = angular.module('loApp', [
   'loApp.directives',
   'loApp.controllers',
   'ngResource',
+  'ngCookies',
   'patternfly.autofocus',
   'patternfly.notification',
   'patternfly.select',

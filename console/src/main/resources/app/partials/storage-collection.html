@@ -54,13 +54,10 @@
         </div>
 
         <hr ng-show="collectionList.length > 0"/>
-        
-        <div class="alert alert-info" ng-show="collectionList.length > 0">
-<!--
-          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+        <div class="alert alert-info" ng-show="collectionList.length > 0 && !isInfoClosed">
+          <button type="button" class="close" aria-hidden="true" ng-click="infoClose()">
             <span class="pficon pficon-close"></span>
           </button>
--->
           <span class="pficon pficon-info"></span>
           <strong>Use JSON Syntax in the table cells.</strong> Learn more about <a href="http://www.w3schools.com/json/json_syntax.asp" target="_blank">JSON Syntax</a>.
         </div>
