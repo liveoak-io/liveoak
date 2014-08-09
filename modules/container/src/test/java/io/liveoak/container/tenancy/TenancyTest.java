@@ -87,12 +87,12 @@ public class TenancyTest {
         assertThat(appAdmin.getMode()).isEqualTo(Mode.ACTIVE);
         assertThat(appAdmin.getState()).isEqualTo(State.UP);
 
-        ServiceController<?> appAdminMount = this.serviceContainer.getService(applicationAdminResource(ZeroExtension.APPLICATION_ID).append("mount"));
+        ServiceController<?> appAdminMount = this.serviceContainer.getService(defaultMount(applicationAdminResource(ZeroExtension.APPLICATION_ID)));
         assertThat(appAdminMount).isNotNull();
         assertThat(appAdminMount.getMode()).isEqualTo(Mode.ACTIVE);
         assertThat(appAdminMount.getState()).isEqualTo(State.UP);  // we are mounted
 
-        ServiceController<ApplicationContext> appContext = (ServiceController<ApplicationContext>) this.serviceContainer.getService(applicationContext(ZeroExtension.APPLICATION_ID).append("mount"));
+        ServiceController<ApplicationContext> appContext = (ServiceController<ApplicationContext>) this.serviceContainer.getService(defaultMount(applicationContext(ZeroExtension.APPLICATION_ID)));
         assertThat(appContext).isNotNull();
         assertThat(appContext.getMode()).isEqualTo(Mode.ACTIVE);
         assertThat(appContext.getState()).isEqualTo(State.DOWN); // our public side isn't mounted
@@ -107,7 +107,7 @@ public class TenancyTest {
         // now let's wire up the Zero app's /applications container, and it should all fall together.
 
         MountService appsMountService = new MountService();
-        this.serviceContainer.addService(resource(ZeroExtension.APPLICATION_ID, "applications").append("mount"), appsMountService)
+        this.serviceContainer.addService(LiveOak.defaultMount(resource(ZeroExtension.APPLICATION_ID, "applications")), appsMountService)
                 .addDependency(applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, appsMountService.mountPointInjector())
                 .addDependency(resource(ZeroExtension.APPLICATION_ID, "applications"), RootResource.class, appsMountService.resourceInjector())
                 .install();
@@ -126,7 +126,7 @@ public class TenancyTest {
 
 
         this.serviceContainer.awaitStability();
-        appContext = (ServiceController<ApplicationContext>) this.serviceContainer.getService(applicationContext(ZeroExtension.APPLICATION_ID).append("mount"));
+        appContext = (ServiceController<ApplicationContext>) this.serviceContainer.getService(defaultMount(applicationContext(ZeroExtension.APPLICATION_ID)));
         assertThat(appContext).isNotNull();
         assertThat(appContext.getMode()).isEqualTo(Mode.ACTIVE);
         assertThat(appContext.getState()).isEqualTo(State.UP);
@@ -174,7 +174,7 @@ public class TenancyTest {
         assertThat(appAdmin.getMode()).isEqualTo(Mode.ACTIVE);
         assertThat(appAdmin.getState()).isEqualTo(State.UP);
 
-        ServiceController<?> appAdminMount = this.serviceContainer.getService(applicationAdminResource(ZeroExtension.APPLICATION_ID).append("mount"));
+        ServiceController<?> appAdminMount = this.serviceContainer.getService(defaultMount(applicationAdminResource(ZeroExtension.APPLICATION_ID)));
         assertThat(appAdminMount).isNotNull();
         assertThat(appAdminMount.getMode()).isEqualTo(Mode.ACTIVE);
         assertThat(appAdminMount.getState()).isEqualTo(State.UP); // we are mounted, but our parent isn't
@@ -184,7 +184,7 @@ public class TenancyTest {
         assertThat(appContext.getMode()).isEqualTo(Mode.ACTIVE);
         assertThat(appContext.getState()).isEqualTo(State.UP);
 
-        ServiceController<?> appContextMount = this.serviceContainer.getService(applicationContext(ZeroExtension.APPLICATION_ID).append("mount"));
+        ServiceController<?> appContextMount = this.serviceContainer.getService(defaultMount(applicationContext(ZeroExtension.APPLICATION_ID)));
         assertThat(appContextMount).isNotNull();
         assertThat(appContextMount.getMode()).isEqualTo(Mode.ACTIVE);
         assertThat(appContextMount.getState()).isEqualTo(State.UP);

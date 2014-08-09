@@ -1,5 +1,6 @@
 package io.liveoak.container.zero.service;
 
+import io.liveoak.container.extension.MediaTypeMountService;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
@@ -7,6 +8,7 @@ import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.container.zero.SystemResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.MediaType;
 import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -32,22 +34,22 @@ public class ZeroResourcesService implements Service<Void> {
         target.addService(systemName, new ValueService<SystemResource>(new ImmediateValue<>(new SystemResource())))
                 .install();
 
-        mount(target, systemName);
+        MountService<RootResource> mount = new MountService<>();
+        target.addService(systemName.append("mount"), mount)
+                .addDependency(LiveOak.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, mount.mountPointInjector())
+                .addDependency(systemName, RootResource.class, mount.resourceInjector())
+                .install();
 
         ServiceName applicationsName = LiveOak.resource(ZeroExtension.APPLICATION_ID, "applications");
         ApplicationsResourceService applicationsResource = new ApplicationsResourceService();
         target.addService(applicationsName, applicationsResource)
                 .addDependency(LiveOak.APPLICATION_REGISTRY, InternalApplicationRegistry.class, applicationsResource.applicationRegistryInjector())
                 .install();
-        mount(target, applicationsName);
-    }
 
-    protected void mount(ServiceTarget target, ServiceName resourceName) {
-        MountService<RootResource> mount = new MountService<>();
-
-        target.addService(resourceName.append("mount"), mount)
-                .addDependency(LiveOak.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, mount.mountPointInjector())
-                .addDependency(resourceName, RootResource.class, mount.resourceInjector())
+        MediaTypeMountService<RootResource> mediaTypeMount = new MediaTypeMountService<>(null, MediaType.JSON, true);
+        target.addService(LiveOak.defaultMount(applicationsName), mediaTypeMount)
+                .addDependency(LiveOak.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, mediaTypeMount.mountPointInjector())
+                .addDependency(applicationsName, RootResource.class, mediaTypeMount.resourceInjector())
                 .install();
     }
 

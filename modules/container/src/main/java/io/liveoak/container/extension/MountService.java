@@ -1,6 +1,7 @@
 package io.liveoak.container.extension;
 
 import io.liveoak.container.tenancy.MountPointResource;
+import io.liveoak.spi.MediaType;
 import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -11,11 +12,11 @@ import org.jboss.msc.value.InjectedValue;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class MountService<T extends RootResource> implements Service<T> {
 
     public MountService() {
-
     }
 
     public MountService(String verifyId) {
@@ -30,14 +31,21 @@ public class MountService<T extends RootResource> implements Service<T> {
             }
         }
 
-
-        this.mountableInjector.getValue().registerResource(this.resourceInjector.getValue());
+        mountResource();
         this.resourceInjector.getValue().parent(this.mountableInjector.getValue());
+    }
+
+    protected void mountResource() {
+        this.mountableInjector.getValue().registerResource(this.resourceInjector.getValue());
     }
 
     @Override
     public void stop(StopContext context) {
         this.resourceInjector.getValue().parent(null);
+        unmountResource();
+    }
+
+    protected void unmountResource() {
         this.mountableInjector.getValue().unregisterResource(this.resourceInjector.getValue());
     }
 
@@ -55,6 +63,6 @@ public class MountService<T extends RootResource> implements Service<T> {
     }
 
     private String verifyId;
-    private InjectedValue<MountPointResource> mountableInjector = new InjectedValue<>();
-    private InjectedValue<T> resourceInjector = new InjectedValue<>();
+    protected InjectedValue<MountPointResource> mountableInjector = new InjectedValue<>();
+    protected InjectedValue<T> resourceInjector = new InjectedValue<>();
 }

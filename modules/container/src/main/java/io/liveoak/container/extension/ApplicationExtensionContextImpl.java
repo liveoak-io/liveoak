@@ -8,6 +8,7 @@ import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.MediaType;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -19,6 +20,7 @@ import org.jboss.msc.value.ImmediateValue;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class ApplicationExtensionContextImpl implements ApplicationExtensionContext {
 
@@ -56,8 +58,18 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
 
     @Override
     public void mountPublic(ServiceName publicName) {
-        MountService<RootResource> mount = new MountService(this.appExtension.resourceId());
-        ServiceController<? extends Resource> controller = this.target.addService(publicName.append("mount"), mount)
+        mountPublic(publicName, null);
+    }
+
+    @Override
+    public void mountPublic(ServiceName publicName, MediaType mediaType) {
+        mountPublic(publicName, mediaType, false);
+    }
+
+    @Override
+    public void mountPublic(ServiceName publicName, MediaType mediaType, boolean makeDefault) {
+        MediaTypeMountService<RootResource> mount = new MediaTypeMountService(this.appExtension.resourceId(), mediaType, makeDefault);
+        ServiceController<? extends Resource> controller = this.target.addService(LiveOak.defaultMount(publicName), mount)
                 .addDependency(this.publicMount, MountPointResource.class, mount.mountPointInjector())
                 .addDependency(publicName, RootResource.class, mount.resourceInjector())
                 .install();
@@ -66,10 +78,20 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
 
     @Override
     public void mountPublic(RootResource publicResource) {
+        mountPublic(publicResource, null);
+    }
+
+    @Override
+    public void mountPublic(RootResource publicResource, MediaType mediaType) {
+        mountPublic(publicResource, mediaType, false);
+    }
+
+    @Override
+    public void mountPublic(RootResource publicResource, MediaType mediaType, boolean makeDefault) {
         ValueService<RootResource> service = new ValueService<RootResource>(new ImmediateValue<>(publicResource));
         this.target.addService(LiveOak.resource(application().id(), resourceId()), service)
                 .install();
-        mountPublic(LiveOak.resource(application().id(), resourceId()));
+        mountPublic(LiveOak.resource(application().id(), resourceId()), mediaType, makeDefault);
     }
 
     @Override
@@ -79,7 +101,17 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
 
     @Override
     public void mountPrivate(ServiceName privateName) {
-        MountService<RootResource> mount = new MountService(this.appExtension.resourceId());
+        mountPrivate(privateName, null);
+    }
+
+    @Override
+    public void mountPrivate(ServiceName privateName, MediaType mediaType) {
+        mountPrivate(privateName, mediaType, false);
+    }
+
+    @Override
+    public void mountPrivate(ServiceName privateName, MediaType mediaType, boolean makeDefault) {
+        MediaTypeMountService<RootResource> mount = new MediaTypeMountService(this.appExtension.resourceId(), mediaType, makeDefault);
 
         ConfigFilteringService configFilter = new ConfigFilteringService(filteringProperties());
         target.addService(privateName.append("filter-config"), configFilter)
@@ -105,7 +137,7 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
                 .addDependency(privateName, RootResource.class, lifecycle.resourceInjector())
                 .install();
 
-        ServiceController<? extends Resource> controller = this.target.addService(privateName.append("mount"), mount)
+        ServiceController<? extends Resource> controller = this.target.addService(LiveOak.defaultMount(privateName), mount)
                 .addDependency(privateName.append("lifecycle"))
                 .addDependency(this.adminMount, MountPointResource.class, mount.mountPointInjector())
                 .addDependency(privateName.append("wrapper"), RootResource.class, mount.resourceInjector())
@@ -115,10 +147,20 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
 
     @Override
     public void mountPrivate(RootResource privateResource) {
+        mountPrivate(privateResource, null);
+    }
+
+    @Override
+    public void mountPrivate(RootResource privateResource, MediaType mediaType) {
+        mountPrivate(privateResource, mediaType, false);
+    }
+
+    @Override
+    public void mountPrivate(RootResource privateResource, MediaType mediaType, boolean makeDefault) {
         ValueService<RootResource> service = new ValueService<RootResource>(new ImmediateValue<>(privateResource));
         this.target.addService(LiveOak.adminResource(application().id(), resourceId()), service)
                 .install();
-        mountPrivate(LiveOak.adminResource(application().id(), resourceId()));
+        mountPrivate(LiveOak.adminResource(application().id(), resourceId()), mediaType, makeDefault);
     }
 
     protected Properties filteringProperties() {

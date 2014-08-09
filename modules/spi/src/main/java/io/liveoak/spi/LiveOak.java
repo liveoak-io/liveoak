@@ -73,6 +73,10 @@ public class LiveOak {
         return LIVEOAK.append("application-admin-resource", appId, resourceId);
     }
 
+    public static ServiceName defaultMount(ServiceName serviceName) {
+        return serviceName.append("default-mount");
+    }
+
     public static ServiceName extension(String extensionId) {
         return LIVEOAK.append("extension", extensionId);
     }

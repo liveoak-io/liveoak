@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.container.extension.MediaTypeMountService;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.tenancy.ApplicationResource;
@@ -17,6 +18,7 @@ import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.MediaType;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
@@ -112,8 +114,8 @@ public class ApplicationService implements Service<InternalApplication> {
         ApplicationContextService appContext = new ApplicationContextService(this.app);
         target.addService(appContextName, appContext)
                 .install();
-        MountService<ApplicationContext> appContextMount = new MountService<>();
-        this.app.contextController(target.addService(appContextName.append("mount"), appContextMount)
+        MediaTypeMountService<ApplicationContext> appContextMount = new MediaTypeMountService<>(null, MediaType.JSON, true);
+        this.app.contextController(target.addService(LiveOak.defaultMount(appContextName), appContextMount)
                 .addDependency(LiveOak.GLOBAL_CONTEXT, MountPointResource.class, appContextMount.mountPointInjector())
                 .addDependency(appContextName, ApplicationContext.class, appContextMount.resourceInjector())
                 .install());
@@ -124,8 +126,8 @@ public class ApplicationService implements Service<InternalApplication> {
         ApplicationResourceService appResource = new ApplicationResourceService(this.app);
         target.addService(appResourceName, appResource)
                 .install();
-        MountService<ApplicationResource> appResourceMount = new MountService<>();
-        this.app.resourceController(target.addService(appResourceName.append("mount"), appResourceMount)
+        MediaTypeMountService<ApplicationResource> appResourceMount = new MediaTypeMountService<>(null, MediaType.JSON, true);
+        this.app.resourceController(target.addService(LiveOak.defaultMount(appResourceName), appResourceMount)
                 .addDependency(LiveOak.resource(ZeroExtension.APPLICATION_ID, "applications"), MountPointResource.class, appResourceMount.mountPointInjector())
                 .addDependency(appResourceName, ApplicationResource.class, appResourceMount.resourceInjector())
                 .install());

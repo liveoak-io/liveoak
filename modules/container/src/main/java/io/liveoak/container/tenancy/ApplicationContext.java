@@ -3,7 +3,7 @@ package io.liveoak.container.tenancy;
 /**
  * @author Bob McWhirter
  */
-public class ApplicationContext extends SimpleResourceRegistry {
+public class ApplicationContext extends MediaTypeResourceRegistry {
 
     public ApplicationContext(InternalApplication application) {
         super(application.id());
