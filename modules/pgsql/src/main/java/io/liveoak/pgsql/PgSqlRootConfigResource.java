@@ -152,12 +152,12 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
             initialConnections = 1;
         }
 
-        List<String> exposedSchemas = (List<String>) state.getProperty("schemas");
+        List<String> exposedSchemas = (List<String>) state.getPropertyAsList("schemas");
         if (exposedSchemas != null) {
             this.exposedSchemas = exposedSchemas;
         }
 
-        List<String> blockedSchemas = (List<String>) state.getProperty("blocked-schemas");
+        List<String> blockedSchemas = (List<String>) state.getPropertyAsList("blocked-schemas");
         if (blockedSchemas != null) {
             this.blockedSchemas = blockedSchemas;
         }

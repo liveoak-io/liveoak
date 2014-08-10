@@ -24,6 +24,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.jboss.logging.Logger;
+import org.junit.Assert;
 import org.postgresql.jdbc2.optional.PoolingDataSource;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -60,6 +61,14 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
         JsonNode expectedNode = parseJson(expected);
 
         assertThat((Object) resultNode).isEqualTo(expectedNode);
+    }
+
+    protected void checkResultForError(String result) throws IOException {
+        JsonNode node = parseJson(result);
+        JsonNode cause = node.get("cause");
+        if (node.get("error-type") != null) {
+            Assert.fail("Server returned an error: error-type: " + node.get("error-type") + ", cause: " + cause);
+        }
     }
 
     protected String postRequest(HttpPost post, String json) throws IOException {

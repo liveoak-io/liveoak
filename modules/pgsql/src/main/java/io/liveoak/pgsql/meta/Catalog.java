@@ -16,7 +16,7 @@ public class Catalog {
 
     private final Set<String> schemas;
     private final String defaultSchema;
-    private Map<TableRef, Table> tables;
+    private final Map<TableRef, Table> tables;
 
     public Catalog(Set<String> schemas, String defaultSchema, Map<TableRef, Table> tables) {
         this.schemas = Collections.unmodifiableSet(schemas);
@@ -70,6 +70,11 @@ public class Catalog {
             tablesWithIds.put(t.tableRef(), t);
         }
         this.tables = Collections.unmodifiableMap(tablesWithIds);
+
+        // set catalog on tables
+        for (Table t: tables.values()) {
+            t.catalog(this);
+        }
     }
 
     public Table table(TableRef tableRef) {

@@ -102,19 +102,19 @@ public class PgSqlReadCollectionTest extends BasePgSqlTest {
                         "order_id", "014-1003095",
                         "create_date", time("2014-06-07 15:10:15.0"),
                         "total", 18990L,
-                        "addresses", expandDepth == 2 ? resourceRef("/testApp/" + BASEPATH + "/addresses/1") : addr1}),
+                        "address", expandDepth == 2 ? resourceRef("/testApp/" + BASEPATH + "/addresses/1") : addr1}),
 
                 resource("014-2004096", endpoint, expandDepth == 1 ? new Object[0] : new Object[]{
                         "order_id", "014-2004096",
                         "create_date", time("2014-04-02 11:06:12.0"),
                         "total", 43800L,
-                        "addresses", expandDepth == 2 ? resourceRef("/testApp/" + BASEPATH + "/addresses/2") : addr2}),
+                        "address", expandDepth == 2 ? resourceRef("/testApp/" + BASEPATH + "/addresses/2") : addr2}),
 
                 resource("014-2004345", endpoint, expandDepth == 1 ? new Object[0] : new Object[]{
                         "order_id", "014-2004345",
                         "create_date", time("2014-06-01 18:06:12.0"),
                         "total", 32500L,
-                        "addresses", expandDepth == 2 ? resourceRef("/testApp/" + BASEPATH + "/addresses/2") : addr2})
+                        "address", expandDepth == 2 ? resourceRef("/testApp/" + BASEPATH + "/addresses/2") : addr2})
         );
 
         checkResource(result, expected);
@@ -137,7 +137,7 @@ public class PgSqlReadCollectionTest extends BasePgSqlTest {
                             "order_id", "014-1003095",
                             "create_date", time("2014-06-07 15:10:15.0"),
                             "total", 18990L,
-                            "addresses", resourceRef("/testApp/sqldata/addresses/1")});
+                            "address", resourceRef("/testApp/sqldata/addresses/1")});
 
 
             order_two = resource("014-2004096", "/testApp/sqldata/" + schema_two + ".orders",
@@ -145,14 +145,14 @@ public class PgSqlReadCollectionTest extends BasePgSqlTest {
                             "order_id", "014-2004096",
                             "create_date", time("2014-04-02 11:06:12.0"),
                             "total", 43800L,
-                            "addresses", resourceRef("/testApp/sqldata/addresses/2")});
+                            "address", resourceRef("/testApp/sqldata/addresses/2")});
 
             order_three = resource("014-2004345", "/testApp/sqldata/" + schema_two + ".orders",
                     new Object[]{
                             "order_id", "014-2004345",
                             "create_date", time("2014-06-01 18:06:12.0"),
                             "total", 32500L,
-                            "addresses", resourceRef("/testApp/sqldata/addresses/2")});
+                            "address", resourceRef("/testApp/sqldata/addresses/2")});
         }
 
         ResourceState expected = resource(endpoint, new Object[] {

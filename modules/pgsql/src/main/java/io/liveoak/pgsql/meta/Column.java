@@ -109,6 +109,8 @@ public class Column {
                 return Types.BINARY;
             case "varbinary":
                 return Types.VARBINARY;
+            case "timestamp":
+                return Types.TIMESTAMP;
             default:
                 throw new IllegalStateException("Unknown type: " + type);
         }

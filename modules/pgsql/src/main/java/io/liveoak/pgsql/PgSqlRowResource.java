@@ -146,7 +146,8 @@ public class PgSqlRowResource implements Resource {
         // if there are any fks process them
         for (Map.Entry<ForeignKey, String[]> ent : fkMap.entrySet()) {
             String fkTable = cat.table(ent.getKey().tableRef()).id();
-            sink.accept(fkTable, new PgSqlResourceRef(
+            String fkField = ent.getKey().fieldName();
+            sink.accept(fkField, new PgSqlResourceRef(
                     new PgSqlTableResource(parent.parent(), fkTable),
                     PrimaryKey.spliceId(ent.getValue())));
         }

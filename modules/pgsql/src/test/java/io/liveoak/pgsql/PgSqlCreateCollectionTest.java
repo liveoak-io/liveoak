@@ -154,7 +154,7 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                 "quantity", 1,
                 "price", 39900,
                 "vat", 20,
-                schema_two + ".orders", resourceRef("/testApp/" + BASEPATH + "/" + schema_two + ".orders/014-2004096")
+                "order", resourceRef("/testApp/" + BASEPATH + "/" + schema_two + ".orders/014-2004096")
         });
         result = client.create(ctx("*(*)"), endpoint, body);
         System.out.println(result);
@@ -165,12 +165,12 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                 "quantity", 1,
                 "price", 39900,
                 "vat", 20,
-                schema_two + ".orders", resource("014-2004096", "/testApp/" + BASEPATH + "/" + schema_two + ".orders", new Object[]{
+                "order", resource("014-2004096", "/testApp/" + BASEPATH + "/" + schema_two + ".orders", new Object[]{
                         "order_id", "014-2004096",
                         "create_date", time("2014-04-02 11:06:12.0"),
                         "total", 43800L,
-                        "addresses", resourceRef("/testApp/" + BASEPATH + "/addresses/2"),
-                        "items", list(resourceRef("/testApp/" + BASEPATH + "/items/I39845355"))
+                        "items", list(resourceRef("/testApp/" + BASEPATH + "/items/I39845355")),
+                        "address", resourceRef("/testApp/" + BASEPATH + "/addresses/2")
                 })
         });
 
@@ -184,7 +184,7 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                 "quantity", 1,
                 "price", 32500,
                 "vat", 20,
-                schema_two + ".orders", resourceRef("014-2004345", "/testApp/" + BASEPATH + "/" + schema_two + ".orders")
+                "order", resourceRef("014-2004345", "/testApp/" + BASEPATH + "/" + schema_two + ".orders")
         });
 
         result = client.update(ctx("*(*)"), endpoint + "/I39845355", body);
@@ -196,12 +196,12 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                 "quantity", 1,
                 "price", 32500,
                 "vat", 20,
-                schema_two + ".orders", resource("014-2004345", "/testApp/" + BASEPATH + "/" + schema_two + ".orders", new Object[]{
+                "order", resource("014-2004345", "/testApp/" + BASEPATH + "/" + schema_two + ".orders", new Object[]{
                         "order_id", "014-2004345",
                         "create_date", time("2014-06-01 18:06:12.0"),
                         "total", 32500L,
-                        "addresses", resourceRef("/testApp/" + BASEPATH + "/addresses/2"),
-                        "items", list(resourceRef("/testApp/" + BASEPATH + "/items/I39845355"))
+                        "items", list(resourceRef("/testApp/" + BASEPATH + "/items/I39845355")),
+                        "address", resourceRef("/testApp/" + BASEPATH + "/addresses/2")
                 })
         });
 

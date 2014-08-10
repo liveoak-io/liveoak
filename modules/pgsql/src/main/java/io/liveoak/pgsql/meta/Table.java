@@ -2,7 +2,6 @@ package io.liveoak.pgsql.meta;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -15,6 +14,7 @@ public class Table implements Comparable<Table> {
     private List<Column> columns;
     private PrimaryKey pk;
     private List<ForeignKey> foreignKeys;
+    private Catalog catalog;
 
     /**
      * In all referredKeys the ForeignKey.tableRef points to this table.
@@ -133,7 +133,7 @@ public class Table implements Comparable<Table> {
             sb.append("\"").append(col.name()).append("\" ").append(col.typeSpec());
             boolean partOfPk = pk().getColumn(col.name()) != null;
             if (col.unique() && !partOfPk) {
-                sb.append(" UNIQUE ");
+                sb.append(" UNIQUE");
             }
             if (col.notNull() && !partOfPk) {
                 sb.append(" NOT NULL");
@@ -221,6 +221,15 @@ public class Table implements Comparable<Table> {
         return null;
     }
 
+    public ForeignKey foreignKeyForFieldName(String name) {
+        for (ForeignKey fk: foreignKeys) {
+            if (fk.fieldName().equals(name)) {
+                return fk;
+            }
+        }
+        return null;
+    }
+
     public Key joinKeyForTable(Table table) {
         for (ForeignKey fk: foreignKeys) {
             if (fk.tableRef().equals(table.tableRef())) {
@@ -233,6 +242,17 @@ public class Table implements Comparable<Table> {
             }
         }
         return null;
+    }
+
+    void catalog(Catalog catalog) {
+        if (this.catalog != null) {
+            throw new RuntimeException("Catalog already set");
+        }
+        this.catalog = catalog;
+
+        for (ForeignKey fk: foreignKeys) {
+            fk.catalog(catalog);
+        }
     }
 
     @Override

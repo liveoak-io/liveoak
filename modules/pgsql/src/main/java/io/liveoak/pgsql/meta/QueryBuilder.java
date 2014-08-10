@@ -104,18 +104,21 @@ public class QueryBuilder {
     public PreparedStatement prepareSelectAllFromTable(Connection con, Table table, Sorting sorting, Pagination pagination) throws SQLException {
         StringBuilder sb = new StringBuilder(selectAllFromTable(table));
 
-        if (sorting != null && sorting.specs().size() > 0) {  // TODO: that's ugly
-            sb.append(" ORDER BY ");
+        if (sorting != null) {
+            StringBuilder orderBy = new StringBuilder();
             int i = 0;
             for (Sorting.Spec spec: sorting) {
                 if (i > 0) {
-                    sb.append(",");
+                    orderBy.append(",");
                 }
-                sb.append(spec.name());
+                orderBy.append(spec.name());
                 if (!spec.ascending()) {
-                    sb.append(" DESC");
+                    orderBy.append(" DESC");
                 }
                 i++;
+            }
+            if (orderBy.length() > 0) {
+                sb.append(" ORDER BY ").append(orderBy);
             }
         }
         sb.append(" LIMIT " + pagination.limit());
@@ -249,7 +252,7 @@ public class QueryBuilder {
 
             if (key instanceof ForeignKey) {
                 // if it's a FK then extract referenced id
-                String fkField = catalog.table(((ForeignKey) key).tableRef()).id();
+                String fkField = ((ForeignKey) key).fieldName();
                 val = selfHrefId(fkField, state.getProperty(fkField));
 
             } else if (key instanceof PrimaryKey) {
@@ -294,7 +297,7 @@ public class QueryBuilder {
 
             ForeignKey fk = table.foreignKeyForColumnName(c.name());
             if (fk != null) {
-                String field = catalog.table(fk.tableRef()).id();
+                String field = fk.fieldName();
                 Object resRef = state.getProperty(field);
                 String id = null;
                 if (resRef instanceof ResourceRef) {
@@ -496,7 +499,9 @@ public class QueryBuilder {
 
             for (Object item: listOfNew) {
                 ResourceState newState = ((ResourceState) item);
-                newState.putProperty(table.id(), new DefaultResourceRef(state.uri()));
+                ForeignKey fk = (ForeignKey) refTable.joinKeyForTable(table);
+                String joinField = fk.fieldName();
+                newState.putProperty(joinField, new DefaultResourceRef(state.uri()));
                 executeCreate(ctx, con, refTable, newState);
             }
         }
@@ -738,19 +743,28 @@ public class QueryBuilder {
             if (node instanceof Identifier) {
                 String name = ((Identifier) node).name();
                 String [] segments = name.split("\\.");
-                Table colTable = table;
+                Table lastTable = table;
                 Column c = null;
                 int i = 0;
                 for (String segment: segments) {
-                    c = colTable.column(segment);
+                    c = lastTable.column(segment);
                     if (c == null) {
                         // it might be a reference to related table
-                        colTable = catalog.table(new TableRef(segment));
+                        ForeignKey fk = lastTable.foreignKeyForFieldName(segment);
+                        Table colTable = fk != null ? catalog.table(fk.tableRef()) : null;
+                        if (colTable == null) {
+                            colTable = catalog.table(new TableRef(segment));
+                        }
                         if (colTable == null) {
                             throw new IllegalArgumentException("Query refers to non-existent field: " + name + " ('" + segment + "' not found)");
                         }
-                        Key leftKey = table.joinKeyForTable(colTable);
-                        Key rightKey = colTable.joinKeyForTable(table);
+                        Key leftKey = lastTable.joinKeyForTable(colTable);
+                        Key rightKey = colTable.joinKeyForTable(lastTable);
+                        if (leftKey == null || rightKey == null) {
+                            throw new RuntimeException("Unable to join tables for: " + name + " (left key: " + leftKey + ", right key: " + rightKey + ")");
+                        }
+                        lastTable = colTable;
+
                         joins.add(new Pair(leftKey, rightKey));
                     } else if (i != segments.length - 1) {
                         throw new IllegalArgumentException("Query refers to non-existent field: " + name + " (good up to '" + segment + "')");
@@ -763,7 +777,7 @@ public class QueryBuilder {
                 col[0] = c;
 
                 // convert ORM scoped field name to table scoped column name
-                ((Identifier) node).name(colTable.quotedSchemaName() + "." + c.name());
+                ((Identifier) node).name(lastTable.quotedSchemaName() + "." + c.name());
 
             } else if (node instanceof Value) {
                 values.add(new Pair<>(col[0], (Value) node));

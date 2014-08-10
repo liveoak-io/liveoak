@@ -4,6 +4,8 @@ import java.util.List;
 
 public class ForeignKey extends Key {
     private TableRef table;
+    private Catalog catalog;
+    private String fieldName;
 
     public ForeignKey(List<Column> fkCols, TableRef table) {
         super(fkCols);
@@ -15,6 +17,28 @@ public class ForeignKey extends Key {
 
     public TableRef tableRef() {
         return table;
+    }
+
+    void catalog(Catalog catalog) {
+        if (this.catalog != null) {
+            throw new RuntimeException("Catalog already set");
+        }
+        this.catalog = catalog;
+
+        if (fieldName == null) {
+            String name = columns().get(0).name();
+            String tableId = catalog.table(tableRef()).id();
+
+            if (name.endsWith("_id")) {
+                fieldName = name.substring(0, name.length()-3);
+            } else {
+                fieldName = tableId;
+            }
+        }
+    }
+
+    public String fieldName() {
+        return fieldName;
     }
 
     @Override
