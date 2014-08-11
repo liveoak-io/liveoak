@@ -157,10 +157,6 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<DefaultH
         return returnFields;
     }
 
-    protected ResourceState decodeState(MediaType mediaType, ByteBuf content) throws Exception {
-        return codecManager.decode(mediaType, content);
-    }
-
     protected Pagination decodePagination(ResourceParams params) {
         int offset = limit(params.intValue("offset", 0), 0, Integer.MAX_VALUE);
         int limit = limit(params.intValue("limit", Pagination.DEFAULT_LIMIT), 0, Pagination.MAX_LIMIT);
