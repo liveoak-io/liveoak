@@ -73,9 +73,9 @@ public class MediaTypeMatcherTest {
 
         List<MediaType> candidates = new ArrayList<>();
 
-        candidates.add(new MediaType("application/json"));
-        candidates.add(new MediaType("text/xml"));
-        candidates.add(new MediaType("text/html"));
+        candidates.add(MediaType.JSON);
+        candidates.add(MediaType.XML);
+        candidates.add(MediaType.HTML);
 
         MediaType match = matcher.findBestMatch(candidates);
 
@@ -90,14 +90,50 @@ public class MediaTypeMatcherTest {
 
         List<MediaType> candidates = new ArrayList<>();
 
-        candidates.add(new MediaType("application/json"));
-        candidates.add(new MediaType("text/xml"));
-        candidates.add(new MediaType("text/html"));
+        candidates.add(MediaType.JSON);
+        candidates.add(MediaType.XML);
+        candidates.add(MediaType.HTML);
 
         MediaType match = matcher.findBestMatch(candidates);
 
         assertThat(match).isNotNull();
         assertThat(match.type()).isEqualTo("text");
         assertThat(match.subtype()).isEqualTo("xml");
+    }
+
+    @Test
+    public void testFindBestMatchWithCustomTypeNotRequested() throws Exception {
+        MediaTypeMatcher matcher = new DefaultMediaTypeMatcher("application/json; q=0.81, text/xml; q=0.8, */*; q=0.2");
+
+        List<MediaType> candidates = new ArrayList<>();
+
+        candidates.add(MediaType.LOCAL_APP_JSON);
+        candidates.add(MediaType.XML);
+        candidates.add(MediaType.JSON);
+        candidates.add(MediaType.HTML);
+
+        MediaType match = matcher.findBestMatch(candidates);
+
+        assertThat(match).isNotNull();
+        assertThat(match.type()).isEqualTo("application");
+        assertThat(match.subtype()).isEqualTo("json");
+    }
+
+    @Test
+    public void testFindBestMatchWithCustomTypeRequested() throws Exception {
+        MediaTypeMatcher matcher = new DefaultMediaTypeMatcher("application/liveoak-local-app+json; q=0.8, */*; q=0.2");
+
+        List<MediaType> candidates = new ArrayList<>();
+
+        candidates.add(MediaType.JSON);
+        candidates.add(MediaType.XML);
+        candidates.add(MediaType.HTML);
+        candidates.add(MediaType.LOCAL_APP_JSON);
+
+        MediaType match = matcher.findBestMatch(candidates);
+
+        assertThat(match).isNotNull();
+        assertThat(match.type()).isEqualTo("application");
+        assertThat(match.subtype()).isEqualTo("liveoak-local-app");
     }
 }
