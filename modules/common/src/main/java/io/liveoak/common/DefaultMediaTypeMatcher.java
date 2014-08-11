@@ -88,19 +88,6 @@ public class DefaultMediaTypeMatcher implements MediaTypeMatcher {
         return this.mediaTypes;
     }
 
-    @Override
-    public MediaType findBestMatch(List<MediaType> types) {
-        for (MediaType mine : this.mediaTypes) {
-            for (MediaType other : types) {
-                if (other.isCompatible(mine)) {
-                    return other;
-                }
-            }
-        }
-
-        return null;
-    }
-
     private List<MediaType> mediaTypes = new ArrayList<>();
 
     @Override
