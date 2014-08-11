@@ -106,6 +106,7 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<DefaultH
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .requestAttribute(HttpHeaders.Names.AUTHORIZATION, msg.headers().get(HttpHeaders.Names.AUTHORIZATION))
+                    .requestAttribute(HttpHeaders.Names.CONTENT_TYPE, contentType)
                     .requestAttribute(HTTP_REQUEST, msg)
                     .resourceState(new DefaultLazyResourceState(codecManager, contentType, content))
                     .build());
@@ -126,6 +127,7 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<DefaultH
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .requestAttribute(HttpHeaders.Names.AUTHORIZATION, msg.headers().get(HttpHeaders.Names.AUTHORIZATION))
+                    .requestAttribute(HttpHeaders.Names.CONTENT_TYPE, contentType)
                     .requestAttribute(HTTP_REQUEST, msg)
                     .resourceState(new DefaultLazyResourceState(codecManager, contentType, content))
                     .build());

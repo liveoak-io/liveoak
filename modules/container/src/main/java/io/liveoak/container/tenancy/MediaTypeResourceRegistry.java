@@ -142,9 +142,10 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
 
     private MediaType mediaType(RequestContext ctx) {
         try {
-            DefaultHttpRequest request = (DefaultHttpRequest) ctx.requestAttributes().getAttribute(HttpResourceRequestDecoder.HTTP_REQUEST);
-            String contentTypeHeader = request.headers().get(HttpHeaders.Names.CONTENT_TYPE);
-            return new MediaType(contentTypeHeader);
+            MediaType mediaType = (MediaType) ctx.requestAttributes().getAttribute(HttpHeaders.Names.CONTENT_TYPE);
+            if (mediaType != null) {
+                return mediaType;
+            }
         } catch (NullPointerException e) {
             log.trace("Unable to retrieve Content-Type from Request. Defaulting to 'application/json'.");
         }
