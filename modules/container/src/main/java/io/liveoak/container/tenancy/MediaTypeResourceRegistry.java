@@ -146,7 +146,7 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
             String contentTypeHeader = request.headers().get(HttpHeaders.Names.CONTENT_TYPE);
             return new MediaType(contentTypeHeader);
         } catch (NullPointerException e) {
-            log.warn("Unable to retrieve Content-Type from Request, caused by NullPointerException.");
+            log.trace("Unable to retrieve Content-Type from Request. Defaulting to 'application/json'.");
         }
 
         return MediaType.JSON;
