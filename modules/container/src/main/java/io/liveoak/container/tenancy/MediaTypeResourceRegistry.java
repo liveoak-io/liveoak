@@ -153,6 +153,10 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
         return MediaType.JSON;
     }
 
+    public String toString() {
+        return "[" + getClass().getSimpleName() + ": parent=" + this.parent + "; id=" + this.id + "; registry=" + this.registry.values() + "]";
+    }
+
     private static MediaType DEFAULT = new MediaType("DEFAULT/none");
     private Resource parent;
     private String id;
