@@ -51,6 +51,19 @@ public class ZeroResourcesService implements Service<Void> {
                 .addDependency(LiveOak.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, mediaTypeMount.mountPointInjector())
                 .addDependency(applicationsName, RootResource.class, mediaTypeMount.resourceInjector())
                 .install();
+
+        // Install Local Applications Resource
+        ServiceName localApplicationsName = LiveOak.resource(ZeroExtension.APPLICATION_ID, "local-applications");
+        LocalApplicationsResourceService localAppsResourceService = new LocalApplicationsResourceService();
+        target.addService(localApplicationsName, localAppsResourceService)
+                .addDependency(LiveOak.APPLICATION_REGISTRY, InternalApplicationRegistry.class, localAppsResourceService.applicationRegistryInjector())
+                .install();
+
+        MediaTypeMountService<RootResource> localAppMediaTypeMount = new MediaTypeMountService<>(null, MediaType.LOCAL_APP_JSON, false);
+        target.addService(LiveOak.defaultMount(localApplicationsName), localAppMediaTypeMount)
+                .addDependency(LiveOak.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, localAppMediaTypeMount.mountPointInjector())
+                .addDependency(localApplicationsName, RootResource.class, localAppMediaTypeMount.resourceInjector())
+                .install();
     }
 
     @Override
