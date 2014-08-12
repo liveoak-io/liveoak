@@ -92,8 +92,8 @@ public class TestHelper extends BasePgSqlHttpTest {
                 "       'unique': false                                              \n" +
                 "     }],                                                            \n" +
                 "  'primary-key': ['user_id'],                                       \n" +
-                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"users\" ( \"user_id\" varchar (40),\"nick\" varchar (60) UNIQUE NOT NULL," +
-                "\"last_login\" timestamp NOT NULL, PRIMARY KEY (\"user_id\")'       \n" +
+                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"users\" (\"user_id\" varchar (40), \"nick\" varchar (60) UNIQUE NOT NULL, " +
+                "\"last_login\" timestamp NOT NULL, PRIMARY KEY (\"user_id\"))'       \n" +
                 "}";
 
         checkResult(result, expected);
@@ -174,10 +174,10 @@ public class TestHelper extends BasePgSqlHttpTest {
                 "     },                                                             \n" +
                 "     {                                                              \n" +
                 "       'name': 'public',                                            \n" +
-                "       'type': 'boolean',                                           \n" +
+                "       'type': 'bool',                                              \n" +
                 "       'size': 1 ,                                                  \n" +
                 "       'nullable': false,                                           \n" +
-                "       'unique': true                                               \n" +
+                "       'unique': false                                              \n" +
                 "     },                                                             \n" +
                 "     {                                                              \n" +
                 "       'name': 'create_time',                                       \n" +
@@ -191,9 +191,9 @@ public class TestHelper extends BasePgSqlHttpTest {
                 "      'table': '" + schema + ".users',                              \n" +
                 "      'columns': ['owner_id']                                       \n" +
                 "   }],                                                              \n" +
-                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"rooms\" ( \"room_id\" varchar (40),\"owner_id\" varchar (40) NOT NULL," +
-                "\"name\" varchar (60) UNIQUE NOT NULL,\"public\" bool NOT NULL,\"create_time\" timestamp NOT NULL, PRIMARY KEY (\"room_id\"), " +
-                "FOREIGN KEY (\"owner_id\") REFERENCES \"" + schema + "\".\"users\" (\"user_id\")'\n" +
+                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"rooms\" (\"room_id\" varchar (40), \"owner_id\" varchar (40) NOT NULL, " +
+                "\"name\" varchar (60) UNIQUE NOT NULL, \"public\" bool NOT NULL, \"create_time\" timestamp NOT NULL, PRIMARY KEY (\"room_id\"), " +
+                "FOREIGN KEY (\"owner_id\") REFERENCES \"" + schema + "\".\"users\" (\"user_id\"))'\n" +
                 "}";
 
         checkResult(result, expected);
@@ -296,10 +296,10 @@ public class TestHelper extends BasePgSqlHttpTest {
                 "      'table': '" + schema + ".users',                              \n" +
                 "      'columns': ['user_id']                                        \n" +
                 "   }],                                                              \n" +
-                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"messages\" ( \"message_id\" varchar (40),\"user_id\" varchar (40) NOT NULL," +
-                "\"room_id\" varchar (40) NOT NULL,\"create_time\" timestamp NOT NULL,\"content\" varchar (255) NOT NULL, PRIMARY KEY (\"message_id\"), " +
+                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"messages\" (\"message_id\" varchar (40), \"user_id\" varchar (40) NOT NULL, " +
+                "\"room_id\" varchar (40) NOT NULL, \"create_time\" timestamp NOT NULL, \"content\" varchar (255) NOT NULL, PRIMARY KEY (\"message_id\"), " +
                 "FOREIGN KEY (\"room_id\") REFERENCES \"" + schema + "\".\"rooms\" (\"room_id\"), " +
-                "FOREIGN KEY (\"user_id\") REFERENCES \"" + schema + "\".\"users\" (\"user_id\")'\n" +
+                "FOREIGN KEY (\"user_id\") REFERENCES \"" + schema + "\".\"users\" (\"user_id\"))'\n" +
                 "}";
 
         checkResult(result, expected);
@@ -392,16 +392,16 @@ public class TestHelper extends BasePgSqlHttpTest {
                 "  'self' : {                                                        \n" +
                 "    'href' : '/" + APP + "/" + RESOURCE + "/rooms/00000000001'      \n" +
                 "  },                                                                \n" +
+                "  'room_id' : '00000000001',                                        \n" +
+                "  'name': 'Wonderland',                                             \n" +
+                "  'public': true,                                                   \n" +
+                "  'create_time': 1407702142000,                                     \n" +
+                "  'messages' : [ ],                                                 \n" +
                 "  'owner': {                                                        \n" +
                 "    'self': {                                                       \n" +
                 "      'href': '/" + APP + "/" + RESOURCE + "/users/00000000002'     \n" +
                 "    }                                                               \n" +
-                "  },                                                                \n" +
-                "  'name': 'Wonderland'                                              \n" +
-                "  'public': true,                                                   \n" +
-                "  'create_time': '2014-08-10T22:22:22'                              \n" +
-                "  'messages' : [ ],                                                 \n" +
-                "  'rooms' : [ ]                                                     \n" +
+                "  }                                                                 \n" +
                 "}";
 
         checkResult(result, expected);
@@ -460,7 +460,7 @@ public class TestHelper extends BasePgSqlHttpTest {
                 "  'self': {                                                         \n" +
                 "    'href': '/" + APP + "/" + RESOURCE + "/messages/" + id + "'    \n" +
                 "  },                                                                \n" +
-                "  'messsage_id': '" + id + "',                                      \n" +
+                "  'message_id': '" + id + "',                                      \n" +
                 "  'create_time': " + now + ",                                       \n" +
                 "  'content': '" + message + "',                                     \n" +
                 "  'user': {                                                         \n" +
@@ -486,6 +486,7 @@ public class TestHelper extends BasePgSqlHttpTest {
         createMessagesTable();
     }
 
+    @Test
     public void fillWithData() throws IOException {
         createUserAlice();
         createUserBob();

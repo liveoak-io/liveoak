@@ -111,7 +111,7 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
                         obj("table", schema_two + ".orders",
                         "columns", list("order_id"))
                 ),
-                "ddl", "CREATE TABLE \"" + schema + "\".\"items\" ( \"item_id\" varchar (40),\"name\" varchar (255) NOT NULL,\"quantity\" int4 NOT NULL,\"price\" int4 NOT NULL,\"vat\" int4 NOT NULL,\"order_id\" varchar (40) NOT NULL, PRIMARY KEY (\"item_id\"), FOREIGN KEY (\"order_id\") REFERENCES \"" + schema_two + "\".\"orders\" (\"order_id\"))"
+                "ddl", "CREATE TABLE \"" + schema + "\".\"items\" (\"item_id\" varchar (40), \"name\" varchar (255) NOT NULL, \"quantity\" int4 NOT NULL, \"price\" int4 NOT NULL, \"vat\" int4 NOT NULL, \"order_id\" varchar (40) NOT NULL, PRIMARY KEY (\"item_id\"), FOREIGN KEY (\"order_id\") REFERENCES \"" + schema_two + "\".\"orders\" (\"order_id\"))"
                 }
         );
         expected = schemaBody;

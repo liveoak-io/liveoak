@@ -118,14 +118,14 @@ public class Table implements Comparable<Table> {
 
     public String ddlPretty(Catalog catalog, boolean multiline) {
 
-        StringBuilder sb = new StringBuilder("CREATE TABLE \"").append(schema()).append("\".\"").append(name()).append("\" ( ");
+        StringBuilder sb = new StringBuilder("CREATE TABLE \"").append(schema()).append("\".\"").append(name()).append("\" (");
         if (multiline) {
             sb.append("\n    ");
         }
         int i = 0;
         for (Column col : columns()) {
             if (i > 0) {
-                sb.append(",");
+                sb.append(", ");
                 if (multiline) {
                     sb.append("\n    ");
                 }
@@ -142,11 +142,12 @@ public class Table implements Comparable<Table> {
         }
         List<Column> pkcols = pk().columns();
         if (pkcols.size() > 0) {
-            sb.append(",");
             if (multiline) {
-                sb.append("\n   ");
+                sb.append(",\n    ");
+            } else {
+                sb.append(", ");
             }
-            sb.append(" PRIMARY KEY (");
+            sb.append("PRIMARY KEY (");
             i = 0;
             for (Column col : pkcols) {
                 if (i > 0) {
@@ -160,11 +161,12 @@ public class Table implements Comparable<Table> {
 
         List<ForeignKey> fkeys = foreignKeys();
         for (ForeignKey fk : fkeys) {
-            sb.append(",");
             if (multiline) {
-                sb.append("\n   ");
+                sb.append(",\n   ");
+            } else {
+                sb.append(", ");
             }
-            sb.append(" FOREIGN KEY (");
+            sb.append("FOREIGN KEY (");
             i = 0;
             for (Column col : fk.columns()) {
                 if (i > 0) {

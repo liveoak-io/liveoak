@@ -561,8 +561,8 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "      'table': '" + schema + ".items',                              \n" +
                 "      'columns': ['item_id']                                        \n" +
                 "   }],                                                              \n" +
-                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"attachments\" ( \"attachment_id\" varchar (40),\"name\" varchar (255) NOT NULL," +
-                        "\"content\" text NOT NULL,\"item_id\" varchar (40) NOT NULL, PRIMARY KEY (\"attachment_id\"), FOREIGN KEY (\"item_id\") " +
+                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"attachments\" (\"attachment_id\" varchar (40), \"name\" varchar (255) NOT NULL, " +
+                        "\"content\" text NOT NULL, \"item_id\" varchar (40) NOT NULL, PRIMARY KEY (\"attachment_id\"), FOREIGN KEY (\"item_id\") " +
                         "REFERENCES \"" + schema + "\".\"items\" (\"item_id\"))'     \n" +
                 "}";
 
@@ -1008,8 +1008,8 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "    'table' : '" + schema_two + ".orders',                          \n" +
                 "    'columns' : [ 'order_id' ]                                      \n" +
                 "  } ],                                                              \n" +
-                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"items\" ( \"item_id\" varchar (40),\"name\" varchar (255) NOT NULL," +
-                        "\"quantity\" int4 NOT NULL,\"price\" int4 NOT NULL,\"vat\" int4 NOT NULL,\"order_id\" varchar (40) NOT NULL, " +
+                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"items\" (\"item_id\" varchar (40), \"name\" varchar (255) NOT NULL, " +
+                        "\"quantity\" int4 NOT NULL, \"price\" int4 NOT NULL, \"vat\" int4 NOT NULL, \"order_id\" varchar (40) NOT NULL, " +
                         "PRIMARY KEY (\"item_id\"), FOREIGN KEY (\"order_id\") REFERENCES \"" + schema_two + "\".\"orders\" (\"order_id\"))' \n" +
                 "}";
         checkResult(result, expected);
@@ -1280,8 +1280,11 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "    'nullable' : false,                                             \n" +
                 "    'unique' : false                                                \n" +
                 "  } ],                                                              \n" +     // TODO: handle 'default'
-                "  'primary-key' : [ 'address_id' ]                                  \n" +
-                "}";                                                                           // TODO: Add 'ddl': 'CREATE TABLE ...'
+                "  'primary-key' : [ 'address_id' ],                                 \n" +
+                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"addresses\" (\"address_id\" int4, \"name\" varchar (255) NOT NULL, " +
+                "\"street\" varchar (255) NOT NULL, \"postcode\" varchar (10) NOT NULL, \"city\" varchar (60) NOT NULL, " +
+                "\"country_iso\" bpchar NOT NULL, \"is_company\" bool NOT NULL, PRIMARY KEY (\"address_id\"))' \n" +
+                "}";
 
         checkResult(result, expected);
 
@@ -1358,8 +1361,8 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "    'table': '" + schema + ".addresses',                            \n" +
                 "    'columns': ['address_id']                                       \n" +
                 "  }],                                                                \n" +
-                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"orders\" ( " +
-                        "\"order_id\" varchar (40),\"create_date\" timestamp NOT NULL,\"total\" int8 NOT NULL,\"address_id\" int4 NOT NULL, " +
+                "  'ddl' : 'CREATE TABLE \"" + schema + "\".\"orders\" (" +
+                        "\"order_id\" varchar (40), \"create_date\" timestamp NOT NULL, \"total\" int8 NOT NULL, \"address_id\" int4 NOT NULL, " +
                         "PRIMARY KEY (\"order_id\"), FOREIGN KEY (\"address_id\") REFERENCES \"" + schema + "\".\"addresses\" (\"address_id\"))' \n" +
                 "}";
 
@@ -1437,8 +1440,8 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "    'table': '" + schema + ".addresses',                            \n" +
                 "    'columns': ['address_id']                                       \n" +
                 "  }],                                                               \n" +
-                "  'ddl' : 'CREATE TABLE \"" + schema_two + "\".\"orders\" ( " +
-                        "\"order_id\" varchar (40),\"create_date\" timestamp NOT NULL,\"total\" int8 NOT NULL,\"address_id\" int4 NOT NULL, " +
+                "  'ddl' : 'CREATE TABLE \"" + schema_two + "\".\"orders\" (" +
+                        "\"order_id\" varchar (40), \"create_date\" timestamp NOT NULL, \"total\" int8 NOT NULL, \"address_id\" int4 NOT NULL, " +
                         "PRIMARY KEY (\"order_id\"), FOREIGN KEY (\"address_id\") REFERENCES \"" + schema + "\".\"addresses\" (\"address_id\"))' \n" +
                 "}";
 

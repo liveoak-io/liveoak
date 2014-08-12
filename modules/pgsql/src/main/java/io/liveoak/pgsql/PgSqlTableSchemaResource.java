@@ -54,18 +54,6 @@ public class PgSqlTableSchemaResource  implements Resource {
             col.put("size", c.size());
             col.put("nullable", !c.notNull());
             col.put("unique", c.unique());
-            /*
-            if (c.notNull() || c.unique()) {
-                List<String> modifiers = new LinkedList<>();
-                if (c.notNull()) {
-                    modifiers.add("NOT NULL");
-                }
-                if (c.unique()) {
-                    modifiers.add("UNIQUE");
-                }
-                col.put("modifiers", modifiers);
-            }
-            */
             cols.add(col);
         }
 
@@ -92,14 +80,12 @@ public class PgSqlTableSchemaResource  implements Resource {
                     fkcols.add(c.name());
                 }
                 fkspec.put("columns", fkcols);
-
                 fkspecs.add(fkspec);
             }
-
             sink.accept("foreign-keys", fkspecs);
-            sink.accept("ddl", table.ddl(parent.getCatalog()));
         }
 
+        sink.accept("ddl", table.ddl(parent.getCatalog()));
         sink.close();
     }
 }
