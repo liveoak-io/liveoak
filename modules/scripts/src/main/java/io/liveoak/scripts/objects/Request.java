@@ -5,17 +5,13 @@ package io.liveoak.scripts.objects;
  */
 public interface Request {
 
-    String getRequestID();
+    String getId();
 
-    String getResourcePath();
+    String getPath();
 
-    void setResourcePath(String resourcePath);
-
-    String getResourceType();
+    String getType();
 
     Resource getResource();
 
-    void setResource(Resource resource); //TODO
-
-    RequestContext getRequestContext();
+    RequestContext getContext();
 }

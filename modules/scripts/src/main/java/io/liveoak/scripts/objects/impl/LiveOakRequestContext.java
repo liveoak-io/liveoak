@@ -1,13 +1,10 @@
 package io.liveoak.scripts.objects.impl;
 
-import java.util.List;
 import java.util.Map;
 
-import io.liveoak.scripts.objects.Application;
-import io.liveoak.scripts.objects.Pagination;
 import io.liveoak.scripts.objects.RequestContext;
 import io.liveoak.scripts.objects.SecurityContext;
-import io.liveoak.scripts.objects.Sorting;
+import io.liveoak.scripts.objects.scripting.ScriptingRequestContext;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -15,37 +12,19 @@ import io.liveoak.scripts.objects.Sorting;
 public class LiveOakRequestContext implements RequestContext {
 
     LiveOakSecurityContext securityContext;
-    LiveOakApplication liveOakApplication;
-    LiveOakPagination liveOakPagination;
     LiveOakRequestAttributes liveOakRequestAttributes;
     LiveOakResourceParameters liveOakResourceParameters;
-    LiveOakSorting liveOakSorting;
 
-    io.liveoak.spi.RequestContext requestContext;
+    ScriptingRequestContext requestContext;
 
-    public LiveOakRequestContext(io.liveoak.spi.RequestContext requestContext) {
+    public LiveOakRequestContext(ScriptingRequestContext requestContext) {
         this.requestContext = requestContext;
 
         this.securityContext = new LiveOakSecurityContext(requestContext.securityContext());
 
-        liveOakApplication = new LiveOakApplication(requestContext.application());
-
-        liveOakPagination = new LiveOakPagination(requestContext.pagination());
-
         liveOakRequestAttributes = new LiveOakRequestAttributes(requestContext.requestAttributes());
 
-        liveOakResourceParameters = new LiveOakResourceParameters(requestContext.resourceParams());
-
-        if (requestContext.sorting() != null) {
-            liveOakSorting = new LiveOakSorting(requestContext.sorting());
-        } else {
-            liveOakSorting = null;
-        }
-    }
-
-    @Override
-    public Application getApplication() {
-        return liveOakApplication;
+        liveOakResourceParameters = new LiveOakResourceParameters(requestContext);
     }
 
     @Override
@@ -54,20 +33,13 @@ public class LiveOakRequestContext implements RequestContext {
     }
 
     @Override
-    public Pagination getPagination() {
-        return liveOakPagination;
-    }
-
-    public Map<String, Object> getRequestAttributes() {
+    public Map<String, Object> getAttributes() {
         return liveOakRequestAttributes;
     }
 
-    @Override
-    public List<Sorting.Spec> getSorting() {
-        return liveOakSorting;
-    }
 
-    public Map<String, Object> getResourceParameters() {
+    @Override
+    public Map<String, Object> getParameters() {
         return liveOakResourceParameters;
     }
 }

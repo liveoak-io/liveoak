@@ -7,6 +7,7 @@ package io.liveoak.security.policy.drools.impl;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import io.liveoak.spi.ResourceParams;
 
@@ -41,11 +42,6 @@ public class ResourceParamsDecorator implements ResourceParams {
     @Override
     public List<String> values(String name) {
         return delegate.values(name);
-    }
-
-    @Override
-    public int intValue(String name, int defaultValue) {
-        return delegate.intValue(name, defaultValue);
     }
 
     /**

@@ -1,7 +1,6 @@
 package io.liveoak.scripts.objects;
 
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -9,15 +8,10 @@ import java.util.Map;
  */
 public interface RequestContext {
 
-    Application getApplication();
-
     SecurityContext getSecurityContext();
 
-    Pagination getPagination();
+    Map<String, Object> getAttributes();
 
-    Map<String, Object> getRequestAttributes();
+    Map<String, Object> getParameters();
 
-    List<Sorting.Spec> getSorting();
-
-    //TODO: figure out how to handle the ReturnFields.
 }

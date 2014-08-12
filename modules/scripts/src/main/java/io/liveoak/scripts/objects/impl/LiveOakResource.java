@@ -52,7 +52,7 @@ public class LiveOakResource implements Resource {
     }
 
     @Override
-    public String getURI() {
+    public String getUri() {
         if (state.uri() == null) {
             return null;
         } else {
@@ -61,7 +61,7 @@ public class LiveOakResource implements Resource {
     }
 
     @Override
-    public void setURI(String uri) throws Exception {
+    public void setUri(String uri) throws Exception {
         state.uri(new URI(uri));
     }
 

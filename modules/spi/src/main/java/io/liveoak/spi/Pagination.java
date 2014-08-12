@@ -13,13 +13,13 @@ package io.liveoak.spi;
  */
 public interface Pagination {
     // TODO: readMember limits from configuration i.e. move this somewhere else
+    static final int DEFAULT_OFFSET = 0;
     static final int DEFAULT_LIMIT = 100;
-
     static final int MAX_LIMIT = 10000;
 
     static final Pagination NONE = new Pagination() {
         public int offset() {
-            return 0;
+            return DEFAULT_OFFSET;
         }
 
         public int limit() {

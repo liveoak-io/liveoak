@@ -8,12 +8,19 @@ import java.util.Map;
 
 import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.scripts.libraries.manager.LibraryManager;
-import io.liveoak.scripts.objects.impl.LiveOakForbiddenResponse;
-import io.liveoak.scripts.objects.impl.LiveOakNotAcceptableResponse;
-import io.liveoak.scripts.objects.impl.LiveOakNotAuthorizedResponse;
 import io.liveoak.scripts.objects.impl.LiveOakResource;
 import io.liveoak.scripts.objects.impl.LiveOakResourceRequest;
 import io.liveoak.scripts.objects.impl.LiveOakResourceResponse;
+import io.liveoak.scripts.objects.impl.exception.LiveOakCreateNotSupportedException;
+import io.liveoak.scripts.objects.impl.exception.LiveOakDeleteNotSupportedException;
+import io.liveoak.scripts.objects.impl.exception.LiveOakException;
+import io.liveoak.scripts.objects.impl.exception.LiveOakNotAcceptableException;
+import io.liveoak.scripts.objects.impl.exception.LiveOakNotAuthorizedException;
+import io.liveoak.scripts.objects.impl.exception.LiveOakReadNotSupportedException;
+import io.liveoak.scripts.objects.impl.exception.LiveOakResourceAlreadyExistsException;
+import io.liveoak.scripts.objects.impl.exception.LiveOakResourceNotFoundException;
+import io.liveoak.scripts.objects.impl.exception.LiveOakUpdateNotSupportedException;
+import io.liveoak.scripts.objects.scripting.ScriptingResourceRequest;
 import io.liveoak.scripts.resourcetriggered.resource.ResourceScript;
 import io.liveoak.scripts.resourcetriggered.resource.ScriptFileResource;
 import io.liveoak.spi.RequestType;
@@ -114,8 +121,9 @@ public class ResourceScriptManager {
 
     public Object executeScripts(ResourceRequest request) {
 
-        String resourcePath = request.resourcePath().toString();
-        RequestType type = request.requestType();
+        ScriptingResourceRequest scriptingRequest = new ScriptingResourceRequest(request);
+        String resourcePath = scriptingRequest.resourcePath().toString();
+        RequestType type = scriptingRequest.requestType();
 
         ScriptFileResource.RESOURCE_FUNCTION resourceFunction = ScriptFileResource.RESOURCE_FUNCTION.PREREAD;
         switch (type) {
@@ -149,7 +157,7 @@ public class ResourceScriptManager {
                 // Note: since we want to run scripts with a higher priority first, we also need to reverse it
                 Collections.sort(resourceScripts, new ResourceScript.ReverseComparator());
                 for (ResourceScript resourceScript : resourceScripts) {
-                    Object reply = runScript(resourceFunction.getFunctionName(), resourceScript, request);
+                    Object reply = runScript(resourceFunction.getFunctionName(), resourceScript, scriptingRequest);
                     if (reply != null) {
                         return reply;
                     }
@@ -157,7 +165,7 @@ public class ResourceScriptManager {
             }
         }
 
-        return null;
+        return scriptingRequest;
     }
 
     public Object executeScripts(ResourceResponse response) throws Exception {
@@ -236,6 +244,7 @@ public class ResourceScriptManager {
         }
 
         Config config = new Config();
+        config.setCompileMode(Config.CompileMode.OFF); //TODO: probably shouldn't be needed, check with a newer version of DynJS
 
         DynJS dynJS = new DynJS(config);
 
@@ -250,10 +259,11 @@ public class ResourceScriptManager {
         runner.withSource(source);
 
         Object response = runner.evaluate();
-        return handleResponse(response, resourceResponse.inReplyTo());
+        ScriptingResourceRequest request = new ScriptingResourceRequest(resourceResponse.inReplyTo());
+        return handleResponse(response, request);
     }
 
-    protected Object runScript(String functionName, ResourceScript resourceScript, ResourceRequest resourceRequest) {
+    protected Object runScript(String functionName, ResourceScript resourceScript, ScriptingResourceRequest resourceRequest) {
         Map<String, Object> library = new HashMap<>();
 
         for (String libraryName : resourceScript.libraries()) {
@@ -261,6 +271,7 @@ public class ResourceScriptManager {
         }
 
         Config config = new Config();
+        config.setCompileMode(Config.CompileMode.OFF); //TODO: probably shouldn't be needed, check with a newer version of DynJS
 
         DynJS dynJS = new DynJS(config);
 
@@ -297,25 +308,44 @@ public class ResourceScriptManager {
     }
 
     protected void configureGlobalObject(GlobalObject globalObject) {
-        globalObject.put("Resource", LiveOakResource.class);
-        globalObject.put("NotAuthorizedResponse", LiveOakNotAuthorizedResponse.class);
-        globalObject.put("NotAcceptableResponse", LiveOakNotAcceptableResponse.class);
-        globalObject.put("ForbiddenResponse", LiveOakForbiddenResponse.class);
+        Map<String, Class> liveoakMap = new HashMap<String, Class>();
+        liveoakMap.put("Resource", LiveOakResource.class);
+        liveoakMap.put("Error", LiveOakException.class);
+        liveoakMap.put("NotAcceptableError", LiveOakNotAcceptableException.class);
+        liveoakMap.put("ResourceAlreadyExistsError", LiveOakResourceAlreadyExistsException.class);
+        liveoakMap.put("UpdateNotSupportedError", LiveOakUpdateNotSupportedException.class);
+        liveoakMap.put("ReadNotSupportedError", LiveOakReadNotSupportedException.class);
+        liveoakMap.put("ResourceNotFoundError", LiveOakResourceNotFoundException.class);
+        liveoakMap.put("NotAuthorizedError", LiveOakNotAuthorizedException.class);
+        liveoakMap.put("DeleteNotSupportedError", LiveOakDeleteNotSupportedException.class);
+        liveoakMap.put("CreateNotSupportedError", LiveOakCreateNotSupportedException.class);
 
+        globalObject.put("liveoak", liveoakMap);
     }
 
-    protected Object handleResponse(Object response, ResourceRequest request) {
-        if (response instanceof LiveOakNotAcceptableResponse) {
-            LiveOakNotAcceptableResponse liveOakErrorResponse = (LiveOakNotAcceptableResponse) response;
-            ResourceErrorResponse resourceErrorResponse = new DefaultResourceErrorResponse(request, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, liveOakErrorResponse.getMessage());
-            return resourceErrorResponse;
-        } else if (response instanceof LiveOakNotAuthorizedResponse) {
-            LiveOakNotAuthorizedResponse liveOakErrorResponse = (LiveOakNotAuthorizedResponse) response;
-            ResourceErrorResponse resourceErrorResponse = new DefaultResourceErrorResponse(request, ResourceErrorResponse.ErrorType.NOT_AUTHORIZED, liveOakErrorResponse.getMessage());
-            return resourceErrorResponse;
-        } else if (response instanceof LiveOakForbiddenResponse) {
-            LiveOakForbiddenResponse liveOakErrorResponse = (LiveOakForbiddenResponse) response;
-            ResourceErrorResponse resourceErrorResponse = new DefaultResourceErrorResponse(request, ResourceErrorResponse.ErrorType.FORBIDDEN, liveOakErrorResponse.getMessage());
+    protected Object handleResponse(Object response, ScriptingResourceRequest request) {
+        if (response instanceof LiveOakException) {
+            LiveOakException liveOakException = (LiveOakException)response;
+            ResourceErrorResponse.ErrorType errorType = ResourceErrorResponse.ErrorType.INTERNAL_ERROR;
+            if (response instanceof LiveOakResourceAlreadyExistsException) {
+                errorType = ResourceErrorResponse.ErrorType.RESOURCE_ALREADY_EXISTS;
+            } else if (response instanceof LiveOakNotAcceptableException) {
+                errorType =  ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE;
+            } else if (response instanceof LiveOakUpdateNotSupportedException) {
+                errorType =  ResourceErrorResponse.ErrorType.UPDATE_NOT_SUPPORTED;
+            }else if (response instanceof LiveOakReadNotSupportedException) {
+                errorType =  ResourceErrorResponse.ErrorType.READ_NOT_SUPPORTED;
+            }else if (response instanceof LiveOakResourceNotFoundException) {
+                errorType =  ResourceErrorResponse.ErrorType.NO_SUCH_RESOURCE;
+            }else if (response instanceof LiveOakNotAuthorizedException) {
+                errorType =  ResourceErrorResponse.ErrorType.NOT_AUTHORIZED;
+            }else if (response instanceof LiveOakDeleteNotSupportedException) {
+                errorType =  ResourceErrorResponse.ErrorType.DELETE_NOT_SUPPORTED;
+            }else if (response instanceof LiveOakCreateNotSupportedException) {
+                errorType =  ResourceErrorResponse.ErrorType.CREATE_NOT_SUPPORTED;
+            }
+
+            ResourceErrorResponse resourceErrorResponse = new DefaultResourceErrorResponse(request, errorType, liveOakException.getMessage());
             return resourceErrorResponse;
         }
         return null;
