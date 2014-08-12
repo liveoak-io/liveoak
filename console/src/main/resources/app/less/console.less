@@ -645,6 +645,11 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
     &:hover {
       cursor: pointer;
       opacity: 1;
+      
+      .panel-body p {
+        margin-right: 10px;
+        .transition;
+      }
     }
     
     &:hover, 
@@ -710,7 +715,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
     
       &.clicked .panel-body p,
       &.clicked:hover .panel-body p {
-        height: 173px;
+        height: auto;
         padding-bottom: 10px;
       }
     }
