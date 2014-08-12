@@ -39,7 +39,7 @@ public class LiveOakSecurityContext implements SecurityContext {
 
     @Override
     public List<String> getRoles() {
-        if (securityContext != null) {
+        if (securityContext != null && securityContext.getRoles() != null) {
             return new ArrayList<>(securityContext.getRoles());
         } else {
             return new ArrayList<>();
@@ -54,5 +54,20 @@ public class LiveOakSecurityContext implements SecurityContext {
     @Override
     public Boolean hasRole(String role) {
         return securityContext.hasRole(role);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{");
+        builder.append("authenticated :").append(getAuthenticated());
+        builder.append(", realm: " + getRealm());
+        builder.append(", subject: " + getSubject());
+        builder.append(", last-verified: " + getLastVerified());
+        builder.append(", token: " + getToken());
+        builder.append(", realm: " + getRoles());
+
+        builder.append("}");
+        return builder.toString();
     }
 }

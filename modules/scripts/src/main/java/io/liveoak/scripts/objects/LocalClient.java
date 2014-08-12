@@ -1,5 +1,7 @@
 package io.liveoak.scripts.objects;
 
+import java.util.Map;
+
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
@@ -13,12 +15,12 @@ public interface LocalClient {
 
     Resource delete(String path) throws Exception;
 
-    Resource create(String path, Resource resource, RequestContext requestContext);
+    Resource create(String path, Resource resource, Map<String, Object> parameters) throws Exception;
 
-    Resource read(String path, RequestContext requestContext);
+    Resource read(String path, Map<String, Object> parameters) throws Exception;
 
-    Resource update(String path, Resource resource, RequestContext requestContext);
+    Resource update(String path, Resource resource, Map<String, Object> parameters) throws Exception;
 
-    Resource delete(String path, RequestContext requestContext);
+    Resource delete(String path, Map<String, Object> parameters) throws Exception;
 
 }

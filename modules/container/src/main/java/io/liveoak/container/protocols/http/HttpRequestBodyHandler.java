@@ -8,9 +8,9 @@ package io.liveoak.container.protocols.http;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.state.LazyResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -45,7 +45,7 @@ public class HttpRequestBodyHandler extends MessageToMessageDecoder<Object> {
     private static Logger log = Logger.getLogger(HttpRequestBodyHandler.class);
 
     private FileUpload fileUpload;
-    private DefaultResourceRequest request;
+    private ResourceRequest request;
 
     private boolean complete;
     private Invocation completion;
@@ -99,7 +99,7 @@ public class HttpRequestBodyHandler extends MessageToMessageDecoder<Object> {
                 ctx.pipeline().firstContext().read();
             }
 
-        } else if (msg instanceof DefaultResourceRequest) {
+        } else if (msg instanceof ResourceRequest) {
             // beginning of a new request
             complete = false;
             if (fileUpload != null) {
@@ -107,7 +107,7 @@ public class HttpRequestBodyHandler extends MessageToMessageDecoder<Object> {
             }
             fileUpload = null;
 
-            DefaultResourceRequest request = (DefaultResourceRequest) msg;
+            ResourceRequest request = (ResourceRequest) msg;
             if (request.requestType() != RequestType.CREATE && request.requestType() != RequestType.UPDATE) {
                 // not POST or PUT
                 out.add(request);

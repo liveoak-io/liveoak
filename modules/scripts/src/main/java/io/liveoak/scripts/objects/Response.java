@@ -5,8 +5,6 @@ package io.liveoak.scripts.objects;
  */
 public interface Response {
 
-    String getRequestID();
-
     String getType();
 
     Resource getResource();

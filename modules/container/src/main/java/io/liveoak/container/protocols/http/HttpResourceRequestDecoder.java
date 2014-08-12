@@ -160,8 +160,9 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<DefaultH
     }
 
     protected Pagination decodePagination(ResourceParams params) {
-        int offset = limit(params.intValue("offset", 0), 0, Integer.MAX_VALUE);
-        int limit = limit(params.intValue("limit", Pagination.DEFAULT_LIMIT), 0, Pagination.MAX_LIMIT);
+
+        int offset = limit(intValue(params.value("offset"), 0), 0, Integer.MAX_VALUE);
+        int limit = limit(intValue(params.value("limit"), Pagination.DEFAULT_LIMIT), 0, Pagination.MAX_LIMIT);
 
         return new Pagination() {
             public int offset() {
@@ -190,6 +191,18 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<DefaultH
         }
         return value;
     }
+
+    private int intValue(String value, int def) {
+        if (value == null) {
+            return def;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return def;
+        }
+    }
+
 
     private ResourceCodecManager codecManager;
 }

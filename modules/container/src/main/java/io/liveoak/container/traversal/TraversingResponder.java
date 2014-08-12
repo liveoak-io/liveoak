@@ -8,9 +8,9 @@ package io.liveoak.container.traversal;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.container.tenancy.GlobalContext;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -22,7 +22,7 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public class TraversingResponder extends BaseResponder {
 
-    public TraversingResponder(Executor executor, GlobalContext globalContext, DefaultResourceRequest inReplyTo, ChannelHandlerContext ctx) {
+    public TraversingResponder(Executor executor, GlobalContext globalContext, ResourceRequest inReplyTo, ChannelHandlerContext ctx) {
         super(inReplyTo, ctx);
         this.executor = executor;
         this.currentResource = globalContext;

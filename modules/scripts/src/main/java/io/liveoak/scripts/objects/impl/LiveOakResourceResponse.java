@@ -3,6 +3,7 @@ package io.liveoak.scripts.objects.impl;
 import io.liveoak.scripts.objects.Request;
 import io.liveoak.scripts.objects.Resource;
 import io.liveoak.scripts.objects.Response;
+import io.liveoak.scripts.objects.scripting.ScriptingResourceRequest;
 import io.liveoak.spi.ResourceResponse;
 
 /**
@@ -17,14 +18,9 @@ public class LiveOakResourceResponse implements Response {
     public LiveOakResourceResponse(ResourceResponse resourceResponse) {
         this.resourceResponse = resourceResponse;
 
-        liveOakResourceRequest = new LiveOakResourceRequest(resourceResponse.inReplyTo());
+        liveOakResourceRequest = new LiveOakResourceRequest(new ScriptingResourceRequest(resourceResponse.inReplyTo()));
 
         liveOakResource = new LiveOakResource(resourceResponse.state());
-    }
-
-    @Override
-    public String getRequestID() {
-        return resourceResponse.requestId().toString();
     }
 
     @Override

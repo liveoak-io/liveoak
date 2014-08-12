@@ -1,15 +1,15 @@
 package io.liveoak.scripts.objects.impl;
 
-import java.util.AbstractMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import io.liveoak.spi.RequestAttributes;
+import io.netty.handler.codec.http.HttpRequest;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class LiveOakRequestAttributes extends AbstractMap<String, Object> {
+public class LiveOakRequestAttributes extends LiveOakMap<String, Object> {
 
     RequestAttributes attributes;
 
@@ -21,8 +21,15 @@ public class LiveOakRequestAttributes extends AbstractMap<String, Object> {
     public Set<Entry<String, Object>> entrySet() {
         Set<Entry<String, Object>> entrySet = new HashSet<>();
         for (String attributeName : attributes.getAttributeNames()) {
-            Entry entry = new AbstractMap.SimpleEntry<>(attributeName, attributes.getAttribute(attributeName));
-            entrySet.add(entry);
+            Object attribute = attributes.getAttribute(attributeName);
+            if (attribute instanceof HttpRequest) {
+                LiveOakHttpRequest liveOakHttpRequest = new LiveOakHttpRequest((HttpRequest)attribute);
+                Entry entry = new LiveOakMapEntry<>(attributeName, liveOakHttpRequest);
+                entrySet.add(entry);
+            } else {
+                Entry entry = new LiveOakMapEntry<>(attributeName, attributes.getAttribute(attributeName));
+                entrySet.add(entry);
+            }
         }
         return entrySet;
     }

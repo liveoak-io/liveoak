@@ -3,6 +3,7 @@ package io.liveoak.scripts.objects.impl;
 import io.liveoak.scripts.objects.Request;
 import io.liveoak.scripts.objects.RequestContext;
 import io.liveoak.scripts.objects.Resource;
+import io.liveoak.scripts.objects.scripting.ScriptingResourceRequest;
 import io.liveoak.spi.ResourceRequest;
 
 /**
@@ -14,33 +15,28 @@ public class LiveOakResourceRequest implements Request {
     Resource resource;
     RequestContext requestContext;
 
-    public LiveOakResourceRequest(ResourceRequest request) {
+    public LiveOakResourceRequest(ScriptingResourceRequest request) {
         this.request = request;
         if (request.state() != null) {
             resource = new LiveOakResource(request.state());
         }
         if (request.requestContext() != null) {
-            requestContext = new LiveOakRequestContext(request.requestContext());
+            requestContext = new LiveOakRequestContext(request.scriptingRequestContext());
         }
     }
 
     @Override
-    public String getRequestID() {
+    public String getId() {
         return request.requestId().toString();
     }
 
     @Override
-    public String getResourcePath() {
+    public String getPath() {
         return request.resourcePath().toString();
     }
 
     @Override
-    public void setResourcePath(String resourcePath) {
-        //TODO: see if we can modify the resourcePath of the ResourceRequest...
-    }
-
-    @Override
-    public String getResourceType() {
+    public String getType() {
         return request.requestType().toString().toLowerCase();
     }
 
@@ -50,12 +46,7 @@ public class LiveOakResourceRequest implements Request {
     }
 
     @Override
-    public void setResource(Resource resource) {
-        //TODO
-    }
-
-    @Override
-    public RequestContext getRequestContext() {
+    public RequestContext getContext() {
         return this.requestContext;
     }
 }

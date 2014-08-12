@@ -11,9 +11,9 @@ public interface Resource {
 
     void setId(String id);
 
-    String getURI();
+    String getUri();
 
-    void setURI(String uri) throws Exception;
+    void setUri(String uri) throws Exception;
 
     Map<String, Object> getProperties();
 

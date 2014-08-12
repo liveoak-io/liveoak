@@ -42,9 +42,4 @@ class SimpleResourceParams implements ResourceParams {
         list.add(map.get(name));
         return list;
     }
-
-    @Override
-    public int intValue(String name, int defaultValue) {
-        return defaultValue;
-    }
 }

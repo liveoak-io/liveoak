@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import io.liveoak.common.DefaultResourceErrorResponse;
+import io.liveoak.scripts.objects.Util;
+import io.liveoak.scripts.objects.impl.exception.LiveOakException;
 import io.liveoak.scripts.resourcetriggered.manager.ResourceScriptManager;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.ResourceErrorResponse;
@@ -15,6 +17,7 @@ import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.container.interceptor.DefaultInterceptor;
 import io.liveoak.spi.container.interceptor.InboundInterceptorContext;
 import io.liveoak.spi.container.interceptor.OutboundInterceptorContext;
+import org.dynjs.exception.ThrowException;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -53,14 +56,22 @@ public class ScriptInterceptor extends DefaultInterceptor {
         } catch (Exception e) {
             e.printStackTrace();
             String message = "Error processing request";
-            //TODO: remove the "Error: " check here, its because DynJS for some reason uses a crappy empty error message.
             if (e.getMessage() != null && !e.getMessage().equals(DYNJS_ERROR_PREFIX)) {
                 message = e.getMessage();
                 if (message.startsWith(DYNJS_ERROR_PREFIX)) {
                     message = message.substring(DYNJS_ERROR_PREFIX.length());
+                    context.replyWith(new DefaultResourceErrorResponse(context.request(), ResourceErrorResponse.ErrorType.INTERNAL_ERROR, message));
+                    return;
+                }
+            } else if (e instanceof ThrowException) {
+                Object value = ((ThrowException)e).getValue();
+                if (value instanceof LiveOakException) {
+                    context.replyWith(Util.getErrorResponse(context.request(), (LiveOakException)value));
+                    return;
                 }
             }
-            context.replyWith(new DefaultResourceErrorResponse(context.request(), ResourceErrorResponse.ErrorType.INTERNAL_ERROR, message));
+                context.replyWith(new DefaultResourceErrorResponse(context.request(), ResourceErrorResponse.ErrorType.INTERNAL_ERROR, message));
+
         }
     }
 
@@ -77,8 +88,9 @@ public class ScriptInterceptor extends DefaultInterceptor {
                 } else {
                     context.forward();
                 }
+            } else {
+                context.forward();
             }
-            context.forward();
         } catch (Exception e) {
             e.printStackTrace();
             String message = "Error processing response";
@@ -87,6 +99,12 @@ public class ScriptInterceptor extends DefaultInterceptor {
                 message = e.getMessage();
                 if (message.startsWith(DYNJS_ERROR_PREFIX)) {
                     message = message.substring(DYNJS_ERROR_PREFIX.length());
+                }
+            } else if (e instanceof ThrowException) {
+                Object value = ((ThrowException)e).getValue();
+                if (value instanceof LiveOakException) {
+                    context.forward(Util.getErrorResponse(context.response().inReplyTo(), (LiveOakException)value));
+                    return;
                 }
             }
             context.forward(new DefaultResourceErrorResponse(context.response().inReplyTo(), ResourceErrorResponse.ErrorType.INTERNAL_ERROR, message));
