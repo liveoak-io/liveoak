@@ -10,7 +10,6 @@
     <resources>
         <artifact name="io.vertx:vertx-core:${vertx.version}"/>
         <artifact name="io.vertx:vertx-platform:${vertx.version}"/>
-        <artifact name="com.hazelcast:hazelcast:2.6"/>
     </resources>
 
     <dependencies>
