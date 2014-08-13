@@ -1,23 +1,15 @@
 package io.liveoak.pgsql;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.netty.handler.codec.http.HttpHeaders;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -186,14 +178,13 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                        \n" +
                 "    'href' : '/testApp/sqldata'                                     \n" +
                 "  },                                                                \n" +
-                "  'count' : 6,                                                      \n" +
+                "  'links': [{                                                       \n" +
+                "    'rel': 'batch',                                                 \n" +
+                "    'href': '/testApp/sqldata/_batch'                               \n" +
+                "  }],                                                               \n" +
+                "  'count' : 5,                                                      \n" +
                 "  'type' : 'database',                                              \n" +
                 "  'members' : [ {                                                   \n" +
-                "    'id' : '_batch',                                                \n" +
-                "    'self' : {                                                      \n" +
-                "      'href' : '/testApp/sqldata/_batch'                            \n" +
-                "    }                                                               \n" +
-                "  }, {                                                              \n" +
                 "    'id' : 'addresses',                                             \n" +
                 "    'self' : {                                                      \n" +
                 "      'href' : '/testApp/sqldata/addresses'                         \n" +
@@ -236,14 +227,12 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                        \n" +
                 "    'href' : '/testApp/sqldata'                                     \n" +
                 "  },                                                                \n" +
-                "  'count' : 1,                                                      \n" +
-                "  'type' : 'database',                                              \n" +
-                "  'members' : [ {                                                   \n" +
-                "    'id' : '_batch',                                                \n" +
-                "    'self' : {                                                      \n" +
-                "      'href' : '/testApp/sqldata/_batch'                            \n" +
-                "    }                                                               \n" +
-                "  } ]                                                               \n" +
+                "  'links': [{                                                       \n" +
+                "    'rel': 'batch',                                                 \n" +
+                "    'href': '/testApp/sqldata/_batch'                               \n" +
+                "  }],                                                               \n" +
+                "  'count' : 0,                                                      \n" +
+                "  'type' : 'database'                                               \n" +
                 "}";
 
         checkResult(result, expected);
@@ -882,14 +871,13 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                        \n" +
                 "    'href' : '/testApp/sqldata'                                     \n" +
                 "  },                                                                \n" +
-                "  'count' : 4,                                                      \n" +
+                "  'links': [{                                                       \n" +
+                "    'rel': 'batch',                                                 \n" +
+                "    'href': '/testApp/sqldata/_batch'                               \n" +
+                "  }],                                                               \n" +
+                "  'count' : 3,                                                      \n" +
                 "  'type' : 'database',                                              \n" +
                 "  'members' : [ {                                                   \n" +
-                "    'id' : '_batch',                                                \n" +
-                "    'self' : {                                                      \n" +
-                "      'href' : '/testApp/sqldata/_batch'                            \n" +
-                "    }                                                               \n" +
-                "  }, {                                                              \n" +
                 "    'id' : 'addresses',                                             \n" +
                 "    'self' : {                                                      \n" +
                 "      'href' : '/testApp/sqldata/addresses'                         \n" +

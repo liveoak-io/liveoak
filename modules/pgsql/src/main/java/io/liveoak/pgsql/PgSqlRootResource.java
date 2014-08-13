@@ -20,8 +20,10 @@ import io.liveoak.pgsql.meta.Table;
 import io.liveoak.pgsql.meta.TableRef;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.resource.MapResource;
 import io.liveoak.spi.resource.async.DefaultRootResource;
 import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
@@ -70,8 +72,15 @@ public class PgSqlRootResource extends DefaultRootResource {
         // store to ctx attributes to pass on to readMembers
         ctx.requestAttributes().setAttribute(TABLE_NAMES, tables);
 
+        List<Resource> links = new LinkedList<>();
+        MapResource batch = new MapResource();
+        batch.put("rel", "batch");
+        batch.put("href", uri() + "/" + BATCH_ENDPOINT);
+        links.add(batch);
+        sink.accept("links", links);
+
         // here only set num of tables as size
-        sink.accept("count", tables.size() + 1);
+        sink.accept("count", tables.size());
 
         // maybe some other things to do with db as a whole
         sink.accept("type", "database");
@@ -80,7 +89,6 @@ public class PgSqlRootResource extends DefaultRootResource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.accept(new PgSqlBatchResource(this, BATCH_ENDPOINT));
         List<String> tables = (List<String>) ctx.requestAttributes().getAttribute(TABLE_NAMES);
         for (String table: tables) {
             sink.accept(new PgSqlTableResource(this, table));
@@ -309,32 +317,6 @@ public class PgSqlRootResource extends DefaultRootResource {
         if (unique == null) {
             unique = Boolean.FALSE;
         }
-        /*
-        boolean notNull = false;
-        boolean unique = false;
-
-        List modifiers = col.getPropertyAsList("modifiers");
-        if (modifiers != null) {
-            for (Object val : modifiers) {
-                if (val == null) {
-                    throw new RuntimeException("Invalid value for modifier: " + val);
-                }
-                if (val instanceof String == false) {
-                    throw new RuntimeException("Invalid value for modifier: " + val);
-                }
-                switch (((String) val).toLowerCase()) {
-                    case "not null":
-                        notNull = true;
-                        break;
-                    case "unique":
-                        unique = true;
-                        break;
-                    default:
-                        throw new RuntimeException("Invalid value for modifier: " + val);
-                }
-            }
-        }
-        */
         return new Column(table, name, type, size, !nullable, unique);
     }
 

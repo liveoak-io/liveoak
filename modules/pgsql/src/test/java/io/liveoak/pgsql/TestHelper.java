@@ -518,14 +518,12 @@ public class TestHelper extends BasePgSqlHttpTest {
                 "  'self' : {                                                        \n" +
                 "    'href' : '/" + APP + "/" + RESOURCE + "'                        \n" +
                 "  },                                                                \n" +
-                "  'count' : 1,                                                      \n" +
+                "  'links': [{                                                       \n" +
+                "    'rel': 'batch',                                                 \n" +
+                "    'href': '/testApp/sqldata/_batch'                               \n" +
+                "  }],                                                               \n" +
+                "  'count' : 0,                                                      \n" +
                 "  'type' : 'database',                                              \n" +
-                "  '_members' : [ {                                                  \n" +
-                "    'id' : '_batch',                                                \n" +
-                "    'self' : {                                                      \n" +
-                "      'href' : '/" + APP + "/" + RESOURCE + "/_batch'               \n" +
-                "    }                                                               \n" +
-                "  } ]                                                               \n" +
                 "}";
 
         checkResult(result, expected);
