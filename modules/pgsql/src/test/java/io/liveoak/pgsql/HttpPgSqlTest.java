@@ -253,6 +253,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
                 "  },                                                                            \n" +
+                "  'links' : [{                                                                  \n" +
+                "    'rel' : 'schema',                                                           \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders;schema'                \n" +
+                "  }],                                                                           \n" +
                 "  'count' : 2,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
                 "  'members' : [ {                                                               \n" +
@@ -313,6 +317,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
                 "  },                                                                            \n" +
+                "  'links' : [{                                                                  \n" +
+                "    'rel' : 'schema',                                                           \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders;schema'                \n" +
+                "  }],                                                                           \n" +
                 "  'count' : 0,                                                                  \n" +
                 "  'type' : 'collection'                                                         \n" +
                 "}";
@@ -349,6 +357,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
                 "  },                                                                            \n" +
+                "  'links' : [{                                                                  \n" +
+                "    'rel' : 'schema',                                                           \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders;schema'                \n" +
+                "  }],                                                                           \n" +
                 "  'count' : 2,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
                 "  'members' : [ {                                                               \n" +
@@ -571,6 +583,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
                 "  },                                                                            \n" +
+                "  'links' : [{                                                                  \n" +
+                "    'rel' : 'schema',                                                           \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders;schema'                \n" +
+                "  }],                                                                           \n" +
                 "  'count' : 1,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
                 "  'members' : [ {                                                              \n" +
@@ -602,6 +618,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
                 "  },                                                                            \n" +
+                "  'links' : [{                                                                  \n" +
+                "    'rel' : 'schema',                                                           \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders;schema'                \n" +
+                "  }],                                                                           \n" +
                 "  'count' : 1,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
                 "  'members' : [ {                                                              \n" +
@@ -670,6 +690,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
                 "  },                                                                            \n" +
+                "  'links' : [{                                                                  \n" +
+                "    'rel' : 'schema',                                                           \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders;schema'                \n" +
+                "  }],                                                                           \n" +
                 "  'count' : 1,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
                 "  'members' : [ {                                                              \n" +
@@ -702,6 +726,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/items'                                           \n" +
                 "  },                                                                            \n" +
+                "  'links' : [{                                                                  \n" +
+                "    'rel' : 'schema',                                                           \n" +
+                "    'href' : '/testApp/sqldata/items;schema'                                    \n" +
+                "  }],                                                                           \n" +
                 "  'count' : 0,                                                                  \n" +
                 "  'type' : 'collection'                                                         \n" +
                 "}";
@@ -720,6 +748,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
                 "  },                                                                            \n" +
+                "  'links' : [{                                                                  \n" +
+                "    'rel' : 'schema',                                                           \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders;schema'                \n" +
+                "  }],                                                                           \n" +
                 "  'count' : 2,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
                 "  'members' : [ {                                                               \n" +
@@ -772,6 +804,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
                 "  },                                                                            \n" +
+                "  'links' : [{                                                                  \n" +
+                "    'rel' : 'schema',                                                           \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders;schema'                \n" +
+                "  }],                                                                           \n" +
                 "  'count' : 2,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
                 "  'members' : [ {                                                               \n" +

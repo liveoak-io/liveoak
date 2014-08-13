@@ -3,6 +3,8 @@ package io.liveoak.pgsql;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
@@ -13,6 +15,7 @@ import io.liveoak.pgsql.meta.QueryBuilder;
 import io.liveoak.pgsql.meta.Table;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Sorting;
+import io.liveoak.spi.resource.MapResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
@@ -23,6 +26,7 @@ import io.liveoak.spi.state.ResourceState;
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 public class PgSqlTableResource implements Resource {
+    private static final String SCHEMA_ENDPOINT = ";schema";
 
     private PgSqlRootResource parent;
     private String id;
@@ -52,6 +56,13 @@ public class PgSqlTableResource implements Resource {
             return;
         }
         results = queryTable(id, null, ctx);
+
+        List<Resource> links = new LinkedList<>();
+        MapResource batch = new MapResource();
+        batch.put("rel", "schema");
+        batch.put("href", uri() + SCHEMA_ENDPOINT);
+        links.add(batch);
+        sink.accept("links", links);
 
         sink.accept("count", results.count());
         sink.accept("type", "collection");

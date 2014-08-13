@@ -95,6 +95,11 @@ public class PgSqlReadCollectionTest extends BasePgSqlTest {
             });
         }
         ResourceState expected = resource(endpoint, new Object[] {
+                        "links", list(
+                                obj("rel", "schema",
+                                    "href", endpoint + ";schema")
+                        ),
+
                         "count", 3,
                         "type", "collection"
                 },
@@ -156,6 +161,10 @@ public class PgSqlReadCollectionTest extends BasePgSqlTest {
         }
 
         ResourceState expected = resource(endpoint, new Object[] {
+                        "links", list(
+                                obj("rel", "schema",
+                                    "href", endpoint + ";schema")
+                        ),
                         "count", 2,
                         "type", "collection"
                 },
