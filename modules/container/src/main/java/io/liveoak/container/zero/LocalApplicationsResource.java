@@ -12,14 +12,17 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.vertx.java.core.Vertx;
 
 /**
  * @author Ken Finnigan
  */
 public class LocalApplicationsResource implements RootResource, SynchronousResource {
 
-    public LocalApplicationsResource(InternalApplicationRegistry applicationRegistry) {
+    public LocalApplicationsResource(InternalApplicationRegistry applicationRegistry, File applicationsDirectory, Vertx vertx) {
         this.applicationRegistry = applicationRegistry;
+        this.applicationsDirectory = applicationsDirectory;
+        this.vertx = vertx;
     }
 
     public void parent(Resource parent) {
@@ -38,16 +41,39 @@ public class LocalApplicationsResource implements RootResource, SynchronousResou
 
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        File localDir = null;
+        File localDir;
         String localPath = (String) state.getProperty("localPath");
-        if (localPath != null) {
+
+        // Ensure 'localPath' exists and points to a LiveOak application
+        if (localPath == null || localPath.length() == 0) {
+            responder.invalidRequest(INVALID_REQUEST_MESSAGE);
+            return;
+        } else {
             localDir = new File(localPath);
+            if (!localDir.exists()) {
+                responder.invalidRequest(INVALID_REQUEST_MESSAGE);
+                return;
+            } else if (!(new File(localDir, "application.json")).exists()) {
+                responder.invalidRequest(INVALID_REQUEST_MESSAGE);
+                return;
+            }
         }
 
         // Copy from 'localPath' to application path
-
-        InternalApplication app = this.applicationRegistry.createApplication(state.id(), (String) state.getProperty("name"), localDir);
-        responder.resourceCreated(app.resource());
+        String id = state.id();
+        File installDir = new File(this.applicationsDirectory, id);
+        this.vertx.fileSystem().copy(localDir.getAbsolutePath(), installDir.getAbsolutePath(), true, event -> {
+            if (event.succeeded()) {
+                try {
+                    InternalApplication app = this.applicationRegistry.createApplication(id, (String) state.getProperty("name"), installDir);
+                    responder.resourceCreated(app.resource());
+                } catch (InterruptedException e) {
+                    responder.internalError(e);
+                }
+            } else if (event.failed()) {
+                responder.internalError(event.cause());
+            }
+        });
     }
 
     @Override
@@ -77,4 +103,8 @@ public class LocalApplicationsResource implements RootResource, SynchronousResou
 
     private Resource parent;
     private final InternalApplicationRegistry applicationRegistry;
+    private final File applicationsDirectory;
+    private final Vertx vertx;
+
+    private static final String INVALID_REQUEST_MESSAGE = "'localPath' must contain a valid path to a LiveOak application on the local system.";
 }

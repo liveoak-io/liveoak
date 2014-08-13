@@ -1,5 +1,7 @@
 package io.liveoak.container.zero.service;
 
+import java.io.File;
+
 import io.liveoak.container.extension.MediaTypeMountService;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.InternalApplication;
@@ -20,6 +22,11 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 import org.jboss.msc.value.InjectedValue;
+import org.vertx.java.core.Vertx;
+
+import static io.liveoak.spi.LiveOak.APPLICATIONS_DIR;
+import static io.liveoak.spi.LiveOak.APPLICATION_REGISTRY;
+import static io.liveoak.spi.LiveOak.VERTX;
 
 /**
  * @author Bob McWhirter
@@ -43,7 +50,7 @@ public class ZeroResourcesService implements Service<Void> {
         ServiceName applicationsName = LiveOak.resource(ZeroExtension.APPLICATION_ID, "applications");
         ApplicationsResourceService applicationsResource = new ApplicationsResourceService();
         target.addService(applicationsName, applicationsResource)
-                .addDependency(LiveOak.APPLICATION_REGISTRY, InternalApplicationRegistry.class, applicationsResource.applicationRegistryInjector())
+                .addDependency(APPLICATION_REGISTRY, InternalApplicationRegistry.class, applicationsResource.applicationRegistryInjector())
                 .install();
 
         MediaTypeMountService<RootResource> mediaTypeMount = new MediaTypeMountService<>(null, MediaType.JSON, true);
@@ -56,7 +63,9 @@ public class ZeroResourcesService implements Service<Void> {
         ServiceName localApplicationsName = LiveOak.resource(ZeroExtension.APPLICATION_ID, "local-applications");
         LocalApplicationsResourceService localAppsResourceService = new LocalApplicationsResourceService();
         target.addService(localApplicationsName, localAppsResourceService)
-                .addDependency(LiveOak.APPLICATION_REGISTRY, InternalApplicationRegistry.class, localAppsResourceService.applicationRegistryInjector())
+                .addDependency(APPLICATION_REGISTRY, InternalApplicationRegistry.class, localAppsResourceService.applicationRegistryInjector())
+                .addDependency(APPLICATIONS_DIR, File.class, localAppsResourceService.applicationDirectoryInjector())
+                .addDependency(VERTX, Vertx.class, localAppsResourceService.vertxInjector())
                 .install();
 
         MediaTypeMountService<RootResource> localAppMediaTypeMount = new MediaTypeMountService<>(null, MediaType.LOCAL_APP_JSON, false);
