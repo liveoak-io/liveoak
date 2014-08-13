@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import io.liveoak.container.InMemoryDBExtension;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
 import io.liveoak.spi.MediaType;
@@ -42,16 +43,16 @@ import static org.fest.assertions.Assertions.assertThat;
 public class LocalApplicationsResourceTest {
 
     private LiveOakSystem system;
-    protected CloseableHttpClient httpClient;
+    private CloseableHttpClient httpClient;
+    private File appDir;
 
     @Before
     public void setUpServer() throws Exception {
-        File appDir = new File(getClass().getClassLoader().getResource("apps").getFile());
+        appDir = new File(getClass().getClassLoader().getResource("apps").getFile());
         this.system = LiveOakFactory.create(null, appDir, null);
+        this.system.extensionInstaller().load("dummy", new InMemoryDBExtension());
 
         this.system.awaitStability();
-
-        this.system.extensionInstaller().load("dummy", new InMemoryExtension());
     }
 
     @After
@@ -75,10 +76,6 @@ public class LocalApplicationsResourceTest {
         File myApp = new File(LocalApplicationsResourceTest.class.getClassLoader().getResource("apps/myapp").getFile());
         if (myApp != null && myApp.exists()) {
             deleteNonEmptyDir(myApp);
-        }
-        File resApp = new File(LocalApplicationsResourceTest.class.getClassLoader().getResource("apps/resapp").getFile());
-        if (resApp != null && resApp.exists()) {
-            deleteNonEmptyDir(resApp);
         }
     }
 
@@ -218,7 +215,7 @@ public class LocalApplicationsResourceTest {
         // Post an application
         File app1LocalPath = new File(getClass().getClassLoader().getResource("importApps/app1").getFile());
         postRequest = new HttpPost("http://localhost:8080/admin/applications");
-        postRequest.setEntity(new StringEntity("{ \"id\": \"myapp\", \"name\": \"My Application\", \"localPath\": \"" + app1LocalPath.getAbsolutePath() + "\" }"));
+        postRequest.setEntity(new StringEntity("{ \"id\": \"myapp\", \"localPath\": \"" + app1LocalPath.getAbsolutePath() + "\" }"));
         postRequest.setHeader("Content-Type", MediaType.LOCAL_APP_JSON.toString());
 
         response = httpClient.execute(postRequest);
@@ -231,7 +228,7 @@ public class LocalApplicationsResourceTest {
 
         assertThat(state.id()).isNotNull();
         assertThat(state.getProperty("id")).isEqualTo("myapp");
-        assertThat(state.getProperty("name")).isEqualTo("My Application");
+        assertThat(state.getProperty("name")).isEqualTo("app1");
         assertThat(state.getProperty("visible")).isEqualTo(true);
 
         // check STOMP
@@ -239,7 +236,7 @@ public class LocalApplicationsResourceTest {
         assertThat(obj).isNotNull();
 
         ResourceState appObjState = decode(obj.content());
-        assertThat(appObjState.getProperty("name")).isEqualTo("My Application");
+        assertThat(appObjState.getProperty("name")).isEqualTo("app1");
 
         assertThat(state.getProperty("id")).isEqualTo(appObjState.getProperty("id"));
         response.close();
@@ -260,78 +257,6 @@ public class LocalApplicationsResourceTest {
         response.close();
 
         // Check files were copied across
-        getRequest = new HttpGet("http://localhost:8080/myapp/resources/app");
-        getRequest.setHeader("Content-Type", MediaType.JSON.toString());
-
-        response = this.httpClient.execute(getRequest);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
-
-        state = decode(response);
-        assertThat(state).isNotNull();
-        assertThat(state.members().get(0).id()).isEqualTo("index.html");
-
-        response.close();
-    }
-
-    @Test
-    public void testAppCreationWithResourceOverwrite() throws Exception {
-        HttpPost postRequest;
-        HttpGet getRequest;
-        CloseableHttpResponse response;
-
-        // Post an application
-        File resAppLocalPath = new File(getClass().getClassLoader().getResource("importApps/resourcesApp").getFile());
-        postRequest = new HttpPost("http://localhost:8080/admin/applications");
-        postRequest.setEntity(new StringEntity("{ \"id\": \"resapp\", \"name\": \"Resource Application\", \"localPath\": \"" + resAppLocalPath.getAbsolutePath() + "\","
-            + "\"resources\": { \"code\": { \"type\": \"filesystem\", \"config\": { \"directory\": \"${application.dir}/app/\" } } } }"));
-        postRequest.setHeader("Content-Type", MediaType.LOCAL_APP_JSON.toString());
-
-        response = httpClient.execute(postRequest);
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
-
-        ResourceState state = decode(response);
-        assertThat(state).isNotNull();
-        assertThat(state).isInstanceOf(ResourceState.class);
-
-        assertThat(state.id()).isNotNull();
-        assertThat(state.getProperty("id")).isEqualTo("resapp");
-        assertThat(state.getProperty("name")).isEqualTo("Resource Application");
-        assertThat(state.getProperty("visible")).isEqualTo(true);
-
-        response.close();
-
-        // Check resources were overwritten
-        getRequest = new HttpGet("http://localhost:8080/resapp?expand=members");
-        getRequest.setHeader("Content-Type", MediaType.JSON.toString());
-
-        response = this.httpClient.execute(getRequest);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
-
-        state = decode(response);
-        assertThat(state).isNotNull();
-        assertThat(state.members().size()).isEqualTo(2);
-        assertThat(state.members().get(0).id()).isEqualTo("code");
-
-        response.close();
-
-        // Check files were copied across
-        getRequest = new HttpGet("http://localhost:8080/resapp/resources/code");
-        getRequest.setHeader("Content-Type", MediaType.JSON.toString());
-
-        response = this.httpClient.execute(getRequest);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
-
-        state = decode(response);
-        assertThat(state).isNotNull();
-        assertThat(state.members().get(0).id()).isEqualTo("index.html");
-
-        response.close();
+        assertThat(this.system.vertx().fileSystem().existsSync(appDir.getPath() + "/myapp/app/index.html")).isTrue();
     }
 }
