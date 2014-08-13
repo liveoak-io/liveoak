@@ -3,14 +3,14 @@
   html-app: '/app/index.html',
   resources : {
     app: {
-      type: 'filesystem',
+      type: 'dummy',
       config: {
         directory: "${application.dir}/app/"
       }
     },
 
     client: {
-      type: 'aggregating-filesystem',
+      type: 'dummy',
       config: {
         directory: "${io.liveoak.js.dir}"
       }
