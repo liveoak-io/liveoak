@@ -47,6 +47,7 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
     protected void loadExtension(String id, Extension ext) throws Exception {
         this.system.extensionInstaller().load(id, ext);
         this.extensionIds.add(id);
+        this.system.awaitStability();
     }
 
     protected void loadExtension(String id, Extension ext, ObjectNode extConfig) throws Exception {
@@ -54,11 +55,13 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
         fullConfig.put( "config", extConfig );
         this.system.extensionInstaller().load(id, ext, fullConfig);
         this.extensionIds.add(id);
+        this.system.awaitStability();
     }
 
     protected InternalApplicationExtension installResource(String extId, String resourceId, ObjectNode resourceConfig) throws Exception {
         InternalApplicationExtension appExt = this.application.extend(extId, resourceId, resourceConfig);
         this.extensions.add(appExt);
+        this.system.awaitStability();
         return appExt;
     }
 
