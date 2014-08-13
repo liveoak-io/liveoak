@@ -564,7 +564,7 @@ loMod.controller('ExampleListCtrl', function($scope, $location, $filter, Notific
   $scope.install = function(example) {
     example.installing = true;
 
-    new LoAppExamples({ name: example.id, localPath: example.path }).$install({},
+    new LoAppExamples({ id: example.id, localPath: example.path }).$install({},
       function(/*value, responseHeaders*/) {
         Notifications.success('The example application "' + example.id + '" has been installed.');
         example.installing = false;
