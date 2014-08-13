@@ -2,6 +2,7 @@ package io.liveoak.container.zero;
 
 import java.io.File;
 
+import io.liveoak.common.util.StringPropertyReplacer;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.spi.RequestContext;
@@ -46,15 +47,16 @@ public class LocalApplicationsResource implements RootResource, SynchronousResou
 
         // Ensure 'localPath' exists and points to a LiveOak application
         if (localPath == null || localPath.length() == 0) {
-            responder.invalidRequest(INVALID_REQUEST_MESSAGE);
+            responder.invalidRequest(String.format(INVALID_REQUEST_MESSAGE, localPath));
             return;
         } else {
+            localPath = StringPropertyReplacer.replaceProperties(localPath, System.getProperties());
             localDir = new File(localPath);
             if (!localDir.exists()) {
-                responder.invalidRequest(INVALID_REQUEST_MESSAGE);
+                responder.invalidRequest(String.format(INVALID_REQUEST_MESSAGE, localPath));
                 return;
             } else if (!(new File(localDir, "application.json")).exists()) {
-                responder.invalidRequest(INVALID_REQUEST_MESSAGE);
+                responder.invalidRequest(String.format(INVALID_REQUEST_MESSAGE, localPath));
                 return;
             }
         }
@@ -106,5 +108,5 @@ public class LocalApplicationsResource implements RootResource, SynchronousResou
     private final File applicationsDirectory;
     private final Vertx vertx;
 
-    private static final String INVALID_REQUEST_MESSAGE = "'localPath' must contain a valid path to a LiveOak application on the local system.";
+    private static final String INVALID_REQUEST_MESSAGE = "'localPath' must contain a valid path to a LiveOak application on the system. %s is invalid.";
 }
