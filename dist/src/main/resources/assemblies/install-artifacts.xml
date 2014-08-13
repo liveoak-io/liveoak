@@ -56,5 +56,9 @@
             <directory>../clients/javascript/src/main/javascript/</directory>
             <outputDirectory>/client</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>./target/examples/liveoak-examples-master</directory>
+            <outputDirectory>/examples</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>
