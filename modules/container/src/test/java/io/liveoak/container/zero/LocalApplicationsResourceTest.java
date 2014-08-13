@@ -1,4 +1,4 @@
-package io.liveoak.container.mime;
+package io.liveoak.container.zero;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +37,7 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author Ken Finnigan
  */
-public class LocalApplicationMimeTypeTest {
+public class LocalApplicationsResourceTest {
 
     private LiveOakSystem system;
 
