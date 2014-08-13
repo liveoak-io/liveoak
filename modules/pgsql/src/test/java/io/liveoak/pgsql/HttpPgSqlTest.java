@@ -86,7 +86,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         System.out.println(result);
         checkResultForError(result);
 
-        query = "{$or: [{create_date: {$gt: '2014-04-03'}}, {total: {$gt: 30000}}]}";
+        query = "{$or: [{create_date: {$gt: '2014-04-03'}}, {$not: {total: {$gt: 30000}}}]}";
 
         get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?q=" + URLEncoder.encode(query, "utf-8"));
         get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);

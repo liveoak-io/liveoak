@@ -33,6 +33,7 @@ import io.liveoak.pgsql.sql.Identifier;
 import io.liveoak.pgsql.sql.LessThan;
 import io.liveoak.pgsql.sql.LessThanOrEqual;
 import io.liveoak.pgsql.sql.LogicalOperator;
+import io.liveoak.pgsql.sql.Not;
 import io.liveoak.pgsql.sql.NotEqual;
 import io.liveoak.pgsql.sql.Operator;
 import io.liveoak.pgsql.sql.Or;
@@ -881,6 +882,10 @@ public class QueryBuilder {
                         op = new NotEqual();
                         op.right(parseRelationalOperand(node));
                         break;
+                    case "$not":
+                        op = new Not();
+                        parseLogical((LogicalOperator) op, node);
+                        break;
                     default:
                         throw new IllegalArgumentException("Unsupported operator: " + name);
                 }
@@ -934,13 +939,17 @@ public class QueryBuilder {
     }
 
     private void parseLogical(LogicalOperator op, JsonNode node) {
-        if (!node.isArray()) {
-            throw new IllegalArgumentException("Value must be a JSON array - " + op + ": " + node);
-        }
+        //if (!node.isArray()) {
+        //    throw new IllegalArgumentException("Value must be a JSON array - " + op + ": " + node);
+        //}
 
-        // iterate over items, convert them to Expressions, and attach them to op ...
-        for (JsonNode el: node) {
-            op = op.next(parseRelational(el));
+        // if node is array iterate over items, convert them to Expressions, and attach them to op ...
+        if (node.isArray()) {
+            for (JsonNode el : node) {
+                op = op.next(parseRelational(el));
+            }
+        } else {
+            op.next(parseRelational(node));
         }
     }
 

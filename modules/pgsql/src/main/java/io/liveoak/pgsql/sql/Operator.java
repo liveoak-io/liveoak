@@ -41,18 +41,20 @@ public abstract class Operator<T extends Operator> extends Expression {
 
     @Override
     public String toString() {
-        boolean groupLeft = e1 instanceof LogicalOperator && !getClass().isAssignableFrom(e1.getClass());
 
         StringBuilder sb = new StringBuilder();
-        if (groupLeft) {
-            sb.append("(");
-        }
-        sb.append(e1);
-        if (groupLeft) {
-            sb.append(")");
+        if (e1 != null) {
+            boolean groupLeft = groupLeft();
+            if (groupLeft) {
+                sb.append("(");
+            }
+            sb.append(e1);
+            if (groupLeft) {
+                sb.append(")");
+            }
         }
         if (e2 != null) {
-            boolean groupRight = e2 instanceof LogicalOperator && !getClass().isAssignableFrom(e2.getClass());
+            boolean groupRight = groupRight();
             sb.append(name());
             if (groupRight) {
                 sb.append("(");
@@ -63,5 +65,13 @@ public abstract class Operator<T extends Operator> extends Expression {
             }
         }
         return sb.toString();
+    }
+
+    protected boolean groupRight() {
+        return !Not.class.isAssignableFrom(e2.getClass()) && e2 instanceof LogicalOperator && !getClass().isAssignableFrom(e2.getClass());
+    }
+
+    protected boolean groupLeft() {
+        return !Not.class.isAssignableFrom(e1.getClass()) && e1 instanceof LogicalOperator && !getClass().isAssignableFrom(e1.getClass());
     }
 }

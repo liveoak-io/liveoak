@@ -1,6 +1,7 @@
 package io.liveoak.pgsql;
 
 import io.liveoak.pgsql.sql.And;
+import io.liveoak.pgsql.sql.Not;
 import io.liveoak.pgsql.sql.Operator;
 import io.liveoak.pgsql.sql.Expression;
 import io.liveoak.pgsql.sql.Identifier;
@@ -63,5 +64,18 @@ public class ExpressionTest {
 
         Or orex = eq1.or(eq2.and(eq3.or(eq2)));
         Assertions.assertThat(orex.toString()).isEqualTo("total=? OR (total=item.total AND (country=? OR total=item.total))");
+
+        // test NOT
+        Not notex = new Not().next(eq1);
+        Assertions.assertThat(notex.toString()).isEqualTo("NOT total=?");
+
+        Not notex2 = new Not().next(eq2);
+
+        String expected = "NOT total=? AND NOT total=item.total";
+        Assertions.assertThat(notex.and(notex2).toString()).isEqualTo(expected);
+        Assertions.assertThat(new And().next(notex).next(notex2).toString()).isEqualTo(expected);
+        Assertions.assertThat(eq1.not().and(eq2.not()).toString()).isEqualTo(expected);
+
+        Assertions.assertThat(eq1.not().or(eq2.and(eq3).not()).toString()).isEqualTo("NOT total=? OR NOT (total=item.total AND country=?)");
     }
 }

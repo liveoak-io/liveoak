@@ -13,6 +13,10 @@ public abstract class Expression {
         return new Or(this, e);
     }
 
+    public Not not() {
+        return new Not(this);
+    }
+
     public Expression normalize() {
         return this;
     }
