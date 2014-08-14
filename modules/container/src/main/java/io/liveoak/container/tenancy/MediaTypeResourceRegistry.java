@@ -72,15 +72,20 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
 
     @Override
     public void unregisterResource(Resource resource, MediaType mediaType) {
-        Map<MediaType, Resource> resourceMap = this.registry.get(resource.id());
-        resourceMap.remove(mediaType);
+        if (this.registry != null) {
+            Map<MediaType, Resource> resourceMap = this.registry.get(resource.id());
 
-        if (resourceMap.size() == 1 && resourceMap.get(DEFAULT) != null) {
-            resourceMap.remove(DEFAULT);
-        }
+            if (resourceMap != null) {
+                resourceMap.remove(mediaType);
 
-        if (resourceMap.isEmpty()) {
-            this.registry.remove(resource.id());
+                if (resourceMap.size() == 1 && resourceMap.get(DEFAULT) != null) {
+                    resourceMap.remove(DEFAULT);
+                }
+
+                if (resourceMap.isEmpty()) {
+                    this.registry.remove(resource.id());
+                }
+            }
         }
     }
 
