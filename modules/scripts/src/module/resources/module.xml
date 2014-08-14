@@ -15,7 +15,7 @@
         <module name="io.liveoak.spi"/>
         <module name="io.liveoak.interceptor"/>
         <module name="io.liveoak.common"/>
-        <module name="io.liveoak.container"/>
+<!--        <module name="io.liveoak.container"/> -->
         <module name="org.eclipse.jgit"/>
         <module name="javax.api" services="import"/>
         <module name="sun.jdk" services="import"/>

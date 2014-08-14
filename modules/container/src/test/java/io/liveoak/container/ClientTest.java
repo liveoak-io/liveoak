@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
@@ -60,7 +61,7 @@ public class ClientTest {
     @Test
     public void testRead() throws Throwable {
 
-        ReturnFields fields = new ReturnFieldsImpl("*,members(*,members(*))");
+        ReturnFields fields = new DefaultReturnFields("*,members(*,members(*))");
 
         RequestContext requestContext = new RequestContext.Builder().returnFields(fields).build();
         ResourceState result = this.client.read(requestContext, "/testApp");
@@ -83,7 +84,7 @@ public class ClientTest {
     @Test
     public void testCreate() throws Throwable {
 
-        ReturnFields fields = new ReturnFieldsImpl("*");
+        ReturnFields fields = new DefaultReturnFields("*");
 
         RequestContext requestContext = new RequestContext.Builder().returnFields(fields).build();
         ResourceState bob = new DefaultResourceState("bob");

@@ -6,8 +6,8 @@
 package io.liveoak.container.codec;
 
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.container.InMemoryObjectResource;
-import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.common.codec.driver.EncodingDriver;
 import io.liveoak.common.codec.driver.RootEncodingDriver;
 import io.liveoak.common.codec.state.ResourceStateEncoder;
@@ -35,7 +35,7 @@ public class EncoderReturnFieldsTest {
         encoder.initialize(buffer);
         ReturnFields returnFields = ReturnFields.ALL;
         if (fieldsSpec != null && !fieldsSpec.trim().equals("")) {
-            returnFields = new ReturnFieldsImpl(fieldsSpec);
+            returnFields = new DefaultReturnFields(fieldsSpec);
         }
         RequestContext requestContext = new RequestContext.Builder().returnFields(returnFields).build();
         RootEncodingDriver driver = new RootEncodingDriver(requestContext, encoder, resource, () -> {

@@ -3,9 +3,7 @@
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-package io.liveoak.container;
-
-import io.liveoak.spi.ReturnFields;
+package io.liveoak.common;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,12 +11,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
+import io.liveoak.spi.ReturnFields;
+
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class ReturnFieldsImpl implements ReturnFields {
+public class DefaultReturnFields implements ReturnFields {
 
-    private HashMap<String, ReturnFieldsImpl> fields = new LinkedHashMap<>();
+    private HashMap<String, DefaultReturnFields> fields = new LinkedHashMap<>();
 
     private static enum XpctState {
         xpctIdentCommaOpen,
@@ -33,10 +33,10 @@ public class ReturnFieldsImpl implements ReturnFields {
         end
     }
 
-    private ReturnFieldsImpl() {
+    private DefaultReturnFields() {
     }
 
-    public ReturnFieldsImpl(String spec) {
+    public DefaultReturnFields(String spec) {
 
         if (spec == null || spec.trim().length() == 0) {
             throw new IllegalArgumentException("Fields spec is null or empty!");
@@ -46,7 +46,7 @@ public class ReturnFieldsImpl implements ReturnFields {
         StringBuilder token = new StringBuilder(buf.length);
 
         // stack for handling depth
-        LinkedList<HashMap<String, ReturnFieldsImpl>> specs = new LinkedList<>();
+        LinkedList<HashMap<String, DefaultReturnFields>> specs = new LinkedList<>();
         specs.add(fields);
 
         // parser state
@@ -71,7 +71,7 @@ public class ReturnFieldsImpl implements ReturnFields {
                 if (state != XpctState.xpctIdentCommaOpen && state != XpctState.xpctAnything) {
                     error(spec, i);
                 }
-                ReturnFieldsImpl sub = new ReturnFieldsImpl();
+                DefaultReturnFields sub = new DefaultReturnFields();
                 specs.getLast().put(token.toString(), sub);
                 specs.add(sub.fields);
                 token.setLength(0);
@@ -133,7 +133,7 @@ public class ReturnFieldsImpl implements ReturnFields {
         if (pathSegments == null || pathSegments.length == 0) {
             throw new IllegalArgumentException("No path specified!");
         }
-        ReturnFieldsImpl current = this;
+        DefaultReturnFields current = this;
 
         for (String path : pathSegments) {
             if (current == null) {
@@ -145,7 +145,7 @@ public class ReturnFieldsImpl implements ReturnFields {
             if (!current.fields.containsKey(path)) {
                 return false;
             }
-            current = (ReturnFieldsImpl) current.fields.get(path);
+            current = (DefaultReturnFields) current.fields.get(path);
         }
         return true;
     }
@@ -170,15 +170,15 @@ public class ReturnFieldsImpl implements ReturnFields {
         return "[ReturnFieldsImpl: fields=" + this.fields + "]";
     }
 
-    public ReturnFieldsImpl withExpand(String spec) {
+    public DefaultReturnFields withExpand(String spec) {
         StringTokenizer expandFields = new StringTokenizer(spec);
 
-        ReturnFieldsImpl merged = new ReturnFieldsImpl();
+        DefaultReturnFields merged = new DefaultReturnFields();
         merged.fields.putAll(this.fields);
 
         while (expandFields.hasMoreTokens()) {
             String expandField = expandFields.nextToken();
-            merged.fields.put(expandField, new ReturnFieldsImpl("*"));
+            merged.fields.put(expandField, new DefaultReturnFields("*"));
         }
 
         return merged;

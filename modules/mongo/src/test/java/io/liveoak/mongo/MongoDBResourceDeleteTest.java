@@ -8,7 +8,7 @@ package io.liveoak.mongo;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import io.liveoak.container.ReturnFieldsImpl;
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
@@ -84,7 +84,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
 
         // we should not be able to directly delete a child object
         try {
-            ResourceState result = client.delete(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("bar(ABC(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName
+            ResourceState result = client.delete(new RequestContext.Builder().returnFields(new DefaultReturnFields("bar(ABC(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName
                     + "/" + id + "/foo");
             Fail.fail("We should not be able to directly delete a child object");
         } catch (ResourceNotFoundException e) {
@@ -131,7 +131,7 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
 
         // we should not be able to directly delete a child object
         try {
-            ResourceState result = client.delete(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("bar(ABC(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName
+            ResourceState result = client.delete(new RequestContext.Builder().returnFields(new DefaultReturnFields("bar(ABC(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName
                     + "/" + id + "/foo");
             Fail.fail();
         } catch (ResourceNotFoundException e) {

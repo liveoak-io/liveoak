@@ -1,6 +1,7 @@
 package io.liveoak.container;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ReturnFields;
@@ -77,7 +78,7 @@ public class MemberEncodingDriverTest {
     @Test
     public void testReadAsteriskReturnFields() throws Exception {
         // when all is specified, the members should be returned
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*")).build(), PATH + RESOURCE_ID);
+        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*")).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
@@ -99,7 +100,7 @@ public class MemberEncodingDriverTest {
     @Test
     public void testReadOtherReturnFields() throws Exception {
         // when requesting return fields and not members, should not be reading the members
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new ReturnFieldsImpl("foo")).build(), PATH + RESOURCE_ID);
+        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("foo")).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
@@ -110,7 +111,7 @@ public class MemberEncodingDriverTest {
     @Test
     public void testReadMembersReturnFields() throws Exception {
         // when requesting 'members' as part of the return fields, should be reading the members
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new ReturnFieldsImpl("members")).build(), PATH + RESOURCE_ID);
+        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("members")).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
@@ -121,7 +122,7 @@ public class MemberEncodingDriverTest {
     @Test
     public void testReadMembersAndOtherReturnFields() throws Exception {
         // when requesting 'members' as part of the return fields, should be reading the members
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new ReturnFieldsImpl("foo,members")).build(), PATH + RESOURCE_ID);
+        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("foo,members")).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
@@ -132,7 +133,7 @@ public class MemberEncodingDriverTest {
     @Test
     public void testReadMultiReturnFields() throws Exception {
         // when requesting 'members' as part of the return fields, should be reading the members
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new ReturnFieldsImpl("bar,foo, _members")).build(), PATH + RESOURCE_ID);
+        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("bar,foo, _members")).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);

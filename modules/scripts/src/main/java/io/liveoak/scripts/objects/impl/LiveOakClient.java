@@ -9,7 +9,7 @@ import java.util.Map;
 import io.liveoak.common.DefaultRequestContext;
 import io.liveoak.common.DefaultResourceParams;
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.container.ReturnFieldsImpl;
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.scripts.objects.LocalClient;
 import io.liveoak.scripts.objects.Resource;
 import io.liveoak.scripts.objects.Util;
@@ -148,7 +148,7 @@ public class LiveOakClient implements LocalClient {
 
         Object fields = parameters.get("fields");
         if (fields != null || fields instanceof String) {
-            builder.returnFields(new ReturnFieldsImpl((String)fields));
+            builder.returnFields(new DefaultReturnFields((String)fields));
             parameters.remove("fields");
         }
 
