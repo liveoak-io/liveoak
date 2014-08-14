@@ -2,16 +2,14 @@ package io.liveoak.scripts.resourcetriggered.resource;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.scripts.resource.ScriptsRootResource;
-import io.liveoak.scripts.resourcetriggered.manager.ResourceScriptManager;
 import io.liveoak.spi.InvalidPropertyTypeException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
@@ -34,16 +32,16 @@ public class ResourceScripts implements Resource {
     private static final String METADATA_FILENAME = "metadata.json";
     private static final String SOURCE_FILENAME = "source.js";
 
-    private ResourceScriptManager resourceInterceptorManager;
+    private static final String TARGET_PARAMETER = "target";
+
     private Vertx vertx;
 
-    private Map<String, ResourceScript> scripts;
+    private ScriptMap scripts;
 
     File resourceDirectory;
 
-    public ResourceScripts(ResourceScriptManager resourceScriptManager, Vertx vertx) {
-        this.scripts = new HashMap<>();
-        this.resourceInterceptorManager = resourceScriptManager;
+    public ResourceScripts(ScriptMap scriptMap, Vertx vertx) {
+        this.scripts = scriptMap;
         this.vertx = vertx;
     }
 
@@ -77,16 +75,17 @@ public class ResourceScripts implements Resource {
                             ObjectNode objectNode = (ObjectNode) ObjectMapperFactory.create().readTree(metadataFile);
 
                             ResourceState state = ConversionUtils.convert(objectNode);
+                            state.id(resourceID);
 
-                            ResourceScript resourceScript = ResourceScript.generate(this, resourceID, state);
+                            ResourceScript resourceScript = new ResourceScript(this, state);
                             // add this resource to the list of scripts available.
-                            this.scripts.put(resourceID, resourceScript);
+                            this.scripts.add(resourceScript.getScript());
 
                             // read the file containing the source for this script [if any]
                             File sourceFile = new File(scriptDirectory.getPath() + File.separator + "/" + SOURCE_FILENAME);
                             if (sourceFile.exists()) {
                                 vertx.fileSystem().readFile(sourceFile.getPath(), (buffer) -> {
-                                    resourceScript.setScriptFile(buffer.result().getByteBuf());
+                                    resourceScript.getScript().setScriptBuffer(buffer.result().getByteBuf());
                                 });
                             }
                         }
@@ -117,17 +116,25 @@ public class ResourceScripts implements Resource {
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("name", "Resource Triggered Scripts");
         sink.accept("description", "Scripts which are run when a monitored resource is modified.");
-        sink.accept("count", scripts.size());
+
+        //TODO: it not very performant to have count as part of the properties (since have to query the size)
+        //      count should be specified in the readMembers method response
+        ResourceParams resourceParams = ctx.resourceParams();
+        if (resourceParams != null && resourceParams.value(TARGET_PARAMETER) != null) {
+            String target = resourceParams.value(TARGET_PARAMETER);
+            sink.accept("count", scripts.getByTarget(target).size());
+        } else {
+            sink.accept("count", scripts.size());
+        }
         sink.close();
     }
 
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         try {
-            ResourceScript resourceScript = ResourceScript.generate(this, state);
+            ResourceScript resourceScript = new ResourceScript(this, state);
 
-            scripts.put(resourceScript.id(), resourceScript);
-            //resourceInterceptorManager.addResource(resourceScript);
+            scripts.add(resourceScript.getScript());
 
             //Write to the file system
             ObjectNode objectNode = ConversionUtils.convert(state);
@@ -141,43 +148,47 @@ public class ResourceScripts implements Resource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        for (ResourceScript scriptResource : scripts.values()) {
-            sink.accept(scriptResource);
+
+        ResourceParams resourceParams = ctx.resourceParams();
+        if (resourceParams != null && resourceParams.value(TARGET_PARAMETER) != null) {
+            String target = resourceParams.value(TARGET_PARAMETER);
+            for (Script script: scripts.getByTarget(target)) {
+                sink.accept(new ResourceScript(this, script));
+            }
+
+        } else {
+
+            for (Script script : scripts.values()) {
+                sink.accept(new ResourceScript(this, script));
+            }
         }
         sink.close();
     }
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        ResourceScript script = scripts.get(id);
+        Script script = scripts.get(id);
         if (script != null) {
-            responder.resourceRead(script);
+            responder.resourceRead(new ResourceScript(this, script));
         } else {
             responder.noSuchResource(id);
         }
     }
 
     public void deleteMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        ResourceScript script = scripts.get(id);
+        Script script = scripts.get(id);
         if (script != null) {
-            ScriptFileResource scriptFile = script.getScriptFile();
-            if (scriptFile != null) {
-                getResourceInterceptorManager().removeResource(id);
+            if (script.getScriptBuffer() != null) {
                 deleteSourceFile(id);
             }
             deleteMetadataFile(id);
             deleteScriptDirectory(id);
             scripts.remove(id);
-            responder.resourceDeleted(script);
+            responder.resourceDeleted(new ResourceScript(this, script));
         } else {
             responder.noSuchResource(id);
         }
     }
-
-    ResourceScriptManager getResourceInterceptorManager() {
-        return this.resourceInterceptorManager;
-    }
-
 
     public Logger logger() {
         return parent.logger();

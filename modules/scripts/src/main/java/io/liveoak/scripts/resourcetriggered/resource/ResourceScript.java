@@ -1,14 +1,15 @@
 package io.liveoak.scripts.resourcetriggered.resource;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import io.liveoak.common.util.ConversionUtils;
-import io.liveoak.scripts.common.GenericScriptResource;
 import io.liveoak.spi.InvalidPropertyTypeException;
+import io.liveoak.spi.PropertyException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.RequiredPropertyException;
 import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.LazyResourceState;
@@ -18,169 +19,148 @@ import io.netty.buffer.ByteBuf;
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class ResourceScript extends GenericScriptResource implements Comparable<ResourceScript> {
+public class ResourceScript implements Resource {
 
-    private String target;
-    private Integer priority = 1; //set the default priority to 1
-
-    protected static final String TARGET_PATH = "resource-path";
+    // Property names specified in the resource state
+    protected static final String NAME = "name";
+    protected static final String DESCRIPTION = "description";
+    protected static final String ENABLED = "enabled";
+    protected static final String LIBRARIES = "libraries";
+    protected static final String TARGET_PATH = "target-path";
     protected static final String PRIORITY = "priority";
-
-    protected ScriptFileResource scriptFileResource;
 
     private ResourceScripts parent;
 
-    protected ResourceScript(ResourceScripts parent, String id, ResourceState state) throws Exception {
-        super(parent, id, state);
+    // The script which this resource represents
+    private Script script;
+
+    public ResourceScript(ResourceScripts parent, ResourceState state) throws Exception {
         this.parent = parent;
+        this.script = createScript(state);
     }
 
-    protected static ResourceScript generate(ResourceScripts parent, String id, ResourceState state) throws Exception {
-        ResourceScript serverScriptResource = new ResourceScript(parent, id, state);
-
-        Object target = state.getProperty(TARGET_PATH);
-        if (target != null && target instanceof String) {
-            serverScriptResource.target = (String) target;
-        } else {
-            throw new InvalidPropertyTypeException(TARGET_PATH, String.class);
-        }
-
-        Object priority = state.getProperty(PRIORITY);
-        if (priority != null && priority instanceof Integer) {
-            serverScriptResource.priority = (Integer) priority;
-        } else if (priority != null) {
-            throw new InvalidPropertyTypeException(PRIORITY, Integer.class);
-        }
-
-        return serverScriptResource;
+    public ResourceScript(ResourceScripts parent, Script script) throws Exception {
+        this.parent = parent;
+        this.script = script;
     }
 
-    protected static ResourceScript generate(ResourceScripts parent, ResourceState state) throws Exception {
+    protected Script createScript(ResourceState state) throws PropertyException {
+
         String id = state.id();
         if (id == null) {
-            id = UUID.randomUUID().toString();
+            if (script != null) {
+                id = script.getId();
+            } else {
+                id = UUID.randomUUID().toString();
+            }
         }
 
-        ResourceScript serverScriptResource = new ResourceScript(parent, id, state);
+        String target = (String)getProperty(TARGET_PATH, state, true, String.class);
 
-        Object target = state.getProperty(TARGET_PATH);
-        if (target != null && target instanceof String) {
-            serverScriptResource.target = (String) target;
+        Script.Builder builder = new Script.Builder(id, target);
+
+        String name = (String) getProperty(NAME, state, false, String.class);
+        if (name != null) {
+            builder.setName(name);
+        }
+
+        String description = (String)getProperty(DESCRIPTION, state, false, String.class);
+        if (description != null) {
+            builder.setDescription(description);
+        }
+
+        Boolean enabled = (Boolean) getProperty(ENABLED, state, false, Boolean.class);
+        if (enabled != null) {
+            builder.setEnabled(enabled);
+        }
+
+        Integer priority = (Integer) getProperty(PRIORITY, state, false, Integer.class);
+        if (priority != null) {
+            builder.setPriority(priority);
+        }
+
+        List librariesProperty = (List) getProperty(LIBRARIES, state, false, ArrayList.class);
+        if (librariesProperty != null) {
+            List<String> libraries = new ArrayList<String>(librariesProperty.size());
+            for (Object libName: librariesProperty) {
+                if (libName instanceof String) {
+                    libraries.add((String)libName);
+                } else {
+                    throw new InvalidPropertyTypeException(LIBRARIES, String.class, true);
+                }
+            }
+            builder.setLibraries(libraries);
+        }
+
+        return builder.build();
+    }
+
+    //TODO: move this to a utility class or to the ResourceState class directly?
+    protected Object getProperty(String name, ResourceState state, boolean required, Class<?> requestedType) throws PropertyException {
+        Object propertyObject = state.getProperty(name);
+        if (required && propertyObject == null) {
+            throw new RequiredPropertyException(name, requestedType);
+        } else if (propertyObject == null) {
+            return null;
+        } else if (propertyObject.getClass() == requestedType) {
+            return requestedType.cast(propertyObject);
         } else {
-            throw new InvalidPropertyTypeException(TARGET_PATH, String.class);
+            throw new InvalidPropertyTypeException(name, requestedType);
         }
-
-        Object priority = state.getProperty(PRIORITY);
-        if (priority != null && priority instanceof Integer) {
-            serverScriptResource.priority = (Integer) priority;
-        } else if (priority != null) {
-            throw new InvalidPropertyTypeException(PRIORITY, Integer.class);
-        }
-
-        return serverScriptResource;
     }
 
-    public String target() {
-        return target;
-    }
-
-    public Integer priority() {
-        return priority;
+    public Script getScript() {
+        return script;
     }
 
     @Override
-    public int compareTo(ResourceScript resourceServerScriptResource) {
-        if (this.priority() > resourceServerScriptResource.priority()) {
-            return 1;
-        } else if (this.priority() == resourceServerScriptResource.priority()) {
-            return 0;
-        } else {
-            return -1;
-        }
+    public Resource parent() {
+        return this.parent;
+    }
+
+    @Override
+    public String id() {
+        return script.getId();
     }
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept(NAME, name);
-        sink.accept(DESCRIPTION, description);
-        sink.accept(ENABELD, enabled);
-        sink.accept(TARGET_PATH, target);
-        sink.accept(PRIORITY, priority);
-        sink.accept(LIBRARIES, libraries);
-
-        if (scriptFileResource != null) {
-            sink.accept("provides", scriptFileResource.provides());
-        }
-
+        sink.accept(NAME, script.getName());
+        sink.accept(DESCRIPTION, script.getDescription());
+        sink.accept(ENABLED, script.isEnabled());
+        sink.accept(TARGET_PATH, script.getTarget());
+        sink.accept(PRIORITY, script.getPriority());
+        sink.accept(LIBRARIES, script.getLibraries());
         sink.close();
     }
 
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        //TODO: put this code in a common location since its also used when creating
-        Object nameProperty = state.getProperty(NAME);
-        if (nameProperty != null) {
-            name = nameProperty.toString();
-        } else {
-            name = null;
-        }
-
-        Object descriptionProperty = state.getProperty(DESCRIPTION);
-        if (descriptionProperty != null) {
-            description = descriptionProperty.toString();
-        } else {
-            description = null;
-        }
-
-        Object enabledProperty = state.getProperty(ENABELD);
-        if (enabledProperty != null && enabledProperty instanceof Boolean) {
-            enabled = (Boolean) enabledProperty;
-        } else {
-            enabled = false;
-        }
-
-        libraries.clear();
-        Object libraries = state.getProperty(LIBRARIES);
-        if (libraries != null && libraries instanceof List) {
-            for (Object entry : (List) libraries) {
-                if (entry instanceof String) {
-                    this.libraries.add((String) entry);
-                }
+        try {
+            if (script != null && state.id() != null && !state.id().equals(script.getId())) {
+                responder.invalidRequest("The resource ID cannot be changed during an update.");
+            } else {
+                // since we don't do partial updates, we need to overwrite everything here with the new state
+                script = createScript(state);
+                responder.resourceUpdated(this);
             }
-        } else if (libraries != null) {
-            throw new InvalidPropertyTypeException(LIBRARIES, List.class);
+        } catch (PropertyException pe) {
+            responder.invalidRequest(pe.getMessage());
+        } catch (Exception e) {
+            responder.internalError(e.getMessage());
         }
-
-        Object targetProperty = state.getProperty(TARGET_PATH);
-        if (targetProperty != null && targetProperty instanceof String) {
-            target = (String) targetProperty;
-        } else {
-            throw new InvalidPropertyTypeException(TARGET_PATH, String.class);
-        }
-
-        Object priorityProperty = state.getProperty(PRIORITY);
-        if (priorityProperty != null && priorityProperty instanceof Integer) {
-            priority = (Integer) priorityProperty;
-        } else if (priorityProperty != null) {
-            throw new InvalidPropertyTypeException(PRIORITY, Integer.class);
-        }
-
-        parent.getResourceInterceptorManager().addResource(this);
-        parent.writeMetadataFile(this.id(), ConversionUtils.convert(state));
-        responder.resourceUpdated(this);
     }
 
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-
         if (state instanceof LazyResourceState) {
             LazyResourceState lazyResourceState = (LazyResourceState) state;
             ByteBuf content = lazyResourceState.contentAsByteBuf();
-            setScriptFile(content.copy());
 
-            parent.writeSourceFile(this.id(), content.copy());
+            script.setScriptBuffer(content);
+            parent.writeSourceFile(this.id(), script.getScriptBuffer());
 
-            responder.resourceCreated(scriptFileResource);
+            responder.resourceCreated(new ScriptFileResource(this));
             return;
         }
         responder.invalidRequest("The uploaded script must be a binary javascript file.");
@@ -188,56 +168,34 @@ public class ResourceScript extends GenericScriptResource implements Comparable<
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.accept(scriptFileResource);
+        if (script.getScriptBuffer() != null) {
+            sink.accept(new ScriptFileResource(this));
+        }
         sink.close();
     }
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        if (scriptFileResource != null && id.equals(scriptFileResource.id())) {
-            responder.resourceRead(scriptFileResource);
+        if (id.equals(ScriptFileResource.ID) && script.getScriptBuffer() != null) {
+            responder.resourceRead(new ScriptFileResource(this));
         } else {
             responder.noSuchResource(id);
         }
-
     }
 
     @Override
     public void delete(RequestContext ctx, Responder responder) throws Exception {
-        parent.deleteMember(ctx, this.id(), responder);
+        this.script = null;
+        parent.deleteMember(ctx, script.getId(), responder);
     }
 
+    //TODO: add DeleteMember to the Resource object?
     public void deleteMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        parent.getResourceInterceptorManager().removeResource(this.id);
-        parent.deleteSourceFile(this.id);
-
-        responder.resourceDeleted(this.scriptFileResource);
-
-        this.scriptFileResource = null;
-    }
-
-    public ScriptFileResource getScriptFile() {
-        return this.scriptFileResource;
-    }
-
-    public void setScriptFile(ByteBuf buffer) {
-        this.scriptFileResource = new ScriptFileResource(this, buffer);
-        parent.getResourceInterceptorManager().addResource(this);
-    }
-
-
-    public static class ReverseComparator implements Comparator<ResourceScript> {
-
-        @Override
-        public int compare(ResourceScript o1, ResourceScript o2) {
-            if (o1.priority() > o2.priority()) {
-                return -1;
-            } else if (o1.priority() == o2.priority()) {
-                return 0;
-            } else {
-                return 1;
-            }
+        if (id == ScriptFileResource.ID && script.getScriptBuffer() != null) {
+            responder.resourceDeleted(new ScriptFileResource(this));
+            this.script.setScriptBuffer(null);
+        } else {
+            responder.noSuchResource(id);
         }
     }
 }
-
