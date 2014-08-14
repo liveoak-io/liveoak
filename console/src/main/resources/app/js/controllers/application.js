@@ -335,30 +335,6 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
 
   $scope.changed = false;
 
-  $scope.addRedirectUri = function() {
-    $scope.settings.redirectUris.push($scope.newRedirectUri);
-    if(!$scope.newWebOrigin && (/^http[s]?:\/\/[^/]*/).test($scope.newRedirectUri)) {
-      var newWebOrigin = $scope.newRedirectUri.match(/^http[s]?:\/\/[^/]*/)[0];
-      if ($scope.settings.webOrigins.indexOf(newWebOrigin) === -1) {
-        $scope.newWebOrigin = newWebOrigin;
-      }
-    }
-    $scope.newRedirectUri = '';
-  };
-
-  $scope.deleteRedirectUri = function(index) {
-    $scope.settings.redirectUris.splice(index, 1);
-  };
-
-  $scope.addWebOrigin = function() {
-    $scope.settings.webOrigins.push($scope.newWebOrigin);
-    $scope.newWebOrigin = '';
-  };
-
-  $scope.deleteWebOrigin = function(index) {
-    $scope.settings.webOrigins.splice(index, 1);
-  };
-
   $scope.availableRoles = $filter('orderBy')(loRealmAppRoles, 'name');//loRealmRoles.concat(loRealmAppRoles);
   $scope.noRoles = ['The application has no Roles'];
 
@@ -368,16 +344,92 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     redirectUris: angular.copy($scope.appClient.redirectUris) || [],
     webOrigins: angular.copy($scope.appClient.webOrigins) || []
   };
+
   angular.forEach(scopeMappings, function(role) {$scope.settings.scopeMappings.push(role.id);});
 
   var settingsBackup = angular.copy($scope.settings);
+
+  $scope.redirectUris = [];
+
+  angular.forEach($scope.settings.redirectUris, function (uri) {
+    $scope.redirectUris.push({'val': uri});
+  });
+
+  if ($scope.redirectUris.length === 0) {
+    $scope.redirectUris.push({});
+  }
+
+  var redirectUrisBackup = angular.copy($scope.redirectUris);
+
+  $scope.webOrigins = [];
+
+  angular.forEach($scope.settings.webOrigins, function (uri) {
+    $scope.webOrigins.push({'val': uri});
+  });
+
+  if ($scope.webOrigins.length === 0) {
+    $scope.webOrigins.push({});
+  }
+
+  var webOriginsBackup = angular.copy($scope.webOrigins);
+
+  $scope.checkUrl = function(uri){
+    return (/^http[s]?:\/\/[^/]*/).test(uri);
+  };
+
+  $scope.changeRedirectUri = function(uri){
+    if(!$scope.newWebOrigin && (/^http[s]?:\/\/[^/]*/).test(uri)) {
+      var newWebOrigin = uri.match(/^http[s]?:\/\/[^/]*/)[0];
+      if ($scope.settings.webOrigins.indexOf(newWebOrigin) === -1) {
+        $scope.webOrigins[$scope.webOrigins.length - 1] = {'val': newWebOrigin};
+      }
+    }
+  };
+
+  $scope.addRedirectUri = function() {
+    $scope.redirectUris.push({});
+  };
+
+  $scope.deleteRedirectUri = function(index) {
+    $scope.redirectUris.splice(index, 1);
+  };
+
+  $scope.addWebOrigin = function() {
+    $scope.webOrigins.push({});
+  };
+
+  $scope.deleteWebOrigin = function(index) {
+    $scope.webOrigins.splice(index, 1);
+  };
 
   $scope.$watch('settings', function() {
     $scope.changed = !angular.equals($scope.settings, settingsBackup);
   }, true);
 
+  function checkValChange(toInspect, backup){
+    var newCopy = angular.copy(toInspect);
+
+    var last = newCopy[newCopy.length-1];
+
+    if (!last.hasOwnProperty('val') || last.val === ''){
+      newCopy.pop();
+    }
+
+    return !angular.equals(newCopy, backup);
+  }
+
+  $scope.$watch('redirectUris', function(a) {
+    $scope.changed = checkValChange(a, redirectUrisBackup);
+  }, true);
+
+  $scope.$watch('webOrigins', function(a) {
+    $scope.changed = checkValChange(a, webOriginsBackup);
+  }, true);
+
   $scope.clear = function() {
     $scope.settings = angular.copy(settingsBackup);
+    $scope.redirectUris = angular.copy(redirectUrisBackup);
+    $scope.webOrigins = angular.copy(webOriginsBackup);
   };
 
   var arrayObjectIndexOf = function(array, object) {
@@ -441,6 +493,21 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
   };
 
   $scope.save = function() {
+    $scope.settings.redirectUris = [];
+
+    angular.forEach($scope.redirectUris, function(uri) {
+      if (uri.hasOwnProperty('val')) {
+        $scope.settings.redirectUris.push(uri.val);
+      }
+    });
+
+    $scope.settings.webOrigins= [];
+    angular.forEach($scope.webOrigins, function (uri) {
+      if (uri.hasOwnProperty('val')) {
+        $scope.settings.webOrigins.push(uri.val);
+      }
+    });
+
     var nameChanged = $scope.appClient.name !== $scope.settings.name;
     var redirectUrisChanged = !angular.equals($scope.appClient.redirectUris, $scope.settings.redirectUris);
     var webOriginsChanged = !angular.equals($scope.appClient.webOrigins, $scope.settings.webOrigins);

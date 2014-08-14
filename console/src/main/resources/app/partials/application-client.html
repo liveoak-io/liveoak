@@ -11,10 +11,10 @@
   
       <hr>
   
-      <form class="lo-form-horizontal clearfix">
+      <form class="lo-form-horizontal clearfix" name="clientsForm">
         <fieldset>
           <div class="form-group clearfix">
-            <label class="col-sm-2 control-label" for="clientname">Client Name</label>
+            <label class="col-sm-2 control-label" for="clientname" required>Client Name <span class="required">*</span></label>
             <div class="col-sm-4">
               <input class="form-control" type="text" id="clientname" ng-model="settings.name" required pf-focused="!settings.name" >
             </div>
@@ -39,41 +39,57 @@
               </span>
             </div>
           </div>
-          <div class="form-group multiple clearfix" data-ng-show="!appClient.bearerOnly">
+          <div class="form-group multiple clearfix hover-menu" data-ng-show="!appClient.bearerOnly">
             <label class="col-sm-2 control-label" for="newRedirectUri">Redirect URIs</label>
-            <div class="col-sm-4" ng-repeat="redirectUri in settings.redirectUris" class="row">
+            <div class="col-sm-4 row" ng-repeat="redirectUri in redirectUris">
               <div class="col-sm-12">
-                <div class="input-group">
-                  <input class="form-control" type="text" name="redirectUri" id="redirectUri" data-ng-model="redirectUri" readonly />
-                  <div class="input-group-btn">
-                    <button class="btn btn-default" type="button" data-ng-click="deleteRedirectUri($index)"><i class="fa fa-trash-o"></i></button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-sm-4">
-              <div class="col-sm-12">
-                <div  ng-class="{'input-group': newRedirectUri.length > 0}">
-                  <input class="form-control" type="text" id="newRedirectUri" name="newRedirectUri" ng-model="newRedirectUri" placeholder="New redirect URI..."/>
-                  <div class="input-group-btn" ng-show="newRedirectUri.length > 0">
-                    <button class="btn btn-primary" data-ng-click="addRedirectUri()" >Add</button>
-                  </div>
+                <input class="form-control" type="text" name="newRedirectUri" id="newRedirectUri"
+                       placeholder="New Redirect URI..." data-ng-model="redirectUri.val"
+                       ng-change="changeRedirectUri(redirectUri.val)" pf-validation="checkUrl(redirectUri.val)">
+
+                <span class="help-block">
+                  <span>It is not right.</span>
+                </span>
+
+                <div class="input-group-client">
+                  <button type="button" class="btn btn-link btn-icon" ng-show="!$first"
+                          data-ng-click="deleteRedirectUri($index)">
+                    <i class="fa fa-trash-o" data-tooltip-placement="top" data-tooltip="Remove URI"></i>
+                    <span>Remove URI</span>
+                  </button>
+
+                  <button type="button" class="btn btn-link btn-icon" ng-click="addRedirectUri()"
+                          ng-show="$last" ng-disabled="!redirectUri">
+                    <i class="fa fa-plus-circle" data-tooltip-placement="top" data-tooltip="Add URI"></i>
+                    <span>Add URI</span>
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-          <div class="form-group multiple clearfix">
-            <label class="col-sm-2 control-label" for="newRedirectUri">Web Origins</label>
-            <div class="col-sm-4" ng-repeat="webOrigin in settings.webOrigins" class="row">
-              <div class="col-sm-12" style="padding: 0;">
-                <div class="input-group">
-                  <input class="form-control" type="text" name="redirectUri" id="webOrigin" data-ng-model="webOrigin" readonly />
-                  <div class="input-group-btn">
-                    <button class="btn btn-default" type="button" data-ng-click="deleteWebOrigin($index)"><i class="fa fa-trash-o"></i></button>
-                  </div>
+          <div class="form-group multiple clearfix hover-menu">
+            <label class="col-sm-2 control-label" for="newWebOrigin">Web Origins</label>
+            <div class="col-sm-4 row" ng-repeat="webOrigin in webOrigins">
+              <div class="col-sm-12">
+                <input class="form-control" type="text" name="redirectUri" id="webOrigin"
+                       placeholder="New Web Origin..." data-ng-model="webOrigins[$index].val" />
+
+                <div class="input-group-client">
+                  <button type="button" class="btn btn-link btn-icon" ng-show="!$first"
+                          data-ng-click="deleteWebOrigin($index)">
+                    <i class="fa fa-trash-o" data-tooltip-placement="top" data-tooltip="Remove URI"></i>
+                    <span>Remove Web Origin</span>
+                  </button>
+
+                  <button type="button" class="btn btn-link btn-icon" ng-click="addWebOrigin(webOrigin)"
+                          ng-show="$last" ng-disabled="!webOrigin">
+                    <i class="fa fa-plus-circle" data-tooltip-placement="top" data-tooltip="Add URI"></i>
+                    <span>Add Web Origin</span>
+                  </button>
                 </div>
               </div>
             </div>
+            <!--
             <div class="col-sm-4">
               <div class="col-sm-12">
                 <div  ng-class="{'input-group': newWebOrigin.length > 0}">
@@ -84,6 +100,7 @@
                 </div>
               </div>
             </div>
+            -->
           </div>
           <div class="form-group clearfix">
             <label class="col-sm-2 control-label" for="scope">Scope</label>
@@ -96,7 +113,7 @@
           </div>
         </fieldset>
         <div class="pull-right form-actions">
-          <button class="btn btn-default btn-lg" ng-disabled="!changed" type="button" ng-click="clear()">Clear changes</button>
+          <button class="btn btn-default btn-lg" ng-disabled="!changed || clientsForm.$invalid || !settings.name" type="button" ng-click="clear()">Clear changes</button>
           <button class="btn btn-primary btn-lg" ng-disabled="!changed" type="submit" ng-click="save()">Save</button>
         </div>
       </form>

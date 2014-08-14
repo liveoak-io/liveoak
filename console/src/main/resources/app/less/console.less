@@ -2567,6 +2567,28 @@ tr.deleted {
   
 }
 
+.form-group.hover-menu {
+
+  .input-group-client {
+
+    display: none;
+    position: absolute;
+    top: 0;
+    right: -60px;
+    width: 50px;
+
+    button.btn {
+      margin-left: 2px;
+    }
+  }
+
+  .row:hover {
+    .input-group-client {
+      display: block;
+    }
+  }
+}
+
 /* Backdrop for advanced search, used to catch clicks outside the adv. search windoww */
 #advancedBackdrop {
   z-index: 0;
