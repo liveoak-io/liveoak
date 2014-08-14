@@ -112,11 +112,11 @@ public class Table implements Comparable<Table> {
         return referredKeys;
     }
 
-    public String ddl(Catalog catalog) {
-        return ddlPretty(catalog, false);
+    public String ddl() {
+        return ddlPretty(false);
     }
 
-    public String ddlPretty(Catalog catalog, boolean multiline) {
+    public String ddlPretty(boolean multiline) {
 
         StringBuilder sb = new StringBuilder("CREATE TABLE \"").append(schema()).append("\".\"").append(name()).append("\" (");
         if (multiline) {
@@ -246,7 +246,15 @@ public class Table implements Comparable<Table> {
         return null;
     }
 
+    /**
+     * This method has package private visibility as it's only supposed to be used during Catalog / Table construction
+     *
+     * @param catalog
+     */
     void catalog(Catalog catalog) {
+        if (catalog == null) {
+            throw new IllegalArgumentException("catalog == null");
+        }
         if (this.catalog != null) {
             throw new RuntimeException("Catalog already set");
         }

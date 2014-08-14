@@ -31,10 +31,12 @@ public class PgSqlTableResource implements Resource {
     private PgSqlRootResource parent;
     private String id;
     private QueryResults results;
+    private QueryBuilder queryBuilder;
 
     public PgSqlTableResource(PgSqlRootResource root, String table) {
         this.parent = root;
         this.id = table;
+        this.queryBuilder = parent.queryBuilder();
     }
 
     @Override
@@ -91,12 +93,12 @@ public class PgSqlTableResource implements Resource {
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         // insert a new record into a table
-        Catalog cat = parent.getCatalog();
+        Catalog cat = parent.catalog();
         Table table = cat.tableById(id());
 
         String itemId = null;
-        try (Connection c = parent.getConnection()) {
-            itemId = new QueryBuilder(cat).executeInsert(ctx, c, table, state);
+        try (Connection c = parent.connection()) {
+            itemId = queryBuilder.executeInsert(ctx, c, table, state);
 
             // TODO: also handle expanded many-to-one / one-to-many
         }
@@ -115,13 +117,13 @@ public class PgSqlTableResource implements Resource {
 
     @Override
     public void delete(RequestContext ctx, Responder responder) throws Exception {
-        Catalog cat = parent.getCatalog();
+        Catalog cat = parent.catalog();
         Table t = cat.tableById(id);
-        try (Connection c = parent.getConnection()) {
-            new QueryBuilder(cat).executeDeleteTable(c, t);
+        try (Connection c = parent.connection()) {
+            queryBuilder.executeDeleteTable(c, t);
         }
         // trigger schema reload
-        parent.configuration().reloadSchema();
+        parent.reloadSchema();
 
         // TODO - does it make sense to return a body here at all? Container fails to set Content-Length if resourceDeleted(null)
         // only return id and uri in response - no members
@@ -134,20 +136,19 @@ public class PgSqlTableResource implements Resource {
     }
 
     public QueryResults queryTable(String table, String id, RequestContext ctx) throws SQLException, IOException {
-        Catalog cat = parent.getCatalog();
+        Catalog cat = parent.catalog();
         Table t = cat.tableById(table);
-        try (Connection con = parent.getConnection()) {
-            QueryBuilder qb = new QueryBuilder(cat);
+        try (Connection con = parent.connection()) {
             String q = ctx.resourceParams().value("q");
 
             if (id == null) {
                 if (q != null) {
-                    return qb.querySelectFromTable(con, t, replaceIdsWithColumnNames(ctx.sorting()), ctx.pagination(), q);
+                    return queryBuilder.querySelectFromTable(con, t, replaceIdsWithColumnNames(ctx.sorting()), ctx.pagination(), q);
                 } else {
-                    return qb.querySelectFromTable(con, t, replaceIdsWithColumnNames(ctx.sorting()), ctx.pagination());
+                    return queryBuilder.querySelectFromTable(con, t, replaceIdsWithColumnNames(ctx.sorting()), ctx.pagination());
                 }
             } else {
-                return qb.querySelectFromTableWhereId(con, t, id);
+                return queryBuilder.querySelectFromTableWhereId(con, t, id);
             }
         }
     }
@@ -156,7 +157,7 @@ public class PgSqlTableResource implements Resource {
         if (sorting == null) {
             return null;
         }
-        Catalog cat = parent.getCatalog();
+        Catalog cat = parent.catalog();
         Sorting.Builder builder = new Sorting.Builder();
         for (Sorting.Spec f: sorting) {
             if (f.name().equals("id")) {

@@ -39,7 +39,7 @@ public class PgSqlTableSchemaResource  implements Resource {
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
 
-        Table table = parent.getCatalog().table(new TableRef(id));
+        Table table = parent.catalog().table(new TableRef(id));
 
         if (table == null) {
             throw new IllegalStateException("No table definition found for: " + id);
@@ -85,7 +85,7 @@ public class PgSqlTableSchemaResource  implements Resource {
             sink.accept("foreign-keys", fkspecs);
         }
 
-        sink.accept("ddl", table.ddl(parent.getCatalog()));
+        sink.accept("ddl", table.ddl());
         sink.close();
     }
 }

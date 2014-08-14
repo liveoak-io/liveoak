@@ -4,7 +4,6 @@ import java.sql.Connection;
 
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
-import io.liveoak.pgsql.meta.QueryBuilder;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 
@@ -23,9 +22,8 @@ public class PgSqlResourceRef extends PgSqlRowResource {
 
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         QueryResults results;
-        try (Connection con = parent().parent().getConnection()) {
-            QueryBuilder qb = new QueryBuilder(parent().parent().getCatalog());
-            results = qb.querySelectFromTableWhereId(con, parent().id(), id());
+        try (Connection con = parent().parent().connection()) {
+            results = queryBuilder().querySelectFromTableWhereId(con, parent().id(), id());
         }
 
         for (Row row: results.rows()) {

@@ -72,7 +72,7 @@ public class Catalog {
         this.tables = Collections.unmodifiableMap(tablesWithIds);
 
         // set catalog on tables
-        for (Table t: tables.values()) {
+        for (Table t: this.tables.values()) {
             t.catalog(this);
         }
     }
@@ -108,5 +108,11 @@ public class Catalog {
 
     public Table tableById(String id) {
         return table(new TableRef(id));
+    }
+
+    public Table newTable(String schema, String name, List<Column> columns, PrimaryKey key, List<ForeignKey> foreignKeys) {
+        Table table = new Table(schema, name, columns, key, foreignKeys);
+        table.catalog(this);
+        return table;
     }
 }

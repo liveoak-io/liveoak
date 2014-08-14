@@ -32,16 +32,18 @@ public class PgSqlRowResource implements Resource {
     private PgSqlTableResource parent;
     private String id;
     private Row row;
+    private QueryBuilder queryBuilder;
 
     public PgSqlRowResource(PgSqlTableResource parent, String id) {
         this.parent = parent;
         this.id = id;
+        this.queryBuilder = parent.parent().queryBuilder();
     }
 
     public PgSqlRowResource(PgSqlTableResource parent, Row row) {
         this.parent = parent;
         this.row = row;
-        Table table = parent.parent().getCatalog().table(new TableRef(parent.id()));
+        Table table = parent.parent().catalog().table(new TableRef(parent.id()));
         List<Column> pk = table.pk().columns();
         StringBuilder sb = new StringBuilder();
         for (Column c: pk) {
@@ -50,7 +52,12 @@ public class PgSqlRowResource implements Resource {
             }
             sb.append(row.value(c.name()));
         }
-        id = sb.toString();
+        this.id = sb.toString();
+        this.queryBuilder = parent.parent().queryBuilder();
+    }
+
+    protected QueryBuilder queryBuilder() {
+        return queryBuilder;
     }
 
     public void row(Row row) {
@@ -73,7 +80,7 @@ public class PgSqlRowResource implements Resource {
             return;
         }
 
-        Catalog cat = parent.parent().getCatalog();
+        Catalog cat = parent.parent().catalog();
         Table table = cat.table(new TableRef(parent.id()));
         HashMap<ForeignKey, String[]> fkMap = new HashMap<>();
 
@@ -115,8 +122,7 @@ public class PgSqlRowResource implements Resource {
         // we have to make a query select from orders where address_id = row.get(pk)
         HashMap<String, List<Resource>> stacked = new HashMap<>();
         for (ForeignKey fk : table.referredKeys()) {
-            QueryBuilder builder = new QueryBuilder(cat);
-            try (Connection con = parent.parent().getConnection()) {
+            try (Connection con = parent.parent().connection()) {
                 List<Column> cols = fk.columns();
                 Table tab = cat.table(cols.get(0).tableRef());
 
@@ -128,7 +134,7 @@ public class PgSqlRowResource implements Resource {
                     throw new IllegalStateException("Primary key column count on " + table.id() + " doesn't match foreign key column count on " + tab.id());
                 }
 
-                QueryResults results = builder.querySelectFromTableWhere(con, tab, cols, vals, null, Pagination.NONE);
+                QueryResults results = queryBuilder.querySelectFromTableWhere(con, tab, cols, vals, null, Pagination.NONE);
                 LinkedList ls = new LinkedList();
                 for (Row r : results.rows()) {
                     ls.add(new PgSqlRowResource(
@@ -157,10 +163,11 @@ public class PgSqlRowResource implements Resource {
 
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        Catalog cat = parent.parent().getCatalog();
+        Catalog cat = parent.parent().catalog();
         Table table = cat.table(new TableRef(parent.id()));
-        try (Connection c = parent.parent().getConnection()) {
-            new QueryBuilder(cat).executeUpdate(ctx, c, table, state);
+
+        try (Connection c = parent.parent().connection()) {
+            queryBuilder.executeUpdate(ctx, c, table, state);
         }
         //responder.resourceUpdated(this);
         responder.resourceUpdated(new PgSqlRowResource(parent, parent.queryTable(parent.id(), id, ctx).rows().get(0)));
@@ -171,10 +178,11 @@ public class PgSqlRowResource implements Resource {
         ResourceParams params = ctx.resourceParams();
         boolean cascade = params != null && params.contains("cascade");
 
-        Catalog cat = parent.parent().getCatalog();
+        Catalog cat = parent.parent().catalog();
         Table table = cat.table(new TableRef(parent.id()));
-        try (Connection c = parent.parent().getConnection()) {
-            new QueryBuilder(cat).executeDelete(ctx, c, table, id, cascade);
+
+        try (Connection c = parent.parent().connection()) {
+            queryBuilder.executeDelete(ctx, c, table, id, cascade);
         }
 
         this.row = null;

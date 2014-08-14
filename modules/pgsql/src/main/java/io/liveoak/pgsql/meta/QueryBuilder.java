@@ -61,16 +61,7 @@ public class QueryBuilder {
     public QueryBuilder(Catalog catalog) {
         this.catalog = catalog;
     }
-/*
-    public String selectAllFromTable(String table) {
-        Table tableDef = catalog.table(new TableRef(table));
-        if (tableDef == null) {
-            throw new IllegalStateException("No such table: " + table);
-        }
 
-        return selectAllFromTable(tableDef);
-    }
-*/
     public String selectAllFromTable(Table table) {
         return "SELECT * FROM " + table.quotedSchemaName();
     }
@@ -705,6 +696,21 @@ public class QueryBuilder {
         }
     }
 
+    public void executeCreateTable(Connection con, Table table) throws SQLException {
+        try (Connection c = con) {
+            // if schema may need to be created now is the time
+            boolean newSchemaNeeded = !catalog.schemas().contains(table.tableRef().schema());
+            if (newSchemaNeeded) {
+                try (PreparedStatement ps = c.prepareStatement("CREATE SCHEMA IF NOT EXISTS " + table.tableRef().quotedSchema())) {
+                    ps.execute();
+                }
+            }
+            try (PreparedStatement ps = c.prepareStatement(table.ddl())) {
+                ps.execute();
+            }
+        }
+    }
+
     private boolean transitivelyReferredBy(Table t1, Table t2) {
         for (ForeignKey fk: t1.referredKeys()) {
             Table dep = catalog.table(fk.columns().get(0).tableRef());
@@ -939,9 +945,6 @@ public class QueryBuilder {
     }
 
     private void parseLogical(LogicalOperator op, JsonNode node) {
-        //if (!node.isArray()) {
-        //    throw new IllegalArgumentException("Value must be a JSON array - " + op + ": " + node);
-        //}
 
         // if node is array iterate over items, convert them to Expressions, and attach them to op ...
         if (node.isArray()) {

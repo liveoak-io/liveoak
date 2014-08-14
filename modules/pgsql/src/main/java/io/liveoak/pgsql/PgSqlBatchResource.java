@@ -21,10 +21,12 @@ public class PgSqlBatchResource implements Resource {
 
     private PgSqlRootResource parent;
     private String id;
+    private QueryBuilder queryBuilder;
 
     public PgSqlBatchResource(PgSqlRootResource parent, String id) {
         this.parent = parent;
         this.id = id;
+        this.queryBuilder = parent.queryBuilder();
     }
 
     @Override
@@ -52,8 +54,8 @@ public class PgSqlBatchResource implements Resource {
         // as we have to delete them in order of dependencies
         List<Table> deleteList = new LinkedList<>();
 
-        Catalog cat = parent.getCatalog();
-        try (Connection c = parent.getConnection()) {
+        Catalog cat = parent.catalog();
+        try (Connection c = parent.connection()) {
             // iterate through members one by one, and perform operation on each
             for (ResourceState member : state.members()) {
                 // parse uri
@@ -83,15 +85,17 @@ public class PgSqlBatchResource implements Resource {
                     String itemId = pathSegments.get(3).name();
 
                     if (action.equals("create")) {
-                        new QueryBuilder(cat).executeInsert(ctx, c, table, member);
+                        queryBuilder.executeInsert(ctx, c, table, member);
                     } else if (action.equals("delete")) {
-                        new QueryBuilder(cat).executeDelete(ctx, c, table, itemId, ctx.resourceParams().contains("cascade"));
+                        queryBuilder.executeDelete(ctx, c, table, itemId, ctx.resourceParams().contains("cascade"));
                     } else if (action.equals("update")) {
-                        new QueryBuilder(cat).executeUpdate(ctx, c, table, member);
+                        queryBuilder.executeUpdate(ctx, c, table, member);
                     }
                 } else {
                     if (action.equals("delete")) {
                         deleteList.add(table);
+                    } else if (action.equals("create")) {
+
                     } else {
                         responder.invalidRequest("'action' parameter value not supported for collection uri (" + uri + "): " + action);
                         return;
@@ -101,9 +105,9 @@ public class PgSqlBatchResource implements Resource {
                 // TODO: also handle expanded many-to-one / one-to-many
             }
             if (deleteList.size() > 0) {
-                new QueryBuilder(cat).executeDeleteTables(c, deleteList);
+                queryBuilder.executeDeleteTables(c, deleteList);
                 // trigger schema reload
-                parent.configuration().reloadSchema();
+                parent.reloadSchema();
             }
         }
         responder.resourceRead(this);

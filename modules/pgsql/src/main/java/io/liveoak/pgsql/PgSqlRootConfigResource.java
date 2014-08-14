@@ -2,24 +2,21 @@ package io.liveoak.pgsql;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import io.liveoak.pgsql.meta.Catalog;
 import io.liveoak.pgsql.meta.Column;
 import io.liveoak.pgsql.meta.ForeignKey;
 import io.liveoak.pgsql.meta.PrimaryKey;
+import io.liveoak.pgsql.meta.QueryBuilder;
 import io.liveoak.pgsql.meta.Table;
 import io.liveoak.pgsql.meta.TableRef;
 import io.liveoak.spi.InitializationException;
@@ -39,10 +36,9 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
     private static Logger log = Logger.getLogger(PgSqlRootConfigResource.class);
     private PGPoolingDataSource ds;
     private Catalog catalog;
-    private List<String> exposedSchemas;
-    private List<String> blockedSchemas;
-    private String defaultSchema;
-    private boolean allowCreateSchema;
+    private ConfigurationImpl configuration = new ConfigurationImpl();
+    private PgSqlCRUDController controller;
+    private QueryBuilder queryBuilder;
 
     public PgSqlRootConfigResource(String id) {
         super(id);
@@ -58,26 +54,16 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
         }
     }
 
-    public String defaultSchema() {
-        return defaultSchema;
+    public PgSqlConfiguration configuration() {
+        return configuration;
     }
 
-    public List<String> exposedSchemas() {
-        if (exposedSchemas == null) {
-            return null;
-        }
-        return Collections.unmodifiableList(exposedSchemas);
+    public PgSqlCRUDController controller() {
+        return controller;
     }
 
-    public List<String> blockedSchemas() {
-        if (blockedSchemas == null) {
-            return null;
-        }
-        return Collections.unmodifiableList(blockedSchemas);
-    }
-
-    public boolean allowCreateSchema() {
-        return allowCreateSchema;
+    public QueryBuilder queryBuilder() {
+        return queryBuilder;
     }
 
     /**
@@ -87,14 +73,14 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
      * @return a connection retrieved from the pool
      * @throws SQLException
      */
-    public Connection getConnection() throws SQLException {
+    public Connection connection() throws SQLException {
         if (ds == null) {
             throw new IllegalStateException("DataSource not available");
         }
         return ds.getConnection();
     }
 
-    public Catalog getCatalog() {
+    public Catalog catalog() {
         return catalog;
     }
 
@@ -108,16 +94,20 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
         sink.accept("password", ds.getPassword());
         sink.accept("max-connections", ds.getMaxConnections());
         sink.accept("initial-connections", ds.getInitialConnections());
-        if (exposedSchemas != null && exposedSchemas.size() > 0) {
-            sink.accept("schemas", exposedSchemas);
+
+        List<String> schemas = configuration.exposedSchemas();
+        if (schemas != null && schemas.size() > 0) {
+            sink.accept("schemas", schemas);
         }
-        if (blockedSchemas != null && blockedSchemas.size() > 0) {
-            sink.accept("blocked-schemas", blockedSchemas);
+
+        schemas = configuration.blockedSchemas();
+        if (schemas != null && schemas.size() > 0) {
+            sink.accept("blocked-schemas", schemas);
         }
-        if (defaultSchema != null) {
-            sink.accept("default-schema", defaultSchema);
+        if (configuration.defaultSchema() != null) {
+            sink.accept("default-schema", configuration.defaultSchema());
         }
-        sink.accept("allow-create-schema", allowCreateSchema);
+        sink.accept("allow-create-schema", configuration.allowCreateSchema());
         sink.close();
     }
 
@@ -154,19 +144,19 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
 
         List<String> exposedSchemas = (List<String>) state.getPropertyAsList("schemas");
         if (exposedSchemas != null) {
-            this.exposedSchemas = exposedSchemas;
+            configuration.exposedSchemas(exposedSchemas);
         }
 
         List<String> blockedSchemas = (List<String>) state.getPropertyAsList("blocked-schemas");
         if (blockedSchemas != null) {
-            this.blockedSchemas = blockedSchemas;
+            configuration.blockedSchemas(blockedSchemas);
         }
 
-        this.defaultSchema = state.getPropertyAsString("default-schema");
+        configuration.defaultSchema(state.getPropertyAsString("default-schema"));
 
         Boolean bval = state.getPropertyAsBoolean("allow-create-schema");
         if (bval != null) {
-            allowCreateSchema = bval;
+            configuration.allowCreateSchema(bval);
         }
 
         PGPoolingDataSource old = this.ds;
@@ -250,13 +240,16 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
     }
 
     public void reloadSchema() throws SQLException {
-        try (Connection c = getConnection()) {
-            Set<String> schemas = calculateEffectiveSchemas(c, ds.getDatabaseName(), exposedSchemas, blockedSchemas);
-            if (defaultSchema == null) {
-                defaultSchema = determineDefaultSchema(ds.getUser(), schemas);
+        try (Connection c = connection()) {
+            Set<String> schemas = calculateEffectiveSchemas(c, ds.getDatabaseName(), configuration.exposedSchemas(), configuration.blockedSchemas());
+            if (configuration.defaultSchema() == null) {
+                configuration.defaultSchema(determineDefaultSchema(ds.getUser(), schemas));
             }
             Map<TableRef, Table> tables = reverseEngineerTableInfo(c, ds.getDatabaseName(), schemas);
-            catalog = new Catalog(schemas, defaultSchema, tables);
+
+            this.catalog = new Catalog(schemas, configuration.defaultSchema(), tables);
+            this.controller = new PgSqlCRUDController(catalog, configuration);
+            this.queryBuilder = new QueryBuilder(catalog);
         }
     }
 
@@ -341,5 +334,46 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
         }
 
         return tables;
+    }
+
+
+    static public class ConfigurationImpl implements PgSqlConfiguration {
+
+        private List<String> exposedSchemas;
+        private List<String> blockedSchemas;
+        private boolean allowCreateSchema;
+        private String defaultSchema;
+
+        public List<String> exposedSchemas() {
+            return exposedSchemas;
+        }
+
+        public void exposedSchemas(List<String> exposedSchemas) {
+            this.exposedSchemas = Collections.unmodifiableList(exposedSchemas);
+        }
+
+        public List<String> blockedSchemas() {
+            return blockedSchemas;
+        }
+
+        public void blockedSchemas(List<String> blockedSchemas) {
+            this.blockedSchemas = Collections.unmodifiableList(blockedSchemas);
+        }
+
+        public boolean allowCreateSchema() {
+            return allowCreateSchema;
+        }
+
+        public void allowCreateSchema(boolean allowCreateSchema) {
+            this.allowCreateSchema = allowCreateSchema;
+        }
+
+        public String defaultSchema() {
+            return defaultSchema;
+        }
+
+        public void defaultSchema(String defaultSchema) {
+            this.defaultSchema = defaultSchema;
+        }
     }
 }
