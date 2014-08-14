@@ -14,7 +14,7 @@ import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.common.codec.DefaultLazyResourceState;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.common.codec.UnsupportedMediaTypeException;
-import io.liveoak.container.ReturnFieldsImpl;
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.Pagination;
@@ -23,7 +23,6 @@ import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.Sorting;
-import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
@@ -143,11 +142,11 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<DefaultH
 
     private ReturnFields decodeReturnFields(ResourceParams params) {
         String fieldsValue = params.value("fields");
-        ReturnFieldsImpl returnFields = null;
+        DefaultReturnFields returnFields = null;
         if (fieldsValue != null && !"".equals(fieldsValue)) {
-            returnFields = new ReturnFieldsImpl(fieldsValue);
+            returnFields = new DefaultReturnFields(fieldsValue);
         } else {
-            returnFields = new ReturnFieldsImpl("*");
+            returnFields = new DefaultReturnFields("*");
         }
 
         String expandValue = params.value("expand");

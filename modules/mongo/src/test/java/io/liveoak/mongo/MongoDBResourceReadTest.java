@@ -8,7 +8,7 @@ package io.liveoak.mongo;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import io.liveoak.container.ReturnFieldsImpl;
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
@@ -109,7 +109,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         String id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
 
         // check that we don't get back baz, but that we do get the child and grandchild
-        RequestContext rCtx = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("foo,child")).build();
+        RequestContext rCtx = new RequestContext.Builder().returnFields(new DefaultReturnFields("foo,child")).build();
         ResourceState result = client.read(rCtx, "/testApp/" + BASEPATH + "/" + methodName + "/" + id);
 
         // verify response
@@ -124,7 +124,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertThat(resultGrandChild.getProperty("123")).isEqualTo(456);
 
         // check that we don't get back the non specified embedded objects
-        rCtx = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("foo")).build();
+        rCtx = new RequestContext.Builder().returnFields(new DefaultReturnFields("foo")).build();
         result = client.read(rCtx, "/testApp/" + BASEPATH + "/" + methodName + "/" + id);
 
         // verify response
@@ -134,7 +134,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertThat(result.getProperty("baz")).isNull();
 
         // check that we don't get back the non specified embedded child objects
-        rCtx = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("foo,child(ABC,test)")).build();
+        rCtx = new RequestContext.Builder().returnFields(new DefaultReturnFields("foo,child(ABC,test)")).build();
         result = client.read(rCtx, "/testApp/" + BASEPATH + "/" + methodName + "/" + id);
 
         // verify response
@@ -195,7 +195,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals(1, db.getCollection(methodName).getCount());
 
         ResourceState result = client
-                .read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/foobaz");
+                .read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/foobaz");
 
         // verify the result
         assertThat(result).isNotNull();
@@ -213,7 +213,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertThat(((Collection) result.getProperty("eArray"))).isEmpty();
 
         try {
-            result = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/foobaz/child");
+            result = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/foobaz/child");
             Fail.fail();
         } catch (ResourceNotFoundException e) {
             // expected

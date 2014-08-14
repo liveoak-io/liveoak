@@ -5,6 +5,7 @@
  */
 package io.liveoak.container;
 
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.spi.ReturnFields;
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,7 +20,7 @@ public class ReturnFieldsTest {
     @Test
     public void testBasic() {
         String spec = "field1,field2,field3";
-        ReturnFieldsImpl fspec = new ReturnFieldsImpl(spec);
+        DefaultReturnFields fspec = new DefaultReturnFields(spec);
 
         StringBuilder val = new StringBuilder();
         for (String field : fspec) {
@@ -41,7 +42,7 @@ public class ReturnFieldsTest {
 
         for (String filter : specs) {
             try {
-                fspec = new ReturnFieldsImpl(filter);
+                fspec = new DefaultReturnFields(filter);
                 Assert.fail("Parsing of fields spec should have failed! : " + filter);
             } catch (Exception e) {
                 //e.printStackTrace();
@@ -51,7 +52,7 @@ public class ReturnFieldsTest {
 
     @Test
     public void testNestedWithGlob() {
-        ReturnFieldsImpl spec = new ReturnFieldsImpl("name,dog(*)");
+        DefaultReturnFields spec = new DefaultReturnFields("name,dog(*)");
 
         assertThat(spec.included("name")).isTrue();
         assertThat(spec.included("tacos")).isFalse();
@@ -65,14 +66,14 @@ public class ReturnFieldsTest {
 
     @Test
     public void testMergeWithExpand() {
-        ReturnFieldsImpl fields = new ReturnFieldsImpl("*");
+        DefaultReturnFields fields = new DefaultReturnFields("*");
         fields = fields.withExpand("members");
 
         assertThat(fields.included("name")).isTrue();
         assertThat(fields.included("members")).isTrue();
         assertThat(fields.child("members").included("name")).isTrue();
 
-        fields = new ReturnFieldsImpl("wife").withExpand("dogs");
+        fields = new DefaultReturnFields("wife").withExpand("dogs");
 
         assertThat(fields.included("wife")).isTrue();
         assertThat(fields.included("name")).isFalse();
@@ -87,7 +88,7 @@ public class ReturnFieldsTest {
     @Test
     public void testNested() {
         String spec = "field1,field2(sub1,sub2(subsub1)),field3";
-        ReturnFieldsImpl fspec = new ReturnFieldsImpl(spec);
+        DefaultReturnFields fspec = new DefaultReturnFields(spec);
 
         String val = traverse(fspec);
         Assert.assertEquals(spec, val.toString());
@@ -110,7 +111,7 @@ public class ReturnFieldsTest {
 
         for (String filter : specs) {
             try {
-                fspec = new ReturnFieldsImpl(filter);
+                fspec = new DefaultReturnFields(filter);
                 Assert.fail("Parsing of fields spec should have failed! : " + filter);
             } catch (Exception e) {
                 //e.printStackTrace();

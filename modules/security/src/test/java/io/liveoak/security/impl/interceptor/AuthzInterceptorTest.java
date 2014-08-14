@@ -6,19 +6,16 @@
 
 package io.liveoak.security.impl.interceptor;
 
-import java.util.Collections;
-
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.DefaultSecurityContext;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
-import io.liveoak.container.ReturnFieldsImpl;
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.interceptor.extension.InterceptorExtension;
 import io.liveoak.security.extension.SecurityExtension;
 import io.liveoak.security.integration.AuthzServiceConfigResource;
 import io.liveoak.security.integration.AuthzServiceRootResource;
-import io.liveoak.security.spi.AuthzPolicyEntry;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.NotAuthorizedException;
 import io.liveoak.spi.RequestContext;
@@ -100,7 +97,7 @@ public class AuthzInterceptorTest extends AbstractResourceTestCase {
                 .requestType(RequestType.READ)
                 .resourcePath(new ResourcePath("/testApp/mock-resource"))
                 .securityContext(new DefaultSecurityContext());
-        ResourceState fullState = client.read(reqContext.returnFields(new ReturnFieldsImpl("*(*(*))")), "/testApp/mock-resource");
+        ResourceState fullState = client.read(reqContext.returnFields(new DefaultReturnFields("*(*(*))")), "/testApp/mock-resource");
         Assert.assertEquals(3, fullState.members().size());
         ResourceState todos = fullState.members().get(0);
         Assert.assertEquals("todos", todos.id());
@@ -147,9 +144,9 @@ public class AuthzInterceptorTest extends AbstractResourceTestCase {
                 .requestType(RequestType.READ)
                 .resourcePath(new ResourcePath("/testApp/mock-resource"))
                 .securityContext(new DefaultSecurityContext());
-        ResourceState state1 = client.read(reqContext.returnFields(new ReturnFieldsImpl("*")), "/testApp/mock-resource");
-        ResourceState state2 = client.read(reqContext.returnFields(new ReturnFieldsImpl("*(*)")), "/testApp/mock-resource");
-        ResourceState state3 = client.read(reqContext.returnFields(new ReturnFieldsImpl("*(*(*))")), "/testApp/mock-resource");
+        ResourceState state1 = client.read(reqContext.returnFields(new DefaultReturnFields("*")), "/testApp/mock-resource");
+        ResourceState state2 = client.read(reqContext.returnFields(new DefaultReturnFields("*(*)")), "/testApp/mock-resource");
+        ResourceState state3 = client.read(reqContext.returnFields(new DefaultReturnFields("*(*(*))")), "/testApp/mock-resource");
 
         Assert.assertEquals(3, state1.members().size());
         ResourceState todos = state1.members().get(0);

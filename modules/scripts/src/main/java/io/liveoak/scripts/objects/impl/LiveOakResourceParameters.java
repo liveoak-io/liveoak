@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.liveoak.container.ReturnFieldsImpl;
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.scripts.objects.Util;
 import io.liveoak.scripts.objects.scripting.ScriptingRequestContext;
 import io.liveoak.scripts.objects.scripting.ScriptingResourceParams;
@@ -68,7 +68,7 @@ public class LiveOakResourceParameters extends LiveOakMap<String, Object> {
             resourceParams.setValue(key, sort);
         } else if (key.equals("fields") && value != null) {
             String fields = value.toString();
-            context.returnFields(new ReturnFieldsImpl(fields));
+            context.returnFields(new DefaultReturnFields(fields));
             resourceParams.setValue(key, fields);
         } else {
             resourceParams.setValue(key, String.valueOf(value));

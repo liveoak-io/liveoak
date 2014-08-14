@@ -12,6 +12,7 @@ import static org.junit.Assert.fail;
 import java.net.URI;
 import java.util.List;
 
+import io.liveoak.common.DefaultReturnFields;
 import org.fest.assertions.Fail;
 import org.junit.Test;
 
@@ -21,7 +22,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 
-import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.NotAcceptableException;
 import io.liveoak.spi.RequestContext;
@@ -66,7 +66,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(result.getProperty("spouse")).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/jane"));
 
         // get an expanded resource state
-        ResourceState expandedResult = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
+        ResourceState expandedResult = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
                 + "/jane");
         // verify this expanded resource state
         assertThat(expandedResult).isNotNull();
@@ -82,7 +82,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(expandedSpouse.getProperty("spouse")).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/jane"));
 
         // get an expanded resource to two levels.
-        ResourceState expandedResult2 = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName
+        ResourceState expandedResult2 = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName
                 + "/jane");
         // verify the results, we should get back the Jane object when accessing the Jane's spouse's spouse
         ResourceState expandedSpouse1 = (ResourceState) expandedResult2.getProperty("spouse");
@@ -129,7 +129,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(result.getProperty("lastName")).isEqualTo("Smith");
         assertThat(result.getProperty("department")).isEqualTo(new URI("/testApp/" + BASEPATH + "/departments/financing"));
 
-        ResourceState expandedResult = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*)")).build(), "/testApp/" + BASEPATH + "/employees" + "/john");
+        ResourceState expandedResult = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/employees" + "/john");
         // verify the expanded results
         assertThat(expandedResult.id()).isEqualTo("john");
         assertThat(expandedResult.uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/employees" + "/john"));
@@ -185,7 +185,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         // try and expand the result, since the 'spouse' object doesn't exist an exception should be thrown
 
         try {
-            client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/john");
+            client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/john");
             Fail.fail();
         } catch (NotAcceptableException e) {
             // expected
@@ -248,7 +248,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(childrenResult.get(1)).isEqualTo(new URI("/testApp/storage/testReadDBRefArray/judy"));
 
         // get the expanded result
-        ResourceState expandedResult = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
+        ResourceState expandedResult = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
                 + "/john");
         // verify the expanded result
         assertThat(expandedResult).isNotNull();
@@ -309,7 +309,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(getResource.getProperty("father")).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/johnSmith"));
 
         // verify we can get the father using the reference
-        getResource = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/judySmith");
+        getResource = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/judySmith");
         ResourceState fatherResourceState = (ResourceState) getResource.getProperty("father");
         assertThat(fatherResourceState.getProperty("name")).isEqualTo("John Smith");
     }
@@ -405,7 +405,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         people.insert(sueObject);
         people.insert(steveObject);
 
-        ResourceState sueResource = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
+        ResourceState sueResource = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
                 + "/Sue");
         // verify the result, with Sally being Sue's best friend
         ResourceState bestFriend = (ResourceState) sueResource.getProperty("bestFriend");
@@ -424,7 +424,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         // verify the result, with Steve now being Sue's best frien
         assertThat(sueResource.getProperty("bestFriend")).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/Steve"));
 
-        sueResource = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/Sue");
+        sueResource = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/Sue");
         // verify the result, with Steve now being Sue's best friend
         bestFriend = (ResourceState) sueResource.getProperty("bestFriend");
         assertThat(bestFriend.getProperty("name")).isEqualTo("Steve");
@@ -449,7 +449,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         people.insert(sallyObject);
         people.insert(sueObject);
 
-        ResourceState sueResource = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
+        ResourceState sueResource = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
                 + "/Sue");
         // verify the result, with Sally being Sue's best friend
         ResourceState bestFriend = (ResourceState) sueResource.getProperty("bestFriend");
@@ -481,7 +481,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         people.insert(sallyObject);
         people.insert(sueObject);
 
-        ResourceState sueResource = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
+        ResourceState sueResource = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
                 + "/sue");
         // verify the result, with Sally being Sue's best friend
         ResourceState bestFriend = (ResourceState) sueResource.getProperty("bestFriend");

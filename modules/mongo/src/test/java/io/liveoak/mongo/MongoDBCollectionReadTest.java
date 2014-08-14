@@ -13,13 +13,13 @@ import static org.junit.Assert.fail;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.liveoak.common.DefaultReturnFields;
 import org.fest.assertions.Fail;
 import org.junit.Test;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 
-import io.liveoak.container.ReturnFieldsImpl;
 import io.liveoak.spi.NotAcceptableException;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
@@ -77,7 +77,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
         assertThat(db.getCollectionNames()).hasSize(4);
 
-        ResourceState result = client.read(new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).build(), "/testApp/" + BASEPATH);
+        ResourceState result = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand("members")).build(), "/testApp/" + BASEPATH);
 
         // verify response
         assertThat(result).isNotNull();
@@ -134,7 +134,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertEquals(1014, db.getCollectionNames().size());
 
         // This should return 23 collections
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members"))
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand("members"))
                 .pagination(new SimplePagination(11, 23)).build();
         ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH);
 
@@ -153,7 +153,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         }
 
         // This should return 3 collections as a total number of them is 1013
-        requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).pagination(new SimplePagination(1010, 20)).build();
+        requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand("members")).pagination(new SimplePagination(1010, 20)).build();
         result = client.read(requestContext, "/testApp/" + BASEPATH);
 
         // verify the result
@@ -187,7 +187,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // This should return 2 items
         SimpleResourceParams resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand("members")).resourceParams(resourceParams).build();
         ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
 
         // verify response
@@ -204,7 +204,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // Try another query
         resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:'Doe'}");
-        requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+        requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand("members")).resourceParams(resourceParams).build();
         result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
 
         assertThat(result).isNotNull();
@@ -233,7 +233,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // This should return 2 items
         SimpleResourceParams resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:\"foo\"}");
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand("members")).resourceParams(resourceParams).build();
         ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollectionNoResults");
 
         // verify response
@@ -259,7 +259,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // This should return 2 items
         SimpleResourceParams resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName,\"foo\"}");
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand("members")).resourceParams(resourceParams).build();
 
         try {
             ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollectionInvalid");
@@ -289,7 +289,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
         resourceParams.put("hint", "_id_");
 
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand("members")).resourceParams(resourceParams).build();
         ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
 
         // verify response
@@ -307,7 +307,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // Try another query
         resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:'Doe'}");
-        requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+        requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand("members")).resourceParams(resourceParams).build();
         result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
 
         assertThat(result).isNotNull();
@@ -340,7 +340,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
         resourceParams.put("hint", "foobar"); // NOTE: foobar does not correspond to an index we can use
 
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand("members")).resourceParams(resourceParams).build();
 
         try {
             client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
@@ -374,7 +374,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
         resourceParams.put("hint", "{foobar, 1}"); // NOTE: foobar does not correspond to an index we can use
 
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new ReturnFieldsImpl("*").withExpand("members")).resourceParams(resourceParams).build();
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand("members")).resourceParams(resourceParams).build();
 
         try {
             client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
@@ -405,7 +405,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         // This should return 6 items ordered by lastName ascending, and name descending
         RequestContext requestContext = new RequestContext.Builder()
-                .returnFields(new ReturnFieldsImpl("*").withExpand("members"))
+                .returnFields(new DefaultReturnFields("*").withExpand("members"))
                 .sorting(new Sorting("lastName,-name"))
                 .resourceParams(resourceParams).build();
         ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testSortCollection");
@@ -434,7 +434,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         // This should return 4 items ordered by lastName descending and name ascending
         RequestContext requestContext = new RequestContext.Builder()
-                .returnFields(new ReturnFieldsImpl("*").withExpand("members"))
+                .returnFields(new DefaultReturnFields("*").withExpand("members"))
                 .sorting(new Sorting("-lastName,name"))
                 .resourceParams(resourceParams).build();
         ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQuerySortCollection");
@@ -460,7 +460,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         //
         SimpleResourceParams resourceParams = new SimpleResourceParams();
         RequestContext requestContext = new RequestContext.Builder()
-                .returnFields(new ReturnFieldsImpl("*").withExpand("members"))
+                .returnFields(new DefaultReturnFields("*").withExpand("members"))
                 .resourceParams(resourceParams)
                 .build();
 
