@@ -17,6 +17,7 @@ import io.liveoak.scripts.objects.scripting.ScriptingPagination;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceException;
+import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.Sorting;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.state.ResourceState;
@@ -47,6 +48,9 @@ public class LiveOakClient implements LocalClient {
         try {
             ResourceState resourceState = client.read(new DefaultRequestContext.Builder().build(), path);
             return new LiveOakResource(resourceState);
+        } catch (ResourceNotFoundException e) {
+            //on a read it probably makes sense to just return null rather than throw an error.
+            return null;
         } catch (Exception e) {
             throw handleException(e);
         }
@@ -87,6 +91,9 @@ public class LiveOakClient implements LocalClient {
         try {
             ResourceState resourceState = client.read(generateRequestContext(parameters), path);
             return new LiveOakResource(resourceState);
+        } catch (ResourceNotFoundException e) {
+            //on a read it probably makes sense to just return null rather than throw an error.
+            return null;
         } catch (Exception e) {
             throw handleException(e);
         }

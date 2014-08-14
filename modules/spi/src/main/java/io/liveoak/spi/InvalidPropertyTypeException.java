@@ -5,20 +5,30 @@
  */
 package io.liveoak.spi;
 
-public class InvalidPropertyTypeException extends Exception {
+public class InvalidPropertyTypeException extends PropertyException {
 
     private static final long serialVersionUID = 1L;
 
     public InvalidPropertyTypeException(String name, Class<?> requestedType) {
-        this.name = name;
-        this.requestedType = requestedType;
+        this(name, requestedType, false);
     }
 
-    private String name;
-    private Class<?> requestedType;
+    public InvalidPropertyTypeException(String name, Class<?> requestType, boolean collection) {
+        this.name = name;
+        this.requestedType = requestType;
+        this.collection = collection;
+    }
+
+    protected String name;
+    protected Class<?> requestedType;
+    protected boolean collection;
 
     @Override
     public String getMessage() {
-        return "Invalid property type. The property named '" + name + "' expects a type of " + requestedType.getSimpleName();
+        if (!collection) {
+            return "Invalid property type. The property named '" + name + "' expects a type of " + requestedType.getSimpleName();
+        } else {
+            return "Invalid property type. The property name '" + name + "' expects a collection of type " + requestedType.getSimpleName();
+        }
     }
 }

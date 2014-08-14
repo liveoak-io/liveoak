@@ -1,6 +1,5 @@
 package io.liveoak.scripts.resourcetriggered.resource;
 
-import io.liveoak.scripts.resourcetriggered.manager.ResourceScriptManager;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -17,7 +16,7 @@ public class ResourceScriptService implements Service<ResourceScripts> {
 
     @Override
     public void start(StartContext startContext) throws StartException {
-        this.resourceScripts = new ResourceScripts(scriptManagerInjector.getValue(), vertxInjector.getValue());
+        this.resourceScripts = new ResourceScripts(scriptMapInjector.getValue(), vertxInjector.getValue());
     }
 
     @Override
@@ -30,7 +29,8 @@ public class ResourceScriptService implements Service<ResourceScripts> {
         return resourceScripts;
     }
 
-    public InjectedValue<ResourceScriptManager> scriptManagerInjector = new InjectedValue<>();
+
+    public InjectedValue<ScriptMap> scriptMapInjector = new InjectedValue<>();
 
     public InjectedValue<Vertx> vertxInjector = new InjectedValue<>();
 }
