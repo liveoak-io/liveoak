@@ -29,7 +29,7 @@ public class PgSqlCRUDController {
         this.configuration = configuration;
     }
 
-    public Table parseCreateTableRequest(ResourceState state) {
+    public Table parseCreateTableRequest(ResourceState state, boolean checkDependencies) {
 
         String id = state.id();
         if (id == null || id.length() == 0) {
@@ -119,7 +119,7 @@ public class PgSqlCRUDController {
                 TableRef fkTableRef = new TableRef(fkTableId);
                 // make sure the referred table exists
                 Table fkTable = catalog.table(fkTableRef);
-                if (fkTable == null) {
+                if (checkDependencies && fkTable == null) {
                     throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                             "Table referred to by 'foreign-keys' item does not exist or is not accessible: " + fkTableId);
                 }
@@ -149,22 +149,25 @@ public class PgSqlCRUDController {
                 }
 
                 // check that fk table pk column count and types match fk columns
-
-                Iterator<Column> it = fkTable.pk().columns().iterator();
-                Iterator<Column> fkit = fkColumns.iterator();
-                while (fkit.hasNext() && it.hasNext()) {
-                    Column fkcol = fkit.next();
-                    Column pkcol = it.next();
-                    if (!fkcol.typeSpec().equals(pkcol.typeSpec())) {
-                        throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
-                                "Invalid JSON message - 'foreign-keys' / 'columns' type spec mismatch: " + fkcol.typeSpec() + " vs. " + pkcol.typeSpec());
+                if (checkDependencies) {
+                    Iterator<Column> it = fkTable.pk().columns().iterator();
+                    Iterator<Column> fkit = fkColumns.iterator();
+                    while (fkit.hasNext() && it.hasNext()) {
+                        Column fkcol = fkit.next();
+                        Column pkcol = it.next();
+                        if (!fkcol.typeSpec().equals(pkcol.typeSpec())) {
+                            throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                                    "Invalid JSON message - 'foreign-keys' / 'columns' type spec mismatch: " + fkcol.typeSpec() + " vs. " + pkcol.typeSpec());
+                        }
                     }
+                    if (it.hasNext() || fkit.hasNext()) {
+                        throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                                "Invalid JSON message - 'foreign-keys' / 'columns' mismatch for: " + o);
+                    }
+                    fks.add(new ForeignKey(fkColumns, new TableRef(fkTable.schema(), fkTable.name())));
+                } else {
+                    fks.add(new ForeignKey(fkColumns, fkTableRef));
                 }
-                if (it.hasNext() || fkit.hasNext()) {
-                    throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
-                            "Invalid JSON message - 'foreign-keys' / 'columns' mismatch for: " + o);
-                }
-                fks.add(new ForeignKey(fkColumns, new TableRef(fkTable.schema(), fkTable.name())));
             }
         }
 

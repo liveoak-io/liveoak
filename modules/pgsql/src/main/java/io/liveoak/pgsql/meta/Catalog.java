@@ -2,6 +2,8 @@ package io.liveoak.pgsql.meta;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +24,37 @@ public class Catalog {
         this.schemas = Collections.unmodifiableSet(schemas);
         this.defaultSchema = defaultSchema;
 
+        Map<TableRef, Table> tablesWithIds = enhanceWithIdsAndReferredFKs(tables);
+        this.tables = Collections.unmodifiableMap(tablesWithIds);
+
+        // set catalog on tables
+        for (Table t: this.tables.values()) {
+            t.catalog(this);
+        }
+    }
+
+    public Catalog(Catalog catalog, List<Table> tablesToAdd) {
+        Map<TableRef, Table> newTables = new HashMap<>();
+        for (Map.Entry<TableRef, Table> e: catalog.tables.entrySet()) {
+            Table t = e.getValue();
+            newTables.put(e.getKey(), t.copy());
+        }
+        for (Table t: tablesToAdd) {
+            newTables.put(t.tableRef(), t.copy());
+        }
+
+        Map<TableRef, Table> tablesWithIds = enhanceWithIdsAndReferredFKs(newTables);
+        this.schemas = catalog.schemas;
+        this.defaultSchema = catalog.defaultSchema;
+        this.tables = Collections.unmodifiableMap(tablesWithIds);
+
+        // set catalog on tables
+        for (Table t: this.tables.values()) {
+            t.catalog(this);
+        }
+    }
+
+    protected Map<TableRef, Table> enhanceWithIdsAndReferredFKs(Map<TableRef, Table> tables) {
         Map<TableRef, Table> tablesWithIds = new LinkedHashMap<>();
         Map<TableRef, List<ForeignKey>> referredKeys = new LinkedHashMap<>();
 
@@ -69,12 +102,7 @@ public class Catalog {
         for (Table t: ordered) {
             tablesWithIds.put(t.tableRef(), t);
         }
-        this.tables = Collections.unmodifiableMap(tablesWithIds);
-
-        // set catalog on tables
-        for (Table t: this.tables.values()) {
-            t.catalog(this);
-        }
+        return tablesWithIds;
     }
 
     public Table table(TableRef tableRef) {
@@ -114,5 +142,82 @@ public class Catalog {
         Table table = new Table(schema, name, columns, key, foreignKeys);
         table.catalog(this);
         return table;
+    }
+
+    public Table newTable(Table table) {
+        Table t = table.copy();
+        t.catalog(this);
+        return t;
+    }
+
+    /**
+     * This kind of sorting is used by DROP which first has to
+     * remove R that links to T before it can remove a T.
+     *
+     * @param tables
+     * @return
+     */
+    public Set<Table> orderByReferred(Collection<Table> tables) {
+        Set<Table> sorted = new TreeSet<>(new Comparator<Table>() {
+            @Override
+            public int compare(Table t1, Table t2) {
+                if (t1 == t2) {
+                    return 0;
+                }
+                if (transitivelyReferredBy(t1, t2)) {
+                    return 1;
+                }
+
+                return -1;
+            }
+        });
+        sorted.addAll(tables);
+        return sorted;
+    }
+
+    private boolean transitivelyReferredBy(Table t1, Table t2) {
+        for (ForeignKey fk: t1.referredKeys()) {
+            Table dep = table(fk.columns().get(0).tableRef());
+            if (dep.id().equals(t2.id())) {
+                return true;
+            }
+            return transitivelyReferredBy(dep, t2);
+        }
+        return false;
+    }
+
+    /**
+     * This kind of sorting is by CREATE table which first has
+     * to create table T, and then table R that links to table T.
+     *
+     * @param tables
+     * @return
+     */
+    public Set<Table> orderByReferring(Collection<Table> tables) {
+        Set<Table> sorted = new TreeSet<>(new Comparator<Table>() {
+            @Override
+            public int compare(Table t1, Table t2) {
+                if (t1 == t2) {
+                    return 0;
+                }
+                if (transitivelyReferring(t1, t2)) {
+                    return 1;
+                }
+                return -1;
+            }
+        });
+        sorted.addAll(tables);
+        return sorted;
+    }
+
+    private boolean transitivelyReferring(Table t1, Table t2) {
+        for (ForeignKey fk: t1.foreignKeys()) {
+            Table dep = table(fk.tableRef());
+            if (dep.tableRef().equals(t2.tableRef())) {
+                return true;
+            }
+            return transitivelyReferring(dep, t2);
+        }
+        return false;
     }
 }

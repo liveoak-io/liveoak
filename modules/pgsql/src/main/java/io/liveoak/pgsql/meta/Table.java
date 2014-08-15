@@ -1,6 +1,7 @@
 package io.liveoak.pgsql.meta;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -22,6 +23,7 @@ public class Table implements Comparable<Table> {
      */
     private List<ForeignKey> referredKeys;
 
+    private Table() {}
 
     public Table(String id, Table table, List<ForeignKey> referredKeys) {
         this.id = id;
@@ -276,5 +278,22 @@ public class Table implements Comparable<Table> {
         }
 
         return id.compareTo(o.id);
+    }
+
+    public Table copy() {
+        Table t = new Table();
+        t.id = id;
+        t.schema = schema;
+        t.name = name;
+        t.columns = columns;
+        t.pk = pk;
+        t.referredKeys = referredKeys;
+
+        List<ForeignKey> newFks = new LinkedList<>();
+        for (ForeignKey key: foreignKeys) {
+            newFks.add(key.copy());
+        }
+        t.foreignKeys = Collections.unmodifiableList(newFks);
+        return t;
     }
 }

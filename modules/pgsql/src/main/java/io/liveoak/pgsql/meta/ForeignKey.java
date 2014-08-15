@@ -7,6 +7,10 @@ public class ForeignKey extends Key {
     private Catalog catalog;
     private String fieldName;
 
+    private ForeignKey(List<Column> fkCols) {
+        super(fkCols);
+    }
+
     public ForeignKey(List<Column> fkCols, TableRef table) {
         super(fkCols);
         if (table == null) {
@@ -27,7 +31,8 @@ public class ForeignKey extends Key {
 
         if (fieldName == null) {
             String name = columns().get(0).name();
-            String tableId = catalog.table(tableRef()).id();
+            Table table = catalog.table(tableRef());
+            String tableId = table != null ? table.id() : tableRef().asUnquotedIdentifier();
 
             if (name.endsWith("_id")) {
                 fieldName = name.substring(0, name.length()-3);
@@ -59,5 +64,12 @@ public class ForeignKey extends Key {
         int result = super.hashCode();
         result = 31 * result + table.hashCode();
         return result;
+    }
+
+    public ForeignKey copy() {
+        ForeignKey fk = new ForeignKey(columns());
+        fk.fieldName = fieldName;
+        fk.table = table;
+        return fk;
     }
 }

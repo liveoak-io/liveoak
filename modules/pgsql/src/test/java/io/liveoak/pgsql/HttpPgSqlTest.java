@@ -5,7 +5,10 @@ import java.net.URLEncoder;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -15,6 +18,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * See superclass JavaDoc for how to set up PostgreSQL for this test.
+ *
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 public class HttpPgSqlTest extends BasePgSqlHttpTest {
@@ -69,7 +74,8 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         // Bulk update by sending deeply nested to _batch?action=update
         testBulkUpdateNested();
 
-        // GET all collections and send response back to _batch?action=delete
+        // GET all collections and send response back to _batch?action=delete,
+        // then use _batch?action=create to recreate them
         testBulkTablesDeleteBySendingGetResponse();
     }
 
@@ -91,7 +97,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
         result = getRequest(get);
         System.out.println(result);
-
+        checkResultForError(result);
 
         //
         query = "{$and: [{create_date: {$lt: '2014-04-03'}}, {total: {$gt: 30000}}]}";
@@ -101,7 +107,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
         result = getRequest(get);
         System.out.println(result);
-
+        checkResultForError(result);
 
         // this query is equivalent to the previous one
         query = "{create_date: {$lt: '2014-04-03'}, total: {$gt: 30000}}";
@@ -111,7 +117,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
         result = getRequest(get);
         System.out.println(result);
-
+        checkResultForError(result);
 
         // condition requiring joins
         query = "{'address.country_iso': 'UK'}";
@@ -131,7 +137,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
         result = getRequest(get);
         System.out.println(result);
-
+        checkResultForError(result);
 
         // condition requiring multiple joins
         query = "{'items.name': 'The Gadget', 'address.country_iso': 'UK'}";
@@ -141,6 +147,9 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
         result = getRequest(get);
         System.out.println(result);
+        checkResultForError(result);
+
+        // TODO: proper response checking to make sure queries return proper results
     }
 
     private void testBulkTablesDeleteBySendingGetResponse() throws IOException {
@@ -152,7 +161,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
 
         // first try to delete one table with dependencies so it should fail
-        String json = "{                                                         \n" +
+        String json = "{                                                             \n" +
                 "  'members' : [ {                                                   \n" +
                 "    'id' : 'addresses',                                             \n" +
                 "    'self' : {                                                      \n" +
@@ -212,6 +221,9 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
         checkResult(result, expected);
 
+        // fetch all schemas for these tables
+        List<JsonNode> schemas = fetchSchemas("addresses", "attachments", "items", schema + ".orders", schema_two + ".orders");
+
         // delete them all now
         result = postRequest(post, expected);
         System.out.println(result);
@@ -220,7 +232,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         result = getRequest(get);
         System.out.println(result);
 
-        expected = "{                                                         \n" +
+        expected = "{                                                                \n" +
                 "  'id' : 'sqldata',                                                 \n" +
                 "  'self' : {                                                        \n" +
                 "    'href' : '/testApp/sqldata'                                     \n" +
@@ -234,6 +246,48 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "}";
 
         checkResult(result, expected);
+
+        // now use _batch endpoint to recreate them
+        StringBuilder sb = new StringBuilder("{ \"members\": [");
+        int i = 0;
+        for (JsonNode node: schemas) {
+            if (i > 0) {
+                sb.append(",\n");
+            }
+            sb.append(node.toString());
+            i++;
+        }
+        sb.append("]}");
+
+        json = sb.toString();
+        System.out.println("request: " + json);
+
+        post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH + "/_batch?action=create");
+        post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
+
+        result = postRequest(post, json);
+        System.out.println(result);
+
+        checkResultForError(result);
+
+        // TODO: test error response when trying to recreate table with FKs pointing to nonexistent table
+        // TODO: test batch recreating multiple tables on top of existing multiple tables
+        //   e.g. addresses, orders exists, create attachments, items
+    }
+
+    private List<JsonNode> fetchSchemas(String ... tableIds) throws IOException {
+        List<JsonNode> results = new LinkedList<>();
+        for (String tableId: tableIds) {
+            HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + tableId + ";schema");
+            get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+            String result = getRequest(get);
+            System.out.println(result);
+
+            results.add(parseJson(result));
+        }
+        return results;
     }
 
     private void testBulkOrdersDeleteAndCreateBySendingGetResponse() throws IOException {

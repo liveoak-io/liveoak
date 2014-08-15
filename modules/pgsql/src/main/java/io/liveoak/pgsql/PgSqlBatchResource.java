@@ -19,6 +19,10 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class PgSqlBatchResource implements Resource {
 
+    private static final String CREATE = "create";
+    private static final String UPDATE = "update";
+    private static final String DELETE = "delete";
+
     private PgSqlRootResource parent;
     private String id;
     private QueryBuilder queryBuilder;
@@ -43,7 +47,7 @@ public class PgSqlBatchResource implements Resource {
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         // check the requested action
         String action = ctx.resourceParams().value("action");
-        if (action == null || (!action.equals("create") && !action.equals("update") && !action.equals("delete"))) {
+        if (action == null || (!action.equals(CREATE) && !action.equals(UPDATE) && !action.equals(DELETE))) {
             responder.invalidRequest("'action' parameter needs to be specified with one of: 'create', 'update', 'delete', as a value");
             return;
         }
@@ -52,7 +56,7 @@ public class PgSqlBatchResource implements Resource {
 
         // for delete operation uris that identify tables require special handling
         // as we have to delete them in order of dependencies
-        List<Table> deleteList = new LinkedList<>();
+        List<Table> workList = new LinkedList<>();
 
         Catalog cat = parent.catalog();
         try (Connection c = parent.connection()) {
@@ -77,25 +81,25 @@ public class PgSqlBatchResource implements Resource {
                     continue;
                 }
                 Table table = cat.tableById(tableName);
-                if (table == null) {
-                    throw new IllegalArgumentException("Table not found: " + tableName + " (uri: " + uri + ")");
-                }
 
                 if (pathSegments.size() == 4) {
+                    if (table == null) {
+                        throw new IllegalArgumentException("Table not found: " + tableName + " (uri: " + uri + ")");
+                    }
                     String itemId = pathSegments.get(3).name();
 
-                    if (action.equals("create")) {
+                    if (action.equals(CREATE)) {
                         queryBuilder.executeInsert(ctx, c, table, member);
-                    } else if (action.equals("delete")) {
+                    } else if (action.equals(DELETE)) {
                         queryBuilder.executeDelete(ctx, c, table, itemId, ctx.resourceParams().contains("cascade"));
-                    } else if (action.equals("update")) {
+                    } else if (action.equals(UPDATE)) {
                         queryBuilder.executeUpdate(ctx, c, table, member);
                     }
                 } else {
-                    if (action.equals("delete")) {
-                        deleteList.add(table);
-                    } else if (action.equals("create")) {
-
+                    if (action.equals(DELETE)) {
+                        workList.add(table);
+                    } else if (action.equals(CREATE)) {
+                        workList.add(parent.controller().parseCreateTableRequest(member, false));
                     } else {
                         responder.invalidRequest("'action' parameter value not supported for collection uri (" + uri + "): " + action);
                         return;
@@ -104,8 +108,13 @@ public class PgSqlBatchResource implements Resource {
 
                 // TODO: also handle expanded many-to-one / one-to-many
             }
-            if (deleteList.size() > 0) {
-                queryBuilder.executeDeleteTables(c, deleteList);
+            if (workList.size() > 0) {
+                if (action.equals(DELETE)) {
+                    queryBuilder.executeDeleteTables(c, workList);
+                } else if (action.equals(CREATE)) {
+                    queryBuilder.executeCreateTables(c, workList);
+                }
+
                 // trigger schema reload
                 parent.reloadSchema();
             }

@@ -7,13 +7,11 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -676,20 +674,7 @@ public class QueryBuilder {
         }
 
         // first find all dependencies, and order them properly
-        Set<Table> sorted = new TreeSet<>(new Comparator<Table>() {
-            @Override
-            public int compare(Table t1, Table t2) {
-                if (t1 == t2) {
-                    return 0;
-                }
-                if (transitivelyReferredBy(t1, t2)) {
-                    return 1;
-                }
-
-                return -1;
-            }
-        });
-        sorted.addAll(deleteList);
+        Set<Table> sorted = catalog.orderByReferred(deleteList);
 
         for (Table t: sorted) {
             executeDeleteTable(c, t);
@@ -697,29 +682,41 @@ public class QueryBuilder {
     }
 
     public void executeCreateTable(Connection con, Table table) throws SQLException {
-        try (Connection c = con) {
-            // if schema may need to be created now is the time
-            boolean newSchemaNeeded = !catalog.schemas().contains(table.tableRef().schema());
-            if (newSchemaNeeded) {
-                try (PreparedStatement ps = c.prepareStatement("CREATE SCHEMA IF NOT EXISTS " + table.tableRef().quotedSchema())) {
-                    ps.execute();
-                }
-            }
-            try (PreparedStatement ps = c.prepareStatement(table.ddl())) {
+
+        // if schema may need to be created now is the time
+        boolean newSchemaNeeded = !catalog.schemas().contains(table.tableRef().schema());
+        if (newSchemaNeeded) {
+            try (PreparedStatement ps = con.prepareStatement("CREATE SCHEMA IF NOT EXISTS " + table.tableRef().quotedSchema())) {
                 ps.execute();
             }
         }
+        try (PreparedStatement ps = con.prepareStatement(table.ddl())) {
+            System.out.println("execute: " + table.ddl());
+            ps.execute();
+        }
     }
 
-    private boolean transitivelyReferredBy(Table t1, Table t2) {
-        for (ForeignKey fk: t1.referredKeys()) {
-            Table dep = catalog.table(fk.columns().get(0).tableRef());
-            if (dep.id().equals(t2.id())) {
-                return true;
+    public void executeCreateTables(Connection c, List<Table> createList) throws SQLException {
+
+        Catalog tempCat = new Catalog(catalog, createList);
+        // check that all the referred are also in createList / catalog
+        // if not - don't even start creating
+        for (Table t: createList) {
+            deps:
+            for (ForeignKey fk: t.foreignKeys()) {
+                Table dep = tempCat.table(fk.tableRef());
+                if (dep == null) {
+                    throw new IllegalArgumentException("Table " + t.id() + " has dependency on " + fk.tableRef() + " which should also be included for creation");
+                }
             }
-            return transitivelyReferredBy(dep, t2);
         }
-        return false;
+
+        // now order by referring
+        Set<Table> sorted = tempCat.orderByReferring(createList);
+
+        for (Table t: sorted) {
+            executeCreateTable(c, tempCat.table(t.tableRef()));
+        }
     }
 
     public QueryResults querySelectFromTable(Connection con, Table table, Sorting sorting, Pagination pagination, String query) throws IOException, SQLException {

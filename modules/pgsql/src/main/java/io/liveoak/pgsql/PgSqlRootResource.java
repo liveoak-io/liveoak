@@ -128,7 +128,7 @@ public class PgSqlRootResource extends DefaultRootResource {
 
         Table table;
         try {
-            table = controller().parseCreateTableRequest(state);
+            table = controller().parseCreateTableRequest(state, true);
         } catch(RequestProcessingException e) {
             responder.error(e.errorType(), e.getMessage(), e.getCause());
             return;

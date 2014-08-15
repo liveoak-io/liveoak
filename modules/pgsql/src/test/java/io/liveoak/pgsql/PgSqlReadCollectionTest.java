@@ -8,7 +8,6 @@ import org.junit.Test;
 /**
  * See superclass JavaDoc for how to set up PostgreSQL for this test.
  *
- *
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 public class PgSqlReadCollectionTest extends BasePgSqlTest {

@@ -30,6 +30,16 @@ import org.postgresql.jdbc2.optional.PoolingDataSource;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
+ * In order to run this test first prepare a local postgresql instance:
+ *
+ * initdb -D ~/.liveoak/pgsql/data
+ * pg_ctl -D ~/.liveoak/pgsql/data -l logfile start
+ * createdb test
+ * psql test
+ * GRANT CREATE ON DATABASE test TO test
+ * CREATE USER ‘test’ createdb PASSWORD ‘test’
+ * \q
+ *
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
