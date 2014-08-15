@@ -80,7 +80,7 @@ public class InternalApplication implements Application {
 
         ResourceState configState = (ResourceState) resourceDefinition.getProperty("config");
         if (configState != null) {
-            config = ConversionUtils.convert((ResourceState) resourceDefinition.getProperty("config"));
+            config = ConversionUtils.convert(configState);
         } else {
             config = JsonNodeFactory.instance.objectNode();
         }
