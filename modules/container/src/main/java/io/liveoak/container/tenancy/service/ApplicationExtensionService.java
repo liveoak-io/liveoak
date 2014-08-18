@@ -24,10 +24,9 @@ import org.jboss.msc.value.InjectedValue;
 public class ApplicationExtensionService implements Service<InternalApplicationExtension> {
 
 
-    public ApplicationExtensionService(String extensionId, String resourceId, ObjectNode configuration, boolean boottime) {
+    public ApplicationExtensionService(String extensionId, String resourceId, boolean boottime) {
         this.extensionId = extensionId;
         this.resourceId = resourceId;
-        this.configuration = configuration;
         this.boottime = boottime;
     }
 
@@ -68,7 +67,7 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
                 this.appExtension,
                 LiveOak.applicationContext(appId),
                 LiveOak.applicationAdminResource(appId).append("extensions"),
-                this.configuration,
+                this.configurationInjector.getValue(),
                 this.boottime);
 
         try {
@@ -99,6 +98,10 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
         return this.extensionInjector;
     }
 
+    public Injector<ObjectNode> configurationInjector() {
+        return this.configurationInjector;
+    }
+
     protected Properties properties() {
         InternalApplication app = this.applicationInjector.getValue();
 
@@ -122,9 +125,9 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
     private InjectedValue<InternalApplication> applicationInjector = new InjectedValue<>();
     private InjectedValue<ServiceRegistry> serviceRegistryInjector = new InjectedValue<>();
     private InjectedValue<Extension> extensionInjector = new InjectedValue<>();
+    private InjectedValue<ObjectNode> configurationInjector = new InjectedValue<>();
 
     private InternalApplicationExtension appExtension;
-    private final ObjectNode configuration;
     private boolean boottime;
 
     private static final Logger log = Logger.getLogger(ApplicationExtensionService.class);

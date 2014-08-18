@@ -20,6 +20,8 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StabilityMonitor;
+import org.jboss.msc.service.ValueService;
+import org.jboss.msc.value.ImmediateValue;
 
 /**
  * @author Bob McWhirter
@@ -126,10 +128,14 @@ public class InternalApplication implements Application {
         StabilityMonitor monitor = new StabilityMonitor();
         target.addMonitor(monitor);
 
-        ServiceName name = LiveOak.applicationExtension(this.id, resourceId);
-        ApplicationExtensionService appExt = new ApplicationExtensionService(extensionId, resourceId, configuration, boottime);
+        ServiceName resourceServiceName = LiveOak.applicationExtension(this.id, resourceId);
 
-        ServiceController<InternalApplicationExtension> controller = target.addService(name, appExt)
+        target.addService(resourceServiceName.append("config"), new ValueService<>(new ImmediateValue<>(configuration))).install();
+
+        ApplicationExtensionService appExt = new ApplicationExtensionService(extensionId, resourceId, boottime);
+
+        ServiceController<InternalApplicationExtension> controller = target.addService(resourceServiceName, appExt)
+                .addDependency(resourceServiceName.append("config"), ObjectNode.class, appExt.configurationInjector())
                 .addDependency(LiveOak.extension(extensionId), Extension.class, appExt.extensionInjector())
                 .addDependency(LiveOak.application(this.id), InternalApplication.class, appExt.applicationInjector())
                 .addDependency(LiveOak.SERVICE_REGISTRY, ServiceRegistry.class, appExt.serviceRegistryInjector())
