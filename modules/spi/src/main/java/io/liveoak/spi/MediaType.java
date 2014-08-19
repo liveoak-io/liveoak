@@ -27,6 +27,7 @@ public class MediaType {
     public static final MediaType LOCAL_APP_JSON = new MediaType("application/liveoak-local-app+json");
 
     public static final MediaType HTML = new MediaType("text/html");
+    public static final MediaType FORM_URLENCODED = new MediaType("application/x-www-form-urlencoded");
     public static final MediaType TEXT = new MediaType("text/plain");
 
     public static final MediaType PNG = new MediaType("image/png");

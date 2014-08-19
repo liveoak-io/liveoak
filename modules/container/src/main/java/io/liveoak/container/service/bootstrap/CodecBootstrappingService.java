@@ -4,6 +4,7 @@ import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.common.codec.ResourceDecoder;
 import io.liveoak.common.codec.StateEncoder;
+import io.liveoak.common.codec.form.FormURLDecoder;
 import io.liveoak.common.codec.html.HTMLEncoder;
 import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.common.codec.json.JSONEncoder;
@@ -11,6 +12,7 @@ import io.liveoak.container.service.CodecInstallationService;
 import io.liveoak.container.service.CodecManagerService;
 import io.liveoak.container.service.CodecService;
 import io.liveoak.spi.MediaType;
+
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
@@ -36,6 +38,7 @@ public class CodecBootstrappingService implements Service<Void> {
 
         installCodec(target, MediaType.JSON, JSONEncoder.class, new JSONDecoder());
         installCodec(target, MediaType.HTML, HTMLEncoder.class, null);
+        installCodec(target, MediaType.FORM_URLENCODED, null, new FormURLDecoder());
 
         // Custom Media Types
         installCodec(target, MediaType.LOCAL_APP_JSON, JSONEncoder.class, new JSONDecoder());
