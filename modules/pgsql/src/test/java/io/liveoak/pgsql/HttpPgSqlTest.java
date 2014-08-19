@@ -1504,7 +1504,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "     },                                                             \n" +
                 "     {                                                              \n" +
                 "       'name': 'address_id',                                        \n" +
-                "       'type': 'int4',                                              \n" +     // TODO - should work for integer as well
+                "       'type': 'int4',                                              \n" +
                 "       'nullable': false                                            \n" +
                 "     }],                                                            \n" +
                 "  'primary-key': ['order_id'],                                      \n" +
@@ -1545,7 +1545,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "    },                                                              \n" +
                 "    {                                                               \n" +
                 "      'name': 'address_id',                                         \n" +
-                "      'type': 'int4',                                               \n" +     // TODO - should work for integer as well
+                "      'type': 'int4',                                               \n" +
                 "      'size' : 10,                                                  \n" +
                 "      'nullable': false,                                            \n" +
                 "      'unique' : false                                              \n" +
@@ -1583,7 +1583,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "     },                                                             \n" +
                 "     {                                                              \n" +
                 "       'name': 'address_id',                                        \n" +
-                "       'type': 'int4',                                              \n" +     // TODO - should work for integer as well
+                "       'type': 'integer',                                           \n" +
                 "       'nullable': false                                            \n" +
                 "     }],                                                            \n" +
                 "  'primary-key': ['order_id'],                                      \n" +

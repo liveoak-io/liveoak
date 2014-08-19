@@ -47,6 +47,8 @@ public class Column {
             case "char":
             case "varchar":
                 return type + " (" + size + ")";
+            case "integer":
+                return "int4";
             default:
                 return type;
         }
@@ -66,6 +68,7 @@ public class Column {
         } else {
             switch (type) {
                 case "int4":
+                case "integer":
                     ps.setInt(i, ValueConverter.toInt(value));
                     return;
                 case "timestamp":
