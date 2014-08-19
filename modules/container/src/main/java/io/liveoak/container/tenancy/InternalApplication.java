@@ -1,12 +1,15 @@
 package io.liveoak.container.tenancy;
 
 import java.io.File;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.container.tenancy.service.ApplicationExtensionService;
 import io.liveoak.spi.Application;
+import io.liveoak.spi.ApplicationClient;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.extension.Extension;
@@ -24,13 +27,14 @@ import org.jboss.msc.service.StabilityMonitor;
  */
 public class InternalApplication implements Application {
 
-    public InternalApplication(ServiceTarget target, String id, String name, File directory, ResourcePath htmlAppPath, Boolean visible) {
+    public InternalApplication(ServiceTarget target, String id, String name, File directory, ResourcePath htmlAppPath, Boolean visible, Map<String, ApplicationClient> clients) {
         this.target = target;
         this.id = id;
         this.name = name;
         this.directory = directory;
         this.htmlAppPath = htmlAppPath;
         this.visible = visible;
+        this.clients = clients;
     }
 
     @Override
@@ -61,12 +65,28 @@ public class InternalApplication implements Application {
         this.visible = visible;
     }
 
+    @Override
+    public Map<String, ApplicationClient> clients() {
+        return this.clients;
+    }
+
+    public void addClient(ApplicationClient client) {
+        if (this.clients == null) {
+            this.clients = new ConcurrentHashMap<>();
+        }
+        this.clients.put(client.id(), client);
+    }
+
     public File configurationFile() {
         return new File(this.directory, "application.json");
     }
 
     public ResourcePath htmlApplicationResourcePath() {
         return this.htmlAppPath;
+    }
+
+    public void setHtmlApplicationPath(String path) {
+        this.htmlAppPath = new ResourcePath(path);
     }
 
     public InternalApplicationExtension extend(String resourceId, ResourceState resourceDefinition) throws Exception {
@@ -153,8 +173,9 @@ public class InternalApplication implements Application {
     private String id;
     private String name;
     private File directory;
-    private final ResourcePath htmlAppPath;
+    private ResourcePath htmlAppPath;
     private Boolean visible;
+    private Map<String, ApplicationClient> clients;
 
     private static final Logger log = Logger.getLogger(InternalApplication.class);
 }

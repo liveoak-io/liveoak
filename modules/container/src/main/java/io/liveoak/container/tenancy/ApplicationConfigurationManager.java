@@ -2,13 +2,16 @@ package io.liveoak.container.tenancy;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.ApplicationClient;
 import org.jboss.logging.Logger;
 
 /**
@@ -26,11 +29,18 @@ public class ApplicationConfigurationManager {
         return (ObjectNode) mapper.readTree(this.file);
     }
 
-    public synchronized void updateApplication(String name, Boolean visible, ObjectNode config) throws IOException {
+    public synchronized void updateApplication(InternalApplication application, ObjectNode clients) throws IOException {
         ObjectNode tree = read();
-        tree.put("name", name);
-        tree.put("visible", visible);
-        tree.put("config", config);
+        tree.put("name", application.name());
+        if (application.htmlApplicationResourcePath() != null) {
+            tree.put("html-app", application.htmlApplicationResourcePath().toString());
+        }
+        tree.put("visible", application.visible());
+
+        if (clients != null) {
+            tree.put("clients", clients);
+        }
+
         write(tree);
     }
 
