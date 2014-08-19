@@ -102,12 +102,12 @@ public class ScriptMap {
             resourcePath = resourcePath.parent();
             if (!uri.endsWith("/*")) {
                 paths.add(resourcePath.toString() + "/*");
+                paths.add(resourcePath.toString() + "/**");
             }
         }
         while (!resourcePath.segments().isEmpty()) {
             resourcePath = resourcePath.parent();
             paths.add(resourcePath.toString() + "/**");
-            //paths.add(resourcePath.toString() + "**");
         }
         return paths;
     }
