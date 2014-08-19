@@ -6,6 +6,7 @@
 package io.liveoak.common.codec.driver;
 
 import io.liveoak.common.codec.NonEncodableValueException;
+import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.resource.async.Resource;
 
 import java.util.Date;
@@ -43,6 +44,8 @@ public class ValueEncodingDriver extends AbstractEncodingDriver {
         } else if (o == null) {
             encoder().writeNullValue();
         } else if (o instanceof Enum) {
+            encoder().writeValue(o.toString());
+        } else if (o instanceof ResourcePath) {
             encoder().writeValue(o.toString());
         } else {
             throw new NonEncodableValueException(o);
