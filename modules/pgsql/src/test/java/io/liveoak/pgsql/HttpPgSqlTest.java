@@ -222,7 +222,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         checkResult(result, expected);
 
         // fetch all schemas for these tables
-        List<JsonNode> schemas = fetchSchemas("addresses", "attachments", "items", schema + ".orders", schema_two + ".orders");
+        // order is deliberate
+        // we will send to /_batch first three from the list in that order,
+        // then the last two
+        List<JsonNode> schemas = fetchSchemas(schema + ".orders", schema_two + ".orders", "addresses", "attachments", "items");
 
         // delete them all now
         result = postRequest(post, expected);
@@ -247,33 +250,126 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
         checkResult(result, expected);
 
-        // now use _batch endpoint to recreate them
-        StringBuilder sb = new StringBuilder("{ \"members\": [");
-        int i = 0;
-        for (JsonNode node: schemas) {
-            if (i > 0) {
-                sb.append(",\n");
-            }
-            sb.append(node.toString());
-            i++;
-        }
-        sb.append("]}");
+        String batch_one = packMembers(schemas.subList(0, 3));
+        String batch_two = packMembers(schemas.subList(3, 5));
 
-        json = sb.toString();
-        System.out.println("request: " + json);
+        // use _batch endpoint to test errors trying to recreate tables with
+        // unfulfilled dependencies.
+        System.out.println("request: " + batch_two);
+        post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH + "/_batch?action=create");
+        post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
+
+        result = postRequest(post, batch_two);
+        System.out.println(result);
+
+        // test error response when trying to recreate table with FKs pointing to nonexistent table
+        expected = "{                                                                            \n" +
+                "  'id' : '_batch',                                                              \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/_batch'                                          \n" +
+                "  },                                                                            \n" +
+                "  'members' : [ {                                                               \n" +
+                "    'id' : 'items',                                                             \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/items'                                         \n" +
+                "    },                                                                          \n" +
+                "    'error-type' : 'NOT_ACCEPTABLE',                                            \n" +
+                "    'message' : 'Table \\\"" + schema + "\\\".\\\"items\\\" has dependency on \\\"" +
+                schema_two + "\\\".\\\"orders\\\" which should also be included for creation'    \n" +
+                "  }, {                                                                          \n" +
+                "    'id' : 'attachments',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/attachments'                                   \n" +
+                "    },                                                                          \n" +
+                "    'error-type' : 'NOT_ACCEPTABLE',                                            \n" +
+                "    'message' : 'ERROR: relation \\\"" + schema + ".items\\\" does not exist',  \n" +
+                "    'cause' : 'org.postgresql.util.PSQLException: ERROR: relation \\\"" +
+                schema + ".items\\\" does not exist'                                             \n" +
+                "  } ]                                                                           \n" +
+                "}";
+
+        checkResult(result, expected);
+
+        // use _batch endpoint and recreate orders and addresses
+        // endpoint will have to reorder them, and process addresses first
+        System.out.println("request: " + batch_one);
 
         post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH + "/_batch?action=create");
         post.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
         post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
 
-        result = postRequest(post, json);
+        result = postRequest(post, batch_one);
         System.out.println(result);
 
-        checkResultForError(result);
+        expected = "{                                                                \n" +
+                "  'id' : '_batch',                                                  \n" +
+                "  'self' : {                                                        \n" +
+                "    'href' : '/testApp/sqldata/_batch'                              \n" +
+                "  },                                                                \n" +
+                "  'members' : [ {                                                   \n" +
+                "    'id' : 'addresses',                                             \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/addresses'                         \n" +
+                "    }                                                               \n" +
+                "  }, {                                                              \n" +
+                "    'id' : '" + schema_two + ".orders',                             \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders'         \n" +
+                "    }                                                               \n" +
+                "  }, {                                                              \n" +
+                "    'id' : '" + schema + ".orders',                                 \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/" + schema + ".orders'             \n" +
+                "    }                                                               \n" +
+                "  } ]                                                               \n" +
+                "}";
 
-        // TODO: test error response when trying to recreate table with FKs pointing to nonexistent table
-        // TODO: test batch recreating multiple tables on top of existing multiple tables
-        //   e.g. addresses, orders exists, create attachments, items
+        // schema_two being before schema is simply the result of a
+        // TreeSet / Catalog.orderByReferring sorting algorithm
+        checkResult(result, expected);
+
+        // test batch recreating multiple tables on top of existing multiple tables
+        // ... the remaining two tables - there is reordering again
+        System.out.println("request: " + batch_two);
+
+        result = postRequest(post, batch_two);
+        System.out.println(result);
+
+        expected = "{                                                                \n" +
+                "  'id' : '_batch',                                                  \n" +
+                "  'self' : {                                                        \n" +
+                "    'href' : '/testApp/sqldata/_batch'                              \n" +
+                "  },                                                                \n" +
+                "  'members' : [ {                                                   \n" +
+                "    'id' : 'items',                                                 \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/items'                             \n" +
+                "    }                                                               \n" +
+                "  }, {                                                              \n" +
+                "    'id' : 'attachments',                                           \n" +
+                "    'self' : {                                                      \n" +
+                "      'href' : '/testApp/sqldata/attachments'                       \n" +
+                "    }                                                               \n" +
+                "  } ]                                                               \n" +
+                "}";
+
+        checkResult(result, expected);
+    }
+
+    private String packMembers(List<JsonNode> nodes) {
+        StringBuilder sb = new StringBuilder("{ \"members\": [");
+
+        for (int i = 0; i < nodes.size(); i++) {
+            JsonNode node = nodes.get(i);
+            if (i > 0) {
+                sb.append(",\n");
+            }
+            sb.append(node.toString());
+        }
+        sb.append("]}");
+
+        return sb.toString();
     }
 
     private List<JsonNode> fetchSchemas(String ... tableIds) throws IOException {
@@ -354,7 +450,18 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'id' : '_batch',                                                              \n" +
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/_batch'                                          \n" +
-                "  }                                                                             \n" +
+                "  },                                                                            \n" +
+                "  'members': [{                                                                 \n" +
+                "    'id' : '014-1003095',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'         \n" +
+                "    }                                                                           \n" +
+                "  },{                                                                           \n" +
+                "    'id' : '014-2004096',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-2004096'         \n" +
+                "    }                                                                           \n" +
+                "  }]                                                                            \n" +
                 "}";
 
         checkResult(result, expectedBatch);
@@ -518,7 +625,18 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'id' : '_batch',                                                              \n" +
                 "  'self' : {                                                                    \n" +
                 "    'href' : '/testApp/sqldata/_batch'                                          \n" +
-                "  }                                                                             \n" +
+                "  },                                                                            \n" +
+                "  'members' : [{                                                                \n" +
+                "    'id' : '014-1003095',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'         \n" +
+                "     }                                                                          \n" +
+                "  },{                                                                           \n" +
+                "    'id' : '014-2004096',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-2004096'         \n" +
+                "    }                                                                           \n" +
+                "  }]                                                                            \n" +
                 "}";
 
         checkResult(result, expectedBatch);   // we should get results back - all updated members

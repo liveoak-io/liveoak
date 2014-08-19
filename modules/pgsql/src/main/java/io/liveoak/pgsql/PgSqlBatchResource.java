@@ -1,5 +1,6 @@
 package io.liveoak.pgsql;
 
+import java.net.URI;
 import java.sql.Connection;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +9,10 @@ import io.liveoak.pgsql.meta.Catalog;
 import io.liveoak.pgsql.meta.QueryBuilder;
 import io.liveoak.pgsql.meta.Table;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.ResourceProcessingException;
+import io.liveoak.spi.resource.StatusResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
@@ -26,6 +30,7 @@ public class PgSqlBatchResource implements Resource {
     private PgSqlRootResource parent;
     private String id;
     private QueryBuilder queryBuilder;
+    private List<Resource> members;
 
     public PgSqlBatchResource(PgSqlRootResource parent, String id) {
         this.parent = parent;
@@ -52,11 +57,12 @@ public class PgSqlBatchResource implements Resource {
             return;
         }
 
+        List<PgSqlBatchItem<Table, ?>> statuses = new LinkedList<>();
         List<ResourcePath.Segment> thisPath = ctx.resourcePath().segments();
 
         // for delete operation uris that identify tables require special handling
         // as we have to delete them in order of dependencies
-        List<Table> workList = new LinkedList<>();
+        List<PgSqlBatchItem<Table, ?>> workList = new LinkedList<>();
 
         Catalog cat = parent.catalog();
         try (Connection c = parent.connection()) {
@@ -88,21 +94,35 @@ public class PgSqlBatchResource implements Resource {
                     }
                     String itemId = pathSegments.get(3).name();
 
-                    if (action.equals(CREATE)) {
-                        queryBuilder.executeInsert(ctx, c, table, member);
-                    } else if (action.equals(DELETE)) {
-                        queryBuilder.executeDelete(ctx, c, table, itemId, ctx.resourceParams().contains("cascade"));
-                    } else if (action.equals(UPDATE)) {
-                        queryBuilder.executeUpdate(ctx, c, table, member);
+                    PgSqlBatchItem item = new PgSqlBatchItem(new PgSqlTableResource(parent, tableName), itemId);
+                    statuses.add(item);
+                    try {
+                        if (action.equals(CREATE)) {
+                            queryBuilder.executeInsert(ctx, c, table, member);
+                        } else if (action.equals(DELETE)) {
+                            queryBuilder.executeDelete(ctx, c, table, itemId, ctx.resourceParams().contains("cascade"));
+                        } else if (action.equals(UPDATE)) {
+                            queryBuilder.executeUpdate(ctx, c, table, member);
+                        }
+                    } catch (Exception e) {
+                        item.error(new ResourceProcessingException(
+                                ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, e.getMessage(), e.getCause()));
                     }
                 } else {
+                    PgSqlBatchItem item = new PgSqlBatchItem(parent, tableName);
+                    statuses.add(item);
+
                     if (action.equals(DELETE)) {
-                        workList.add(table);
+                        workList.add( item.input(table) );
                     } else if (action.equals(CREATE)) {
-                        workList.add(parent.controller().parseCreateTableRequest(member, false));
+                        try {
+                            workList.add( item.input(parent.controller().parseCreateTableRequest(member, false)) );
+                        } catch (ResourceProcessingException e) {
+                            item.error(e);
+                        }
                     } else {
-                        responder.invalidRequest("'action' parameter value not supported for collection uri (" + uri + "): " + action);
-                        return;
+                        item.error(new ResourceProcessingException(
+                                "'action' parameter value not supported for collection uri (" + uri + "): " + action));
                     }
                 }
 
@@ -110,13 +130,28 @@ public class PgSqlBatchResource implements Resource {
             }
             if (workList.size() > 0) {
                 if (action.equals(DELETE)) {
-                    queryBuilder.executeDeleteTables(c, workList);
+                    statuses = queryBuilder.executeDeleteTables(c, workList);
                 } else if (action.equals(CREATE)) {
-                    queryBuilder.executeCreateTables(c, workList);
+                    statuses = queryBuilder.executeCreateTables(c, workList);
                 }
 
                 // trigger schema reload
                 parent.reloadSchema();
+            }
+        }
+
+        // turn statuses into response
+        members = new LinkedList<>();
+        for (PgSqlBatchItem item: statuses) {
+            if (item.error() != null) {
+                members.add(new StatusResource(new URI(item.parent().uri().toString() + "/" + item.id()), item.error()));
+            } else {
+                Resource p = item.parent();
+                if (p instanceof PgSqlRootResource) {
+                    members.add(new PgSqlTableResource((PgSqlRootResource) p, item.id()));
+                } else {
+                    members.add(new PgSqlResourceRef((PgSqlTableResource) p, item.id()));
+                }
             }
         }
         responder.resourceRead(this);
@@ -124,6 +159,11 @@ public class PgSqlBatchResource implements Resource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
+        if (members != null) {
+            for (Resource member: members) {
+                sink.accept(member);
+            }
+        }
         sink.close();
     }
 

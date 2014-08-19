@@ -10,6 +10,7 @@ import io.liveoak.pgsql.meta.QueryBuilder;
 import io.liveoak.pgsql.meta.Table;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.resource.MapResource;
 import io.liveoak.spi.resource.async.DefaultRootResource;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -129,7 +130,7 @@ public class PgSqlRootResource extends DefaultRootResource {
         Table table;
         try {
             table = controller().parseCreateTableRequest(state, true);
-        } catch(RequestProcessingException e) {
+        } catch(ResourceProcessingException e) {
             responder.error(e.errorType(), e.getMessage(), e.getCause());
             return;
         }

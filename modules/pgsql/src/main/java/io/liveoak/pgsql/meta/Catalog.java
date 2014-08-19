@@ -85,7 +85,7 @@ public class Catalog {
         for (Map.Entry<String, List<TableRef>> e: seenNames.entrySet()) {
             if (e.getValue().size() > 1) {
                 for (TableRef ref: e.getValue()) {
-                    unordered.add(new Table(ref.asUnquotedIdentifier(), tables.get(ref), referredKeys.get(ref)));
+                    unordered.add(new Table(ref.schemaName(), tables.get(ref), referredKeys.get(ref)));
                 }
             } else {
                 TableRef ref = e.getValue().get(0);
@@ -213,6 +213,10 @@ public class Catalog {
     private boolean transitivelyReferring(Table t1, Table t2) {
         for (ForeignKey fk: t1.foreignKeys()) {
             Table dep = table(fk.tableRef());
+            if (dep == null) {
+                // a case when there is a reference to nonexistent table
+                return false;
+            }
             if (dep.tableRef().equals(t2.tableRef())) {
                 return true;
             }

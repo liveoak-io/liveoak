@@ -32,7 +32,7 @@ public class ForeignKey extends Key {
         if (fieldName == null) {
             String name = columns().get(0).name();
             Table table = catalog.table(tableRef());
-            String tableId = table != null ? table.id() : tableRef().asUnquotedIdentifier();
+            String tableId = table != null ? table.id() : tableRef().schemaName();
 
             if (name.endsWith("_id")) {
                 fieldName = name.substring(0, name.length()-3);

@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -18,6 +19,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.liveoak.common.codec.DefaultResourceRef;
+import io.liveoak.pgsql.PgSqlBatchItem;
 import io.liveoak.pgsql.data.Pair;
 import io.liveoak.pgsql.data.Id;
 import io.liveoak.pgsql.data.QueryResults;
@@ -40,7 +42,9 @@ import io.liveoak.pgsql.sql.RelationalOperator;
 import io.liveoak.pgsql.sql.Value;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.Sorting;
 import io.liveoak.spi.state.ResourceRef;
 import io.liveoak.spi.state.ResourceState;
@@ -660,25 +664,44 @@ public class QueryBuilder {
         }
     }
 
-    public void executeDeleteTables(Connection c, List<Table> deleteList) throws SQLException {
+    public List<PgSqlBatchItem<Table,?>> executeDeleteTables(Connection c, List<PgSqlBatchItem<Table, ?>> deleteList) throws SQLException {
+
+        List<PgSqlBatchItem<Table, ?>> statuses = new LinkedList<>();
+
+        List<Table> listOfTables = PgSqlBatchItem.asListOfInputs(deleteList);
+        Map<Table, PgSqlBatchItem> itemMap = PgSqlBatchItem.asMapOfInputs(deleteList);
 
         // check that all the referrers are also in deleteList
         // if not - don't even start deleting
-        for (Table t: deleteList) {
+        for (Table t: listOfTables) {
             for (ForeignKey fk: t.referredKeys()) {
                 Table dep = catalog.table(fk.columns().get(0).tableRef());
-                if (! deleteList.contains(dep)) {
-                    throw new IllegalArgumentException("Table " + dep.id() + " has dependency on " + t.id() + " and should be included for deletion as well");
+                if (! itemMap.containsKey(dep)) {
+                    itemMap.get(t).error(new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                            "Table " + dep.id() + " has dependency on " + t.id() + " and should be included for deletion as well"));
                 }
             }
         }
 
         // first find all dependencies, and order them properly
-        Set<Table> sorted = catalog.orderByReferred(deleteList);
+        Set<Table> sorted = catalog.orderByReferred(listOfTables);
 
         for (Table t: sorted) {
-            executeDeleteTable(c, t);
+            PgSqlBatchItem<Table, ?> item = itemMap.get(t);
+            statuses.add(item);
+
+            if (item.error() != null) {
+                continue;
+            }
+            try {
+                executeDeleteTable(c, t);
+            } catch (Exception e) {
+                item.error(new ResourceProcessingException(
+                        ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, e.getMessage(), e));
+            }
         }
+
+        return statuses;
     }
 
     public void executeCreateTable(Connection con, Table table) throws SQLException {
@@ -696,27 +719,46 @@ public class QueryBuilder {
         }
     }
 
-    public void executeCreateTables(Connection c, List<Table> createList) throws SQLException {
+    public List<PgSqlBatchItem<Table,?>> executeCreateTables(Connection c, List<PgSqlBatchItem<Table,?>> createList) throws SQLException {
 
-        Catalog tempCat = new Catalog(catalog, createList);
+        List<PgSqlBatchItem<Table, ?>> statuses = new LinkedList<>();
+
+        List<Table> listOfTables = PgSqlBatchItem.asListOfInputs(createList);
+        Map<Table, PgSqlBatchItem> itemMap = PgSqlBatchItem.asMapOfInputs(createList);
+
+        Catalog tempCat = new Catalog(catalog, listOfTables);
         // check that all the referred are also in createList / catalog
         // if not - don't even start creating
-        for (Table t: createList) {
+        for (Table t: listOfTables) {
             deps:
             for (ForeignKey fk: t.foreignKeys()) {
                 Table dep = tempCat.table(fk.tableRef());
                 if (dep == null) {
-                    throw new IllegalArgumentException("Table " + t.id() + " has dependency on " + fk.tableRef() + " which should also be included for creation");
+                    itemMap.get(t).error(new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                            "Table " + t.quotedSchemaName() + " has dependency on " + fk.tableRef().quotedSchemaName() + " which should also be included for creation"));
                 }
             }
         }
 
         // now order by referring
-        Set<Table> sorted = tempCat.orderByReferring(createList);
+        Set<Table> sorted = tempCat.orderByReferring(listOfTables);
 
         for (Table t: sorted) {
-            executeCreateTable(c, tempCat.table(t.tableRef()));
+            PgSqlBatchItem<Table, ?> item = itemMap.get(t);
+            statuses.add(item);
+
+            // if item is already marked as erred, skip it
+            if (item.error() != null) {
+                continue;
+            }
+            try {
+                executeCreateTable(c, tempCat.table(t.tableRef()));
+            } catch (Exception e) {
+                item.error(new ResourceProcessingException(
+                        ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, e.getMessage(), e));
+            }
         }
+        return statuses;
     }
 
     public QueryResults querySelectFromTable(Connection con, Table table, Sorting sorting, Pagination pagination, String query) throws IOException, SQLException {

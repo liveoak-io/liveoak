@@ -72,7 +72,7 @@ public class PgSqlTableSchemaResource  implements Resource {
             List<MapResource> fkspecs = new LinkedList<>();
             for (ForeignKey fk : fks) {
                 MapResource fkspec = new MapResource();
-                fkspec.put("table", fk.tableRef().asUnquotedIdentifier());
+                fkspec.put("table", fk.tableRef().schemaName());
 
                 List<String> fkcols = new LinkedList<>();
                 List<Column> fkColumns = fk.columns();

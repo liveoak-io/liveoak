@@ -14,6 +14,7 @@ import io.liveoak.pgsql.meta.Table;
 import io.liveoak.pgsql.meta.TableRef;
 import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.state.ResourceState;
 
 /**
@@ -29,11 +30,11 @@ public class PgSqlCRUDController {
         this.configuration = configuration;
     }
 
-    public Table parseCreateTableRequest(ResourceState state, boolean checkDependencies) {
+    public Table parseCreateTableRequest(ResourceState state, boolean checkDependencies) throws ResourceProcessingException {
 
         String id = state.id();
         if (id == null || id.length() == 0) {
-            throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, "No id");
+            throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, "No id");
         }
 
         // remove any matrix parameters if present
@@ -46,7 +47,7 @@ public class PgSqlCRUDController {
         // check if table exists
         Table table = catalog.table(tableRef);
         if (table != null) {
-            throw new RequestProcessingException(ResourceErrorResponse.ErrorType.RESOURCE_ALREADY_EXISTS);
+            throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.RESOURCE_ALREADY_EXISTS);
         }
 
         // check if schema is exposed
@@ -60,12 +61,12 @@ public class PgSqlCRUDController {
         List<Column> cols = new LinkedList<>();
         List columns = state.getPropertyAsList("columns");
         if (columns == null) {
-            throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+            throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                     "Invalid JSON message - 'columns' missing");
         }
         for (Object o: columns) {
             if (o instanceof ResourceState == false) {
-                throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                         "Invalid JSON message - 'columns' item not an object: " + o);
             }
             Column col = column(tableRef, (ResourceState) o);
@@ -80,11 +81,11 @@ public class PgSqlCRUDController {
 
             for (Object pkCol: pkCols) {
                 if (pkCol instanceof String == false) {
-                    throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                    throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                             "Invalid JSON message - 'primary-key' item must be a string: " + pkCol);
                 }
                 if (!seenNames.contains(pkCol)) {
-                    throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                    throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                             "Invalid JSON message - 'primary-key' refers to non-existent column: " + pkCol);
                 }
                 for (Column col: cols) {
@@ -96,7 +97,7 @@ public class PgSqlCRUDController {
             }
             pk = new PrimaryKey(pkColumns);
         } else {
-            throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+            throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                     "Invalid JSON message - 'primary-key' field missing");
         }
 
@@ -106,13 +107,13 @@ public class PgSqlCRUDController {
         if (fkList != null) {
             for (Object o: fkList) {
                 if (o instanceof ResourceState == false) {
-                    throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                    throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                             "Invalid JSON message - 'foreign-keys' item not an object: " + o);
                 }
                 ResourceState item = (ResourceState) o;
                 String fkTableId = item.getPropertyAsString("table");
                 if (fkTableId == null) {
-                    throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                    throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                             "Invalid JSON message - 'table' property missing on 'foreign-keys' item: " + o);
                 }
 
@@ -120,24 +121,24 @@ public class PgSqlCRUDController {
                 // make sure the referred table exists
                 Table fkTable = catalog.table(fkTableRef);
                 if (checkDependencies && fkTable == null) {
-                    throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                    throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                             "Table referred to by 'foreign-keys' item does not exist or is not accessible: " + fkTableId);
                 }
 
                 List fkcols = item.getPropertyAsList("columns");
                 if (fkcols == null) {
-                    throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                    throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                             "Invalid JSON message - 'columns' property missing on 'foreign-keys' item: " + o);
                 }
 
                 List<Column> fkColumns = new LinkedList<>();
                 for (Object fkcol: fkcols) {
                     if (fkcol instanceof String == false) {
-                        throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                        throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                                 "Invalid JSON message - 'foreign-keys' / 'columns' item must be a string: " + fkcol);
                     }
                     if (!seenNames.contains(fkcol)) {
-                        throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                        throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                                 "Invalid JSON message - 'foreign-keys' / 'columns' item refers to non-existent column: " + fkcol);
                     }
                     for (Column col: cols) {
@@ -156,12 +157,12 @@ public class PgSqlCRUDController {
                         Column fkcol = fkit.next();
                         Column pkcol = it.next();
                         if (!fkcol.typeSpec().equals(pkcol.typeSpec())) {
-                            throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                            throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                                     "Invalid JSON message - 'foreign-keys' / 'columns' type spec mismatch: " + fkcol.typeSpec() + " vs. " + pkcol.typeSpec());
                         }
                     }
                     if (it.hasNext() || fkit.hasNext()) {
-                        throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                        throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                                 "Invalid JSON message - 'foreign-keys' / 'columns' mismatch for: " + o);
                     }
                     fks.add(new ForeignKey(fkColumns, new TableRef(fkTable.schema(), fkTable.name())));
@@ -181,7 +182,7 @@ public class PgSqlCRUDController {
                     (exposed == null || exposed.isEmpty() || exposed.contains(tableRef.schema()));
 
             if (!createNewSchema || !configuration.allowCreateSchema()) {
-                throw new RequestProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
                         "Not allowed to create a new schema");
             }
         }

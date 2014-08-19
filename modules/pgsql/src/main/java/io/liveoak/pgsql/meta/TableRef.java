@@ -57,7 +57,7 @@ public class TableRef {
         return "\"" + schema + "\"";
     }
 
-    public String asQuotedIdentifier() {
+    public String quotedSchemaName() {
         StringBuilder sb = new StringBuilder();
         sb.append("\"");
         if (schema != null) {
@@ -67,7 +67,7 @@ public class TableRef {
         return sb.toString();
     }
 
-    public String asUnquotedIdentifier() {
+    public String schemaName() {
         StringBuilder sb = new StringBuilder();
         if (schema != null) {
             sb.append(schema).append('.');
