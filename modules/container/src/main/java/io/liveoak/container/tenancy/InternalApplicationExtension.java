@@ -3,6 +3,7 @@ package io.liveoak.container.tenancy;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.tenancy.service.ApplicationExtensionRemovalService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.extension.Extension;
@@ -76,6 +77,9 @@ public class InternalApplicationExtension implements Consumer<Exception> {
         } catch (InterruptedException e) {
             log.error("Unable to remove extension: " + this.extensionId, e);
         }
+
+        ServiceController<ObjectNode> configController = (ServiceController<ObjectNode>) this.registry.getService(LiveOak.applicationExtension(appId, this.resourceId).append("config"));
+        configController.setMode(ServiceController.Mode.REMOVE);
     }
 
     public void adminResourceController(ServiceController<? extends Resource> controller) {
