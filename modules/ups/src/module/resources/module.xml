@@ -15,12 +15,12 @@
         <artifact name="org.jboss.resteasy:resteasy-jackson-provider:3.0.6.Final"/>
         <artifact name="org.codehaus.jackson:jackson-core-asl:1.9.12"/> 
         <artifact name="org.codehaus.jackson:jackson-mapper-asl:1.9.12"/> 
-        <artifact name="net.iharder:base64:2.3.8"/>
     </resources>
 
     <dependencies>
         <module name="io.liveoak.spi"/>
         <module name="io.liveoak.mongo"/>
+        <module name="net.iharder"/>
         <system>
             <paths>
                 <path name="javax/net"/>
