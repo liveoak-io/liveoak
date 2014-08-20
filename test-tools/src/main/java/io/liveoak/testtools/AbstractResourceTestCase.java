@@ -86,6 +86,8 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
             this.system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
             this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application", applicationDirectory());
 
+            this.system.awaitStability();
+
             // loadExtensions() relies on this.application
             loadExtensions();
 
