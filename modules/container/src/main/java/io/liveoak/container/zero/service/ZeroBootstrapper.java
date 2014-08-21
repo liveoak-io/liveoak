@@ -1,6 +1,7 @@
 package io.liveoak.container.zero.service;
 
 import io.liveoak.container.extension.ExtensionInstaller;
+import io.liveoak.container.zero.extension.ApplicationClientsExtension;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -11,6 +12,7 @@ import org.jboss.msc.value.InjectedValue;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class ZeroBootstrapper implements Service<Void> {
     @Override
@@ -18,7 +20,8 @@ public class ZeroBootstrapper implements Service<Void> {
         context.asynchronous();
         new Thread(() -> {
             try {
-                this.extensionInstallerInjector.getValue().load( "zero", new ZeroExtension() );
+                this.extensionInstallerInjector.getValue().load("zero", new ZeroExtension());
+                this.extensionInstallerInjector.getValue().load("application-clients", new ApplicationClientsExtension());
                 context.complete();
             } catch (Throwable e) {
                 context.failed(new StartException(e));

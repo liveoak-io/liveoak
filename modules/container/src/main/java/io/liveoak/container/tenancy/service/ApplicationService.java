@@ -2,13 +2,13 @@ package io.liveoak.container.tenancy.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.common.util.ObjectMapperFactory;
@@ -19,7 +19,7 @@ import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
-import io.liveoak.spi.ApplicationClient;
+import io.liveoak.container.zero.service.ApplicationClientsInstallService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.ResourcePath;
@@ -36,7 +36,7 @@ import org.jboss.msc.value.InjectedValue;
 
 /**
  * @author Bob McWhirter
- * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
+ * @author Ken Finnigan
  */
 public class ApplicationService implements Service<InternalApplication> {
 
@@ -72,7 +72,6 @@ public class ApplicationService implements Service<InternalApplication> {
         Boolean appVisible = Boolean.TRUE;
         ResourcePath htmlApp = null;
         ResourceState resourcesTree = null;
-        Map<String, ApplicationClient> clients = null;
 
         if (applicationJson.exists()) {
             JSONDecoder decoder = new JSONDecoder();
@@ -92,30 +91,6 @@ public class ApplicationService implements Service<InternalApplication> {
                 if ((value = state.getProperty("resources")) != null) {
                     resourcesTree = (ResourceState) value;
                 }
-                if ((value = state.getProperty("clients")) != null) {
-                    // TODO Where to put this???
-                    ResourceState clientsTree = (ResourceState) value;
-                    for (String clientId : clientsTree.getPropertyNames()) {
-                        ObjectNode clientNode = ConversionUtils.convert((ResourceState) clientsTree.getProperty(clientId));
-                        ApplicationClient client = new ApplicationClient() {
-                            @Override
-                            public String id() {
-                                return clientId;
-                            }
-
-                            @Override
-                            public String type() {
-                                return clientNode.get("type").asText();
-                            }
-
-                            @Override
-                            public String securityKey() {
-                                return clientNode.get("security-key").asText();
-                            }
-                        };
-                        clients.put(clientId, client);
-                    }
-                }
             } catch (IOException e) {
                 log.error("Error decoding content of application.json for " + appName, e);
             }
@@ -134,16 +109,26 @@ public class ApplicationService implements Service<InternalApplication> {
             }
         }
 
-        this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp, appVisible, clients);
+        this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp, appVisible);
 
         ServiceName configManagerName = LiveOak.applicationConfigurationManager(this.id);
         ApplicationConfigurationService configManager = new ApplicationConfigurationService(applicationJson);
         target.addService(configManagerName, configManager)
                 .install();
 
+        ServiceName appContextName = LiveOak.applicationContext(this.id);
+
+        // Configure application-clients resource if it's not present
+        if (resourcesTree == null || !resourcesTree.getPropertyNames().contains("application-clients")) {
+            ApplicationClientsInstallService appClientInstaller = new ApplicationClientsInstallService();
+            target.addService(appContextName.append("app-client-install"), appClientInstaller)
+                    .addDependency(configManagerName)
+                    .addInjectionValue(appClientInstaller.applicationInjector(), this)
+                    .install();
+        }
+
         // context resource
 
-        ServiceName appContextName = LiveOak.applicationContext(this.id);
         ApplicationContextService appContext = new ApplicationContextService(this.app);
         target.addService(appContextName, appContext)
                 .install();
@@ -166,6 +151,11 @@ public class ApplicationService implements Service<InternalApplication> {
                 .addDependency(appResourceName, ApplicationResource.class, appResourceMount.resourceInjector())
                 .install());
 
+        // Only install the application-clients resource for an application if it's not currently
+        ResourceState state = new DefaultResourceState();
+        state.putProperty("type", "application-clients");
+
+        // Startup all resources defined for the application
         ApplicationResourcesStartupService resources = new ApplicationResourcesStartupService(resourcesTree);
 
         target.addService(LiveOak.application(this.id).append("resources"), resources)

@@ -3,10 +3,7 @@ package io.liveoak.container.tenancy;
 import java.util.Collection;
 import java.util.Collections;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.container.zero.ApplicationExtensionsResource;
-import io.liveoak.spi.ApplicationClient;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
@@ -68,7 +65,6 @@ public class ApplicationResource implements RootResource, SynchronousResource {
         sink.accept("html-app", this.app.htmlApplicationResourcePath());
         sink.accept("visible", this.app.visible());
         sink.accept("directory", this.app.directory().getAbsolutePath());
-        sink.accept("clients", this.app.clients());
         sink.close();
     }
 
@@ -89,31 +85,7 @@ public class ApplicationResource implements RootResource, SynchronousResource {
             this.app.setHtmlApplicationPath(htmlPath);
         }
 
-        ResourceState clientsState = (ResourceState) state.getProperty("clients");
-        if (clientsState != null) {
-            for (String clientId : clientsState.getPropertyNames()) {
-                ObjectNode clientNode = ConversionUtils.convert((ResourceState) clientsState.getProperty(clientId));
-                ApplicationClient client = new ApplicationClient() {
-                    @Override
-                    public String id() {
-                        return clientId;
-                    }
-
-                    @Override
-                    public String type() {
-                        return clientNode.get("type").asText();
-                    }
-
-                    @Override
-                    public String securityKey() {
-                        return clientNode.get("security-key").asText();
-                    }
-                };
-                this.app.addClient(client);
-            }
-        }
-
-        this.configManager.updateApplication(this.app, ConversionUtils.convert(clientsState));
+        this.configManager.updateApplication(this.app);
 
         responder.resourceUpdated(this);
     }
