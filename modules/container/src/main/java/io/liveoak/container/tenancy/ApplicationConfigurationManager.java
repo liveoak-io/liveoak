@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -37,7 +38,7 @@ public class ApplicationConfigurationManager {
         write(tree);
     }
 
-    public synchronized void updateResource(String id, String type, ObjectNode config) throws IOException {
+    public synchronized void updateResource(String id, String type, JsonNode config) throws IOException {
         ObjectNode tree = read();
         ObjectNode resourcesTree = (ObjectNode) tree.get("resources");
         if (resourcesTree == null) {
