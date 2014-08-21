@@ -43,6 +43,10 @@ public class Key {
         return -1;
     }
 
+    public boolean sameColumnsAs(Key key) {
+        return columns().equals(key.columns());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

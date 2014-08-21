@@ -1,6 +1,7 @@
 package io.liveoak.pgsql;
 
 import java.io.IOException;
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -93,12 +94,19 @@ public class PgSqlTableResource implements Resource {
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         // insert a new record into a table
+        String itemId = state.id();
+        if (itemId == null || itemId.length() == 0) {
+            responder.invalidRequest("No id");
+            return;
+        }
+
+        state.uri(new URI(uri().toString() + "/" + itemId));
+
         Catalog cat = parent.catalog();
         Table table = cat.tableById(id());
 
-        String itemId = null;
         try (Connection c = parent.connection()) {
-            itemId = queryBuilder.executeInsert(ctx, c, table, state);
+            itemId = queryBuilder.executeCreate(ctx, c, table, state);
 
             // TODO: also handle expanded many-to-one / one-to-many
         }

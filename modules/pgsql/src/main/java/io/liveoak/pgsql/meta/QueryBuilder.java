@@ -436,6 +436,10 @@ public class QueryBuilder {
 
     public QueryResults query(PreparedStatement ps, Pagination pagination) throws SQLException {
         try (PreparedStatement s = ps) {
+            if (log.isTraceEnabled()) {
+                log.trace("sql: " + rawSQL(ps));
+            }
+
             if (pagination != null) {
                 s.setMaxRows(pagination.limit());
             }
@@ -465,6 +469,7 @@ public class QueryBuilder {
         return new QueryResults();
     }
 
+    /*
     public String executeInsert(RequestContext ctx, Connection con, Table table, ResourceState state) throws SQLException {
         String id = extractId(table, state);
         try (PreparedStatement ps = prepareInsert(con, table, state)) {
@@ -472,9 +477,10 @@ public class QueryBuilder {
         }
         return id;
     }
-
+    */
     public String executeCreate(RequestContext ctx, Connection con, Table table, ResourceState state) throws SQLException {
 
+        // perform this first, as it serves as an id presence check
         String id = extractId(table, state);
 
         // first create new record in master table
@@ -490,13 +496,20 @@ public class QueryBuilder {
 
             // create children / there can't be any existing yet
             List<Object> listOfNew = state.getPropertyAsList(refTable.id());
+            if (listOfNew != null) {
+                for (Object item : listOfNew) {
+                    ResourceState newState = ((ResourceState) item);
 
-            for (Object item: listOfNew) {
-                ResourceState newState = ((ResourceState) item);
-                ForeignKey fk = (ForeignKey) refTable.joinKeyForTable(table);
-                String joinField = fk.fieldName();
-                newState.putProperty(joinField, new DefaultResourceRef(state.uri()));
-                executeCreate(ctx, con, refTable, newState);
+                    // if id is not set on item and foreign key columns on item are the same as its primary key columns,
+                    // then set the id - since its value must be equal to master's id
+                    if (newState.id() == null && refTable.pk().sameColumnsAs(ref)) {
+                        newState.id(id);
+                    }
+
+                    // link child back to master - overwriting any existing value
+                    newState.putProperty(ref.fieldName(), new DefaultResourceRef(state.uri()));
+                    executeCreate(ctx, con, refTable, newState);
+                }
             }
         }
 
@@ -520,10 +533,47 @@ public class QueryBuilder {
         }
     }
 
-    public void executeUpdate(RequestContext ctx, Connection con, Table table, ResourceState state) throws SQLException {
+    public void executeMerge(RequestContext ctx, Connection con, Table table, ResourceState state) throws SQLException {
+        executeUpdate(ctx, con, table, state, null, true);
+    }
 
+    public void executeUpdate(RequestContext ctx, Connection con, Table table, ResourceState state) throws SQLException {
+        executeUpdate(ctx, con, table, state, null, false);
+    }
+
+    public void executeUpdate(RequestContext ctx, Connection con, Table table, ResourceState state, ForeignKey master, boolean upsert) throws SQLException {
+
+        // perform this first as it also serves as id check
         Id tableId = new Id(table.pk(), state.id());
 
+        // handle many-to-one relationships
+        // if what is in state is not only a reference, but a full nested instance
+        // perform upsert on that instance
+        for (ForeignKey ref: table.foreignKeys()) {
+            ResourceState item = state.getPropertyAsResourceState(ref.fieldName());
+            for (String name: item.getPropertyNames()) {
+                if (!"self".equals(name)) {
+                    executeUpdate(ctx, con, catalog.table(ref.tableRef()), item, ref, true);
+                    break;
+                }
+            }
+        }
+
+        // update the record in master table
+        // if record with specified id doesn't exist, the update will fail, after which we try insert
+        // that should be better performance-wise than checking if it exist or not
+        int updateCount;
+        try (PreparedStatement ps = prepareUpdate(con, table, state)) {
+            updateCount = ps.executeUpdate();
+        }
+        if (updateCount == 0 && upsert) {
+            try (PreparedStatement ps = prepareInsert(con, table, state)) {
+                if (log.isTraceEnabled()) {
+                    log.trace("sql: " + rawSQL(ps));
+                }
+                ps.execute();
+            }
+        }
         List<Object> values = new LinkedList<>();
         List<Column> columns = new LinkedList<>();
 
@@ -534,67 +584,74 @@ public class QueryBuilder {
             i++;
         }
 
-        // first take care of references
-        for(ForeignKey ref: table.referredKeys()) {
+        // take care of references, but skip master if specified
+        for (ForeignKey ref: table.referredKeys()) {
+            if (ref.equals(master)) {
+                continue;
+            }
+
             TableRef refTableRef = ref.columns().get(0).tableRef();
             Table refTable = catalog.table(refTableRef);
 
-            // check if refTable has any referredKeys
-            if (refTable.referredKeys().size() > 0) {
-                // if yes, then load ids of referring refTable items first
-                QueryResults results = querySelectFromTableWhere(con, refTable, refTable.pk().columns(), ref.columns(), values, null, null);
-                String prefix = new ResourcePath(state.uri().toString()).parent().parent().toString() + "/" + refTable.id();
-                List<String> currentUris = prefixElements(extractPksFromResults(results, refTable), prefix);
+            // if yes, then load ids of referring refTable items first
+            QueryResults results = querySelectFromTableWhere(con, refTable, refTable.pk().columns(), ref.columns(), values, null, null);
+            String prefix = new ResourcePath(state.uri().toString()).parent().parent().toString() + "/" + refTable.id() + "/";
+            List<String> currentUris = prefixElements(extractPksFromResults(results, refTable), prefix);
 
-                List<Object> listOfNew = state.getPropertyAsList(refTable.id());
-                List<String> newUris = new LinkedList<>();
-                for (Object item: listOfNew) {
-                    if (item instanceof ResourceState == false) {
-                        throw new RuntimeException("Invalid JSON message - unexpected content of " + refTable.id() + " - item should be a JSON object: " + item);
-                    }
-                    ResourceState itemState = (ResourceState) item;
-                    newUris.add(itemState.uri().toString());
+            List<Object> listOfNew = state.getPropertyAsList(refTable.id());
+            List<String> newUris = new LinkedList<>();
+            for (Object item: listOfNew) {
+                if (item instanceof ResourceState == false) {
+                    throw new RuntimeException("Invalid JSON message - unexpected content of " + refTable.id() + " - item should be a JSON object: " + item);
+                }
+                ResourceState itemState = (ResourceState) item;
+                newUris.add(itemState.uri().toString());
+            }
+
+            List<ResourceState> updated = new LinkedList<>();
+
+            // compare newUris with currentUris
+            List<String> addedUris = new ArrayList(newUris);
+            addedUris.removeAll(currentUris);
+
+            // first create newly added
+            for (Object item: listOfNew) {
+                ResourceState newState = ((ResourceState) item);
+
+                // if id is not set on item and foreign key columns on item are the same as its primary key columns,
+                // then set the id - since its value must be equal to master's id
+                if (newState.id() == null && refTable.pk().sameColumnsAs(ref)) {
+                    newState.id(state.id());
                 }
 
-                List<ResourceState> updated = new LinkedList<>();
+                // link child back to its master - overwriting any existing value
+                newState.putProperty(ref.fieldName(), new DefaultResourceRef(state.uri()));
 
-                // compare newUris with currentUris
-                List<String> addedUris = new ArrayList(newUris);
-                addedUris.removeAll(currentUris);
-
-                // first create newly added
-                for (Object item: listOfNew) {
-                    ResourceState newState = ((ResourceState) item);
-                    if (addedUris.contains(newState.uri().toString())) {
-                        executeCreate(ctx, con, refTable, newState);
-                    } else {
-                        updated.add(newState);
-                    }
+                if (addedUris.contains(newState.uri().toString())) {
+                    executeCreate(ctx, con, refTable, newState);
+                } else {
+                    updated.add(newState);
                 }
+            }
 
-                // now remove those that are to be removed
-                List<String> removedUris = new ArrayList(currentUris);
-                removedUris.removeAll(newUris);
+            // now remove those that are to be removed
+            List<String> removedUris = new ArrayList(currentUris);
+            removedUris.removeAll(newUris);
 
-                for (String uri: removedUris) {
-                    executeDelete(ctx, con, refTable, uri.substring(prefix.length()), true);
-                }
+            for (String uri: removedUris) {
+                executeDelete(ctx, con, refTable, uri.substring(prefix.length()), true);
+            }
 
-                // update existing
-                for (ResourceState item: updated) {
-                    // only update if there are some properties present other than just self
-                    for (String name: item.getPropertyNames()) {
-                        if (!"self".equals(name)) {
-                            executeUpdate(ctx, con, refTable, item);
-                            break;
-                        }
+            // update existing
+            for (ResourceState item: updated) {
+                // only update if there are some properties present other than just self
+                for (String name: item.getPropertyNames()) {
+                    if (!"self".equals(name)) {
+                        executeUpdate(ctx, con, refTable, item);
+                        break;
                     }
                 }
             }
-        }
-
-        try (PreparedStatement ps = prepareUpdate(con, table, state)) {
-            ps.executeUpdate();
         }
     }
 
@@ -648,18 +705,27 @@ public class QueryBuilder {
                     }
                 } else {
                     try (PreparedStatement ps = prepareDeleteWhere(con, refTable, ref.columns(), values)) {
+                        if (log.isTraceEnabled()) {
+                            log.trace("sql: " + rawSQL(ps));
+                        }
                         ps.executeUpdate();
                     }
                 }
             }
         }
         try (PreparedStatement ps = prepareDeleteWhere(con, table, columns, values)) {
+            if (log.isTraceEnabled()) {
+                log.trace("sql: " + rawSQL(ps));
+            }
             ps.executeUpdate();
         }
     }
 
     public void executeDeleteTable(Connection con, Table t) throws SQLException {
         try (PreparedStatement ps = prepareDeleteTable(con, t)) {
+            if (log.isTraceEnabled()) {
+                log.trace("sql: " + rawSQL(ps));
+            }
             ps.executeUpdate();
         }
     }
@@ -696,6 +762,9 @@ public class QueryBuilder {
             try {
                 executeDeleteTable(c, t);
             } catch (Exception e) {
+                if (log.isTraceEnabled()) {
+                    log.trace("Exception deleting a table: ", e);
+                }
                 item.error(new ResourceProcessingException(
                         ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, e.getMessage(), e));
             }
@@ -710,11 +779,16 @@ public class QueryBuilder {
         boolean newSchemaNeeded = !catalog.schemas().contains(table.tableRef().schema());
         if (newSchemaNeeded) {
             try (PreparedStatement ps = con.prepareStatement("CREATE SCHEMA IF NOT EXISTS " + table.tableRef().quotedSchema())) {
+                if (log.isTraceEnabled()) {
+                    log.trace("sql: " + rawSQL(ps));
+                }
                 ps.execute();
             }
         }
         try (PreparedStatement ps = con.prepareStatement(table.ddl())) {
-            System.out.println("execute: " + table.ddl());
+            if (log.isTraceEnabled()) {
+                log.trace("sql: " + rawSQL(ps));
+            }
             ps.execute();
         }
     }
@@ -754,6 +828,9 @@ public class QueryBuilder {
             try {
                 executeCreateTable(c, tempCat.table(t.tableRef()));
             } catch (Exception e) {
+                if (log.isTraceEnabled()) {
+                    log.trace("Exception creating a table: ", e);
+                }
                 item.error(new ResourceProcessingException(
                         ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, e.getMessage(), e));
             }
@@ -836,7 +913,17 @@ public class QueryBuilder {
                 .append(" WHERE ")
                 .append(expression.toString());
 
-        // TODO: add sorting and pagination settings
+        // TODO: finish implementing sorting
+        if (sorting != null) {
+            // need to convert sorting field specs to fully qualified column names
+        }
+
+        if (pagination != null) {
+            if (pagination.offset() > 0) {
+                select.append(" OFFSET " + pagination.offset());
+            }
+            select.append(" LIMIT " + pagination.limit());
+        }
 
         PreparedStatement ps = con.prepareStatement(select.toString());
 
@@ -1001,6 +1088,14 @@ public class QueryBuilder {
         return mapper.readTree(jp);
     }
 
+    private static String rawSQL(PreparedStatement ps) {
+        String raw = ps.toString();
+        int len = "Pooled statement wrapping physical statement ".length();
+        if (raw.length() > len) {
+            raw = raw.substring(len);
+        }
+        return raw;
+    }
     private static final JsonFactory JSON_FACTORY = new JsonFactory();
 
     static {

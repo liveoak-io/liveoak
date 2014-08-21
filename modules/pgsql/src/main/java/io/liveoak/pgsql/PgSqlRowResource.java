@@ -120,7 +120,7 @@ public class PgSqlRowResource implements Resource {
         // address has address_id PK, orders has address_id fk
         // Here we have Row of select from addresses
         // we have to make a query select from orders where address_id = row.get(pk)
-        HashMap<String, List<Resource>> stacked = new HashMap<>();
+        HashMap<String, Object> stacked = new HashMap<>();
         for (ForeignKey fk : table.referredKeys()) {
             try (Connection con = parent.parent().connection()) {
                 List<Column> cols = fk.columns();
@@ -140,11 +140,16 @@ public class PgSqlRowResource implements Resource {
                     ls.add(new PgSqlRowResource(
                             new PgSqlTableResource(parent.parent(), tab.id()), r));
                 }
-                stacked.put(tab.id(), ls);
+                if (fk.sameColumnsAs(tab.pk())) {
+                    // it's a one-to-one
+                    stacked.put(tab.id(), ls.size() > 0 ? ls.get(0) : null);
+                } else {
+                    stacked.put(tab.id(), ls);
+                }
             }
         }
 
-        for (Map.Entry<String, List<Resource>> ent: new TreeMap<>(stacked).entrySet()) {
+        for (Map.Entry<String, ?> ent: new TreeMap<>(stacked).entrySet()) {
             sink.accept(ent.getKey(), ent.getValue());
         }
 

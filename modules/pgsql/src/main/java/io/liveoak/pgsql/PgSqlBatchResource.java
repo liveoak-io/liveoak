@@ -25,6 +25,7 @@ public class PgSqlBatchResource implements Resource {
 
     private static final String CREATE = "create";
     private static final String UPDATE = "update";
+    private static final String MERGE = "merge";
     private static final String DELETE = "delete";
 
     private PgSqlRootResource parent;
@@ -52,7 +53,9 @@ public class PgSqlBatchResource implements Resource {
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         // check the requested action
         String action = ctx.resourceParams().value("action");
-        if (action == null || (!action.equals(CREATE) && !action.equals(UPDATE) && !action.equals(DELETE))) {
+        if (action == null || (!action.equals(CREATE) && !action.equals(UPDATE)
+                && !action.equals(MERGE) && !action.equals(DELETE))) {
+
             responder.invalidRequest("'action' parameter needs to be specified with one of: 'create', 'update', 'delete', as a value");
             return;
         }
@@ -98,13 +101,18 @@ public class PgSqlBatchResource implements Resource {
                     statuses.add(item);
                     try {
                         if (action.equals(CREATE)) {
-                            queryBuilder.executeInsert(ctx, c, table, member);
-                        } else if (action.equals(DELETE)) {
-                            queryBuilder.executeDelete(ctx, c, table, itemId, ctx.resourceParams().contains("cascade"));
+                            queryBuilder.executeCreate(ctx, c, table, member);
                         } else if (action.equals(UPDATE)) {
                             queryBuilder.executeUpdate(ctx, c, table, member);
+                        } else if (action.equals(MERGE)) {
+                            queryBuilder.executeMerge(ctx, c, table, member);
+                        } else if (action.equals(DELETE)) {
+                            queryBuilder.executeDelete(ctx, c, table, itemId, true);
                         }
                     } catch (Exception e) {
+                        if (log.isTraceEnabled()) {
+                            log.trace("Exception performing batch operation: ", e);
+                        }
                         item.error(new ResourceProcessingException(
                                 ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, e.getMessage(), e.getCause()));
                     }
@@ -118,6 +126,9 @@ public class PgSqlBatchResource implements Resource {
                         try {
                             workList.add( item.input(parent.controller().parseCreateTableRequest(member, false)) );
                         } catch (ResourceProcessingException e) {
+                            if (log.isTraceEnabled()) {
+                                log.trace("Exception processing batch create: ", e);
+                            }
                             item.error(e);
                         }
                     } else {
