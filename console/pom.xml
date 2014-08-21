@@ -22,54 +22,14 @@
         <module-name/>
         <console.app.res>${project.basedir}/target/</console.app.res>
         <html.unit.version>2.13</html.unit.version>
-        <arquillian.version>1.1.3.Final</arquillian.version>
-        <arquillian.drone.version>1.3.0.Final</arquillian.drone.version>
-        <arquillian.selenium.version>2.40.0</arquillian.selenium.version>
-        <arquillian.graphene.webdriver.version>2.0.2.Final</arquillian.graphene.webdriver.version>
         <version.jasmine.plugin>1.3.1.3</version.jasmine.plugin>
         <version.lesscss.plugin>1.3.3</version.lesscss.plugin>
-
-        <!-- Arquillian related properties -->
-        <arquillian.browser>phantomjs</arquillian.browser>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.jboss.arquillian</groupId>
-                <artifactId>arquillian-bom</artifactId>
-                <version>${arquillian.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.arquillian.extension</groupId>
-                <artifactId>arquillian-drone-bom</artifactId>
-                <version>${arquillian.drone.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.arquillian.selenium</groupId>
-                <artifactId>selenium-bom</artifactId>
-                <version>${arquillian.selenium.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.graphene</groupId>
-            <artifactId>graphene-webdriver</artifactId>
-            <version>${arquillian.graphene.webdriver.version}</version>
-            <type>pom</type>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -315,6 +275,7 @@
             </build>
         </profile>
 
+        <!--
         <profile>
             <id>e2e-tests</id>
             <build>
@@ -364,6 +325,7 @@
                 </plugins>
             </build>
         </profile>
+        -->
     </profiles>
 
 </project>
