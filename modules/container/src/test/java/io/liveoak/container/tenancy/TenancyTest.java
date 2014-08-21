@@ -1,12 +1,14 @@
 package io.liveoak.container.tenancy;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import io.liveoak.container.extension.ExtensionInstaller;
 import io.liveoak.container.extension.ExtensionService;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.service.ApplicationsDeployerService;
 import io.liveoak.container.tenancy.service.ApplicationsDirectoryService;
 import io.liveoak.container.zero.ApplicationExtensionsResource;
 import io.liveoak.container.zero.ApplicationsResource;
+import io.liveoak.container.zero.extension.ApplicationClientsExtension;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.resource.RootResource;
@@ -33,30 +35,19 @@ public class TenancyTest {
     private ServiceContainer serviceContainer;
 
     @Before
-    public void setUpServiceContainer() {
+    public void setUpServiceContainer() throws Exception {
         this.serviceContainer = ServiceContainer.Factory.create();
 
         File appDir = new File(getClass().getClassLoader().getResource("apps").getFile());
         this.serviceContainer.addService(LiveOak.APPLICATIONS_DIR, new ApplicationsDirectoryService(appDir))
                 .install();
 
-        /*
-        this.serviceContainer.addListener(new AbstractServiceListener<Object>() {
-            @Override
-            public synchronized void transition(ServiceController<?> controller, ServiceController.Transition transition) {
-                System.err.println(controller.getName() + " :: " + transition);
-                if (transition.getAfter() == ServiceController.Substate.PROBLEM || transition.getAfter() == ServiceController.Substate.START_FAILED) {
-                    System.err.println("**");
-                    System.err.println(" controller: " + controller);
-                    System.err.println(" unavail: " + controller.getImmediateUnavailableDependencies());
-                    if ( controller.getStartException() != null ) {
-                        controller.getStartException().printStackTrace();
+        this.serviceContainer.addService(LiveOak.SERVICE_REGISTRY, new ValueService<>(new ImmediateValue<>(this.serviceContainer))).install();
 
-                    }
-                }
-            }
-        });
-        */
+        ExtensionInstaller installer = new ExtensionInstaller(this.serviceContainer.subTarget(), LiveOak.resource(ZeroExtension.APPLICATION_ID, "system"));
+        installer.load("application-clients", new ApplicationClientsExtension());
+
+        this.serviceContainer.awaitStability();
     }
 
     @After
