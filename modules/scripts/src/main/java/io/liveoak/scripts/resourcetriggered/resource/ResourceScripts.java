@@ -146,6 +146,13 @@ public class ResourceScripts implements Resource {
         }
     }
 
+    public void updateChild(ResourceScript resourceScript) {
+        if (scripts.get(resourceScript.id()) != null) {
+            scripts.remove(resourceScript.id());
+            scripts.add(resourceScript.getScript());
+        }
+    }
+
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
 

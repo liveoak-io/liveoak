@@ -37,12 +37,18 @@ public class ScriptFileResource implements BinaryResource {
 
     @Override
     public long contentLength() {
-        return parent.getScript().getScriptBuffer().readableBytes();
+        if (parent.getScript() != null && parent.getScript().getScriptBuffer() != null) {
+            return parent.getScript().getScriptBuffer().readableBytes();
+        } else {
+            return 0;
+        }
     }
 
     @Override
     public void readContent(RequestContext ctx, BinaryContentSink sink) throws Exception {
-        sink.accept(parent.getScript().getScriptBuffer());
+        if (parent.getScript() != null) {
+            sink.accept(parent.getScript().getScriptBuffer());
+        }
         sink.close();
     }
 
