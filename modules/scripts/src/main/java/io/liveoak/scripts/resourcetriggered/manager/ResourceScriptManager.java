@@ -68,7 +68,7 @@ public class ResourceScriptManager {
 
         // CREATE is special since we apply the create to /foo/bar to create /foo/bar/baz so we should also check /foo/bar/*
         if (resourceFunction == Script.FUNCTIONS.PRECREATE) {
-            scripts.addAll(scriptMap.getByPath(resourcePath + "/*")) ;
+            scripts.addAll(scriptMap.getByPath(resourcePath + "/*", resourceFunction, true)) ;
         }
 
         for (Script script : scripts) {
@@ -109,7 +109,7 @@ public class ResourceScriptManager {
 
         // CREATE is special since we apply the create to /foo/bar to create /foo/bar/baz so we should also check /foo/bar/*
         if (resourceFunction == Script.FUNCTIONS.POSTCREATE) {
-            scripts.addAll(scriptMap.getByPath(resourcePath + "/*")) ;
+            scripts.addAll(scriptMap.getByPath(resourcePath + "/*", resourceFunction, true)) ;
         }
 
         for (Script script : scripts) {

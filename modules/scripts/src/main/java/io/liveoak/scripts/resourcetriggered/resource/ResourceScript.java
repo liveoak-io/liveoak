@@ -28,6 +28,7 @@ public class ResourceScript implements Resource {
     protected static final String LIBRARIES = "libraries";
     protected static final String TARGET_PATH = "target-path";
     protected static final String PRIORITY = "priority";
+    protected static final String PROVIDES = "provides";
 
     private ResourceScripts parent;
 
@@ -131,6 +132,7 @@ public class ResourceScript implements Resource {
         sink.accept(TARGET_PATH, script.getTarget());
         sink.accept(PRIORITY, script.getPriority());
         sink.accept(LIBRARIES, script.getLibraries());
+        sink.accept(PROVIDES, script.getProvides());
         sink.close();
     }
 
@@ -141,7 +143,8 @@ public class ResourceScript implements Resource {
                 responder.invalidRequest("The resource ID cannot be changed during an update.");
             } else {
                 // since we don't do partial updates, we need to overwrite everything here with the new state
-                script = createScript(state);
+                this.script = createScript(state);
+                parent.updateChild(this);
                 responder.resourceUpdated(this);
             }
         } catch (PropertyException pe) {
@@ -185,15 +188,16 @@ public class ResourceScript implements Resource {
 
     @Override
     public void delete(RequestContext ctx, Responder responder) throws Exception {
-        this.script = null;
         parent.deleteMember(ctx, script.getId(), responder);
+        this.script = null;
     }
 
     //TODO: add DeleteMember to the Resource object?
     public void deleteMember(RequestContext ctx, String id, Responder responder) throws Exception {
         if (id == ScriptFileResource.ID && script.getScriptBuffer() != null) {
-            responder.resourceDeleted(new ScriptFileResource(this));
+            Resource resource = new ScriptFileResource(this);
             this.script.setScriptBuffer(null);
+            responder.resourceDeleted(resource);
         } else {
             responder.noSuchResource(id);
         }

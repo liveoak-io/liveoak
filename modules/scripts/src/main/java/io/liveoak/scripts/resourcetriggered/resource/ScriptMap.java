@@ -67,7 +67,7 @@ public class ScriptMap {
         if (ids != null) {
             for (String id: ids) {
                 Script script = idMap.get(id);
-                if (script.isEnabled() && script.getProvides().contains(function)) {
+                if ((script.isEnabled() == enabled) && script.getProvides().contains(function)) {
                     scripts.add(idMap.get(id));
                 }
             }

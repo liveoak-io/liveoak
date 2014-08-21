@@ -154,17 +154,27 @@ public class Script{
     }
 
     public ByteBuf getScriptBuffer() {
-        return scriptBuffer.copy();
+        if (scriptBuffer != null) {
+            return scriptBuffer.copy();
+        } else {
+            return null;
+        }
     }
 
     //TODO: remove ?
     public String getScriptBufferAsString() {
-        return getScriptBuffer().toString(Charset.forName("UTF-8"));
+        if (getScriptBuffer() != null) {
+            return getScriptBuffer().toString(Charset.forName("UTF-8"));
+        } else {
+            return null;
+        }
     }
 
     public void setScriptBuffer(ByteBuf scriptBuffer) {
         this.scriptBuffer = scriptBuffer;
-        analyseProvides();
+        if (scriptBuffer != null) {
+            analyseProvides();
+        }
     }
 
     public int getPriority() {
