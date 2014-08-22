@@ -47,7 +47,7 @@
       </div>
 
       <span ng-repeat="s in storageList">
-        <lo-collection-security-summary lo-app="curApp" lo-storage="s.id" lo-collection="c.id" ng-repeat="c in s._members"></lo-collection-security-summary>
+        <lo-collection-security-summary lo-app="curApp" lo-storage="s.id" lo-collection="c.id" ng-repeat="c in s.members"></lo-collection-security-summary>
       </span>
     </div>
 

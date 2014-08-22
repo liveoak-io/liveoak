@@ -159,10 +159,10 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
 
   $scope.resources = [];
 
-  if (loStorageList._members) {
-    for (var i = 0; i < loStorageList._members.length; i++) {
+  if (loStorageList.members) {
+    for (var i = 0; i < loStorageList.members.length; i++) {
 
-      var resource = loStorageList._members[i];
+      var resource = loStorageList.members[i];
 
       if (resource.hasOwnProperty('db')) {
         $scope.resources.push({
@@ -241,7 +241,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $scope.breadcrumbs.push({'label': 'Collections',    'href':''});
   }
 
-  $scope.collectionList = currentCollectionList._members;
+  $scope.collectionList = currentCollectionList.members;
 
   $scope.collectionData = [];
   $scope.collectionDataBackup = [];
@@ -859,9 +859,9 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
         $scope.columns = ['id'];
 
-        for (var rowIndex in data._members) {
-          if (data._members && data._members[rowIndex]) {
-            for (var c in data._members[rowIndex]) {
+        for (var rowIndex in data.members) {
+          if (data.members && data.members[rowIndex]) {
+            for (var c in data.members[rowIndex]) {
               if (c !== 'self' && c !== 'id' && $scope.columns.indexOf(c) === -1) {
                 $scope.columns.push(c);
               }
@@ -872,8 +872,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
       $scope.collectionData = [];
 
-      for (var rIndex in data._members){
-        var rData = data._members[rIndex];
+      for (var rIndex in data.members){
+        var rData = data.members[rIndex];
         $scope.collectionData.push(encodeJSON(rData));
       }
 
@@ -964,7 +964,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $log.debug('Loading collection list');
     var promise = LoCollection.getList({appId: currentApp.id, storageId: $routeParams.storageId});
     promise.$promise.then(function (data) {
-      $scope.collectionList = data._members;
+      $scope.collectionList = data.members;
       if (callback) {
         callback();
       }

@@ -9,14 +9,14 @@ loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, $fi
   $scope.storageList = [];
 
   /* jshint unused: false */
-  angular.forEach(loStorageList._members, function(value, key) {
+  angular.forEach(loStorageList.members, function(value, key) {
     if (value.hasOwnProperty('db')) {
       this.push(value.id);
     }
   }, $scope.storageList);
   /* jshint unused: true */
 
-  var pushEntries = $filter('filter')(loStorageList._members, {'id': 'push'});
+  var pushEntries = $filter('filter')(loStorageList.members, {'id': 'push'});
   $scope.pushConfig = pushEntries && pushEntries.length > 0 ? pushEntries[0] : undefined;
 
   $scope.breadcrumbs = [

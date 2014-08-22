@@ -115,7 +115,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
             assertLink(links.get(0), "self", "/testApp/gridfs/john/.files");
             assertLink(links.get(1), "parent", "/testApp/gridfs/john");
 
-            JsonArray members = json.getArray("_members");
+            JsonArray members = json.getArray("members");
             assertThat(members).isNotNull();
             assertThat(members.size()).isEqualTo(4);
 

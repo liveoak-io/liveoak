@@ -28,7 +28,7 @@ public class GridFSResource implements Resource {
             new String[]{"aliases", "chunkSize", "_id", "id"})));
 
     protected static Set<String> NOT_UPDATABLE = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            new String[] {"aliases", "chunkSize", "md5", "_id", "id", "createDate", "length", "contentType", "self", "links", "_members", "dir"})));
+            new String[] {"aliases", "chunkSize", "md5", "_id", "id", "createDate", "length", "contentType", "self", "links", "members", "dir"})));
 
 
     /* Parent that will end up in response as part of the uri() */

@@ -12,18 +12,18 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
     {'label': 'Security Policies', 'href': '#/applications/' + currentApp.id + '/security'}
   ];
 
-  $scope.storageList = $filter('filter')(expApp._members, {'type': 'database'});
+  $scope.storageList = $filter('filter')(expApp.members, {'type': 'database'});
 
-  var _uriPolicies = $filter('filter')(expAppResources._members, {'id': 'uri-policy' });
+  var _uriPolicies = $filter('filter')(expAppResources.members, {'id': 'uri-policy' });
   $scope.uriPolicies = _uriPolicies && _uriPolicies.length > 0 ? _uriPolicies[0].rules : [];
 
-  var _aclPolicies = $filter('filter')(expAppResources._members, {'id': 'acl-policy' });
+  var _aclPolicies = $filter('filter')(expAppResources.members, {'id': 'acl-policy' });
   $scope.acl = _aclPolicies && _aclPolicies.length > 0 ? _aclPolicies[0].autoRules : [];
 
   $scope.securedColls = [];
   $scope.unsecuredColls = [];
   angular.forEach($scope.storageList, function(storage) {
-    angular.forEach(storage._members, function(collection) {
+    angular.forEach(storage.members, function(collection) {
       if (($filter('filter')($scope.acl, {'resourcePath': collection.self.href })).length > 0 || ($filter('filter')($scope.uriPolicies, {'uriPattern': collection.self.href })).length > 0) {
         $scope.securedColls.push(collection.self.href);
       }
@@ -113,11 +113,11 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
     {'label': 'Secure ' + $scope.currentCollectionDisplay, 'href': '#/applications/' + currentApp.id + '/security/' + $scope.currentCollection}
   ];
 
-  $scope.storageList = $filter('filter')(loStorageList._members, {'type': 'database'});
+  $scope.storageList = $filter('filter')(loStorageList.members, {'type': 'database'});
 
   $scope.collectionsList = [];
   angular.forEach($scope.storageList, function(storage) {
-    angular.forEach(storage._members, function(collection) {
+    angular.forEach(storage.members, function(collection) {
       $scope.collectionsList.push({id: storage.id + '/' + collection.id, name: storage.id + ' / ' + collection.id});
     });
   });

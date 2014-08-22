@@ -133,7 +133,7 @@ public class MemberEncodingDriverTest {
     @Test
     public void testReadMultiReturnFields() throws Exception {
         // when requesting 'members' as part of the return fields, should be reading the members
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("bar,foo, _members")).build(), PATH + RESOURCE_ID);
+        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("bar,foo, members")).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);

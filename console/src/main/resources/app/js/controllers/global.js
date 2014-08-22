@@ -47,7 +47,7 @@ loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, Liv
 });
 
 loMod.controller('HomeCtrl', function($log, $rootScope, $scope, $location, $filter, loAppList) {
-  var filtered = $filter('filter')(loAppList._members, {'visible': true});
+  var filtered = $filter('filter')(loAppList.members, {'visible': true});
   if (filtered.length === 1) {
     $location.url('/applications/' + filtered[0].id);
   }
@@ -58,7 +58,7 @@ loMod.controller('HomeCtrl', function($log, $rootScope, $scope, $location, $filt
 
 angular.module('loApp.controllers').controller('AppDropdownCtrl', function($rootScope, $filter, LoApp) {
   LoApp.getList(function(data){
-    $rootScope.applications = $filter('filter')(data._members, {'visible': true});
+    $rootScope.applications = $filter('filter')(data.members, {'visible': true});
   });
 });
 

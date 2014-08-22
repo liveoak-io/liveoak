@@ -108,7 +108,7 @@ public class JSONEncoder implements StateEncoder {
 
     @Override
     public void startMembers() throws Exception {
-        this.generator.writeFieldName("_members");
+        this.generator.writeFieldName("members");
         this.generator.writeStartArray();
     }
 

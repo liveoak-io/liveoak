@@ -176,7 +176,7 @@ public class JSONDecoder implements ResourceDecoder {
         parser.nextToken();
         Object value = decodeValue(parser);
 
-        if (name.equals("_members") && value instanceof Collection) {
+        if (name.equals("members") && value instanceof Collection) {
             ((Collection) value).stream().forEach((e) -> state.addMember((ResourceState) e));
         } else {
             state.putProperty(name, value);

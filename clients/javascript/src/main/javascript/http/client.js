@@ -35,7 +35,7 @@ var Http = function (options) {
         options.expand = '*';
         var url = createUrl(path, options);
         request('GET', url, null, function (data) {
-            var members = data._members || [];
+            var members = data.members || [];
             options.success(members);
         }, options.error);
     }
@@ -156,7 +156,7 @@ var Http = function (options) {
 
     var jsonReplacer = function (key, value) {
         switch (key) {
-            case '_members': return undefined;
+            case 'members': return undefined;
             case 'self': return undefined;
             default: return value;
         }

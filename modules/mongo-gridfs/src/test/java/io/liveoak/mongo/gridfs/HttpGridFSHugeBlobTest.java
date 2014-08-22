@@ -350,7 +350,7 @@ public class HttpGridFSHugeBlobTest extends AbstractGridFSTest {
             assertThat(json.getArray("tags").contains("2038"));
 
             // make sure it has exactly one member
-            assertThat(json.getArray("_members").size()).isEqualTo(1);
+            assertThat(json.getArray("members").size()).isEqualTo(1);
 
 
             // TODO: move under different parent

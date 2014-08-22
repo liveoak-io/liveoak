@@ -11,20 +11,20 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
 
   var increaseStorages = function(app) {
     return function (resources) {
-      if (resources._members) {
-        for (var j = 0; j < resources._members.length; j++) {
-          if (resources._members[j].hasOwnProperty('MongoClientOptions')) {
+      if (resources.members) {
+        for (var j = 0; j < resources.members.length; j++) {
+          if (resources.members[j].hasOwnProperty('MongoClientOptions')) {
             app.mongoStorages++;
           }
-          else if(resources._members[j].hasOwnProperty('upsURL')) {
-            app.push = resources._members[j];
+          else if(resources.members[j].hasOwnProperty('upsURL')) {
+            app.push = resources.members[j];
           }
         }
       }
     };
   };
 
-  var filtered = $filter('orderBy')($filter('filter')(loAppList._members, {'visible': true}), 'name');
+  var filtered = $filter('orderBy')($filter('filter')(loAppList.members, {'visible': true}), 'name');
   for (var i = 0; i < filtered.length; i++) {
     var app = {
       id: filtered[i].id,
@@ -272,7 +272,7 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
   }
 
   loClients.$promise.then(function () {
-    $scope.appClients = loClients._members;
+    $scope.appClients = loClients.members;
     for (var j = 0; $scope.appClients && j < $scope.appClients.length; j++) {
       var kcClient = idClientMap[$scope.appClients[j].id];
       $scope.appClients[j].realmRoles = LoRealmAppClientScopeMapping.query({appId: currentApp.name, clientId: kcClient.name});
@@ -592,7 +592,7 @@ loMod.controller('NextStepsCtrl', function($scope, $rootScope, $routeParams, cur
   $scope.storageList = [];
 
   /* jshint unused: false */
-  angular.forEach(loStorageList._members, function (value, key) {
+  angular.forEach(loStorageList.members, function (value, key) {
     if (value.hasOwnProperty('db')) {
       this.push({id: value.id, provider: value.hasOwnProperty('MongoClientOptions') ? 'mongoDB' : 'unknown'});
     }
@@ -621,7 +621,7 @@ loMod.controller('ExampleListCtrl', function($scope, $location, $filter, Notific
 
   for (var i = 0; i < examplesList.length; i++) {
     var example = examplesList[i];
-    if ($filter('filter')(loAppList._members, {'id': example.id}, true).length > 0) {
+    if ($filter('filter')(loAppList.members, {'id': example.id}, true).length > 0) {
       example.installed = true;
     }
   }
