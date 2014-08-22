@@ -15,7 +15,9 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
 
     @Test
     public void testCreateCollection() throws Exception {
-
+        if (skipTests()) {
+            return;
+        }
         String endpoint = "/testApp/" + BASEPATH;
 
         // list existing tables as unexpanded members

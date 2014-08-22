@@ -26,6 +26,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
     @Test
     public void testAll() throws IOException {
+        if (skipTests()) {
+            return;
+        }
+
         System.out.println("testAll");
         testInitialCollections();
 
@@ -1620,7 +1624,9 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
     @Before
     public void init() throws IOException {
-
+        if (skipTests()) {
+            return;
+        }
         // create three tables
         HttpPost post = new HttpPost("http://localhost:8080/testApp/" + BASEPATH);
         post.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
@@ -1890,6 +1896,9 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
     @After
     public void cleanup() throws SQLException {
+        if (skipTests()) {
+            return;
+        }
         // delete schemas
         try (Connection c = datasource.getConnection()) {
             try (CallableStatement s = c.prepareCall("drop schema " + schema_two + " cascade")) {

@@ -14,6 +14,9 @@ public class PgSqlReadCollectionTest extends BasePgSqlTest {
 
     @Test
     public void testReadCollection() throws Exception {
+        if (skipTests()) {
+            return;
+        }
 
         String endpoint = "/testApp/" + BASEPATH + "/addresses";
         ResourceState result = client.read(ctx("*"), endpoint);

@@ -56,6 +56,7 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
 
     protected static String schema;
     protected static String schema_two;
+    private static boolean skipTests;
 
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
     private SimpleDateFormat iso = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.S");
@@ -72,7 +73,15 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
         ds.setPassword(System.getProperty("pgsql.password", "test"));
         ds.setMaxConnections(10);
         ds.setInitialConnections(1);
-        ds.initialize();
+        try {
+            ds.initialize();
+        } catch (Exception e) {
+            skipTests = true;
+            System.out.println("Failed to initialize datasource. Tests will be skipped ...");
+            e.printStackTrace();
+            return;
+        }
+
         datasource = ds;
 
         schema = "xlo_test_" + UUID.randomUUID().toString().substring(0, 8);
@@ -105,6 +114,9 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
 
     @AfterClass
     public static void cleanup() throws SQLException {
+        if (skipTests()) {
+            return;
+        }
         // delete schemas for the test
         try (Connection c = datasource.getConnection()) {
             try (CallableStatement s = c.prepareCall("drop schema " + schema_two + " cascade")) {
@@ -115,6 +127,10 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
                 s.execute();
             }
         }
+    }
+
+    protected static boolean skipTests() {
+        return skipTests;
     }
 
     @Override

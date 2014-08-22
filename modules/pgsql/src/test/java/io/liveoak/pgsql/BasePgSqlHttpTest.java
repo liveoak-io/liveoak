@@ -53,6 +53,7 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
     protected String schema;
     protected String schema_two;
     protected PoolingDataSource datasource;
+    private boolean skipTests;
 
     static {
         JSON_FACTORY.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
@@ -191,7 +192,18 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
         ds.setPassword(password);
         ds.setMaxConnections(maxConnections);
         ds.setInitialConnections(initialConnections);
-        ds.initialize();
+        try {
+            ds.initialize();
+        } catch (Exception e) {
+            skipTests = true;
+            System.out.println("Failed to initialize datasource. Tests will be skipped ...");
+            e.printStackTrace();
+        }
+
         datasource = ds;
+    }
+
+    protected boolean skipTests() {
+        return skipTests;
     }
 }
