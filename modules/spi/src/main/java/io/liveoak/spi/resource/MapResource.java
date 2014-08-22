@@ -7,6 +7,7 @@ package io.liveoak.spi.resource;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.liveoak.spi.RequestContext;
@@ -20,7 +21,7 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class MapResource implements Resource {
 
-    private Map<String, Object> map = new HashMap<>();
+    private Map<String, Object> map = new LinkedHashMap<>();
 
     @Override
     public Resource parent() {

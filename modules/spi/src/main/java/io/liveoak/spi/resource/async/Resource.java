@@ -51,8 +51,9 @@ public interface Resource {
             }
             try {
                 // if the id starts with a ';', then don't encode this part
-                if (currentId.startsWith(";")) {
-                currentId = ";" + URLEncoder.encode(current.id().substring(1), "UTF-8");
+                int pos = currentId.indexOf(";");
+                if (pos != -1) {
+                    currentId = currentId.substring(0, pos+1) + URLEncoder.encode(current.id().substring(pos+1), "UTF-8");
                 } else {
                     currentId = URLEncoder.encode(current.id(), "UTF-8");
                 }
