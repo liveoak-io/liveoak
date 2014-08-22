@@ -90,8 +90,9 @@ public class HTMLEncoder implements StateEncoder {
     protected void resourceLink(ResourceState resourcestate) throws XMLStreamException {
         if (resourcestate.uri() != null) {
             startTag("a");
-            attribute("href", resourcestate.uri().toString());
-            text(resourcestate.id());
+            String uri = resourcestate.uri().toString();
+            attribute("href", uri);
+            text(resourcestate.id() != null ? resourcestate.id() : uri);
             endTag("a");
             text(" / ");
         }

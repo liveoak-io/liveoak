@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.List;
 
 import io.liveoak.common.DefaultReturnFields;
+import io.liveoak.spi.state.ResourceRef;
 import org.fest.assertions.Fail;
 import org.junit.Test;
 
@@ -63,7 +64,8 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(result.id()).isEqualTo("john");
         assertThat(result.uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/john"));
         assertThat(result.getProperty("name")).isEqualTo("John Smith");
-        assertThat(result.getProperty("spouse")).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/jane"));
+        assertThat(result.getProperty("spouse")).isInstanceOf(ResourceRef.class);
+        assertThat(result.getPropertyAsResourceState("spouse").uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/jane"));
 
         // get an expanded resource state
         ResourceState expandedResult = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
@@ -79,7 +81,8 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(expandedSpouse.id()).isEqualTo("john");
         assertThat(expandedSpouse.uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/john"));
         assertThat(expandedSpouse.getProperty("name")).isEqualTo("John Smith");
-        assertThat(expandedSpouse.getProperty("spouse")).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/jane"));
+        assertThat(expandedSpouse.getProperty("spouse")).isInstanceOf(ResourceRef.class);
+        assertThat(expandedSpouse.getPropertyAsResourceState("spouse").uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/jane"));
 
         // get an expanded resource to two levels.
         ResourceState expandedResult2 = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName
@@ -90,7 +93,8 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(expandedSpouse2.id()).isEqualTo("jane");
         assertThat(expandedSpouse2.uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/jane"));
         assertThat(expandedSpouse2.getProperty("name")).isEqualTo("Jane Smith");
-        assertThat(expandedSpouse2.getProperty("spouse")).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/john"));
+        assertThat(expandedSpouse2.getProperty("spouse")).isInstanceOf(ResourceRef.class);
+        assertThat(expandedSpouse2.getPropertyAsResourceState("spouse").uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/john"));
     }
 
     @Test
@@ -127,7 +131,8 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(result.uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/employees" + "/john"));
         assertThat(result.getProperty("firstName")).isEqualTo("John");
         assertThat(result.getProperty("lastName")).isEqualTo("Smith");
-        assertThat(result.getProperty("department")).isEqualTo(new URI("/testApp/" + BASEPATH + "/departments/financing"));
+        assertThat(result.getProperty("department")).isInstanceOf(ResourceRef.class);
+        assertThat(result.getPropertyAsResourceState("department").uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/departments/financing"));
 
         ResourceState expandedResult = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/employees" + "/john");
         // verify the expanded results
@@ -139,7 +144,8 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         ResourceState departmentState = (ResourceState) expandedResult.getProperty("department");
         assertThat(departmentState.id()).isEqualTo("financing");
         assertThat(departmentState.uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/departments/financing"));
-        assertThat(departmentState.getProperty("head")).isEqualTo(new URI("/testApp/" + BASEPATH + "/employees" + "/john"));
+        assertThat(departmentState.getProperty("head")).isInstanceOf(ResourceRef.class);
+        assertThat(departmentState.getPropertyAsResourceState("head").uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/employees" + "/john"));
     }
 
     @Test
@@ -172,7 +178,8 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(result.id()).isEqualTo("john");
         assertThat(result.uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/john"));
         assertThat(result.getProperty("name")).isEqualTo("John Smith");
-        assertThat(result.getProperty("spouse")).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/jane"));
+        assertThat(result.getProperty("spouse")).isInstanceOf(ResourceRef.class);
+        assertThat(result.getPropertyAsResourceState("spouse").uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/jane"));
 
         // verify that the jane url results in a not found exception
         try {
@@ -242,10 +249,10 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(result.uri()).isEqualTo(new URI("/testApp/storage/testReadDBRefArray/john"));
         assertThat(result.getProperty("firstName")).isEqualTo("John");
         assertThat(result.getProperty("lastName")).isEqualTo("Smith");
-        List childrenResult = (List) result.getProperty("children");
+        List<ResourceRef> childrenResult = (List<ResourceRef>) result.getProperty("children");
         assertThat(childrenResult.size()).isEqualTo(2);
-        assertThat(childrenResult.get(0)).isEqualTo(new URI("/testApp/storage/testReadDBRefArray/jack"));
-        assertThat(childrenResult.get(1)).isEqualTo(new URI("/testApp/storage/testReadDBRefArray/judy"));
+        assertThat(childrenResult.get(0).uri()).isEqualTo(new URI("/testApp/storage/testReadDBRefArray/jack"));
+        assertThat(childrenResult.get(1).uri()).isEqualTo(new URI("/testApp/storage/testReadDBRefArray/judy"));
 
         // get the expanded result
         ResourceState expandedResult = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
@@ -291,7 +298,8 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(createdResource).isNotNull();
         assertThat(createdResource.id()).isEqualTo("judySmith");
         assertThat(createdResource.uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/judySmith"));
-        assertThat(createdResource.getProperty("father")).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/johnSmith"));
+        assertThat(createdResource.getProperty("father")).isInstanceOf(ResourceRef.class);
+        assertThat(createdResource.getPropertyAsResourceState("father").uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/johnSmith"));
 
         // verify what is in the database
         DBObject judyDBObject = db.getCollection(methodName).findOne(new BasicDBObject("_id", "judySmith"));
@@ -306,7 +314,8 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(getResource).isNotNull();
         assertThat(getResource.id()).isEqualTo("judySmith");
         assertThat(getResource.uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/judySmith"));
-        assertThat(getResource.getProperty("father")).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/johnSmith"));
+        assertThat(getResource.getProperty("father")).isInstanceOf(ResourceRef.class);
+        assertThat(getResource.getPropertyAsResourceState("father").uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/johnSmith"));
 
         // verify we can get the father using the reference
         getResource = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/judySmith");
@@ -418,11 +427,13 @@ public class MongoDBRefTest extends BaseMongoDBTest {
 
         ResourceState updatedState = client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/Sue", sueResource);
         // verify the result
-        assertThat(updatedState.getProperty("bestFriend")).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/Steve"));
+        assertThat(updatedState.getProperty("bestFriend")).isInstanceOf(ResourceRef.class);
+        assertThat(updatedState.getPropertyAsResourceState("bestFriend").uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/Steve"));
 
         sueResource = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/Sue");
         // verify the result, with Steve now being Sue's best frien
-        assertThat(sueResource.getProperty("bestFriend")).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/Steve"));
+        assertThat(sueResource.getProperty("bestFriend")).isInstanceOf(ResourceRef.class);
+        assertThat(sueResource.getPropertyAsResourceState("bestFriend").uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/Steve"));
 
         sueResource = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/Sue");
         // verify the result, with Steve now being Sue's best friend

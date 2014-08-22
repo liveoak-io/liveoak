@@ -46,6 +46,9 @@ public interface Resource {
 
         while (current != null) {
             String currentId = current.id();
+            if (currentId == null) {
+                return null;
+            }
             try {
                 // if the id starts with a ';', then don't encode this part
                 if (currentId.startsWith(";")) {

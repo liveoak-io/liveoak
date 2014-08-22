@@ -13,13 +13,13 @@ import io.liveoak.common.codec.driver.EncodingDriver;
 import io.liveoak.common.codec.driver.RootEncodingDriver;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceRef;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fest.assertions.Fail;
 import org.junit.Test;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -124,12 +124,12 @@ public class ResourceStateEncoderTest {
 
         assertThat(encoded.getPropertyNames()).contains("dog");
         assertThat(encoded.getProperty("dog")).isNotNull();
-        assertThat(encoded.getProperty("dog")).isInstanceOf(URI.class);
+        assertThat(encoded.getProperty("dog")).isInstanceOf(ResourceRef.class);
 
         assertThat(encoded.members()).hasSize(0);
 
-        URI encodedMoses = (URI) encoded.getProperty("dog");
-        assertThat(encodedMoses).isEqualTo(mosesResourse.uri());
+        ResourceRef encodedMoses = (ResourceRef) encoded.getProperty("dog");
+        assertThat(encodedMoses.uri()).isEqualTo(mosesResourse.uri());
     }
 
     @Test
@@ -171,11 +171,11 @@ public class ResourceStateEncoderTest {
 
         assertThat(encoded.members()).hasSize(0);
 
-        List<URI> encodedDogs = (List<URI>) encoded.getProperty("dogs");
+        List<ResourceRef> encodedDogs = (List<ResourceRef>) encoded.getProperty("dogs");
 
         assertThat(encodedDogs).hasSize(2);
 
-        assertThat(encodedDogs.get(0)).isEqualTo(mosesResourse.uri());
-        assertThat(encodedDogs.get(1)).isEqualTo(onlyResource.uri());
+        assertThat(encodedDogs.get(0).uri()).isEqualTo(mosesResourse.uri());
+        assertThat(encodedDogs.get(1).uri()).isEqualTo(onlyResource.uri());
     }
 }

@@ -49,16 +49,19 @@ public class JSONEncoder implements StateEncoder {
     @Override
     public void startResource(ResourceState resourceState) throws Exception {
         this.generator.writeStartObject();
-        if (resourceState.id() != null && !this.inhibitIds) {
+        if (this.inhibitIds) {
+            return;
+        }
+        if (resourceState.id() != null) {
             this.generator.writeFieldName("id");
             this.generator.writeString(resourceState.id());
-            if (resourceState.uri() != null) {
-                this.generator.writeFieldName("self");
-                this.generator.writeStartObject();
-                this.generator.writeFieldName("href");
-                this.generator.writeString(resourceState.uri().toString());
-                this.generator.writeEndObject();
-            }
+        }
+        if (resourceState.uri() != null) {
+            this.generator.writeFieldName("self");
+            this.generator.writeStartObject();
+            this.generator.writeFieldName("href");
+            this.generator.writeString(resourceState.uri().toString());
+            this.generator.writeEndObject();
         }
     }
 

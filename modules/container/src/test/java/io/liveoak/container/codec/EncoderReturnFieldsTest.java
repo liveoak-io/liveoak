@@ -14,6 +14,7 @@ import io.liveoak.common.codec.state.ResourceStateEncoder;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceRef;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -167,12 +168,12 @@ public class EncoderReturnFieldsTest {
 
         assertThat(encoded.getPropertyNames()).contains("dog");
         assertThat(encoded.getProperty("dog")).isNotNull();
-        assertThat(encoded.getProperty("dog")).isInstanceOf(URI.class);
+        assertThat(encoded.getProperty("dog")).isInstanceOf(ResourceRef.class);
 
         assertThat(encoded.members()).hasSize(0);
 
-        URI mosesUri = (URI) encoded.getProperty("dog");
-        assertThat(mosesUri).isEqualTo(mosesResourse.uri());
+        ResourceRef mosesRef = (ResourceRef) encoded.getProperty("dog");
+        assertThat(mosesRef.uri()).isEqualTo(mosesResourse.uri());
     }
 
     @Test

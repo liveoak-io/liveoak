@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Stack;
 
+import io.liveoak.common.codec.DefaultResourceRef;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.codec.ResourceEncoder;
 import io.liveoak.spi.resource.async.Resource;
@@ -50,6 +51,8 @@ public class ResourceStateEncoder implements ResourceEncoder {
             if (resource.uri() == null) {
                 throw new IllegalStateException("Resource has id() but not uri(): " + resource.id());
             }
+            state.uri(resource.uri());
+        } else if (resource.uri() != null) {
             state.uri(resource.uri());
         }
         this.stack.push(state);
@@ -168,11 +171,7 @@ public class ResourceStateEncoder implements ResourceEncoder {
 
         if (top instanceof Collection) {
             // TODO: figure out the proper way to handle resources here
-            //ResourceState state = new DefaultResourceState();
-            //state.id(resource.id());
-            //state.uri(resource.uri());
-            //((Collection) top).add(state);
-            ((Collection) top).add(resource.uri());
+            ((Collection) top).add(new DefaultResourceRef(resource.uri()));
         } else if (top instanceof ResourceState) {
             DefaultResourceState state = new DefaultResourceState();
             state.id(resource.id());
@@ -180,11 +179,8 @@ public class ResourceStateEncoder implements ResourceEncoder {
             ((ResourceState) top).addMember(state);
         } else if (top instanceof PropertyCatcher) {
             // TODO: figure out the proper way to handle resources here
-            //ResourceState state = new DefaultResourceState();
-            //state.id(resource.id());
-            //state.uri(resource.uri());
-            //((PropertyCatcher) top).value = state;
-            ((PropertyCatcher) top).value = resource.uri();
+            ResourceState state = new DefaultResourceRef(resource.uri());
+            ((PropertyCatcher) top).value = state;
         }
     }
 
