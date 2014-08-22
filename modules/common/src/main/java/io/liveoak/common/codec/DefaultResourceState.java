@@ -44,7 +44,7 @@ public class DefaultResourceState implements ResourceState {
 
     @Override
     public URI uri() {
-        return this.uri;
+        return this.uri != null ? this.uri : ResourceState.super.uri();
     }
 
     @Override

@@ -26,15 +26,22 @@ import java.util.List;
  */
 public class Sorting implements Iterable<Sorting.Spec> {
 
-    private List<Spec> specs = new LinkedList<>();
+    private List<Spec> specs;
 
+    public Sorting() {
+        specs = Collections.emptyList();
+    }
+
+    public Sorting(List<Spec> specs) {
+        this.specs = Collections.unmodifiableList(specs);
+    }
 
     //TODO: remove this. This exposes the implementation details of how the client specifies the
     // sorting in the request. This class should only deal with Specs directly, not a specialized string.
     // The class which reads the query parameter is the one which should be separating out the values.
     public Sorting(String sortingSpec) {
         String[] spec = sortingSpec.split(",");
-
+        List<Spec> specList = new LinkedList<>();
         for (String s : spec) {
             boolean asc = true;
             s = s.trim();
@@ -47,15 +54,9 @@ public class Sorting implements Iterable<Sorting.Spec> {
             if (s.equals("")) {
                 throw new IllegalArgumentException("Invalid sorting specification: " + sortingSpec);
             }
-            specs.add(new Spec(s, asc));
+            specList.add(new Spec(s, asc));
         }
-    }
-
-    public Sorting() {
-    }
-
-    public Sorting(List<Spec> specs) {
-        this.specs = new LinkedList<>(specs);
+        specs = Collections.unmodifiableList(specList);
     }
 
     public List<Spec> specs() {
@@ -63,7 +64,7 @@ public class Sorting implements Iterable<Sorting.Spec> {
     }
 
     public Iterator<Spec> iterator() {
-        return Collections.unmodifiableList(specs).iterator();
+        return specs.iterator();
     }
 
     public static class Spec {
@@ -89,6 +90,19 @@ public class Sorting implements Iterable<Sorting.Spec> {
 
         public void name(String name) {
             this.name = name;
+        }
+    }
+
+    public static class Builder {
+        private List<Spec> specList = new LinkedList<>();
+
+        public Builder addSpec(String name, boolean ascending) {
+            specList.add(new Spec(name, ascending));
+            return this;
+        }
+
+        public Sorting build() {
+            return new Sorting(specList);
         }
     }
 }

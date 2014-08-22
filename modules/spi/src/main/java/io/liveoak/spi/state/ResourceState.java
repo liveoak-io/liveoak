@@ -6,11 +6,13 @@
 package io.liveoak.spi.state;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Set;
 
@@ -39,7 +41,22 @@ public interface ResourceState {
 
     void uri(URI uri);
 
-    URI uri();
+    default URI uri() {
+        ResourceState self = getPropertyAsResourceState("self");
+        if (self == null) {
+            return null;
+        }
+        String href = self.getPropertyAsString("href");
+        if (href == null) {
+            return null;
+        }
+
+        try {
+            return new URI(href);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Invalid self/href: " + href);
+        }
+    }
 
     /**
      * Add a property to the state.
