@@ -10,16 +10,26 @@
           <div class="pull-left">
             <img alt="{{ example['icon-alt'] }}" src="/admin/console/img/example-apps/{{example.icon}}">
 
-            <button class="btn btn-lg" type="button" onclick="event.stopPropagation();" ng-class="{installing: example.installing, 'btn-default': !example.installed, 'btn-primary': example.installed}" ng-click="example.installed ? goto(example) : install(example)" ng-disabled="example.installing">
+            <button class="btn btn-lg" type="button" onclick="event.stopPropagation();" ng-hide="example.instructions" ng-class="{installing: example.installing, 'btn-default': !example.installed, 'btn-primary': example.installed}" ng-click="example.installed ? goto(example) : install(example)" ng-disabled="example.installing">
               <span class="spinner spinner-xs spinner-inline"></span>
               <span class="text" ng-hide="example.installing || example.installed">Install</span>
               <span class="text" ng-show="example.installing">Installing...</span>
               <span class="text" ng-show="example.installed">Open</span>
             </button>
+            <a class="btn btn-lg btn-default" href="{{example.instructions}}" onclick="event.stopPropagation();" target="_blank" ng-show="example.instructions">
+              <span class="text">Instructions</span>
+            </a>
           </div>
           <div class="pull-right">
             <h3>{{example.name}}</h3>
-            <p>{{example.description}}</p>
+            <p>
+              {{example.description}}
+              <br/>
+              <br/>
+              <span ng-show="example.clicked && example.depends">
+                <i class="fa fa-lightbulb-o"></i> This example requires <span ng-repeat="dependencies in example.depends"><span ng-repeat="dep in dependencies"><strong>{{dep}}</strong><span ng-show="!$last"> and </span></span> <span ng-show="!$last"> or </span> </span> to be installed.
+              </span>
+            </p>
           </div>
         </div>
       </div>

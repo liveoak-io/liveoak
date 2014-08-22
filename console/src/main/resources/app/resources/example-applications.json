@@ -1,7 +1,7 @@
 [
   {
-    "id": "auth",
-    "path": "${JBOSS_HOME}/examples/auth",
+    "id": "auth-html",
+    "path": "${io.liveoak.home.dir}/examples/auth/auth-html",
     "name": "Auth",
     "description": "Basic functionality related to authentication to Keycloak/LiveOak. It's simple Javascript application, which you can use to login into Keycloak and obtain OAuth access token in JWT format from Keycloak. You can also try to send ajax request to 'storage' resource with access token attached in Authorization header. Storage request will be successful just in case that you are authenticated.",
     "icon": "auth.svg",
@@ -9,11 +9,13 @@
   },
   {
     "id": "chat-android",
-    "path": "${JBOSS_HOME}/examples/chat/chat-android",
+    "path": "${io.liveoak.home.dir}/examples/chat/chat-android",
     "name": "Android Chat",
     "description": "Get native Android integration with resources stored in a LiveOak instance; Native notifications of resource subscription from Google Cloud Messaging (GCM) via integration with the Aerogear Unified Push Server (UPS); System notifications when the application is in the background; Uses GCM for updated chats when the application has focus.",
     "icon": "chat-android.svg",
-    "icon-alt": "Illustration: Ballons with the Android logo"
+    "icon-alt": "Illustration: Ballons with the Android logo",
+    "depends": [["chat-html"],["chat-html-secured"]],
+    "instructions": "https://github.com/liveoak-io/liveoak-examples/tree/master/chat/chat-android#readme"
   },
   {
     "id": "chat-html",
@@ -45,7 +47,9 @@
     "name": "Android Gallery",
     "description": "The Android Gallery demo application runs as a native application on a mobile device or emulator. It connects remotely to LiveOak endpoints provided by 'gallery' example application.",
     "icon": "gallery-android.svg",
-    "icon-alt": "Illustration: Pictures with the Android logo"
+    "icon-alt": "Illustration: Pictures with the Android logo",
+    "depends": [["gallery"]],
+    "instructions": "https://github.com/liveoak-io/liveoak-examples/tree/master/gallery-cordova#readme"
   },
   {
     "id": "todomvc",
@@ -59,9 +63,11 @@
     "id": "todomvc-cordova",
     "path": "${io.liveoak.home.dir}/examples/todomvc-cordova",
     "name": "TodoMVC (Cordova)",
-    "description": "TBD",
+    "description": "The Cordova version of TodoMVC demo application runs as a native application on a mobile device or emulator. It connects remotely to LiveOak endpoints provided by 'todomvc' example application.",
     "icon": "todomvc-android.svg",
-    "icon-alt": "Illustration: A list with the Android logo"
+    "icon-alt": "Illustration: A list with the Android logo",
+    "depends": [["todomvc"]],
+    "instructions": "https://github.com/liveoak-io/liveoak-examples/tree/master/todomvc-cordova#readme"
   }
 
 ]
