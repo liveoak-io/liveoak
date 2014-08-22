@@ -20,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Random;
 
 /**
  * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
@@ -137,7 +136,9 @@ public class AbstractTestCase {
 
             // wait for it to stop
             long start = System.currentTimeMillis();
-            while(mongoLauncher.serverRunning(mongoHost, mongoPort, (e) -> { if (System.currentTimeMillis() - start > 120000) throw new RuntimeException(e); })) {
+            while(mongoLauncher.serverRunning(mongoHost, mongoPort, (e) -> {
+                    if (System.currentTimeMillis() - start > 120000) throw new RuntimeException(e);
+                })) {
 
                 if (System.currentTimeMillis() - start > 120000) {
                     throw new RuntimeException("mongod process still seems to be running (2m timeout)");

@@ -68,9 +68,10 @@ public class OsUtils {
         }
 
         if (err != null) {
-            throw new RuntimeException("Execution ended with err status: " + proc.exitValue() + ":\n" + err.complete().getBufferedOutput());
+            throw new ExecutionException("Execution ended with err status:\n" +
+                    err.complete().getBufferedOutput(), proc.exitValue());
         } else {
-            throw new RuntimeException("Execution ended with err status: " + proc.exitValue());
+            throw new ExecutionException("Execution ended with err status", proc.exitValue());
         }
     }
 

@@ -218,6 +218,10 @@ public class MongoLauncher {
                 if (result == null) {
                     try {
                         result = OsUtils.execWithOneLiner(new String[]{"which", "mongod"}, null, false);
+                    } catch (ExecutionException ignored) {
+                        if (ignored.exitCode() != 1) {
+                            log.debug("[IGNORED] Command execution failed: which mongod", ignored);
+                        }
                     } catch (Exception ignored) {
                         log.debug("[IGNORED] Command execution failed: which mongod", ignored);
                     }
