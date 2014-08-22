@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -19,6 +19,8 @@ public class MediaType {
     private static final String PLUS = "+";
     private static final String SEMI_COLON = ";";
     private static final String EQUALS = "=";
+
+    public static final MediaType ANY = new MediaType("*/*");
 
     public static final MediaType JSON = new MediaType("application/json");
     public static final MediaType XML = new MediaType("text/xml");

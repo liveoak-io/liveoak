@@ -26,6 +26,13 @@ public interface MediaTypeMatcher {
     List<MediaType> mediaTypes();
 
     default MediaType findBestMatch(List<MediaType> types) {
+        if (MediaType.ANY.equals(mediaTypes().get(0))) {
+            // If we're looking for */*, then return application/json if it's an option
+            if (types.contains(MediaType.JSON)) {
+                return MediaType.JSON;
+            }
+        }
+
         MediaType compatible = null;
         for (MediaType mine : mediaTypes()) {
             for (MediaType other : types) {

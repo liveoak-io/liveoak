@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -17,6 +17,7 @@ import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class MediaTypeMatcherTest {
 
@@ -135,5 +136,23 @@ public class MediaTypeMatcherTest {
         assertThat(match).isNotNull();
         assertThat(match.type()).isEqualTo("application");
         assertThat(match.subtype()).isEqualTo("liveoak-local-app");
+    }
+
+    @Test
+    public void testFindBestMatchWhenAcceptAny() throws Exception {
+        DefaultMediaTypeMatcher matcher = new DefaultMediaTypeMatcher("text/html; q=0.4, */*; q=0.9");
+
+        List<MediaType> candidates = new ArrayList<>();
+
+        candidates.add(MediaType.LOCAL_APP_JSON);
+        candidates.add(MediaType.XML);
+        candidates.add(MediaType.JSON);
+        candidates.add(MediaType.HTML);
+
+        MediaType match = matcher.findBestMatch(candidates);
+
+        assertThat(match).isNotNull();
+        assertThat(match.type()).isEqualTo("application");
+        assertThat(match.subtype()).isEqualTo("json");
     }
 }
