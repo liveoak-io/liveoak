@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import io.liveoak.container.protocols.http.HttpResourceRequestDecoder;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
@@ -13,7 +12,6 @@ import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
-import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.jboss.logging.Logger;
 
@@ -51,6 +49,7 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
 
     @Override
     public void registerResource(Resource resource, MediaType mediaType, boolean makeDefault) {
+        log.debug("registerResource: " + resource.id());
         Map<MediaType, Resource> resourceMap = this.registry.get(resource.id());
 
         if (resourceMap == null) {
@@ -72,7 +71,9 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
 
     @Override
     public void unregisterResource(Resource resource, MediaType mediaType) {
+        log.debug("unregisterResource: " + resource.id());
         if (this.registry != null) {
+            log.debug("registry not null");
             Map<MediaType, Resource> resourceMap = this.registry.get(resource.id());
 
             if (resourceMap != null) {

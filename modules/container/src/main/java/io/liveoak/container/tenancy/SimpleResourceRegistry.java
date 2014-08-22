@@ -37,10 +37,12 @@ public class SimpleResourceRegistry implements MountPointResource, RootResource,
     }
 
     public void registerResource(Resource resource) {
+        log.debug("registerResource: " + resource.id());
         this.registry.put(resource.id(), resource);
     }
 
     public void unregisterResource(Resource resource) {
+        log.debug("unregisterResource: " + resource.id());
         this.registry.remove(resource.id());
     }
 

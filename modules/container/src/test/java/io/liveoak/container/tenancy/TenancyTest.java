@@ -111,7 +111,7 @@ public class TenancyTest {
 
         this.serviceContainer.awaitStability();
 
-        Collection<Resource> appResources = appContext.getValue().members();
+        Collection<? extends Resource> appResources = appContext.getValue().members();
         assertThat(appResources).isNotNull();
         assertThat(appResources).hasSize(1);
 
@@ -187,7 +187,7 @@ public class TenancyTest {
         assertThat(registeredApps).hasSize(1);
         assertThat(((ApplicationResource) registeredApps.iterator().next()).application()).isSameAs(app.getValue());
 
-        Collection<Resource> appResources = appContext.getValue().members();
+        Collection<? extends Resource> appResources = appContext.getValue().members();
         assertThat(appResources).isNotNull();
         assertThat(appResources).hasSize(2);
 
