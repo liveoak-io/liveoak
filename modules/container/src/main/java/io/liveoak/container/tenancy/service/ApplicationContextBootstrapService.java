@@ -38,6 +38,7 @@ public class ApplicationContextBootstrapService implements Service<Void> {
                 .addDependency(LiveOak.VERTX, Vertx.class, subscriptions.vertxInjector())
                 .addDependency(LiveOak.SUBSCRIPTION_MANAGER, DefaultSubscriptionManager.class, subscriptions.subscriptionManagerInjector())
                 .addDependency(LiveOak.CODEC_MANAGER, ResourceCodecManager.class, subscriptions.codecManagerInjector())
+                .addDependency(LiveOak.CODEC_MANAGER_COMPLETE)
                 .install();
     }
 

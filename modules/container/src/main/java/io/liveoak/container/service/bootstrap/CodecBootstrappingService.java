@@ -1,5 +1,8 @@
 package io.liveoak.container.service.bootstrap;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.common.codec.ResourceDecoder;
@@ -8,12 +11,14 @@ import io.liveoak.common.codec.form.FormURLDecoder;
 import io.liveoak.common.codec.html.HTMLEncoder;
 import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.common.codec.json.JSONEncoder;
+import io.liveoak.container.service.CodecInstallationCompleteService;
 import io.liveoak.container.service.CodecInstallationService;
 import io.liveoak.container.service.CodecManagerService;
 import io.liveoak.container.service.CodecService;
 import io.liveoak.spi.MediaType;
 
 import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StartContext;
@@ -21,6 +26,7 @@ import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 
 import static io.liveoak.spi.LiveOak.CODEC_MANAGER;
+import static io.liveoak.spi.LiveOak.CODEC_MANAGER_COMPLETE;
 import static io.liveoak.spi.LiveOak.codec;
 
 /**
@@ -36,17 +42,23 @@ public class CodecBootstrappingService implements Service<Void> {
         target.addService(CODEC_MANAGER, codecManager)
                 .install();
 
-        installCodec(target, MediaType.JSON, JSONEncoder.class, new JSONDecoder());
-        installCodec(target, MediaType.HTML, HTMLEncoder.class, null);
-        installCodec(target, MediaType.FORM_URLENCODED, null, new FormURLDecoder());
+        List<ServiceName> codecCompletionDependencies = new ArrayList<>();
+
+        codecCompletionDependencies.add(installCodec(target, MediaType.JSON, JSONEncoder.class, new JSONDecoder()));
+        codecCompletionDependencies.add(installCodec(target, MediaType.HTML, HTMLEncoder.class, null));
+        codecCompletionDependencies.add(installCodec(target, MediaType.FORM_URLENCODED, null, new FormURLDecoder()));
 
         // Custom Media Types
-        installCodec(target, MediaType.LOCAL_APP_JSON, JSONEncoder.class, new JSONDecoder());
+        codecCompletionDependencies.add(installCodec(target, MediaType.LOCAL_APP_JSON, JSONEncoder.class, new JSONDecoder()));
+
+        // Install completion service
+        ServiceBuilder<Void> builder = target.addService(CODEC_MANAGER_COMPLETE, new CodecInstallationCompleteService());
+        codecCompletionDependencies.forEach(each -> builder.addDependency(each));
+        builder.install();
     }
 
     @Override
     public void stop(StopContext context) {
-
     }
 
     @Override
@@ -54,7 +66,7 @@ public class CodecBootstrappingService implements Service<Void> {
         return null;
     }
 
-    private void installCodec(ServiceTarget target, MediaType mediaType, Class<? extends StateEncoder> encoderClass, ResourceDecoder decoder) {
+    private ServiceName installCodec(ServiceTarget target, MediaType mediaType, Class<? extends StateEncoder> encoderClass, ResourceDecoder decoder) {
         ServiceName name = codec(mediaType.toString());
 
         CodecService codec = new CodecService(encoderClass, decoder);
@@ -66,5 +78,7 @@ public class CodecBootstrappingService implements Service<Void> {
                 .addDependency(name, ResourceCodec.class, installer.codecInjector())
                 .addDependency(CODEC_MANAGER, ResourceCodecManager.class, installer.codecManagerInjector())
                 .install();
+
+        return name.append("install");
     }
 }

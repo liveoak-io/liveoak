@@ -12,6 +12,7 @@ public class LiveOak {
     public static final ServiceName SUBSCRIPTION_MANAGER = LIVEOAK.append("subscription-manager");
     public static final ServiceName INTERCEPTOR_MANAGER = LIVEOAK.append("interceptor-manager");
     public static final ServiceName CODEC_MANAGER = LIVEOAK.append("codec-manager");
+    public static final ServiceName CODEC_MANAGER_COMPLETE = CODEC_MANAGER.append("complete");
     public static final ServiceName PIPELINE_CONFIGURATOR = LIVEOAK.append("pipeline-configurator");
     public static final ServiceName WORKER_POOL = LIVEOAK.append("worker-pool");
 

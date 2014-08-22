@@ -219,6 +219,9 @@ public class LocalApplicationsResourceTest {
         postRequest.setHeader("Content-Type", MediaType.LOCAL_APP_JSON.toString());
 
         response = httpClient.execute(postRequest);
+
+        this.system.awaitStability();
+
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
 

@@ -26,6 +26,7 @@ import org.jboss.msc.value.ImmediateValue;
 
 import static io.liveoak.spi.LiveOak.CLIENT;
 import static io.liveoak.spi.LiveOak.CODEC_MANAGER;
+import static io.liveoak.spi.LiveOak.CODEC_MANAGER_COMPLETE;
 import static io.liveoak.spi.LiveOak.GLOBAL_CONTEXT;
 import static io.liveoak.spi.LiveOak.INTERCEPTOR_MANAGER;
 import static io.liveoak.spi.LiveOak.NOTIFIER;
@@ -80,7 +81,8 @@ public class ServersBootstrappingService implements Service<Void> {
                 .addDependency(CODEC_MANAGER, ResourceCodecManager.class, pipelineConfigurator.codecManagerInjector())
                 .addDependency(CLIENT, Client.class, pipelineConfigurator.clientInjector())
                 .addDependency(GLOBAL_CONTEXT, GlobalContext.class, pipelineConfigurator.globalContextInjector())
-                .addDependency(WORKER_POOL, Executor.class, pipelineConfigurator.workerPoolInjector());
+                .addDependency(WORKER_POOL, Executor.class, pipelineConfigurator.workerPoolInjector())
+                .addDependencies(CODEC_MANAGER_COMPLETE);
 
         pipelineBuilder.install();
 
