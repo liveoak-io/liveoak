@@ -81,6 +81,30 @@ public class DefaultResourceState implements ResourceState {
         return "[DefaultResourceState: id=" + this.id + "; uri=" + this.uri() + "; properties=" + this.properties + "; members=" + this.members + "]";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DefaultResourceState that = (DefaultResourceState) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (!members.equals(that.members)) return false;
+        if (!properties.equals(that.properties)) return false;
+        if (uri != null ? !uri.equals(that.uri) : that.uri != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (uri != null ? uri.hashCode() : 0);
+        result = 31 * result + properties.hashCode();
+        result = 31 * result + members.hashCode();
+        return result;
+    }
+
     private String id;
     private URI uri;
     private Map<String, Object> properties = new LinkedHashMap<>();

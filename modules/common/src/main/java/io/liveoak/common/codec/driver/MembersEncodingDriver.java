@@ -66,7 +66,7 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
             try {
                 encodeNext();
             } catch (Exception e) {
-                log.error("", e);
+                log.error("Exception while generating response: ", e);
             }
         }
     }
