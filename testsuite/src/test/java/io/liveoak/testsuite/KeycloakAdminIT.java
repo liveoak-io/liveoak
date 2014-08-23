@@ -1,4 +1,4 @@
-package org.liveoak.testsuite;
+package io.liveoak.testsuite;
 
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.junit.Before;

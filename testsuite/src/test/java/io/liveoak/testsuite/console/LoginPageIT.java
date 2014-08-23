@@ -3,7 +3,7 @@
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-package io.liveoak.console.testsuite;
+package io.liveoak.testsuite.console;
 
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.junit.Arquillian;

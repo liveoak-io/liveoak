@@ -1,4 +1,4 @@
-package org.liveoak.testsuite;
+package io.liveoak.testsuite;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Assert;

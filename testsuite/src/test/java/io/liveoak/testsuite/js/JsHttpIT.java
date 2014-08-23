@@ -1,6 +1,9 @@
-package org.liveoak.testsuite.js;
+package io.liveoak.testsuite.js;
 
-import org.apache.commons.io.IOUtils;
+import java.io.IOException;
+import java.net.URL;
+
+import io.liveoak.testsuite.AbstractLiveOakTest;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,12 +12,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.liveoak.testsuite.AbstractLiveOakTest;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>

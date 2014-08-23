@@ -1,4 +1,4 @@
-package io.liveoak.console.testsuite;
+package io.liveoak.testsuite.console;
 
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.junit.Arquillian;

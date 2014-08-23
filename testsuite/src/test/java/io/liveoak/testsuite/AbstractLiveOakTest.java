@@ -1,4 +1,4 @@
-package org.liveoak.testsuite;
+package io.liveoak.testsuite;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +38,7 @@ public abstract class AbstractLiveOakTest {
     protected String baseUrl;
 
     @Drone
-    private WebDriver browser;
+    protected WebDriver browser;
 
     @Before
     public void before() throws Exception {
