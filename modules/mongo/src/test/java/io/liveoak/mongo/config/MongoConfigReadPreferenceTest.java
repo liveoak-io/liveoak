@@ -18,7 +18,6 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
 
     @Test
     public void testDefault() throws Exception {
-        System.out.println("testDefault");
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testDefaultDB");
         setUpSystem(config);
@@ -33,12 +32,10 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         // the default values
         assertThat(readPreferenceResourceState.getProperty(ReadPreferenceResource.Options.TYPE.toString())).isEqualTo(ReadPreferenceResource.Types.PRIMARY.toString());
         assertThat(readPreferenceResourceState.getPropertyNames().size()).isEqualTo(1); //Since its a primary type, there cannot be tags
-        System.out.println("END_TEST");
     }
 
     @Test
     public void testConfigureType() throws Exception {
-        System.out.println("testConfigureType");
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testConfigureTypeDB");
 
@@ -59,12 +56,10 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         assertThat(readPreferenceResourceState.getPropertyNames().size()).isEqualTo(2); // since not a primary type, will have a list of tags
         assertThat(readPreferenceResourceState.getProperty(ReadPreferenceResource.Options.TYPE.toString())).isEqualTo(ReadPreferenceResource.Types.SECONDARY.toString());
         assertThat((List) readPreferenceResourceState.getProperty(ReadPreferenceResource.Options.TAGS.toString())).isEmpty();
-        System.out.println("END_TEST");
     }
 
     @Test
     public void testUpdateType() throws Exception {
-        System.out.println("testUpdateType");
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testUpdateTypeDB");
         setUpSystem(config);
@@ -90,12 +85,10 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         ResourceState updatedReadPreferenceResourceState = (ResourceState) result.getProperty(ReadPreferenceResource.ID);
         assertThat(updatedReadPreferenceResourceState.getProperty(ReadPreferenceResource.Options.TYPE.toString())).isEqualTo(ReadPreferenceResource.Types.NEAREST.toString());
 
-        System.out.println("END_TEST");
     }
 
     @Test
     public void testSetWithTags() throws Exception {
-        System.out.println("testSetWithTags");
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testConfigureWithTagsDB");
 
@@ -126,12 +119,10 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         assertThat(tagsStates.size()).isEqualTo(2);
         assertThat(tagsStates.get(0).getProperty("foo")).isEqualTo("bar");
         assertThat(tagsStates.get(1).getProperty("hello")).isEqualTo("world");
-        System.out.println("END_TEST");
     }
 
     @Test
     public void testInvalidType() throws Exception {
-        System.out.println("testInvalidType");
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testInvalidTypeDB");
 
@@ -145,12 +136,10 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         } catch (InitializationException e) {
             //expected
         }
-        System.out.println("END_TEST");
     }
 
     @Test
     public void testNullType() throws Exception {
-        System.out.println("testNullType");
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testNullTypeDB");
 
@@ -170,12 +159,10 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         // the default values
         assertThat(readPreferenceResourceState.getProperty(ReadPreferenceResource.Options.TYPE.toString())).isEqualTo(ReadPreferenceResource.Types.PRIMARY.toString());
         assertThat(readPreferenceResourceState.getPropertyNames().size()).isEqualTo(1); //Since its a primary type, there cannot be tags
-        System.out.println("END_TEST");
     }
 
     @Test
     public void testUpdateTags() throws Exception {
-        System.out.println("testUpdateTags");
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testUpdateTagsDB");
 
@@ -211,12 +198,10 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         List<ResourceState> tagsStates = (List) readPreferenceResourceState.getProperty(ReadPreferenceResource.Options.TAGS.toString());
         assertThat(tagsStates.size()).isEqualTo(1);
         assertThat(tagsStates.get(0).getProperty("loc")).isEqualTo("west");
-        System.out.println("END_TEST");
     }
 
     @Test
     public void testRemoveEmptyTags() throws Exception {
-        System.out.println("testRemoveEmptyTags");
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testRemoveTagDB");
 
@@ -250,12 +235,10 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         assertThat(readPreferenceResourceState.getProperty(ReadPreferenceResource.Options.TYPE.toString())).isEqualTo(ReadPreferenceResource.Types.SECONDARY.toString());
         List<ResourceState> tagsStates = (List) readPreferenceResourceState.getProperty(ReadPreferenceResource.Options.TAGS.toString());
         assertThat(tagsStates.size()).isEqualTo(0);
-        System.out.println("END_TEST");
     }
 
     @Test
     public void testRemoveNullTags() throws Exception {
-        System.out.println("testRemoveNullTags");
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testRemoveTagDB");
 
@@ -288,7 +271,6 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         assertThat(readPreferenceResourceState.getProperty(ReadPreferenceResource.Options.TYPE.toString())).isEqualTo(ReadPreferenceResource.Types.SECONDARY.toString());
         List<ResourceState> tagsStates = (List) readPreferenceResourceState.getProperty(ReadPreferenceResource.Options.TAGS.toString());
         assertThat(tagsStates.size()).isEqualTo(0);
-        System.out.println("END_TEST");
     }
 
 }

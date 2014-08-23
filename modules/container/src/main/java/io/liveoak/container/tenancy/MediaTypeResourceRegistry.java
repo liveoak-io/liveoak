@@ -49,7 +49,6 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
 
     @Override
     public void registerResource(Resource resource, MediaType mediaType, boolean makeDefault) {
-        log.debug("registerResource: " + resource.id() + " in " + this.id());
         Map<MediaType, Resource> resourceMap = this.registry.get(resource.id());
 
         if (resourceMap == null) {
@@ -71,9 +70,7 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
 
     @Override
     public void unregisterResource(Resource resource, MediaType mediaType) {
-        log.debug("unregisterResource: " + resource.id() + " in " + this.id());
         if (this.registry != null) {
-            log.debug("registry not null");
             Map<MediaType, Resource> resourceMap = this.registry.get(resource.id());
 
             if (resourceMap != null) {
