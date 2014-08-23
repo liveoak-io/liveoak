@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.state.ResourceRef;
 import io.liveoak.spi.state.ResourceState;
 
@@ -13,6 +14,7 @@ import io.liveoak.spi.state.ResourceState;
 public class DefaultResourceRef extends DefaultResourceState implements ResourceRef {
     private ResourcePath resourcePath;
     private ResourceRef parent;
+    private ResourceProcessingException error;
 
     public DefaultResourceRef(ResourceRef parent, String id) throws URISyntaxException {
         this.resourcePath = new ResourcePath(parent.uri() + "/" + id);
@@ -28,6 +30,21 @@ public class DefaultResourceRef extends DefaultResourceState implements Resource
     public DefaultResourceRef(URI uri) {
         this.resourcePath = new ResourcePath(uri.getPath().toString());
         uri(uri);
+    }
+
+    public void error(ResourceProcessingException e) {
+        this.error = e;
+        super.putProperty("error-type", e.errorType());
+        if (e.getMessage() != null) {
+            super.putProperty("message", e.getMessage());
+        }
+        if (e.getCause() != null) {
+            super.putProperty("cause", e.getCause());
+        }
+    }
+
+    public ResourceProcessingException error() {
+        return this.error;
     }
 
     public ResourcePath resourcePath() {

@@ -9,6 +9,7 @@ import io.liveoak.common.codec.NonEncodableValueException;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.resource.async.Resource;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.Map;
 
@@ -39,6 +40,8 @@ public class ValueEncodingDriver extends AbstractEncodingDriver {
             encoder().writeLink((Resource) o);
         } else if (o instanceof Boolean) {
             encoder().writeValue((Boolean) o);
+        } else if (o instanceof URI) {
+            encoder().writeValue(o.toString());
         } else if (o instanceof Map) {
             encoder().writeValue((Map) o);
         } else if (o == null) {

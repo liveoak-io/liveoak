@@ -6,6 +6,7 @@
 package io.liveoak.common.codec.driver;
 
 import io.liveoak.spi.ReturnFields;
+import io.liveoak.spi.resource.StatusResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import org.jboss.logging.Logger;
@@ -53,7 +54,9 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
                 }
                 hasMembers = true;
             }
-            if (returnFields().child("members").isEmpty()) {
+            if (resource instanceof StatusResource) {
+                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, ReturnFields.ALL));
+            } else if (returnFields().child("members").isEmpty()) {
                 addChildDriver(new ValueEncodingDriver(MembersEncodingDriver.this, resource));
             } else {
                 addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, returnFields().child("members")));

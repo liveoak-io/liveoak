@@ -6,17 +6,38 @@
 
 package io.liveoak.spi;
 
+import static io.liveoak.spi.ResourceErrorResponse.*;
+
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
 public class ResourceProcessingException extends Exception {
 
+    private final ErrorType errorType;
+
     public ResourceProcessingException(String message) {
-        super(message);
+        this(ErrorType.INTERNAL_ERROR, message);
     }
 
     public ResourceProcessingException(String message, Throwable cause) {
-        super(message, cause);
+        this(ErrorType.INTERNAL_ERROR, message, cause);
     }
 
+    public ResourceProcessingException(ErrorType errorType) {
+        this.errorType = errorType;
+    }
+
+    public ResourceProcessingException(ErrorType errorType, String message) {
+        super(message);
+        this.errorType = errorType;
+    }
+
+    public ResourceProcessingException(ErrorType errorType, String message, Throwable cause) {
+        super(message, cause);
+        this.errorType = errorType;
+    }
+
+    public ErrorType errorType() {
+        return errorType;
+    }
 }
