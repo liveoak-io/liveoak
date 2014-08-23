@@ -5,6 +5,8 @@
  */
 package io.liveoak.spi.resource.async;
 
+import io.liveoak.spi.ResourceErrorResponse;
+
 /**
  * Object to report on results of actions performed by Resources.
  *
@@ -104,4 +106,12 @@ public interface Responder {
     void invalidRequest(String message);
     void invalidRequest(Throwable cause);
     void invalidRequest(String message, Throwable cause);
+
+    /**
+     * Indicates an error of specific kind specified via errorType argument
+     * @param errorType ... type of error
+     */
+    void error(ResourceErrorResponse.ErrorType errorType);
+    void error(ResourceErrorResponse.ErrorType errorType, String message);
+    void error(ResourceErrorResponse.ErrorType errorType, String message, Throwable cause);
 }

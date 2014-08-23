@@ -5,6 +5,8 @@
  */
 package io.liveoak.spi.resource.async;
 
+import io.liveoak.spi.ResourceErrorResponse;
+
 /**
  * @author Bob McWhirter
  */
@@ -87,6 +89,21 @@ public class DelegatingResponder implements Responder {
     @Override
     public void invalidRequest(String message, Throwable cause) {
         delegate.invalidRequest(message, cause);
+    }
+
+    @Override
+    public void error(ResourceErrorResponse.ErrorType errorType) {
+        delegate.error(errorType);
+    }
+
+    @Override
+    public void error(ResourceErrorResponse.ErrorType errorType, String message) {
+        delegate.error(errorType, message);
+    }
+
+    @Override
+    public void error(ResourceErrorResponse.ErrorType errorType, String message, Throwable cause) {
+        delegate.error(errorType, message, cause);
     }
 
     private Responder delegate;

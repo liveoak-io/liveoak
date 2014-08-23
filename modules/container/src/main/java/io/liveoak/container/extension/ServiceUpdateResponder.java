@@ -1,6 +1,7 @@
 package io.liveoak.container.extension;
 
 import io.liveoak.spi.ResourceAlreadyExistsException;
+import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -96,5 +97,20 @@ public class ServiceUpdateResponder implements Responder {
     public void invalidRequest(String message, Throwable cause) {
         this.context.failed(new StartException(message, cause));
 
+    }
+
+    @Override
+    public void error(ResourceErrorResponse.ErrorType errorType) {
+        this.context.failed(new StartException(errorType.toString()));
+    }
+
+    @Override
+    public void error(ResourceErrorResponse.ErrorType errorType, String message) {
+        this.context.failed(new StartException(message));
+    }
+
+    @Override
+    public void error(ResourceErrorResponse.ErrorType errorType, String message, Throwable cause) {
+        this.context.failed(new StartException(cause));
     }
 }
