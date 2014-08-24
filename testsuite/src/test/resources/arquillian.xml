@@ -7,4 +7,11 @@
         <property name="dimensions">1680x1050</property>
     </extension>
 
+    <extension qualifier="graphene">
+        <!-- Increase default wait intervals -->
+        <property name="waitGuiInterval">5</property>
+        <property name="waitAjaxInterval">10</property>
+        <property name="waitModelInterval">25</property>
+    </extension>
+
 </arquillian>

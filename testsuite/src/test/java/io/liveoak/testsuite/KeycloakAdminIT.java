@@ -23,12 +23,12 @@ public class KeycloakAdminIT extends AbstractLiveOakTest {
     public void before() throws Exception {
         super.before();
 
-        keycloakUrl = baseUrl.replace("8080", "8383") + "/auth/rest";
+        keycloakUrl = BASE_URL.replace("8080", "8383") + "/auth/rest";
     }
 
     @Test
     public void getAdminResource() throws Exception {
-        browser.get(baseUrl + "/admin");
+        browser.get(BASE_URL + "/admin");
 
         System.out.println(browser.getTitle());
 

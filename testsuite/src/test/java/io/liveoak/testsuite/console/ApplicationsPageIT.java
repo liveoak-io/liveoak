@@ -1,18 +1,14 @@
 package io.liveoak.testsuite.console;
 
-import org.jboss.arquillian.drone.api.annotation.Drone;
-import org.jboss.arquillian.junit.Arquillian;
+import io.liveoak.testsuite.AbstractLiveOakTest;
 import org.jboss.arquillian.junit.InSequence;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.jboss.arquillian.graphene.Graphene.*;
@@ -23,22 +19,7 @@ import static org.junit.Assert.*;
 /**
  * @author <a href="mailto:amendonc@redhat.com">Alexandre Mendonca</a>
  */
-@RunWith(Arquillian.class)
-public class ApplicationsPageIT {
-
-    @Drone
-    WebDriver browser;
-
-    private static final String BASE_URL = "http://localhost:8080/admin/";
-
-    @FindBy
-    private WebElement username;
-
-    @FindBy
-    private WebElement password;
-
-    @FindBy(id = "kc-login")
-    private WebElement loginButton;
+public class ApplicationsPageIT extends AbstractLiveOakTest {
 
     @FindBy(className = "empty-instance")
     private WebElement noAppsPanel;
@@ -52,14 +33,6 @@ public class ApplicationsPageIT {
     private static final String PUSH_URL = "localhost";
     private static final String PUSH_APPID = "the-app-lica-tion";
     private static final String PUSH_SECRET = "terces";
-
-    public void login(String userName, String password) {
-        this.username.sendKeys(userName);
-        this.password.sendKeys(password);
-        //loginButton.click();
-        //waitModel().until().element(noAppsPanel).is().visible();
-        guardHttp(loginButton).click();
-    }
 
     private void openNewApplicationModalWithNoApps() {
         waitGui().until().element(createAppBtn).is().visible();
@@ -94,9 +67,9 @@ public class ApplicationsPageIT {
     @Test
     @InSequence(1)
     public void checkNoAppsInstalledExists() {
-        browser.navigate().to(BASE_URL);
+        browser.navigate().to(BASE_ADMIN_URL);
 
-        login("admin", "admin");
+        performLoginWithConfirm("admin", "admin");
 
         assertTrue("Check that page contains No Applications element", noAppsPanel.isDisplayed());
         assertEquals("Check that No Applications element has correct text", "LiveOak currently has no applications installed.", noAppsPanel.findElement(By.tagName("p")).getText());

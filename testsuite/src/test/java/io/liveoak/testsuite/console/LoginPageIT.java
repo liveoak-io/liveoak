@@ -5,12 +5,9 @@
  */
 package io.liveoak.testsuite.console;
 
-import org.jboss.arquillian.drone.api.annotation.Drone;
-import org.jboss.arquillian.junit.Arquillian;
+import io.liveoak.testsuite.AbstractLiveOakTest;
 import org.jboss.arquillian.junit.InSequence;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -22,22 +19,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author <a href="mailto:amendonc@redhat.com">Alexandre Mendonca</a>
  */
-@RunWith(Arquillian.class)
-public class LoginPageIT {
-
-    @Drone
-    WebDriver browser;
-
-    private static final String BASE_URL = "http://localhost:8080/admin/";
-
-    @FindBy
-    private WebElement username;
-
-    @FindBy
-    private WebElement password;
-
-    @FindBy(id = "kc-login")
-    private WebElement loginButton;
+public class LoginPageIT extends AbstractLiveOakTest {
 
     @FindBy(id = "kc-feedback")
     private WebElement loginFeedback;
@@ -51,7 +33,7 @@ public class LoginPageIT {
     @Test
     @InSequence(1)
     public void loginComponentsExist() {
-        browser.navigate().to(BASE_URL);
+        browser.navigate().to(BASE_ADMIN_URL);
 
         assertTrue("Check that page contains username input element", username.isDisplayed());
         assertTrue("Check that page contains password input element", password.isDisplayed());
@@ -62,10 +44,7 @@ public class LoginPageIT {
     @Test
     @InSequence(2)
     public void loginFails() {
-        username.sendKeys("hacker");
-        password.sendKeys("letmein");
-
-        guardHttp(loginButton).click();
+        performLogin("hacker", "letmein");
 
         assertTrue("Check that page contains login feedback element", loginFeedback.isDisplayed());
         assertEquals("Check that failed login text is correct",
@@ -77,12 +56,7 @@ public class LoginPageIT {
     @Test
     @InSequence(3)
     public void loginSucceeds() {
-        username.clear();
-        username.sendKeys("admin");
-        password.clear();
-        password.sendKeys("admin");
-
-        guardHttp(loginButton).click();
+        performLoginWithConfirm("admin", "admin");
 
 /*
         assertEquals("Check that page title is the LiveOak Admin Console",
@@ -96,7 +70,7 @@ public class LoginPageIT {
     @Test
     @InSequence(4)
     public void loginPersist() {
-        browser.navigate().to(BASE_URL);
+        browser.navigate().to(BASE_ADMIN_URL);
 
         waitGui().until().element(loggedUser).is().visible();
 
@@ -124,7 +98,7 @@ public class LoginPageIT {
     @Test
     @InSequence(6)
     public void logoutPersists() {
-        browser.navigate().to(BASE_URL);
+        browser.navigate().to(BASE_ADMIN_URL);
 
         assertTrue("Check that page contains username input element", username.isDisplayed());
         assertTrue("Check that page contains password input element", password.isDisplayed());

@@ -29,7 +29,7 @@ public class JsHttpIT extends AbstractLiveOakTest {
 
     @Before
     public void before() throws Exception {
-        browser.navigate().to(new URL(baseUrl + "/default/app/index.html"));
+        browser.navigate().to(new URL(BASE_URL + "/default/app/index.html"));
         execute("init-liveoak.js");
     }
 
