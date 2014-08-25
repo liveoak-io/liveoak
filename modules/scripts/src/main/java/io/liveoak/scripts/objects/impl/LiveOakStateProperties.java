@@ -14,6 +14,10 @@ public class LiveOakStateProperties extends LiveOakMap<String, Object> {
 
     ResourceState resourceState;
 
+    public LiveOakStateProperties() {
+        this.resourceState = new DefaultResourceState();
+    }
+
     public LiveOakStateProperties(ResourceState resourceState) {
         this.resourceState = resourceState;
     }

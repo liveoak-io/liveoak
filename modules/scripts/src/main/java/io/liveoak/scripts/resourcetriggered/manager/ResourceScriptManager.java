@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.liveoak.common.DefaultResourceErrorResponse;
+import io.liveoak.common.DefaultResourceResponse;
 import io.liveoak.scripts.libraries.manager.LibraryManager;
 import io.liveoak.scripts.objects.impl.LiveOakResource;
 import io.liveoak.scripts.objects.impl.LiveOakResourceRequest;
@@ -25,6 +26,9 @@ import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
+import io.liveoak.spi.ReturnFields;
+import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceState;
 import org.dynjs.Config;
 import org.dynjs.runtime.DynJS;
 import org.dynjs.runtime.GlobalObject;
@@ -119,6 +123,47 @@ public class ResourceScriptManager {
             }
         }
 
+        if (resourceFunction == Script.FUNCTIONS.POSTREAD) {
+            //we are on a post read, which means expand could have been used to return expanded members
+
+            //check if the members were set to be expanded or not
+            Object handleMembers = handleMembers (response, response.state(), response.inReplyTo().requestContext().returnFields());
+            if (handleMembers != null) {
+                return handleMembers;
+            }
+        }
+
+        return null;
+    }
+
+    protected Object handleMembers(ResourceResponse response, ResourceState state, ReturnFields returnFields) {
+        if (!returnFields.child("members").isEmpty()) {
+            for (ResourceState memberState: state.members()) {
+                DefaultResourceResponse memberResponse = new DefaultResourceResponse(response.inReplyTo(),
+                        ResourceResponse.ResponseType.READ, new Resource() {
+                    @Override
+                    public Resource parent() {
+                        return response.resource();
+                    }
+
+                    @Override
+                    public String id() {
+                        return memberState.id();
+                    }
+                });
+                memberResponse.setState(memberState);
+
+                Set<Script> memberScripts = scriptMap.getByTarget(memberState.uri().toString(), Script.FUNCTIONS.POSTREAD, true);
+                for (Script memberScript: memberScripts) {
+                    Object reply = runScript(Script.FUNCTIONS.POSTREAD.getFunctionName(),memberScript , memberResponse);
+                    if (reply != null) {
+                        return reply;
+                    }
+                }
+
+                handleMembers(response, memberState, returnFields.child("members"));
+            }
+        }
         return null;
     }
 
