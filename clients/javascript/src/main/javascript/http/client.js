@@ -32,7 +32,7 @@ var Http = function (options) {
     }
 
     this.readMembers = function (path, options) {
-        options.expand = '*';
+        options.fields = '*(*)';
         var url = createUrl(path, options);
         request('GET', url, null, function (data) {
             var members = data.members || [];
@@ -110,12 +110,6 @@ var Http = function (options) {
 
         var query = '';
 
-        if (params.expand) {
-            if (query) {
-                query += '&';
-            }
-            query += 'expand=' + params.expand;
-        }
         if (params.fields) {
             if (query) {
                 query += '&';

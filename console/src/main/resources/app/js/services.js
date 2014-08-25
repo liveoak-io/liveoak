@@ -107,7 +107,7 @@ loMod.factory('LoStorage', function($resource) {
     },
     getList : {
       method : 'GET',
-      params: { expand : 'members' }
+      params: { fields : '*(*)' }
     },
     create : {
       method : 'POST',
@@ -125,7 +125,7 @@ loMod.factory('LoStorage', function($resource) {
 });
 
 loMod.factory('LoCollection', function($resource) {
-  return $resource('/:appId/:storageId/:collectionId?expand=members', {
+  return $resource('/:appId/:storageId/:collectionId?fields=*(*)', {
     appId : '@appId',
     storageId : '@storageId',
     collectionId : '@collectionId'
@@ -136,7 +136,7 @@ loMod.factory('LoCollection', function($resource) {
     },
     getList : {
       method : 'GET',
-      params: { expand : 'members' }
+      params: { fields : '*(*)' }
     },
     create : {
       method : 'POST',
@@ -165,7 +165,7 @@ loMod.factory('LoCollectionItem', function($resource) {
     },
     getList : {
       method : 'GET',
-      params: { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId', expand : 'members' }
+      params: { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId', fields : '*(*)' }
     },
     create : {
       method : 'POST',
@@ -191,7 +191,7 @@ loMod.factory('LoApp', function($resource) {
     },
     getList : {
       method : 'GET',
-      params: { expand : 'members' }
+      params: { fields : '*(*)' }
     },
     create : {
       method : 'POST',
@@ -392,7 +392,7 @@ loMod.factory('LoSecurityCollections', function($resource) {
   }, {
     get : {
       method: 'GET',
-      params: { expand : 'members' }
+      params: { fields : '*(*)' }
     }
   });
 });
@@ -511,7 +511,7 @@ loMod.factory('LoClient', function($resource) {
     },
     getList : {
       method : 'GET',
-      params : { expand: 'members' }
+      params : { fields: '*(*)' }
     },
     update : {
       method : 'PUT'
