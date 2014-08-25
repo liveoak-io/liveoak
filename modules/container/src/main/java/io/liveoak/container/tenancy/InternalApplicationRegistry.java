@@ -1,11 +1,5 @@
 package io.liveoak.container.tenancy;
 
-import io.liveoak.container.tenancy.service.ApplicationService;
-import io.liveoak.spi.Application;
-import io.liveoak.spi.LiveOak;
-import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceTarget;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,8 +7,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.liveoak.container.tenancy.service.ApplicationRemovalService;
+import io.liveoak.container.tenancy.service.ApplicationService;
+import io.liveoak.spi.Application;
+import io.liveoak.spi.LiveOak;
+import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceTarget;
+import org.vertx.java.core.Vertx;
+
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class InternalApplicationRegistry implements ApplicationRegistry {
 
@@ -24,7 +27,7 @@ public class InternalApplicationRegistry implements ApplicationRegistry {
     }
 
     public InternalApplication createApplication(String id, String name) throws InterruptedException {
-        return createApplication( id, name, null );
+        return createApplication(id, name, null);
     }
 
     public InternalApplication createApplication(String id, String name, File directory) throws InterruptedException {
@@ -46,12 +49,20 @@ public class InternalApplicationRegistry implements ApplicationRegistry {
     @Override
     public Application application(String id) throws InterruptedException {
         ServiceController<InternalApplication> controller = this.applications.get(id);
-        if ( controller == null ) {
+        if (controller == null) {
             return null;
         }
         return controller.awaitValue();
     }
 
+    public void removeApplication(String id) {
+        ServiceController<InternalApplication> controller = this.applications.remove(id);
+        ApplicationRemovalService removalService = new ApplicationRemovalService(controller);
+        this.target.addService(LiveOak.application(id).append("remove"), removalService)
+                .addDependency(LiveOak.VERTX, Vertx.class, removalService.vertxInjector())
+                .install();
+    }
+
     private final ServiceTarget target;
-    private Map<String,ServiceController<InternalApplication>> applications = new HashMap<>();
+    private Map<String, ServiceController<InternalApplication>> applications = new HashMap<>();
 }

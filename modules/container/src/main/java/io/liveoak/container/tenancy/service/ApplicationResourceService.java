@@ -3,7 +3,7 @@ package io.liveoak.container.tenancy.service;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.zero.ApplicationExtensionsResource;
+import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
@@ -17,6 +17,7 @@ import org.jboss.msc.value.InjectedValue;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class ApplicationResourceService implements Service<ApplicationResource> {
 
@@ -26,12 +27,12 @@ public class ApplicationResourceService implements Service<ApplicationResource> 
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.resource = new ApplicationResource(this.app, this.configManager.getValue());
+        this.resource = new ApplicationResource(this.app, this.configManager.getValue(), this.applicationRegistry.getValue());
 
         ServiceTarget target = context.getChildTarget();
         ServiceName name = context.getController().getName();
 
-        target.addService(name.append("extensions"), new ValueService<ApplicationExtensionsResource>(new ImmediateValue<>(this.resource.extensionsResource())))
+        target.addService(name.append("extensions"), new ValueService<>(new ImmediateValue<>(this.resource.extensionsResource())))
                 .install();
     }
 
@@ -49,7 +50,12 @@ public class ApplicationResourceService implements Service<ApplicationResource> 
         return this.configManager;
     }
 
+    public Injector<InternalApplicationRegistry> registryInjector() {
+        return this.applicationRegistry;
+    }
+
     private final InternalApplication app;
     private ApplicationResource resource;
     private InjectedValue<ApplicationConfigurationManager> configManager = new InjectedValue<>();
+    private InjectedValue<InternalApplicationRegistry> applicationRegistry = new InjectedValue<>();
 }

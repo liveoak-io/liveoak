@@ -17,9 +17,10 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class ApplicationResource implements RootResource, SynchronousResource {
 
-    public ApplicationResource(InternalApplication app, ApplicationConfigurationManager configManager) {
+    public ApplicationResource(InternalApplication app, ApplicationConfigurationManager configManager, InternalApplicationRegistry appRegistry) {
         this.app = app;
         this.configManager = configManager;
+        this.appRegistry = appRegistry;
         this.extensions = new ApplicationExtensionsResource(this, "resources");
     }
 
@@ -90,9 +91,15 @@ public class ApplicationResource implements RootResource, SynchronousResource {
         responder.resourceUpdated(this);
     }
 
+    @Override
+    public void delete(RequestContext ctx, Responder responder) throws Exception {
+        this.appRegistry.removeApplication(id());
+        responder.resourceDeleted(this);
+    }
+
     private Resource parent;
     private InternalApplication app;
     private final ApplicationExtensionsResource extensions;
     private ApplicationConfigurationManager configManager;
-
+    private InternalApplicationRegistry appRegistry;
 }

@@ -17,6 +17,7 @@ import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.container.zero.service.ApplicationClientsInstallService;
@@ -144,6 +145,7 @@ public class ApplicationService implements Service<InternalApplication> {
         ApplicationResourceService appResource = new ApplicationResourceService(this.app);
         target.addService(appResourceName, appResource)
                 .addDependency(configManagerName, ApplicationConfigurationManager.class, appResource.configInjector())
+                .addDependency(LiveOak.APPLICATION_REGISTRY, InternalApplicationRegistry.class, appResource.registryInjector())
                 .install();
         MediaTypeMountService<ApplicationResource> appResourceMount = new MediaTypeMountService<>(null, MediaType.JSON, true);
         this.app.resourceController(target.addService(LiveOak.defaultMount(appResourceName), appResourceMount)
