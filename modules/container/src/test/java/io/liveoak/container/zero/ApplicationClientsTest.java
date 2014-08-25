@@ -1,14 +1,7 @@
 package io.liveoak.container.zero;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
-import java.util.Map;
 
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.LiveOakFactory;
@@ -53,27 +46,7 @@ public class ApplicationClientsTest {
 
     @AfterClass
     public static void cleanUpInstalledApps() throws Exception {
-        File myApp = new File(ApplicationClientsTest.class.getClassLoader().getResource("apps/testApp").getFile());
-        if (myApp != null && myApp.exists()) {
-            deleteNonEmptyDir(myApp);
-        }
-    }
-
-    private static void deleteNonEmptyDir(File dir) throws IOException {
-        Path directory = dir.toPath();
-        Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
-        });
+        new AppCleanup().accept("apps/testApp");
     }
 
     @Test

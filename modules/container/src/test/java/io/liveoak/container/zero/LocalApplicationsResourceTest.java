@@ -1,13 +1,7 @@
 package io.liveoak.container.zero;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +26,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -73,27 +66,7 @@ public class LocalApplicationsResourceTest {
 
     @AfterClass
     public static void cleanUpInstalledApps() throws Exception {
-        File myApp = new File(LocalApplicationsResourceTest.class.getClassLoader().getResource("apps/myapp").getFile());
-        if (myApp != null && myApp.exists()) {
-            deleteNonEmptyDir(myApp);
-        }
-    }
-
-    private static void deleteNonEmptyDir(File dir) throws IOException {
-        Path directory = dir.toPath();
-        Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
-        });
+        new AppCleanup().accept("apps/myapp");
     }
 
     protected ResourceState decode(HttpResponse response) throws Exception {
