@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.application', []);
 
-loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal, $filter, Notifications, examplesList, loAppList, LoApp, LoStorage, LoPush, LoRealmApp) {
+loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal, $filter, $route, Notifications, examplesList, loAppList, LoApp, LoStorage, LoPush, LoRealmApp) {
 
   $scope.applications = [];
   $scope.exampleApplications = [];
@@ -65,6 +65,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
         function(/*value, responseHeaders*/) {
           Notifications.success('The application "' + appId + '" has been deleted.');
           LoRealmApp.delete({appId: appId});
+          $route.reload();
           $modalInstance.close();
         },
         // error
