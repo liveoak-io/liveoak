@@ -1,4 +1,4 @@
-<lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="clients" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
+<lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="application-clients" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
 
 <div class="col-md-9 lo-main-pane application-client">
 
@@ -8,9 +8,9 @@
       <lo-breadcrumbs></lo-breadcrumbs>
       <h2 class="pull-left"><span>{{ appClient.name || 'New Client' }}</span> Configuration</h2>
       <p class="subtitle">All fields are required</p>
-  
+
       <hr>
-  
+
       <form class="lo-form-horizontal clearfix" name="clientsForm">
         <fieldset>
           <div class="form-group clearfix">
@@ -22,17 +22,17 @@
           <div class="form-group clearfix">
             <label class="col-sm-2 control-label" for="platform">Platform</label>
             <div class="lo-instances col-sm-offset-2">
-              <label class="checkbox-inline html5" ng-class="{'active': settings.platform == 'html5'}">
-                <input type="radio" name="platform" ng-model="settings.platform" value="html5"> HTML 5
+              <label class="checkbox-inline html5" ng-class="{'active': settings.type == 'html5'}">
+                <input type="radio" name="platform" ng-model="settings.type" value="html5"> HTML 5
               </label>
-              <label class="checkbox-inline android" ng-class="{'active': settings.platform == 'android'}">
-                <input type="radio" name="platform" ng-model="settings.platform" value="android"> Android
+              <label class="checkbox-inline android" ng-class="{'active': settings.type == 'android'}">
+                <input type="radio" name="platform" ng-model="settings.type" value="android"> Android
               </label>
-              <label class="checkbox-inline ios" ng-class="{'active': settings.platform == 'ios'}">
-                <input type="radio" name="platform" ng-model="settings.platform" value="ios"> iOS
+              <label class="checkbox-inline ios" ng-class="{'active': settings.type == 'ios'}">
+                <input type="radio" name="platform" ng-model="settings.type" value="ios"> iOS
               </label>
-              <label class="checkbox-inline custom" ng-class="{'active': settings.platform == 'custom'}">
-                <input type="radio" name="platform" ng-model="settings.platform" value="custom"> My Platform
+              <label class="checkbox-inline custom" ng-class="{'active': settings.type == 'custom'}">
+                <input type="radio" name="platform" ng-model="settings.type" value="custom"> My Platform
               </label>
               <span data-tooltip-placement="top" data-tooltip="Add Platform">
                 <button type="button" class="btn btn-link btn-icon inline add-condition" data-toggle="modal" data-target="#add-platform"><i class="fa fa-plus-circle"></i><span>Add Platform</span></button>

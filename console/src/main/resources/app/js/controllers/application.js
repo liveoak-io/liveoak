@@ -249,7 +249,8 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
 
 });
 
-loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal, Notifications, LoRealmApp, LoRealmAppClientScopeMapping, currentApp, loRealmAppClients) {
+loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal, Notifications, LoRealmApp, loClients,
+                                            LoRealmAppClientScopeMapping, currentApp, loRealmAppClients) {
 
   $rootScope.curApp = currentApp;
 
@@ -263,11 +264,21 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
     return element.publicClient && element.name !== 'security-admin-console';
   };
 
-  $scope.appClients = $filter('filter')(loRealmAppClients, appFilter);
+  var idClientMap = {};
 
-  for (var i = 0; i < $scope.appClients.length; i++) {
-    $scope.appClients[i].realmRoles = LoRealmAppClientScopeMapping.query({appId: currentApp.name, clientId: $scope.appClients[i].name});
+  for (var client in loRealmAppClients){
+    var realmClient = loRealmAppClients[client];
+    idClientMap[realmClient.id] = realmClient;
   }
+
+  loClients.$promise.then(function () {
+    $scope.appClients = loClients._members;
+    for (var j = 0; $scope.appClients && j < $scope.appClients.length; j++) {
+      var kcClient = idClientMap[$scope.appClients[j].id];
+      $scope.appClients[j].realmRoles = LoRealmAppClientScopeMapping.query({appId: currentApp.name, clientId: kcClient.name});
+      $scope.appClients[j].kcClient = kcClient;
+    }
+  });
 
   // Delete Client
   $scope.modalClientDelete = function(clientId) {
@@ -307,10 +318,12 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
     };
 
   };
-
 });
 
-loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, $location, $http, Notifications, LoRealmApp, LoRealmAppRoles, LoRealmAppClientScopeMapping, currentApp, loRealmAppClient, loRealmRoles, loRealmAppRoles, scopeMappings) {
+loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, $location, $http, Notifications,
+                                           LoRealmApp, LoRealmAppRoles, LoRealmAppClientScopeMapping, currentApp,
+                                           loRealmAppClient, loRealmRoles, loRealmAppRoles, scopeMappings, LoClient,
+                                           loClient) {
 
   $rootScope.curApp = currentApp;
 
@@ -321,6 +334,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
   ];
 
   if (loRealmAppClient && loRealmAppClient.id) {
+    $scope.loClient = loClient;
     $scope.create = false;
     $scope.appClient = loRealmAppClient;
     $scope.breadcrumbs.push({'label': loRealmAppClient.name, 'href':'#/applications/' + currentApp.id + '/application-clients/' + loRealmAppClient.name});
@@ -328,6 +342,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
   else {
     $scope.create = true;
     $scope.appClient = new LoRealmApp();
+    $scope.loClient = new LoClient();
     $scope.appClient.bearerOnly = false;
     $scope.appClient.publicClient = true;
     $scope.breadcrumbs.push({'label': 'New Client', 'href':'#/applications/' + currentApp.id + '/application-clients/create-client'});
@@ -340,6 +355,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
 
   $scope.settings = {
     name: $scope.appClient.name,
+    type: loClient.type,
     scopeMappings: [],
     redirectUris: angular.copy($scope.appClient.redirectUris) || [],
     webOrigins: angular.copy($scope.appClient.webOrigins) || []
@@ -511,26 +527,46 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     var nameChanged = $scope.appClient.name !== $scope.settings.name;
     var redirectUrisChanged = !angular.equals($scope.appClient.redirectUris, $scope.settings.redirectUris);
     var webOriginsChanged = !angular.equals($scope.appClient.webOrigins, $scope.settings.webOrigins);
-    if (nameChanged || redirectUrisChanged || webOriginsChanged) {
+    var typeChanged = !angular.equals($scope.loClient.type, $scope.settings.type);
+
+    if (nameChanged || redirectUrisChanged || webOriginsChanged || typeChanged) {
       var originalName = $scope.appClient.name;
       $scope.appClient.name = $scope.settings.name;
       $scope.appClient.redirectUris = $scope.settings.redirectUris;
       $scope.appClient.webOrigins = $scope.settings.webOrigins;
+
       var appClientPromise = $scope.create ? $scope.appClient.$create() : $scope.appClient.$save({appId: originalName});
-      appClientPromise.then(
-        function(appClient) {
+
+      // Save client in the KC
+      appClientPromise.then(function(appClient) {
           $scope.appClient = appClient;
           if(!angular.equals($scope.settings.scopeMappings, settingsBackup.scopeMappings)) {
             saveScopeMappings();
           }
-          else {
-            onSaveSuccessful();
-          }
         },
         function(httpResponse) {
-          Notifications.httpError('The client "' + originalName + '" could not be ' + ($scope.create ? 'created': 'updated') + '.', httpResponse);
+          Notifications.httpError('The KC client "' + originalName + '" could not be ' + ($scope.create ? 'created': 'updated') + '.', httpResponse);
         }
-      );
+      // Get the ID of previously saved client
+      ).then(function(){
+          return LoRealmApp.get({appId: $scope.appClient.name}).$promise;
+        }, function(httpResponse) {
+          Notifications.httpError('The "' + originalName + '" client scope mappings could not be ' + ($scope.create ? 'created': 'updated') + '.', httpResponse);
+        }
+      // Use this id when saving LO (with additional information about client type) client
+      ).then(function(kcClient){
+          $scope.loClient.id = kcClient.id;
+          $scope.loClient.type = $scope.settings.type;
+          $scope.loClient['security-key'] = $scope.appClient.name;
+
+          return $scope.create ? $scope.loClient.$create({appId: currentApp.id}) : $scope.loClient.$update({appId: currentApp.id, clientId: originalName});
+        }
+      // Notify about operation status
+      ).then(function(){
+          onSaveSuccessful();
+        }, function(httpResponse) {
+          Notifications.httpError('The LO client "' + originalName + '" could not be ' + ($scope.create ? 'created': 'updated') + '.', httpResponse);
+        });
     }
     else if (!angular.equals($scope.settings.scopeMappings, settingsBackup.scopeMappings)) {
       saveScopeMappings();

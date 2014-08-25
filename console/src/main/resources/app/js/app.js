@@ -65,6 +65,9 @@ loMod.config(['$routeProvider', function($routeProvider) {
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
         },
+        loClients: function(LoClient, $route){
+          return LoClient.getList({appId: $route.current.params.appId});
+        },
         loRealmAppClients : function(LoRealmAppListLoader) {
           return new LoRealmAppListLoader();
         }
@@ -92,6 +95,13 @@ loMod.config(['$routeProvider', function($routeProvider) {
         loRealmAppClient: function(LoRealmApp, $route) {
           return LoRealmApp.get({appId: $route.current.params.clientId}).$promise.then(function (data) {
             return data;
+          });
+        },
+        loClient: function(LoClient, LoRealmApp, $route) {
+          return LoRealmApp.get({appId: $route.current.params.clientId}).$promise.then(function (data) {
+            return LoClient.get({appId: $route.current.params.appId, clientId: data.id}).$promise.then(function(data){
+              return data;
+            });
           });
         },
         loRealmAppRoles: function(LoRealmAppRoles, $route) {
@@ -140,6 +150,9 @@ loMod.config(['$routeProvider', function($routeProvider) {
                 $create({realmId: 'liveoak-apps'}).then(function(){ return new LoRealmAppRolesLoader();});
             }
           );
+        },
+        loClient: function(LoClient) {
+          return new LoClient();
         },
         loRealmRoles: function(LoRealmRolesLoader){
           return new LoRealmRolesLoader();
