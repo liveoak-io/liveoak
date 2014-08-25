@@ -56,7 +56,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
     });
   };
 
-  var DeleteApplicationModalCtrl = function ($scope, $modalInstance, $log, LoApp) {
+  var DeleteApplicationModalCtrl = function ($scope, $modalInstance, $log, LoApp, LoRealmApp) {
 
     $scope.applicationDelete = function (appId) {
       $log.debug('Deleting application: ' + appId);
@@ -64,6 +64,7 @@ loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal
         // success
         function(/*value, responseHeaders*/) {
           Notifications.success('The application "' + appId + '" has been deleted.');
+          LoRealmApp.delete({appId: appId});
           $modalInstance.close();
         },
         // error

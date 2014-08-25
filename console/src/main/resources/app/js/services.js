@@ -299,6 +299,9 @@ loMod.factory('LoRealmApp', function($resource) {
     },
     create: {
       method: 'POST'
+    },
+    delete: {
+      method: 'DELETE'
     }
   });
 });
