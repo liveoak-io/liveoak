@@ -139,7 +139,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
 });
 
 loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routeParams, loStorageList, currentApp,
-                                             LoStorage, Notifications, $modal) {
+                                             LoStorage, Notifications, $modal, $filter) {
 
   $log.debug('StorageListCtrl');
 
@@ -202,6 +202,10 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
     LoStorage.delete({ appId : currentApp.id, storageId : $scope.storageId},
       function(){
         Notifications.success('The storage "' + $scope.storageId + '" has been deleted.');
+        var _deletedStorage = $filter('filter')($scope.resources, {'path':$scope.storageId})[0];
+        var _deletedIndex = $scope.resources.indexOf(_deletedStorage);
+
+        $scope.resources.splice(_deletedIndex, 1);
       },
       function(httpResponse){
         Notifications.httpError('Failed to delete the storage "' + $scope.storageId + '".', httpResponse);

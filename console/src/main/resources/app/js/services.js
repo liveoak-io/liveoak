@@ -501,3 +501,27 @@ loMod.factory('LoAppExamples', function($resource) {
     });
 });
 
+loMod.factory('LoClient', function($resource) {
+  return $resource('/admin/applications/:appId/resources/application-clients/:clientId', {
+    appId : '@appId',
+    clientId: '@clientId'
+  }, {
+    get : {
+      method : 'GET'
+    },
+    getList : {
+      method : 'GET',
+      params : { expand: 'members' }
+    },
+    update : {
+      method : 'PUT'
+    },
+    create : {
+      method : 'POST',
+      params : { appId : '@appId' }
+    },
+    delete : {
+      method : 'DELETE'
+    }
+  });
+});
