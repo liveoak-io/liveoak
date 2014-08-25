@@ -105,6 +105,7 @@
         <module>mongo</module>
         <module>mongo-gridfs</module>
         <module>mongo-launcher</module>
+        <module>pgsql</module>
         <module>filesystem</module>
         <module>aggregating-filesystem</module>
         <module>scheduler</module>

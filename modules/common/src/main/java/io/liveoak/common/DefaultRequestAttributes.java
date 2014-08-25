@@ -21,7 +21,6 @@ public class DefaultRequestAttributes implements RequestAttributes {
     public DefaultRequestAttributes() {
     }
 
-    ;
 
     @Override
     public Collection<String> getAttributeNames() {
