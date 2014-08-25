@@ -135,6 +135,14 @@ a {
   &:focus {
     outline: 0 none;
   }
+  
+  &.link-color {
+    color: @c_green!important;
+    
+    i {
+      color: @c_gray;
+    }
+  }
 }
 
 p {
@@ -211,6 +219,11 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
     color: @c_gray;
     display: inline-block;
     margin-top: 5px;
+    
+    &.list-info {
+      display: block;
+      margin-bottom: 15px;
+    }
   }
 }
 
@@ -330,10 +343,10 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
 
     li {
       text-align: center;
-      margin-top: 36px;
+      margin-top: 30px;
 
       &:first-child {
-        margin-top: 32px;
+        margin-top: 28px;
       }
 
       a {
@@ -352,11 +365,16 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
           color: inherit;
           opacity: 1;
           -webkit-opacity: inherit;
+          font-size: 36px;
+          
+          &.fa-mobile {
+            font-size: 48px;
+          }
         }
       }
 
       &.active {
-        background: url(../css/img/sidebar-active.svg) no-repeat right 22px;
+        background: url(../css/img/sidebar-active.svg) no-repeat right 16px;
 
         a {
           opacity: 1;
@@ -443,6 +461,11 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
         color: @c_green;
       }
       
+      span {
+        font-size: 18px;
+        font-weight: 100;
+      }
+      
       + .label {
         margin-left: 15px;
       }
@@ -527,7 +550,6 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
         font-size: 13px;
         margin-bottom: 5px;
 
-
         a, a:hover {
           color: @c_gray;
         }
@@ -539,7 +561,20 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
         i {
           margin-right: 6px;
         }
+        
+        span {
+          color: @c_graylight;
+        }
       }
+      
+      & + pre {
+        margin-top: 15px;
+      }
+    }
+    
+    .panel-description {
+      color: @c_graylight;
+      margin-bottom: 10px;
     }
   }
   
@@ -2354,7 +2389,7 @@ tr.deleted {
   
     li {
       display: table-cell;
-      width: 25%;
+      width: 16.66%;
       margin: 0;
       padding-bottom: 13px;
       padding-top: 8px;
@@ -2475,19 +2510,34 @@ tr.deleted {
       }
     }
     
+    .navbar-vertical ul {
+      display: block;
+    }
+    
     .navbar-vertical li {
-      
+      display: inline-block;
       padding-bottom: 10px;
+      width: calc(~"100% / 3 - 2px");
+      margin-top: 10px;
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-bottom: 0;
       
-      a {
-        font-size: 13px;
+      &.active {
+        background: none;
+      }
       
-        .fa {
-          font-size: 2.5em;
-        }
+      &:first-child {
+        margin-top: 0;
+      }
+      
+      &:last-child {
+        margin-bottom: 10px;
       }
     }
   }
+  
+  
   
   .app-dashboard .lo-info-pane {
     padding: 0 20px;
@@ -2596,8 +2646,4 @@ tr.deleted {
   height: 100%;
   position: absolute;
   top: 0;
-}
-
-.animated {
-  position: relative;
 }

@@ -1,0 +1,108 @@
+<lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="logic" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
+
+<div class="col-md-9 lo-main-pane">
+  <div class="row">
+    <div class="lo-content-area col-md-12">
+      <ol class="breadcrumb">
+        <li><a href="#/applications">Applications</a></li>
+        <li><a href="#">Name_of_the_app</a></li>
+        <li>Business Logic</li>
+      </ol>
+      <h2><span>Name_of_the_app</span> Business Logic</h2>
+  
+      <div class="lo-page-info clearfix">
+        <p class="list-info">These are the currently installed Resource Triggered Business Logic Scripts.</p>
+        <p><span class="lo-emph">You have</span> <strong>2</strong> script(s).</p>
+      </div>
+      <div class="panel">
+        <div class="panel-heading">
+          <h2 class="panel-title">Script Name 1 <span>(Script Id 1)</span></h2>
+          <span class="label label-success">Enabled</span>
+        </div>
+        <div class="panel-body">
+          <p class="panel-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus viverra, dolor sed congue bibendum, urna purus faucibus mauris, in venenatis ante libero ac augue. Sed dapibus eu lacus a interdum. Vivamus tincidunt ac arcu a venenatis.</p>
+          <ul class="lo-app-opts">
+            <li><i class="fa fa-link" tooltip="Target"></i>/myApp/storage/products/*</li>
+            <li><i class="fa fa-level-up" tooltip="Priority"></i>1</li>
+            <li><i class="fa fa-hand-o-right" tooltip="Triggers"></i>Preupdate</li>
+            <li><a href="#" class="link-color"><i class="fa fa-code" tooltip="Script"></i>Show script</a> <span>(3.39kb)</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <h2 class="panel-title">Script Name 1 <span>(Script Id 1)</span></h2>
+          <span class="label label-default">Disabled</span>
+        </div>
+        <div class="panel-body">
+          <ul class="lo-app-opts">
+            <li><i class="fa fa-link" tooltip="Target"></i>/myApp/storage/products/myProduct</li>
+            <li><i class="fa fa-level-up" tooltip="Priority"></i>2</li>
+            <li><i class="fa fa-hand-o-right" tooltip="Triggers"></i>Preupdate</li>
+            <li><a href="#" class="link-color"><i class="fa fa-code" tooltip="Script"></i>Hide script</a> <span>(3.39kb)</span></li>
+          </ul>
+
+          <pre> 
+  var LiveOak = function( options ) {
+    options = options || {};
+
+    // Allow instantiation without using new
+    if(!(this instanceof LiveOak)) {
+        return new LiveOak( options );
+    }
+
+    // Use address of liveoak.js if server address not specified
+    if (!options.host) {
+        var server = parseScriptUrl();
+        options.host = server.host;
+        options.port = server.port;
+        options.secure = server.secure;
+    }
+
+    var http = new Http(options);
+    var auth;
+    var stomp_client = new Stomp.Client( options.host, options.port, options.secure );
+
+    this.connect = function( callback ) {
+      // TODO: Better way to do this...
+      if (arguments.length == 1) {
+         stomp_client.connect( arguments[0] );
+      }
+      if (arguments.length == 2) {
+        stomp_client.connect( arguments[0], arguments[1] );
+      }
+      if (arguments.length == 3) {
+        stomp_client.connect( arguments[0], arguments[1], arguments[2] );
+      }
+      if (arguments.length == 4) {
+        stomp_client.connect( arguments[0], arguments[1], arguments[2], arguments[3] );
+      }
+    };
+
+    this.onStompError = function( callback ) {
+        stomp_client.onerror = callback;
+    }
+
+    this.create = http.create;
+    this.read = http.read;
+    this.readMembers = http.readMembers;
+    this.save = http.save;
+    this.update = http.update;
+    this.remove = http.remove;
+
+    this.subscribe = function( path, callback ) {
+        var id = stomp_client.subscribe( path, function(msg) {
+            var data = JSON.parse( msg.body );
+            callback( data, msg.headers.action );
+        });
+        return id;
+    };
+          </pre>
+          
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

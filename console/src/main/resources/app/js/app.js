@@ -55,6 +55,18 @@ loMod.config(['$routeProvider', function($routeProvider) {
         }
       }
     })
+    .when('/applications/:appId/business-logic', {
+      templateUrl : '/admin/console/partials/business-logic.html',
+      controller : 'ExampleListCtrl',
+      resolve: {
+        loAppList : function(LoAppListLoader) {
+          return new LoAppListLoader();
+        },
+        examplesList : function(LoAppExamples) {
+          return LoAppExamples.query().$promise;
+        }
+      }
+    })
     .when('/applications/:appId', {
       redirectTo: '/applications/:appId/dashboard'
     })
@@ -64,9 +76,6 @@ loMod.config(['$routeProvider', function($routeProvider) {
       resolve: {
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
-        },
-        loClients: function(LoClient, $route){
-          return LoClient.getList({appId: $route.current.params.appId});
         },
         loRealmAppClients : function(LoRealmAppListLoader) {
           return new LoRealmAppListLoader();
@@ -95,13 +104,6 @@ loMod.config(['$routeProvider', function($routeProvider) {
         loRealmAppClient: function(LoRealmApp, $route) {
           return LoRealmApp.get({appId: $route.current.params.clientId}).$promise.then(function (data) {
             return data;
-          });
-        },
-        loClient: function(LoClient, LoRealmApp, $route) {
-          return LoRealmApp.get({appId: $route.current.params.clientId}).$promise.then(function (data) {
-            return LoClient.get({appId: $route.current.params.appId, clientId: data.id}).$promise.then(function(data){
-              return data;
-            });
           });
         },
         loRealmAppRoles: function(LoRealmAppRoles, $route) {
@@ -150,9 +152,6 @@ loMod.config(['$routeProvider', function($routeProvider) {
                 $create({realmId: 'liveoak-apps'}).then(function(){ return new LoRealmAppRolesLoader();});
             }
           );
-        },
-        loClient: function(LoClient) {
-          return new LoClient();
         },
         loRealmRoles: function(LoRealmRolesLoader){
           return new LoRealmRolesLoader();
