@@ -1,5 +1,6 @@
 package io.liveoak.container.service;
 
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -12,6 +13,7 @@ public class CodecInstallationCompleteService implements Service<Void> {
     @Override
     public void start(StartContext context) throws StartException {
         //Do Nothing
+        log.trace("Codec installation complete.");
     }
 
     @Override
@@ -22,4 +24,6 @@ public class CodecInstallationCompleteService implements Service<Void> {
     public Void getValue() throws IllegalStateException, IllegalArgumentException {
         return null;
     }
+
+    static final Logger log = Logger.getLogger(CodecInstallationCompleteService.class);
 }
