@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.storage', []);
 
-loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, LoStorage, loStorage, Notifications, currentApp) {
+loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $routeParams, $log, LoStorage, loStorage, Notifications, currentApp) {
 
   $log.debug('StorageCtrl');
 
@@ -21,6 +21,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
   $scope.changed = false;
 
   $scope.create = true;
+  $scope.fix = $routeParams.fix;
 
   if (loStorage.id){
     $scope.create = false;
@@ -36,9 +37,18 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
   var storageModelBackup = angular.copy(loStorage);
   $scope.storageModel = angular.copy(loStorage);
 
+  $scope.passwordInputType = 'password';
+  $scope.changePasswordInputType = function() {
+    if ($scope.passwordInputType === 'password') {
+      $scope.passwordInputType = 'text';
+    }
+    else {
+      $scope.passwordInputType = 'password';
+    }
+  };
+
   $scope.clear = function(){
     $scope.storageModel = angular.copy(storageModelBackup);
-    $scope.passwdConfirm = '';
     $scope.changed = false;
   };
 
@@ -63,9 +73,6 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $log, Lo
     if ((unameSet && !paswdSet)||(!unameSet && paswdSet)) {
 
       Notifications.error('Please fill in both the username and password fields.');
-    } else if (paswdSet && !angular.equals($scope.storageModel.credentials[0].password, $scope.passwdConfirm)) {
-
-      Notifications.error('The password does not match the password confirmation.');
     } else {
 
       var credentials = [];
