@@ -57,13 +57,13 @@ loMod.config(['$routeProvider', function($routeProvider) {
     })
     .when('/applications/:appId/business-logic', {
       templateUrl : '/admin/console/partials/business-logic.html',
-      controller : 'ExampleListCtrl',
+      controller : 'BusinessLogicListCtrl',
       resolve: {
-        loAppList : function(LoAppListLoader) {
-          return new LoAppListLoader();
+        currentApp: function(LoAppLoader) {
+          return new LoAppLoader();
         },
-        examplesList : function(LoAppExamples) {
-          return LoAppExamples.query().$promise;
+        triggeredScripts: function(LoBusinessLogicScripts, $route) {
+          return LoBusinessLogicScripts.getTriggered({appId: $route.current.params.appId}).$promise;
         }
       }
     })
