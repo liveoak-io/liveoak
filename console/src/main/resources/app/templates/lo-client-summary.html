@@ -2,7 +2,7 @@
   <div class="panel-heading">
     <h2 class="panel-title"><a href="#/applications/{{app.id}}/application-clients/{{ client.kcClient.name }}">{{ client.kcClient.name }}</a></h2>
     <div class="pull-right">
-      <a href ng-click="$parent.modalClientDelete(client.name)"><i class="fa fa-trash-o" tooltip="Delete Client"></i></a>
+      <a href ng-click="$parent.modalClientDelete(client.kcClient.name, client.kcClient.id)"><i class="fa fa-trash-o" tooltip="Delete Client"></i></a>
     </div>
   </div>
   <div class="panel-body">
