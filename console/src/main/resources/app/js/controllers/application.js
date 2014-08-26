@@ -262,10 +262,6 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
     {'label': 'Clients', 'href': '#/applications/' + currentApp.id + '/application-clients'}
   ];
 
-  var appFilter = function(element) {
-    return element.publicClient && element.name !== 'security-admin-console';
-  };
-
   var idClientMap = {};
 
   for (var client in loRealmAppClients){
@@ -283,36 +279,45 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
   });
 
   // Delete Client
-  $scope.modalClientDelete = function(clientId) {
+  $scope.modalClientDelete = function(clientId, kcId) {
     $scope.deleteClientId = clientId;
+    $scope.deleteKcId = kcId;
     $modal.open({
       templateUrl: '/admin/console/templates/modal/application/client-delete.html',
       controller: DeleteClientModalCtrl,
       scope: $scope
     }).result.then(
       function() {
-        LoRealmApp.query().$promise.then(function(data) {
-          $scope.appClients = $filter('filter')(data, appFilter);
-        });
+        var _deletedClient = $filter('filter')($scope.appClients, {'id' : kcId})[0];
+        var _deletedIndex = $scope.appClients.indexOf(_deletedClient);
+
+        $scope.appClients.splice(_deletedIndex, 1);
       }
     );
   };
 
-  var DeleteClientModalCtrl = function ($scope, $modalInstance, $log, LoRealmApp) {
+  var DeleteClientModalCtrl = function ($scope, $modalInstance, $log, LoRealmApp, LoClient) {
 
-    $scope.clientDelete = function (clientId) {
-      $log.debug('Deleting client: ' + clientId);
-      LoRealmApp.delete({appId: clientId},
+    $scope.clientDelete = function (clientId, kcId) {
+      LoClient.delete({appId: currentApp.name, clientId: kcId},
         // success
-        function(/*value, responseHeaders*/) {
-          Notifications.success('The client "' + clientId + '" has been deleted.');
-          $modalInstance.close();
-        },
+        angular.noop,
         // error
         function (httpResponse) {
-          Notifications.httpError('Failed to delete the client "' + clientId + '".', httpResponse);
+          Notifications.httpError('Failed to delete the LO client "' + clientId + '" data.', httpResponse);
+        }
+      ).$promise.then(function() {
+          return LoRealmApp.delete({appId: clientId}).$promise;
+
+        }).then( function() {
+          Notifications.success('The client "' + clientId + '" has been deleted.');
+          $modalInstance.close();
+
+        }, function (httpResponse) {
+          Notifications.httpError('Failed to delete the KC client "' + clientId + '".', httpResponse);
         }
       );
+
     };
 
     $scope.cancel = function () {
