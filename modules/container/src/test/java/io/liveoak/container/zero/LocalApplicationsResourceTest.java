@@ -145,9 +145,11 @@ public class LocalApplicationsResourceTest {
         CloseableHttpResponse response;
 
         // Post an application
-        File badAppPath = new File(getClass().getClassLoader().getResource("importApps/badApp").getFile());
+        String badAppPath = new File(getClass().getClassLoader().getResource("importApps/badApp").getFile()).getAbsolutePath();
+        // make sure to escape special chars in order to compose valid JSON
+        badAppPath = badAppPath.replace("\\", "\\\\");
         postRequest = new HttpPost("http://localhost:8080/admin/applications");
-        postRequest.setEntity(new StringEntity("{ \"id\": \"badapp\", \"name\": \"Bad Application\", \"localPath\": \"" + badAppPath.getAbsolutePath() + "\" }"));
+        postRequest.setEntity(new StringEntity("{ \"id\": \"badapp\", \"name\": \"Bad Application\", \"localPath\": \"" + badAppPath + "\" }"));
         postRequest.setHeader("Content-Type", MediaType.LOCAL_APP_JSON.toString());
 
         response = httpClient.execute(postRequest);
@@ -186,9 +188,12 @@ public class LocalApplicationsResourceTest {
         CloseableHttpResponse response;
 
         // Post an application
-        File app1LocalPath = new File(getClass().getClassLoader().getResource("importApps/app1").getFile());
+        String appPath = new File(getClass().getClassLoader().getResource("importApps/app1").getFile()).getAbsolutePath();
+        // make sure to escape special chars in order to compose valid JSON
+        appPath = appPath.replace("\\", "\\\\");
+
         postRequest = new HttpPost("http://localhost:8080/admin/applications");
-        postRequest.setEntity(new StringEntity("{ \"id\": \"myapp\", \"localPath\": \"" + app1LocalPath.getAbsolutePath() + "\" }"));
+        postRequest.setEntity(new StringEntity("{ \"id\": \"myapp\", \"localPath\": \"" + appPath + "\" }"));
         postRequest.setHeader("Content-Type", MediaType.LOCAL_APP_JSON.toString());
 
         response = httpClient.execute(postRequest);
