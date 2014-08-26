@@ -43,8 +43,8 @@ import static org.fest.assertions.Assertions.assertThat;
  * pg_ctl -D ~/.liveoak/pgsql/data -l logfile start
  * createdb test
  * psql test
- * GRANT CREATE ON DATABASE test TO test
- * CREATE USER ‘test’ createdb PASSWORD ‘test’
+ * CREATE USER test createdb PASSWORD 'test';
+ * GRANT CREATE ON DATABASE test TO test;
  * \q
  *
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
