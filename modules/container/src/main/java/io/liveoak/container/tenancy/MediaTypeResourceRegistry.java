@@ -58,7 +58,7 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
 
         resourceMap.put(mediaType, resource);
 
-        if (makeDefault || !resourceMap.containsKey(DEFAULT)) {
+        if (makeDefault) {
             resourceMap.put(DEFAULT, resource);
         }
     }
