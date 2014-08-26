@@ -528,3 +528,35 @@ loMod.factory('LoClient', function($resource) {
     }
   });
 });
+
+loMod.factory('LoBusinessLogicScripts', function($resource) {
+  return $resource('/admin/applications/:appId/resources/scripts', {
+    appId : '@appId',
+    clientId: '@clientId'
+  }, {
+    get : {
+      method : 'GET',
+      params: { fields : '*(*)' }
+    },
+    getTriggered: {
+      method: 'GET',
+      url: '/admin/applications/:appId/resources/scripts/resource-triggered-scripts',
+      params: { fields : '*(*)' }
+    },
+    getEndpoint: {
+      method: 'GET',
+      url: '/admin/applications/:appId/resources/scripts/endpoint-scripts/:scriptId',
+      params: { fields : '*(*)' }
+    },
+    getScheduled: {
+      method: 'GET',
+      url: '/admin/applications/:appId/resources/scripts/scheduled-scripts/:scriptId',
+      params: { fields : '*(*)' }
+    },
+    getLibraries: {
+      method: 'GET',
+      url: '/admin/applications/:appId/resources/scripts/libraries/:scriptId',
+      params: { fields : '*(*)' }
+    }
+  });
+});
