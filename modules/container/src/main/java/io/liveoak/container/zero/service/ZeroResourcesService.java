@@ -1,6 +1,7 @@
 package io.liveoak.container.zero.service;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import io.liveoak.container.extension.MediaTypeMountService;
 import io.liveoak.container.extension.MountService;
@@ -16,6 +17,7 @@ import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StabilityMonitor;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
@@ -30,12 +32,15 @@ import static io.liveoak.spi.LiveOak.VERTX;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class ZeroResourcesService implements Service<Void> {
 
     @Override
     public void start(StartContext context) throws StartException {
         ServiceTarget target = context.getChildTarget();
+        StabilityMonitor monitor = new StabilityMonitor();
+        target.addMonitor(monitor);
 
         ServiceName systemName = LiveOak.resource(ZeroExtension.APPLICATION_ID, "system");
         target.addService(systemName, new ValueService<SystemResource>(new ImmediateValue<>(new SystemResource())))
@@ -73,6 +78,13 @@ public class ZeroResourcesService implements Service<Void> {
                 .addDependency(LiveOak.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, localAppMediaTypeMount.mountPointInjector())
                 .addDependency(localApplicationsName, RootResource.class, localAppMediaTypeMount.resourceInjector())
                 .install();
+
+        try {
+            monitor.awaitStability(200, TimeUnit.MILLISECONDS, null);
+        } catch (InterruptedException e) {
+            throw new StartException(e);
+        }
+        target.removeMonitor(monitor);
     }
 
     @Override

@@ -82,7 +82,7 @@ public class ServersBootstrappingService implements Service<Void> {
                 .addDependency(CLIENT, Client.class, pipelineConfigurator.clientInjector())
                 .addDependency(GLOBAL_CONTEXT, GlobalContext.class, pipelineConfigurator.globalContextInjector())
                 .addDependency(WORKER_POOL, Executor.class, pipelineConfigurator.workerPoolInjector())
-                .addDependencies(CODEC_MANAGER_COMPLETE);
+                .addDependency(CODEC_MANAGER_COMPLETE);
 
         pipelineBuilder.install();
 

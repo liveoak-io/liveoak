@@ -1,6 +1,7 @@
 package io.liveoak.container.tenancy.service;
 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.extension.ApplicationExtensionContextImpl;
@@ -13,6 +14,7 @@ import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.StabilityMonitor;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
@@ -36,21 +38,8 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
         log.debug("** Activate " + this.extensionId + " as " + resourceId + " for " + this.applicationInjector.getValue().id());
 
         ServiceTarget target = context.getChildTarget();
-
-        /*
-        target.addListener( new AbstractServiceListener<Object>() {
-            @Override
-            public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
-                System.err.println( controller.getName() + " :: " + transition );
-                if ( transition.enters(ServiceController.State.START_FAILED )) {
-                    System.err.println( controller.getImmediateUnavailableDependencies() );
-                }
-                if ( controller.getStartException() != null ) {
-                    controller.getStartException().printStackTrace();
-                }
-            }
-        });
-        */
+        StabilityMonitor monitor = new StabilityMonitor();
+        target.addMonitor(monitor);
 
         this.appExtension = new InternalApplicationExtension(
                 this.serviceRegistryInjector.getValue(),
@@ -76,6 +65,9 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
             if (this.appExtension.exception() != null) {
                 throw this.appExtension.exception();
             }
+
+            monitor.awaitStability(200, TimeUnit.MILLISECONDS, null);
+            target.removeMonitor(monitor);
         } catch (Exception e) {
             throw new StartException(e);
         }
