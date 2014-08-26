@@ -3,7 +3,7 @@
 
   <div class="col-md-10 lo-main-pane">
     <div class="row">
-      <ul class="nav nav-tabs nav-tabs-pf">
+      <ul class="nav nav-tabs nav-tabs-pf" ng-hide="create || fix">
         <li><a href="#/applications/{{curApp.id}}/storage/{{storageModel.id}}/browse">Collections</a></li>
         <li class="active"><a href="">Settings</a></li>
       </ul>
@@ -81,14 +81,14 @@
               <label class="col-sm-3  control-label" for="passwd">Password</label>
 
               <div class="col-sm-4">
-                <input class="form-control" ng-model="storageModel.credentials[0].password" type="password" id="passwd">
-              </div>
-            </div>
-            <div class="form-group clearfix">
-              <label class="col-sm-3  control-label" for="passwdConfirm">Password confirmation</label>
-
-              <div class="col-sm-4">
-                <input class="form-control" ng-model="passwdConfirm" ng-disabled="!storageModel.credentials[0].password" type="password" id="passwdConfirm">
+                <div class="search-comp clearfix" style="width: 100%;">
+                  <input class="form-control" type="{{passwordInputType}}" id="passwd" name="password" ng-model="storageModel.credentials[0].password">
+                  <button class="btn btn-link btn-icon" ng-click="changePasswordInputType()" type="button" tooltip="Show/Hide Password" >
+                    <i class="fa fa-eye-slash" ng-show="passwordInputType === 'password'"></i>
+                    <i class="fa fa-eye" ng-show="passwordInputType === 'text'"></i>
+                    <span>Show/Hide Password</span>
+                  </button>
+                </div>
               </div>
             </div>
           </fieldset>

@@ -1,9 +1,10 @@
 <div class="panel" ng-class="{'animated rollIn': created == storage.path}">
   <div class="panel-heading">
     <h2 class="panel-title">
-      <a ng-show="storage.hasCollections" ng-href="#/applications/{{loApp.id}}/storage/{{storage.path}}/browse">{{storage.path}}</a>
+        <a ng-show="storage.hasCollections" ng-href="#/applications/{{loApp.id}}/storage/{{storage.path}}/browse">{{storage.path}}</a>
+        <a ng-hide="storage.hasCollections" ng-href="#/applications/{{loApp.id}}/storage/{{storage.path}}?fix">{{storage.path}}</a>
+        <i ng-hide="storage.hasCollections" class="fa fa-warning" data-tooltip="Unable to reach storage server. Please check the configuration."></i>
     </h2>
-    <h2 ng-hide="storage.hasCollections" class="panel-title">{{storage.path}}</h2>
     <div class="pull-right">
       <a href="" data-tooltip-placement="top" data-tooltip="Delete Storage" ng-click="loDelete({storageId: storage.path})"><i class="fa fa-trash-o"></i></a>
     </div>
