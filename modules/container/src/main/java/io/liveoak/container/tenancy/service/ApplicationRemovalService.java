@@ -40,7 +40,7 @@ public class ApplicationRemovalService implements Service<Void> {
                 if (result.succeeded()) {
                     context.complete();
                 } else {
-                    log.error("Unable to remove application directory: " + appDir.getAbsolutePath());
+                    context.failed(new StartException("Unable to remove application directory: " + appDir.getAbsolutePath()));
                 }
             });
 
@@ -69,6 +69,4 @@ public class ApplicationRemovalService implements Service<Void> {
 
     private InjectedValue<Vertx> vertx = new InjectedValue<>();
     private ServiceController<InternalApplication> appServiceController;
-
-    private static final Logger log = Logger.getLogger(ApplicationRemovalService.class);
 }
