@@ -58,6 +58,8 @@ public class TenancyTest {
     @Test
     public void testBootstrapPiecemeal() throws InterruptedException {
         InternalApplicationRegistry registry = new InternalApplicationRegistry(this.serviceContainer);
+        this.serviceContainer.addService(LiveOak.APPLICATION_REGISTRY, new ValueService<>(new ImmediateValue<>(registry)))
+                .install();
 
         InternalApplication installedApp = registry.createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
 
@@ -134,11 +136,11 @@ public class TenancyTest {
     @Test
     public void testBootstrapUsingExtension() throws Exception {
         GlobalContext globalContext = new GlobalContext();
-        this.serviceContainer.addService(LiveOak.GLOBAL_CONTEXT, new ValueService<GlobalContext>(new ImmediateValue<>(globalContext)))
+        this.serviceContainer.addService(LiveOak.GLOBAL_CONTEXT, new ValueService<>(new ImmediateValue<>(globalContext)))
                 .install();
 
         InternalApplicationRegistry registry = new InternalApplicationRegistry(this.serviceContainer);
-        this.serviceContainer.addService(LiveOak.APPLICATION_REGISTRY, new ValueService<InternalApplicationRegistry>(new ImmediateValue<>(registry)))
+        this.serviceContainer.addService(LiveOak.APPLICATION_REGISTRY, new ValueService<>(new ImmediateValue<>(registry)))
                 .install();
 
         ApplicationsDeployerService deployerService = new ApplicationsDeployerService();
