@@ -397,16 +397,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
   var webOriginsBackup = angular.copy($scope.webOrigins);
 
   $scope.checkUrl = function(uri){
-    return (/^http[s]?:\/\/[^/]*/).test(uri);
-  };
-
-  $scope.changeRedirectUri = function(uri){
-    if(!$scope.newWebOrigin && (/^http[s]?:\/\/[^/]*/).test(uri)) {
-      var newWebOrigin = uri.match(/^http[s]?:\/\/[^/]*/)[0];
-      if ($scope.settings.webOrigins.indexOf(newWebOrigin) === -1) {
-        $scope.webOrigins[$scope.webOrigins.length - 1] = {'val': newWebOrigin};
-      }
-    }
+    return (/^.+:\/\/[^\/]*/).test(uri);
   };
 
   $scope.addRedirectUri = function() {
