@@ -1,4 +1,4 @@
-<lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="logic" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
+<lo-navigation ng-controller="AppDropdownCtrl" data-lo-current="business-logic" data-lo-apps="applications" data-lo-app="curApp"></lo-navigation>
 
 <div class="col-md-9 lo-main-pane">
   <div class="row">
@@ -6,12 +6,19 @@
       <lo-breadcrumbs></lo-breadcrumbs>
       <h2><span>{{curApp.name}}</span> Business Logic</h2>
   
-      <div class="lo-page-info clearfix">
+      <div class="lo-page-info clearfix" ng-show="scripts.members">
         <p class="list-info">These are the currently installed Resource Triggered Business Logic Scripts.</p>
         <p><span class="lo-emph">You have</span> <strong>{{scripts.members.length}}</strong> script<span ng-show="scripts.members.length > 1">s</span>.</p>
       </div>
 
-      <div class="panel" ng-repeat="script in scripts.members">
+      <div class="panel" ng-hide="scripts.members">
+        <div class="panel-body text-center empty-instance">
+          <i class="fa fa-code"></i>
+          <p>This application currently has no business logic scripts.</p>
+        </div>
+      </div>
+
+      <div class="panel" ng-show="scripts.members" ng-repeat="script in scripts.members">
         <div class="panel-heading">
           <h2 class="panel-title">{{script.name}} <span>({{script.id}})</span></h2>
           <span class="label label-success" ng-show="script.enabled">Enabled</span>

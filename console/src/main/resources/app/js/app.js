@@ -63,7 +63,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
           return new LoAppLoader();
         },
         triggeredScripts: function(LoBusinessLogicScripts, $route) {
-          return LoBusinessLogicScripts.getTriggered({appId: $route.current.params.appId}).$promise;
+          return LoBusinessLogicScripts.getTriggered({appId: $route.current.params.appId});
         }
       }
     })
