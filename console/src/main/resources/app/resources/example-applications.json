@@ -1,23 +1,5 @@
 [
   {
-    "id": "auth-html",
-    "path": "${io.liveoak.home.dir}/examples/auth/auth-html",
-    "name": "Auth",
-    "description": "Basic functionality related to authentication to Keycloak/LiveOak. It's simple Javascript application, which you can use to login into Keycloak and obtain OAuth access token in JWT format from Keycloak. You can also try to send ajax request to 'storage' resource with access token attached in Authorization header. Storage request will be successful just in case that you are authenticated.",
-    "icon": "auth.svg",
-    "icon-alt": "Illustration: Two keys"
-  },
-  {
-    "id": "chat-android",
-    "path": "${io.liveoak.home.dir}/examples/chat/chat-android",
-    "name": "Android Chat",
-    "description": "Get native Android integration with resources stored in a LiveOak instance; Native notifications of resource subscription from Google Cloud Messaging (GCM) via integration with the Aerogear Unified Push Server (UPS); System notifications when the application is in the background; Uses GCM for updated chats when the application has focus.",
-    "icon": "chat-android.svg",
-    "icon-alt": "Illustration: Ballons with the Android logo",
-    "depends": [["chat-html"],["chat-html-secured"]],
-    "instructions": "https://github.com/liveoak-io/liveoak-examples/tree/master/chat/chat-android#readme"
-  },
-  {
     "id": "chat-html",
     "path": "${io.liveoak.home.dir}/examples/chat/chat-html",
     "name": "HTML Chat",
@@ -34,12 +16,70 @@
     "icon-alt": "Illustration: Ballons with a lock symbol"
   },
   {
+    "id": "chat-android",
+    "path": "${io.liveoak.home.dir}/examples/chat/chat-android",
+    "name": "Android Chat",
+    "description": "Get native Android integration with resources stored in a LiveOak instance; Native notifications of resource subscription from Google Cloud Messaging (GCM) via integration with the Aerogear Unified Push Server (UPS); System notifications when the application is in the background; Uses GCM for updated chats when the application has focus.",
+    "icon": "chat-android.svg",
+    "icon-alt": "Illustration: Ballons with the Android logo",
+    "depends": [["chat-html"],["chat-html-secured"]],
+    "instructions": "https://github.com/liveoak-io/liveoak-examples/tree/master/chat/chat-android#readme"
+  },
+  {
     "id": "gallery",
     "path": "${io.liveoak.home.dir}/examples/gallery",
     "name": "Gallery",
     "description": "The Gallery demo application runs in desktop, and mobile browser, and also provides REST endpoints for gallery-cordova application.",
     "icon": "gallery.svg",
     "icon-alt": "Illustration: A series of pictures"
+  },
+  {
+    "id": "todomvc",
+    "path": "${io.liveoak.home.dir}/examples/todomvc",
+    "name": "TodoMVC",
+    "description": "The TodoMVC example is based on the example http://todomvc.com/architecture-examples/angularjs/#/ . Our example is integrated with [Keycloak](http://www.keycloak.org) and it's showing security possibilities of [LiveOak](http://liveoak.io) (among other things).",
+    "icon": "todomvc.svg",
+    "icon-alt": "Illustration: A list with one item checked"
+  },
+  {
+    "id": "helloscript",
+    "path": "${io.liveoak.home.dir}/examples/scripting/helloscript",
+    "name": "Business Logic - Hello Messages",
+    "description": "The Hello Messages example shows a simple usage of Business Logic by outputting a message to the log before and after any resource of the application is read.",
+    "icon": "",
+    "icon-alt": ""
+  },
+  {
+    "id": "metadatascript",
+    "path": "${io.liveoak.home.dir}/examples/scripting/metadatascript",
+    "name": "Business Logic - Add Metadata",
+    "description": "The Add Metadata example shows how Business Logic can add a 'last-modified' field to any data being created or updated within the 'storage' resource of the application.",
+    "icon": "",
+    "icon-alt": ""
+  },
+  {
+    "id": "formatscript",
+    "path": "${io.liveoak.home.dir}/examples/scripting/formatscript",
+    "name": "Business Logic - Data Validation",
+    "description": "The Data Validation example utilizes Business Logic for validating data received on a create or update, and throws appropriate errors back to the client if validation failed",
+    "icon": "",
+    "icon-alt": ""
+  },
+  {
+    "id": "useragentsscript",
+    "path": "${io.liveoak.home.dir}/examples/scripting/useragentsscript",
+    "name": "Business Logic - Collecting user agent data",
+    "description": "Utilize Business Logic to read/query/write/update LiveOak resources. In this case it uses the headers from the request to track how many times the same User Agent has accessed the resource.",
+    "icon": "",
+    "icon-alt": ""
+  },
+  {
+    "id": "auth-html",
+    "path": "${io.liveoak.home.dir}/examples/auth/auth-html",
+    "name": "Auth",
+    "description": "Basic functionality related to authentication to Keycloak/LiveOak. It's simple Javascript application, which you can use to login into Keycloak and obtain OAuth access token in JWT format from Keycloak. You can also try to send ajax request to 'storage' resource with access token attached in Authorization header. Storage request will be successful just in case that you are authenticated.",
+    "icon": "auth.svg",
+    "icon-alt": "Illustration: Two keys"
   },
   {
     "id": "gallery-cordova",
@@ -50,14 +90,6 @@
     "icon-alt": "Illustration: Pictures with the Android logo",
     "depends": [["gallery"]],
     "instructions": "https://github.com/liveoak-io/liveoak-examples/tree/master/gallery-cordova#readme"
-  },
-  {
-    "id": "todomvc",
-    "path": "${io.liveoak.home.dir}/examples/todomvc",
-    "name": "TodoMVC",
-    "description": "The TodoMVC example is based on the example http://todomvc.com/architecture-examples/angularjs/#/ . Our example is integrated with [Keycloak](http://www.keycloak.org) and it's showing security possibilities of [LiveOak](http://liveoak.io) (among other things).",
-    "icon": "todomvc.svg",
-    "icon-alt": "Illustration: A list with one item checked"
   },
   {
     "id": "todomvc-cordova",
