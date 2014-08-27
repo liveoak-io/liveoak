@@ -1,5 +1,5 @@
 {
-  "name": "liveOak-console",
+  "name": "liveoak-console",
   "description": "LiveOak console interface",
   "repository": "https://github.com/liveoak-io/liveoak",
   "devDependencies": {
