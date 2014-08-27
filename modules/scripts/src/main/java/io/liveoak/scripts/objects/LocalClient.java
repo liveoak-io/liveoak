@@ -13,7 +13,7 @@ public interface LocalClient {
 
     Resource update(String path, Resource resource) throws Exception;
 
-    Resource delete(String path) throws Exception;
+    Resource remove(String path) throws Exception;
 
     Resource create(String path, Resource resource, Map<String, Object> parameters) throws Exception;
 
@@ -21,6 +21,6 @@ public interface LocalClient {
 
     Resource update(String path, Resource resource, Map<String, Object> parameters) throws Exception;
 
-    Resource delete(String path, Map<String, Object> parameters) throws Exception;
+    Resource remove(String path, Map<String, Object> parameters) throws Exception;
 
 }

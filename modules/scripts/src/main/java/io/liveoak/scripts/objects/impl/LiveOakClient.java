@@ -1,6 +1,7 @@
 package io.liveoak.scripts.objects.impl;
 
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -8,8 +9,8 @@ import java.util.Map;
 
 import io.liveoak.common.DefaultRequestContext;
 import io.liveoak.common.DefaultResourceParams;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.DefaultReturnFields;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.scripts.objects.LocalClient;
 import io.liveoak.scripts.objects.Resource;
 import io.liveoak.scripts.objects.Util;
@@ -36,7 +37,7 @@ public class LiveOakClient implements LocalClient {
     @Override
     public Resource create(String path, Resource resource) throws Exception {
         try {
-            ResourceState resourceState = client.create(new DefaultRequestContext.Builder().build(), path, toResourceState(resource));
+            ResourceState resourceState = client.create(new DefaultRequestContext.Builder().build(), URLDecoder.decode(path, "UTF-8"), toResourceState(resource));
             return new LiveOakResource(resourceState);
         } catch (Exception e) {
             throw handleException(e);
@@ -46,7 +47,7 @@ public class LiveOakClient implements LocalClient {
     @Override
     public Resource read(String path) throws Exception {
         try {
-            ResourceState resourceState = client.read(new DefaultRequestContext.Builder().build(), path);
+            ResourceState resourceState = client.read(new DefaultRequestContext.Builder().build(), URLDecoder.decode(path, "UTF-8"));
             return new LiveOakResource(resourceState);
         } catch (ResourceNotFoundException e) {
             //on a read it probably makes sense to just return null rather than throw an error.
@@ -59,7 +60,7 @@ public class LiveOakClient implements LocalClient {
     @Override
     public Resource update(String path, Resource resource) throws Exception {
         try {
-            ResourceState resourceState = client.update(new DefaultRequestContext.Builder().build(), path, toResourceState(resource));
+            ResourceState resourceState = client.update(new DefaultRequestContext.Builder().build(), URLDecoder.decode(path, "UTF-8"), toResourceState(resource));
             return new LiveOakResource(resourceState);
         } catch (Exception e) {
             throw handleException(e);
@@ -67,9 +68,9 @@ public class LiveOakClient implements LocalClient {
     }
 
     @Override
-    public Resource delete(String path) throws Exception {
+    public Resource remove(String path) throws Exception {
         try {
-            ResourceState resourceState = client.delete(new DefaultRequestContext.Builder().build(), path);
+            ResourceState resourceState = client.delete(new DefaultRequestContext.Builder().build(), URLDecoder.decode(path, "UTF-8"));
             return new LiveOakResource(resourceState);
         } catch (Exception e) {
             throw handleException(e);
@@ -79,7 +80,7 @@ public class LiveOakClient implements LocalClient {
     @Override
     public Resource create(String path, Resource resource, Map<String, Object> parameters) throws Exception {
         try {
-            ResourceState resourceState = client.create(generateRequestContext(parameters), path, toResourceState(resource));
+            ResourceState resourceState = client.create(generateRequestContext(parameters), URLDecoder.decode(path, "UTF-8"), toResourceState(resource));
             return new LiveOakResource(resourceState);
         } catch (Exception e) {
             throw handleException(e);
@@ -89,7 +90,7 @@ public class LiveOakClient implements LocalClient {
     @Override
     public Resource read(String path, Map<String, Object> parameters) throws Exception {
         try {
-            ResourceState resourceState = client.read(generateRequestContext(parameters), path);
+            ResourceState resourceState = client.read(generateRequestContext(parameters), URLDecoder.decode(path, "UTF-8"));
             return new LiveOakResource(resourceState);
         } catch (ResourceNotFoundException e) {
             //on a read it probably makes sense to just return null rather than throw an error.
@@ -102,7 +103,7 @@ public class LiveOakClient implements LocalClient {
     @Override
     public Resource update(String path, Resource resource, Map<String, Object> parameters) throws Exception {
         try {
-            ResourceState resourceState = client.update(generateRequestContext(parameters), path, toResourceState(resource));
+            ResourceState resourceState = client.update(generateRequestContext(parameters), URLDecoder.decode(path, "UTF-8"), toResourceState(resource));
             return new LiveOakResource(resourceState);
         } catch (Exception e) {
             throw handleException(e);
@@ -110,9 +111,9 @@ public class LiveOakClient implements LocalClient {
     }
 
     @Override
-    public Resource delete(String path, Map<String, Object> parameters) throws Exception {
+    public Resource remove(String path, Map<String, Object> parameters) throws Exception {
         try {
-            ResourceState resourceState = client.delete(generateRequestContext(parameters), path);
+            ResourceState resourceState = client.delete(generateRequestContext(parameters), URLDecoder.decode(path, "UTF-8"));
             return new LiveOakResource(resourceState);
         } catch (Exception e) {
             throw handleException(e);
