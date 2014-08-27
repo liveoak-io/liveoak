@@ -66,7 +66,7 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
                 throw this.appExtension.exception();
             }
 
-            monitor.awaitStability(200, TimeUnit.MILLISECONDS, null);
+            monitor.awaitStability(250, TimeUnit.MILLISECONDS, null);
             target.removeMonitor(monitor);
         } catch (Exception e) {
             throw new StartException(e);
