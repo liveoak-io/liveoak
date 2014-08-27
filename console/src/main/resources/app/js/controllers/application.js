@@ -330,7 +330,7 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
 loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, $location, $http, Notifications,
                                            LoRealmApp, LoRealmAppRoles, LoRealmAppClientScopeMapping, currentApp,
                                            loRealmAppClient, loRealmRoles, loRealmAppRoles, scopeMappings, LoClient,
-                                           loClient) {
+                                           loClient, $modal, $q) {
 
   $rootScope.curApp = currentApp;
 
@@ -340,8 +340,14 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     {'label': 'Clients',       'href':'#/applications/' + currentApp.id + '/application-clients'}
   ];
 
+  var platformsBasic = ['html5', 'android', 'ios'];
+  $scope.platformsCustom = [];
+
   if (loRealmAppClient && loRealmAppClient.id) {
     $scope.loClient = loClient;
+    if (platformsBasic.indexOf(loClient.type) === -1) {
+      $scope.platformsCustom.push(loClient.type);
+    }
     $scope.create = false;
     $scope.appClient = loRealmAppClient;
     $scope.breadcrumbs.push({'label': loRealmAppClient.name, 'href':'#/applications/' + currentApp.id + '/application-clients/' + loRealmAppClient.name});
@@ -398,6 +404,17 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
 
   $scope.checkUrl = function(uri){
     return (/^.+:\/\/[^\/]*/).test(uri);
+  };
+
+  $scope.checkClientName = function(clientName){
+    if (!clientName || clientName === ''){
+      $scope.clientsForm.clientname.$setValidity('clientName', true);
+    }
+    LoRealmApp.get({appId: clientName}, function(){
+      $scope.clientsForm.clientname.$setValidity('clientName', false);
+    }, function(){
+      $scope.clientsForm.clientname.$setValidity('clientName', true);
+    });
   };
 
   $scope.addRedirectUri = function() {
@@ -506,6 +523,33 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     }
   };
 
+  $scope.modalPlatformAdd = function() {
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/application/platform-add.html',
+      controller: ModalCtrlPlatformAdd,
+      scope: $scope
+    });
+  };
+
+  var ModalCtrlPlatformAdd = function ($scope, $modalInstance) {
+
+    $scope.addPlatform = function(platformNew) {
+      $scope.$parent.platforms.push(platformNew);
+      $scope.$parent.settings.type = platformNew;
+    };
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+
+    $scope.checkPlatform = function (platform){
+      if ($scope.$parent.platforms.indexOf(platform) > -1){
+        return false;
+      }
+      return true;
+    };
+  };
+
   $scope.save = function() {
     $scope.settings.redirectUris = [];
 
@@ -543,13 +587,21 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
           }
         },
         function(httpResponse) {
-          Notifications.httpError('The KC client "' + originalName + '" could not be ' + ($scope.create ? 'created': 'updated') + '.', httpResponse);
+          if(httpResponse){
+            Notifications.httpError('The KC client "' + originalName + '" could not be ' + ($scope.create ? 'created': 'updated') + '.', httpResponse);
+          }
+
+          return $q.reject();
         }
       // Get the ID of previously saved client
       ).then(function(){
           return LoRealmApp.get({appId: $scope.appClient.name}).$promise;
         }, function(httpResponse) {
-          Notifications.httpError('The "' + originalName + '" client scope mappings could not be ' + ($scope.create ? 'created': 'updated') + '.', httpResponse);
+          if(httpResponse){
+            Notifications.httpError('The "' + originalName + '" client scope mappings could not be ' + ($scope.create ? 'created' : 'updated') + '.', httpResponse);
+          }
+
+          return $q.reject();
         }
       // Use this id when saving LO (with additional information about client type) client
       ).then(function(kcClient){
@@ -558,12 +610,16 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
           $scope.loClient['security-key'] = $scope.appClient.name;
 
           return $scope.create ? $scope.loClient.$create({appId: currentApp.id}) : $scope.loClient.$update({appId: currentApp.id, clientId: originalName});
+        }, function(){
+          return $q.reject();
         }
       // Notify about operation status
       ).then(function(){
           onSaveSuccessful();
         }, function(httpResponse) {
-          Notifications.httpError('The LO client "' + originalName + '" could not be ' + ($scope.create ? 'created': 'updated') + '.', httpResponse);
+          if (httpResponse) {
+            Notifications.httpError('The LO client "' + originalName + '" could not be ' + ($scope.create ? 'created' : 'updated') + '.', httpResponse);
+          }
         });
     }
     else if (!angular.equals($scope.settings.scopeMappings, settingsBackup.scopeMappings)) {

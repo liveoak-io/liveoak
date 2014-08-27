@@ -1,0 +1,29 @@
+<form class="horizontal-form" name="platformForm">
+  <div class="modal-header">
+    <button type="button" class="close" ng-click="cancel()">
+      <span class="pficon pficon-close"></span>
+    </button>
+    <h4 class="modal-title">Add Platform</h4>
+  </div>
+  <div class="modal-body">
+    <div class="modal-body">
+      <fieldset>
+        <div class="form-group clearfix">
+          <label for="pfname" class="col-sm-3 control-label">Platform Name <span class="required">*</span></label>
+          <div class="col-sm-7">
+            <input type="text" class="form-control" id="pfname" ng-model="platformNew" pf-focused="true"
+                pf-validation="checkPlatform(platformNew)"/>
+            <span class="help-block" ng-show="clientsForm.clientname.$invalid && settings.name">
+              <span>Platform with this name already exists.</span>
+            </span>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button type="submit" class="btn btn-primary" ng-disabled="platformForm.$invalid"
+            ng-click="addPlatform(platformNew);cancel()">Add</button>
+  </div>
+</form>
