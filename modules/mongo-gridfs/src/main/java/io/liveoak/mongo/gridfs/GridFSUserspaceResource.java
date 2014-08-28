@@ -39,7 +39,7 @@ public class GridFSUserspaceResource extends GridFSDirectoryResource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         DBCollection col = getFilesCollection();
         String rootId = getRootDirId(col);
         if (rootId == null) {

@@ -107,7 +107,7 @@ public class SchedulerResource implements RootResource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         this.children.values().stream().forEach((e) -> {
             sink.accept(e);
         });

@@ -59,7 +59,7 @@ public class GridFSRootResource extends GridFSDirectoryResource implements RootR
 
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         sink.close();
     }
 

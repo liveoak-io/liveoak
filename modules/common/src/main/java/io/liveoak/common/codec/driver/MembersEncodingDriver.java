@@ -64,13 +64,8 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
         }
 
         @Override
-        public void close() {
-            //TODO: remove the try catch here and throw an exception instead
-            try {
-                encodeNext();
-            } catch (Exception e) {
-                log.error("Exception while generating response: ", e);
-            }
+        public void close() throws Exception{
+            encodeNext();
         }
     }
 

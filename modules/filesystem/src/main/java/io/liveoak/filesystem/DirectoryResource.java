@@ -5,15 +5,16 @@
  */
 package io.liveoak.filesystem;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import org.vertx.java.core.Vertx;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Bob McWhirter
@@ -38,10 +39,13 @@ public class DirectoryResource implements FSResource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception{
+
+        CompletableFuture<ResourceSink> future = new CompletableFuture<>();
+
         vertx().fileSystem().readDir(file().getPath(), (result) -> {
             if (result.failed()) {
-                sink.close();
+                future.complete(sink);
             } else {
                 List<File> sorted = new ArrayList<>();
 
@@ -78,9 +82,12 @@ public class DirectoryResource implements FSResource {
                         sink.accept(createFileResource(each));
                     }
                 }
-                sink.close();
+                future.complete(sink);
             }
         });
+
+        ResourceSink resourceSink = future.get();
+        resourceSink.close();
     }
 
     @Override
