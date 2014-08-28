@@ -340,12 +340,12 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     {'label': 'Clients',       'href':'#/applications/' + currentApp.id + '/application-clients'}
   ];
 
-  var platformsBasic = ['html5', 'android', 'ios'];
+  $scope.platformsBasic = ['html5', 'android', 'ios'];
   $scope.platformsCustom = [];
 
   if (loRealmAppClient && loRealmAppClient.id) {
     $scope.loClient = loClient;
-    if (platformsBasic.indexOf(loClient.type) === -1) {
+    if ($scope.platformsBasic.indexOf(loClient.type) === -1) {
       $scope.platformsCustom.push(loClient.type);
     }
     $scope.create = false;
@@ -534,7 +534,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
   var ModalCtrlPlatformAdd = function ($scope, $modalInstance) {
 
     $scope.addPlatform = function(platformNew) {
-      $scope.$parent.platforms.push(platformNew);
+      $scope.$parent.platformsCustom.push(platformNew);
       $scope.$parent.settings.type = platformNew;
     };
 
@@ -543,7 +543,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     };
 
     $scope.checkPlatform = function (platform){
-      if ($scope.$parent.platforms.indexOf(platform) > -1){
+      if ($scope.$parent.platformsBasic.indexOf(platform) > -1 || $scope.$parent.platformsCustom.indexOf(platform) > -1){
         return false;
       }
       return true;
