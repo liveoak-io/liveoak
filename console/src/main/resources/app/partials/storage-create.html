@@ -74,7 +74,7 @@
               <label class="col-sm-3  control-label" for="stuname">Username</label>
 
               <div class="col-sm-4">
-                <input class="form-control" ng-model="storageModel.credentials[0].username" type="text" id="stuname">
+                <input class="form-control" ng-model="storageModel.credentials[0].username" type="text" id="stuname" autocomplete="off">
               </div>
             </div>
             <div class="form-group clearfix">
@@ -82,7 +82,7 @@
 
               <div class="col-sm-4">
                 <div class="search-comp clearfix" style="width: 100%;">
-                  <input class="form-control" type="{{passwordInputType}}" id="passwd" name="password" ng-model="storageModel.credentials[0].password">
+                  <input class="form-control" type="{{passwordInputType}}" id="passwd" name="password" autocomplete="off" ng-model="storageModel.credentials[0].password">
                   <button class="btn btn-link btn-icon" ng-click="changePasswordInputType()" type="button" tooltip="Show/Hide Password" >
                     <i class="fa fa-eye-slash" ng-show="passwordInputType === 'password'"></i>
                     <i class="fa fa-eye" ng-show="passwordInputType === 'text'"></i>
