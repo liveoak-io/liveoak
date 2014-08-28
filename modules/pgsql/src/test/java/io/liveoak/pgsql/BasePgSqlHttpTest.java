@@ -1,3 +1,8 @@
+/*
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+ */
 package io.liveoak.pgsql;
 
 import java.io.ByteArrayOutputStream;
@@ -20,9 +25,11 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.fest.assertions.Assertions;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
 import org.postgresql.jdbc2.optional.PoolingDataSource;
@@ -36,8 +43,8 @@ import static org.fest.assertions.Assertions.assertThat;
  * pg_ctl -D ~/.liveoak/pgsql/data -l logfile start
  * createdb test
  * psql test
- * GRANT CREATE ON DATABASE test TO test
- * CREATE USER ‘test’ createdb PASSWORD ‘test’
+ * CREATE USER test createdb PASSWORD 'test';
+ * GRANT CREATE ON DATABASE test TO test;
  * \q
  *
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -82,6 +89,13 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
         }
     }
 
+    protected void expectError(String result, String errorType) throws IOException {
+        JsonNode node = parseJson(result);
+        String error = node.get("error-type").asText();
+        Assertions.assertThat(error).isNotNull();
+        Assertions.assertThat(error).isEqualTo(errorType);
+    }
+
     protected String postRequest(HttpPost post, String json) throws IOException {
 
         StringEntity entity = new StringEntity(json, ContentType.create(APPLICATION_JSON, "UTF-8"));
@@ -91,6 +105,32 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
         System.out.println("\n" + json);
 
         CloseableHttpResponse result = httpClient.execute(post);
+
+        System.err.println("=============>>>");
+        System.err.println(result);
+
+        HttpEntity resultEntity = result.getEntity();
+
+        assertThat(resultEntity.getContentLength()).isGreaterThan(0);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        resultEntity.writeTo(baos);
+
+        String resultStr = new String(baos.toByteArray());
+        System.err.println(resultStr);
+        System.err.println("\n<<<=============");
+        return resultStr;
+    }
+
+    protected String putRequest(HttpPut put, String json) throws IOException {
+
+        StringEntity entity = new StringEntity(json, ContentType.create(APPLICATION_JSON, "UTF-8"));
+        put.setEntity(entity);
+
+        System.err.println("DO PUT - " + put.getURI());
+        System.out.println("\n" + json);
+
+        CloseableHttpResponse result = httpClient.execute(put);
 
         System.err.println("=============>>>");
         System.err.println(result);

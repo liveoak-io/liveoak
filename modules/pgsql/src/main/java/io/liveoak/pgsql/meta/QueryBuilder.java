@@ -1,6 +1,12 @@
+/*
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+ */
 package io.liveoak.pgsql.meta;
 
 import java.io.IOException;
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -293,17 +299,28 @@ public class QueryBuilder {
             if (fk != null) {
                 String field = fk.fieldName();
                 Object resRef = state.getProperty(field);
-                String id = null;
-                if (resRef instanceof ResourceRef) {
-                    id = ((ResourceRef) resRef).resourcePath().tail().toString();
-                } else if (resRef instanceof ResourceState) {
-                    id = ((ResourceState) resRef).id();
+                if (resRef != null) {
+                    String id = null;
+                    if (resRef instanceof ResourceRef) {
+                        id = ((ResourceRef) resRef).resourcePath().tail().toString();
+                    } else if (resRef instanceof ResourceState) {
+                        ResourceState refState = (ResourceState) resRef;
+                        id = refState.id();
+                        if (id == null) {
+                            URI refStateUri = refState.uri();
+                            if (refStateUri != null) {
+                                id = new ResourcePath(refStateUri.toString()).tail().name();
+                            }
+                        }
+                    }
+                    if (id == null) {
+                        throw new RuntimeException("Invalid value for field: " + field);
+                    }
+                    Id fkId = new Id(catalog.table(fk.tableRef()).pk(), id);
+                    values.add(fkId.valueForIndex(fk.indexForColumn(c.name())));
+                } else {
+                    values.add(null);
                 }
-                if (id == null) {
-                    throw new RuntimeException("Invalid value for field: " + field);
-                }
-                Id fkId = new Id(catalog.table(fk.tableRef()).pk(), id);
-                values.add(fkId.valueForIndex(fk.indexForColumn(c.name())));
             } else {
                 values.add(state.getProperty(c.name()));
             }
@@ -551,10 +568,12 @@ public class QueryBuilder {
         // perform upsert on that instance
         for (ForeignKey ref: table.foreignKeys()) {
             ResourceState item = state.getPropertyAsResourceState(ref.fieldName());
-            for (String name: item.getPropertyNames()) {
-                if (!"self".equals(name)) {
-                    executeUpdate(ctx, con, catalog.table(ref.tableRef()), item, ref, true);
-                    break;
+            if (item != null) {
+                for (String name : item.getPropertyNames()) {
+                    if (!"self".equals(name)) {
+                        executeUpdate(ctx, con, catalog.table(ref.tableRef()), item, ref, true);
+                        break;
+                    }
                 }
             }
         }
@@ -592,13 +611,19 @@ public class QueryBuilder {
 
             TableRef refTableRef = ref.columns().get(0).tableRef();
             Table refTable = catalog.table(refTableRef);
+            List<Object> listOfNew = state.getPropertyAsList(refTable.id());
+
+            // if field is not specified, then don't process it
+            // that allows us to update only a master table if so desired - which is a crucial capability
+            if (listOfNew == null) {
+                continue;
+            }
 
             // if yes, then load ids of referring refTable items first
             QueryResults results = querySelectFromTableWhere(con, refTable, refTable.pk().columns(), ref.columns(), values, null, null);
             String prefix = new ResourcePath(state.uri().toString()).parent().parent().toString() + "/" + refTable.id() + "/";
             List<String> currentUris = prefixElements(extractPksFromResults(results, refTable), prefix);
 
-            List<Object> listOfNew = state.getPropertyAsList(refTable.id());
             List<String> newUris = new LinkedList<>();
             for (Object item: listOfNew) {
                 if (item instanceof ResourceState == false) {

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+ */
 package io.liveoak.pgsql;
 
 import java.net.URI;
@@ -42,8 +47,8 @@ import static org.fest.assertions.Assertions.assertThat;
  * pg_ctl -D ~/.liveoak/pgsql/data -l logfile start
  * createdb test
  * psql test
- * GRANT CREATE ON DATABASE test TO test
- * CREATE USER ‘test’ createdb PASSWORD ‘test’
+ * CREATE USER test createdb PASSWORD 'test';
+ * GRANT CREATE ON DATABASE test TO test;
  * \q
  */
 public class BasePgSqlTest extends AbstractResourceTestCase {

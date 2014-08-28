@@ -1,3 +1,8 @@
+/*
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+ */
 package io.liveoak.pgsql;
 
 import java.util.HashSet;
@@ -180,10 +185,13 @@ public class PgSqlCRUDController {
             List<String> blocked = configuration.blockedSchemas();
             createNewSchema = (blocked == null || !blocked.contains(tableRef.schema())) &&
                     (exposed == null || exposed.isEmpty() || exposed.contains(tableRef.schema()));
-
-            if (!createNewSchema || !configuration.allowCreateSchema()) {
+            if (!createNewSchema) {
                 throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
-                        "Not allowed to create a new schema");
+                        "Not allowed access to " + tableRef.schema() + " - blocked by 'schemas' / 'blocked-schemas' configuration");
+            }
+            if (!configuration.allowCreateSchema()) {
+                throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE,
+                        "Not allowed to create a new schema - 'allow-create-schema' configuration option is false");
             }
         }
 
