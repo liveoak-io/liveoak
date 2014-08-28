@@ -68,7 +68,7 @@ public class LiveOakClient implements LocalClient {
     }
 
     @Override
-    public Resource remove(String path) throws Exception {
+    public Resource delete(String path) throws Exception {
         try {
             ResourceState resourceState = client.delete(new DefaultRequestContext.Builder().build(), URLDecoder.decode(path, "UTF-8"));
             return new LiveOakResource(resourceState);
@@ -111,7 +111,7 @@ public class LiveOakClient implements LocalClient {
     }
 
     @Override
-    public Resource remove(String path, Map<String, Object> parameters) throws Exception {
+    public Resource delete(String path, Map<String, Object> parameters) throws Exception {
         try {
             ResourceState resourceState = client.delete(generateRequestContext(parameters), URLDecoder.decode(path, "UTF-8"));
             return new LiveOakResource(resourceState);
