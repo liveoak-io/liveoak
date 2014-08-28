@@ -46,13 +46,16 @@ public interface ResourceState {
         if (self == null) {
             return null;
         }
-        String href = self.getPropertyAsString("href");
+        Object href = self.getProperty("href");
         if (href == null) {
             return null;
         }
+        if (href instanceof URI) {
+            return (URI) href;
+        }
 
         try {
-            return new URI(href);
+            return new URI(String.valueOf(href));
         } catch (URISyntaxException e) {
             throw new RuntimeException("Invalid self/href: " + href);
         }
