@@ -77,29 +77,15 @@ public class Column {
                 default:
                     ps.setObject(i, value);
             }
-/*
-                case "varchar":
-                    return Types.VARCHAR;
-                case "nvarchar":
-                    return Types.NVARCHAR;
-                case "char":
-                    return Types.CHAR;
-                case "nchar":
-                    return Types.NCHAR;
-                case "binary":
-                    return Types.BINARY;
-                case "varbinary":
-                    return Types.VARBINARY;
-
-*/
-
         }
     }
 
     public int sqlType() {
         switch (type) {
-            case "int8":
+            case "int4":
                 return Types.INTEGER;
+            case "int8":
+                return Types.BIGINT;
             case "varchar":
                 return Types.VARCHAR;
             case "nvarchar":

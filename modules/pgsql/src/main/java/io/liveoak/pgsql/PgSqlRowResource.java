@@ -1,5 +1,6 @@
 package io.liveoak.pgsql;
 
+import java.net.URI;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.data.Row;
 import io.liveoak.pgsql.meta.Catalog;
@@ -171,6 +173,21 @@ public class PgSqlRowResource implements Resource {
         Catalog cat = parent.parent().catalog();
         Table table = cat.table(new TableRef(parent.id()));
 
+        // check self / href - it must be equal to this uri
+        ResourceState self = state.getPropertyAsResourceState("self");
+        if (self == null) {
+            self = new DefaultResourceState();
+            self.putProperty("href", uri());
+            state.putProperty("self", self);
+        } else {
+            String href = self.getPropertyAsString("href");
+            if (href == null) {
+                self.putProperty("href", uri());
+            } else if (!new URI(href).equals(uri())) {
+                responder.invalidRequest("'self' / 'href' does not match the item: " + href + " (should be: " + uri() + ")");
+                return;
+            }
+        }
         try (Connection c = parent.parent().connection()) {
             queryBuilder.executeUpdate(ctx, c, table, state);
         }

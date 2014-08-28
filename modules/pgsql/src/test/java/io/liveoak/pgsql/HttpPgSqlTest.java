@@ -13,6 +13,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,6 +58,9 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         // query orders
         testQueryOrders();
 
+        // update order
+        testUpdateOrder();
+
         // delete an order cascading - include all the order items
         testDeleteFirstOrderCascading();
 
@@ -81,6 +85,92 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         // GET all collections and send response back to _batch?action=delete,
         // then use _batch?action=create to recreate them
         testBulkTablesDeleteBySendingGetResponse();
+    }
+
+    private void testUpdateOrder() throws IOException {
+        HttpPut put = new HttpPut("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders/014-1003095");
+        put.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+        put.setHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
+
+        // perform an update, omitting one-to-many relationships - only 'orders' table will be updated
+        String json = "  {                                                                       \n" +
+                "    'id' : '014-1003095',                                                       \n" +
+                "    'create_date' : 1402146615000,                                              \n" +
+                "    'total' : 19000,                                                            \n" +
+                "    'address' : {                                                               \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      }                                                                         \n" +
+                "    }                                                                           \n" +
+                "  }                                                                             \n";
+
+        String response = putRequest(put, json);
+        System.out.println(response);
+
+        String expected = "{                                                                     \n" +
+                "  'id' : '014-1003095',                                                         \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'           \n" +
+                "  },                                                                            \n" +
+                "  'order_id' : '014-1003095',                                                   \n" +
+                "  'create_date' : 1402146615000,                                                \n" +
+                "  'total' : 19000,                                                              \n" +
+                "  'items' : [ {                                                                 \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/items/I39845355'                               \n" +
+                "    }                                                                           \n" +
+                "  } ],                                                                          \n" +
+                "  'address' : {                                                                 \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/addresses/1'                                   \n" +
+                "    }                                                                           \n" +
+                "  }                                                                             \n" +
+                "}";
+
+        checkResult(response, expected);
+
+        // perform another update, this time remove all 'items' as part of the update
+        json = "  {                                                                              \n" +
+                "    'id' : '014-1003095',                                                       \n" +
+                "    'create_date' : 1402146615000,                                              \n" +
+                "    'total' : 19000,                                                            \n" +
+                "    'items' : [],                                                               \n" +
+                "    'address' : {                                                               \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      }                                                                         \n" +
+                "    }                                                                           \n" +
+                "  }                                                                             \n";
+
+        response = putRequest(put, json);
+        System.out.println(response);
+
+        expected = "{                                                                            \n" +
+                "  'id' : '014-1003095',                                                         \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'           \n" +
+                "  },                                                                            \n" +
+                "  'order_id' : '014-1003095',                                                   \n" +
+                "  'create_date' : 1402146615000,                                                \n" +
+                "  'total' : 19000,                                                              \n" +
+                "  'items' : [ ],                                                                \n" +
+                "  'address' : {                                                                 \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/addresses/1'                                   \n" +
+                "    }                                                                           \n" +
+                "  }                                                                             \n" +
+                "}";
+
+        checkResult(response, expected);
+
+        // make sure the item really doesn't exist any more
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/items/I39845355");
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        response = getRequest(get);
+        System.out.println(response);
+
+        expectError(response, "NO_SUCH_RESOURCE");
     }
 
     private void testQueryOrders() throws IOException {
@@ -153,6 +243,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
         System.out.println(result);
         checkResultForError(result);
 
+        // TODO: insert more data
         // TODO: proper response checking to make sure queries return proper results
     }
 
