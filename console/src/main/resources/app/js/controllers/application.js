@@ -437,24 +437,12 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     $scope.changed = !angular.equals($scope.settings, settingsBackup);
   }, true);
 
-  function checkValChange(toInspect, backup){
-    var newCopy = angular.copy(toInspect);
-
-    var last = newCopy[newCopy.length-1];
-
-    if (!last.hasOwnProperty('val') || last.val === ''){
-      newCopy.pop();
-    }
-
-    return !angular.equals(newCopy, backup);
-  }
-
   $scope.$watch('redirectUris', function(a) {
-    $scope.changed = checkValChange(a, redirectUrisBackup);
+    $scope.changed = !angular.equals(a, redirectUrisBackup);
   }, true);
 
   $scope.$watch('webOrigins', function(a) {
-    $scope.changed = checkValChange(a, webOriginsBackup);
+    $scope.changed = !angular.equals(a, webOriginsBackup);
   }, true);
 
   $scope.clear = function() {
