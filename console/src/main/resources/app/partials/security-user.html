@@ -80,7 +80,7 @@
             </div>
             <div class="col-sm-4" ng-show="create || resetPassword">
               <div class="search-comp clearfix" style="width: 100%;">
-              <input class="form-control" type="{{inputType}}" id="password" name="password" ng-model="userModel.password" pf-focused="resetPassword">
+              <input class="form-control" type="{{inputType}}" id="password" name="password" autocomplete="off" ng-model="userModel.password" pf-focused="resetPassword">
               <button class="btn btn-link btn-icon ng-scope" ng-click="changeInputType()" type="button" tooltip="Show/Hide Password" >
                 <i class="fa fa-eye-slash" ng-show="inputType === 'password'"></i>
                 <i class="fa fa-eye" ng-show="inputType === 'text'"></i>
