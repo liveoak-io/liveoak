@@ -14,5 +14,5 @@ import java.util.function.Consumer;
  */
 public interface ResourceSink extends Consumer<Resource>, AutoCloseable {
 
-    void close();
+    void close() throws Exception;
 }

@@ -84,7 +84,7 @@ public class RootMongoResource extends MongoResource implements RootResource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         Pagination pagination = ctx.pagination();
         Stream<String> members = this.db().getCollectionNames().stream().skip(pagination.offset());
         if (pagination.limit() > 0) {

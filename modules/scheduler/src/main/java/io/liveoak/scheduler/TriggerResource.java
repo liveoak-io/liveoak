@@ -47,7 +47,7 @@ public class TriggerResource implements Resource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
+    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         this.fires.stream().forEach((e) -> {
             sink.accept(e);
         });
