@@ -226,8 +226,18 @@ loMod.config(['$routeProvider', function($routeProvider) {
         loStorageList : function(LoSecurityCollectionsLoader) {
           return new LoSecurityCollectionsLoader();
         },
-        loRealmAppRoles: function(LoRealmAppRolesLoader) {
-          return new LoRealmAppRolesLoader();
+        // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
+        loRealmAppRoles: function(LoRealmAppRoles, LoRealmApp, $route) {
+          return new LoRealmAppRoles.query({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              new LoRealmApp({'name': $route.current.params.appId, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'},
+              function() {
+                $route.reload();
+              });
+            }
+          );
         },
         uriPolicies: function(LoSecurity, $route) {
           return LoSecurity.get({appId: $route.current.params.appId}).$promise.then(function(data) {
@@ -305,8 +315,24 @@ loMod.config(['$routeProvider', function($routeProvider) {
         userRoles: function() {
           return [];
         },
-        appRoles: function(LoRealmAppRolesLoader) {
+        // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
+        /*appRoles: function(LoRealmAppRolesLoader) {
           return new LoRealmAppRolesLoader();
+        }*/
+        appRoles: function(LoRealmAppRoles, LoRealmApp, $route) {
+          return new LoRealmAppRoles.query({appId: $route.current.params.appId}).$promise.then(
+            function(data) {
+              return data;
+            },
+            function() {
+              new LoRealmApp({'name': $route.current.params.appId, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'},
+                function() {
+                  return new LoRealmAppRoles.query({appId: $route.current.params.appId}).$promise.then(
+                    function(data) {
+                      return data;
+                    });
+                });
+            });
         }
       }
     })
