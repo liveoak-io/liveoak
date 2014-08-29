@@ -57,7 +57,7 @@
             <outputDirectory>/client</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>./target/examples/liveoak-examples-master</directory>
+            <directory>./target/examples/liveoak-examples-1.0.0.Alpha02</directory>
             <outputDirectory>/examples</outputDirectory>
         </fileSet>
     </fileSets>
