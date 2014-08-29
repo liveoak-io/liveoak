@@ -44,34 +44,34 @@
   {
     "id": "helloscript",
     "path": "${io.liveoak.home.dir}/examples/scripting/helloscript",
-    "name": "Business Logic - Hello Messages",
+    "name": "Messages",
     "description": "The Hello Messages example shows a simple usage of Business Logic by outputting a message to the log before and after any resource of the application is read.",
-    "icon": "",
-    "icon-alt": ""
+    "icon": "script.svg",
+    "icon-alt": "Illustration: An XML empty tag element"
   },
   {
     "id": "metadatascript",
     "path": "${io.liveoak.home.dir}/examples/scripting/metadatascript",
-    "name": "Business Logic - Add Metadata",
+    "name": "Metadata for Data",
     "description": "The Add Metadata example shows how Business Logic can add a 'last-modified' field to any data being created or updated within the 'storage' resource of the application.",
-    "icon": "",
-    "icon-alt": ""
+    "icon": "script.svg",
+    "icon-alt": "Illustration: An XML empty tag element"
   },
   {
     "id": "formatscript",
     "path": "${io.liveoak.home.dir}/examples/scripting/formatscript",
-    "name": "Business Logic - Data Validation",
+    "name": "Data Validation",
     "description": "The Data Validation example utilizes Business Logic for validating data received on a create or update, and throws appropriate errors back to the client if validation failed",
-    "icon": "",
-    "icon-alt": ""
+    "icon": "script.svg",
+    "icon-alt": "Illustration: An XML empty tag element"
   },
   {
     "id": "useragentsscript",
     "path": "${io.liveoak.home.dir}/examples/scripting/useragentsscript",
-    "name": "Business Logic - Collecting user agent data",
+    "name": "Request Headers",
     "description": "Utilize Business Logic to read/query/write/update LiveOak resources. In this case it uses the headers from the request to track how many times the same User Agent has accessed the resource.",
-    "icon": "",
-    "icon-alt": ""
+    "icon": "script.svg",
+    "icon-alt": "Illustration: An XML empty tag element"
   },
   {
     "id": "auth-html",
