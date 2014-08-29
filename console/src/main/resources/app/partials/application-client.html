@@ -56,13 +56,11 @@
                   <button type="button" class="btn btn-link btn-icon" ng-show="redirectUris.length > 1"
                           data-ng-click="deleteRedirectUri($index)">
                     <i class="fa fa-trash-o" data-tooltip-placement="top" data-tooltip="Remove URI"></i>
-                    <span>Remove URI</span>
                   </button>
 
                   <button type="button" class="btn btn-link btn-icon" ng-click="addRedirectUri()"
                           ng-show="$last && redirectUri.val && redirectUri.val !== ''" ng-disabled="!redirectUri">
                     <i class="fa fa-plus-circle" data-tooltip-placement="top" data-tooltip="Add URI"></i>
-                    <span>Add URI</span>
                   </button>
                 </div>
               </div>
@@ -84,13 +82,11 @@
                   <button type="button" class="btn btn-link btn-icon" ng-show="webOrigins.length > 1"
                           data-ng-click="deleteWebOrigin($index)">
                     <i class="fa fa-trash-o" data-tooltip-placement="top" data-tooltip="Remove URI"></i>
-                    <span>Remove Web Origin</span>
                   </button>
 
                   <button type="button" class="btn btn-link btn-icon" ng-click="addWebOrigin(webOrigin)"
                           ng-show="$last && webOrigin.val && webOrigin.val !== ''" ng-disabled="!webOrigin">
                     <i class="fa fa-plus-circle" data-tooltip-placement="top" data-tooltip="Add URI"></i>
-                    <span>Add Web Origin</span>
                   </button>
                 </div>
               </div>
