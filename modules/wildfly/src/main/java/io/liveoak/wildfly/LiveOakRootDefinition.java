@@ -17,12 +17,13 @@ import org.jboss.dmr.ModelType;
  */
 public class LiveOakRootDefinition extends PersistentResourceDefinition {
 
+    public static final String DEFAULT_SOCKET_BINDING = "liveoak";
     public static final LiveOakRootDefinition INSTANCE = new LiveOakRootDefinition();
 
     protected static final SimpleAttributeDefinition SOCKET_BINDING =
             new SimpleAttributeDefinitionBuilder("socket-binding", ModelType.STRING, false)
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
-                    .setDefaultValue(new ModelNode("liveoak"))
+                    .setDefaultValue(new ModelNode(DEFAULT_SOCKET_BINDING))
                     .build();
 
     private LiveOakRootDefinition() {

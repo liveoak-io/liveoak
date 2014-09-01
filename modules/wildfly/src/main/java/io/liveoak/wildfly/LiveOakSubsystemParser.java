@@ -38,8 +38,10 @@ public class LiveOakSubsystemParser implements XMLStreamConstants, XMLElementRea
     }
 
     @Override
-    public void writeContent(XMLExtendedStreamWriter writer, SubsystemMarshallingContext value) throws XMLStreamException {
-        ModelNode model = new ModelNode();
+    public void writeContent(XMLExtendedStreamWriter writer, SubsystemMarshallingContext ctx) throws XMLStreamException {
+        ModelNode model = new ModelNode().set(LiveOakRootDefinition.INSTANCE.getPathElement().getValue(), ctx.getModelNode());
+        model = new ModelNode().set(LiveOakRootDefinition.INSTANCE.getPathElement().getKey(), model);
+
         //model.get(UndertowRootDefinition.INSTANCE.getPathElement().getKeyValuePair()).set(context.getModelNode());//this is bit of workaround for SPRD to work properly
         xmlDescription.persist(writer, model, LiveOakExtension.NAMESPACE);
 
