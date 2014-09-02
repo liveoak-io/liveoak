@@ -3,6 +3,7 @@ package io.liveoak.wildfly;
 import org.jboss.as.controller.Extension;
 import org.jboss.as.controller.ExtensionContext;
 import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
 import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.SubsystemRegistration;
 import org.jboss.as.controller.descriptions.NonResolvingResourceDescriptionResolver;
@@ -50,17 +51,11 @@ public class LiveOakExtension implements Extension {
     @Override
     public void initialize(ExtensionContext context) {
         final SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, 1, 0, 0);
-        final ManagementResourceRegistration registration = subsystem.registerSubsystemModel(new SimpleResourceDefinition(
-                PathElement.pathElement(SUBSYSTEM, SUBSYSTEM_NAME),
-                new NonResolvingResourceDescriptionResolver(),
-                LiveOakSubsystemAdd.INSTANCE,
-                LiveOakSubsystemRemove.INSTANCE
-        ));
+        final ManagementResourceRegistration registration = subsystem.registerSubsystemModel(LiveOakRootDefinition.INSTANCE);
         //We always need to add a 'describe' operation
         registration.registerOperationHandler(GenericSubsystemDescribeHandler.DEFINITION, GenericSubsystemDescribeHandler.INSTANCE);
         subsystem.registerXMLElementWriter(LiveOakSubsystemParser.INSTANCE);
         log.debug("liveoak subsystem, activate!");
-
     }
 
 }
