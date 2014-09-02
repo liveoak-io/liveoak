@@ -5,6 +5,8 @@
  */
 package io.liveoak.container.protocols;
 
+import java.util.concurrent.Executor;
+
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.ErrorHandler;
 import io.liveoak.container.RequestContextDisposerHandler;
@@ -39,12 +41,9 @@ import io.liveoak.stomp.server.protocol.StompErrorHandler;
 import io.liveoak.stomp.server.protocol.SubscribeHandler;
 import io.liveoak.stomp.server.protocol.UnsubscribeHandler;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
-
-import java.util.concurrent.Executor;
 
 /**
  * @author Bob McWhirter
@@ -179,9 +178,6 @@ public class PipelineConfigurator {
         pipeline.addLast("cors-origin-handler", new CORSHandler());
         pipeline.addLast("cors-preflight-handler", new CORSPreflightOptionsHandler());
         //pipeline.addLast( new DebugHandler( "server-post-cors" ) );
-
-        pipeline.addLast("deflater", new HttpContentCompressor(1));
-
         pipeline.addLast("http-resource-decoder", new HttpResourceRequestDecoder(this.codecManager));
         pipeline.addLast("http-resource-encoder", new HttpResourceResponseEncoder(this.codecManager));
         pipeline.addLast("http-request-body-handler", new HttpRequestBodyHandler());
