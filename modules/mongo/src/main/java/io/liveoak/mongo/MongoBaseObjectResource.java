@@ -5,10 +5,6 @@
  */
 package io.liveoak.mongo;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.DBRef;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.ReturnFields;
@@ -16,7 +12,15 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.DBRef;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -106,20 +110,11 @@ public class MongoBaseObjectResource extends MongoObjectResource {
         state.getPropertyNames().stream().forEach((name) -> {
             if (!name.equals(MONGO_ID_FIELD) && !name.equals(MBAAS_ID_FIELD)) {
                 Object value = state.getProperty(name);
+                if(value instanceof Collection) {
+                    value = convertCollection(responder, (Collection<?>)value);
+                }
                 if (value instanceof ResourceState) {
-                    ResourceState valueResourceState = (ResourceState)value;
-                    Object dbRefObject = valueResourceState.getProperty( "$dbref" );
-                    try {
-                        if (dbRefObject != null) {
-                            value = getDBRef((String)dbRefObject);
-                        }
-                        else {
-                            value = createObject( (ResourceState) value );
-                        }
-                    } catch (Exception e) {
-                        responder.invalidRequest( "Could not update Property");
-                        throw new RuntimeException("Could not update property!", e);
-                    }
+                    value = convertResourceState(responder, (ResourceState)value);
                 }
                 if (value == null) {
                     dbObject.removeField( name );
@@ -144,6 +139,33 @@ public class MongoBaseObjectResource extends MongoObjectResource {
         getParent().updateChild(ctx, this.id(), dbObject);
 
         responder.resourceUpdated(this);
+    }
+
+    private Object convertCollection(Responder responder, Collection<?> value) {
+        List<Object> newCol = new ArrayList<Object>();
+        for(Object tmp: value) {
+            if (tmp instanceof ResourceState) {
+                tmp = convertResourceState(responder, (ResourceState)tmp);
+            }
+            newCol.add(tmp);
+        }
+        return newCol;
+    }
+
+    private Object convertResourceState(Responder responder, ResourceState valueResourceState) {
+        Object tmp = null;
+        Object dbRefObject = valueResourceState.getProperty( "$dbref" );
+        try {
+            if (dbRefObject != null) {
+                tmp = getDBRef((String)dbRefObject);
+            } else {
+                tmp = createObject( (ResourceState) valueResourceState );
+            }
+        } catch (Exception e) {
+            responder.invalidRequest( "Could not update Property");
+            throw new RuntimeException("Could not update property!", e);
+        }
+        return tmp;
     }
 
     @Override
