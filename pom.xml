@@ -78,6 +78,7 @@
         <arquillian.angularjs.version>1.2.0.Alpha1</arquillian.angularjs.version>
 
         <!-- Maven Plugins -->
+        <version.assembly.plugin>2.4</version.assembly.plugin>
         <version.resourceStates.plugin>2.4.2</version.resourceStates.plugin>
         <version.vertx.plugin>2.0.1-final</version.vertx.plugin>
         <version.codehaus.helper.plugin>1.8</version.codehaus.helper.plugin>
