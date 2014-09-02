@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.jboss</groupId>
     <artifactId>jboss-parent</artifactId>
-    <version>14</version>
+    <version>16</version>
   </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -78,16 +78,6 @@
         <arquillian.angularjs.version>1.2.0.Alpha1</arquillian.angularjs.version>
 
         <!-- Maven Plugins -->
-        <version.compiler.plugin>3.1</version.compiler.plugin>
-        <version.source.plugin>2.1.2</version.source.plugin>
-        <version.javadoc.plugin>2.8.1</version.javadoc.plugin>
-        <version.release.plugin>2.5</version.release.plugin>
-        <version.enforcer.plugin>1.3.1</version.enforcer.plugin>
-        <version.checkstyle.plugin>2.12.1</version.checkstyle.plugin>
-        <version.surefire.plugin>2.16</version.surefire.plugin>
-        <version.resources.plugin>2.6</version.resources.plugin>
-        <version.failsafe.plugin>2.16</version.failsafe.plugin>
-        <version.gpg.plugin>1.4</version.gpg.plugin>
         <version.resourceStates.plugin>2.4.2</version.resourceStates.plugin>
         <version.vertx.plugin>2.0.1-final</version.vertx.plugin>
         <version.codehaus.helper.plugin>1.8</version.codehaus.helper.plugin>
