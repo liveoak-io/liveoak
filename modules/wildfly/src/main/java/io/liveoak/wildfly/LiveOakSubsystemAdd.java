@@ -45,16 +45,12 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
     private static final Logger log = Logger.getLogger(LiveOakSubsystemAdd.class);
 
     private LiveOakSubsystemAdd() {
+        super(LiveOakRootDefinition.SOCKET_BINDING);
     }
 
     @Override
     protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model, ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers) throws OperationFailedException {
         super.performRuntime(context, operation, model, verificationHandler, newControllers);
-    }
-
-    @Override
-    protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
-        LiveOakRootDefinition.SOCKET_BINDING.validateAndSet(operation, model);
     }
 
     /**
@@ -73,7 +69,6 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
         }, OperationContext.Stage.RUNTIME);
 
         log.trace("BOOT MODEL: " + model);
-        log.trace("BOOT OP: " + operation);
 
 
         String propVal = System.getProperty(LIVEOAK_HOME_PROPERTY);
@@ -102,8 +97,7 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         log.debug("installed mongo auto-setup");
 
-        ModelNode socketBindingNode = model.get("socket-binding");
-        String socketBinding = socketBindingNode.isDefined() ? socketBindingNode.asString() : LiveOakRootDefinition.DEFAULT_SOCKET_BINDING;
+        String socketBinding = LiveOakRootDefinition.SOCKET_BINDING.resolveModelAttribute(context,model).asString();
 
         LiveOakSocketBindingService liveoakSocketBinding = new LiveOakSocketBindingService();
 

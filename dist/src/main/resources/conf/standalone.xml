@@ -373,7 +373,7 @@
             <client-config name="Standard-Client-Config"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:2.0"/>
-        <subsystem xmlns="urn:liveoak:liveoak:1.0" socket-binding="liveoak"/>
+        <subsystem xmlns="urn:liveoak:liveoak:1.0" />
     </profile>
     <interfaces>
         <interface name="localhost">
