@@ -38,8 +38,6 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
         log.debug("** Activate " + this.extensionId + " as " + resourceId + " for " + this.applicationInjector.getValue().id());
 
         ServiceTarget target = context.getChildTarget();
-        StabilityMonitor monitor = new StabilityMonitor();
-        target.addMonitor(monitor);
 
         this.appExtension = new InternalApplicationExtension(
                 this.serviceRegistryInjector.getValue(),
@@ -66,8 +64,6 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
                 throw this.appExtension.exception();
             }
 
-            monitor.awaitStability(300, TimeUnit.MILLISECONDS, null);
-            target.removeMonitor(monitor);
         } catch (Exception e) {
             throw new StartException(e);
         }

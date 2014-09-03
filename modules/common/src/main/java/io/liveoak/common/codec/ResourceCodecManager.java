@@ -22,6 +22,7 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import org.jboss.logging.Logger;
 
 /**
  * @author Bob McWhirter
@@ -77,6 +78,7 @@ public class ResourceCodecManager {
         }
 
         if (!codec.hasEncoder()) {
+            log.trace("This media is not supported: " + mediaTypeMatcher + " (codecs: " + codecs + ")");
             throw new UnsupportedMediaTypeException(mediaTypeMatcher);
         }
 
@@ -112,6 +114,8 @@ public class ResourceCodecManager {
     }
 
     private List<CodecRegistration> codecs = new CopyOnWriteArrayList<>();
+
+    private static final Logger log = Logger.getLogger(ResourceCodecManager.class);
 
     private static class CodecRegistration {
 
