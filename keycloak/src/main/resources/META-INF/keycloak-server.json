@@ -3,28 +3,31 @@
         "realm": "liveoak-admin"
     },
 
-    "audit": {
-        "provider": "${keycloak.audit.provider,keycloak.model.provider:mongo}",
-        "mongo": {
-          "host": "${keycloak.audit.mongo.host:127.0.0.1}",
-          "port": "${keycloak.audit.mongo.port:27017}",
-          "db": "${keycloak.audit.mongo.db:liveoak-kc-audit}",
-          "clearOnStartup": "${keycloak.audit.mongo.clearOnStartup:false}"
-        }
+    "eventsStore": {
+        "provider": "mongo"
     },
 
-    "model": {
-        "provider": "${keycloak.model.provider:mongo}",
-        "mongo": {
-          "host": "${keycloak.model.mongo.host:127.0.0.1}",
-          "port": "${keycloak.model.mongo.port:27017}",
-          "db": "${keycloak.model.mongo.db:liveoak-kc}",
-          "clearOnStartup": "${keycloak.model.mongo.clearOnStartup:false}"
-        }
+    "realm": {
+        "provider": "mongo"
     },
 
-    "modelCache": {
-        "provider": "${keycloak.model.cache.provider:none}"
+    "user": {
+        "provider": "mongo"
+    },
+
+    "userSessions": {
+        "provider" : "mem"
+    },
+
+    "realmCache": {
+        "provider": "mem"
+    },
+
+    "userCache": {
+        "provider": "mem",
+        "mem": {
+            "maxSize": 20000
+        }
     },
 
     "timer": {
@@ -33,6 +36,9 @@
 
     "theme": {
         "default": "keycloak",
+        "staticMaxAge": 2592000,
+        "cacheTemplates": true,
+        "cacheThemes": true,
         "folder": {
             "dir": "${keycloak.theme.dir}"
         }
@@ -52,5 +58,14 @@
 
     "scheduled": {
         "interval": 900
+    },
+
+    "connectionsMongo": {
+        "default": {
+            "host": "${keycloak.connectionsMongo.host:127.0.0.1}",
+            "port": "${keycloak.connectionsMongo.port:27017}",
+            "db": "${keycloak.connectionsMongo.db:liveoak-kc}",
+            "clearOnStartup": "${keycloak.connectionsMongo.clearOnStartup:false}"
+        }
     }
 }
