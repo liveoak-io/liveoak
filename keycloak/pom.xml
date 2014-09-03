@@ -15,60 +15,15 @@
     <description/>
 
     <properties>
-        <servlet.api.30.version>1.0.1.Final</servlet.api.30.version>
-        <google.zxing.version>2.2</google.zxing.version>
-        <winzipaes.version>1.0.1</winzipaes.version>
-        <freemarker.version>2.3.19</freemarker.version>
-        <twitter4j.version>3.0.5</twitter4j.version>
-        <picketlink.version>2.6.0.CR2</picketlink.version>
+        <servlet.api.30.version>1.0.2.Final</servlet.api.30.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.picketlink</groupId>
-                <artifactId>picketlink-common</artifactId>
-                <version>${picketlink.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.picketlink</groupId>
-                <artifactId>picketlink-idm-api</artifactId>
-                <version>${picketlink.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.picketlink</groupId>
-                <artifactId>picketlink-idm-impl</artifactId>
-                <version>${picketlink.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.picketlink</groupId>
-                <artifactId>picketlink-idm-simple-schema</artifactId>
-                <version>${picketlink.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.jboss.spec.javax.servlet</groupId>
                 <artifactId>jboss-servlet-api_3.0_spec</artifactId>
                 <version>${servlet.api.30.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.idyl</groupId>
-                <artifactId>winzipaes</artifactId>
-                <version>${winzipaes.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.zxing</groupId>
-                <artifactId>javase</artifactId>
-                <version>${google.zxing.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.freemarker</groupId>
-                <artifactId>freemarker</artifactId>
-                <version>${freemarker.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.twitter4j</groupId>
-                <artifactId>twitter4j-core</artifactId>
-                <version>${twitter4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -76,197 +31,8 @@
     <dependencies>
         <dependency>
             <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-core</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.iharder</groupId>
-            <artifactId>base64</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-core-jaxrs</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-services</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>javase</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-model-api</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-model-mongo</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-invalidation-cache-model</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-audit-api</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-audit-mongo</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-audit-jboss-logging</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-audit-email</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <!-- social -->
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-social-core</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-social-github</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-social-google</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-social-twitter</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.twitter4j</groupId>
-            <artifactId>twitter4j-core</artifactId>
-            <version>${twitter4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-social-facebook</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <!-- forms -->
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-forms-common-freemarker</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-forms-common-themes</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-account-api</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-account-freemarker</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-login-api</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-login-freemarker</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-email-api</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-email-freemarker</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-js-adapter</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <!-- authentication api -->
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-authentication-api</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-authentication-model</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-authentication-picketlink</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.picketlink</groupId>
-            <artifactId>picketlink-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.picketlink</groupId>
-            <artifactId>picketlink-idm-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.picketlink</groupId>
-            <artifactId>picketlink-idm-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.picketlink</groupId>
-            <artifactId>picketlink-idm-simple-schema</artifactId>
-        </dependency>
-
-        <!-- timer -->
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-timer-api</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-timer-basic</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-
-        <!-- picketlink -->
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-picketlink-api</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-picketlink-realm</artifactId>
-            <version>${keycloak.version}</version>
+            <artifactId>keycloak-dependencies-server-all</artifactId>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.jboss.spec.javax.servlet</groupId>
@@ -310,28 +76,6 @@
             <artifactId>jboss-logging</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <!-- export/import -->
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-export-import-api</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-export-import-impl</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>de.idyl</groupId>
-            <artifactId>winzipaes</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>

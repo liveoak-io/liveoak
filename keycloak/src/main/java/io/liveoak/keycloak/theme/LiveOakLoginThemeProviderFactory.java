@@ -3,7 +3,7 @@ package io.liveoak.keycloak.theme;
 import org.keycloak.Config;
 import org.keycloak.freemarker.ThemeProvider;
 import org.keycloak.freemarker.ThemeProviderFactory;
-import org.keycloak.provider.ProviderSession;
+import org.keycloak.models.KeycloakSession;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -14,7 +14,7 @@ public class LiveOakLoginThemeProviderFactory implements ThemeProviderFactory {
     public static final String ID = "liveoak";
 
     @Override
-    public ThemeProvider create(ProviderSession providerSession) {
+    public ThemeProvider create(KeycloakSession keycloakSession) {
         return themeProvider;
     }
 
