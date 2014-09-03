@@ -14,6 +14,7 @@ import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import org.jboss.logging.Logger;
 
 /**
@@ -168,7 +169,15 @@ public class BaseResponder implements Responder {
     }
 
     protected void resumeRead() {
-        ctx.pipeline().firstContext().read();
+        ChannelPipeline pipeline = ctx.pipeline();
+        if (pipeline == null) {
+            return;
+        }
+        ChannelHandlerContext context = pipeline.firstContext();
+        if (context == null) {
+            return;
+        }
+        context.read();
     }
 
     private final ResourceRequest inReplyTo;
