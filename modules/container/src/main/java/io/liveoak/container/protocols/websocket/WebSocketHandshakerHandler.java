@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -12,10 +12,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpRequestDecoder;
-import io.netty.handler.codec.http.HttpRequestEncoder;
-import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.util.ReferenceCountUtil;
@@ -31,18 +27,18 @@ public class WebSocketHandshakerHandler extends SimpleChannelInboundHandler<Obje
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if ( ! ( msg instanceof FullHttpRequest ) ) {
+        if (!(msg instanceof FullHttpRequest)) {
             DefaultHttpRequest req = (DefaultHttpRequest) msg;
             String upgrade = req.headers().get(HttpHeaders.Names.UPGRADE);
             if (HttpHeaders.Values.WEBSOCKET.equalsIgnoreCase(upgrade)) {
                 // ensure FullHttpRequest by installing HttpObjectAggregator in front of this handler
                 ReferenceCountUtil.retain(msg);
                 this.configurator.switchToWebSocketsHandshake(ctx.pipeline());
-                ctx.pipeline().fireChannelRead( msg );
+                ctx.pipeline().fireChannelRead(msg);
             } else {
                 ReferenceCountUtil.retain(msg);
                 this.configurator.switchToPlainHttp(ctx.pipeline());
-                ctx.pipeline().fireChannelRead( msg );
+                ctx.pipeline().fireChannelRead(msg);
             }
         } else {
             // do the handshake
@@ -50,7 +46,7 @@ public class WebSocketHandshakerHandler extends SimpleChannelInboundHandler<Obje
             WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(req.getUri(), null, false);
             WebSocketServerHandshaker handshaker = wsFactory.newHandshaker(req);
             if (handshaker == null) {
-                WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
+                WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
             } else {
                 ChannelFuture future = handshaker.handshake(ctx.channel(), req);
                 future.addListener(f -> {
