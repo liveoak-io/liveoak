@@ -7,6 +7,7 @@ package io.liveoak.common.util;
 
 import java.io.File;
 import java.util.Properties;
+import java.util.function.Function;
 
 /**
  * A utility class for replacing properties in strings.
@@ -73,6 +74,9 @@ public final class StringPropertyReplacer {
         return replaceProperties(string, null);
     }
 
+    public static String replaceProperties(final String string, final Properties props) {
+        return replaceProperties(string, props, (v) -> {return v;});
+    }
     /**
      * <p>Go through the input string and replace any occurance of ${p} with the
      * props.getProperty(p) value. If there is no such property p defined, then
@@ -95,7 +99,7 @@ public final class StringPropertyReplacer {
      * @return the input string with all property references replaced if any. If
      * there are no valid references the input string will be returned.
      */
-    public static String replaceProperties(final String string, final Properties props) {
+    public static String replaceProperties(final String string, final Properties props, Function<String, String> filter) {
         final char[] chars = string.toCharArray();
         StringBuffer buffer = new StringBuffer();
         boolean properties = false;
@@ -123,7 +127,7 @@ public final class StringPropertyReplacer {
             else if (c == '}' && state == IN_BRACKET) {
                 // No content
                 if (start + 2 == i) {
-                    buffer.append("${}"); // REVIEW: Correct?
+                    buffer.append(filter != null ? filter.apply("${}") : "${}"); // REVIEW: Correct?
                 } else { // Collect the system property
                     String value = null;
 
@@ -168,11 +172,11 @@ public final class StringPropertyReplacer {
 
                     if (value != null) {
                         properties = true;
-                        buffer.append(value);
+                        buffer.append(filter != null ? filter.apply(value) : value);
                     } else {
-                        buffer.append("${");
-                        buffer.append(key);
-                        buffer.append('}');
+                        buffer.append(filter != null ? filter.apply("${") : "${");
+                        buffer.append(filter != null ? filter.apply(key) : key);
+                        buffer.append(filter != null ? filter.apply("}") : "}");
                     }
 
                 }

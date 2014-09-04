@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.codec.json.JSONEncoder;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.common.util.StringPropertyReplacer;
 import io.liveoak.spi.LiveOak;
@@ -92,7 +93,7 @@ public class ExtensionInstaller {
 
     private String replaceProperties(File file) throws IOException {
         String original = new String(Files.readAllBytes(file.toPath()));
-        return StringPropertyReplacer.replaceProperties(original, System.getProperties());
+        return StringPropertyReplacer.replaceProperties(original, System.getProperties(), (v) -> { return JSONEncoder.jsonStringEscape(v); });
     }
 
     private ServiceTarget target;
