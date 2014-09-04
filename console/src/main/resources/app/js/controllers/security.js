@@ -554,7 +554,7 @@ loMod.controller('SecurityUsersCtrl', function($scope, $rootScope, $log, $route,
 
 });
 
-loMod.controller('SecurityUsersAddCtrl', function($scope, $rootScope, $log, $route, $location, $http, $modal, currentApp, userProfile, userRoles, appRoles, LoRealmUsers, Notifications) {
+loMod.controller('SecurityUsersAddCtrl', function($scope, $rootScope, $log, $route, $location, $http, $modal, currentApp, userProfile, userRoles, appRoles, LoRealmUsers, Notifications, LiveOak) {
 
   $rootScope.curApp = currentApp;
 
@@ -624,7 +624,7 @@ loMod.controller('SecurityUsersAddCtrl', function($scope, $rootScope, $log, $rou
       );
     }
 
-    var roleMappingsUrl = '/auth/admin/realms/liveoak-apps/users/' + $scope.userModel.profile.username + '/role-mappings/applications/' + currentApp.name;
+    var roleMappingsUrl = LiveOak.getAuthServerUrl() + '/admin/realms/liveoak-apps/users/' + $scope.userModel.profile.username + '/role-mappings/applications/' + currentApp.name;
 
     var rolesData = [];
     for(var i = 0; i < appRoles.length; i++) {

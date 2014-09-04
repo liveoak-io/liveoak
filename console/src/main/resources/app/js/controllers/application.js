@@ -330,7 +330,7 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
 loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, $location, $http, Notifications,
                                            LoRealmApp, LoRealmAppRoles, LoRealmAppClientScopeMapping, currentApp,
                                            loRealmAppClient, loRealmRoles, loRealmAppRoles, scopeMappings, LoClient,
-                                           loClient, $modal, $q) {
+                                           loClient, LiveOak, $modal, $q) {
 
   $rootScope.curApp = currentApp;
 
@@ -475,7 +475,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
       }
     }
 
-    var scopeMappingsUrl = '/auth/admin/realms/liveoak-apps/applications/' + $scope.settings.name +  '/scope-mappings/applications/' + $route.current.params.appId;
+    var scopeMappingsUrl = LiveOak.getAuthServerUrl() + '/admin/realms/liveoak-apps/applications/' + $scope.settings.name +  '/scope-mappings/applications/' + $route.current.params.appId;
 
     var scopeMappingsAdd = function() {
       if(smData.length > 0) {

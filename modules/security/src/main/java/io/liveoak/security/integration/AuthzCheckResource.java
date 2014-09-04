@@ -68,7 +68,7 @@ public class AuthzCheckResource implements Resource {
 
             if (ctxToAuthorize.securityContext() != null && ctxToAuthorize.securityContext().getRealm() != null) {
                 String realm = ctxToAuthorize.securityContext().getRealm();
-                if (realm.equals("liveoak-admin")) {
+                if (realm.equals("liveoak-admin") || realm.equals("master")) { // TODO: Hardcoded realms and 'admin' role is just temporary solution
                     boolean accepted = ctxToAuthorize.securityContext().getRoles().contains("admin");
                     writeAuthzResponse(sink, accepted);
                     return;

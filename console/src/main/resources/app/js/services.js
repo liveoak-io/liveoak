@@ -288,8 +288,8 @@ loMod.factory('LoPush', function($resource) {
   });
 });
 
-loMod.factory('LoRealmApp', function($resource) {
-  return $resource('/auth/admin/realms/:realmId/applications/:appId', {
+loMod.factory('LoRealmApp', function($resource, LiveOak) {
+  return $resource(LiveOak.getAuthServerUrl() + '/admin/realms/:realmId/applications/:appId', {
     realmId : 'liveoak-apps',
     appId: '@appId'
   }, {
@@ -305,29 +305,29 @@ loMod.factory('LoRealmApp', function($resource) {
   });
 });
 
-loMod.factory('LoRealmAppRoles', function($resource) {
-  return $resource('/auth/admin/realms/:realmId/applications/:appId/roles/:roleName', {
+loMod.factory('LoRealmAppRoles', function($resource, LiveOak) {
+  return $resource(LiveOak.getAuthServerUrl() + '/admin/realms/:realmId/applications/:appId/roles/:roleName', {
     realmId : 'liveoak-apps',
     appId: '@appId',
     roleName: '@roleName'
   });
 });
 
-loMod.factory('LoRealmRoles', function($resource) {
-  return $resource('/auth/admin/realms/:realmId/roles', {
+loMod.factory('LoRealmRoles', function($resource, LiveOak) {
+  return $resource(LiveOak.getAuthServerUrl() + '/admin/realms/:realmId/roles', {
     realmId : 'liveoak-apps'
   });
 });
 
-loMod.factory('LoRealmClientRoles', function($resource) {
-  return $resource('/auth/admin/realms/:realmId/applications/:appId/scope-mappings/realm', {
+loMod.factory('LoRealmClientRoles', function($resource, LiveOak) {
+  return $resource(LiveOak.getAuthServerUrl() + '/admin/realms/:realmId/applications/:appId/scope-mappings/realm', {
     realmId: 'liveoak-apps',
     appId: '@appId'
   });
 });
 
-loMod.factory('LoRealmAppClientScopeMapping', function($resource) {
-  return $resource('/auth/admin/realms/:realmId/applications/:clientId/scope-mappings/applications/:appId', {
+loMod.factory('LoRealmAppClientScopeMapping', function($resource, LiveOak) {
+  return $resource(LiveOak.getAuthServerUrl() + '/admin/realms/:realmId/applications/:clientId/scope-mappings/applications/:appId', {
     realmId: 'liveoak-apps',
     appId : '@appId',
     clientId : '@clientId'
@@ -449,26 +449,26 @@ loMod.factory('LoACLLoader', function(Loader, LoACL, $route) {
   });
 });
 
-loMod.factory('LoRealmUsers', function($resource) {
-  return $resource('/auth/admin/realms/:realmId/users/:userId', {
+loMod.factory('LoRealmUsers', function($resource, LiveOak) {
+  return $resource(LiveOak.getAuthServerUrl() + '/admin/realms/:realmId/users/:userId', {
     realmId : 'liveoak-apps',
     userId : '@userId'
   }, {
     resetPassword : {
       method: 'PUT',
-      url: '/auth/admin/realms/:realmId/users/:userId/reset-password'
+      url: LiveOak.getAuthServerUrl() + '/admin/realms/:realmId/users/:userId/reset-password'
     },
     addRoles : {
       method: 'POST',
-      url: '/auth/admin/realms/:realmId/users/:userId/role-mappings/applications/:appId'
+      url: LiveOak.getAuthServerUrl() + '/admin/realms/:realmId/users/:userId/role-mappings/applications/:appId'
     },
     deleteRoles : {
       method: 'DELETE',
-      url: '/auth/admin/realms/:realmId/users/:userId/role-mappings/applications/:appId'
+      url: LiveOak.getAuthServerUrl() + '/admin/realms/:realmId/users/:userId/role-mappings/applications/:appId'
     },
     getRoles: {
       method: 'GET',
-      url: '/auth/admin/realms/:realmId/users/:userId/role-mappings/applications/:appId/composite',
+      url: LiveOak.getAuthServerUrl() + '/admin/realms/:realmId/users/:userId/role-mappings/applications/:appId/composite',
       isArray: true
     },
     update: {
