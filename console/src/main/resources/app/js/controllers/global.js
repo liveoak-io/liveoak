@@ -13,10 +13,15 @@ loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, $ro
       $location.path('/error');
     });
 
+  // to avoid initial flashing of sidebar on non-sidebar pages
+  $rootScope.hideSidebar = true;
+
+  // originalPath is used to calculate the sidebar active element
   $rootScope.$on('$locationChangeSuccess', function() {
     $rootScope.oPath = $route.current.$$route.originalPath;
   });
 
+  // so that it shows back when switching from non-sidebar to sidebar pages
   $rootScope.$on('$routeChangeSuccess', function() {
     delete $rootScope.hideSidebar;
   });
