@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.global', []);
 
-loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, LiveOak) {
+loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, $route, LiveOak) {
 
   $log.debug('GlobalCtrl' + LiveOak);
 
@@ -12,6 +12,14 @@ loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, Liv
       $log.error('failed to change routes');
       $location.path('/error');
     });
+
+  $rootScope.$on('$locationChangeSuccess', function() {
+    $rootScope.oPath = $route.current.$$route.originalPath;
+  });
+
+  $rootScope.$on('$routeChangeSuccess', function() {
+    delete $rootScope.hideSidebar;
+  });
 
   /* jshint ignore:start */
   $scope.auth = LiveOak.auth;
