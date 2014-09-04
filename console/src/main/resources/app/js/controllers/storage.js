@@ -557,7 +557,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     var urlCreator = $window.URL || $window.webkitURL || $window.mozURL || $window.msURL;
 
     $scope.urlExport = urlCreator.createObjectURL( blob);
-    $scope.jsonName = $scope.collectionId + '_' + (new Date()).toISOString() + '.txt';
+    $scope.jsonName = $scope.collectionId + '_' + (new Date()).toISOString() + '.json';
   }
 
   $scope.rowAdd = function(){
