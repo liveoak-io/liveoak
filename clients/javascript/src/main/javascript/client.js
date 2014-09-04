@@ -87,6 +87,10 @@ var LiveOak = function( options ) {
         http.getToken = function() {
             return auth.token;
         }
+
+        this.getAuthServerUrl = function() {
+            return auth.authServerUrl;
+        }
     }
 
     function parseScriptUrl() {
