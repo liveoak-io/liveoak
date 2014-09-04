@@ -37,7 +37,7 @@ public class ResourceStateEncoderTest {
         encoder.initialize(buffer);
         RootEncodingDriver driver = new RootEncodingDriver(new RequestContext.Builder().build(), encoder, resource, () -> {
             future.complete(encoder.root());
-        });
+        }, null);
         return driver;
     }
 

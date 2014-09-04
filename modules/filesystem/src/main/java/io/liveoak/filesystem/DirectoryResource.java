@@ -8,7 +8,6 @@ package io.liveoak.filesystem;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
@@ -39,13 +38,10 @@ public class DirectoryResource implements FSResource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception{
-
-        CompletableFuture<ResourceSink> future = new CompletableFuture<>();
-
+    public void readMembers(RequestContext ctx, ResourceSink sink) {
         vertx().fileSystem().readDir(file().getPath(), (result) -> {
             if (result.failed()) {
-                future.complete(sink);
+                sink.close();
             } else {
                 List<File> sorted = new ArrayList<>();
 
@@ -82,12 +78,9 @@ public class DirectoryResource implements FSResource {
                         sink.accept(createFileResource(each));
                     }
                 }
-                future.complete(sink);
+                sink.close();
             }
         });
-
-        ResourceSink resourceSink = future.get();
-        resourceSink.close();
     }
 
     @Override

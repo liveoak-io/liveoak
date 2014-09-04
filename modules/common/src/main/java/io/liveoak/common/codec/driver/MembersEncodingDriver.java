@@ -64,8 +64,12 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
         }
 
         @Override
-        public void close() throws Exception{
-            encodeNext();
+        public void close() {
+            try {
+                encodeNext();
+            } catch (Exception e) {
+                error(e);
+            }
         }
     }
 

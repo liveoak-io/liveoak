@@ -27,4 +27,5 @@ public interface EncodingDriver {
 
     void encodeNext() throws Exception;
 
+    void error(Throwable e);
 }

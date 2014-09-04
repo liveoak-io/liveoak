@@ -41,7 +41,7 @@ public class EncoderReturnFieldsTest {
         RequestContext requestContext = new RequestContext.Builder().returnFields(returnFields).build();
         RootEncodingDriver driver = new RootEncodingDriver(requestContext, encoder, resource, () -> {
             future.complete(encoder.root());
-        });
+        }, null);
         return driver;
     }
 

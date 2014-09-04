@@ -3,8 +3,9 @@
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package io.liveoak.container;
+
+import java.util.concurrent.Executor;
 
 import io.liveoak.client.impl.ClientResourceResponseImpl;
 import io.liveoak.common.DefaultResourceErrorResponse;
@@ -21,11 +22,10 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import org.jboss.logging.Logger;
 
-import java.util.concurrent.Executor;
-
 /**
  * @author Bob McWhirter
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+ * @author Ken Finnigan
  */
 public class ResourceStateHandler extends ChannelOutboundHandlerAdapter {
 
@@ -77,15 +77,18 @@ public class ResourceStateHandler extends ChannelOutboundHandlerAdapter {
             ResourceState state = encoder.root();
             response.setState(state);
             ctx.writeAndFlush(response, promise);
-        });
+        }, t -> handleError(ctx, response, ResourceErrorResponse.ErrorType.INTERNAL_ERROR, t));
 
         try {
             driver.encode();
         } catch (Exception e) {
-            log.error(ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, e);
-            ctx.writeAndFlush( new DefaultResourceErrorResponse( response.inReplyTo(), ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, e.getMessage(), e ) );
-            ctx.fireUserEventTriggered(new RequestCompleteEvent(response.requestId()));
+            handleError(ctx, response, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, e);
         }
+    }
 
+    private void handleError(ChannelHandlerContext ctx, ResourceResponse response, ResourceErrorResponse.ErrorType errorType, Throwable t) {
+        log.error(errorType, t);
+        ctx.writeAndFlush(new DefaultResourceErrorResponse(response.inReplyTo(), errorType, t.getMessage(), t));
+        ctx.fireUserEventTriggered(new RequestCompleteEvent(response.requestId()));
     }
 }
