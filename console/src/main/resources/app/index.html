@@ -31,7 +31,29 @@
   <lo-navbar></lo-navbar>
 </div>
 
-<div data-ng-view id="lo-content-row" class="row lo-main-pane">
+<div id="lo-content-row" class="row lo-main-pane">
+  <aside class="lo-sidebar col-md-2 fixed clearfix" ng-controller="NavigationCtrl" ng-show="!hideSidebar" >
+    <div class="dropdown">
+      <a class="dropdown-toggle" href="#">{{curApp.name}}<b class="caret"></b></a>
+      <ul class="dropdown-menu">
+        <li ng-repeat="app in applications" ng-class="{active: app.id == curApp.id}"><a ng-href="#/applications/{{app.id}}/{{current}}">{{ app.name | characters: 35 :true }}</a></li>
+      </ul>
+    </div>
+
+    <nav class="navbar navbar-vertical" role="navigation">
+      <div class="bs-sidebar">
+        <ul>
+          <li ng-class="{active: current === 'dashboard'}" class="dashboard"><a href="#/applications/{{curApp.id}}/dashboard"><i class="fa fa-tachometer"></i>Dashboard</a></li>
+          <li ng-class="{active: current === 'storage'}" class="storage"><a href="#/applications/{{curApp.id}}/storage"><i class="fa fa-cloud"></i>Storage</a></li>
+          <li ng-class="{active: current === 'security'}" class="security"><a href="#/applications/{{curApp.id}}/security/policies"><i class="fa fa-lock"></i>Security</a></li>
+          <li ng-class="{active: current === 'push'}" class="push"><a href="#/applications/{{curApp.id}}/push"><i class="fa fa-mobile"></i>Push</a></li>
+          <li ng-class="{active: current === 'application-clients'}" class="clients"><a href="#/applications/{{curApp.id}}/application-clients"><i class="fa fa-globe"></i>Clients</a></li>
+          <li ng-class="{active: current === 'business-logic'}" class="logic"><a href="#/applications/{{curApp.id}}/business-logic"><i class="fa fa-code"></i>Logic</a></li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+  <div data-ng-view class="ng-cloak"></div>
 </div>
 
 <script src="/admin/client/liveoak.js" type="text/javascript"></script>

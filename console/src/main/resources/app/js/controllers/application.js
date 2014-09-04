@@ -2,7 +2,19 @@
 
 var loMod = angular.module('loApp.controllers.application', []);
 
-loMod.controller('AppListCtrl', function($scope, $routeParams, $location, $modal, $filter, $route, Notifications, examplesList, loAppList, LoApp, LoStorage, LoPush, LoRealmApp) {
+loMod.controller('NavigationCtrl', function($scope, $rootScope) {
+  $scope.$watch('oPath', function() {
+    if ($rootScope.oPath) {
+      var a = $rootScope.oPath;
+      a = a.substr('/applications/:appId/'.length);
+      $scope.current = a.substr(0, a.indexOf('/') > 0 ? a.indexOf('/') : a.length);
+    }
+  });
+});
+
+loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $location, $modal, $filter, $route, Notifications, examplesList, loAppList, LoApp, LoStorage, LoPush, LoRealmApp) {
+
+  $rootScope.hideSidebar = true;
 
   $scope.applications = [];
   $scope.exampleApplications = [];
@@ -630,6 +642,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
 loMod.controller('NextStepsCtrl', function($scope, $rootScope, $routeParams, currentApp, loStorageList) {
 
   $rootScope.curApp = currentApp;
+  $rootScope.hideSidebar = true;
 
   $scope.storageList = [];
 
@@ -652,7 +665,9 @@ loMod.controller('NextStepsCtrl', function($scope, $rootScope, $routeParams, cur
 
 });
 
-loMod.controller('ExampleListCtrl', function($scope, $location, $filter, Notifications, LoAppExamples, LoApp, examplesList, loAppList) {
+loMod.controller('ExampleListCtrl', function($scope, $rootScope, $location, $filter, Notifications, LoAppExamples, LoApp, examplesList, loAppList) {
+
+  $rootScope.hideSidebar = true;
 
   $scope.breadcrumbs = [
     {'label': 'Applications', 'href': '#/applications'},
