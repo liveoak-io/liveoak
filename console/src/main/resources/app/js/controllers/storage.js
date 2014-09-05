@@ -255,8 +255,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
   $scope.live = {};
 
-  $scope.subscriptionId = false;
-
   $scope.columnsHidden = [];
   $scope.newRow = {};
   $scope.newRows = [];
@@ -283,7 +281,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   }
 
   // Load data for selected collection
-  if ( currentCollectionList ) {
+  if ( currentCollectionList && $scope.collectionId) {
 
     loadCollectionData($scope.collectionId, true);
 
@@ -291,12 +289,13 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       if ($scope.subscriptionId){
         $log.debug('Removing subscription "' + $scope.subscriptionId + '"');
         LiveOak.unsubscribe($scope.subscriptionId);
-        $scope.subscriptionId = false;
+        $rootScope.subscriptionId = false;
       }
 
       if (!$scope.subscriptionId) {
         var urlSubscribe = '/' + currentApp.id + '/' + $routeParams.storageId + '/' + $scope.collectionId + '/*';
-        $scope.subscriptionId = LiveOak.subscribe(urlSubscribe, function (data) {
+        $rootScope.subscriptionId = LiveOak.subscribe(urlSubscribe, function (data) {
+          $log.debug('Data reload callback');
           //Notifications.warn('Data were changed outside console: ' + JSON.stringify(data));
           loadCollectionData($scope.collectionId, true);
           $scope.live = data;
@@ -557,7 +556,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     var urlCreator = $window.URL || $window.webkitURL || $window.mozURL || $window.msURL;
 
     $scope.urlExport = urlCreator.createObjectURL( blob);
-    $scope.jsonName = $scope.collectionId + '_' + (new Date()).toISOString() + '.txt';
+    $scope.jsonName = $scope.collectionId + '_' + (new Date()).toISOString() + '.json';
   }
 
   $scope.rowAdd = function(){
