@@ -54,7 +54,6 @@ public class ApplicationExtensionRemovalService implements Service<Void> {
 
         // remove ourselves
         context.getController().setMode(ServiceController.Mode.REMOVE);
-        this.appExtensionServiceController.setMode(ServiceController.Mode.REMOVE);
     }
 
     @Override

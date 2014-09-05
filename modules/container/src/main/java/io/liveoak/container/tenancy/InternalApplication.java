@@ -114,12 +114,9 @@ public class InternalApplication implements Application {
 
         ServiceName resourceServiceName = LiveOak.applicationExtension(this.id, resourceId);
 
-        target.addService(resourceServiceName.append("config"), new ValueService<>(new ImmediateValue<>(configuration))).install();
-
-        ApplicationExtensionService appExt = new ApplicationExtensionService(extensionId, resourceId, boottime);
+        ApplicationExtensionService appExt = new ApplicationExtensionService(extensionId, resourceId, configuration, boottime);
 
         ServiceController<InternalApplicationExtension> controller = target.addService(resourceServiceName, appExt)
-                .addDependency(resourceServiceName.append("config"), ObjectNode.class, appExt.configurationInjector())
                 .addDependency(LiveOak.extension(extensionId), Extension.class, appExt.extensionInjector())
                 .addDependency(LiveOak.application(this.id), InternalApplication.class, appExt.applicationInjector())
                 .addDependency(LiveOak.SERVICE_REGISTRY, ServiceRegistry.class, appExt.serviceRegistryInjector())

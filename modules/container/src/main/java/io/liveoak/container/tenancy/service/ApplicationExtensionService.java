@@ -1,7 +1,6 @@
 package io.liveoak.container.tenancy.service;
 
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.extension.ApplicationExtensionContextImpl;
@@ -14,10 +13,11 @@ import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ServiceTarget;
-import org.jboss.msc.service.StabilityMonitor;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
+import org.jboss.msc.service.ValueService;
+import org.jboss.msc.value.ImmediateValue;
 import org.jboss.msc.value.InjectedValue;
 
 /**
@@ -26,9 +26,10 @@ import org.jboss.msc.value.InjectedValue;
 public class ApplicationExtensionService implements Service<InternalApplicationExtension> {
 
 
-    public ApplicationExtensionService(String extensionId, String resourceId, boolean boottime) {
+    public ApplicationExtensionService(String extensionId, String resourceId, ObjectNode configuration, boolean boottime) {
         this.extensionId = extensionId;
         this.resourceId = resourceId;
+        this.configuration = configuration;
         this.boottime = boottime;
     }
 
@@ -38,6 +39,9 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
         log.debug("** Activate " + this.extensionId + " as " + resourceId + " for " + this.applicationInjector.getValue().id());
 
         ServiceTarget target = context.getChildTarget();
+
+        target.addService(LiveOak.applicationExtension(this.applicationInjector.getValue().id(), resourceId).append("config"), new ValueService<>(new ImmediateValue<>(configuration)))
+                .install();
 
         this.appExtension = new InternalApplicationExtension(
                 this.serviceRegistryInjector.getValue(),
@@ -54,7 +58,7 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
                 this.appExtension,
                 LiveOak.applicationContext(appId),
                 LiveOak.applicationAdminResource(appId).append("extensions"),
-                this.configurationInjector.getValue(),
+                this.configuration,
                 this.boottime);
 
         try {
@@ -90,10 +94,6 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
         return this.extensionInjector;
     }
 
-    public Injector<ObjectNode> configurationInjector() {
-        return this.configurationInjector;
-    }
-
     protected Properties properties() {
         InternalApplication app = this.applicationInjector.getValue();
 
@@ -117,9 +117,9 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
     private InjectedValue<InternalApplication> applicationInjector = new InjectedValue<>();
     private InjectedValue<ServiceRegistry> serviceRegistryInjector = new InjectedValue<>();
     private InjectedValue<Extension> extensionInjector = new InjectedValue<>();
-    private InjectedValue<ObjectNode> configurationInjector = new InjectedValue<>();
 
     private InternalApplicationExtension appExtension;
+    private ObjectNode configuration;
     private boolean boottime;
 
     private static final Logger log = Logger.getLogger(ApplicationExtensionService.class);
