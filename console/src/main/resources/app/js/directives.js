@@ -13,11 +13,6 @@ loDirectives.directive('loNavbar', function () {
 
 loDirectives.directive('loNavigation', function () {
   return {
-    scope: {
-      loCurrent: '@',
-      loApps: '=',
-      loApp: '='
-    },
     restrict: 'E',
     replace: true,
     templateUrl: '/admin/console/templates/lo-navigation.html'
