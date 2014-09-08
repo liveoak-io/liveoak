@@ -25,9 +25,9 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 
-import static io.liveoak.spi.LiveOak.CODEC_MANAGER;
-import static io.liveoak.spi.LiveOak.CODEC_MANAGER_COMPLETE;
-import static io.liveoak.spi.LiveOak.codec;
+import static io.liveoak.spi.Services.CODEC_MANAGER;
+import static io.liveoak.spi.Services.CODEC_MANAGER_COMPLETE;
+import static io.liveoak.spi.Services.codec;
 
 /**
  * @author Bob McWhirter

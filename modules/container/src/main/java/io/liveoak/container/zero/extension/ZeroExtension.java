@@ -3,7 +3,7 @@ package io.liveoak.container.zero.extension;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.zero.ZeroServices;
 import io.liveoak.container.zero.service.ZeroResourcesService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
@@ -25,7 +25,7 @@ public class ZeroExtension implements Extension {
         ZeroResourcesService appResources = new ZeroResourcesService();
 
         target.addService(ZeroServices.BOOTSTRAP.append("resources"), appResources)
-                .addDependency(LiveOak.application(APPLICATION_ID), InternalApplication.class, appResources.applicationInjector())
+                .addDependency(Services.application(APPLICATION_ID), InternalApplication.class, appResources.applicationInjector())
                 .install();
 
         // DO NOT mountPrivate, since this isn't exposed as a valid extension.

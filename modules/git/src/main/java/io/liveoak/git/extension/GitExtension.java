@@ -4,7 +4,7 @@ import java.io.File;
 
 import io.liveoak.git.GitRepoAdminResource;
 import io.liveoak.git.service.GitRepoResourceService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
@@ -34,8 +34,8 @@ public class GitExtension implements Extension {
 
         GitRepoResourceService publicResource = new GitRepoResourceService(privateResource, context.resourceId());
 
-        target.addService(LiveOak.resource(appId, context.resourceId()), publicResource)
-                .addDependency(LiveOak.VERTX, Vertx.class, publicResource.vertxInjector())
+        target.addService(Services.resource(appId, context.resourceId()), publicResource)
+                .addDependency(Services.VERTX, Vertx.class, publicResource.vertxInjector())
                 .install();
 
         context.mountPublic();

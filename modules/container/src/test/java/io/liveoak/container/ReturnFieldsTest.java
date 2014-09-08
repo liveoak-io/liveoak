@@ -6,6 +6,7 @@
 package io.liveoak.container;
 
 import io.liveoak.common.DefaultReturnFields;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ReturnFields;
 import org.junit.Assert;
 import org.junit.Test;
@@ -67,11 +68,11 @@ public class ReturnFieldsTest {
     @Test
     public void testMergeWithExpand() {
         DefaultReturnFields fields = new DefaultReturnFields("*");
-        fields = fields.withExpand("members");
+        fields = fields.withExpand(LiveOak.MEMBERS);
 
         assertThat(fields.included("name")).isTrue();
-        assertThat(fields.included("members")).isTrue();
-        assertThat(fields.child("members").included("name")).isTrue();
+        assertThat(fields.included(LiveOak.MEMBERS)).isTrue();
+        assertThat(fields.child(LiveOak.MEMBERS).included("name")).isTrue();
 
         fields = new DefaultReturnFields("wife").withExpand("dogs");
 

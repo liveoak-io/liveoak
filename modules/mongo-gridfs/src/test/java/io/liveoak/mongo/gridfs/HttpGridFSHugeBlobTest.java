@@ -5,6 +5,7 @@
  */
 package io.liveoak.mongo.gridfs;
 
+import io.liveoak.spi.LiveOak;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -69,7 +70,7 @@ public class HttpGridFSHugeBlobTest extends AbstractGridFSTest {
             assertThat(resultEntity.getContentType().getValue()).isEqualTo(APPLICATION_JSON);
 
             // do some more assertions on the response
-            assertThat(json.getObject("self").getString("href")).startsWith("/testApp/gridfs/john/.files/");
+            assertThat(json.getObject(LiveOak.SELF).getString(LiveOak.HREF)).startsWith("/testApp/gridfs/john/.files/");
 
             String [] urlSegments = url.split("/");
             String lastSegment = urlSegments[urlSegments.length-1];
@@ -230,7 +231,7 @@ public class HttpGridFSHugeBlobTest extends AbstractGridFSTest {
             assertThat(result.getStatusLine().getStatusCode()).isEqualTo(200);
             assertThat(resultEntity.getContentType().getValue()).isEqualTo(APPLICATION_JSON);
             // do some more assertions on the response
-            assertThat(json.getObject("self").getString("href")).startsWith(FILES_URI_ROOT);
+            assertThat(json.getObject(LiveOak.SELF).getString(LiveOak.HREF)).startsWith(FILES_URI_ROOT);
 
             if (url.startsWith(FILES_URI_ROOT)) {
                 String [] urlSegments = url.split("/");
@@ -291,12 +292,12 @@ public class HttpGridFSHugeBlobTest extends AbstractGridFSTest {
             JsonArray links = new JsonArray();
             JsonObject ref = new JsonObject();
             ref.putString("rel", "self");
-            ref.putString("href", "must not be saved");
+            ref.putString(LiveOak.HREF, "must not be saved");
             links.add(ref);
             result.putArray("links", links);
 
             // use files url to update meta info - expect 200
-            String filesUrl = ROOT_URL + result.getObject("self").getString("href");
+            String filesUrl = ROOT_URL + result.getObject(LiveOak.SELF).getString(LiveOak.HREF);
             putFileMeta(filesUrl, result);
 
             // get it by old pathname - expect 404
@@ -341,7 +342,7 @@ public class HttpGridFSHugeBlobTest extends AbstractGridFSTest {
             // update via old files url which should be the same
             json = new JsonObject();
             json.putArray("tags", new JsonArray(new Object[] {"summer", "vacation", "mars", "2038"}));
-            parentUrl = ROOT_URL + result.getObject("self").getString("href");
+            parentUrl = ROOT_URL + result.getObject(LiveOak.SELF).getString(LiveOak.HREF);
             putFileMeta(parentUrl, json);
 
             // get it, and make sure it contains tags
@@ -350,7 +351,7 @@ public class HttpGridFSHugeBlobTest extends AbstractGridFSTest {
             assertThat(json.getArray("tags").contains("2038"));
 
             // make sure it has exactly one member
-            assertThat(json.getArray("members").size()).isEqualTo(1);
+            assertThat(json.getArray(LiveOak.MEMBERS).size()).isEqualTo(1);
 
 
             // TODO: move under different parent

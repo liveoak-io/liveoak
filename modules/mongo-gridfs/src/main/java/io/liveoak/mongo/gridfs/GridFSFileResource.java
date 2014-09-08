@@ -8,6 +8,7 @@ package io.liveoak.mongo.gridfs;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Responder;
@@ -52,15 +53,15 @@ public class GridFSFileResource extends GridFSResource {
 
             links.add(new MapResource()
                     .put("rel", "self")
-                    .put("href", selfPath));
+                    .put(LiveOak.HREF, selfPath));
 
             links.add(new MapResource()
                     .put("rel", "parent")
-                    .put("href", parentPath));
+                    .put(LiveOak.HREF, parentPath));
 
             links.add(new MapResource()
                     .put("rel", "blob")
-                    .put("href", blobPath));
+                    .put(LiveOak.HREF, blobPath));
 
             sink.accept("links", links);
 

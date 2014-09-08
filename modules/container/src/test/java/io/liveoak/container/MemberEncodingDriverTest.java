@@ -3,6 +3,7 @@ package io.liveoak.container;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.client.Client;
@@ -111,7 +112,7 @@ public class MemberEncodingDriverTest {
     @Test
     public void testReadMembersReturnFields() throws Exception {
         // when requesting 'members' as part of the return fields, should be reading the members
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("members")).build(), PATH + RESOURCE_ID);
+        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields(LiveOak.MEMBERS)).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);

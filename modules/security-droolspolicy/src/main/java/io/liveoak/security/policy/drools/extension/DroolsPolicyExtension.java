@@ -4,7 +4,7 @@ import io.liveoak.security.policy.drools.DroolsPolicyServices;
 import io.liveoak.security.policy.drools.impl.DroolsPolicy;
 import io.liveoak.security.policy.drools.service.DroolsPolicyConfigResourceService;
 import io.liveoak.security.policy.drools.service.DroolsPolicyResourceService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
@@ -35,12 +35,12 @@ public class DroolsPolicyExtension implements Extension {
 
         DroolsPolicyResourceService resource = new DroolsPolicyResourceService(context.resourceId());
 
-        target.addService(LiveOak.resource(appId, context.resourceId()), resource)
+        target.addService(Services.resource(appId, context.resourceId()), resource)
                 .addDependency(DroolsPolicyServices.policy(appId, context.resourceId()), DroolsPolicy.class, resource.policyInjector())
                 .install();
 
         DroolsPolicyConfigResourceService configResource = new DroolsPolicyConfigResourceService(context.resourceId());
-        target.addService(LiveOak.adminResource(appId, context.resourceId()), configResource)
+        target.addService(Services.adminResource(appId, context.resourceId()), configResource)
                 .addDependency(DroolsPolicyServices.policy(appId, context.resourceId()), DroolsPolicy.class, configResource.policyInjector())
                 .install();
 

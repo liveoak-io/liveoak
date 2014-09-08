@@ -7,6 +7,8 @@ package io.liveoak.pgsql;
 
 import java.net.URISyntaxException;
 import java.text.ParseException;
+
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
 
@@ -104,7 +106,7 @@ public class PgSqlReadCollectionTest extends BasePgSqlTest {
         ResourceState expected = resource(endpoint, new Object[] {
                         "links", list(
                                 obj("rel", "schema",
-                                    "href", endpoint + ";schema")
+                                    LiveOak.HREF, endpoint + ";schema")
                         ),
 
                         "count", 3,
@@ -170,7 +172,7 @@ public class PgSqlReadCollectionTest extends BasePgSqlTest {
         ResourceState expected = resource(endpoint, new Object[] {
                         "links", list(
                                 obj("rel", "schema",
-                                    "href", endpoint + ";schema")
+                                    LiveOak.HREF, endpoint + ";schema")
                         ),
                         "count", 2,
                         "type", "collection"

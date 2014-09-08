@@ -3,7 +3,7 @@ package io.liveoak.container.extension;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.zero.extension.ZeroExtension;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
 import org.jboss.logging.Logger;
@@ -33,14 +33,14 @@ public class ExtensionService implements Service<Extension> {
     public void start(StartContext context) throws StartException {
         ServiceTarget target = context.getChildTarget();
 
-        ServiceName name = LiveOak.extension(this.id);
+        ServiceName name = Services.extension(this.id);
 
         ObjectNode extConfig = (ObjectNode) this.fullConfig.get("config");
         if (extConfig == null) {
             extConfig = JsonNodeFactory.instance.objectNode();
         }
 
-        SystemExtensionContext extContext = new SystemExtensionContextImpl(target, this.id, LiveOak.resource(ZeroExtension.APPLICATION_ID, "system"), extConfig);
+        SystemExtensionContext extContext = new SystemExtensionContextImpl(target, this.id, Services.resource(ZeroExtension.APPLICATION_ID, "system"), extConfig);
 
         try {
             this.extension.extend(extContext);

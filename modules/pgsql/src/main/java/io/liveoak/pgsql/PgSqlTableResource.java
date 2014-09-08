@@ -19,6 +19,7 @@ import io.liveoak.pgsql.meta.Column;
 import io.liveoak.pgsql.meta.QueryBuilder;
 
 import io.liveoak.pgsql.meta.Table;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Sorting;
 import io.liveoak.spi.resource.MapResource;
@@ -68,7 +69,7 @@ public class PgSqlTableResource implements Resource {
         List<Resource> links = new LinkedList<>();
         MapResource batch = new MapResource();
         batch.put("rel", "schema");
-        batch.put("href", uri() + SCHEMA_ENDPOINT);
+        batch.put(LiveOak.HREF, uri() + SCHEMA_ENDPOINT);
         links.add(batch);
         sink.accept("links", links);
 

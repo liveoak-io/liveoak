@@ -5,7 +5,7 @@ import io.liveoak.container.extension.MountService;
 import io.liveoak.container.subscriptions.DefaultSubscriptionManager;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.MountPointResource;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceTarget;
@@ -39,7 +39,7 @@ public class ApplicationSubscriptionsResourceService implements Service<Applicat
         String appId = this.app.id();
 
         target.addService(context.getController().getName().append("mount"), mount)
-                .addDependency(LiveOak.applicationContext(appId), MountPointResource.class, mount.mountPointInjector())
+                .addDependency(Services.applicationContext(appId), MountPointResource.class, mount.mountPointInjector())
                 .addInjectionValue(mount.resourceInjector(), this)
                 .install();
     }

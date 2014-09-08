@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.interceptor.extension.InterceptorExtension;
 import io.liveoak.keycloak.extension.KeycloakExtension;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.SecurityContext;
 import io.liveoak.testtools.MockExtension;
@@ -64,7 +64,7 @@ public class AuthInterceptorTest extends AbstractKeycloakTest {
         httpClient = HttpClientBuilder.create().build();
         System.err.println("** C");
 
-        mock = (MockRootResource) this.system.service(LiveOak.resource("testApp", "auth-test"));
+        mock = (MockRootResource) this.system.service(Services.resource("testApp", "auth-test"));
     }
 
     @After

@@ -9,8 +9,8 @@ import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.vertx.java.platform.PlatformManager;
 
-import static io.liveoak.spi.LiveOak.VERTX;
-import static io.liveoak.spi.LiveOak.VERTX_PLATFORM_MANAGER;
+import static io.liveoak.spi.Services.VERTX;
+import static io.liveoak.spi.Services.VERTX_PLATFORM_MANAGER;
 
 /**
  * @author Bob McWhirter

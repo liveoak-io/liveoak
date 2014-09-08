@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.mongodb.DBObject;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
@@ -25,10 +26,10 @@ import org.bson.types.ObjectId;
 public class GridFSResource implements Resource {
 
     protected static Set<String> FILTERED = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            new String[]{"aliases", "chunkSize", "_id", "id"})));
+            new String[]{"aliases", "chunkSize", "_id", LiveOak.ID})));
 
     protected static Set<String> NOT_UPDATABLE = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            new String[] {"aliases", "chunkSize", "md5", "_id", "id", "createDate", "length", "contentType", "self", "links", "members", "dir"})));
+            new String[] {"aliases", "chunkSize", "md5", "_id", LiveOak.ID, "createDate", "length", "contentType", LiveOak.SELF, "links", LiveOak.MEMBERS, "dir"})));
 
 
     /* Parent that will end up in response as part of the uri() */

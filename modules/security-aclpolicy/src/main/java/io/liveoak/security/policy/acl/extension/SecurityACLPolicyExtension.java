@@ -10,7 +10,7 @@ import io.liveoak.security.policy.acl.service.AclPolicyConfigResourceService;
 import io.liveoak.security.policy.acl.service.AclPolicyRootResourceService;
 import io.liveoak.security.policy.acl.service.AclPolicyService;
 import io.liveoak.security.policy.acl.service.AclUpdaterInterceptorService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
@@ -32,8 +32,8 @@ public class SecurityACLPolicyExtension implements Extension {
         // Install AclUpdaterInterceptor
         ServiceTarget target = context.target();
         AclUpdaterInterceptorService aclInterceptor = new AclUpdaterInterceptorService();
-        ServiceController<AclUpdaterInterceptor> aclController = target.addService(LiveOak.interceptor("acl-updater"), aclInterceptor)
-                .addDependency(LiveOak.CLIENT, Client.class, aclInterceptor.clientInjector())
+        ServiceController<AclUpdaterInterceptor> aclController = target.addService(Services.interceptor("acl-updater"), aclInterceptor)
+                .addDependency(Services.CLIENT, Client.class, aclInterceptor.clientInjector())
                 .install();
         InterceptorRegistrationHelper.installInterceptor(target, aclController);
     }
@@ -53,12 +53,12 @@ public class SecurityACLPolicyExtension implements Extension {
                 .install();
 
         AclPolicyRootResourceService resource = new AclPolicyRootResourceService(context.resourceId());
-        target.addService(LiveOak.resource(appId, context.resourceId()), resource)
+        target.addService(Services.resource(appId, context.resourceId()), resource)
                 .addDependency(SecurityACLPolicyServices.policy(appId, context.resourceId()), AclPolicy.class, resource.policyInjector())
                 .install();
 
         AclPolicyConfigResourceService configResource = new AclPolicyConfigResourceService(context.resourceId());
-        target.addService(LiveOak.adminResource(appId, context.resourceId()), configResource)
+        target.addService(Services.adminResource(appId, context.resourceId()), configResource)
                 .addDependency(SecurityACLPolicyServices.policy(appId, context.resourceId()), AclPolicy.class, configResource.policyInjector())
                 .install();
 

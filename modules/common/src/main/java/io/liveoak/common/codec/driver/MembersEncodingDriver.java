@@ -5,6 +5,7 @@
  */
 package io.liveoak.common.codec.driver;
 
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.StatusResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -24,7 +25,7 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
     public void encode() throws Exception {
         //we should only read the members if they are going to be returned in the response
         //otherwise it could be an expensive operation when all we are requesting is metadata (ie count)
-        if (requestContext().returnFields().included("members")) {
+        if (requestContext().returnFields().included(LiveOak.MEMBERS)) {
             resource().readMembers(requestContext(), new MyResourceSink());
         } else {
             encodeNext();
@@ -43,7 +44,7 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
 
         @Override
         public void accept(Resource resource) {
-            if (!returnFields().included("members")) {
+            if (!returnFields().included(LiveOak.MEMBERS)) {
                 return;
             }
             if (!hasMembers) {
@@ -56,10 +57,10 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
             }
             if (resource instanceof StatusResource) {
                 addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, ReturnFields.ALL));
-            } else if (returnFields().child("members").isEmpty()) {
+            } else if (returnFields().child(LiveOak.MEMBERS).isEmpty()) {
                 addChildDriver(new ValueEncodingDriver(MembersEncodingDriver.this, resource));
             } else {
-                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, returnFields().child("members")));
+                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, returnFields().child(LiveOak.MEMBERS)));
             }
         }
 

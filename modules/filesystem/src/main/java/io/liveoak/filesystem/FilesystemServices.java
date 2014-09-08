@@ -1,6 +1,6 @@
 package io.liveoak.filesystem;
 
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -8,7 +8,7 @@ import org.jboss.msc.service.ServiceName;
  */
 public class FilesystemServices {
 
-    public static final ServiceName FILESYSTEM = LiveOak.LIVEOAK.append("filesystem");
+    public static final ServiceName FILESYSTEM = Services.LIVEOAK.append("filesystem");
 
     public static final ServiceName DIR = FILESYSTEM.append("dir");
 

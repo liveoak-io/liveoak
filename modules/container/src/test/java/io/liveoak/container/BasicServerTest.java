@@ -6,6 +6,7 @@
 package io.liveoak.container;
 
 import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.stomp.StompMessage;
@@ -218,8 +219,8 @@ public class BasicServerTest {
         ResourceState memoryCollection = state.members().get(0);
         assertThat(memoryCollection.id()).isEqualTo("people");
 
-        ResourceState selfObj = (ResourceState) memoryCollection.getProperty("self");
-        assertThat(selfObj.getProperty("href")).isEqualTo("/testApp/memory/people");
+        ResourceState selfObj = (ResourceState) memoryCollection.getProperty(LiveOak.SELF);
+        assertThat(selfObj.getProperty(LiveOak.HREF)).isEqualTo("/testApp/memory/people");
 
         System.err.println("TEST #6");
         // Post a person
@@ -248,7 +249,7 @@ public class BasicServerTest {
         ResourceState bobObjState = (ResourceState) decode(obj.content());
         assertThat(bobObjState.getProperty("name")).isEqualTo("bob");
 
-        assertThat(((ResourceState) state).getProperty("id")).isEqualTo(bobObjState.getProperty("id"));
+        assertThat(((ResourceState) state).getProperty(LiveOak.ID)).isEqualTo(bobObjState.getProperty(LiveOak.ID));
         response.close();
     }
 

@@ -3,7 +3,7 @@ package io.liveoak.mongo.extension;
 import io.liveoak.mongo.RootMongoResource;
 import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.mongo.internal.InternalMongoService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
@@ -17,7 +17,7 @@ import org.jboss.msc.value.ImmediateValue;
  */
 public class MongoExtension implements Extension {
 
-    public static final ServiceName INTERNAL_MONGO_SERVICE_NAME = LiveOak.LIVEOAK.append("internal").append("mongo");
+    public static final ServiceName INTERNAL_MONGO_SERVICE_NAME = Services.LIVEOAK.append("internal").append("mongo");
     public static final ServiceName INTERNAL_MONGO_CONFIG_SERVICE_NAME = INTERNAL_MONGO_SERVICE_NAME.append("config");
 
 

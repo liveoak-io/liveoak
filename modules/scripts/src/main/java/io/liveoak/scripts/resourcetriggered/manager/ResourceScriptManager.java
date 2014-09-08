@@ -22,6 +22,7 @@ import io.liveoak.scripts.objects.impl.exception.LiveOakUpdateNotSupportedExcept
 import io.liveoak.scripts.objects.scripting.ScriptingResourceRequest;
 import io.liveoak.scripts.resourcetriggered.resource.Script;
 import io.liveoak.scripts.resourcetriggered.resource.ScriptMap;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourceRequest;
@@ -137,7 +138,7 @@ public class ResourceScriptManager {
     }
 
     protected Object handleMembers(ResourceResponse response, ResourceState state, ReturnFields returnFields) {
-        if (!returnFields.child("members").isEmpty()) {
+        if (!returnFields.child(LiveOak.MEMBERS).isEmpty()) {
             for (ResourceState memberState: state.members()) {
                 DefaultResourceResponse memberResponse = new DefaultResourceResponse(response.inReplyTo(),
                         ResourceResponse.ResponseType.READ, new Resource() {
@@ -161,7 +162,7 @@ public class ResourceScriptManager {
                     }
                 }
 
-                handleMembers(response, memberState, returnFields.child("members"));
+                handleMembers(response, memberState, returnFields.child(LiveOak.MEMBERS));
             }
         }
         return null;

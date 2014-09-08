@@ -17,10 +17,10 @@ import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 import org.jboss.msc.value.InjectedValue;
 
-import static io.liveoak.spi.LiveOak.APPLICATIONS_DEPLOYER;
-import static io.liveoak.spi.LiveOak.APPLICATIONS_DIR;
-import static io.liveoak.spi.LiveOak.APPLICATION_REGISTRY;
-import static io.liveoak.spi.LiveOak.GLOBAL_CONTEXT;
+import static io.liveoak.spi.Services.APPLICATIONS_DEPLOYER;
+import static io.liveoak.spi.Services.APPLICATIONS_DIR;
+import static io.liveoak.spi.Services.APPLICATION_REGISTRY;
+import static io.liveoak.spi.Services.GLOBAL_CONTEXT;
 
 /**
  * @author Bob McWhirter

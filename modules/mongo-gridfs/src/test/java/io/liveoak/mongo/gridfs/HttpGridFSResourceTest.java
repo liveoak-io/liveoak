@@ -5,6 +5,7 @@
  */
 package io.liveoak.mongo.gridfs;
 
+import io.liveoak.spi.LiveOak;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -66,7 +67,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
             assertThat(resultEntity.getContentType().getValue()).isEqualTo(APPLICATION_JSON);
 
             // do some more assertions on the response
-            assertThat(json.getObject("self").getString("href")).startsWith("/testApp/gridfs/john/.files/");
+            assertThat(json.getObject(LiveOak.SELF).getString(LiveOak.HREF)).startsWith("/testApp/gridfs/john/.files/");
             assertThat(json.getString("filename")).isEqualTo("beach.jpg");
             String blobId = json.getString("id");
             assertThat(blobId).isNotEqualTo("beach.jpg");
@@ -75,7 +76,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
             JsonArray links = json.getArray("links");
             assertThat(links).isNotNull();
             assertThat(links.size()).isEqualTo(3);
-            assertLink(links.get(0), "self", "/testApp/gridfs/john/vacation/italy_2013/beach.jpg;meta");
+            assertLink(links.get(0), LiveOak.SELF, "/testApp/gridfs/john/vacation/italy_2013/beach.jpg;meta");
             assertLink(links.get(1), "parent", "/testApp/gridfs/john/vacation/italy_2013");
             assertLink(links.get(2), "blob", "/testApp/gridfs/john/vacation/italy_2013/beach.jpg");
 
@@ -104,7 +105,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
             assertThat(resultEntity.getContentType().getValue()).isEqualTo(APPLICATION_JSON);
 
             // do some more assertions on the response
-            assertThat(json.getObject("self").getString("href")).isEqualTo("/testApp/gridfs/john/.files");
+            assertThat(json.getObject(LiveOak.SELF).getString(LiveOak.HREF)).isEqualTo("/testApp/gridfs/john/.files");
             assertThat(json.getString("id")).isNotEqualTo(".blobs");
             assertThat(json.getBoolean("dir")).isEqualTo(true);
             // TODO add owner, and createDate
@@ -112,10 +113,10 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
             links = json.getArray("links");
             assertThat(links).isNotNull();
             assertThat(links.size()).isEqualTo(2);
-            assertLink(links.get(0), "self", "/testApp/gridfs/john/.files");
+            assertLink(links.get(0), LiveOak.SELF, "/testApp/gridfs/john/.files");
             assertLink(links.get(1), "parent", "/testApp/gridfs/john");
 
-            JsonArray members = json.getArray("members");
+            JsonArray members = json.getArray(LiveOak.MEMBERS);
             assertThat(members).isNotNull();
             assertThat(members.size()).isEqualTo(4);
 
@@ -199,7 +200,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
             assertThat(resultEntity.getContentType().getValue()).isEqualTo(BLOB_CONTENT_TYPE);
 
             // and again via blob uri
-            get = new HttpGet("http://localhost:8080" + blobJson.getObject("self").getString("href").replace(".files", ".blobs"));
+            get = new HttpGet("http://localhost:8080" + blobJson.getObject(LiveOak.SELF).getString(LiveOak.HREF).replace(".files", ".blobs"));
             get.setHeader(HttpHeaders.Names.ACCEPT, ALL);
 
             System.err.println("DO GET - " + get.getURI());
@@ -281,7 +282,7 @@ public class HttpGridFSResourceTest extends AbstractGridFSTest {
         assertThat(item).isInstanceOf(JsonObject.class);
         JsonObject obj = (JsonObject) item;
         assertThat(obj.getString("id")).isEqualTo(id);
-        assertThat(obj.getObject("self").getString("href")).isEqualTo("/testApp/gridfs/john/.files/" + id);
+        assertThat(obj.getObject(LiveOak.SELF).getString(LiveOak.HREF)).isEqualTo("/testApp/gridfs/john/.files/" + id);
         assertThat(obj.getString("filename")).isEqualTo("beach.jpg");
     }
 }

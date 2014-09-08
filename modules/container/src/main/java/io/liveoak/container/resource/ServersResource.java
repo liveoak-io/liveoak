@@ -3,7 +3,7 @@ package io.liveoak.container.resource;
 import java.util.List;
 
 import io.liveoak.container.server.LocalServer;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.container.NetworkServer;
 import io.liveoak.spi.resource.async.Resource;
@@ -35,9 +35,9 @@ public class ServersResource implements Resource {
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         List<ServiceName> names = this.serviceContainer.getServiceNames();
         for (ServiceName name : names) {
-            if (LiveOak.NETWORK_SERVER.equals(name.getParent())) {
+            if (Services.NETWORK_SERVER.equals(name.getParent())) {
                 sink.accept(new NetworkServerResource(this, name.getSimpleName(), (NetworkServer) this.serviceContainer.getService(name).getValue()));
-            } else if (LiveOak.LOCAL_SERVER.equals(name.getParent())) {
+            } else if (Services.LOCAL_SERVER.equals(name.getParent())) {
                 sink.accept(new LocalServerResource(this, name.getSimpleName(), (LocalServer) this.serviceContainer.getService(name).getValue()));
             }
         }

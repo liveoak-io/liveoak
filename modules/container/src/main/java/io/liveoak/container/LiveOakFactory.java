@@ -21,7 +21,6 @@ import org.jboss.msc.service.AbstractServiceListener;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StabilityMonitor;
 import org.jboss.msc.service.StartContext;
@@ -32,11 +31,11 @@ import org.jboss.msc.value.DefaultValue;
 import org.jboss.msc.value.ImmediateValue;
 import org.vertx.java.core.Vertx;
 
-import static io.liveoak.spi.LiveOak.LIVEOAK;
-import static io.liveoak.spi.LiveOak.SERVICE_CONTAINER;
-import static io.liveoak.spi.LiveOak.SERVICE_REGISTRY;
-import static io.liveoak.spi.LiveOak.SOCKET_BINDING;
-import static io.liveoak.spi.LiveOak.VERTX;
+import static io.liveoak.spi.Services.LIVEOAK;
+import static io.liveoak.spi.Services.SERVICE_CONTAINER;
+import static io.liveoak.spi.Services.SERVICE_REGISTRY;
+import static io.liveoak.spi.Services.SOCKET_BINDING;
+import static io.liveoak.spi.Services.VERTX;
 
 /**
  * Bootstrapping <code>main()</code> method.

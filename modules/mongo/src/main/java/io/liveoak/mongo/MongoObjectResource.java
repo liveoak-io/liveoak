@@ -14,6 +14,7 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -57,7 +58,7 @@ public class MongoObjectResource extends MongoResource {
         // TODO: only read properties specified in the return fields and not everything
         Set<String> keys = getDBObject().keySet();
         for (String key : keys) {
-            if (!key.equals(MONGO_ID_FIELD) && !key.equals(MBAAS_ID_FIELD)) {
+            if (!key.equals(MONGO_ID_FIELD) && !key.equals(LiveOak.ID)) {
                 Object value = getDBObject().get(key);
                 if (value instanceof BasicDBObject) {
                     value = new MongoEmbeddedObjectResource(this, (DBObject) value);

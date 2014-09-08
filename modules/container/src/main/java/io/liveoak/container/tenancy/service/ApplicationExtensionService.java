@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.extension.ApplicationExtensionContextImpl;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
@@ -40,7 +40,7 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
 
         ServiceTarget target = context.getChildTarget();
 
-        target.addService(LiveOak.applicationExtension(this.applicationInjector.getValue().id(), resourceId).append("config"), new ValueService<>(new ImmediateValue<>(configuration)))
+        target.addService(Services.applicationExtension(this.applicationInjector.getValue().id(), resourceId).append("config"), new ValueService<>(new ImmediateValue<>(configuration)))
                 .install();
 
         this.appExtension = new InternalApplicationExtension(
@@ -56,8 +56,8 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
         this.extensionContext = new ApplicationExtensionContextImpl(
                 target,
                 this.appExtension,
-                LiveOak.applicationContext(appId),
-                LiveOak.applicationAdminResource(appId).append("extensions"),
+                Services.applicationContext(appId),
+                Services.applicationAdminResource(appId).append("extensions"),
                 this.configuration,
                 this.boottime);
 

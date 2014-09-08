@@ -13,6 +13,7 @@ import java.util.List;
 import io.liveoak.pgsql.meta.Catalog;
 import io.liveoak.pgsql.meta.QueryBuilder;
 import io.liveoak.pgsql.meta.Table;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceProcessingException;
@@ -83,7 +84,7 @@ public class PgSqlRootResource extends DefaultRootResource {
         List<Resource> links = new LinkedList<>();
         MapResource batch = new MapResource();
         batch.put("rel", "batch");
-        batch.put("href", uri() + "/" + BATCH_ENDPOINT);
+        batch.put(LiveOak.HREF, uri() + "/" + BATCH_ENDPOINT);
         links.add(batch);
         sink.accept("links", links);
 

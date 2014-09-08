@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.codec.json.JSONDecoder;
-import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.container.extension.MediaTypeMountService;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
@@ -22,6 +21,7 @@ import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.container.zero.service.ApplicationClientsInstallService;
 import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.state.ResourceState;
@@ -79,7 +79,7 @@ public class ApplicationService implements Service<InternalApplication> {
             try {
                 ResourceState state = decoder.decode(applicationJson);
                 Object value;
-                if ((value = state.getProperty("name")) != null) {
+                if ((value = state.getProperty(LiveOak.NAME)) != null) {
                     appName = (String) value;
                 }
                 if ((value = state.getProperty("html-app")) != null) {
@@ -89,7 +89,7 @@ public class ApplicationService implements Service<InternalApplication> {
                 if ((value = state.getProperty("visible")) != null) {
                     appVisible = (Boolean) value;
                 }
-                if ((value = state.getProperty("resources")) != null) {
+                if ((value = state.getProperty(LiveOak.RESOURCES)) != null) {
                     resourcesTree = (ResourceState) value;
                 }
             } catch (IOException e) {
@@ -99,9 +99,9 @@ public class ApplicationService implements Service<InternalApplication> {
             ObjectMapper mapper = ObjectMapperFactory.create();
             ObjectWriter writer = mapper.writer().with(new DefaultPrettyPrinter("\n"));
             ObjectNode tree = JsonNodeFactory.instance.objectNode();
-            tree.put("id", this.id);
-            tree.put("name", appName);
-            tree.put("resources", JsonNodeFactory.instance.objectNode());
+            tree.put(LiveOak.ID, this.id);
+            tree.put(LiveOak.NAME, appName);
+            tree.put(LiveOak.RESOURCES, JsonNodeFactory.instance.objectNode());
             try {
                 applicationJson.getParentFile().mkdirs();
                 writer.writeValue(applicationJson, tree);
@@ -112,15 +112,15 @@ public class ApplicationService implements Service<InternalApplication> {
 
         this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp, appVisible);
 
-        ServiceName configManagerName = LiveOak.applicationConfigurationManager(this.id);
+        ServiceName configManagerName = Services.applicationConfigurationManager(this.id);
         ApplicationConfigurationService configManager = new ApplicationConfigurationService(applicationJson);
         target.addService(configManagerName, configManager)
                 .install();
 
-        ServiceName appContextName = LiveOak.applicationContext(this.id);
+        ServiceName appContextName = Services.applicationContext(this.id);
 
         // Configure application-clients resource if it's not present
-        if (resourcesTree == null || !resourcesTree.getPropertyNames().contains("application-clients")) {
+        if (resourcesTree == null || !resourcesTree.getPropertyNames().contains(LiveOak.APPLICATION_CLIENTS_RESOURCE_TYPE)) {
             ApplicationClientsInstallService appClientInstaller = new ApplicationClientsInstallService();
             target.addService(appContextName.append("app-client-install"), appClientInstaller)
                     .addDependency(configManagerName)
@@ -134,33 +134,33 @@ public class ApplicationService implements Service<InternalApplication> {
         target.addService(appContextName, appContext)
                 .install();
         MediaTypeMountService<ApplicationContext> appContextMount = new MediaTypeMountService<>(null, MediaType.JSON, true);
-        this.app.contextController(target.addService(LiveOak.defaultMount(appContextName), appContextMount)
-                .addDependency(LiveOak.GLOBAL_CONTEXT, MountPointResource.class, appContextMount.mountPointInjector())
+        this.app.contextController(target.addService(Services.defaultMount(appContextName), appContextMount)
+                .addDependency(Services.GLOBAL_CONTEXT, MountPointResource.class, appContextMount.mountPointInjector())
                 .addDependency(appContextName, ApplicationContext.class, appContextMount.resourceInjector())
                 .install());
 
         // admin resource
 
-        ServiceName appResourceName = LiveOak.applicationAdminResource(this.id);
+        ServiceName appResourceName = Services.applicationAdminResource(this.id);
         ApplicationResourceService appResource = new ApplicationResourceService(this.app);
         target.addService(appResourceName, appResource)
                 .addDependency(configManagerName, ApplicationConfigurationManager.class, appResource.configInjector())
-                .addDependency(LiveOak.APPLICATION_REGISTRY, InternalApplicationRegistry.class, appResource.registryInjector())
+                .addDependency(Services.APPLICATION_REGISTRY, InternalApplicationRegistry.class, appResource.registryInjector())
                 .install();
         MediaTypeMountService<ApplicationResource> appResourceMount = new MediaTypeMountService<>(null, MediaType.JSON, true);
-        this.app.resourceController(target.addService(LiveOak.defaultMount(appResourceName), appResourceMount)
-                .addDependency(LiveOak.resource(ZeroExtension.APPLICATION_ID, "applications"), MountPointResource.class, appResourceMount.mountPointInjector())
+        this.app.resourceController(target.addService(Services.defaultMount(appResourceName), appResourceMount)
+                .addDependency(Services.resource(ZeroExtension.APPLICATION_ID, "applications"), MountPointResource.class, appResourceMount.mountPointInjector())
                 .addDependency(appResourceName, ApplicationResource.class, appResourceMount.resourceInjector())
                 .install());
 
         // Only install the application-clients resource for an application if it's not currently
         ResourceState state = new DefaultResourceState();
-        state.putProperty("type", "application-clients");
+        state.putProperty(LiveOak.RESOURCE_TYPE, LiveOak.APPLICATION_CLIENTS_RESOURCE_TYPE);
 
         // Startup all resources defined for the application
         ApplicationResourcesStartupService resources = new ApplicationResourcesStartupService(resourcesTree);
 
-        target.addService(LiveOak.application(this.id).append("resources"), resources)
+        target.addService(Services.application(this.id).append("resources"), resources)
                 .addInjectionValue(resources.applicationInjector(), this)
                 .install();
     }

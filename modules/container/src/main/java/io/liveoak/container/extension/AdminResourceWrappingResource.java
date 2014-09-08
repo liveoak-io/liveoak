@@ -2,6 +2,7 @@ package io.liveoak.container.extension;
 
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.DelegatingRootResource;
 import io.liveoak.spi.resource.RootResource;
@@ -32,7 +33,7 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("type", type());
+        sink.accept(LiveOak.RESOURCE_TYPE, type());
 
         super.readProperties(ctx, sink);
     }
@@ -40,9 +41,9 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         //Clean out from the state what we don't care about
-        state.removeProperty("id");
-        state.removeProperty("self");
-        state.removeProperty("type");
+        state.removeProperty(LiveOak.ID);
+        state.removeProperty(LiveOak.SELF);
+        state.removeProperty(LiveOak.RESOURCE_TYPE);
 
         if (this.ignoreUpdate) {
             this.ignoreUpdate = false;

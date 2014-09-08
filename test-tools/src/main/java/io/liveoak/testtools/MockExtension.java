@@ -1,6 +1,6 @@
 package io.liveoak.testtools;
 
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
@@ -21,7 +21,7 @@ public class MockExtension implements Extension {
     private final Class<? extends RootResource> resourceClass;
 
     public static ServiceName resource(String appId, Class<? extends RootResource> cls) {
-        return LiveOak.resource( appId, cls.getName() );
+        return Services.resource(appId, cls.getName());
     }
 
     public MockExtension(Class<? extends RootResource> resourceClass) {
@@ -40,7 +40,7 @@ public class MockExtension implements Extension {
         Constructor<? extends RootResource> ctor = this.resourceClass.getConstructor(String.class);
 
         RootResource resource = ctor.newInstance(context.resourceId());
-        ServiceName name = LiveOak.resource(context.application().id(), context.resourceId());
+        ServiceName name = Services.resource(context.application().id(), context.resourceId());
 
         target.addService(name, new ValueService<RootResource>(new ImmediateValue<>(resource)))
                 .install();

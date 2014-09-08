@@ -12,6 +12,7 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -27,7 +28,6 @@ public abstract class MongoResource implements Resource, BlockingResource {
     private MongoResource parent;
 
     protected static final String MONGO_ID_FIELD = "_id";
-    protected static final String MBAAS_ID_FIELD = "id";
 
     // TODO: see if there is a more elegant way to handle this. Prefixes are lame....
     protected static final String MBAAS_MONGO_OBJECT_ID_PREFIX = "ObjectId(\"";
@@ -94,7 +94,7 @@ public abstract class MongoResource implements Resource, BlockingResource {
             if (key.equalsIgnoreCase("$dbref")) {
                 DBRef dbRef = getDBRef((String) resourceState.getProperty("$dbref"));
                 basicDBObject.append(key, dbRef);
-            } else if (!key.equals(MBAAS_ID_FIELD)) { // don't append the ID field again
+            } else if (!key.equals(LiveOak.ID)) { // don't append the ID field again
                 Object value = resourceState.getProperty(key);
                 if (value instanceof ResourceState) {
                     Object dbrefObject = ((ResourceState) value).getProperty("$dbref");

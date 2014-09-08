@@ -12,6 +12,7 @@ import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.ResourceProcessingException;
@@ -207,7 +208,7 @@ public class MongoCollectionResource extends MongoResource {
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
 
         // if the state properties are not empty [other than the id value] then throw an error since the other properties are not writable
-        if ( state.getPropertyNames().isEmpty() || state.getPropertyNames().size() == 1 && state.getPropertyNames().contains( "id" ) ) {
+        if ( state.getPropertyNames().isEmpty() || state.getPropertyNames().size() == 1 && state.getPropertyNames().contains( LiveOak.ID ) ) {
             // if the current state id does not match the current id, then rename the collection.
             if ( state.id()!= null && !state.id().equals( this.id() ) ) {
                 // if there already exists a collection by this name, then throw an error

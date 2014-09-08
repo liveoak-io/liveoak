@@ -12,7 +12,7 @@ import io.liveoak.scripts.resourcetriggered.resource.ResourceScriptService;
 import io.liveoak.scripts.resourcetriggered.resource.ResourceScripts;
 import io.liveoak.scripts.resourcetriggered.resource.ScriptMap;
 import io.liveoak.scripts.resourcetriggered.resource.ScriptMapService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
@@ -27,14 +27,14 @@ import org.vertx.java.core.Vertx;
  */
 public class ScriptExtension implements Extension {
 
-    public static final ServiceName SCRIPT_SERVICE_NAME = LiveOak.LIVEOAK.append("scripts");
+    public static final ServiceName SCRIPT_SERVICE_NAME = Services.LIVEOAK.append("scripts");
     public static final ServiceName RESOURCE_SCRIPT_MANAGER_SERVICE_NAME = SCRIPT_SERVICE_NAME.append("resource-script-manager");
     public static final ServiceName RESOURCE_SCRIPT_MAP_SERVICE_NAME = SCRIPT_SERVICE_NAME.append("resource-map");
     public static final ServiceName LIBRARY_MANAGER_SERVICE_NAME = SCRIPT_SERVICE_NAME.append("library-manager");
     public static final ServiceName LIBRARIES_RESOURCE_SERVICE_NAME = SCRIPT_SERVICE_NAME.append("libraries-resource");
     public static final ServiceName RESOURCE_SCRIPTS_SERVICE_NAME = SCRIPT_SERVICE_NAME.append("resource-scripts");
 
-    public static final ServiceName SCRIPT_INTERCEPTOR_SERVICE_NAME = LiveOak.interceptor("script-interceptor");
+    public static final ServiceName SCRIPT_INTERCEPTOR_SERVICE_NAME = Services.interceptor("script-interceptor");
 
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
@@ -55,7 +55,7 @@ public class ScriptExtension implements Extension {
         // RESOURCE LIBRARIES
         LibraryManagerService libraryManagerService = new LibraryManagerService();
         context.target().addService(LIBRARY_MANAGER_SERVICE_NAME.append(applicationId), libraryManagerService)
-                .addDependency(LiveOak.CLIENT, Client.class, libraryManagerService.clientInjector)
+                .addDependency(Services.CLIENT, Client.class, libraryManagerService.clientInjector)
                 .install();
 
         ScriptLibraryService scriptLibraryService = new ScriptLibraryService();
@@ -82,7 +82,7 @@ public class ScriptExtension implements Extension {
         ResourceScriptService resourceScriptsService = new ResourceScriptService();
         context.target().addService(RESOURCE_SCRIPTS_SERVICE_NAME.append(applicationId), resourceScriptsService)
                 .addDependency(RESOURCE_SCRIPT_MAP_SERVICE_NAME.append(applicationId), ScriptMap.class, resourceScriptsService.scriptMapInjector)
-                .addDependency(LiveOak.VERTX, Vertx.class, resourceScriptsService.vertxInjector)
+                .addDependency(Services.VERTX, Vertx.class, resourceScriptsService.vertxInjector)
                 .install();
 
 
@@ -96,11 +96,11 @@ public class ScriptExtension implements Extension {
 
         // ROOT SCRIPT RESOURCE
         ScriptService scriptsService = new ScriptService(context.resourceId());
-        context.target().addService(LiveOak.resource(context.application().id(), context.resourceId()), scriptsService)
+        context.target().addService(Services.resource(context.application().id(), context.resourceId()), scriptsService)
                 .addDependency(RESOURCE_SCRIPTS_SERVICE_NAME.append(applicationId), ResourceScripts.class, scriptsService.resourceScriptsInjector)
                 .addDependency(LIBRARIES_RESOURCE_SERVICE_NAME.append(applicationId), ScriptLibraries.class, scriptsService.librariesResourceInjector)
                 .install();
-        context.mountPrivate(LiveOak.resource(context.application().id(), context.resourceId()));
+        context.mountPrivate(Services.resource(context.application().id(), context.resourceId()));
     }
 
     @Override

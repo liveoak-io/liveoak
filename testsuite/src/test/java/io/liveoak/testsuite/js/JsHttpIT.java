@@ -3,6 +3,7 @@ package io.liveoak.testsuite.js;
 import java.io.IOException;
 import java.net.URL;
 
+import io.liveoak.spi.LiveOak;
 import io.liveoak.testsuite.AbstractLiveOakTest;
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.json.JSONArray;
@@ -47,8 +48,8 @@ public class JsHttpIT extends AbstractLiveOakTest {
     public void testRead() throws IOException, JSONException {
         JSONObject result = (JSONObject) execute("read.js", "/default");
 
-        Assert.assertEquals("default", result.getString("id"));
-        Assert.assertEquals("/default", result.getJSONObject("self").getString("href"));
+        Assert.assertEquals("default", result.getString(LiveOak.ID));
+        Assert.assertEquals("/default", result.getJSONObject(LiveOak.SELF).getString(LiveOak.HREF));
     }
 
 }

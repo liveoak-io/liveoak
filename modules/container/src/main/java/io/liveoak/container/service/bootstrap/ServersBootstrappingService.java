@@ -24,17 +24,17 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 
-import static io.liveoak.spi.LiveOak.CLIENT;
-import static io.liveoak.spi.LiveOak.CODEC_MANAGER;
-import static io.liveoak.spi.LiveOak.CODEC_MANAGER_COMPLETE;
-import static io.liveoak.spi.LiveOak.GLOBAL_CONTEXT;
-import static io.liveoak.spi.LiveOak.INTERCEPTOR_MANAGER;
-import static io.liveoak.spi.LiveOak.NOTIFIER;
-import static io.liveoak.spi.LiveOak.PIPELINE_CONFIGURATOR;
-import static io.liveoak.spi.LiveOak.SOCKET_BINDING;
-import static io.liveoak.spi.LiveOak.SUBSCRIPTION_MANAGER;
-import static io.liveoak.spi.LiveOak.WORKER_POOL;
-import static io.liveoak.spi.LiveOak.server;
+import static io.liveoak.spi.Services.CLIENT;
+import static io.liveoak.spi.Services.CODEC_MANAGER;
+import static io.liveoak.spi.Services.CODEC_MANAGER_COMPLETE;
+import static io.liveoak.spi.Services.GLOBAL_CONTEXT;
+import static io.liveoak.spi.Services.INTERCEPTOR_MANAGER;
+import static io.liveoak.spi.Services.NOTIFIER;
+import static io.liveoak.spi.Services.PIPELINE_CONFIGURATOR;
+import static io.liveoak.spi.Services.SOCKET_BINDING;
+import static io.liveoak.spi.Services.SUBSCRIPTION_MANAGER;
+import static io.liveoak.spi.Services.WORKER_POOL;
+import static io.liveoak.spi.Services.server;
 
 /**
  * @author Bob McWhirter

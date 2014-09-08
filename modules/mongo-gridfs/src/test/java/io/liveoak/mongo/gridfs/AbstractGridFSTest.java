@@ -10,6 +10,7 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.mongo.gridfs.extension.GridFSExtension;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
 import org.jboss.logging.Logger;
@@ -73,7 +74,7 @@ public class AbstractGridFSTest extends AbstractHTTPResourceTestCase {
         assertThat(item).isInstanceOf(JsonObject.class);
         JsonObject obj = (JsonObject) item;
         assertThat(obj.getString("rel")).isEqualTo(rel);
-        assertThat(obj.getString("href")).isEqualTo(href);
+        assertThat(obj.getString(LiveOak.HREF)).isEqualTo(href);
     }
 
 }

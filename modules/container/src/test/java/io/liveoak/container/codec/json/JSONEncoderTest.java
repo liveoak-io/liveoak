@@ -11,6 +11,7 @@ import io.liveoak.common.codec.driver.StateEncodingDriver;
 import io.liveoak.common.codec.json.JSONEncoder;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.codec.driver.EncodingDriver;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
@@ -51,7 +52,7 @@ public class JSONEncoderTest {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> root = mapper.readValue(encoded, Map.class);
 
-        assertThat(root.get("id")).isEqualTo("bob");
+        assertThat(root.get(LiveOak.ID)).isEqualTo("bob");
     }
 
     @Test
@@ -65,9 +66,9 @@ public class JSONEncoderTest {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> root = mapper.readValue(encoded, Map.class);
 
-        assertThat(root.get("id")).isEqualTo("bob");
-        assertThat(root.get("self")).isNotNull();
-        assertThat(((Map) root.get("self")).get("href")).isEqualTo("/bob");
+        assertThat(root.get(LiveOak.ID)).isEqualTo("bob");
+        assertThat(root.get(LiveOak.SELF)).isNotNull();
+        assertThat(((Map) root.get(LiveOak.SELF)).get(LiveOak.HREF)).isEqualTo("/bob");
     }
 
     @Test
@@ -81,7 +82,7 @@ public class JSONEncoderTest {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> root = mapper.readValue(encoded, Map.class);
 
-        assertThat(root.get("id")).isEqualTo("bob");
+        assertThat(root.get(LiveOak.ID)).isEqualTo("bob");
         assertThat(root.get("name")).isEqualTo("Bob McWhirter");
     }
 
@@ -97,9 +98,9 @@ public class JSONEncoderTest {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> root = mapper.readValue(encoded, Map.class);
 
-        assertThat(root.get("id")).isEqualTo("bob");
-        assertThat(root.get("self")).isNotNull();
-        assertThat(((Map) root.get("self")).get("href")).isEqualTo("/bob");
+        assertThat(root.get(LiveOak.ID)).isEqualTo("bob");
+        assertThat(root.get(LiveOak.SELF)).isNotNull();
+        assertThat(((Map) root.get(LiveOak.SELF)).get(LiveOak.HREF)).isEqualTo("/bob");
         assertThat(root.get("name")).isEqualTo("Bob McWhirter");
     }
 
@@ -125,7 +126,7 @@ public class JSONEncoderTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(encoded);
 
-        assertThat(root.get("id").asText()).isEqualTo("bob");
+        assertThat(root.get(LiveOak.ID).asText()).isEqualTo("bob");
         assertThat(root.get("name").asText()).isEqualTo("Bob McWhirter");
 
         assertThat(root.get("dog")).isNotNull();
@@ -136,7 +137,7 @@ public class JSONEncoderTest {
         //TODO: figure out how resourceStates of resourceStates should behave with regards to link encoding or resource encoding
         DefaultResourceState mosesState = new DefaultResourceState("moses");
         //mosesState.uri( new URI("/moses") );
-        mosesState.putProperty( "href", "/moses" );
+        mosesState.putProperty( LiveOak.HREF, "/moses" );
         //mosesState.putProperty("name", "Moses");
         //mosesState.putProperty("breed", "German Shepherd");
 
@@ -154,13 +155,13 @@ public class JSONEncoderTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(encoded);
 
-        assertThat(root.get("id").asText()).isEqualTo("bob");
-        assertThat(root.get("self")).isNotNull();
-        assertThat(root.get("self").get("href").asText()).isEqualTo("/bob");
+        assertThat(root.get(LiveOak.ID).asText()).isEqualTo("bob");
+        assertThat(root.get(LiveOak.SELF)).isNotNull();
+        assertThat(root.get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/bob");
         assertThat(root.get("name").asText()).isEqualTo("Bob McWhirter");
 
         assertThat(root.get("dog")).isNotNull();
-        assertThat(root.get("dog").get("href").asText()).isEqualTo("/moses");
+        assertThat(root.get("dog").get(LiveOak.HREF).asText()).isEqualTo("/moses");
     }
 
     @Test
@@ -190,7 +191,7 @@ public class JSONEncoderTest {
         JsonNode root = mapper.readTree(encoded);
 
 
-        assertThat(root.get("id").asText()).isEqualTo("bob");
+        assertThat(root.get(LiveOak.ID).asText()).isEqualTo("bob");
         //assertThat(root.get("self")).isNotNull();
         //assertThat(root.get("self").get("href").asText()).isEqualTo("/bob");
         assertThat(root.get("name").asText()).isEqualTo("Bob McWhirter");
@@ -204,10 +205,10 @@ public class JSONEncoderTest {
 
         assertThat(encodedDogs).hasSize(2);
 
-        assertThat(encodedDogs.get(0).get("id").asText()).isEqualTo("moses");
+        assertThat(encodedDogs.get(0).get(LiveOak.ID).asText()).isEqualTo("moses");
         //assertThat(encodedDogs.get(0).get("href").asText()).isEqualTo("/moses");
 
-        assertThat(encodedDogs.get(1).get("id").asText()).isEqualTo("only");
+        assertThat(encodedDogs.get(1).get(LiveOak.ID).asText()).isEqualTo("only");
         //assertThat(encodedDogs.get(1).get("href").asText()).isEqualTo("/only");
 
     }
@@ -228,7 +229,7 @@ public class JSONEncoderTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(encoded);
 
-        assertThat(root.get("id").asText()).isEqualTo("moses");
+        assertThat(root.get(LiveOak.ID).asText()).isEqualTo("moses");
         //assertThat(root.get("self")).isNotNull();
         //assertThat(root.get("self").get("href").asText()).isEqualTo("/moses");
         assertThat(root.get("name").asText()).isEqualTo("Moses");

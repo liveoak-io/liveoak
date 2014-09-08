@@ -2,6 +2,7 @@ package io.liveoak.container.zero;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -16,7 +17,7 @@ public class SimpleApplicationClientResource implements SynchronousResource {
 
     public SimpleApplicationClientResource(ApplicationClientsResource parent, ResourceState state) {
         this.parent = parent;
-        this.id = (String) state.getProperty("id");
+        this.id = (String) state.getProperty(LiveOak.ID);
         this.type = (String) state.getProperty("type");
         this.securityKey = (String) state.getProperty("security-key");
     }
@@ -54,7 +55,7 @@ public class SimpleApplicationClientResource implements SynchronousResource {
 
     public ObjectNode toJson() {
         ObjectNode json = JsonNodeFactory.instance.objectNode();
-        json.put("id", this.id);
+        json.put(LiveOak.ID, this.id);
         json.put("type", this.type);
         json.put("security-key", this.securityKey);
         return json;

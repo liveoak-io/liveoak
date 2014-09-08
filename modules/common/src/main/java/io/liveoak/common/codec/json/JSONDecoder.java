@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import io.liveoak.common.codec.ResourceDecoder;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.StringPropertyReplacer;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -176,13 +177,13 @@ public class JSONDecoder implements ResourceDecoder {
         parser.nextToken();
         Object value = decodeValue(parser);
 
-        if (name.equals("members") && value instanceof Collection) {
+        if (name.equals(LiveOak.MEMBERS) && value instanceof Collection) {
             ((Collection) value).stream().forEach((e) -> state.addMember((ResourceState) e));
         } else {
             state.putProperty(name, value);
         }
 
-        if (name.equals("id")) {
+        if (name.equals(LiveOak.ID)) {
             state.id(value.toString());
         }
     }

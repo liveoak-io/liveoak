@@ -5,6 +5,7 @@
  */
 package io.liveoak.container;
 
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
@@ -66,8 +67,8 @@ public class InMemoryCollectionResource implements Resource {
     }
 
     protected ResourceState cleanse(ResourceState state) {
-        state.removeProperty("id");
-        state.removeProperty("self");
+        state.removeProperty(LiveOak.ID);
+        state.removeProperty(LiveOak.SELF);
         return state;
     }
 

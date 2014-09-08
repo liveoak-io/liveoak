@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.json.JSONEncoder;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.common.util.StringPropertyReplacer;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
@@ -79,12 +79,12 @@ public class ExtensionInstaller {
         StabilityMonitor monitor = new StabilityMonitor();
         ServiceTarget target = this.target.subTarget();
         target.addMonitor(monitor);
-        ServiceBuilder builder = target.addService(LiveOak.extension(id), new ExtensionService(id, extension, config));
+        ServiceBuilder builder = target.addService(Services.extension(id), new ExtensionService(id, extension, config));
 
         JsonNode deps = config.get("dependencies");
         if (deps != null) {
             for (JsonNode node : deps) {
-                builder.addDependency(LiveOak.extension(node.asText()));
+                builder.addDependency(Services.extension(node.asText()));
             }
         }
         builder.install();

@@ -5,7 +5,7 @@ import java.io.File;
 import io.liveoak.filesystem.FileSystemAdminResource;
 import io.liveoak.filesystem.aggregating.service.AggregatingFilesystemResourceService;
 import io.liveoak.filesystem.extension.FilesystemExtension;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import org.vertx.java.core.Vertx;
 
@@ -22,11 +22,11 @@ public class AggregatingFilesystemExtension extends FilesystemExtension {
         context.mountPrivate(privateResource);
 
         AggregatingFilesystemResourceService publicResource = new AggregatingFilesystemResourceService(context.resourceId());
-        context.target().addService(LiveOak.resource(context.application().id(), context.resourceId()), publicResource)
-                .addDependency(LiveOak.VERTX, Vertx.class, publicResource.vertxInjector())
+        context.target().addService(Services.resource(context.application().id(), context.resourceId()), publicResource)
+                .addDependency(Services.VERTX, Vertx.class, publicResource.vertxInjector())
                 .addInjection(publicResource.adminResourceInjector(), privateResource)
                 .install();
 
-        context.mountPublic(LiveOak.resource(context.application().id(), context.resourceId()));
+        context.mountPublic(Services.resource(context.application().id(), context.resourceId()));
     }
 }

@@ -16,6 +16,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
@@ -150,12 +151,12 @@ public class GridFSDirectoryResource extends GridFSResource {
             List links = new LinkedList();
             links.add(new MapResource()
                     .put("rel", "self")
-                    .put("href", selfPath));
+                    .put(LiveOak.HREF, selfPath));
 
             if (parentPath != null) {
                 links.add(new MapResource()
                         .put("rel", "parent")
-                        .put("href", parentPath));
+                        .put(LiveOak.HREF, parentPath));
             }
             sink.accept("links", links);
         } finally {

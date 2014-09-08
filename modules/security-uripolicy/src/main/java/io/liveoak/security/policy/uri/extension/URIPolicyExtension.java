@@ -4,7 +4,7 @@ import io.liveoak.security.policy.uri.URIPolicyServices;
 import io.liveoak.security.policy.uri.impl.URIPolicy;
 import io.liveoak.security.policy.uri.service.URIPolicyConfigResourceService;
 import io.liveoak.security.policy.uri.service.URIPolicyRootResourceService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
@@ -35,12 +35,12 @@ public class URIPolicyExtension implements Extension {
 
         URIPolicyRootResourceService resource = new URIPolicyRootResourceService(context.resourceId());
 
-        target.addService(LiveOak.resource(appId, context.resourceId()), resource)
+        target.addService(Services.resource(appId, context.resourceId()), resource)
                 .addDependency(URIPolicyServices.policy(appId, context.resourceId()), URIPolicy.class, resource.policyInjector())
                 .install();
 
         URIPolicyConfigResourceService configResource = new URIPolicyConfigResourceService(context.resourceId());
-        target.addService(LiveOak.adminResource(appId, context.resourceId()), configResource)
+        target.addService(Services.adminResource(appId, context.resourceId()), configResource)
                 .addDependency(URIPolicyServices.policy(appId, context.resourceId()), URIPolicy.class, configResource.policyInjector())
                 .install();
 

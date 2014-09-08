@@ -5,7 +5,7 @@ import io.liveoak.container.extension.ExtensionInstaller;
 import io.liveoak.container.resource.PropertiesResource;
 import io.liveoak.container.resource.ServersResource;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.Server;
@@ -40,31 +40,31 @@ public class LiveOakSystem implements Resource {
     }
 
     public Client client() throws InterruptedException {
-        return (Client) this.serviceContainer.getService(LiveOak.CLIENT).awaitValue();
+        return (Client) this.serviceContainer.getService(Services.CLIENT).awaitValue();
     }
 
     public Server networkServer(String name) throws InterruptedException {
-        return (Server) this.serviceContainer.getService(LiveOak.server(name, true)).awaitValue();
+        return (Server) this.serviceContainer.getService(Services.server(name, true)).awaitValue();
     }
 
     public Server localServer(String name) throws InterruptedException {
-        return (Server) this.serviceContainer.getService(LiveOak.server(name, false)).awaitValue();
+        return (Server) this.serviceContainer.getService(Services.server(name, false)).awaitValue();
     }
 
     public ResourceCodecManager codecManager() throws InterruptedException {
-        return (ResourceCodecManager) this.serviceContainer.getService(LiveOak.CODEC_MANAGER).awaitValue();
+        return (ResourceCodecManager) this.serviceContainer.getService(Services.CODEC_MANAGER).awaitValue();
     }
 
     public Vertx vertx() throws InterruptedException {
-        return (Vertx) this.serviceContainer.getService(LiveOak.VERTX).awaitValue();
+        return (Vertx) this.serviceContainer.getService(Services.VERTX).awaitValue();
     }
 
     public InternalApplicationRegistry applicationRegistry() throws InterruptedException {
-        return (InternalApplicationRegistry) this.serviceContainer.getService(LiveOak.APPLICATION_REGISTRY).awaitValue();
+        return (InternalApplicationRegistry) this.serviceContainer.getService(Services.APPLICATION_REGISTRY).awaitValue();
     }
 
     public ExtensionInstaller extensionInstaller() throws InterruptedException {
-        return (ExtensionInstaller) this.serviceContainer.getService(LiveOak.EXTENSION_INSTALLER).awaitValue();
+        return (ExtensionInstaller) this.serviceContainer.getService(Services.EXTENSION_INSTALLER).awaitValue();
     }
 
     public Object service(ServiceName name) throws InterruptedException, TimeoutException {

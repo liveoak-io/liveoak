@@ -46,6 +46,7 @@ import io.liveoak.pgsql.sql.Or;
 import io.liveoak.pgsql.sql.RelationalOperand;
 import io.liveoak.pgsql.sql.RelationalOperator;
 import io.liveoak.pgsql.sql.Value;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceErrorResponse;
@@ -406,12 +407,12 @@ public class QueryBuilder {
                 throw new RuntimeException("Not a valid resource reference - empty uri - for '" + field + "': " + val);
             }
         } else {
-            Object self = ((ResourceState) val).getProperty("self");
+            Object self = ((ResourceState) val).getProperty(LiveOak.SELF);
             if (self == null || self instanceof ResourceState == false) {
                 throw new RuntimeException("Not a valid resource reference - no 'self' - for '" + field + "': " + val);
             }
 
-            href = ((ResourceState) self).getPropertyAsString("href");
+            href = ((ResourceState) self).getPropertyAsString(LiveOak.HREF);
             if (href == null) {
                 throw new RuntimeException("Not a valid resource reference - no 'self/href' - for '" + field + "': " + val);
             }
@@ -570,7 +571,7 @@ public class QueryBuilder {
             ResourceState item = state.getPropertyAsResourceState(ref.fieldName());
             if (item != null) {
                 for (String name : item.getPropertyNames()) {
-                    if (!"self".equals(name)) {
+                    if (!LiveOak.SELF.equals(name)) {
                         executeUpdate(ctx, con, catalog.table(ref.tableRef()), item, ref, true);
                         break;
                     }
@@ -671,7 +672,7 @@ public class QueryBuilder {
             for (ResourceState item: updated) {
                 // only update if there are some properties present other than just self
                 for (String name: item.getPropertyNames()) {
-                    if (!"self".equals(name)) {
+                    if (!LiveOak.SELF.equals(name)) {
                         executeUpdate(ctx, con, refTable, item);
                         break;
                     }

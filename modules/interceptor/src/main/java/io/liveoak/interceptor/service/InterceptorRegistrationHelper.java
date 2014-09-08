@@ -8,8 +8,8 @@ import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 
-import static io.liveoak.spi.LiveOak.INTERCEPTOR_MANAGER;
-import static io.liveoak.spi.LiveOak.interceptor;
+import static io.liveoak.spi.Services.INTERCEPTOR_MANAGER;
+import static io.liveoak.spi.Services.interceptor;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>

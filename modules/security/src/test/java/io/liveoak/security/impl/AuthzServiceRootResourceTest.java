@@ -15,7 +15,6 @@ import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.security.extension.SecurityExtension;
 import io.liveoak.security.integration.AuthzServiceConfigResource;
 import io.liveoak.security.integration.AuthzServiceRootResource;
-import io.liveoak.security.spi.AuthzPolicyEntry;
 import io.liveoak.spi.*;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
@@ -54,8 +53,8 @@ public class AuthzServiceRootResourceTest extends AbstractResourceTestCase {
 
     @Before
     public void before() throws Exception {
-        this.authzService = (AuthzServiceRootResource) this.system.service(LiveOak.resource("testApp", "authz"));
-        this.mockPolicy = (MockAuthzRootPolicyResource) this.system.service(LiveOak.resource("testApp", "mock-policy" ) );
+        this.authzService = (AuthzServiceRootResource) this.system.service(Services.resource("testApp", "authz"));
+        this.mockPolicy = (MockAuthzRootPolicyResource) this.system.service(Services.resource("testApp", "mock-policy") );
     }
 
     @Test

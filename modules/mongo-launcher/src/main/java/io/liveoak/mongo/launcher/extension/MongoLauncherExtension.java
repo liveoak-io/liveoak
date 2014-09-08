@@ -7,7 +7,7 @@ package io.liveoak.mongo.launcher.extension;
 
 import io.liveoak.mongo.launcher.config.MongoLauncherConfigResource;
 import io.liveoak.mongo.launcher.service.MongoLauncherService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
@@ -21,7 +21,7 @@ import org.jboss.msc.value.ImmediateValue;
  */
 public class MongoLauncherExtension implements Extension {
 
-    public static final ServiceName MONGO_LAUNCHER_NAME = LiveOak.LIVEOAK.append("mongo-launcher");
+    public static final ServiceName MONGO_LAUNCHER_NAME = Services.LIVEOAK.append("mongo-launcher");
     public static final ServiceName MONGO_LAUNCHER_CONFIG_NAME = MONGO_LAUNCHER_NAME.append("config");
 
     @Override

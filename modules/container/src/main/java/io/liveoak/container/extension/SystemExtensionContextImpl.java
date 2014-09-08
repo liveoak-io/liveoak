@@ -2,7 +2,7 @@ package io.liveoak.container.extension;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.tenancy.MountPointResource;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.SystemExtensionContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -36,10 +36,10 @@ public class SystemExtensionContextImpl implements SystemExtensionContext {
 
     @Override
     public void mountPrivate(RootResource resource) {
-        target.addService(LiveOak.systemResource(this.id), new ValueService<RootResource>(new ImmediateValue<>(resource)))
+        target.addService(Services.systemResource(this.id), new ValueService<RootResource>(new ImmediateValue<>(resource)))
                 .install();
 
-        mountPrivate(LiveOak.systemResource(this.id));
+        mountPrivate(Services.systemResource(this.id));
     }
 
     @Override

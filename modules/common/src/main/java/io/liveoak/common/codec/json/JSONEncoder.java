@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import io.liveoak.common.codec.NonEncodableValueException;
 import io.liveoak.common.codec.StateEncoder;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
@@ -53,13 +54,13 @@ public class JSONEncoder implements StateEncoder {
             return;
         }
         if (resourceState.id() != null) {
-            this.generator.writeFieldName("id");
+            this.generator.writeFieldName(LiveOak.ID);
             this.generator.writeString(resourceState.id());
         }
         if (resourceState.uri() != null) {
-            this.generator.writeFieldName("self");
+            this.generator.writeFieldName(LiveOak.SELF);
             this.generator.writeStartObject();
-            this.generator.writeFieldName("href");
+            this.generator.writeFieldName(LiveOak.HREF);
             this.generator.writeString(resourceState.uri().toString());
             this.generator.writeEndObject();
         }
@@ -108,7 +109,7 @@ public class JSONEncoder implements StateEncoder {
 
     @Override
     public void startMembers() throws Exception {
-        this.generator.writeFieldName("members");
+        this.generator.writeFieldName(LiveOak.MEMBERS);
         this.generator.writeStartArray();
     }
 
@@ -183,9 +184,9 @@ public class JSONEncoder implements StateEncoder {
     @Override
     public void writeLink(ResourceState resourceState) throws Exception {
         this.generator.writeStartObject();
-        this.generator.writeFieldName("id");
+        this.generator.writeFieldName(LiveOak.ID);
         this.generator.writeString(resourceState.id());
-        this.generator.writeFieldName("href");
+        this.generator.writeFieldName(LiveOak.HREF);
         this.generator.writeString(resourceState.uri().toString());
         this.generator.writeEndObject();
 

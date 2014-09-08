@@ -9,12 +9,11 @@ import io.liveoak.container.service.bootstrap.ServersBootstrappingService;
 import io.liveoak.container.service.bootstrap.TenancyBootstrappingService;
 import io.liveoak.container.service.bootstrap.VertxBootstrappingService;
 import io.liveoak.mongo.launcher.service.MongoLauncherAutoSetupService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.ServiceVerificationHandler;
-import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.network.SocketBinding;
 import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
@@ -34,7 +33,7 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
     static final LiveOakSubsystemAdd INSTANCE = new LiveOakSubsystemAdd();
 
     static final ServiceName JBOSS_HOME = ServiceName.of("jboss", "server", "path", "jboss.home.dir");
-    static final ServiceName LIVEOAK_SUB = LiveOak.LIVEOAK.append("wildfly", "subsystem");
+    static final ServiceName LIVEOAK_SUB = Services.LIVEOAK.append("wildfly", "subsystem");
     static final String LIVEOAK_HOME_PROPERTY = "io.liveoak.home.dir";
     static final ServiceName LIVEOAK_HOME = LIVEOAK_SUB.append("path", LIVEOAK_HOME_PROPERTY);
     static final ServiceName CONF_PATH = LIVEOAK_SUB.append("conf-dir", "path");
@@ -101,7 +100,7 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         LiveOakSocketBindingService liveoakSocketBinding = new LiveOakSocketBindingService();
 
-        context.getServiceTarget().addService(LiveOak.SOCKET_BINDING, liveoakSocketBinding)
+        context.getServiceTarget().addService(Services.SOCKET_BINDING, liveoakSocketBinding)
                 .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(socketBinding), SocketBinding.class, liveoakSocketBinding.socketBindingInjector())
                 .install();
 
@@ -139,7 +138,7 @@ public class LiveOakSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 .addDependency(LIVEOAK_SUB.append("mongo-autosetup"))
                 .install();
 
-        context.getServiceTarget().addService(LiveOak.SERVICE_REGISTRY, new ValueService<ServiceRegistry>(new ImmediateValue<>(context.getServiceRegistry(false))))
+        context.getServiceTarget().addService(Services.SERVICE_REGISTRY, new ValueService<ServiceRegistry>(new ImmediateValue<>(context.getServiceRegistry(false))))
                 .install();
 
         context.getServiceTarget().addService(LIVEOAK_SUB.append("vertx"), new VertxBootstrappingService())

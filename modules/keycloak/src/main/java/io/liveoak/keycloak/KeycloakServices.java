@@ -1,6 +1,6 @@
 package io.liveoak.keycloak;
 
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -8,7 +8,7 @@ import org.jboss.msc.service.ServiceName;
  */
 public class KeycloakServices {
 
-    private static final ServiceName KEYCLOAK = LiveOak.LIVEOAK.append("keycloak");
+    private static final ServiceName KEYCLOAK = Services.LIVEOAK.append("keycloak");
 
     private static final ServiceName UNDERTOW = KEYCLOAK.append("undertow");
 

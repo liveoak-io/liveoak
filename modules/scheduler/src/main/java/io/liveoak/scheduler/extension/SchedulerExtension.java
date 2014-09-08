@@ -4,7 +4,7 @@ import io.liveoak.scheduler.SchedulerServices;
 import io.liveoak.scheduler.service.SchedulerAdminResourceService;
 import io.liveoak.scheduler.service.SchedulerResourceService;
 import io.liveoak.scheduler.service.SchedulerService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
@@ -37,8 +37,8 @@ public class SchedulerExtension implements Extension {
 
         SchedulerResourceService publicResource = new SchedulerResourceService(context.resourceId());
 
-        target.addService(LiveOak.resource(appId, context.resourceId()), publicResource)
-                .addDependency(LiveOak.NOTIFIER, Notifier.class, publicResource.notifierInjector())
+        target.addService(Services.resource(appId, context.resourceId()), publicResource)
+                .addDependency(Services.NOTIFIER, Notifier.class, publicResource.notifierInjector())
                 .addDependency(name, Scheduler.class, publicResource.schedulerInjector())
                 .install();
 
@@ -46,7 +46,7 @@ public class SchedulerExtension implements Extension {
 
         SchedulerAdminResourceService privateResource = new SchedulerAdminResourceService(context.resourceId());
 
-        target.addService(LiveOak.adminResource(appId, context.resourceId()), privateResource)
+        target.addService(Services.adminResource(appId, context.resourceId()), privateResource)
                 .addDependency(name, Scheduler.class, privateResource.schedulerInjector())
                 .install();
 

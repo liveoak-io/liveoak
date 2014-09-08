@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.scheduler.extension.SchedulerExtension;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
@@ -25,7 +26,7 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
 
     @Test
     public void testAddTrigger() throws Exception {
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand("members")).build();
+        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).build();
 
         ResourceState triggerState = new DefaultResourceState();
         triggerState.putProperty("cron", "* * * * * ?");

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.liveoak.common.DefaultReturnFields;
+import io.liveoak.spi.LiveOak;
 import org.junit.Test;
 
 import com.mongodb.BasicDBObject;
@@ -44,7 +45,7 @@ public class MongoDBAggregateCollectionReadTest extends BaseMongoDBTest {
         SimpleResourceParams resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "[{$group:{_id:{country:'$country'},numPeople:{$sum:1}}}]");
         RequestContext requestContext = new RequestContext.Builder()
-                .returnFields(new DefaultReturnFields("*").withExpand("members"))
+                .returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS))
                 .resourceParams(resourceParams)
                 .build();
 

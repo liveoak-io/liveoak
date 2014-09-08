@@ -6,7 +6,7 @@ import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.mongo.gridfs.service.GridFSResourceService;
 import io.liveoak.mongo.gridfs.service.TmpDirService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.SystemExtensionContext;
 import io.liveoak.spi.resource.async.DefaultRootResource;
@@ -19,7 +19,7 @@ import org.vertx.java.core.Vertx;
  */
 public class GridFSExtension extends MongoExtension {
 
-    public static ServiceName TMP_DIR = LiveOak.LIVEOAK.append("gridfs", "tmpdir");
+    public static ServiceName TMP_DIR = Services.LIVEOAK.append("gridfs", "tmpdir");
 
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
@@ -37,13 +37,13 @@ public class GridFSExtension extends MongoExtension {
         context.mountPrivate(privateResource);
 
         GridFSResourceService publicResource = new GridFSResourceService(context.resourceId());
-        context.target().addService(LiveOak.resource(context.application().id(), context.resourceId()), publicResource)
-                .addDependency(LiveOak.VERTX, Vertx.class, publicResource.vertxInjector())
+        context.target().addService(Services.resource(context.application().id(), context.resourceId()), publicResource)
+                .addDependency(Services.VERTX, Vertx.class, publicResource.vertxInjector())
                 .addDependency(TMP_DIR, File.class, publicResource.tmpDirInjector())
                 .addInjection(publicResource.configResourceInjector(), privateResource)
                 .install();
 
-        context.mountPublic(LiveOak.resource(context.application().id(), context.resourceId()));
+        context.mountPublic(Services.resource(context.application().id(), context.resourceId()));
     }
 
 }

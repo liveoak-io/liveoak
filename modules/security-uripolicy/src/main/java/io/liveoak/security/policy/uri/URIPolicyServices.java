@@ -1,6 +1,6 @@
 package io.liveoak.security.policy.uri;
 
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -8,7 +8,7 @@ import org.jboss.msc.service.ServiceName;
  */
 public class URIPolicyServices {
 
-    private static final ServiceName URI_POLICY = LiveOak.LIVEOAK.append("uri-policy");
+    private static final ServiceName URI_POLICY = Services.LIVEOAK.append("uri-policy");
 
     public static ServiceName policy(String appId, String resourceId) {
         return URI_POLICY.append("policy", appId, resourceId);

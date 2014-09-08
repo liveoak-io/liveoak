@@ -23,6 +23,7 @@ import io.liveoak.pgsql.meta.PrimaryKey;
 import io.liveoak.pgsql.meta.QueryBuilder;
 import io.liveoak.pgsql.meta.Table;
 import io.liveoak.pgsql.meta.TableRef;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceParams;
@@ -179,15 +180,15 @@ public class PgSqlRowResource implements Resource {
         Table table = cat.table(new TableRef(parent.id()));
 
         // check self / href - it must be equal to this uri
-        ResourceState self = state.getPropertyAsResourceState("self");
+        ResourceState self = state.getPropertyAsResourceState(LiveOak.SELF);
         if (self == null) {
             self = new DefaultResourceState();
-            self.putProperty("href", uri());
-            state.putProperty("self", self);
+            self.putProperty(LiveOak.HREF, uri());
+            state.putProperty(LiveOak.SELF, self);
         } else {
-            String href = self.getPropertyAsString("href");
+            String href = self.getPropertyAsString(LiveOak.HREF);
             if (href == null) {
-                self.putProperty("href", uri());
+                self.putProperty(LiveOak.HREF, uri());
             } else if (!new URI(href).equals(uri())) {
                 responder.invalidRequest("'self' / 'href' does not match the item: " + href + " (should be: " + uri() + ")");
                 return;

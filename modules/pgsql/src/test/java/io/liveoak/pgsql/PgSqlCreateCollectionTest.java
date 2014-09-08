@@ -5,6 +5,7 @@
  */
 package io.liveoak.pgsql;
 
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ResourceNotFoundException;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.state.ResourceState;
@@ -32,7 +33,7 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
         ResourceState expected = resource(BASEPATH, "/testApp", new Object[] {
                 "links", list(
                         obj("rel", "batch",
-                            "href", endpoint + "/_batch")
+                            LiveOak.HREF, endpoint + "/_batch")
                 ),
                 "count", 3,
                 "type", "database"},
@@ -138,7 +139,7 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
         expected = resource(BASEPATH, "/testApp", new Object[] {
                         "links", list(
                                 obj("rel", "batch",
-                                    "href", endpoint + "/_batch")
+                                    LiveOak.HREF, endpoint + "/_batch")
                         ),
                         "count", 4,
                         "type", "database"},
@@ -247,7 +248,7 @@ public class PgSqlCreateCollectionTest extends BasePgSqlTest {
         expected = resource(BASEPATH, "/testApp", new Object[] {
                 "links", list(
                         obj("rel", "batch",
-                            "href", endpoint + "/_batch")
+                            LiveOak.HREF, endpoint + "/_batch")
                 ),
                 "count", 3,
                 "type", "database"},

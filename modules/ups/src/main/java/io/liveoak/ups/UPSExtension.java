@@ -2,7 +2,7 @@ package io.liveoak.ups;
 
 import io.liveoak.mongo.internal.InternalStorage;
 import io.liveoak.mongo.internal.InternalStorageFactory;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
@@ -31,13 +31,13 @@ public class UPSExtension implements Extension {
 
         // setup the main UPSRootResource and add in its dependency on the SubscriptionManager
         UPSResourceService upsResourceService = new UPSResourceService(context.resourceId());
-        context.target().addService(LiveOak.resource(context.application().id(), context.resourceId()), upsResourceService)
-                .addDependency(LiveOak.SUBSCRIPTION_MANAGER, SubscriptionManager.class, upsResourceService.subscriptionManagerInjector)
+        context.target().addService(Services.resource(context.application().id(), context.resourceId()), upsResourceService)
+                .addDependency(Services.SUBSCRIPTION_MANAGER, SubscriptionManager.class, upsResourceService.subscriptionManagerInjector)
                 .addDependency(storageServiceName, InternalStorage.class, upsResourceService.internalStorageInjector)
                 .addInjection(upsResourceService.configResourceInjector, upsRootConfigResource)
                 .install();
 
-        context.mountPublic(LiveOak.resource(context.application().id(), context.resourceId()));
+        context.mountPublic(Services.resource(context.application().id(), context.resourceId()));
 
     }
 

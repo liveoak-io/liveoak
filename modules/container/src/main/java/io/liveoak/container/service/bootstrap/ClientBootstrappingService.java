@@ -12,8 +12,8 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 
-import static io.liveoak.spi.LiveOak.CLIENT;
-import static io.liveoak.spi.LiveOak.server;
+import static io.liveoak.spi.Services.CLIENT;
+import static io.liveoak.spi.Services.server;
 
 /**
  * @author Bob McWhirter

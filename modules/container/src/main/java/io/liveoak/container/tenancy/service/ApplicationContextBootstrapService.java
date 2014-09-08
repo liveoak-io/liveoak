@@ -4,7 +4,7 @@ import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.subscriptions.DefaultSubscriptionManager;
 import io.liveoak.container.subscriptions.resource.ApplicationSubscriptionsResourceService;
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
@@ -35,10 +35,10 @@ public class ApplicationContextBootstrapService implements Service<Void> {
         ApplicationSubscriptionsResourceService subscriptions = new ApplicationSubscriptionsResourceService(this.app);
 
         target.addService(name, subscriptions)
-                .addDependency(LiveOak.VERTX, Vertx.class, subscriptions.vertxInjector())
-                .addDependency(LiveOak.SUBSCRIPTION_MANAGER, DefaultSubscriptionManager.class, subscriptions.subscriptionManagerInjector())
-                .addDependency(LiveOak.CODEC_MANAGER, ResourceCodecManager.class, subscriptions.codecManagerInjector())
-                .addDependency(LiveOak.CODEC_MANAGER_COMPLETE)
+                .addDependency(Services.VERTX, Vertx.class, subscriptions.vertxInjector())
+                .addDependency(Services.SUBSCRIPTION_MANAGER, DefaultSubscriptionManager.class, subscriptions.subscriptionManagerInjector())
+                .addDependency(Services.CODEC_MANAGER, ResourceCodecManager.class, subscriptions.codecManagerInjector())
+                .addDependency(Services.CODEC_MANAGER_COMPLETE)
                 .install();
     }
 

@@ -1,6 +1,6 @@
 package io.liveoak.scheduler;
 
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -8,7 +8,7 @@ import org.jboss.msc.service.ServiceName;
  */
 public class SchedulerServices {
 
-    private static ServiceName SCHEDULER = LiveOak.LIVEOAK.append("scheduler");
+    private static ServiceName SCHEDULER = Services.LIVEOAK.append("scheduler");
 
     public static ServiceName scheduler(String appId, String resourceId) {
         return SCHEDULER.append(appId, resourceId);

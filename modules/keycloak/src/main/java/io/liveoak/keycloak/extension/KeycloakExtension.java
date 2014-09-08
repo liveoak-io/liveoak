@@ -8,7 +8,7 @@ import io.liveoak.keycloak.interceptor.AuthInterceptorService;
 import io.liveoak.keycloak.service.KeycloakConfigResourceService;
 import io.liveoak.keycloak.service.KeycloakConfigService;
 import io.liveoak.keycloak.service.KeycloakResourceService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
@@ -29,7 +29,7 @@ public class KeycloakExtension implements Extension {
         target.addService(KeycloakServices.address(), new KeycloakConfigService())
                 .install();
 
-        ServiceName serviceName = LiveOak.systemResource(context.id());
+        ServiceName serviceName = Services.systemResource(context.id());
 
         KeycloakConfigResourceService resource = new KeycloakConfigResourceService(context.id());
         target.addService(serviceName, resource)
@@ -40,8 +40,8 @@ public class KeycloakExtension implements Extension {
 
         // Install AuthInterceptor
         AuthInterceptorService authInterceptor = new AuthInterceptorService();
-        ServiceController<AuthInterceptor> authController = target.addService(LiveOak.interceptor("auth"), authInterceptor)
-                .addDependency(LiveOak.CLIENT, Client.class, authInterceptor.clientInjector())
+        ServiceController<AuthInterceptor> authController = target.addService(Services.interceptor("auth"), authInterceptor)
+                .addDependency(Services.CLIENT, Client.class, authInterceptor.clientInjector())
                 .install();
         InterceptorRegistrationHelper.installInterceptor(target, authController);
     }
@@ -49,7 +49,7 @@ public class KeycloakExtension implements Extension {
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
         KeycloakResourceService resource = new KeycloakResourceService(context.resourceId());
-        context.target().addService(LiveOak.resource(context.application().id(), context.resourceId()), resource)
+        context.target().addService(Services.resource(context.application().id(), context.resourceId()), resource)
                 .addDependency(KeycloakServices.address(), KeycloakConfig.class, resource.address())
                 .install();
 

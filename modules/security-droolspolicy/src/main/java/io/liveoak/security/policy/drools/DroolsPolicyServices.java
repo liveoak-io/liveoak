@@ -1,6 +1,6 @@
 package io.liveoak.security.policy.drools;
 
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -8,7 +8,7 @@ import org.jboss.msc.service.ServiceName;
  */
 public class DroolsPolicyServices {
 
-    private static final ServiceName DROOLS_POLICY = LiveOak.LIVEOAK.append("drools-policy");
+    private static final ServiceName DROOLS_POLICY = Services.LIVEOAK.append("drools-policy");
 
     public static ServiceName policy(String appId, String resourceId) {
         return DROOLS_POLICY.append("policy", appId, resourceId);

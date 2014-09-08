@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import io.liveoak.container.InMemoryDBExtension;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.stomp.StompMessage;
@@ -208,8 +209,8 @@ public class LocalApplicationsResourceTest {
         assertThat(state).isInstanceOf(ResourceState.class);
 
         assertThat(state.id()).isNotNull();
-        assertThat(state.getProperty("id")).isEqualTo("myapp");
-        assertThat(state.getProperty("name")).isEqualTo("app1");
+        assertThat(state.getProperty(LiveOak.ID)).isEqualTo("myapp");
+        assertThat(state.getProperty(LiveOak.NAME)).isEqualTo("app1");
         assertThat(state.getProperty("visible")).isEqualTo(true);
 
         // check STOMP
@@ -217,9 +218,9 @@ public class LocalApplicationsResourceTest {
         assertThat(obj).isNotNull();
 
         ResourceState appObjState = decode(obj.content());
-        assertThat(appObjState.getProperty("name")).isEqualTo("app1");
+        assertThat(appObjState.getProperty(LiveOak.NAME)).isEqualTo("app1");
 
-        assertThat(state.getProperty("id")).isEqualTo(appObjState.getProperty("id"));
+        assertThat(state.getProperty(LiveOak.ID)).isEqualTo(appObjState.getProperty(LiveOak.ID));
         response.close();
 
         // Check resources are present

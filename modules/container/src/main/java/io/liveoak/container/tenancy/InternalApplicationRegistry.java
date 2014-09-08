@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import io.liveoak.container.tenancy.service.ApplicationRemovalService;
 import io.liveoak.container.tenancy.service.ApplicationService;
 import io.liveoak.spi.Application;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceTarget;
 import org.vertx.java.core.Vertx;
@@ -32,8 +32,8 @@ public class InternalApplicationRegistry implements ApplicationRegistry {
 
     public InternalApplication createApplication(String id, String name, File directory) throws InterruptedException {
         ApplicationService app = new ApplicationService(id, name, directory);
-        ServiceController<InternalApplication> controller = this.target.addService(LiveOak.application(id), app)
-                .addDependency(LiveOak.APPLICATIONS_DIR, File.class, app.applicationsDirectoryInjector())
+        ServiceController<InternalApplication> controller = this.target.addService(Services.application(id), app)
+                .addDependency(Services.APPLICATIONS_DIR, File.class, app.applicationsDirectoryInjector())
                 .install();
 
         this.applications.put(id, controller);
@@ -58,8 +58,8 @@ public class InternalApplicationRegistry implements ApplicationRegistry {
     public void removeApplication(String id) {
         ServiceController<InternalApplication> controller = this.applications.remove(id);
         ApplicationRemovalService removalService = new ApplicationRemovalService(controller);
-        this.target.addService(LiveOak.application(id).append("remove"), removalService)
-                .addDependency(LiveOak.VERTX, Vertx.class, removalService.vertxInjector())
+        this.target.addService(Services.application(id).append("remove"), removalService)
+                .addDependency(Services.VERTX, Vertx.class, removalService.vertxInjector())
                 .install();
     }
 

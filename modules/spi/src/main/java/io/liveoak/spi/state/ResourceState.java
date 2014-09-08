@@ -16,6 +16,8 @@ import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Set;
 
+import io.liveoak.spi.LiveOak;
+
 /**
  * Opaque state of a resource.
  *
@@ -42,11 +44,11 @@ public interface ResourceState {
     void uri(URI uri);
 
     default URI uri() {
-        ResourceState self = getPropertyAsResourceState("self");
+        ResourceState self = getPropertyAsResourceState(LiveOak.SELF);
         if (self == null) {
             return null;
         }
-        Object href = self.getProperty("href");
+        Object href = self.getProperty(LiveOak.HREF);
         if (href == null) {
             return null;
         }

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.container.tenancy.service.ApplicationExtensionService;
 import io.liveoak.spi.Application;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.state.ResourceState;
@@ -17,8 +17,6 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StabilityMonitor;
-import org.jboss.msc.service.ValueService;
-import org.jboss.msc.value.ImmediateValue;
 
 /**
  * @author Bob McWhirter
@@ -112,14 +110,14 @@ public class InternalApplication implements Application {
         StabilityMonitor monitor = new StabilityMonitor();
         target.addMonitor(monitor);
 
-        ServiceName resourceServiceName = LiveOak.applicationExtension(this.id, resourceId);
+        ServiceName resourceServiceName = Services.applicationExtension(this.id, resourceId);
 
         ApplicationExtensionService appExt = new ApplicationExtensionService(extensionId, resourceId, configuration, boottime);
 
         ServiceController<InternalApplicationExtension> controller = target.addService(resourceServiceName, appExt)
-                .addDependency(LiveOak.extension(extensionId), Extension.class, appExt.extensionInjector())
-                .addDependency(LiveOak.application(this.id), InternalApplication.class, appExt.applicationInjector())
-                .addDependency(LiveOak.SERVICE_REGISTRY, ServiceRegistry.class, appExt.serviceRegistryInjector())
+                .addDependency(Services.extension(extensionId), Extension.class, appExt.extensionInjector())
+                .addDependency(Services.application(this.id), InternalApplication.class, appExt.applicationInjector())
+                .addDependency(Services.SERVICE_REGISTRY, ServiceRegistry.class, appExt.serviceRegistryInjector())
                 .install();
 
         monitor.awaitStability();

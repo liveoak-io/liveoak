@@ -5,6 +5,7 @@
  */
 package io.liveoak.mongo;
 
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceProcessingException;
 import io.liveoak.spi.ReturnFields;
@@ -78,7 +79,7 @@ public class MongoBaseObjectResource extends MongoObjectResource {
 
         Set<String> keys = dbObject.keySet();
         for (String key : keys) {
-            if (!key.equals(MONGO_ID_FIELD) && !key.equals(MBAAS_ID_FIELD)) {
+            if (!key.equals(MONGO_ID_FIELD) && !key.equals(LiveOak.ID)) {
                 Object value = getDBObject().get(key);
                 if (value instanceof BasicDBObject) {
                     value = new MongoEmbeddedObjectResource(this, (DBObject) value);
@@ -108,7 +109,7 @@ public class MongoBaseObjectResource extends MongoObjectResource {
         }
 
         state.getPropertyNames().stream().forEach((name) -> {
-            if (!name.equals(MONGO_ID_FIELD) && !name.equals(MBAAS_ID_FIELD)) {
+            if (!name.equals(MONGO_ID_FIELD) && !name.equals(LiveOak.ID)) {
                 Object value = state.getProperty(name);
                 if(value instanceof Collection) {
                     value = convertCollection(responder, (Collection<?>)value);

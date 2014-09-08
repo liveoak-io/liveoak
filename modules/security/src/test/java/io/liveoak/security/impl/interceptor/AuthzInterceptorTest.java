@@ -16,7 +16,7 @@ import io.liveoak.interceptor.extension.InterceptorExtension;
 import io.liveoak.security.extension.SecurityExtension;
 import io.liveoak.security.integration.AuthzServiceConfigResource;
 import io.liveoak.security.integration.AuthzServiceRootResource;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.NotAuthorizedException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
@@ -72,8 +72,8 @@ public class AuthzInterceptorTest extends AbstractResourceTestCase {
 
     @Before
     public void before() throws Exception {
-        AuthzServiceRootResource authzRootResource = (AuthzServiceRootResource) this.system.service(LiveOak.resource("testApp", "authz"));
-        this.mockPolicy = (InterceptorTestAuthzResource) this.system.service(LiveOak.resource("testApp", "mock-policy" ) );
+        AuthzServiceRootResource authzRootResource = (AuthzServiceRootResource) this.system.service(Services.resource("testApp", "authz"));
+        this.mockPolicy = (InterceptorTestAuthzResource) this.system.service(Services.resource("testApp", "mock-policy") );
     }
 
     @Test

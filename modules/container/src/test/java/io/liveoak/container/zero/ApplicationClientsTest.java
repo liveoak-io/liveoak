@@ -7,6 +7,7 @@ import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.state.ResourceState;
@@ -56,12 +57,12 @@ public class ApplicationClientsTest {
         ResourceState testAppConfig = this.client.read(requestContext, "admin/applications/testApp/resources/application-clients");
 
         assertThat(testAppConfig).isNotNull();
-        assertThat(testAppConfig.getProperty("members")).isNull();
+        assertThat(testAppConfig.getProperty(LiveOak.MEMBERS)).isNull();
 
         // Store a client
         requestContext = new RequestContext.Builder().build();
         ResourceState htmlClientState = new DefaultResourceState();
-        htmlClientState.putProperty("id", "my-html-client");
+        htmlClientState.putProperty(LiveOak.ID, "my-html-client");
         htmlClientState.putProperty("type", "HTML");
         htmlClientState.putProperty("security-key", "html-client");
 

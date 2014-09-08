@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import org.jboss.as.ee.structure.DeploymentType;
 import org.jboss.as.ee.structure.DeploymentTypeMarker;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -64,7 +64,7 @@ public class MongoAutoSetupDependencyProcessor implements DeploymentUnitProcesso
 
         @Override
         public Set<ServiceName> dependencies() {
-            ServiceName name = LiveOak.LIVEOAK.append("mongo-launcher");
+            ServiceName name = Services.LIVEOAK.append("mongo-launcher");
             return Collections.singleton(name);
         }
     }

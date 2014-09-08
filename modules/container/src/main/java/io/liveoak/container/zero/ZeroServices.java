@@ -1,6 +1,6 @@
 package io.liveoak.container.zero;
 
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -8,7 +8,7 @@ import org.jboss.msc.service.ServiceName;
  */
 public class ZeroServices {
 
-    public static final ServiceName ZERO = LiveOak.LIVEOAK.append("zero");
+    public static final ServiceName ZERO = Services.LIVEOAK.append("zero");
     public static final ServiceName BOOTSTRAP = ZERO.append("bootstrap");
     public static final ServiceName SYSTEM_ADMIN_MOUNT = ZERO.append("mount", "system");
 

@@ -4,7 +4,7 @@ import java.io.File;
 
 import io.liveoak.filesystem.FileSystemAdminResource;
 import io.liveoak.filesystem.service.FilesystemResourceService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
@@ -29,12 +29,12 @@ public class FilesystemExtension implements Extension {
         context.mountPrivate(privateResource);
 
         FilesystemResourceService publicResource = new FilesystemResourceService(context.resourceId());
-        context.target().addService(LiveOak.resource(context.application().id(), context.resourceId()), publicResource)
-                .addDependency(LiveOak.VERTX, Vertx.class, publicResource.vertxInjector())
+        context.target().addService(Services.resource(context.application().id(), context.resourceId()), publicResource)
+                .addDependency(Services.VERTX, Vertx.class, publicResource.vertxInjector())
                 .addInjection(publicResource.adminResourceInjector(), privateResource)
                 .install();
 
-        context.mountPublic(LiveOak.resource(context.application().id(), context.resourceId()));
+        context.mountPublic(Services.resource(context.application().id(), context.resourceId()));
     }
 
     @Override

@@ -3,7 +3,7 @@ package io.liveoak.interceptor.extension;
 import io.liveoak.interceptor.service.InterceptorRegistrationHelper;
 import io.liveoak.interceptor.service.InterceptorSystemResourceService;
 import io.liveoak.interceptor.timing.TimingInterceptor;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.container.interceptor.InterceptorManager;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
@@ -21,11 +21,11 @@ public class InterceptorExtension implements Extension {
 
         InterceptorSystemResourceService interceptorSystemResourceService = new InterceptorSystemResourceService(context.id());
 
-        target.addService(LiveOak.systemResource(context.id()), interceptorSystemResourceService)
-                .addDependency(LiveOak.INTERCEPTOR_MANAGER, InterceptorManager.class, interceptorSystemResourceService.interceptorManagerInjector())
+        target.addService(Services.systemResource(context.id()), interceptorSystemResourceService)
+                .addDependency(Services.INTERCEPTOR_MANAGER, InterceptorManager.class, interceptorSystemResourceService.interceptorManagerInjector())
                 .install();
 
-        context.mountPrivate(LiveOak.systemResource(context.id()));
+        context.mountPrivate(Services.systemResource(context.id()));
 
         InterceptorRegistrationHelper.installInterceptor(target, "timing-http", new TimingInterceptor("HTTP"));
         InterceptorRegistrationHelper.installInterceptor(target, "timing-local", new TimingInterceptor("Local"));

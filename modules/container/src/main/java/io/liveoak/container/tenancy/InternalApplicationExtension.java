@@ -4,7 +4,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 import io.liveoak.container.tenancy.service.ApplicationExtensionRemovalService;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.resource.async.Resource;
 import org.jboss.logging.Logger;
@@ -50,12 +50,12 @@ public class InternalApplicationExtension implements Consumer<Exception> {
         }
 
         String appId = this.app.id();
-        ServiceController<InternalApplicationExtension> extController = (ServiceController<InternalApplicationExtension>) this.registry.getService(LiveOak.applicationExtension(appId, this.resourceId));
+        ServiceController<InternalApplicationExtension> extController = (ServiceController<InternalApplicationExtension>) this.registry.getService(Services.applicationExtension(appId, this.resourceId));
 
         ApplicationExtensionRemovalService removal = new ApplicationExtensionRemovalService(extController);
 
         ServiceTarget target = extController.getServiceContainer().subTarget();
-        ServiceController<InternalApplicationExtension> extensionController = (ServiceController<InternalApplicationExtension>) extController.getServiceContainer().getService(LiveOak.applicationExtension(appId, this.resourceId));
+        ServiceController<InternalApplicationExtension> extensionController = (ServiceController<InternalApplicationExtension>) extController.getServiceContainer().getService(Services.applicationExtension(appId, this.resourceId));
 
         CountDownLatch latch = new CountDownLatch(1);
 
@@ -69,7 +69,7 @@ public class InternalApplicationExtension implements Consumer<Exception> {
         });
 
         target.addService(extController.getName().append("remove"), removal)
-                .addDependency(LiveOak.extension(this.extensionId), Extension.class, removal.extensionInjector())
+                .addDependency(Services.extension(this.extensionId), Extension.class, removal.extensionInjector())
                 .install();
 
         try {

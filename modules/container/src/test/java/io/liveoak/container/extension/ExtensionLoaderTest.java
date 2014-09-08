@@ -3,7 +3,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.container.tenancy.SimpleResourceRegistry;
 import io.liveoak.container.zero.extension.ZeroExtension;
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
@@ -27,9 +27,9 @@ public class ExtensionLoaderTest {
     public void setUpServiceContainer() {
         this.serviceContainer = ServiceContainer.Factory.create();
         this.systemAdminMount = new SimpleResourceRegistry("admin" );
-        this.serviceContainer.addService( LiveOak.resource(ZeroExtension.APPLICATION_ID, "system"), new ValueService<MountPointResource>( new ImmediateValue<>( this.systemAdminMount )))
+        this.serviceContainer.addService( Services.resource(ZeroExtension.APPLICATION_ID, "system"), new ValueService<MountPointResource>( new ImmediateValue<>( this.systemAdminMount )))
                 .install();
-        this.serviceContainer.addService( LiveOak.SERVICE_CONTAINER, new ValueService<ServiceContainer>( new ImmediateValue<>( this.serviceContainer ) ) )
+        this.serviceContainer.addService( Services.SERVICE_CONTAINER, new ValueService<ServiceContainer>( new ImmediateValue<>( this.serviceContainer ) ) )
                 .install();
     }
 

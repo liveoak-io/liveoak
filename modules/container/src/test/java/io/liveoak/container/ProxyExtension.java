@@ -1,6 +1,6 @@
 package io.liveoak.container;
 
-import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
@@ -39,7 +39,7 @@ public class ProxyExtension implements Extension {
         ProxyResourceService proxy = new ProxyResourceService(context.resourceId());
 
         target.addService(resource(appId, context.resourceId()), proxy)
-                .addDependency(LiveOak.CLIENT, Client.class, proxy.clientInjector())
+                .addDependency(Services.CLIENT, Client.class, proxy.clientInjector())
                 .addDependency(configName, ProxyConfig.class, proxy.configurationInjector())
                 .install();
 
