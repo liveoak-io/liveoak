@@ -69,9 +69,18 @@ loMod.controller('HomeCtrl', function($log, $rootScope, $scope, $location, $filt
   }
 });
 
-angular.module('loApp.controllers').controller('AppDropdownCtrl', function($rootScope, $filter, LoApp) {
+loMod.controller('NavigationCtrl', function($scope, $rootScope, $filter, LoApp) {
+
   LoApp.getList(function(data){
     $rootScope.applications = $filter('filter')(data.members, {'visible': true});
+  });
+
+  $scope.$watch('oPath', function() {
+    if ($rootScope.oPath) {
+      var a = $rootScope.oPath;
+      a = a.substr('/applications/:appId/'.length);
+      $scope.current = a.substr(0, a.indexOf('/') > 0 ? a.indexOf('/') : a.length);
+    }
   });
 });
 

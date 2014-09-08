@@ -1,20 +1,20 @@
-<aside class="lo-sidebar col-md-2 fixed clearfix hide">
+<aside class="lo-sidebar col-md-2 fixed clearfix" ng-controller="NavigationCtrl">
   <div class="dropdown">
-    <a class="dropdown-toggle" href="#">{{ loApp.name | characters: 25 :true }}<b class="caret"></b></a>
+    <a class="dropdown-toggle" href="#">{{curApp.name}}<b class="caret"></b></a>
     <ul class="dropdown-menu">
-      <li ng-repeat="app in loApps" ng-class="{active: app.id == loApp.id}"><a ng-href="#/applications/{{app.id}}/{{loCurrent}}">{{ app.name | characters: 35 :true }}</a></li>
+      <li ng-repeat="app in applications" ng-class="{active: app.id == curApp.id}"><a ng-href="#/applications/{{app.id}}/{{current}}">{{ app.name | characters: 35 :true }}</a></li>
     </ul>
   </div>
 
   <nav class="navbar navbar-vertical" role="navigation">
     <div class="bs-sidebar">
       <ul>
-        <li ng-class="{active: loCurrent == 'dashboard'}" class="dashboard"><a href="#/applications/{{loApp.id}}/dashboard"><i class="fa fa-tachometer"></i>Dashboard</a></li>
-        <li ng-class="{active: loCurrent == 'storage'}" class="storage"><a href="#/applications/{{loApp.id}}/storage"><i class="fa fa-cloud"></i>Storage</a></li>
-        <li ng-class="{active: loCurrent == 'security'}" class="security"><a href="#/applications/{{loApp.id}}/security/policies"><i class="fa fa-lock"></i>Security</a></li>
-        <li ng-class="{active: loCurrent == 'push'}" class="push"><a href="#/applications/{{loApp.id}}/push"><i class="fa fa-mobile"></i>Push</a></li>
-        <li ng-class="{active: loCurrent == 'application-clients'}" class="clients"><a href="#/applications/{{loApp.id}}/application-clients"><i class="fa fa-globe"></i>Clients</a></li>
-        <li ng-class="{active: loCurrent == 'business-logic'}" class="logic"><a href="#/applications/{{loApp.id}}/business-logic"><i class="fa fa-code"></i>Logic</a></li>
+        <li ng-class="{active: current === 'dashboard'}" class="dashboard"><a href="#/applications/{{curApp.id}}/dashboard"><i class="fa fa-tachometer"></i>Dashboard</a></li>
+        <li ng-class="{active: current === 'storage'}" class="storage"><a href="#/applications/{{curApp.id}}/storage"><i class="fa fa-cloud"></i>Storage</a></li>
+        <li ng-class="{active: current === 'security'}" class="security"><a href="#/applications/{{curApp.id}}/security/policies"><i class="fa fa-lock"></i>Security</a></li>
+        <li ng-class="{active: current === 'push'}" class="push"><a href="#/applications/{{curApp.id}}/push"><i class="fa fa-mobile"></i>Push</a></li>
+        <li ng-class="{active: current === 'application-clients'}" class="clients"><a href="#/applications/{{curApp.id}}/application-clients"><i class="fa fa-globe"></i>Clients</a></li>
+        <li ng-class="{active: current === 'business-logic'}" class="logic"><a href="#/applications/{{curApp.id}}/business-logic"><i class="fa fa-code"></i>Logic</a></li>
       </ul>
     </div>
   </nav>

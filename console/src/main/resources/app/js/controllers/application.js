@@ -2,16 +2,6 @@
 
 var loMod = angular.module('loApp.controllers.application', []);
 
-loMod.controller('NavigationCtrl', function($scope, $rootScope) {
-  $scope.$watch('oPath', function() {
-    if ($rootScope.oPath) {
-      var a = $rootScope.oPath;
-      a = a.substr('/applications/:appId/'.length);
-      $scope.current = a.substr(0, a.indexOf('/') > 0 ? a.indexOf('/') : a.length);
-    }
-  });
-});
-
 loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $location, $modal, $filter, $route, Notifications, examplesList, loAppList, LoApp, LoStorage, LoPush, LoRealmApp) {
 
   $rootScope.hideSidebar = true;
@@ -252,6 +242,10 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
       $modalInstance.close();
       //$location.search('created', $scope.appModel.id).path('applications');
       $location.path('applications/' + $scope.appModel.id + '/next-steps');
+      // FIXME: Remove once we know about new apps by subscriptions
+      LoApp.getList(function(data){
+        $rootScope.applications = $filter('filter')(data.members, {'visible': true});
+      });
     };
   };
 
