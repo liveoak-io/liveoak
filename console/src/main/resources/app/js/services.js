@@ -497,7 +497,7 @@ loMod.factory('LoAppExamples', function($resource) {
         method : 'POST',
         url: '/admin/applications/',
         headers: {
-          'Content-Type':'application/liveoak-local-app+json'
+          'Content-Type':'application/vnd.liveoak.local-app+json'
         }
       }
     });

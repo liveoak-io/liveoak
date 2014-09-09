@@ -122,7 +122,7 @@ public class MediaTypeMatcherTest {
 
     @Test
     public void testFindBestMatchWithCustomTypeRequested() throws Exception {
-        MediaTypeMatcher matcher = new DefaultMediaTypeMatcher("application/liveoak-local-app+json; q=0.8, */*; q=0.2");
+        MediaTypeMatcher matcher = new DefaultMediaTypeMatcher("application/vnd.liveoak.local-app+json; q=0.8, */*; q=0.2");
 
         List<MediaType> candidates = new ArrayList<>();
 
@@ -135,7 +135,7 @@ public class MediaTypeMatcherTest {
 
         assertThat(match).isNotNull();
         assertThat(match.type()).isEqualTo("application");
-        assertThat(match.subtype()).isEqualTo("liveoak-local-app");
+        assertThat(match.subtype()).isEqualTo("vnd.liveoak.local-app");
     }
 
     @Test
