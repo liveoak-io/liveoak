@@ -39,18 +39,28 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
     }
 
     @Override
+    public void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        cleanupState(state);
+        delegate().initializeProperties(ctx, state, responder);
+    }
+
+    @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        cleanupState(state);
+
+        if (this.ignoreUpdate) {
+            this.ignoreUpdate = false;
+            delegate().initializeProperties(ctx, state, responder);
+        } else {
+            delegate().updateProperties(ctx, state, new ResourceConfigPersistingResponder(this, state, responder));
+        }
+    }
+
+    private void cleanupState(ResourceState state) {
         //Clean out from the state what we don't care about
         state.removeProperty(LiveOak.ID);
         state.removeProperty(LiveOak.SELF);
         state.removeProperty(LiveOak.RESOURCE_TYPE);
-
-        if (this.ignoreUpdate) {
-            this.ignoreUpdate = false;
-            super.updateProperties(ctx, state, responder);
-        } else {
-            super.updateProperties(ctx, state, new ResourceConfigPersistingResponder(this, state, responder));
-        }
     }
 
     @Override
