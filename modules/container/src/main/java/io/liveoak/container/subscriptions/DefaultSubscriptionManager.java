@@ -10,6 +10,7 @@ import org.jboss.logging.Logger;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class DefaultSubscriptionManager implements SubscriptionManager {
 
@@ -30,9 +31,8 @@ public class DefaultSubscriptionManager implements SubscriptionManager {
     @Override
     public void resourceCreated(ResourceResponse resourceResponse) {
         ResourcePath path = resourcePathOf(resourceResponse.resource());
-        this.subscriptionsTree.objects(path).forEach((subscription) -> {
-            subscribeResourceCreated(path, subscription, resourceResponse);
-        });
+        this.subscriptionsTree.objects(path).forEach((subscription) -> subscribeResourceCreated(path, subscription, resourceResponse));
+        this.subscriptionsTree.objects(path.parent()).forEach((subscription) -> subscribeResourceCreated(path.parent(), subscription, resourceResponse));
     }
 
     protected void subscribeResourceCreated(ResourcePath path, Subscription subscription, ResourceResponse resourceResponse) {
@@ -46,9 +46,7 @@ public class DefaultSubscriptionManager implements SubscriptionManager {
     @Override
     public void resourceUpdated(ResourceResponse resourceResponse) {
         ResourcePath path = resourcePathOf(resourceResponse.resource());
-        this.subscriptionsTree.objects(path).forEach((subscription) -> {
-            subscribeResourceUpdated(path, subscription, resourceResponse);
-        });
+        this.subscriptionsTree.objects(path).forEach((subscription) -> subscribeResourceUpdated(path, subscription, resourceResponse));
     }
 
     protected void subscribeResourceUpdated(ResourcePath path, Subscription subscription, ResourceResponse resourceResponse) {
@@ -62,9 +60,8 @@ public class DefaultSubscriptionManager implements SubscriptionManager {
     @Override
     public void resourceDeleted(ResourceResponse resourceResponse) {
         ResourcePath path = resourcePathOf(resourceResponse.resource());
-        this.subscriptionsTree.objects(path).forEach((subscription) -> {
-            subscribeResourceDeleted(path, subscription, resourceResponse);
-        });
+        this.subscriptionsTree.objects(path).forEach((subscription) -> subscribeResourceDeleted(path, subscription, resourceResponse));
+        this.subscriptionsTree.objects(path.parent()).forEach((subscription) -> subscribeResourceDeleted(path.parent(), subscription, resourceResponse));
     }
 
     protected void subscribeResourceDeleted(ResourcePath path, Subscription subscription, ResourceResponse resourceResponse) {
