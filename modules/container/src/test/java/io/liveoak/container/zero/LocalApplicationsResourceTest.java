@@ -214,7 +214,7 @@ public class LocalApplicationsResourceTest {
         assertThat(state.getProperty("visible")).isEqualTo(true);
 
         // check STOMP
-        StompMessage obj = appCreationNotification.get(30000, TimeUnit.SECONDS);
+        StompMessage obj = appCreationNotification.get(30, TimeUnit.SECONDS);
         assertThat(obj).isNotNull();
 
         ResourceState appObjState = decode(obj.content());
