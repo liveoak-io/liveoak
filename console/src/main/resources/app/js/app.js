@@ -116,6 +116,9 @@ loMod.config(['$routeProvider', function($routeProvider) {
             });
           });
         },
+        loClients: function(LoClient, $route){
+          return LoClient.getList({appId: $route.current.params.appId});
+        },
         loRealmAppRoles: function(LoRealmAppRoles, $route) {
           // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
           return LoRealmAppRoles.query({appId: $route.current.params.appId}).$promise.then(function(data) {
@@ -165,6 +168,9 @@ loMod.config(['$routeProvider', function($routeProvider) {
         },
         loClient: function(LoClient) {
           return new LoClient();
+        },
+        loClients: function(LoClient, $route){
+          return LoClient.getList({appId: $route.current.params.appId});
         },
         loRealmRoles: function(LoRealmRolesLoader){
           return new LoRealmRolesLoader();
