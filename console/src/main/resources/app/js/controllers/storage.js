@@ -539,24 +539,28 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   };
 
   function updateExportUrl(){
-    $log.debug('Updating export url');
-    var dataObj = angular.copy($scope.collectionData);
-    var dataExportObj = [];
-    for (var row in dataObj) {
-      if (dataObj[row].hasOwnProperty('id')){
-        delete dataObj[row].id;
+    try {
+      $log.debug('Updating export url');
+      var dataObj = angular.copy($scope.collectionData);
+      var dataExportObj = [];
+      for (var row in dataObj) {
+        if (dataObj[row].hasOwnProperty('id')) {
+          delete dataObj[row].id;
+        }
+        if (dataObj[row].hasOwnProperty('self')) {
+          delete dataObj[row].self;
+        }
+        dataExportObj.push(angular.toJson(decodeJSON(dataObj[row])));
       }
-      if (dataObj[row].hasOwnProperty('self')){
-        delete dataObj[row].self;
-      }
-      dataExportObj.push(angular.toJson(decodeJSON(dataObj[row])));
+
+      var blob = new Blob(['[' + dataExportObj.toString() + ']'], { type: 'text/plain' });
+      var urlCreator = $window.URL || $window.webkitURL || $window.mozURL || $window.msURL;
+
+      $scope.urlExport = urlCreator.createObjectURL(blob);
+      $scope.jsonName = $scope.collectionId + '_' + (new Date()).toISOString() + '.json';
+    } catch(e) {
+      // Do nothing if the collection form is invalid
     }
-
-    var blob = new Blob( ['['+dataExportObj.toString()+']'], { type : 'text/plain' });
-    var urlCreator = $window.URL || $window.webkitURL || $window.mozURL || $window.msURL;
-
-    $scope.urlExport = urlCreator.createObjectURL( blob);
-    $scope.jsonName = $scope.collectionId + '_' + (new Date()).toISOString() + '.json';
   }
 
   $scope.rowAdd = function(){
