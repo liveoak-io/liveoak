@@ -336,7 +336,7 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
 loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, $location, $http, Notifications,
                                            LoRealmApp, LoRealmAppRoles, LoRealmAppClientScopeMapping, currentApp,
                                            loRealmAppClient, loRealmRoles, loRealmAppRoles, scopeMappings, LoClient,
-                                           loClient, LiveOak, $modal, $q) {
+                                           loClient, LiveOak, $modal, $q, loClients) {
 
   $rootScope.curApp = currentApp;
 
@@ -348,6 +348,15 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
 
   $scope.platformsBasic = ['html5', 'android', 'ios'];
   $scope.platformsCustom = [];
+
+  var appClients = [];
+
+  if(loClients.members){
+    for(var id in loClients.members){
+      var clientName = loClients.members[id]['security-key'];
+      appClients.push(clientName);
+    }
+  }
 
   if (loRealmAppClient && loRealmAppClient.id) {
     $scope.loClient = loClient;
@@ -416,11 +425,11 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     if (!clientName || clientName === ''){
       $scope.clientsForm.clientname.$setValidity('clientName', true);
     }
-    LoRealmApp.get({appId: clientName}, function(){
+    if (appClients.indexOf(clientName) > -1) {
       $scope.clientsForm.clientname.$setValidity('clientName', false);
-    }, function(){
+    } else {
       $scope.clientsForm.clientname.$setValidity('clientName', true);
-    });
+    }
   };
 
   $scope.addRedirectUri = function() {

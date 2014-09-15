@@ -166,6 +166,9 @@ loMod.config(['$routeProvider', function($routeProvider) {
         loClient: function(LoClient) {
           return new LoClient();
         },
+        loClients: function(LoClient, $route){
+          return LoClient.getList({appId: $route.current.params.appId});
+        },
         loRealmRoles: function(LoRealmRolesLoader){
           return new LoRealmRolesLoader();
         },
