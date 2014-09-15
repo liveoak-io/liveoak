@@ -22,11 +22,94 @@
   <div class="lo-info-pane col-md-3 clearfix" ng-show="applications.length > 0 || exampleApplications.length > 0">
     <section class="lo-tutorials">
       <h3>Example Applications</h3>
-      <i class="fa fa-rocket fa-4x"></i>
+      <i class="fa fa-magic fa-4x"></i>
       <p>Getting started with LiveOak ? Try example applications and explore what LiveOak can do for you.</p>
       <a href="#/example-applications">Try example applications »</a>
     </section>
+    <section class="lo-tutorials">
+      <h3>Import Application</h3>
+      <i class="fa fa-arrow-circle-o-down fa-4x"></i>
+      <p>Import an existing application from the local file system or from a git URL.</p>
+      <a href="#import-app" data-toggle="modal" data-target="#import-app" >Try importing an application »</a>
+    </section>
   </div>
+  
+  
+  <!-- Modal import application -->
+  
+  <div class="modal fade" id="import-app" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <span class="pficon pficon-close"></span>
+          </button>
+          <h4 class="modal-title">Import Application</h4>
+        </div>
+        <div class="modal-body">
+        
+          <div class="alert alert-danger hide"> <!-- Error (invalid folder) -->
+            <span class="pficon-layered">
+              <span class="pficon pficon-error-octagon"></span>
+              <span class="pficon pficon-error-exclamation"></span>
+            </span>
+            <strong>This folder does not contain a valid application.</strong> Please attach a valid folder.
+          </div>
+        
+          <form lo-autofocus>
+            <div class="form-group clearfix">
+              <label for="url" class="col-sm-4 control-label">Import method</label>
+              <div class="col-sm-6">
+                <select class="selectpicker"> <!-- Need to fix the select -->
+                  <option selected="selected">Local file system</option>
+                  <option>Git</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- When local file system is selected -->
+            <div class="form-group clearfix">
+              <label for="app-folder" class="col-sm-4 control-label">Attach Folder</label>
+              <div class="col-sm-6">
+                <!-- Before upload folder -->
+                <div class="button-input-file">
+                  <a href="#" class="btn btn-default"><i class="fa fa-folder-o"></i> Browse...</a>
+                  <input type="file" class="input-file" id="app-folder">
+                </div>
+                <!-- File being uploaded -->
+                <div class="filename hide">
+                  <i class="fa fa-folder-o"></i>
+                  <span class="uploaded-file">file_name.json</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- When Git is select -->
+            <div class="form-group clearfix hide">
+              <label for="url" class="col-sm-4 control-label">HTTPS clone URL</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="url">
+              </div>
+            </div>
+            
+          </form>
+          
+          <!-- Hide the form and show this div when loading -->
+          <div class="loading-step hide">
+            <div class="spinner spinner-lg"></div>
+            <span class="spinner-label">Loading...</span>
+          </div>
+          
+        </div>
+       
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Import</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   
   <!-- When there is no application -->
 

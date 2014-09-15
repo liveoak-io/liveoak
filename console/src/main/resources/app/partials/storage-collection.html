@@ -1,263 +1,260 @@
-<div id="lo-content-row" class="row storage-collections">
+<div class="col-md-10 lo-main-pane">
+  <div class="row">
+  <ul class="nav nav-tabs nav-tabs-pf">
+    <li class="active"><a href="">Collections</a></li>
+    <li><a href="#/applications/{{curApp.id}}/storage/{{storageId}}">Settings</a></li>
+  </ul>
+  
+    <div class="lo-content-area">
+      <lo-breadcrumbs></lo-breadcrumbs>
+      <h2 ng-show="collectionId"><span>{{storageId}}</span> {{collectionId}}</h2>
+      <h2 ng-hide="collectionId"><span>{{storageId}}</span> Collections</h2>
 
-  <div class="col-md-10 lo-main-pane">
-    <div class="row">
-    <ul class="nav nav-tabs nav-tabs-pf">
-      <li class="active"><a href="">Collections</a></li>
-      <li><a href="#/applications/{{curApp.id}}/storage/{{storageId}}">Settings</a></li>
-    </ul>
-    
-      <div class="lo-content-area">
-        <lo-breadcrumbs></lo-breadcrumbs>
-        <h2 ng-show="collectionId"><span>{{storageId}}</span> {{collectionId}}</h2>
-        <h2 ng-hide="collectionId"><span>{{storageId}}</span> Collections</h2>
-
-        <div class="panel" ng-hide="collectionList.length > 0">
-          <div class="panel-body text-center empty-instance">
-            <i class="fa fa-table"></i>
-            <p>This storage resource currently has no collections.</p>
-            <a ng-click="modalCollectionAdd()" class="btn btn-primary btn-lg">New Collection</a>
-          </div>
+      <div class="panel" ng-hide="collectionList.length > 0">
+        <div class="panel-body text-center empty-instance">
+          <i class="fa fa-table"></i>
+          <p>This storage resource currently has no collections.</p>
+          <a ng-click="modalCollectionAdd()" class="btn btn-primary btn-lg">New Collection</a>
         </div>
+      </div>
 
-        <!-- Collections page - main page -->
-        <div class="lo-page-info clearfix" ng-show="collectionList.length > 0">
-          <div class="pull-left">
-            <!-- Collection selector -->
-            <!-- TODO create a watcher on the loSelect directive to check for ngShow attr change and refreshing the widget accordingly -->
-            <span>
-              <select pf-select class="select-lg selectpicker" ng-change="changeCollection()"
-                    ng-model="collectionId" ng-options="o.id as o.id for o in collectionList"></select>
-            </span>
+      <!-- Collections page - main page -->
+      <div class="lo-page-info clearfix" ng-show="collectionList.length > 0">
+        <div class="pull-left">
+          <!-- Collection selector -->
+          <!-- TODO create a watcher on the loSelect directive to check for ngShow attr change and refreshing the widget accordingly -->
+          <span>
+            <select pf-select class="select-lg selectpicker" ng-change="changeCollection()"
+                  ng-model="collectionId" ng-options="o.id as o.id for o in collectionList"></select>
+          </span>
 
-            <!-- TODO - Waiting for LIVEOAK-234 to be resolved.
-            <button disabled class="btn btn-link btn-icon" type="button" data-toggle="tooltip" data-placement="top" title="Edit Collection Name...">
-              <i class="fa fa-edit"></i>
-              <span>Edit Collection Name</span>
-            </button>
-            -->
-
-            <!-- Delete Collection Modal -->
-            <span data-toggle="modal" data-target="#delete-collection">
-              <button class="btn btn-link btn-icon" ng-click="modalCollectionDelete()">
-                <i class="fa fa-trash-o" data-tooltip-placement="top" data-tooltip="Delete Collection"></i>
-                <span>Delete Collection</span>
-              </button>
-            </span>
-          </div>
-
-          <div class="pull-right">
-            <!-- Add Collection Modal -->
-            <button class="btn btn-default btn-lg" ng-click="modalCollectionAdd()">New Collection</button>
-          </div>
-        </div>
-
-        <hr ng-show="collectionList.length > 0"/>
-        <div class="alert alert-info" ng-show="collectionList.length > 0 && !isInfoClosed">
-          <button type="button" class="close" aria-hidden="true" ng-click="infoClose()">
-            <span class="pficon pficon-close"></span>
+          <!-- TODO - Waiting for LIVEOAK-234 to be resolved.
+          <button disabled class="btn btn-link btn-icon" type="button" data-toggle="tooltip" data-placement="top" title="Edit Collection Name...">
+            <i class="fa fa-edit"></i>
+            <span>Edit Collection Name</span>
           </button>
-          <span class="pficon pficon-info"></span>
-          <strong>Use JSON Syntax in the table cells.</strong> Learn more about <a href="http://json.org/" target="_blank">JSON Syntax</a>.
+          -->
+
+          <!-- Delete Collection Modal -->
+          <span data-toggle="modal" data-target="#delete-collection">
+            <button class="btn btn-link btn-icon" ng-click="modalCollectionDelete()">
+              <i class="fa fa-trash-o" data-tooltip-placement="top" data-tooltip="Delete Collection"></i>
+              <span>Delete Collection</span>
+            </button>
+          </span>
         </div>
-        
-        <form name="collectionForm" class="lo-form-horizontal clearfix" ng-show="collectionList.length > 0">
-          <table class="table table-striped table-bordered">
-            <thead>
-            <tr>
-              <th colspan="{{ columns.length + 1 }}" class="table-actions">
-                <div class="search-comp clearfix">
-                  <input type="text" class="form-control search ng-pristine ng-valid" placeholder="Search..."
-                         ng-model="searchQuery">
-                  <button class="btn btn-link btn-icon" tooltip="Search" type="submit" disabled>
-                    <i class="fa fa-search"></i>
-                    <span>Search</span>
-                  </button>
-                </div>
-                <!-- Advanced search dialog -->
-                <div class="advanced-search">
-                  <a href class="dropdown-toggle-button advanced" ng-click="showAdvanced = !showAdvanced">Advanced Search</a>
-                  <a class="dropdown-toggle-button search-clear" href
-                     ng-show="searchQuery !== '' || filterColumns.length !== 0"
-                     ng-click="searchClear()">Clear Search</a>
-                  <div class="asearch popover bottom" ng-show="showAdvanced" lo-autoclose>
-                    <div class="arrow"></div>
-                    <div class="form-group">
-                      <label for="columns-select">Search in Columns</label>
-                      <select pf-select class="select selectpicker" multiple id="columns-select"
-                              ng-model="searchColumns" ng-options="o as o for o in columns"></select>
+
+        <div class="pull-right">
+          <!-- Add Collection Modal -->
+          <button class="btn btn-default btn-lg" ng-click="modalCollectionAdd()">New Collection</button>
+        </div>
+      </div>
+
+      <hr ng-show="collectionList.length > 0"/>
+      <div class="alert alert-info" ng-show="collectionList.length > 0 && !isInfoClosed">
+        <button type="button" class="close" aria-hidden="true" ng-click="infoClose()">
+          <span class="pficon pficon-close"></span>
+        </button>
+        <span class="pficon pficon-info"></span>
+        <strong>Use JSON Syntax in the table cells.</strong> Learn more about <a href="http://json.org/" target="_blank">JSON Syntax</a>.
+      </div>
+      
+      <form name="collectionForm" class="lo-form-horizontal clearfix" ng-show="collectionList.length > 0">
+        <table class="table table-striped table-bordered">
+          <thead>
+          <tr>
+            <th colspan="{{ columns.length + 1 }}" class="table-actions">
+              <div class="search-comp clearfix">
+                <input type="text" class="form-control search ng-pristine ng-valid" placeholder="Search..."
+                       ng-model="searchQuery">
+                <button class="btn btn-link btn-icon" tooltip="Search" type="submit" disabled>
+                  <i class="fa fa-search"></i>
+                  <span>Search</span>
+                </button>
+              </div>
+              <!-- Advanced search dialog -->
+              <div class="advanced-search">
+                <a href class="dropdown-toggle-button advanced" ng-click="showAdvanced = !showAdvanced">Advanced Search</a>
+                <a class="dropdown-toggle-button search-clear" href
+                   ng-show="searchQuery !== '' || filterColumns.length !== 0"
+                   ng-click="searchClear()">Clear Search</a>
+                <div class="asearch popover bottom" ng-show="showAdvanced" lo-autoclose>
+                  <div class="arrow"></div>
+                  <div class="form-group">
+                    <label for="columns-select">Search in Columns</label>
+                    <select pf-select class="select selectpicker" multiple id="columns-select"
+                            ng-model="searchColumns" ng-options="o as o for o in columns"></select>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="condition-input">Condition</label>
+
+                    <div class="inline-items" ng-repeat="condition in searchConditions">
+
+                      <select pf-select="false" class="select selectpicker inline"
+                              ng-model="condition.type" id="condition-input">
+                        <option value="E">Equals</option>
+                        <option value="N">Not equal</option>
                       </select>
-                    </div>
-                    <div class="form-group">
-                      <label for="condition-input">Condition</label>
 
-                      <div class="inline-items" ng-repeat="condition in searchConditions">
+                      <input class="inline form-control" type="text" placeholder="Contains text"
+                             ng-model="condition.text">
 
-                        <select pf-select="false" class="select selectpicker inline"
-                                ng-model="condition.type" id="condition-input">
-                          <option value="E">Equals</option>
-                          <option value="N">Not equal</option>
-                        </select>
+                      <button type="button" ng-click="searchConditionRemove($index)" ng-show="$index > 0"
+                              class="btn btn-link btn-icon inline add-condition">
+                        <i class="fa fa-minus-circle" data-tooltip-placement="top" data-tooltip="Remove Condition"></i><span>Remove Condition</span></button>
 
-                        <input class="inline form-control" type="text" placeholder="Contains text"
-                               ng-model="condition.text">
-
-                        <button type="button" ng-click="searchConditionRemove($index)" ng-show="$index > 0"
-                                class="btn btn-link btn-icon inline add-condition">
-                          <i class="fa fa-minus-circle" data-tooltip-placement="top" data-tooltip="Remove Condition"></i><span>Remove Condition</span></button>
-
-                        <!--
-                        <button ng-show="$last"
-                                data-placement="top" data-toggle="tooltip" type="button" ng-click="searchConditionAdd()"
-                                class="btn btn-link btn-icon inline add-condition" data-original-title="Add Condition">
-                          <i class="fa fa-plus-circle"></i><span>Add Condition</span></button>
-                          -->
-                      </div>
-                    </div>
-
-                    <a href class="lo-condition-add" ng-click="searchConditionAdd()"
-                       tooltip-placement="right" tooltip="On the Right!" tooltip-trigger="{{myFoo}}">Add Condition</a>
-
-                    <div class="pull-right form-actions" tooltip-placement="top"
-                         tooltip="{{ (searchConditionsEmpty || (searchColumns.length === 0)) ? 'No columns set or conditions missing.' : '' }}">
-                      <button type="submit" class="btn btn-primary btn-lg" ng-disabled="searchConditionsEmpty || (searchColumns.length === 0)"
-                              ng-click="advancedSearch()">Search</button>
+                      <!--
+                      <button ng-show="$last"
+                              data-placement="top" data-toggle="tooltip" type="button" ng-click="searchConditionAdd()"
+                              class="btn btn-link btn-icon inline add-condition" data-original-title="Add Condition">
+                        <i class="fa fa-plus-circle"></i><span>Add Condition</span></button>
+                        -->
                     </div>
                   </div>
-                </div>
 
-                <div class="pull-right">
-                  <button class="btn btn-default" ng-click="modalColumnAdd()">Add Column</button>
-                  <button type="button" class="btn btn-default" ng-click="rowAdd()" ng-disabled="!(columns.length > 1)">Add Row</button>
+                  <a href class="lo-condition-add" ng-click="searchConditionAdd()"
+                     tooltip-placement="right" tooltip="On the Right!" tooltip-trigger="{{myFoo}}">Add Condition</a>
 
-                  <div class="dropdown">
-                    <button class="btn btn-default dropdown-toggle" type="button">
-                            <!--ng-disabled="!((collectionId && (collectionData.members.length > 0)) || (columnsHidden.length > 0))"-->
-                      <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                      <li role="presentation">
-                        <a role="menuitem" tabindex="-1" ng-click="modalCollectionImport()">Import Data...</a>
-                      </li>
-                      <li role="presentation">
-                        <a role="menuitem" tabindex="-1" ng-href="{{urlExport}}" download="{{jsonName}}"
-                           ng-show="(collectionId && (collectionData.length > 0))">Export Data to JSON</a>
-                      </li>
-                      <!--li role="presentation">
-                        <a role="menuitem" tabindex="-1" ng-click="modalCollectionExport()">Export Data to JSON</a>
-                      </li-->
-                      <li class="separator"
-                          ng-show="(columnsHidden.length > 0) || (collectionId && (collectionData.length > 0))"></li>
-                      <li role="presentation">
-                        <a role="menuitem" tabindex="-1" ng-click="columnsHidden = []"
-                           ng-show="columnsHidden.length > 0">Show All Columns</a>
-                      </li>
-                      <li role="presentation">
-                        <a role="menuitem" tabindex="-1" ng-click="modalDataDeleteAll()"
-                           ng-show="(collectionId && (collectionData.length > 0))">Delete All Data</a>
-                      </li>
-                    </ul>
+                  <div class="pull-right form-actions" tooltip-placement="top"
+                       tooltip="{{ (searchConditionsEmpty || (searchColumns.length === 0)) ? 'No columns set or conditions missing.' : '' }}">
+                    <button type="submit" class="btn btn-primary btn-lg" ng-disabled="searchConditionsEmpty || (searchColumns.length === 0)"
+                            ng-click="advancedSearch()">Search</button>
                   </div>
                 </div>
-              </th>
-            </tr>
-            <tr ng-show="columns.length > 1">
-              <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown caption row-{{column}}" ng-class="{'before-actions':$last}">
-                <button class="btn btn-link btn-icon btn-unhide btn-unhide-left" type="button"
-                        ng-show="isNextHidden(column, true) && $first" ng-click="unhideNext(column, true)">
-                  <i class="lo-unhide-right"></i>
-                </button>
-                {{ column }}
-                <button class="btn btn-link btn-icon btn-unhide btn-unhide-right" type="button"
-                        ng-show="isNextHidden(column)" ng-click="unhideNext(column)">
-                  <i class="lo-unhide-left"></i>
-                  <i class="lo-unhide-right"></i>
-                </button>
+              </div>
+
+              <div class="pull-right">
+                <button class="btn btn-default" ng-click="modalColumnAdd()">Add Column</button>
+                <button type="button" class="btn btn-default" ng-click="rowAdd()" ng-disabled="!(columns.length > 1)">Add Row</button>
 
                 <div class="dropdown">
-                  <button class="btn btn-link btn-icon dropdown-toggle" type="button">
-                    <i class="fa fa-caret-square-o-down"></i>
+                  <button class="btn btn-default dropdown-toggle" type="button">
+                          <!--ng-disabled="!((collectionId && (collectionData.members.length > 0)) || (columnsHidden.length > 0))"-->
+                    <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                    <li role="presentation" ng-hide="column === 'id'"><a role="menuitem" tabindex="-1" href="" ng-click="columnRemove(column)" href="#">Delete Column</a></li>
-                    <li role="presentation" ng-hide="column === 'id'"><a role="menuitem" tabindex="-1" href="" ng-click="columnClear(column)" href="#">Clear Column</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="columnHide(column)" href="#">Hide Column</a></li>
-                    <li role="presentation" class="divider"></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="setFilter(column, false)">Sort Column A-Z</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="setFilter(column, true)">Sort Column Z-A</a></li>
+                    <li role="presentation">
+                      <a role="menuitem" tabindex="-1" ng-click="modalCollectionImport()">Import Data...</a>
+                    </li>
+                    <li role="presentation">
+                      <a role="menuitem" tabindex="-1" ng-href="{{urlExport}}" download="{{jsonName}}"
+                         ng-show="(collectionId && (collectionData.length > 0))">Export Data to JSON</a>
+                    </li>
+                    <!--li role="presentation">
+                      <a role="menuitem" tabindex="-1" ng-click="modalCollectionExport()">Export Data to JSON</a>
+                    </li-->
+                    <li class="separator"
+                        ng-show="(columnsHidden.length > 0) || (collectionId && (collectionData.length > 0))"></li>
+                    <li role="presentation">
+                      <a role="menuitem" tabindex="-1" ng-click="columnsHidden = []"
+                         ng-show="columnsHidden.length > 0">Show All Columns</a>
+                    </li>
+                    <li role="presentation">
+                      <a role="menuitem" tabindex="-1" ng-click="modalDataDeleteAll()"
+                         ng-show="(collectionId && (collectionData.length > 0))">Delete All Data</a>
+                    </li>
                   </ul>
                 </div>
-              </th>
-              <th class="actions caption">
-                <button class="btn btn-link btn-icon btn-unhide btn-unhide-left" type="button"
-                        ng-show="columns.length === columnsHidden.length" ng-click="columnsHidden = []">
-                  <i class="lo-unhide-right"></i>
+              </div>
+            </th>
+          </tr>
+          <tr ng-show="columns.length > 1">
+            <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown caption row-{{column}}" ng-class="{'before-actions':$last}">
+              <button class="btn btn-link btn-icon btn-unhide btn-unhide-left" type="button"
+                      ng-show="isNextHidden(column, true) && $first" ng-click="unhideNext(column, true)">
+                <i class="lo-unhide-right"></i>
+              </button>
+              {{ column }}
+              <button class="btn btn-link btn-icon btn-unhide btn-unhide-right" type="button"
+                      ng-show="isNextHidden(column)" ng-click="unhideNext(column)">
+                <i class="lo-unhide-left"></i>
+                <i class="lo-unhide-right"></i>
+              </button>
+
+              <div class="dropdown">
+                <button class="btn btn-link btn-icon dropdown-toggle" type="button">
+                  <i class="fa fa-caret-square-o-down"></i>
                 </button>
-                Actions
-              </th>
-            </tr>
-            <tr ng-show="(!collectionData || collectionData.length < 1) && newRows.length < 1">
-              <th colspan="{{columns.length + 1}}">
-                Collection doesn't contain any items.
-              </th>
-            </tr>
-            </thead>
-            <tbody ng-show="collectionId && (columns.length > 0)" class="lo-table-edit">
+                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                  <li role="presentation" ng-hide="column === 'id'"><a role="menuitem" tabindex="-1" href="" ng-click="columnRemove(column)" href="#">Delete Column</a></li>
+                  <li role="presentation" ng-hide="column === 'id'"><a role="menuitem" tabindex="-1" href="" ng-click="columnClear(column)" href="#">Clear Column</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="columnHide(column)" href="#">Hide Column</a></li>
+                  <li role="presentation" class="divider"></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="setFilter(column, false)">Sort Column A-Z</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="setFilter(column, true)">Sort Column Z-A</a></li>
+                </ul>
+              </div>
+            </th>
+            <th class="actions caption">
+              <button class="btn btn-link btn-icon btn-unhide btn-unhide-left" type="button"
+                      ng-show="columns.length === columnsHidden.length" ng-click="columnsHidden = []">
+                <i class="lo-unhide-right"></i>
+              </button>
+              Actions
+            </th>
+          </tr>
+          <tr ng-show="(!collectionData || collectionData.length < 1) && newRows.length < 1">
+            <th colspan="{{columns.length + 1}}">
+              Collection doesn't contain any items.
+            </th>
+          </tr>
+          </thead>
+          <tbody ng-show="collectionId && (columns.length > 0)" class="lo-table-edit">
 
-            <!-- Newly added rows -->
-            <tr ng-repeat="item in newRows">
-              <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}"
-                  ng-click="isEdit = (true && column !== 'id')">
-                <input class="form-control" type="text" ng-model="item[column]" pf-validation="isValidJSON(input)"/>
-              </td>
-              <td class="actions">
-                <button class="btn btn-link btn-icon" tooltip="Delete Row" ng-click="rowRemoveNew($index)">
-                  <i class="fa fa-trash-o"></i>
-                  <span>Delete Row</span>
+          <!-- Newly added rows -->
+          <tr ng-repeat="item in newRows">
+            <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}"
+                ng-click="isEdit = (true && column !== 'id')">
+              <input class="form-control" type="text" ng-model="item[column]" pf-validation="isValidJSON(input)"/>
+            </td>
+            <td class="actions">
+              <button class="btn btn-link btn-icon" tooltip="Delete Row" ng-click="rowRemoveNew($index)">
+                <i class="fa fa-trash-o"></i>
+                <span>Delete Row</span>
+              </button>
+            </td>
+          </tr>
+
+          <!-- Original rows, editing happens here -->
+          <tr ng-repeat="item in collectionData | orderBy:predicate:reverse | conditional:searchQuery:filterColumns:filterConditions"
+              ng-class="{deleted: rowsToDelete.indexOf(item['id']) > -1}">
+
+            <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}"
+                class="row-{{column}}" ng-click="isEdit = (true && column !== 'id')">
+              <!--
+              <input class="form-control" type="text" ng-show="isEdit" ng-model="item[column]"/>
+              <span ng-hide="isEdit">{{ item[column] }}</span>
+              -->
+              <span ng-if="column === 'id'">{{ item[column] }}</span>
+              <input class="form-control" type="text" ng-model="item[column]" ng-if="column !== 'id'"
+                     pf-validation="isValidJSON(input)" pf-validation-disabled="rowsToDelete.indexOf(item['id']) > -1"/>
+            </td>
+            <td class="actions">
+
+              <button class="btn btn-link btn-icon" tooltip="Delete Row" ng-click="rowRemove(item['id'])"
+                      ng-show="rowsToDelete.indexOf(item['id']) < 0">
+                <i class="fa fa-trash-o"></i>
+                <span>Delete Row</span>
+              </button>
+
+              <div ng-show="rowsToDelete.indexOf(item['id']) > -1">
+                <button class="btn btn-link btn-icon" tooltip="Put back" ng-click="rowRemoveUndo(item['id'])">
+                  <i class="fa fa-rotate-left"></i>
+                  <span>Put back</span>
                 </button>
-              </td>
-            </tr>
+              </div>
 
-            <!-- Original rows, editing happens here -->
-            <tr ng-repeat="item in collectionData | orderBy:predicate:reverse | conditional:searchQuery:filterColumns:filterConditions"
-                ng-class="{deleted: rowsToDelete.indexOf(item['id']) > -1}">
-
-              <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}"
-                  class="row-{{column}}" ng-click="isEdit = (true && column !== 'id')">
-                <!--
-                <input class="form-control" type="text" ng-show="isEdit" ng-model="item[column]"/>
-                <span ng-hide="isEdit">{{ item[column] }}</span>
-                -->
-                <span ng-if="column === 'id'">{{ item[column] }}</span>
-                <input class="form-control" type="text" ng-model="item[column]" ng-if="column !== 'id'"
-                       pf-validation="isValidJSON(input)" pf-validation-disabled="rowsToDelete.indexOf(item['id']) > -1"/>
-              </td>
-              <td class="actions">
-
-                <button class="btn btn-link btn-icon" tooltip="Delete Row" ng-click="rowRemove(item['id'])"
-                        ng-show="rowsToDelete.indexOf(item['id']) < 0">
-                  <i class="fa fa-trash-o"></i>
-                  <span>Delete Row</span>
-                </button>
-
-                <div ng-show="rowsToDelete.indexOf(item['id']) > -1">
-                  <button class="btn btn-link btn-icon" tooltip="Put back" ng-click="rowRemoveUndo(item['id'])">
-                    <i class="fa fa-rotate-left"></i>
-                    <span>Put back</span>
-                  </button>
-                </div>
-
-              </td>
-            </tr>
-            </tbody>
-          </table>
-          <div class="pull-right form-actions" ng-show="isDataChange || isClearAll || isColumnChange
-                                                        || rowsToDelete.length > 0 || newRows.length > 0">
-            <button class="btn btn-default btn-lg" ng-click="reset()">Clear changes</button>
-            <button class="btn btn-primary btn-lg" ng-click="save()" ng-disabled="!collectionForm.$valid">Save</button>
-          </div>
-        </form>
-      </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="pull-right form-actions" ng-show="isDataChange || isClearAll || isColumnChange
+                                                      || rowsToDelete.length > 0 || newRows.length > 0">
+          <button class="btn btn-default btn-lg" ng-click="reset()">Clear changes</button>
+          <button class="btn btn-primary btn-lg" ng-click="save()" ng-disabled="!collectionForm.$valid">Save</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
