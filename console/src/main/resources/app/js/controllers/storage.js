@@ -817,7 +817,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     }
 
     function errorCreate(result){
-      var errorType = result.data['message'] || result.data['error-type'];
+      var errorType = result.data.message || result.data['error-type'];
       var object = result.config.data;
       Notifications.error('Error: "' + errorType + '" during saving "' + JSON.stringify(object) + '" to the collection \"' + $scope.collectionId + '\".');
     }
