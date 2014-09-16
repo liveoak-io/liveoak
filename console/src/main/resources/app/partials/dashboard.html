@@ -62,6 +62,8 @@
             <span class="lo-field"><i class="circle"></i> Running</span>
           </div>
           -->
+          <a href="#" class="btn btn-default"><i class="fa fa-external-link"></i>Go to Application</a>
+          
           <div>
             <span class="lo-label">Storage</span>
             <ul>
@@ -87,6 +89,20 @@
           </div>
           <a href="#/applications/{{curApp.id}}/push" ng-show="pushConfig.upsURL">View <strong>Push Settings</strong> »</a>
           <a href="#/applications/{{curApp.id}}/push" ng-hide="pushConfig.upsURL">Set up <strong>Push</strong> »</a>
+        </section>
+        <section>
+          <div>
+            <span class="lo-label">Clients</span>
+            <span class="lo-field">Not set up</span>
+          </div>
+          <a href="#/applications/{{curApp.id}}/application-clients">Set up <strong>Clients</strong> »</a>
+        </section>
+        <section>
+          <div>
+            <span class="lo-label">Business Logic</span>
+            <span class="lo-field">Not set up</span>
+          </div>
+          <a href="#/applications/{{curApp.id}}/business-logic">Set up <strong>Logic</strong> »</a>
         </section>
       </section>
     </div>

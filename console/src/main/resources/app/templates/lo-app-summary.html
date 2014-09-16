@@ -1,6 +1,10 @@
 <div class="panel lo-panel-app" ng-class="{'animated flipInY': created == app.id}">
   <div class="panel-heading">
     <h3 class="panel-title"><a href="#/applications/{{app.id}}">{{app.name}}</a></h3>
+    <a class="btn btn-link btn-icon" href="#" target="_blank">
+      <i class="fa fa-external-link" data-tooltip="Go to Application"></i>
+      <span>Go to Application</span>
+    </a>
 <!--     <span class="label label-default" ng-show="app.example">Example</span> -->
     <div class="pull-right" >
       <a href ng-click="$parent.modalApplicationDelete(app.id)"><i class="fa fa-trash-o" data-tooltip-placement="top" data-tooltip="Delete App"></i></a>
@@ -14,6 +18,8 @@
       <li ng-show="true"><a href="#/applications/{{app.id}}/security"><i class="fa fa-lock" tooltip="Security"></i>Secured by {{$parent.auth.realm}}</a></li>
       <li ng-show="app.push.upsURL"><a href="#/applications/{{app.id}}/push"><i class="fa fa-mobile" tooltip="Push"></i>Push set up</a></li>
       <li ng-hide="app.push.upsURL" class="empty"><a href="#/applications/{{app.id}}/push"><i class="fa fa-mobile" tooltip="Push"></i>No Push set up</a></li>
+      <li class="empty"><a href="#/applications/{{app.id}}/application-clients"><i class="fa fa-globe" tooltip="Clients"></i>No Clients set up</a></li>
+      <li class="empty"><a href="#/applications/{{app.id}}/business-logic"><i class="fa fa-code" tooltip="Business Logic"></i>No Logic set up</a></li>
     </ul>
   </div>
 </div>
