@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.container.extension.FilterExtension;
 import io.liveoak.container.extension.MockExtension;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.zero.extension.ZeroExtension;
@@ -13,13 +14,12 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceException;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.state.ResourceState;
+import org.fest.assertions.Condition;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -36,29 +36,7 @@ public class ConfigurationPersistingTest {
 
     private static final String ADMIN_PATH = "/" + ZeroExtension.APPLICATION_ID + "/applications/testApp/resources/";
 
-    private File projectRoot;
     private ObjectMapper mapper;
-
-    @Before
-    public void setupUserDir() {
-        String name = getClass().getName().replace(".", "/") + ".class";
-        URL resource = getClass().getClassLoader().getResource(name);
-
-        if (resource != null) {
-            File current = new File(resource.getFile());
-
-            while (current.exists()) {
-                if (current.isDirectory()) {
-                    if (new File(current, "pom.xml").exists()) {
-                        this.projectRoot = current;
-                        break;
-                    }
-                }
-
-                current = current.getParentFile();
-            }
-        }
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -66,6 +44,7 @@ public class ConfigurationPersistingTest {
         this.client = this.system.client();
 
         this.system.extensionInstaller().load("mock", new MockExtension());
+        this.system.extensionInstaller().load("filter", new FilterExtension());
 
         // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
         this.system.awaitStability();
@@ -191,5 +170,125 @@ public class ConfigurationPersistingTest {
         mockTree = tree.get("resources").get("mock");
 
         assertThat( mockTree ).isNull();
+    }
+
+    @Test
+    public void testReadNonRuntimeValues() throws Exception {
+        String appDir = "${application.dir}/app/";
+        String randomDir = "/my/path/${application.name}/random";
+        ObjectNode tree = readConfig();
+
+        assertThat(tree.get("resources")).isNotNull();
+        assertThat(tree.get("resources").get("filter")).isNull();
+
+        ObjectNode initialConfig = JsonNodeFactory.instance.objectNode();
+        initialConfig.put("appDir", appDir);
+        initialConfig.put("randomDir", randomDir);
+        this.application.extend("filter", initialConfig);
+
+        this.system.awaitStability();
+
+        // Check config values to make sure we're receiving the unparsed versions
+        ResourceState configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "filter");
+        assertThat(configState).isNotNull();
+        assertThat(configState.getProperty("appDir")).isEqualTo(appDir);
+        assertThat(configState.getProperty("randomDir")).isEqualTo(randomDir);
+
+        // Check that the Resource itself is dealing with parsed values
+        configState = this.client.read(new RequestContext.Builder().build(), "/testApp/filter");
+        assertThat(configState).isNotNull();
+        assertThat(configState.getProperty("appDir")).isNotEqualTo(appDir);
+        assertThat(configState.getProperty("randomDir")).isNotEqualTo(randomDir);
+        assertThat(configState.getProperty("appDir")).satisfies(new Condition<Object>() {
+            @Override
+            public boolean matches(Object value) {
+                if (!(value instanceof String)) {
+                    return false;
+                }
+                return ((String) value).endsWith("/app/");
+            }
+        });
+
+        // Check contents of application.json
+        tree = readConfig();
+        JsonNode filterTree = tree.get("resources").get("filter");
+
+        assertThat(filterTree).isNotNull();
+        assertThat(filterTree.get("type").asText()).isEqualTo("filter");
+        JsonNode configTree = filterTree.get("config");
+        assertThat(configTree.get("appDir").asText()).isEqualTo(appDir);
+        assertThat(configTree.get("randomDir").asText()).isEqualTo(randomDir);
+
+        // Check config values to make sure we can request the parsed versions
+        configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "filter?runtime");
+        assertThat(configState).isNotNull();
+        assertThat(configState.getProperty("appDir")).isNotEqualTo(appDir);
+        assertThat(configState.getProperty("randomDir")).isNotEqualTo(randomDir);
+        assertThat(configState.getProperty("appDir")).satisfies(new Condition<Object>() {
+            @Override
+            public boolean matches(Object value) {
+                if (!(value instanceof String)) {
+                    return false;
+                }
+                return ((String) value).endsWith("/app/");
+            }
+        });
+        assertThat(configState.getProperty("randomDir")).satisfies(new Condition<Object>() {
+            @Override
+            public boolean matches(Object value) {
+                if (!(value instanceof String)) {
+                    return false;
+                }
+                return ((String) value).endsWith("/random");
+            }
+        });
+
+        // Update one of the configuration values
+        String modifiedDir = randomDir + "/more/";
+        configState = new DefaultResourceState();
+        configState.putProperty("appDir", appDir);
+        configState.putProperty("randomDir", modifiedDir);
+
+        this.client.update(new RequestContext.Builder().build(), ADMIN_PATH + "filter", configState);
+
+        // Check config values to make sure we're receiving the unparsed versions
+        configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "filter");
+        assertThat(configState).isNotNull();
+        assertThat(configState.getProperty("appDir")).isEqualTo(appDir);
+        assertThat(configState.getProperty("randomDir")).isEqualTo(modifiedDir);
+
+        // Check that the Resource itself is dealing with parsed values
+        configState = this.client.read(new RequestContext.Builder().build(), "/testApp/filter");
+        assertThat(configState).isNotNull();
+        assertThat(configState.getProperty("appDir")).isNotEqualTo(appDir);
+        assertThat(configState.getProperty("randomDir")).isNotEqualTo(randomDir);
+        assertThat(configState.getProperty("appDir")).satisfies(new Condition<Object>() {
+            @Override
+            public boolean matches(Object value) {
+                if (!(value instanceof String)) {
+                    return false;
+                }
+                return ((String) value).endsWith("/app/");
+            }
+        });
+        assertThat(configState.getProperty("randomDir")).satisfies(new Condition<Object>() {
+            @Override
+            public boolean matches(Object value) {
+                if (!(value instanceof String)) {
+                    return false;
+                }
+                return ((String) value).endsWith("/random/more/");
+            }
+        });
+
+        // Check contents of application.json
+        tree = readConfig();
+        filterTree = tree.get("resources").get("filter");
+
+        assertThat(filterTree).isNotNull();
+        assertThat(filterTree.get("type").asText()).isEqualTo("filter");
+        configTree = filterTree.get("config");
+        assertThat(configTree.get("appDir").asText()).isEqualTo(appDir);
+        assertThat(configTree.get("randomDir").asText()).isEqualTo(modifiedDir);
     }
 }
