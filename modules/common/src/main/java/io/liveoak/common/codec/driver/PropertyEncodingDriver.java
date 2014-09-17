@@ -5,6 +5,8 @@
  */
 package io.liveoak.common.codec.driver;
 
+import java.util.Properties;
+
 import io.liveoak.spi.ReturnFields;
 
 /**
@@ -12,8 +14,8 @@ import io.liveoak.spi.ReturnFields;
  */
 public class PropertyEncodingDriver extends AbstractEncodingDriver {
 
-    public PropertyEncodingDriver(EncodingDriver parent, String name, ReturnFields returnFields) {
-        super(parent, null, returnFields);
+    public PropertyEncodingDriver(EncodingDriver parent, String name, ReturnFields returnFields, Properties props) {
+        super(parent, null, returnFields, props);
         this.name = name;
     }
 

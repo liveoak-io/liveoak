@@ -5,6 +5,8 @@
  */
 package io.liveoak.common.codec.driver;
 
+import java.util.Properties;
+
 import io.liveoak.common.codec.Encoder;
 import io.liveoak.spi.RequestContext;
 
@@ -28,4 +30,6 @@ public interface EncodingDriver {
     void encodeNext() throws Exception;
 
     void error(Throwable e);
+
+    Properties environmentProperties();
 }

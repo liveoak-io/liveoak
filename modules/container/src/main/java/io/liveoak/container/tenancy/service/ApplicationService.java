@@ -2,6 +2,7 @@ package io.liveoak.container.tenancy.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +34,8 @@ import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
+import org.jboss.msc.service.ValueService;
+import org.jboss.msc.value.ImmediateValue;
 import org.jboss.msc.value.InjectedValue;
 
 /**
@@ -117,6 +120,9 @@ public class ApplicationService implements Service<InternalApplication> {
         target.addService(configManagerName, configManager)
                 .install();
 
+        target.addService(Services.applicationEnvironmentProperties(this.id), new ValueService<>(new ImmediateValue<>(envProperties())))
+                .install();
+
         ServiceName appContextName = Services.applicationContext(this.id);
 
         // Configure application-clients resource if it's not present
@@ -163,6 +169,14 @@ public class ApplicationService implements Service<InternalApplication> {
         target.addService(Services.application(this.id).append("resources"), resources)
                 .addInjectionValue(resources.applicationInjector(), this)
                 .install();
+    }
+
+    private Properties envProperties() {
+        Properties props = new Properties(System.getProperties());
+        props.setProperty("application.id", this.app.id());
+        props.setProperty("application.name", this.app.name());
+        props.setProperty("application.dir", this.app.directory().getAbsolutePath());
+        return props;
     }
 
     @Override

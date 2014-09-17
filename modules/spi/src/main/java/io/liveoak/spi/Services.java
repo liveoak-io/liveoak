@@ -69,6 +69,10 @@ public final class Services {
         return LIVEOAK.append("application-admin", appId);
     }
 
+    public static ServiceName applicationEnvironmentProperties(String appId) {
+        return application(appId).append("env-props");
+    }
+
     public static ServiceName resource(String appId, String resourceId) {
         return LIVEOAK.append("application-resource", appId, resourceId);
     }

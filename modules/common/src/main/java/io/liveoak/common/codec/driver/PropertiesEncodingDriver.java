@@ -5,15 +5,14 @@
  */
 package io.liveoak.common.codec.driver;
 
-import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -21,8 +20,8 @@ import java.util.Set;
  */
 public class PropertiesEncodingDriver extends ResourceEncodingDriver {
 
-    public PropertiesEncodingDriver(ResourceEncodingDriver parent, Resource resource, ReturnFields returnFields) {
-        super(parent, resource, returnFields);
+    public PropertiesEncodingDriver(ResourceEncodingDriver parent, Resource resource, ReturnFields returnFields, Properties props) {
+        super(parent, resource, returnFields, props);
     }
 
     @Override
@@ -39,9 +38,18 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
     }
 
     private class MyPropertySink implements PropertySink {
+        private Properties environmentProperties;
+        private boolean setupProperties = false;
 
         @Override
         public void accept(String name, Object value) {
+            if (!setupProperties) {
+                if (environmentProperties == null || environmentProperties.size() == 0) {
+                    environmentProperties = environmentProperties();
+                }
+                setupProperties = true;
+            }
+
             if (!returnFields().included(name)) {
                 return;
             }
@@ -53,23 +61,20 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
                 }
                 hasProperties = true;
             }
-            PropertyEncodingDriver propDriver = new PropertyEncodingDriver(PropertiesEncodingDriver.this, name, null);
-            if (value instanceof ResourceState) {
-                value = ResourceConversionUtils.convertResourceState((ResourceState) value, null);
-            }
+            PropertyEncodingDriver propDriver = new PropertyEncodingDriver(PropertiesEncodingDriver.this, name, null, environmentProperties);
             if (value instanceof Resource) {
                 // embedded resource's don't have id's and should always be displayed unless the return field is set
                 if (((Resource) value).id() == null && returnFields().child(name).isEmpty()) {
-                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().ALL));
+                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().ALL, environmentProperties));
                 } else if (!returnFields().child(name).isEmpty()) {
-                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().child(name)));
+                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().child(name), environmentProperties));
                 } else {
-                    propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value));
+                    propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value, environmentProperties));
                 }
             } else if (value instanceof List || value instanceof Set) {
-                propDriver.addChildDriver(new ListEncodingDriver(propDriver, ((Collection) value).stream(), returnFields().child(name)));
+                propDriver.addChildDriver(new ListEncodingDriver(propDriver, ((Collection) value).stream(), returnFields().child(name), environmentProperties));
             } else {
-                propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value));
+                propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value, environmentProperties));
             }
             addChildDriver(propDriver);
         }
@@ -77,6 +82,11 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
         @Override
         public void close() throws Exception {
             encodeNext();
+        }
+
+        @Override
+        public void replaceWith(Properties props) {
+            this.environmentProperties = props;
         }
     }
 

@@ -5,6 +5,8 @@
  */
 package io.liveoak.common.codec.driver;
 
+import java.util.Properties;
+
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.StatusResource;
@@ -17,8 +19,8 @@ import org.jboss.logging.Logger;
  */
 public class MembersEncodingDriver extends ResourceEncodingDriver {
 
-    public MembersEncodingDriver(EncodingDriver parent, Resource resource, ReturnFields returnFields) {
-        super(parent, resource, returnFields);
+    public MembersEncodingDriver(EncodingDriver parent, Resource resource, ReturnFields returnFields, Properties props) {
+        super(parent, resource, returnFields, props);
     }
 
     @Override
@@ -56,11 +58,11 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
                 hasMembers = true;
             }
             if (resource instanceof StatusResource) {
-                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, ReturnFields.ALL));
+                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, ReturnFields.ALL, environmentProperties()));
             } else if (returnFields().child(LiveOak.MEMBERS).isEmpty()) {
-                addChildDriver(new ValueEncodingDriver(MembersEncodingDriver.this, resource));
+                addChildDriver(new ValueEncodingDriver(MembersEncodingDriver.this, resource, environmentProperties()));
             } else {
-                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, returnFields().child(LiveOak.MEMBERS)));
+                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, returnFields().child(LiveOak.MEMBERS), environmentProperties()));
             }
         }
 

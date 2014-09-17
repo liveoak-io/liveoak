@@ -12,14 +12,15 @@ import io.liveoak.spi.resource.async.Resource;
 import java.net.URI;
 import java.util.Date;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author Bob McWhirter
  */
 public class ValueEncodingDriver extends AbstractEncodingDriver {
 
-    public ValueEncodingDriver(EncodingDriver parent, Object object) {
-        super(parent, object, null);
+    public ValueEncodingDriver(EncodingDriver parent, Object object, Properties props) {
+        super(parent, object, null, props);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package io.liveoak.container.extension;
 
+import java.util.Properties;
+
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.resource.RootResource;
@@ -22,7 +24,7 @@ public class AdminResourceWrappingResourceService implements Service<RootResourc
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.persistingResource = new AdminResourceWrappingResource(this.extension, this.managerInjector.getValue(), resourceInjector.getValue(), this.boottime);
+        this.persistingResource = new AdminResourceWrappingResource(this.extension, this.managerInjector.getValue(), resourceInjector.getValue(), environmentPropertiesInjector.getValue(), this.boottime);
     }
 
     @Override
@@ -43,9 +45,14 @@ public class AdminResourceWrappingResourceService implements Service<RootResourc
         return this.managerInjector;
     }
 
+    public Injector<Properties> environmentPropertiesInjector() {
+        return this.environmentPropertiesInjector;
+    }
+
     private InternalApplicationExtension extension;
     private InjectedValue<RootResource> resourceInjector = new InjectedValue<>();
     private InjectedValue<ApplicationConfigurationManager> managerInjector = new InjectedValue<>();
+    private InjectedValue<Properties> environmentPropertiesInjector = new InjectedValue<>();
     private AdminResourceWrappingResource persistingResource;
     private boolean boottime;
 }

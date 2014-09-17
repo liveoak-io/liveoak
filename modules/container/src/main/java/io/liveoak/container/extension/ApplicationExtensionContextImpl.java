@@ -130,6 +130,7 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
                 .addDependency(privateName.append("save-config"))
                 .addDependency(privateName, RootResource.class, wrapper.resourceInjector())
                 .addDependency(Services.applicationConfigurationManager(appExtension.application().id()), ApplicationConfigurationManager.class, wrapper.configurationManagerInjector())
+                .addDependency(Services.applicationEnvironmentProperties(appExtension.application().id()), Properties.class, wrapper.environmentPropertiesInjector())
                 .install();
 
         UpdateResourceService configApply = new UpdateResourceService(this.appExtension);
