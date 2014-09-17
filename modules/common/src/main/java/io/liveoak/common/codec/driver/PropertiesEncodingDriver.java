@@ -5,9 +5,11 @@
  */
 package io.liveoak.common.codec.driver;
 
+import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 
 import java.util.Collection;
@@ -52,6 +54,9 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
                 hasProperties = true;
             }
             PropertyEncodingDriver propDriver = new PropertyEncodingDriver(PropertiesEncodingDriver.this, name, null);
+            if (value instanceof ResourceState) {
+                value = ResourceConversionUtils.convertResourceState((ResourceState) value, null);
+            }
             if (value instanceof Resource) {
                 // embedded resource's don't have id's and should always be displayed unless the return field is set
                 if (((Resource) value).id() == null && returnFields().child(name).isEmpty()) {

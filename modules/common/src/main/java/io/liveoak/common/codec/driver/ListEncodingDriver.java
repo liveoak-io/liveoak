@@ -5,8 +5,10 @@
  */
 package io.liveoak.common.codec.driver;
 
+import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceState;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +28,9 @@ public class ListEncodingDriver extends AbstractEncodingDriver {
     public void encode() throws Exception {
         encoder().startList();
         ((Stream<Object>) object()).forEach((e) -> {
+            if (e instanceof ResourceState) {
+                e = ResourceConversionUtils.convertResourceState((ResourceState)e, null);
+            }
             if (e instanceof Resource) {
                 Resource r = (Resource) e;
                 // embedded resource's don't have id's and should always be displayed unless the return field is set
