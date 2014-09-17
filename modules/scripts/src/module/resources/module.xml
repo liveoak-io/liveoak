@@ -20,6 +20,7 @@
         <module name="javax.api" services="import"/>
         <module name="sun.jdk" services="import"/>
         <module name="org.dynjs"/>
+        <module name="org.quartz-scheduler"/>
     </dependencies>
 </module>
 

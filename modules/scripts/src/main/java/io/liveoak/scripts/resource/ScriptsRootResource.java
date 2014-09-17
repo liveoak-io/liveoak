@@ -3,7 +3,7 @@ package io.liveoak.scripts.resource;
 import io.liveoak.scripts.endpoints.EndpointScripts;
 import io.liveoak.scripts.libraries.resources.ScriptLibraries;
 import io.liveoak.scripts.resourcetriggered.resource.ResourceScripts;
-import io.liveoak.scripts.scheduled.ScheduledScripts;
+import io.liveoak.scripts.scheduled.resource.ScheduledScriptsResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -23,7 +23,7 @@ public class ScriptsRootResource implements RootResource {
 
     ResourceScripts resourceTriggeredScripts;
     EndpointScripts endpointScripts;
-    ScheduledScripts scheduledScripts;
+    ScheduledScriptsResource scheduledScripts;
     ScriptLibraries scriptLibraries;
 
     protected static final Logger log = Logger.getLogger("io.liveoak.scripts");
@@ -34,15 +34,18 @@ public class ScriptsRootResource implements RootResource {
 
     private String scriptDirectory;
 
-    public ScriptsRootResource(String id, ScriptLibraries scriptLibraries, ResourceScripts resourceTriggeredScripts) {
+    public ScriptsRootResource(String id, ScriptLibraries scriptLibraries, ResourceScripts resourceTriggeredScripts, ScheduledScriptsResource scheduledScripts) {
         this.resourceTriggeredScripts = resourceTriggeredScripts;
-        resourceTriggeredScripts.parent(this);
+        this.resourceTriggeredScripts.parent(this);
 
         this.scriptLibraries = scriptLibraries;
         scriptLibraries.parent(this);
 
         this.endpointScripts = new EndpointScripts(this);
-        this.scheduledScripts = new ScheduledScripts(this);
+
+        this.scheduledScripts = scheduledScripts;
+        this.scheduledScripts.parent(this);
+
         this.id = id;
 
     }
@@ -50,6 +53,7 @@ public class ScriptsRootResource implements RootResource {
     @Override
     public void start() throws Exception {
         resourceTriggeredScripts.start();
+        scheduledScripts.start();
     }
 
 

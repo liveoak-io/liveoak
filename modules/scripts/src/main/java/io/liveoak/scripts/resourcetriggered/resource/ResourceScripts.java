@@ -6,6 +6,8 @@ import java.io.IOException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.scripts.resource.ScriptResource;
+import io.liveoak.scripts.resource.ScriptsResource;
 import io.liveoak.scripts.resource.ScriptsRootResource;
 import io.liveoak.spi.InvalidPropertyTypeException;
 import io.liveoak.spi.RequestContext;
@@ -15,15 +17,13 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-import io.netty.buffer.ByteBuf;
 import org.jboss.logging.Logger;
 import org.vertx.java.core.Vertx;
-import org.vertx.java.core.buffer.Buffer;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class ResourceScripts implements Resource {
+public class ResourceScripts extends ScriptsResource {
 
     private ScriptsRootResource parent;
     private static final String ID = "resource-triggered-scripts";
@@ -34,16 +34,35 @@ public class ResourceScripts implements Resource {
 
     private static final String TARGET_PARAMETER = "target";
 
-    private Vertx vertx;
-
     private ScriptMap scripts;
 
     File resourceDirectory;
 
     public ResourceScripts(ScriptMap scriptMap, Vertx vertx) {
+        super(vertx);
         this.scripts = scriptMap;
-        this.vertx = vertx;
     }
+
+    protected File getScriptsDirectory() {
+        if (resourceDirectory == null) {
+            //get a reference to where the scripts should be held
+            String resourceBasedDir = parent.getScriptDirectory() + File.separator + "/" + RESOURCE_DIRNAME;
+            resourceDirectory = new File(resourceBasedDir);
+
+            // create the directory if it doesn't already exist
+            if (!resourceDirectory.exists()) {
+                resourceDirectory.mkdirs();
+            }
+        }
+        return resourceDirectory;
+    }
+
+    //TODO
+    @Override
+    protected ScriptResource generateChildResource(ResourceState state) {
+        return null;
+    }
+
 
     public void parent(ScriptsRootResource parent) {
         this.parent = parent;
@@ -199,46 +218,5 @@ public class ResourceScripts implements Resource {
 
     public Logger logger() {
         return parent.logger();
-    }
-
-    public void writeMetadataFile(String id, ObjectNode objectNode) throws Exception {
-        File scriptDirectory = new File(resourceDirectory.getPath() + File.separator + id);
-        if (!scriptDirectory.exists()) {
-            scriptDirectory.mkdir();
-        }
-        File metadataFile = new File(scriptDirectory.getPath() + File.separator + METADATA_FILENAME);
-        ObjectMapperFactory.createWriter().writeValue(metadataFile, objectNode);
-    }
-
-    public void deleteMetadataFile(String id) {
-        File scriptDirectory = new File(resourceDirectory.getPath() + File.separator + id);
-        if (scriptDirectory.exists()) {
-            File metadataFile = new File(scriptDirectory.getPath() + File.separator + METADATA_FILENAME);
-            metadataFile.delete();
-        }
-    }
-
-    public void writeSourceFile(String id, ByteBuf byteBuf) throws Exception {
-        File scriptDirectory = new File(resourceDirectory.getPath() + File.separator + id);
-        if (!scriptDirectory.exists()) {
-            scriptDirectory.mkdir();
-        }
-        String filename = scriptDirectory.getPath().toString() + File.separator + SOURCE_FILENAME;
-        vertx.fileSystem().writeFileSync(filename, new Buffer(byteBuf));
-    }
-
-    public void deleteSourceFile(String id) {
-        File scriptDirectory = new File(resourceDirectory.getPath() + File.separator + id);
-        if (scriptDirectory.exists()) {
-            File sourceFile = new File(scriptDirectory.getPath() + File.separator + SOURCE_FILENAME);
-            sourceFile.delete();
-        }
-    }
-
-    public void deleteScriptDirectory(String id) {
-        File scriptDirectory = new File(resourceDirectory.getPath() + File.separator + id);
-        if (scriptDirectory.exists()) {
-            scriptDirectory.delete();
-        }
     }
 }
