@@ -222,6 +222,7 @@ public class ResourceScriptManager {
         return handleResponse(response, resourceRequest);
     }
 
+    //TODO: REMOVE AND EXTEND SCRIPTMANAGER
     protected String configureFunction(GlobalObject globalObject, String functionName, Object... args) {
         //TODO: figure out the right approach to adding parameters to functions
         String prefix = "__liveoak_" + functionName;
@@ -240,6 +241,7 @@ public class ResourceScriptManager {
         return source + ")";
     }
 
+    //TODO: REMOVE AND EXTEND SCRIPTMANAGER
     //TODO: move this to a more common ScriptManager to be used by the Endpoint and Scheduled Scripts
     protected void configureGlobalObject(GlobalObject globalObject) {
         Map<String, Class> liveoakMap = new HashMap<String, Class>();
@@ -257,6 +259,7 @@ public class ResourceScriptManager {
         globalObject.put("liveoak", liveoakMap);
     }
 
+    //TODO: REMOVE AND EXTEND SCRIPTMANAGER
     //TODO: move this to a util class or a more common ScriptManager class
     protected Object handleResponse(Object response, ScriptingResourceRequest request) {
         if (response instanceof LiveOakException) {
