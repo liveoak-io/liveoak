@@ -40,9 +40,6 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
 
         ServiceTarget target = context.getChildTarget();
 
-        target.addService(Services.applicationExtension(this.applicationInjector.getValue().id(), resourceId).append("config"), new ValueService<>(new ImmediateValue<>(configuration)))
-                .install();
-
         this.appExtension = new InternalApplicationExtension(
                 this.serviceRegistryInjector.getValue(),
                 this.applicationInjector.getValue(),
