@@ -38,6 +38,17 @@ public class ApplicationConfigurationManager {
         write(tree);
     }
 
+    public ObjectNode readResource(String id) throws IOException {
+        ObjectNode tree = read();
+        ObjectNode resourcesTree = (ObjectNode) tree.get("resources");
+        if (resourcesTree == null) {
+            resourcesTree = JsonNodeFactory.instance.objectNode();
+            tree.put("resources", resourcesTree);
+        }
+
+        return (ObjectNode) resourcesTree.get(id);
+    }
+
     public synchronized void updateResource(String id, String type, JsonNode config) throws IOException {
         ObjectNode tree = read();
         ObjectNode resourcesTree = (ObjectNode) tree.get("resources");

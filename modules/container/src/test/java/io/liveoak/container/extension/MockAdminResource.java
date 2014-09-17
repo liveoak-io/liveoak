@@ -31,6 +31,6 @@ public class MockAdminResource extends MockResource {
     @Override
     public void properties(ResourceState props) throws Exception {
         this.props = props;
-
+        this.props.putProperty("unknownDir", "/my/unknown/path");
     }
 }

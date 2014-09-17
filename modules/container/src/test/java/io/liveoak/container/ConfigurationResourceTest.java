@@ -178,11 +178,11 @@ public class ConfigurationResourceTest {
 
         ObjectNode configNode = JsonNodeFactory.instance.objectNode();
         configNode.put("file", this.projectRoot.getAbsolutePath());
-        configNode.put("flag", "true");
+        configNode.put("flag", true);
         configNode.put("url", "http://liveoak.io");
         configNode.put("uri", "urn:isbn:0451450523");
-        configNode.put("dbl", "4.6");
-        configNode.put("integer", "35");
+        configNode.put("dbl", new Double("4.6"));
+        configNode.put("integer", new Integer("35"));
         this.application.extend("config-types", CONFIG_TYPE_RESOURCE_ID, configNode);
         this.system.awaitStability();
 

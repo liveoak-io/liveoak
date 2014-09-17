@@ -1,5 +1,9 @@
 package io.liveoak.container.extension;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.LiveOak;
@@ -16,11 +20,11 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class AdminResourceWrappingResource extends DelegatingRootResource {
 
-    public AdminResourceWrappingResource(InternalApplicationExtension extension, ApplicationConfigurationManager configManager, RootResource delegate, boolean boottime) {
+    public AdminResourceWrappingResource(InternalApplicationExtension extension, ApplicationConfigurationManager configManager, RootResource delegate, boolean ignoreUpdate) {
         super(delegate);
         this.extension = extension;
         this.configManager = configManager;
-        this.ignoreUpdate = boottime;
+        this.ignoreUpdate = ignoreUpdate;
     }
 
     public String type() {
@@ -34,8 +38,33 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept(LiveOak.RESOURCE_TYPE, type());
+        JsonNode configNode = this.configManager.readResource(super.id()).get("config");
+        ResourceState configState = configNode != null ? ConversionUtils.convert((ObjectNode)configNode) : new DefaultResourceState();
 
-        super.readProperties(ctx, sink);
+        boolean runtimeValuePresent = ctx.resourceParams().value("runtime") != null;
+        boolean runtimeRequested = runtimeValuePresent ? Boolean.parseBoolean(ctx.resourceParams().value("runtime")) : ctx.resourceParams().names().contains("runtime");
+
+        // If runtime is set, we return the filtered values. If it isn't, we return the unfiltered
+        if (runtimeRequested) {
+            super.readProperties(ctx, sink);
+        } else {
+            super.readProperties(ctx, new PropertySink() {
+                @Override
+                public void accept(String name, Object value) {
+                    Object nonParsedValue;
+                    if ((nonParsedValue = configState.getProperty(name)) != null) {
+                        sink.accept(name, nonParsedValue);
+                    } else {
+                        sink.accept(name, value);
+                    }
+                }
+
+                @Override
+                public void close() throws Exception {
+                    sink.close();
+                }
+            });
+        }
     }
 
     @Override

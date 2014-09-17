@@ -7,8 +7,8 @@ import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.spi.Application;
-import io.liveoak.spi.Services;
 import io.liveoak.spi.MediaType;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -111,7 +111,13 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
 
     @Override
     public void mountPrivate(ServiceName privateName, MediaType mediaType, boolean makeDefault) {
-        MediaTypeMountService<RootResource> mount = new MediaTypeMountService(this.appExtension.resourceId(), mediaType, makeDefault);
+        MediaTypeMountService<RootResource> mount = new MediaTypeMountService(this.resourceId(), mediaType, makeDefault);
+
+        SaveResourceConfigService saveConfigService = new SaveResourceConfigService(this.resourceId(), this.extensionId(), this.boottime);
+        target.addService(privateName.append("save-config"), saveConfigService)
+                .addDependency(Services.applicationConfigurationManager(appExtension.application().id()), ApplicationConfigurationManager.class, saveConfigService.configurationManagerInjector())
+                .addInjection(saveConfigService.configurationInjector(), this.configuration)
+                .install();
 
         ConfigFilteringService configFilter = new ConfigFilteringService(filteringProperties());
         target.addService(privateName.append("filter-config"), configFilter)
@@ -121,6 +127,7 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
         AdminResourceWrappingResourceService wrapper = new AdminResourceWrappingResourceService(this.appExtension, this.boottime);
         target.addService(privateName.append("wrapper"), wrapper)
                 .addDependency(privateName.append("filter-config"))
+                .addDependency(privateName.append("save-config"))
                 .addDependency(privateName, RootResource.class, wrapper.resourceInjector())
                 .addDependency(Services.applicationConfigurationManager(appExtension.application().id()), ApplicationConfigurationManager.class, wrapper.configurationManagerInjector())
                 .install();

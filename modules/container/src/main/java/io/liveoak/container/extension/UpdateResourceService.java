@@ -30,7 +30,7 @@ public class UpdateResourceService implements Service<Void> {
         RequestContext reqContext = new RequestContext.Builder().build();
         context.asynchronous();
         try {
-            this.resourceInjector.getValue().updateProperties(reqContext, ConversionUtils.convert(this.configurationInjector.getValue()), new ServiceUpdateResponder(context));
+            this.resourceInjector.getValue().initializeProperties(reqContext, ConversionUtils.convert(this.configurationInjector.getValue()), new ServiceUpdateResponder(context));
         } catch (Exception e) {
             if (this.exceptionConsumer != null) {
                 this.exceptionConsumer.accept(e);
