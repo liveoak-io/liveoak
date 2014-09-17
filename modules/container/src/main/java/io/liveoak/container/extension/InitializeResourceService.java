@@ -15,13 +15,14 @@ import java.util.function.Consumer;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
-public class UpdateResourceService implements Service<Void> {
+public class InitializeResourceService implements Service<Void> {
 
-    public UpdateResourceService() {
+    public InitializeResourceService() {
     }
 
-    public UpdateResourceService(Consumer<Exception> exceptionConsumer) {
+    public InitializeResourceService(Consumer<Exception> exceptionConsumer) {
         this.exceptionConsumer = exceptionConsumer;
     }
 

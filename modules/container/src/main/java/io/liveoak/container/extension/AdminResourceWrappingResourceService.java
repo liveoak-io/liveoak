@@ -17,14 +17,13 @@ import org.jboss.msc.value.InjectedValue;
  */
 public class AdminResourceWrappingResourceService implements Service<RootResource> {
 
-    public AdminResourceWrappingResourceService(InternalApplicationExtension extension, boolean boottime) {
+    public AdminResourceWrappingResourceService(InternalApplicationExtension extension) {
         this.extension = extension;
-        this.boottime = boottime;
     }
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.persistingResource = new AdminResourceWrappingResource(this.extension, this.managerInjector.getValue(), resourceInjector.getValue(), environmentPropertiesInjector.getValue(), this.boottime);
+        this.persistingResource = new AdminResourceWrappingResource(this.extension, this.managerInjector.getValue(), resourceInjector.getValue(), environmentPropertiesInjector.getValue());
     }
 
     @Override
@@ -54,5 +53,4 @@ public class AdminResourceWrappingResourceService implements Service<RootResourc
     private InjectedValue<ApplicationConfigurationManager> managerInjector = new InjectedValue<>();
     private InjectedValue<Properties> environmentPropertiesInjector = new InjectedValue<>();
     private AdminResourceWrappingResource persistingResource;
-    private boolean boottime;
 }

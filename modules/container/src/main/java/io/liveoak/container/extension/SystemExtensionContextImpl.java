@@ -46,16 +46,10 @@ public class SystemExtensionContextImpl implements SystemExtensionContext {
     public void mountPrivate(ServiceName privateName) {
         MountService<RootResource> mount = new MountService(this.id);
 
-        ConfigFilteringService configFilter = new ConfigFilteringService();
-
-        target.addService(privateName.append("filter-config"), configFilter)
-                .addInjection(configFilter.configurationInjector(), this.configuration)
-                .install();
-
-        UpdateResourceService configApply = new UpdateResourceService();
+        InitializeResourceService configApply = new InitializeResourceService();
         target.addService(privateName.append("apply-config"), configApply)
                 .addDependency(privateName, Resource.class, configApply.resourceInjector())
-                .addDependency(privateName.append("filter-config"), ObjectNode.class, configApply.configurationInjector())
+                .addInjection(configApply.configurationInjector(), this.configuration)
                 .install();
 
         RootResourceLifecycleService lifecycle = new RootResourceLifecycleService();

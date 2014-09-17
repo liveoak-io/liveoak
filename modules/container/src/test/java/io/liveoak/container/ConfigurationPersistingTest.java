@@ -178,7 +178,7 @@ public class ConfigurationPersistingTest {
         assertThat( mockTree ).isNull();
     }
 
-//    @Test
+    @Test
     public void testReadNonRuntimeValues() throws Exception {
         String appDir = "${application.dir}/app/";
         String randomDir = "/my/path/${application.name}/random";

@@ -2,6 +2,7 @@ package io.liveoak.container.extension;
 
 import java.util.Properties;
 
+import io.liveoak.common.util.JsonFilterUtils;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.LiveOak;
@@ -18,12 +19,11 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class AdminResourceWrappingResource extends DelegatingRootResource {
 
-    public AdminResourceWrappingResource(InternalApplicationExtension extension, ApplicationConfigurationManager configManager, RootResource delegate, Properties envProps, boolean ignoreUpdate) {
+    public AdminResourceWrappingResource(InternalApplicationExtension extension, ApplicationConfigurationManager configManager, RootResource delegate, Properties envProps) {
         super(delegate);
         this.extension = extension;
         this.configManager = configManager;
         this.environmentProperties = envProps;
-        this.ignoreUpdate = ignoreUpdate;
     }
 
     public String type() {
@@ -50,27 +50,26 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
 
     @Override
     public void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        cleanupState(state);
-        delegate().initializeProperties(ctx, state, responder);
+        cleanup(state);
+        delegate().initializeProperties(ctx, filter(state), responder);
     }
 
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        cleanupState(state);
+        cleanup(state);
 
-        if (this.ignoreUpdate) {
-            this.ignoreUpdate = false;
-            delegate().initializeProperties(ctx, state, responder);
-        } else {
-            delegate().updateProperties(ctx, state, new ResourceConfigPersistingResponder(this, state, responder));
-        }
+        delegate().updateProperties(ctx, filter(state), new ResourceConfigPersistingResponder(this, state, responder));
     }
 
-    private void cleanupState(ResourceState state) {
+    private void cleanup(ResourceState state) {
         //Clean out from the state what we don't care about
         state.removeProperty(LiveOak.ID);
         state.removeProperty(LiveOak.SELF);
         state.removeProperty(LiveOak.RESOURCE_TYPE);
+    }
+
+    private ResourceState filter(ResourceState state) {
+        return JsonFilterUtils.filter(state, this.environmentProperties);
     }
 
     @Override
@@ -84,7 +83,6 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
 
     private final InternalApplicationExtension extension;
     private final ApplicationConfigurationManager configManager;
-    private boolean ignoreUpdate;
     private Properties environmentProperties;
 
 }
