@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
 package io.liveoak.common.codec.driver;
 
-import java.util.Properties;
+import java.util.function.BiFunction;
 
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ReturnFields;
@@ -19,8 +19,8 @@ import org.jboss.logging.Logger;
  */
 public class MembersEncodingDriver extends ResourceEncodingDriver {
 
-    public MembersEncodingDriver(EncodingDriver parent, Resource resource, ReturnFields returnFields, Properties props) {
-        super(parent, resource, returnFields, props);
+    public MembersEncodingDriver(EncodingDriver parent, Resource resource, ReturnFields returnFields, BiFunction<String, Object, Object> configReplaceFunction) {
+        super(parent, resource, returnFields, configReplaceFunction);
     }
 
     @Override
@@ -58,11 +58,11 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
                 hasMembers = true;
             }
             if (resource instanceof StatusResource) {
-                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, ReturnFields.ALL, environmentProperties()));
+                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, ReturnFields.ALL, configFunction()));
             } else if (returnFields().child(LiveOak.MEMBERS).isEmpty()) {
-                addChildDriver(new ValueEncodingDriver(MembersEncodingDriver.this, resource, environmentProperties()));
+                addChildDriver(new ValueEncodingDriver(MembersEncodingDriver.this, resource));
             } else {
-                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, returnFields().child(LiveOak.MEMBERS), environmentProperties()));
+                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, returnFields().child(LiveOak.MEMBERS), configFunction()));
             }
         }
 

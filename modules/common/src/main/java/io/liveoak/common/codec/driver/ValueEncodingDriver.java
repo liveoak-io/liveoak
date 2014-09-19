@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -12,15 +12,14 @@ import io.liveoak.spi.resource.async.Resource;
 import java.net.URI;
 import java.util.Date;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * @author Bob McWhirter
  */
 public class ValueEncodingDriver extends AbstractEncodingDriver {
 
-    public ValueEncodingDriver(EncodingDriver parent, Object object, Properties props) {
-        super(parent, object, null, props);
+    public ValueEncodingDriver(EncodingDriver parent, Object object) {
+        super(parent, object, null, null);
     }
 
     @Override

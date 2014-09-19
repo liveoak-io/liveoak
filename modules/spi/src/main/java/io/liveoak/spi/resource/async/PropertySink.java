@@ -5,7 +5,7 @@
  */
 package io.liveoak.spi.resource.async;
 
-import java.util.Properties;
+import java.util.function.BiFunction;
 
 /**
  * A sink to asynchronously capture a resource's properties.
@@ -30,9 +30,9 @@ public interface PropertySink {
     void close() throws Exception;
 
     /**
-     * Defines a set of properties that should be used to replace String values.
+     * Specify a function to replace the config value that will be returned.
      *
-     * @param props Properties to use for replacement.
+     * @param function Function to use for replacement.
      */
-    void replaceWith(Properties props);
+    void replaceConfig(BiFunction<String, Object, Object> function);
 }

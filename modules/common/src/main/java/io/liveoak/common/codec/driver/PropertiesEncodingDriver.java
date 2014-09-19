@@ -14,14 +14,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 /**
  * @author Bob McWhirter
  */
 public class PropertiesEncodingDriver extends ResourceEncodingDriver {
 
-    public PropertiesEncodingDriver(ResourceEncodingDriver parent, Resource resource, ReturnFields returnFields, Properties props) {
-        super(parent, resource, returnFields, props);
+    public PropertiesEncodingDriver(ResourceEncodingDriver parent, Resource resource, ReturnFields returnFields, BiFunction<String, Object, Object> configReplaceFunction) {
+        super(parent, resource, returnFields, configReplaceFunction);
     }
 
     @Override
@@ -38,16 +39,16 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
     }
 
     private class MyPropertySink implements PropertySink {
-        private Properties environmentProperties;
-        private boolean setupProperties = false;
+        private BiFunction<String, Object, Object> replaceConfig;
+        private boolean setupConfigFunction = false;
 
         @Override
         public void accept(String name, Object value) {
-            if (!setupProperties) {
-                if (environmentProperties == null || environmentProperties.size() == 0) {
-                    environmentProperties = environmentProperties();
+            if (!setupConfigFunction) {
+                if (replaceConfig == null) {
+                    replaceConfig = configFunction();
                 }
-                setupProperties = true;
+                setupConfigFunction = true;
             }
 
             if (!returnFields().included(name)) {
@@ -61,20 +62,23 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
                 }
                 hasProperties = true;
             }
-            PropertyEncodingDriver propDriver = new PropertyEncodingDriver(PropertiesEncodingDriver.this, name, null, environmentProperties);
+            PropertyEncodingDriver propDriver = new PropertyEncodingDriver(PropertiesEncodingDriver.this, name, null, configFunction());
             if (value instanceof Resource) {
                 // embedded resource's don't have id's and should always be displayed unless the return field is set
                 if (((Resource) value).id() == null && returnFields().child(name).isEmpty()) {
-                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().ALL, environmentProperties));
+                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().ALL, configFunction()));
                 } else if (!returnFields().child(name).isEmpty()) {
-                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().child(name), environmentProperties));
+                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().child(name), configFunction()));
                 } else {
-                    propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value, environmentProperties));
+                    propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value));
                 }
             } else if (value instanceof List || value instanceof Set) {
-                propDriver.addChildDriver(new ListEncodingDriver(propDriver, ((Collection) value).stream(), returnFields().child(name), environmentProperties));
+                propDriver.addChildDriver(new ListEncodingDriver(propDriver, ((Collection) value).stream(), returnFields().child(name), configFunction()));
             } else {
-                propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value, environmentProperties));
+                if (replaceConfig != null) {
+                    value = replaceConfig.apply(name, value);
+                }
+                propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value));
             }
             addChildDriver(propDriver);
         }
@@ -85,8 +89,8 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
         }
 
         @Override
-        public void replaceWith(Properties props) {
-            this.environmentProperties = props;
+        public void replaceConfig(BiFunction<String, Object, Object> function) {
+            this.replaceConfig = function;
         }
     }
 

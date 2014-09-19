@@ -10,8 +10,8 @@ import io.liveoak.spi.resource.async.Resource;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 /**
@@ -19,8 +19,8 @@ import java.util.stream.Stream;
  */
 public class ListEncodingDriver extends AbstractEncodingDriver {
 
-    public ListEncodingDriver(EncodingDriver parent, Stream<Object> object, ReturnFields returnFields, Properties props) {
-        super(parent, object, returnFields, props);
+    public ListEncodingDriver(EncodingDriver parent, Stream<Object> object, ReturnFields returnFields, BiFunction<String, Object, Object> configReplaceFunction) {
+        super(parent, object, returnFields, configReplaceFunction);
     }
 
     @Override
@@ -31,16 +31,19 @@ public class ListEncodingDriver extends AbstractEncodingDriver {
                 Resource r = (Resource) e;
                 // embedded resource's don't have id's and should always be displayed unless the return field is set
                 if (r.id() == null && returnFields().isEmpty()) {
-                    addChildDriver(new ResourceEncodingDriver(this, (Resource) e, ReturnFields.ALL, environmentProperties()));
+                    addChildDriver(new ResourceEncodingDriver(this, (Resource) e, ReturnFields.ALL, configFunction()));
                 } else if (returnFields().isEmpty()) {
-                    addChildDriver(new ValueEncodingDriver(this, e, environmentProperties()));
+                    if (configFunction() != null) {
+                        e = configFunction().apply(r.id(), e);
+                    }
+                    addChildDriver(new ValueEncodingDriver(this, e));
                 } else {
-                    addChildDriver(new ResourceEncodingDriver(this, (Resource) e, returnFields(), environmentProperties()));
+                    addChildDriver(new ResourceEncodingDriver(this, (Resource) e, returnFields(), configFunction()));
                 }
             } else if (e instanceof List || e instanceof Set) {
-                addChildDriver(new ListEncodingDriver(this, ((Collection) e).stream(), returnFields(), environmentProperties()));
+                addChildDriver(new ListEncodingDriver(this, ((Collection) e).stream(), returnFields(), configFunction()));
             } else {
-                addChildDriver(new ValueEncodingDriver(this, e, environmentProperties()));
+                addChildDriver(new ValueEncodingDriver(this, e));
             }
         });
         encodeNext();

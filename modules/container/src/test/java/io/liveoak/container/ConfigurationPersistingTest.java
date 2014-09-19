@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.DefaultResourceParams;
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.container.extension.FilterExtension;
 import io.liveoak.container.extension.MockExtension;
 import io.liveoak.container.tenancy.InternalApplication;
@@ -187,10 +188,7 @@ public class ConfigurationPersistingTest {
         assertThat(tree.get("resources")).isNotNull();
         assertThat(tree.get("resources").get("filter")).isNull();
 
-        ObjectNode initialConfig = JsonNodeFactory.instance.objectNode();
-        initialConfig.put("appDir", appDir);
-        initialConfig.put("randomDir", randomDir);
-        this.application.extend("filter", initialConfig);
+        this.application.extend("filter", ConversionUtils.convert(buildConfig(appDir, randomDir)));
 
         this.system.awaitStability();
 
@@ -230,11 +228,8 @@ public class ConfigurationPersistingTest {
 
         // Update one of the configuration values
         String modifiedDir = randomDir + "/more/";
-        configState = new DefaultResourceState();
-        configState.putProperty("appDir", appDir);
-        configState.putProperty("randomDir", modifiedDir);
 
-        this.client.update(new RequestContext.Builder().build(), ADMIN_PATH + "filter", configState);
+        this.client.update(new RequestContext.Builder().build(), ADMIN_PATH + "filter", buildConfig(appDir, modifiedDir));
 
         // Check config values to make sure we're receiving the unparsed versions
         configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "filter");
@@ -248,6 +243,21 @@ public class ConfigurationPersistingTest {
         validateFile(appDir, modifiedDir);
     }
 
+    private ResourceState buildConfig(String appDir, String randomDir) {
+        ResourceState subState = new DefaultResourceState();
+        subState.putProperty("appDir", "/my/app/dir");
+        List<ResourceState> subList = new ArrayList<>();
+        subList.add(subState);
+
+        ResourceState configState = new DefaultResourceState();
+        configState.putProperty("appDir", appDir);
+        configState.putProperty("randomDir", randomDir);
+        configState.putProperty("notVar", "testApp");
+//        configState.putProperty("sub", subList);
+
+        return configState;
+    }
+
     private void validateFile(String expectedAppDir, String expectedRandomDir) throws IOException {
         JsonNode filterTree = readConfig().get("resources").get("filter");
 
@@ -256,6 +266,8 @@ public class ConfigurationPersistingTest {
         JsonNode configTree = filterTree.get("config");
         assertThat(configTree.get("appDir").asText()).isEqualTo(expectedAppDir);
         assertThat(configTree.get("randomDir").asText()).isEqualTo(expectedRandomDir);
+        assertThat(configTree.get("notVar").asText()).isEqualTo("testApp");
+//        assertThat(configTree.get("sub").get("appDir").asText()).isEqualTo("/my/app/dir");
     }
 
     private void validateEquals(ResourceState configState, String expectedAppDir, String expectedRandomDir) {
@@ -263,6 +275,8 @@ public class ConfigurationPersistingTest {
         assertThat(configState.getProperty("appDir")).isEqualTo(expectedAppDir);
         assertThat(configState.getProperty("randomDir")).isEqualTo(expectedRandomDir);
         assertThat(configState.getProperty("unknownDir")).isEqualTo("/my/unknown/path");
+        assertThat(configState.getProperty("notVar")).isEqualTo("testApp");
+//        assertThat(((ResourceState)configState.getProperty("sub")).getProperty("appDir")).isEqualTo("/my/app/dir");
     }
 
     private void validateNotEquals(ResourceState configState, String expectedAppDir, String expectedRandomDir, String extraRandomEnding) {
@@ -270,6 +284,7 @@ public class ConfigurationPersistingTest {
         assertThat(configState.getProperty("appDir")).isNotEqualTo(expectedAppDir);
         assertThat(configState.getProperty("randomDir")).isNotEqualTo(expectedRandomDir);
         assertThat(configState.getProperty("unknownDir")).isEqualTo("/my/unknown/path");
+        assertThat(configState.getProperty("notVar")).isEqualTo("testApp");
         assertThat(configState.getProperty("appDir")).satisfies(new Condition<Object>() {
             @Override
             public boolean matches(Object value) {
