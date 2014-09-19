@@ -1,5 +1,7 @@
 package io.liveoak.common.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import io.liveoak.common.codec.DefaultResourceState;
@@ -29,6 +31,11 @@ public final class JsonFilterUtils {
         }
         if (src instanceof ResourceState) {
             return filter((ResourceState) src, environmentProperties);
+        }
+        if (src instanceof List) {
+            List<Object> array = new ArrayList<Object>();
+            ((List) src).forEach((e) -> array.add(filter(e, environmentProperties)));
+            return array;
         }
         return src;
     }

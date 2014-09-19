@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  */
 public class ListEncodingDriver extends AbstractEncodingDriver {
 
-    public ListEncodingDriver(EncodingDriver parent, Stream<Object> object, ReturnFields returnFields, BiFunction<String, Object, Object> configReplaceFunction) {
+    public ListEncodingDriver(EncodingDriver parent, Stream<Object> object, ReturnFields returnFields, BiFunction<String[], Object, Object> configReplaceFunction) {
         super(parent, object, returnFields, configReplaceFunction);
     }
 
@@ -31,17 +31,14 @@ public class ListEncodingDriver extends AbstractEncodingDriver {
                 Resource r = (Resource) e;
                 // embedded resource's don't have id's and should always be displayed unless the return field is set
                 if (r.id() == null && returnFields().isEmpty()) {
-                    addChildDriver(new ResourceEncodingDriver(this, (Resource) e, ReturnFields.ALL, configFunction()));
+                    addChildDriver(new ResourceEncodingDriver(this, (Resource) e, ReturnFields.ALL, replaceConfigFunction()));
                 } else if (returnFields().isEmpty()) {
-                    if (configFunction() != null) {
-                        e = configFunction().apply(r.id(), e);
-                    }
                     addChildDriver(new ValueEncodingDriver(this, e));
                 } else {
-                    addChildDriver(new ResourceEncodingDriver(this, (Resource) e, returnFields(), configFunction()));
+                    addChildDriver(new ResourceEncodingDriver(this, (Resource) e, returnFields(), replaceConfigFunction()));
                 }
             } else if (e instanceof List || e instanceof Set) {
-                addChildDriver(new ListEncodingDriver(this, ((Collection) e).stream(), returnFields(), configFunction()));
+                addChildDriver(new ListEncodingDriver(this, ((Collection) e).stream(), returnFields(), replaceConfigFunction()));
             } else {
                 addChildDriver(new ValueEncodingDriver(this, e));
             }

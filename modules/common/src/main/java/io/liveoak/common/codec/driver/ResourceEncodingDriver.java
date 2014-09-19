@@ -19,7 +19,7 @@ public class ResourceEncodingDriver extends AbstractEncodingDriver {
         super(resource, returnFields);
     }
 
-    public ResourceEncodingDriver(EncodingDriver parent, Resource resource, ReturnFields returnFields, BiFunction<String, Object, Object> configReplaceFunction) {
+    public ResourceEncodingDriver(EncodingDriver parent, Resource resource, ReturnFields returnFields, BiFunction<String[], Object, Object> configReplaceFunction) {
         super(parent, resource, returnFields, configReplaceFunction);
     }
 
@@ -30,8 +30,8 @@ public class ResourceEncodingDriver extends AbstractEncodingDriver {
     @Override
     public void encode() throws Exception {
         encoder().startResource(resource());
-        addChildDriver(new PropertiesEncodingDriver(this, resource(), returnFields(), configFunction()));
-        addChildDriver(new MembersEncodingDriver(this, resource(), returnFields(), configFunction()));
+        addChildDriver(new PropertiesEncodingDriver(this, resource(), returnFields(), replaceConfigFunction()));
+        addChildDriver(new MembersEncodingDriver(this, resource(), returnFields(), replaceConfigFunction()));
         encodeNext();
     }
 

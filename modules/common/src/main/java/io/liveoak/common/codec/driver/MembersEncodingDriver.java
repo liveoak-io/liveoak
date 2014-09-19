@@ -19,7 +19,7 @@ import org.jboss.logging.Logger;
  */
 public class MembersEncodingDriver extends ResourceEncodingDriver {
 
-    public MembersEncodingDriver(EncodingDriver parent, Resource resource, ReturnFields returnFields, BiFunction<String, Object, Object> configReplaceFunction) {
+    public MembersEncodingDriver(EncodingDriver parent, Resource resource, ReturnFields returnFields, BiFunction<String[], Object, Object> configReplaceFunction) {
         super(parent, resource, returnFields, configReplaceFunction);
     }
 
@@ -58,11 +58,11 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
                 hasMembers = true;
             }
             if (resource instanceof StatusResource) {
-                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, ReturnFields.ALL, configFunction()));
+                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, ReturnFields.ALL, replaceConfigFunction()));
             } else if (returnFields().child(LiveOak.MEMBERS).isEmpty()) {
                 addChildDriver(new ValueEncodingDriver(MembersEncodingDriver.this, resource));
             } else {
-                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, returnFields().child(LiveOak.MEMBERS), configFunction()));
+                addChildDriver(new ResourceEncodingDriver(MembersEncodingDriver.this, resource, returnFields().child(LiveOak.MEMBERS), replaceConfigFunction()));
             }
         }
 

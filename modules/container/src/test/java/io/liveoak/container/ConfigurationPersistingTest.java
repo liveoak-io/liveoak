@@ -16,6 +16,7 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceException;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.client.Client;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import org.fest.assertions.Condition;
 import org.junit.After;
@@ -246,6 +247,7 @@ public class ConfigurationPersistingTest {
     private ResourceState buildConfig(String appDir, String randomDir) {
         ResourceState subState = new DefaultResourceState();
         subState.putProperty("appDir", "/my/app/dir");
+        subState.putProperty("subAppDir", appDir);
         List<ResourceState> subList = new ArrayList<>();
         subList.add(subState);
 
@@ -253,7 +255,7 @@ public class ConfigurationPersistingTest {
         configState.putProperty("appDir", appDir);
         configState.putProperty("randomDir", randomDir);
         configState.putProperty("notVar", "testApp");
-//        configState.putProperty("sub", subList);
+        configState.putProperty("sub", subList);
 
         return configState;
     }
@@ -267,7 +269,8 @@ public class ConfigurationPersistingTest {
         assertThat(configTree.get("appDir").asText()).isEqualTo(expectedAppDir);
         assertThat(configTree.get("randomDir").asText()).isEqualTo(expectedRandomDir);
         assertThat(configTree.get("notVar").asText()).isEqualTo("testApp");
-//        assertThat(configTree.get("sub").get("appDir").asText()).isEqualTo("/my/app/dir");
+        assertThat(configTree.get("sub").get(0).get("appDir").asText()).isEqualTo("/my/app/dir");
+        assertThat(configTree.get("sub").get(0).get("subAppDir").asText()).isEqualTo(expectedAppDir);
     }
 
     private void validateEquals(ResourceState configState, String expectedAppDir, String expectedRandomDir) {
@@ -276,7 +279,8 @@ public class ConfigurationPersistingTest {
         assertThat(configState.getProperty("randomDir")).isEqualTo(expectedRandomDir);
         assertThat(configState.getProperty("unknownDir")).isEqualTo("/my/unknown/path");
         assertThat(configState.getProperty("notVar")).isEqualTo("testApp");
-//        assertThat(((ResourceState)configState.getProperty("sub")).getProperty("appDir")).isEqualTo("/my/app/dir");
+        assertThat(((ResourceState)((List<Resource>)configState.getProperty("sub")).get(0)).getProperty("appDir")).isEqualTo("/my/app/dir");
+        assertThat(((ResourceState)((List<Resource>)configState.getProperty("sub")).get(0)).getProperty("subAppDir")).isEqualTo(expectedAppDir);
     }
 
     private void validateNotEquals(ResourceState configState, String expectedAppDir, String expectedRandomDir, String extraRandomEnding) {
@@ -285,6 +289,8 @@ public class ConfigurationPersistingTest {
         assertThat(configState.getProperty("randomDir")).isNotEqualTo(expectedRandomDir);
         assertThat(configState.getProperty("unknownDir")).isEqualTo("/my/unknown/path");
         assertThat(configState.getProperty("notVar")).isEqualTo("testApp");
+        assertThat(((ResourceState)((List<Resource>)configState.getProperty("sub")).get(0)).getProperty("appDir")).isEqualTo("/my/app/dir");
+        assertThat(((ResourceState)((List<Resource>)configState.getProperty("sub")).get(0)).getProperty("subAppDir")).isNotEqualTo(expectedAppDir);
         assertThat(configState.getProperty("appDir")).satisfies(new Condition<Object>() {
             @Override
             public boolean matches(Object value) {
@@ -301,6 +307,15 @@ public class ConfigurationPersistingTest {
                     return false;
                 }
                 return ((String) value).endsWith("/random" + extraRandomEnding);
+            }
+        });
+        assertThat(((ResourceState)((List<Resource>)configState.getProperty("sub")).get(0)).getProperty("subAppDir")).satisfies(new Condition<Object>() {
+            @Override
+            public boolean matches(Object value) {
+                if (!(value instanceof String)) {
+                    return false;
+                }
+                return ((String) value).endsWith("/app/");
             }
         });
     }

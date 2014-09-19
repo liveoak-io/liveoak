@@ -14,7 +14,7 @@ import io.liveoak.spi.ReturnFields;
  */
 public class PropertyEncodingDriver extends AbstractEncodingDriver {
 
-    public PropertyEncodingDriver(EncodingDriver parent, String name, ReturnFields returnFields, BiFunction<String, Object, Object> configReplaceFunction) {
+    public PropertyEncodingDriver(EncodingDriver parent, String name, ReturnFields returnFields, BiFunction<String[], Object, Object> configReplaceFunction) {
         super(parent, null, returnFields, configReplaceFunction);
         this.name = name;
     }
@@ -29,6 +29,10 @@ public class PropertyEncodingDriver extends AbstractEncodingDriver {
     public void close() throws Exception {
         encoder().endProperty(this.name);
         parent().encodeNext();
+    }
+
+    public String name() {
+        return this.name;
     }
 
     private String name;

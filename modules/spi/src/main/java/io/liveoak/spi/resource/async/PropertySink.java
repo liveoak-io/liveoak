@@ -34,5 +34,5 @@ public interface PropertySink {
      *
      * @param function Function to use for replacement.
      */
-    void replaceConfig(BiFunction<String, Object, Object> function);
+    void replaceConfig(BiFunction<String[], Object, Object> function);
 }

@@ -5,8 +5,6 @@
  */
 package io.liveoak.common.codec.driver;
 
-import java.util.function.BiFunction;
-
 import io.liveoak.common.codec.Encoder;
 import io.liveoak.spi.RequestContext;
 
@@ -30,6 +28,4 @@ public interface EncodingDriver {
     void encodeNext() throws Exception;
 
     void error(Throwable e);
-
-    BiFunction<String, Object, Object> configFunction();
 }

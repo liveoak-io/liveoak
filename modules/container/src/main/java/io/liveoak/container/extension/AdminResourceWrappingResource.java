@@ -44,9 +44,28 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
 
         // If runtime is not set, we replace the config values
         if (!runtimeRequested) {
-            sink.replaceConfig((name, object) -> {
-                if (configValuesWithVariables.containsKey(name)) {
-                    return configValuesWithVariables.get(name).value();
+            sink.replaceConfig((names, object) -> {
+                if (configValuesWithVariables.containsKey(names[0])) {
+                    ConfigValue configValue = configValuesWithVariables.get(names[0]);
+                    boolean matched = false;
+
+                    // If there's no parents to check, return the value
+                    if (names.length == 1 && configValue.parents().length == 0) {
+                        return configValue.value();
+                    }
+
+                    // Ensure the parent hierarchy has same depth before comparing
+                    if (names.length == configValue.parents().length + 1) {
+                        int index = 1;
+                        for (String parent : configValue.parents()) {
+                            if (names[index++] != parent) {
+                                break;
+                            }
+                        }
+                        matched = true;
+                    }
+
+                    return matched ? configValue.value() : object;
                 }
                 return object;
             });
@@ -96,12 +115,12 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
     }
 
     private void handleConfigObject(String name, Object value, String... parents) {
-        if (value instanceof ResourceState) {
-            updateConfigEnvVars((ResourceState) value, append(name, parents));
-        } else if (value instanceof List) {
-            ((List) value).forEach(obj->handleConfigObject(name, obj, append(name, parents)));
-        } else {
-            if (value != null) {
+        if (value != null) {
+            if (value instanceof ResourceState) {
+                updateConfigEnvVars((ResourceState) value, append(name, parents));
+            } else if (value instanceof List) {
+                ((List) value).forEach(obj->handleConfigObject(name, obj, parents));
+            } else {
                 String val = value.toString();
                 int start = val.indexOf("${");
                 int end = val.indexOf("}", start);

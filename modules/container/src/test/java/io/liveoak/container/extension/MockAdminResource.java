@@ -1,5 +1,8 @@
 package io.liveoak.container.extension;
 
+import java.util.List;
+
+import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.spi.state.ResourceState;
 
 /**
@@ -32,5 +35,12 @@ public class MockAdminResource extends MockResource {
     public void properties(ResourceState props) throws Exception {
         this.props = props;
         this.props.putProperty("unknownDir", "/my/unknown/path");
+
+        for (String name : props.getPropertyNames()) {
+            Object value = props.getProperty(name);
+            if (value instanceof List) {
+                this.props.putProperty(name, ResourceConversionUtils.convertList((List<ResourceState>)value, this));
+            }
+        }
     }
 }

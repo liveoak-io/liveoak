@@ -22,7 +22,7 @@ public abstract class AbstractEncodingDriver implements EncodingDriver {
         this(null, object, returnFields, null);
     }
 
-    public AbstractEncodingDriver(EncodingDriver parent, Object object, ReturnFields returnFields, BiFunction<String, Object, Object> replaceConfigFunction) {
+    public AbstractEncodingDriver(EncodingDriver parent, Object object, ReturnFields returnFields, BiFunction<String[], Object, Object> replaceConfigFunction) {
         this.parent = parent;
         this.object = object;
         this.returnFields = returnFields;
@@ -64,9 +64,12 @@ public abstract class AbstractEncodingDriver implements EncodingDriver {
         parent().error(t);
     }
 
-    @Override
-    public BiFunction<String, Object, Object> configFunction() {
+    protected BiFunction<String[], Object, Object> replaceConfigFunction() {
         return this.replaceConfigFunction;
+    }
+
+    protected void setReplaceConfigFunction(BiFunction<String[], Object, Object> replaceConfigFunction) {
+        this.replaceConfigFunction = replaceConfigFunction;
     }
 
     public void encodeNext() throws Exception {
@@ -85,7 +88,7 @@ public abstract class AbstractEncodingDriver implements EncodingDriver {
     private EncodingDriver parent;
     private Object object;
     private ReturnFields returnFields;
-    private BiFunction<String, Object, Object> replaceConfigFunction;
+    private BiFunction<String[], Object, Object> replaceConfigFunction;
 
     private LinkedList<EncodingDriver> children = new LinkedList<>();
 
