@@ -7,8 +7,8 @@ import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.spi.Application;
-import io.liveoak.spi.Services;
 import io.liveoak.spi.MediaType;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -111,24 +111,26 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
 
     @Override
     public void mountPrivate(ServiceName privateName, MediaType mediaType, boolean makeDefault) {
-        MediaTypeMountService<RootResource> mount = new MediaTypeMountService(this.appExtension.resourceId(), mediaType, makeDefault);
+        MediaTypeMountService<RootResource> mount = new MediaTypeMountService(this.resourceId(), mediaType, makeDefault);
 
-        ConfigFilteringService configFilter = new ConfigFilteringService(filteringProperties());
-        target.addService(privateName.append("filter-config"), configFilter)
-                .addInjection(configFilter.configurationInjector(), this.configuration)
+        SaveResourceConfigService saveConfigService = new SaveResourceConfigService(this.resourceId(), this.extensionId(), this.boottime);
+        target.addService(privateName.append("save-config"), saveConfigService)
+                .addDependency(Services.applicationConfigurationManager(appExtension.application().id()), ApplicationConfigurationManager.class, saveConfigService.configurationManagerInjector())
+                .addInjection(saveConfigService.configurationInjector(), this.configuration)
                 .install();
 
-        AdminResourceWrappingResourceService wrapper = new AdminResourceWrappingResourceService(this.appExtension, this.boottime);
+        AdminResourceWrappingResourceService wrapper = new AdminResourceWrappingResourceService(this.appExtension);
         target.addService(privateName.append("wrapper"), wrapper)
-                .addDependency(privateName.append("filter-config"))
+                .addDependency(privateName.append("save-config"))
                 .addDependency(privateName, RootResource.class, wrapper.resourceInjector())
                 .addDependency(Services.applicationConfigurationManager(appExtension.application().id()), ApplicationConfigurationManager.class, wrapper.configurationManagerInjector())
+                .addDependency(Services.applicationEnvironmentProperties(appExtension.application().id()), Properties.class, wrapper.environmentPropertiesInjector())
                 .install();
 
-        UpdateResourceService configApply = new UpdateResourceService(this.appExtension);
+        InitializeResourceService configApply = new InitializeResourceService(this.appExtension);
         target.addService(privateName.append("apply-config"), configApply)
                 .addDependency(privateName.append("wrapper"), Resource.class, configApply.resourceInjector())
-                .addDependency(privateName.append("filter-config"), ObjectNode.class, configApply.configurationInjector())
+                .addInjection(configApply.configurationInjector(), this.configuration)
                 .install();
 
         RootResourceLifecycleService lifecycle = new RootResourceLifecycleService();
@@ -161,14 +163,6 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
         this.target.addService(Services.adminResource(application().id(), resourceId()), service)
                 .install();
         mountPrivate(Services.adminResource(application().id(), resourceId()), mediaType, makeDefault);
-    }
-
-    protected Properties filteringProperties() {
-        Properties props = new Properties();
-        props.setProperty("application.id", application().id());
-        props.setProperty("application.name", application().name());
-        props.setProperty("application.dir", application().directory().getAbsolutePath());
-        return props;
     }
 
     private ServiceTarget target;

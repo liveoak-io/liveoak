@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -19,7 +19,7 @@ import java.util.Map;
 public class ValueEncodingDriver extends AbstractEncodingDriver {
 
     public ValueEncodingDriver(EncodingDriver parent, Object object) {
-        super(parent, object, null);
+        super(parent, object, null, null);
     }
 
     @Override

@@ -15,13 +15,14 @@ import java.util.function.Consumer;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
-public class UpdateResourceService implements Service<Void> {
+public class InitializeResourceService implements Service<Void> {
 
-    public UpdateResourceService() {
+    public InitializeResourceService() {
     }
 
-    public UpdateResourceService(Consumer<Exception> exceptionConsumer) {
+    public InitializeResourceService(Consumer<Exception> exceptionConsumer) {
         this.exceptionConsumer = exceptionConsumer;
     }
 
@@ -30,7 +31,7 @@ public class UpdateResourceService implements Service<Void> {
         RequestContext reqContext = new RequestContext.Builder().build();
         context.asynchronous();
         try {
-            this.resourceInjector.getValue().updateProperties(reqContext, ConversionUtils.convert(this.configurationInjector.getValue()), new ServiceUpdateResponder(context));
+            this.resourceInjector.getValue().initializeProperties(reqContext, ConversionUtils.convert(this.configurationInjector.getValue()), new ServiceUpdateResponder(context));
         } catch (Exception e) {
             if (this.exceptionConsumer != null) {
                 this.exceptionConsumer.accept(e);

@@ -2,13 +2,16 @@ package io.liveoak.security.policy.acl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.DefaultRequestAttributes;
+import io.liveoak.common.DefaultResourceParams;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
@@ -21,6 +24,7 @@ import io.liveoak.security.policy.acl.integration.AclPolicyConfigResource;
 import io.liveoak.spi.RequestAttributes;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
+import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
 import io.liveoak.testtools.MockExtension;
@@ -134,7 +138,10 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
         sendCreateRequest("/testApp/mock-storage/todos", "john-rw", "john123");
 
         // Update auto-rules config now. Allow just reading for owner in todos collection
-        RequestContext reqCtx = new RequestContext.Builder();
+        Map<String, List<String>> params = new HashMap<>();
+        params.put("runtime", new ArrayList<>());
+        ResourceParams resourceParams = DefaultResourceParams.instance(params);
+        RequestContext reqCtx = new RequestContext.Builder().resourceParams(resourceParams).build();
         ResourceState config = client.read(reqCtx, "/admin/applications/testApp/resources/acl-policy");
         List<ResourceState> autoRules = (List<ResourceState>)config.getProperty(AclPolicyConfigResource.AUTO_RULES_PROPERTY);
 

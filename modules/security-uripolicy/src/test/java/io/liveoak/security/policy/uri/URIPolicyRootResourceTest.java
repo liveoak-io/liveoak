@@ -3,6 +3,7 @@ package io.liveoak.security.policy.uri;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.DefaultRequestAttributes;
+import io.liveoak.common.DefaultResourceParams;
 import io.liveoak.common.DefaultSecurityContext;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
@@ -12,6 +13,7 @@ import io.liveoak.security.policy.uri.integration.URIPolicyConfigResource;
 import io.liveoak.spi.RequestAttributes;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
+import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.state.ResourceState;
@@ -20,9 +22,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -137,7 +142,10 @@ public class URIPolicyRootResourceTest extends AbstractResourceTestCase {
         assertAuthzDecision(storageReq.securityContext(evil), AuthzDecision.REJECT);
 
         // Find and remove storage rule
-        RequestContext reqCtx = new RequestContext.Builder();
+        Map<String, List<String>> params = new HashMap<>();
+        params.put("runtime", new ArrayList<>());
+        ResourceParams resourceParams = DefaultResourceParams.instance(params);
+        RequestContext reqCtx = new RequestContext.Builder().resourceParams(resourceParams).build();
         ResourceState config = client.read(reqCtx, "/admin/applications/testApp/resources/uri-policy");
         List<ResourceState> rules = (List<ResourceState>)config.getProperty(URIPolicyConfigResource.RULES_PROPERTY);
 

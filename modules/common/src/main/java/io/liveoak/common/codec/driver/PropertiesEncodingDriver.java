@@ -11,16 +11,18 @@ import io.liveoak.spi.resource.async.Resource;
 import org.jboss.logging.Logger;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 /**
  * @author Bob McWhirter
  */
 public class PropertiesEncodingDriver extends ResourceEncodingDriver {
 
-    public PropertiesEncodingDriver(ResourceEncodingDriver parent, Resource resource, ReturnFields returnFields) {
-        super(parent, resource, returnFields);
+    public PropertiesEncodingDriver(ResourceEncodingDriver parent, Resource resource, ReturnFields returnFields, BiFunction<String[], Object, Object> configReplaceFunction) {
+        super(parent, resource, returnFields, configReplaceFunction);
     }
 
     @Override
@@ -51,19 +53,32 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
                 }
                 hasProperties = true;
             }
-            PropertyEncodingDriver propDriver = new PropertyEncodingDriver(PropertiesEncodingDriver.this, name, null);
+            PropertyEncodingDriver propDriver = new PropertyEncodingDriver(PropertiesEncodingDriver.this, name, null, replaceConfigFunction());
             if (value instanceof Resource) {
                 // embedded resource's don't have id's and should always be displayed unless the return field is set
                 if (((Resource) value).id() == null && returnFields().child(name).isEmpty()) {
-                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().ALL));
+                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().ALL, replaceConfigFunction()));
                 } else if (!returnFields().child(name).isEmpty()) {
-                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().child(name)));
+                    propDriver.addChildDriver(new ResourceEncodingDriver(propDriver, (Resource) value, returnFields().child(name), replaceConfigFunction()));
                 } else {
                     propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value));
                 }
             } else if (value instanceof List || value instanceof Set) {
-                propDriver.addChildDriver(new ListEncodingDriver(propDriver, ((Collection) value).stream(), returnFields().child(name)));
+                propDriver.addChildDriver(new ListEncodingDriver(propDriver, ((Collection) value).stream(), returnFields().child(name), replaceConfigFunction()));
             } else {
+                if (replaceConfigFunction() != null) {
+                    // Build hierarchy of property names
+                    LinkedList<String> names = new LinkedList<>();
+                    names.addFirst(name);
+                    EncodingDriver parent = propDriver.parent();
+                    while (parent != null) {
+                        if (parent instanceof PropertyEncodingDriver) {
+                            names.addLast(((PropertyEncodingDriver)parent).name());
+                        }
+                        parent = parent.parent();
+                    }
+                    value = replaceConfigFunction().apply(names.toArray(new String[names.size()]), value);
+                }
                 propDriver.addChildDriver(new ValueEncodingDriver(propDriver, value));
             }
             addChildDriver(propDriver);
@@ -72,6 +87,11 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
         @Override
         public void close() throws Exception {
             encodeNext();
+        }
+
+        @Override
+        public void replaceConfig(BiFunction<String[], Object, Object> function) {
+            setReplaceConfigFunction(function);
         }
     }
 

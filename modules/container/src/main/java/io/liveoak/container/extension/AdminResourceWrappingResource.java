@@ -1,5 +1,11 @@
 package io.liveoak.container.extension;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import io.liveoak.common.util.JsonFilterUtils;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.LiveOak;
@@ -16,11 +22,11 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class AdminResourceWrappingResource extends DelegatingRootResource {
 
-    public AdminResourceWrappingResource(InternalApplicationExtension extension, ApplicationConfigurationManager configManager, RootResource delegate, boolean boottime) {
+    public AdminResourceWrappingResource(InternalApplicationExtension extension, ApplicationConfigurationManager configManager, RootResource delegate, Properties envProps) {
         super(delegate);
         this.extension = extension;
         this.configManager = configManager;
-        this.ignoreUpdate = boottime;
+        this.environmentProperties = envProps;
     }
 
     public String type() {
@@ -33,34 +39,55 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept(LiveOak.RESOURCE_TYPE, type());
+        boolean runtimeValuePresent = ctx.resourceParams().value("runtime") != null;
+        boolean runtimeRequested = runtimeValuePresent ? Boolean.parseBoolean(ctx.resourceParams().value("runtime")) : ctx.resourceParams().names().contains("runtime");
 
+        // If runtime is not set, we replace the config values
+        if (!runtimeRequested) {
+            sink.replaceConfig((names, object) -> {
+                if (configValuesWithVariables.containsKey(names[0])) {
+                    ConfigValue configValue = configValuesWithVariables.get(names[0]);
+                    boolean matched = false;
+
+                    // If there's no parents to check, return the value
+                    if (names.length == 1 && configValue.parents().length == 0) {
+                        return configValue.value();
+                    }
+
+                    // Ensure the parent hierarchy has same depth before comparing
+                    if (names.length == configValue.parents().length + 1) {
+                        int index = 1;
+                        for (String parent : configValue.parents()) {
+                            if (names[index++] != parent) {
+                                break;
+                            }
+                        }
+                        matched = true;
+                    }
+
+                    return matched ? configValue.value() : object;
+                }
+                return object;
+            });
+        }
+
+        sink.accept(LiveOak.RESOURCE_TYPE, type());
         super.readProperties(ctx, sink);
     }
 
     @Override
     public void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        cleanupState(state);
-        delegate().initializeProperties(ctx, state, responder);
+        cleanup(state);
+        delegate().initializeProperties(ctx, filter(state), responder);
+        updateConfigEnvVars(state);
     }
 
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        cleanupState(state);
-
-        if (this.ignoreUpdate) {
-            this.ignoreUpdate = false;
-            delegate().initializeProperties(ctx, state, responder);
-        } else {
-            delegate().updateProperties(ctx, state, new ResourceConfigPersistingResponder(this, state, responder));
-        }
-    }
-
-    private void cleanupState(ResourceState state) {
-        //Clean out from the state what we don't care about
-        state.removeProperty(LiveOak.ID);
-        state.removeProperty(LiveOak.SELF);
-        state.removeProperty(LiveOak.RESOURCE_TYPE);
+        cleanup(state);
+        delegate().updateProperties(ctx, filter(state), new ResourceConfigPersistingResponder(this, state, responder));
+        configValuesWithVariables = new HashMap<>();
+        updateConfigEnvVars(state);
     }
 
     @Override
@@ -72,9 +99,66 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
         responder.resourceDeleted(this.delegate());
     }
 
+    private void cleanup(ResourceState state) {
+        //Clean out from the state what we don't care about
+        state.removeProperty(LiveOak.ID);
+        state.removeProperty(LiveOak.SELF);
+        state.removeProperty(LiveOak.RESOURCE_TYPE);
+    }
+
+    private ResourceState filter(ResourceState state) {
+        return JsonFilterUtils.filter(state, this.environmentProperties);
+    }
+
+    private void updateConfigEnvVars(ResourceState state, String... parents) {
+        state.getPropertyNames().forEach(name -> handleConfigObject(name, state.getProperty(name), parents));
+    }
+
+    private void handleConfigObject(String name, Object value, String... parents) {
+        if (value != null) {
+            if (value instanceof ResourceState) {
+                updateConfigEnvVars((ResourceState) value, append(name, parents));
+            } else if (value instanceof List) {
+                ((List) value).forEach(obj->handleConfigObject(name, obj, parents));
+            } else {
+                String val = value.toString();
+                int start = val.indexOf("${");
+                int end = val.indexOf("}", start);
+                if (end > start) {
+                    configValuesWithVariables.put(name, new ConfigValue(value, parents));
+                }
+            }
+        }
+    }
+
+    private String[] append(String newParent, String... parents) {
+        String[] newArray = new String[parents.length + 1];
+        System.arraycopy(parents, 0, newArray, 0, parents.length);
+        newArray[parents.length] = newParent;
+        return newArray;
+    }
+
+    private class ConfigValue {
+        private Object configValue;
+        private String[] parents;
+
+        ConfigValue(Object configValue, String... parents) {
+            this.configValue = configValue;
+            this.parents = parents;
+        }
+
+        public Object value() {
+            return this.configValue;
+        }
+
+        public String[] parents() {
+            return this.parents;
+        }
+    }
+
     private final InternalApplicationExtension extension;
     private final ApplicationConfigurationManager configManager;
-    private boolean ignoreUpdate;
-
+    private Properties environmentProperties;
+    private Map<String, ConfigValue> configValuesWithVariables = new HashMap<>();
 
 }

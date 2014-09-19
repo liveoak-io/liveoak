@@ -1,9 +1,11 @@
 package io.liveoak.filesystem.aggregating;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import io.liveoak.common.DefaultResourceParams;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.filesystem.aggregating.extension.AggregatingFilesystemExtension;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
@@ -11,6 +13,10 @@ import io.liveoak.testtools.AbstractResourceTestCase;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -32,7 +38,10 @@ public class AggregatingFilesystemResourceTest extends AbstractResourceTestCase 
 
     @Test
     public void testReadConfig() throws Exception {
-        ResourceState result = client.read(new RequestContext.Builder().build(), "/admin/applications/testApp/resources/aggr");
+        Map<String, List<String>> params = new HashMap<>();
+        params.put("runtime", new ArrayList<>());
+        ResourceParams resourceParams = DefaultResourceParams.instance(params);
+        ResourceState result = client.read(new RequestContext.Builder().resourceParams(resourceParams).build(), "/admin/applications/testApp/resources/aggr");
         assertThat(result.getProperty("directory")).isEqualTo( new File( applicationDirectory(), "aggr" ).getAbsolutePath() );
     }
 
