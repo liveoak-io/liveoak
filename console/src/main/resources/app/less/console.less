@@ -1,8 +1,8 @@
 @exo:               "Exo 2", sans-serif;
 @fsize:             12px;
 @fsizebig:          13px;
-
 @inc:               30;
+
 /* Main navigation colors */
 @c_navlight:        #ebebeb;
 @c_nav:             #DEDCDC;
@@ -32,12 +32,9 @@
 
 @c_red:             #cb0000;
 
-/* Border colors */
 @c_border:          #ddd;
 
-/*
-  Fonts
-*/
+/* Fonts */
 
 @font-face {
   font-family: 'Exo 2';
@@ -125,8 +122,15 @@ h3, .h3 {
   font-size: 18px;
 }
 
-.applications h3 {
+h3.panel-separator {
   margin-bottom: 18px;
+  margin-top: 30px;
+  cursor: pointer;
+  
+  &:before {
+    font-size: 15px;
+    margin-left: 1px;
+  }
 }
 
 a {
@@ -191,6 +195,10 @@ hr {
   font-size: 15px;
   margin: 10px 0 14px;
   font-weight: 300;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 
 /* Apply to make color slightly lighter */
@@ -472,6 +480,11 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
       + .btn-icon {
         margin-left: 15px;
         margin-bottom: 1px;
+        
+        .fa-external-link {
+          font-size: 14px;
+          margin-bottom: 2px;
+        }
       }
       
       span {
@@ -564,7 +577,11 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
         }
         
         &.empty a, &.empty a:hover {
-          color: @c_graylight;
+          color: #e8e8e8;
+        }
+        
+        &.empty:hover a {
+          color: @c_gray;
         }
 
         i {
@@ -603,6 +620,10 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
 
 .applications-list .panel:last-child {
   margin-bottom: 30px;
+}
+
+.error-page .panel {
+  margin-top: 40px;
 }
 
 
@@ -891,6 +912,43 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   color: @c_graylight;
 }
 
+.panel .panel-body.empty-instance .resources-list li {
+
+  width: 110px;
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  
+  &:hover {
+    text-decoration: none;
+  }
+
+  a {
+    display: block;
+    color: @c_graylight;
+  
+    .fa {
+      font-size: 56px;
+      opacity: 1;
+    }
+    
+    .icon-label {
+      font-size: 18px;
+      display: block;
+      line-height: 1.2em;
+    }
+    
+    &:hover {
+      text-decoration: none;
+      color: @c_green;
+    }
+  }
+  
+  &.disabled a {
+    color: #e8e8e8;
+  }
+}
+
 
 /* The info area (3rd column) */
 .lo-info-pane {
@@ -990,6 +1048,12 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
 .security-list .lo-info-pane .fa-chevron-right {
   font-size: 11px;
   color: @c_graylight;
+  margin-top: 3px;
+}
+
+.lo-tutorials .unsecured-list a {
+  padding-left: 10px;
+  font-size: 13px;
 }
 
 .lo-tutorials {
@@ -1024,6 +1088,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   padding: 0 15px;
   margin-top: 25px;
 }
+
 
 /* Bevel-less button with an icon */
 
@@ -1464,14 +1529,6 @@ legend {
   }
 }
 
-.applications .collapsible {
-  cursor: pointer;
-  
-  &:before {
-    font-size: 15px;
-    margin-left: 1px;
-  }
-}
 
 /* Selectpicker */
 
@@ -2337,6 +2394,70 @@ tr.deleted {
   }
 }
 
+/* Security Policies pages */
+
+.security-policies {
+  
+  .breadcrumb + .nav-tabs {
+    margin-top: 25px;
+    
+    + span + .panel {
+      margin-top: 30px;
+    }
+  }
+}
+
+.lo-content-area .nav-tabs > li:first-child {
+  margin-left: 0;
+}
+
+.nav-tabs > li.active > a, 
+.nav-tabs > li.active > a:hover, 
+.nav-tabs > li.active > a:focus {
+  color: @c_green;
+  background-color: #f5f5f5;
+}
+
+
+/* */
+
+.form-group.hover-menu {
+
+  .input-group-client {
+
+    display: none;
+    position: absolute;
+    top: 0;
+    right: -60px;
+    width: 50px;
+
+    button.btn {
+      margin-left: 2px;
+    }
+  }
+
+  .row:hover {
+    .input-group-client {
+      display: block;
+    }
+  }
+}
+
+/* Backdrop for advanced search, used to catch clicks outside the adv. search windoww */
+#advancedBackdrop {
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+}
+
+.animated {
+  position: relative;
+}
+
+
+
 
 /* Media queries */
 
@@ -2606,8 +2727,6 @@ tr.deleted {
     }
   }
   
-  
-  
   .app-dashboard .lo-info-pane {
     padding: 0 20px;
   }
@@ -2684,39 +2803,4 @@ tr.deleted {
     margin-right: 15px;
   }
   
-}
-
-.form-group.hover-menu {
-
-  .input-group-client {
-
-    display: none;
-    position: absolute;
-    top: 0;
-    right: -60px;
-    width: 50px;
-
-    button.btn {
-      margin-left: 2px;
-    }
-  }
-
-  .row:hover {
-    .input-group-client {
-      display: block;
-    }
-  }
-}
-
-/* Backdrop for advanced search, used to catch clicks outside the adv. search windoww */
-#advancedBackdrop {
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-}
-
-.animated {
-  position: relative;
 }
