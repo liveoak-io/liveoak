@@ -222,9 +222,50 @@ loMod.config(['$routeProvider', function($routeProvider) {
       }
     })
     // .when('/applications/:appId/create-security', {
-    .when('/applications/:appId/security/policies/:storageId/:collectionId', {
-      templateUrl : '/admin/console/partials/security-create.html',
-      controller : 'SecurityCtrl',
+
+    .when('/applications/:appId/security/secure-collections', {
+      templateUrl : '/admin/console/partials/security-create-collections.html',
+      controller : 'NoSecurityCtrl',
+      resolve: {
+        currentApp: function($route) {
+          // FIXME: name may be different from id
+          return {id: $route.current.params.appId, name: $route.current.params.appId};
+        },
+        noCollections: function(LoSecurityCollections, $route, $filter, $location) {
+          return new LoSecurityCollections.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+            var storageList = $filter('filter')(data.members, {'type': 'database'});
+            for(var i = 0; i < storageList.length; i++) {
+              if(storageList[i].members && storageList[i].members.length > 0) {
+                $location.path('/applications/' + $route.current.params.appId + '/security/policies/storage/' + storageList[i].id  + '/' + storageList[i].members[0].id);
+              }
+            }
+            return true;
+          });
+        }
+      }
+    })
+    .when('/applications/:appId/security/secure-storage', {
+      templateUrl : '/admin/console/partials/security-create-storage.html',
+      controller : 'NoSecurityCtrl',
+      resolve: {
+        currentApp: function($route) {
+          // FIXME: name may be different from id
+          return {id: $route.current.params.appId, name: $route.current.params.appId};
+        },
+        noStorage: function(LoSecurityCollections, $route, $filter, $location) {
+          return new LoSecurityCollections.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+            var storageList = $filter('filter')(data.members, {'type': 'database'});
+            if(storageList.length > 0) {
+              $location.path('/applications/' + $route.current.params.appId + '/security/policies/storage/' + storageList[0].id);
+            }
+            return true;
+          });
+        }
+      }
+    })
+    .when('/applications/:appId/security/policies/storage/:storageId/:collectionId', {
+      templateUrl : '/admin/console/partials/security-create-collections.html',
+      controller : 'SecurityCollectionsCtrl',
       resolve: {
         currentApp: function(LoAppLoader) {
           return new LoAppLoader();
@@ -443,6 +484,202 @@ loMod.config(['$routeProvider', function($routeProvider) {
         }
       },
       templateUrl: '/admin/console/partials/storage-collection.html'
+    })
+    .when('/applications/:appId/security/policies/storage/:storageId', {
+      templateUrl : '/admin/console/partials/security-create-storage.html',
+      controller : 'SecurityStorageCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader) {
+          return new LoAppLoader();
+        },
+        loStorageList : function(LoSecurityCollectionsLoader) {
+          return new LoSecurityCollectionsLoader();
+        },
+        // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
+        loRealmAppRoles: function(LoRealmAppRoles, LoRealmApp, $route) {
+          return new LoRealmAppRoles.query({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              new LoRealmApp({'name': $route.current.params.appId, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'},
+                function() {
+                  $route.reload();
+                });
+            }
+          );
+        },
+        uriPolicies: function(LoSecurity, $route) {
+          return LoSecurity.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return undefined;
+            }
+          );
+        },
+//        uriPolicies: function(LoSecurityLoader) {
+//          return new LoSecurityLoader();
+//        },
+        aclPolicies: function(LoACL, $route) {
+          return LoACL.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return undefined;
+            }
+          );
+        }
+//        aclPolicies: function(LoACLLoader) {
+//          return new LoACLLoader();
+//        }
+      }
+    })
+    .when('/applications/:appId/security/secure-push', {
+      templateUrl : '/admin/console/partials/security-create-push.html',
+      controller : 'SecurityPushCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader) {
+          return new LoAppLoader();
+        },
+        loAppExpanded : function(LoSecurityCollectionsLoader) {
+          return new LoSecurityCollectionsLoader();
+        },
+        // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
+        loRealmAppRoles: function(LoRealmAppRoles, LoRealmApp, $route) {
+          return new LoRealmAppRoles.query({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              new LoRealmApp({'name': $route.current.params.appId, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'},
+                function() {
+                  //$route.reload();
+                });
+            }
+          );
+        },
+        uriPolicies: function(LoSecurity, $route) {
+          return LoSecurity.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return undefined;
+            }
+          );
+        },
+//        uriPolicies: function(LoSecurityLoader) {
+//          return new LoSecurityLoader();
+//        },
+        aclPolicies: function(LoACL, $route) {
+          return LoACL.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return undefined;
+            }
+          );
+        }
+//        aclPolicies: function(LoACLLoader) {
+//          return new LoACLLoader();
+//        }
+      }
+    })
+    .when('/applications/:appId/security/secure-clients', {
+      templateUrl : '/admin/console/partials/security-create-clients.html',
+      controller : 'SecurityClientsCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader) {
+          return new LoAppLoader();
+        },
+        loAppExpanded : function(LoSecurityCollectionsLoader) {
+          return new LoSecurityCollectionsLoader();
+        },
+        // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
+        loRealmAppRoles: function(LoRealmAppRoles, LoRealmApp, $route) {
+          return new LoRealmAppRoles.query({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              new LoRealmApp({'name': $route.current.params.appId, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'},
+                function() {
+                  //$route.reload();
+                });
+            }
+          );
+        },
+        uriPolicies: function(LoSecurity, $route) {
+          return LoSecurity.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return undefined;
+            }
+          );
+        },
+//        uriPolicies: function(LoSecurityLoader) {
+//          return new LoSecurityLoader();
+//        },
+        aclPolicies: function(LoACL, $route) {
+          return LoACL.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return undefined;
+            }
+          );
+        }
+//        aclPolicies: function(LoACLLoader) {
+//          return new LoACLLoader();
+//        }
+      }
+    })
+    .when('/applications/:appId/security/secure-logic', {
+      templateUrl : '/admin/console/partials/security-create-logic.html',
+      controller : 'SecurityBusinessLogicCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader) {
+          return new LoAppLoader();
+        },
+        loAppExpanded : function(LoSecurityCollectionsLoader) {
+          return new LoSecurityCollectionsLoader();
+        },
+        // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
+        loRealmAppRoles: function(LoRealmAppRoles, LoRealmApp, $route) {
+          return new LoRealmAppRoles.query({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              new LoRealmApp({'name': $route.current.params.appId, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'},
+                function() {
+                  //$route.reload();
+                });
+            }
+          );
+        },
+        uriPolicies: function(LoSecurity, $route) {
+          return LoSecurity.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return undefined;
+            }
+          );
+        },
+//        uriPolicies: function(LoSecurityLoader) {
+//          return new LoSecurityLoader();
+//        },
+        aclPolicies: function(LoACL, $route) {
+          return LoACL.get({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return undefined;
+            }
+          );
+        }
+//        aclPolicies: function(LoACLLoader) {
+//          return new LoACLLoader();
+//        }
+      }
     })
     .when('/error', {
       controller: 'ErrorCtrl',

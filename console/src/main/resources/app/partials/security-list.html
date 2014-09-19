@@ -12,20 +12,123 @@
 
       <h2><span>{{curApp.name}}</span> Security Policies</h2>
 
-      <!-- In case of no collections secured -->
-      <div class="panel" ng-hide="securedColls.length > 0">
+      <!-- Some resources are secured -->
+      <div class="lo-page-info clearfix" ng-show="securedColls.length > 0">
+        <p>
+          <span class="lo-emph">You have</span> <strong>{{securedColls.length}}</strong> collection<span ng-show="securedColls.length !== 1">s</span> secured.
+        </p>
+        <div class="pull-right" >
+          <div class="dropdown">
+            <a id="securedd" ng-show="unsecuredColls.length > 0" href="" class="btn btn-primary btn-lg" type="button" data-toggle="dropdown">Secure</a>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="securedd">
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#/applications/{{curApp.id}}/security/secure-storage">Storage</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#/applications/{{curApp.id}}/security/secure-collections">Collections</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#/applications/{{curApp.id}}/security/secure-push">Push</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#/applications/{{curApp.id}}/security/secure-clients">Clients</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#/applications/{{curApp.id}}/security/secure-logic">Business Logic</a></li>
+            </ul>
+          </div>
+          <!---->
+        </div>
+      </div>
+
+      <fieldset ng-show="securedStorages.uriPolicies.length > 0 || securedStorages.aclPolicies.length > 0">
+        <legend lo-collapse class="collapsible"><span class="h3">Storage</span></legend>
+        <div class="panel" ng-repeat="s in storageList" ng-if="(securedStorages.uriPolicies | filter: {'uriPattern': '/'+curApp.id+'/'+s.id}).length > 0 || (securedStorages.aclPolicies | filter: {'resourcePath': '/'+curApp.id+'/'+s.id}:true).length > 0">
+          <div class="panel-heading">
+            <h2 class="panel-title"><a href="#/applications/{{curApp.id}}/security/policies/storage/{{s.id}}">{{s.id}}</a></h2>
+            <div class="pull-right" data-tooltip-placement="top" data-tooltip="Delete Security">
+              <a href="" ng-click="modalCollectionSecurityDelete(storage, collection);"><i class="fa fa-trash-o"></i></a>
+            </div>
+          </div>
+          <div class="panel-body">
+            <ul class="lo-app-opts">
+              <li><i class="fa fa-users" tooltip="Who can access"></i>{{ (securedStorages.uriPolicies | filter: {'uriPattern': '/'+curApp.id+'/'+s.id}:true | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
+              <li><i class="fa fa-plus" tooltip="Who can create"></i>{{ (securedStorages.uriPolicies | filter: {'uriPattern': '/'+curApp.id+'/'+s.id}:true | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
+              <li><i class="fa fa-unlock" tooltip="Entry creator can"></i>{{ (securedStorages.aclPolicies | filter: {'resourcePath': '/'+curApp.id+'/'+s.id}:true)[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</a></li>
+            </ul>
+          </div>
+        </div>
+      </fieldset>
+      <fieldset ng-show="securedCollections.uriPolicies.length > 0 || securedCollections.aclPolicies.length > 0">
+        <legend lo-collapse class="collapsible"><span class="h3">Collections</span></legend>
+        <span ng-repeat="s in storageList">
+          <lo-collection-security-summary lo-app="curApp" lo-storage="s.id" lo-collection="c.id" ng-repeat="c in s.members"></lo-collection-security-summary>
+        </span>
+      </fieldset>
+      <fieldset ng-show="securedPush.uriPolicies.length > 0 || securedPush.aclPolicies.length > 0">
+        <legend lo-collapse class="collapsible"><span class="h3">Push</span></legend>
+        <div class="panel">
+          <div class="panel-heading">
+            <h2 class="panel-title"><a href="#/applications/{{curApp.id}}/security/secure-push">Push Configuration</a></h2>
+            <div class="pull-right" data-tooltip-placement="top" data-tooltip="Delete Security">
+              <a href="" ng-click="modalCollectionSecurityDelete(storage, collection);"><i class="fa fa-trash-o"></i></a>
+            </div>
+          </div>
+          <div class="panel-body">
+            <ul class="lo-app-opts">
+              <li><i class="fa fa-users" tooltip="Who can access"></i>{{ (securedPush.uriPolicies | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
+              <li><i class="fa fa-plus" tooltip="Who can create"></i>{{ (securedPush.uriPolicies | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
+              <li><i class="fa fa-unlock" tooltip="Entry creator can"></i>{{ securedPush.aclPolicies[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</a></li>
+            </ul>
+          </div>
+        </div>
+      </fieldset>
+      <fieldset ng-show="securedClients.uriPolicies.length > 0 || securedClients.aclPolicies.length > 0">
+        <legend lo-collapse class="collapsible"><span class="h3">Clients</span></legend>
+        <div class="panel">
+          <div class="panel-heading">
+            <h2 class="panel-title"><a href="#/applications/{{curApp.id}}/security/secure-clients">Clients Management</a></h2>
+            <div class="pull-right" data-tooltip-placement="top" data-tooltip="Delete Security">
+              <a href="" ng-click="modalCollectionSecurityDelete(storage, collection);"><i class="fa fa-trash-o"></i></a>
+            </div>
+          </div>
+          <div class="panel-body">
+            <ul class="lo-app-opts">
+              <li><i class="fa fa-users" tooltip="Who can access"></i>{{ (securedClients.uriPolicies | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
+              <li><i class="fa fa-plus" tooltip="Who can create"></i>{{ (securedClients.uriPolicies | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
+              <li><i class="fa fa-unlock" tooltip="Entry creator can"></i>{{ securedClients.aclPolicies[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</a></li>
+            </ul>
+          </div>
+        </div>
+      </fieldset>
+      <fieldset ng-show="securedBusinessLogic.uriPolicies.length > 0 || securedBusinessLogic.aclPolicies.length > 0">
+        <legend lo-collapse class="collapsible"><span class="h3">Business Logic</span></legend>
+        <div class="panel">
+          <div class="panel-heading">
+            <h2 class="panel-title"><a href="#/applications/{{curApp.id}}/security/secure-clients">Clients Management</a></h2>
+            <div class="pull-right" data-tooltip-placement="top" data-tooltip="Delete Security">
+              <a href="" ng-click="modalCollectionSecurityDelete(storage, collection);"><i class="fa fa-trash-o"></i></a>
+            </div>
+          </div>
+          <div class="panel-body">
+            <ul class="lo-app-opts">
+              <li><i class="fa fa-users" tooltip="Who can access"></i>{{ (securedBusinessLogic.uriPolicies | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
+              <li><i class="fa fa-plus" tooltip="Who can create"></i>{{ (securedBusinessLogic.uriPolicies | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
+              <li><i class="fa fa-unlock" tooltip="Entry creator can"></i>{{ securedBusinessLogic.aclPolicies[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</a></li>
+            </ul>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- No resources are secured -->
+      <div class="panel" ng-hide="securedStorages.uriPolicies.length > 0 || securedStorages.aclPolicies.length > 0 ||
+                                  securedCollections.uriPolicies.length > 0 || securedCollections.aclPolicies.length > 0 ||
+                                  securedPush.uriPolicies.length > 0 || securedPush.aclPolicies.length > 0 ||
+                                  securedClients.uriPolicies.length > 0 || securedClients.aclPolicies.length > 0 ||
+                                  securedBusinessLogic.uriPolicies.length > 0 || securedBusinessLogic.aclPolicies.length > 0">
         <div class="panel-body text-center empty-instance">
           <i class="fa fa-lock"></i>
 
           <span ng-show="storageList.length === 0">
-            <p>This application has no storage resources. Create a storage resource first.</p>
-            <a href="#/applications/{{curApp.id}}/storage" class="btn btn-primary btn-lg" type="button">View Storage</a>
+            <p>None of your resources are secured. Which one would you like to secure first?</p>
           </span>
 
-          <span ng-hide="(storageList.length === 0) || (unsecuredColls.length > 0)">
-            <p>This application has no collections to be secured. Start creating a collection to secure it.</p>
-            <a href="" class="btn btn-primary btn-lg" type="button" ng-click="modalCollectionAdd()">New Collection</a>
-          </span>
+          <span class="btn btn-link" ng-class="{'disabled': (storageList.length === 0)}"><a ng-style="{ color: (storageList.length === 0) ? 'grey' : 'inherit' }" ng-href="{{storageList.length === 0 ? '' : '#/applications/'+curApp.id+'/security/secure-storage'}}"><i class="fa fa-cloud"></i><span class="h3"><br>Storage</span></a></span>
+          <span class="btn btn-link" ng-class="{'disabled': (unsecuredColls.length === 0)}" style="margin-left: 25px;"><a ng-style="{ color: (unsecuredColls.length === 0) ? 'grey' : 'inherit' }" href="#/applications/{{curApp.id}}/security/secure-collections"><i class="fa fa-table"></i><span class="h3"><br>Collections</span></a></span>
+          <span class="btn btn-link" style="margin-left: 25px;"><a href="#/applications/{{curApp.id}}/security/secure-push"><i class="fa fa-mobile"></i><span class="h3"><br>Push</span></a></span>
+          <span class="btn btn-link" style="margin-left: 25px;"><a href="#/applications/{{curApp.id}}/security/secure-clients"><i class="fa fa-globe"></i><span class="h3"><br>Clients</span></a></span>
+          <span class="btn btn-link" style="margin-left: 25px;"><a href="#/applications/{{curApp.id}}/security/secure-logic"><i class="fa fa-code"></i><span class="h3"><br>Business Logic</span></a></span>
 
           <span ng-show="unsecuredColls.length > 0">
             <p>You have not yet secured any of the collections: <span ng-repeat="c in unsecuredColls"><a href="#/applications/{{curApp.name}}/security/policies/{{c.storage}}/{{c.collection}}">{{c.storage}} / {{c.collection}}</a>{{$last ? '' : ', '}}</span>.</p>
@@ -34,19 +137,6 @@
         </div>
       </div>
 
-      <!-- List of collections secured -->
-      <div class="lo-page-info clearfix" ng-show="securedColls.length > 0">
-        <p>
-          <span class="lo-emph">You have</span> <strong>{{securedColls.length}}</strong> collection<span ng-show="securedColls.length !== 1">s</span> secured.
-        </p>
-        <div class="pull-right" >
-          <a ng-show="unsecuredColls.length > 0" href="#/applications/{{curApp.id}}/security/policies/{{unsecuredColls[0].storage}}/{{unsecuredColls[0].collection}}" class="btn btn-primary btn-lg" type="button">Secure a Collection</a>
-        </div>
-      </div>
-
-      <span ng-repeat="s in storageList">
-        <lo-collection-security-summary lo-app="curApp" lo-storage="s.id" lo-collection="c.id" ng-repeat="c in s.members"></lo-collection-security-summary>
-      </span>
     </div>
 
     <div class="lo-info-pane col-md-3 clearfix">
