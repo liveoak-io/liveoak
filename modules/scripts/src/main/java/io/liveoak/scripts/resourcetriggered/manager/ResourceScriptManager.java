@@ -199,8 +199,10 @@ public class ResourceScriptManager {
     protected Object runScript(String functionName, Script script, ScriptingResourceRequest resourceRequest) {
         Map<String, Object> library = new HashMap<>();
 
-        for (String libraryName : script.getLibraries()) {
-            library.put(libraryName, libraryManager.getLibrary(libraryName).object());
+        if (script.getLibraries() != null) {
+            for (String libraryName : script.getLibraries()) {
+                library.put(libraryName, libraryManager.getLibrary(libraryName).object());
+            }
         }
 
         Config config = new Config();

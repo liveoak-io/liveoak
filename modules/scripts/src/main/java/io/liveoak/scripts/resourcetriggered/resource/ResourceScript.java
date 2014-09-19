@@ -12,6 +12,7 @@ import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.BinaryResourceState;
 import io.liveoak.spi.state.LazyResourceState;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
@@ -159,6 +160,14 @@ public class ResourceScript implements Resource {
         if (state instanceof LazyResourceState) {
             LazyResourceState lazyResourceState = (LazyResourceState) state;
             ByteBuf content = lazyResourceState.contentAsByteBuf();
+
+            script.setScriptBuffer(content);
+            parent.writeSourceFile(this.id(), script.getScriptBuffer());
+
+            responder.resourceCreated(new ScriptFileResource(this));
+            return;
+        } else if (state instanceof BinaryResourceState) {
+            ByteBuf content = ((BinaryResourceState)state).getBuffer();
 
             script.setScriptBuffer(content);
             parent.writeSourceFile(this.id(), script.getScriptBuffer());
