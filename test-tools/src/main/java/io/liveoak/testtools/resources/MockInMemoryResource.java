@@ -13,7 +13,6 @@ import java.util.Map;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -63,10 +62,11 @@ public class MockInMemoryResource implements SynchronousResource {
 
     @Override
     public ResourceState properties() throws Exception {
-        ResourceState state = new DefaultResourceState();
+        ResourceState state = new DefaultResourceState(id);
         for (String id : properties.keySet()) {
             state.putProperty(id, properties.get(id));
         }
+        state.uri(uri());
         return state;
     }
 
