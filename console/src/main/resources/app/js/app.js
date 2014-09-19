@@ -67,6 +67,18 @@ loMod.config(['$routeProvider', function($routeProvider) {
         }
       }
     })
+    .when('/applications/:appId/create-logic', {
+      templateUrl : '/admin/console/partials/business-logic-create.html',
+      controller : 'BusinessLogicListCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader) {
+          return new LoAppLoader();
+        },
+        triggeredScripts: function(LoBusinessLogicScripts, $route) {
+          return LoBusinessLogicScripts.getTriggered({appId: $route.current.params.appId});
+        }
+      }
+    })
     .when('/applications/:appId', {
       redirectTo: '/applications/:appId/dashboard'
     })

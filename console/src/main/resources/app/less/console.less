@@ -473,6 +473,11 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
         margin-left: 15px;
         margin-bottom: 1px;
       }
+      
+      span {
+        margin-left: 5px;
+        font-size: 0.75em;
+      }
     }
     
     .pull-right a {
@@ -784,83 +789,91 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
 
 
 /* Panel Dashboard */
-.panel.lo-dashboard .panel-body {
-  .lo-measure-box {
-    width: 33.333333%;
-    font-size: 0.6em;
-    margin-top: 30px;
-    display: table;
 
-    > i {
-      padding-right: 0.2734375em;
-      display: table-cell;
-      font-size: 10.54545454545455em;
-      text-align: right;
-      vertical-align: middle;
-    }
-
-    > div {
-      text-align: left;
-
-      em {
-        font-size: 11.63636363636364em;
-        font-weight: 300;
-        line-height: 0.6em;
-        margin-bottom: -0.078125em;
+.panel.lo-dashboard {
+  
+  .panel-heading .panel-title span {
+    font-size: 1em;
+  }
+  
+  .panel-body {
+    .lo-measure-box {
+      width: 33.333333%;
+      font-size: 0.6em;
+      margin-top: 30px;
+      display: table;
+  
+      > i {
+        padding-right: 0.2734375em;
+        display: table-cell;
+        font-size: 10.54545454545455em;
+        text-align: right;
+        vertical-align: middle;
       }
-
-      .measure {
-        font-size: 2.5em;
-        line-height: 0.5em;
+  
+      > div {
+        text-align: left;
+  
+        em {
+          font-size: 11.63636363636364em;
+          font-weight: 300;
+          line-height: 0.6em;
+          margin-bottom: -0.078125em;
+        }
+  
+        .measure {
+          font-size: 2.5em;
+          line-height: 0.5em;
+        }
+  
+        .text {
+          font-size: 13px;
+          color: @c_graylight;
+          padding-left: 3px;
+          display: block;
+          padding-top: 0.5em;
+        }
       }
-
-      .text {
-        font-size: 13px;
-        color: @c_graylight;
-        padding-left: 3px;
-        display: block;
-        padding-top: 0.5em;
+  
+      &.api {
+        color: #69a8cd;
       }
-    }
-
-    &.api {
-      color: #69a8cd;
-    }
-
-    &.users {
-      color: #e9b356;
-      
-      i {
-				font-size: 9.84848484848485em;
-			}
-    }
-
-    &.push {
-      color: #e39090;
-      
-      i {
-				padding-right: 0.24691358024691em;
-				padding-left: 0.24691358024691em;
-			}
-    }
-
-    &.storage {
-      color: #6ab1ad;
-      
-      i {
-				padding-right: 0.23188405797101em;
-			}
-    }
-
-    &.highlight {
-      width: 100%;
-      margin-top: 0;
-      font-size: 1em;
-      float: none;
-
-      .text {
-        font-size: 16px;
-        padding-left: 5px;
+  
+      &.users {
+        color: #e9b356;
+        
+        i {
+  				font-size: 9.84848484848485em;
+  			}
+      }
+  
+      &.push {
+        color: #e39090;
+        
+        i {
+  				padding-right: 0.24691358024691em;
+  				padding-left: 0.24691358024691em;
+  			}
+      }
+  
+      &.storage {
+        color: #6ab1ad;
+        
+        i {
+  				padding-right: 0.23188405797101em;
+  			}
+      }
+  
+      &.highlight {
+        width: 100%;
+        margin-top: 0;
+        font-size: 1em;
+        float: none;
+  
+        .text {
+          font-size: 16px;
+          padding-left: 5px;
+        }
       }
     }
   }
@@ -1922,6 +1935,11 @@ legend {
   }
 }
 
+.input-help button {
+  margin-top: 2px;
+  margin-left: 0;
+}
+
 /* Grid */
 .row {
   margin-left: 0;
@@ -1963,6 +1981,10 @@ legend {
 
 .help-block {
   margin-bottom: 0;
+  
+  &.info {
+    color: @c_graylight;
+  }
 }
 
 
@@ -2027,6 +2049,23 @@ legend {
 
 .modal#create-application .modal-body {
   min-height: 150px;
+}
+
+.modal-body ul {
+  margin-top: 16px;
+  margin-left: 16px;
+  
+  li {
+    margin-bottom: 4px;
+  }
+  
+  li .lo-emph {
+    margin-left: 5px;
+  }
+}
+
+.modal#path-help .modal-body {
+  margin-bottom: 0;
 }
 
 

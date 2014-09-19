@@ -1,0 +1,114 @@
+<div class="col-md-10 lo-main-pane">
+  <div class="row">
+    <div class="lo-content-area col-md-10">
+      <ol class="breadcrumb">
+        <li><a href="#/applications">Applications</a></li>
+        <li><a href="#">application_name</a></li>
+        <li><a href="#">Business Logic</a></li>
+        <li>New Script</li>
+      </ol>
+      
+      <h2 class="pull-left"><span>{{curApp.name}}</span> New Logic</h2>
+      <p class="subtitle"><span class="required">*</span> Required fields</p>
+
+      <form class="lo-form-horizontal clearfix" name="storageForm" novalidate>
+        <fieldset>
+          <legend lo-collapse class="collapsible"><span class="text">Settings</span></legend>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="name">Script Name</label>
+            <div class="col-sm-4">
+              <input class="form-control" type="text" id="name">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="id">Script ID</label>
+            <div class="col-sm-4">
+              <input class="form-control" type="text" id="id">
+              <span class="help-block info">The script ID cannot be modified once created.</span>
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="description">Description</label>
+            <div class="col-sm-4">
+              <textarea class="form-control" rows="3" id="description"></textarea>
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="enable">Enable Script</label>
+            <div class="col-sm-4">
+              <div class="onoffswitch">
+                <input type="checkbox" id="enable" class="onoffswitch-checkbox">
+                <label class="onoffswitch-label" for="enable">
+                  <span class="onoffswitch-inner">
+                    <span class="onoffswitch-active ng-binding">ON</span>
+                    <span class="onoffswitch-inactive ng-binding">OFF</span></span>
+                  </span>
+                  <span class="onoffswitch-switch"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="priority">Priority</label>
+            <div class="col-sm-2">
+              <input class="form-control" type="number" min="0" max="10" value="5">
+            </div>
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="path">Resource Path <span class="required">*</span></label>
+            <div class="col-sm-4">
+              <input class="form-control" type="text" id="path" value="/<app-name>/">
+            </div>
+            <span data-toggle="modal" data-target="#path-help" class="input-help">
+              <button class="btn btn-link btn-icon">
+                <i class="fa fa-question-circle" data-tooltip-placement="top" data-tooltip="Click for Help"></i>
+                <span>Click for Help</span>
+              </button>
+            </span>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend lo-collapse class="collapsible"><span class="text">Script</span> <span class="required">*</span></legend>
+          <div class="form-group clearfix">
+            <textarea class="form-control" rows="15" id="description"></textarea>
+          </div>
+        </fieldset>
+        <div class="pull-right form-actions">
+          <button lo-button-clear="clear()">Cancel</button>
+          <button lo-button-save="save()">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Help -->
+
+<div class="modal fade" id="path-help" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <span class="pficon pficon-close"></span>
+        </button>
+        <h4 class="modal-title">Help</h4>
+      </div>
+      <div class="modal-body">
+        <p>The resource path starts with the application name, and it follows patterns like:</p>
+        <ul>
+          <li>/app-name/* <span class="lo-emph">(the children of the application)</span></li>
+          <li>/app-name/** <span class="lo-emph">(all descendents of the application></span></li>
+          <li>/app-name/resource-name <span class="lo-emph">(just this particular resource)</span></li>
+          <li>/app-name/myResource/* <span class="lo-emph">(the children of this resource)</span></li>
+          <li>/app-name/myResource/** <span class="lo-emph">(all descendents of this resource)</span></li>
+          <li>...</li>
+          <li>/app-name/myResource/childA/grandChildB/**</li>
+          <li>...</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Ok, I got it</button>
+      </div>
+    </div>
+  </div>
+</div>
