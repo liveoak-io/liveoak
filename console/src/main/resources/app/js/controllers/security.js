@@ -20,6 +20,70 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
   var _aclPolicies = $filter('filter')(expAppResources.members, {'id': 'acl-policy' });
   $scope.acl = _aclPolicies && _aclPolicies.length > 0 ? _aclPolicies[0].autoRules : [];
 
+  $scope.hasSecuredResources = false;
+
+  $scope.securedStorages = {uriPolicies: [], aclPolicies: []};
+  $scope.securedCollections = {uriPolicies: [], aclPolicies: []};
+  $scope.securedPush = {uriPolicies: [], aclPolicies: []};
+  $scope.securedClients = {uriPolicies: [], aclPolicies: []};
+  $scope.securedBusinessLogic = {uriPolicies: [], aclPolicies: []};
+  for (var i = 0; i < $scope.uriPolicies.length; i++) {
+    if ($scope.uriPolicies[i].uriPattern === '/' + currentApp.id + '/push') {
+      $scope.securedPush.uriPolicies.push($scope.uriPolicies[i]);
+    }
+    else if ($scope.uriPolicies[i].uriPattern === '/' + currentApp.id + '/clients' || $scope.uriPolicies[i].uriPattern === '/' + currentApp.id + '/clients/*') {
+      $scope.securedClients.uriPolicies.push($scope.uriPolicies[i]);
+    }
+    else if ($scope.uriPolicies[i].uriPattern === '/admin/applications/' + currentApp.id + '/resources/scripts/') {
+      $scope.securedBusinessLogic.uriPolicies.push($scope.uriPolicies[i]);
+    }
+    else {
+      var pathElems = $scope.uriPolicies[i].uriPattern.split("/");
+      var extra = pathElems[pathElems.length-1] === "*" ? -1 : 0;
+      if (pathElems.length + extra === 3) {
+        // storage
+        if ($filter('filter')($scope.storageList, {'id': pathElems[2]})) {
+          $scope.securedStorages.uriPolicies.push($scope.uriPolicies[i]);
+        }
+      }
+      else if (pathElems.length + extra === 4) {
+        // collection
+        if ($filter('filter')($scope.storageList, {'id': pathElems[2]})) {
+          $scope.securedCollections.uriPolicies.push($scope.uriPolicies[i]);
+        }
+      }
+    }
+  }
+
+  for (var i = 0; i < $scope.acl.length; i++) {
+    if ($scope.acl[i].resourcePath === '/' + currentApp.id + '/push') {
+      $scope.securedPush.aclPolicies.push($scope.acl[i]);
+    }
+    else if ($scope.acl[i].resourcePath === '/' + currentApp.id + '/clients') {
+      $scope.securedClients.aclPolicies.push($scope.acl[i]);
+    }
+    else if ($scope.acl[i].resourcePath === '/admin/applications/' + currentApp.id + '/resources/scripts/') {
+      $scope.securedBusinessLogic.aclPolicies.push($scope.acl[i]);
+    }
+    else {
+      var pathElems = $scope.acl[i].resourcePath.split("/");
+      var extra = pathElems[pathElems.length-1] === "*" ? -1 : 0;
+      if (pathElems.length + extra === 3) {
+        // storage
+        if ($filter('filter')($scope.storageList, {'id': pathElems[2]})) {
+          $scope.securedStorages.aclPolicies.push($scope.acl[i]);
+          console.log($scope.acl[i]);
+        }
+      }
+      else if (pathElems.length + extra === 4) {
+        // collection
+        if ($filter('filter')($scope.storageList, {'id': pathElems[2]})) {
+          $scope.securedCollections.aclPolicies.push($scope.acl[i]);
+        }
+      }
+    }
+  }
+
   $scope.securedColls = [];
   $scope.unsecuredColls = [];
   angular.forEach($scope.storageList, function(storage) {
@@ -99,7 +163,7 @@ loMod.controller('AddCollectionModalCtrl', function ($scope, $modalInstance, $lo
   };
 });
 
-loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route, $log, $filter, $modal, Notifications, LoSecurity, LoACL, LoRealmAppRoles, loRealmAppRoles, uriPolicies, aclPolicies, currentApp, loStorageList) {
+loMod.controller('SecurityCollectionsCtrl', function($scope, $rootScope, $location, $route, $log, $filter, $modal, Notifications, LoSecurity, LoACL, LoRealmAppRoles, loRealmAppRoles, uriPolicies, aclPolicies, currentApp, loStorageList) {
 
   $rootScope.curApp = currentApp;
 
@@ -123,22 +187,11 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
   });
 
   $scope.$watch('currentCollection',  function(/*newVal*/) {
-    $location.path('applications/' + currentApp.id + '/security/policies/' + $scope.currentCollection);
+    $location.path('applications/' + currentApp.id + '/security/policies/storage/' + $scope.currentCollection);
   });
 
   var userPath = '/' + currentApp.id + '/' + $scope.currentCollection;
-  var superuserPath = userPath + '/*';
-
-  var newUriPolicyRule = function(uriPattern, requestTypes, allowedRoles) {
-    return {
-      uriPattern : uriPattern,
-      requestTypes : requestTypes,
-      allowedRoles : allowedRoles,
-      deniedRoles : null,
-      allowedUsers : null,
-      deniedUsers : null
-    };
-  };
+  var superUserPath = userPath + '/*';
 
   var newUriPolicies;
   if(!uriPolicies) {
@@ -149,9 +202,9 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
       rules : [
         newUriPolicyRule(userPath, ['READ'], ['']),
         newUriPolicyRule(userPath, ['CREATE'], ['']),
-        newUriPolicyRule(superuserPath, ['READ'], ['']),
-        newUriPolicyRule(superuserPath, ['UPDATE'], ['']),
-        newUriPolicyRule(superuserPath, ['DELETE'], [''])
+        newUriPolicyRule(superUserPath, ['READ'], ['']),
+        newUriPolicyRule(superUserPath, ['UPDATE'], ['']),
+        newUriPolicyRule(superUserPath, ['DELETE'], [''])
       ]
     };
     uriPolicies = newUriPolicies.config;
@@ -178,11 +231,11 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
 
   if (colUriPolicies.length > 0) {
     // FIXME: move this to some function which will create if doesn't exist
-    var _access = ($filter('filter')(colUriPolicies, {'uriPattern': '!' + superuserPath, requestTypes: 'READ' }));
-    var _create = ($filter('filter')(colUriPolicies, {'uriPattern': '!' + superuserPath, requestTypes: 'CREATE' }));
-    var _readAll = ($filter('filter')(colUriPolicies, {'uriPattern': superuserPath, requestTypes: 'READ' }));
-    var _updateAll = ($filter('filter')(colUriPolicies, {'uriPattern': superuserPath, requestTypes: 'UPDATE' }));
-    var _deleteAll = ($filter('filter')(colUriPolicies, {'uriPattern': superuserPath, requestTypes: 'DELETE' }));
+    var _access = ($filter('filter')(colUriPolicies, {'uriPattern': '!' + superUserPath, requestTypes: 'READ' }));
+    var _create = ($filter('filter')(colUriPolicies, {'uriPattern': '!' + superUserPath, requestTypes: 'CREATE' }));
+    var _readAll = ($filter('filter')(colUriPolicies, {'uriPattern': superUserPath, requestTypes: 'READ' }));
+    var _updateAll = ($filter('filter')(colUriPolicies, {'uriPattern': superUserPath, requestTypes: 'UPDATE' }));
+    var _deleteAll = ($filter('filter')(colUriPolicies, {'uriPattern': superUserPath, requestTypes: 'DELETE' }));
 
     $scope.settings.accessRoles = _access.length > 0 ? _access[0].allowedRoles : [];
     $scope.settings.createEntryRoles = _create.length > 0 ? _create[0].allowedRoles : [];
@@ -198,16 +251,12 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
     $scope.settings.deleteAllRoles   = [];
   }
 
-  var colAclPolicies = $filter('filter')(aclPolicies.autoRules, {'resourcePath': userPath });
+  //var colAclPolicies = $filter('filter')(aclPolicies.autoRules, {'resourcePath': userPath });
 
   $scope.availablePermissions = ['READ','UPDATE','DELETE'];
 
-  if(colAclPolicies.length > 0) {
-    $scope.settings.ownerPermissions = colAclPolicies[0].autoAddedOwnerPermissions;
-  }
-  else {
-    $scope.settings.ownerPermissions = [];
-  }
+  $scope.settings.ownerPermissions = initializeAutoAddedOwnerPermissions(aclPolicies, userPath);
+
   var settingsBackup = angular.copy($scope.settings);
 
   $scope.changed = false;
@@ -236,7 +285,7 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
           hasUserCreate = true;
         }
       }
-      else if (uriPolicies.rules[u].uriPattern === superuserPath) {
+      else if (uriPolicies.rules[u].uriPattern === superUserPath) {
         if (angular.equals(uriPolicies.rules[u].requestTypes, ['READ'])) {
           uriPolicies.rules[u].allowedRoles = $scope.settings.readAllRoles;
           hasSuperRead = true;
@@ -254,9 +303,9 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
 
     if(!hasUserRead) { uriPolicies.rules.push(newUriPolicyRule(userPath, ['READ'], $scope.settings.accessRoles)); }
     if(!hasUserCreate) { uriPolicies.rules.push(newUriPolicyRule(userPath, ['CREATE'], $scope.settings.createEntryRoles)); }
-    if(!hasSuperRead) { uriPolicies.rules.push(newUriPolicyRule(superuserPath, ['READ'], $scope.settings.readAllRoles)); }
-    if(!hasSuperUpdate) { uriPolicies.rules.push(newUriPolicyRule(superuserPath, ['UPDATE'], $scope.settings.updateAllRoles)); }
-    if(!hasSuperDelete) { uriPolicies.rules.push(newUriPolicyRule(superuserPath, ['DELETE'], $scope.settings.deleteAllRoles)); }
+    if(!hasSuperRead) { uriPolicies.rules.push(newUriPolicyRule(superUserPath, ['READ'], $scope.settings.readAllRoles)); }
+    if(!hasSuperUpdate) { uriPolicies.rules.push(newUriPolicyRule(superUserPath, ['UPDATE'], $scope.settings.updateAllRoles)); }
+    if(!hasSuperDelete) { uriPolicies.rules.push(newUriPolicyRule(superUserPath, ['DELETE'], $scope.settings.deleteAllRoles)); }
 
     var uriSuccess = function(value/*, responseHeaders*/) {
       settingsBackup.accessRoles = $scope.settings.accessRoles;
@@ -317,36 +366,11 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
   };
 
   $scope.modalAddRole = function() {
-    var modalAddRole = $modal.open({
-      templateUrl: '/admin/console/templates/modal/application/role-add.html',
-      controller: 'AddRoleModalCtrl',
-      scope: $scope,
-      resolve: {
-        roles: function () {
-          return $scope.appRoles;
-        },
-        currentApp: function () {
-          return currentApp;
-        }
-      }
-    });
-
-    modalAddRole.result.then(
-      function(newRole) { // modal completion
-        $scope.appRoles = LoRealmAppRoles.query({appId: currentApp.id});
-        $scope.settings.accessRoles.push(currentApp.name + '/' + newRole);
-      }
-    );
+    modalAddRole($modal, $scope, LoRealmAppRoles, currentApp);
   };
 
   $scope.toggleItem = function(item, array) {
-    var found = $.inArray(item, array);
-    if (found >= 0) {
-      array.splice(found, 1);
-    }
-    else {
-      array.push(item);
-    }
+    toggleItem(item, array);
   };
 
   $scope.collStorage = $route.current.params.storageId;
@@ -364,6 +388,624 @@ loMod.controller('SecurityCtrl', function($scope, $rootScope, $location, $route,
       }
     });
   };
+});
+
+// -- Security / Storage -------------------------------------------------------
+
+loMod.controller('SecurityStorageCtrl', function($scope, $rootScope, $location, $route, $log, $filter, $modal, Notifications, LoSecurity, LoACL, LoRealmAppRoles, currentApp, loStorageList, loRealmAppRoles, uriPolicies, aclPolicies) {
+
+  $rootScope.curApp = currentApp;
+
+  $scope.currentStorage = $route.current.params.storageId;
+
+  $scope.breadcrumbs = [
+    {'label': 'Applications', 'href': '#/applications'},
+    {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
+    {'label': 'Security', 'href': '#/applications/' + currentApp.id + '/security'},
+    {'label': 'Secure ' + $scope.currentStorage, 'href': '#/applications/' + currentApp.id + '/security/policies/storage/' + $scope.currentStorage}
+  ];
+
+  // watch for currentStorage dropdown changes, so we switch the route accordingly
+  $scope.$watch('currentStorage',  function(/*newVal*/) {
+    $location.path('applications/' + currentApp.id + '/security/policies/storage/' + $scope.currentStorage);
+  });
+
+  // list of storage resources for this application
+  $scope.storageList = $filter('filter')(loStorageList.members, {'type': 'database'});
+
+  // list of roles fetched from Keycloak
+  $scope.appRoles = loRealmAppRoles;
+  // list of available permissions for the creator
+  $scope.availablePermissions = ['READ','UPDATE','DELETE'];
+
+  // define security uris for user and superuser
+  var userPath = '/' + currentApp.id + '/' + $scope.currentStorage;
+  var superUserPath = userPath + '/*';
+
+  // settings object we will work with for storing information
+  $scope.settings = {};
+
+  // initialize URI Policies in case they are not present
+  var newUriPolicies;
+  if(!uriPolicies) {
+    newUriPolicies = new LoSecurity();
+    newUriPolicies.type = 'uri-policy';
+    newUriPolicies.config = {
+      id : 'uri-policy',
+      rules : [
+        newUriPolicyRule(userPath, ['READ'], ['']),
+        newUriPolicyRule(userPath, ['CREATE'], ['']),
+        newUriPolicyRule(superUserPath, ['READ'], ['']),
+        newUriPolicyRule(superUserPath, ['UPDATE'], ['']),
+        newUriPolicyRule(superUserPath, ['DELETE'], [''])
+      ]
+    };
+    uriPolicies = newUriPolicies.config;
+  }
+
+  var newAclPolicies;
+  if(!aclPolicies) {
+    newAclPolicies = new LoACL();
+    newAclPolicies.type = 'acl-policy';
+    newAclPolicies.config = {
+      id: 'acl-policy',
+      autoRules: [{
+        resourcePath: userPath,
+        autoAddedOwnerPermissions: []
+      }]
+    };
+    aclPolicies = newAclPolicies.config;
+  }
+
+  // initialize resource uri policies
+  var resUriPolicies = $filter('filter')(uriPolicies.rules, {'uriPattern': userPath });
+  $scope.settings = initializeUriPolicies(resUriPolicies, userPath, superUserPath, $filter);
+
+  // initialize auto added owner permissions (resource creator can...)
+  $scope.settings.ownerPermissions = initializeAutoAddedOwnerPermissions(aclPolicies, userPath);
+
+  // settings backup to compare for changes and rollback
+  var settingsBackup = angular.copy($scope.settings);
+
+  $scope.changed = false;
+
+  // add/remove item from array
+  $scope.toggleItem = function(item, array) {
+    toggleItem(item, array);
+  };
+
+  // keep a watch on setting to be aware of changes
+  function doWatch() {
+    $scope.$watch('settings', function() {
+      $scope.changed = !angular.equals($scope.settings, settingsBackup);
+    }, true);
+  }
+  doWatch();
+
+  $scope.clear = function() {
+    $scope.settings = angular.copy(settingsBackup);
+  };
+
+  $scope.save = function() {
+    consolidateUriPolicies(uriPolicies, userPath, superUserPath, $scope.settings);
+
+    var uriSuccess = function(value/*, responseHeaders*/) {
+      settingsBackup.accessRoles = $scope.settings.accessRoles;
+      settingsBackup.createEntryRoles = $scope.settings.createEntryRoles;
+      settingsBackup.readAllRoles = $scope.settings.readAllRoles;
+      settingsBackup.updateAllRoles = $scope.settings.updateAllRoles;
+      settingsBackup.deleteAllRoles = $scope.settings.deleteAllRoles = $scope.settings.deleteAllRoles;
+      doWatch();
+
+      newUriPolicies = undefined;
+      uriPolicies = value;
+      Notifications.success('The application URI Policies have been updated.');
+    };
+
+    var uriFailure = function (httpResponse) {
+      Notifications.error('Failed to update the application URI Policies.', httpResponse);
+    };
+
+    if (newUriPolicies) {
+      newUriPolicies.$create({appId: currentApp.name}, uriSuccess, uriFailure);
+    }
+    else {
+      // TODO: save only on diff
+      uriPolicies.$save({appId: currentApp.name}, uriSuccess, uriFailure);
+    }
+
+    var hasACLPermissions = false;
+    for (var i = 0; i < aclPolicies.autoRules.length; i++) {
+      if (aclPolicies.autoRules[i].resourcePath === userPath) {
+        aclPolicies.autoRules[i].autoAddedOwnerPermissions = $scope.settings.ownerPermissions;
+        hasACLPermissions = true;
+      }
+    }
+
+    if (!hasACLPermissions) {
+      aclPolicies.autoRules.push({resourcePath: userPath, autoAddedOwnerPermissions: $scope.settings.ownerPermissions });
+    }
+
+    var aclSuccess = function(value/*, responseHeaders*/) {
+      settingsBackup.ownerPermissions = $scope.settings.ownerPermissions = $scope.settings.ownerPermissions;
+      doWatch();
+
+      newAclPolicies = undefined;
+      aclPolicies = value;
+      Notifications.success('The application ACL Policies have been updated.');
+    };
+    var aclFailure = function (httpResponse) {
+      Notifications.error('Failed to update the application ACL Policies.', httpResponse);
+    };
+
+    if(newAclPolicies) {
+      newAclPolicies.$create({appId: currentApp.name}, aclSuccess, aclFailure);
+    }
+    else {
+      // TODO: save only on diff
+      aclPolicies.$save({appId: currentApp.name}, aclSuccess, aclFailure);
+    }
+  };
+
+  $scope.modalAddRole = function() {
+    modalAddRole($modal, $scope, LoRealmAppRoles, currentApp);
+  };
+
+});
+
+// -- Security / Push ----------------------------------------------------------
+
+loMod.controller('SecurityPushCtrl', function($scope, $rootScope, $location, $route, $log, $filter, $modal, Notifications, LoSecurity, LoACL, LoRealmAppRoles, currentApp, loAppExpanded, loRealmAppRoles, uriPolicies, aclPolicies) {
+
+  $rootScope.curApp = currentApp;
+
+  $scope.breadcrumbs = [
+    {'label': 'Applications', 'href': '#/applications'},
+    {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
+    {'label': 'Security', 'href': '#/applications/' + currentApp.id + '/security'},
+    {'label': 'Secure Push', 'href': '#/applications/' + currentApp.id + '/security/secure-push'}
+  ];
+
+  // list of roles fetched from Keycloak
+  $scope.appRoles = loRealmAppRoles;
+  // list of available permissions for the creator
+  $scope.availablePermissions = ['READ','UPDATE','DELETE'];
+
+  // define security uris for user
+  var userPath = '/' + currentApp.id + '/push';
+
+  // settings object we will work with for storing information
+  $scope.settings = {};
+
+  // initialize URI Policies in case they are not present
+  var newUriPolicies;
+  if(!uriPolicies) {
+    newUriPolicies = new LoSecurity();
+    newUriPolicies.type = 'uri-policy';
+    newUriPolicies.config = {
+      id : 'uri-policy',
+      rules : [
+        newUriPolicyRule(userPath, ['READ'], ['']),
+        newUriPolicyRule(userPath, ['CREATE'], [''])
+      ]
+    };
+    uriPolicies = newUriPolicies.config;
+  }
+
+  var newAclPolicies;
+  if(!aclPolicies) {
+    newAclPolicies = new LoACL();
+    newAclPolicies.type = 'acl-policy';
+    newAclPolicies.config = {
+      id: 'acl-policy',
+      autoRules: [{
+        resourcePath: userPath,
+        autoAddedOwnerPermissions: []
+      }]
+    };
+    aclPolicies = newAclPolicies.config;
+  }
+
+  // initialize resource uri policies
+  var resUriPolicies = $filter('filter')(uriPolicies.rules, {'uriPattern': userPath });
+  $scope.settings = initializeUriPolicies(resUriPolicies, userPath, null, $filter);
+
+  // initialize auto added owner permissions (resource creator can...)
+  $scope.settings.ownerPermissions = initializeAutoAddedOwnerPermissions(aclPolicies, userPath);
+
+  // settings backup to compare for changes and rollback
+  var settingsBackup = angular.copy($scope.settings);
+
+  $scope.changed = false;
+
+  // add/remove item from array
+  $scope.toggleItem = function(item, array) {
+    toggleItem(item, array);
+  };
+
+  // keep a watch on setting to be aware of changes
+  function doWatch() {
+    $scope.$watch('settings', function() {
+      $scope.changed = !angular.equals($scope.settings, settingsBackup);
+    }, true);
+  }
+  doWatch();
+
+  $scope.clear = function() {
+    $scope.settings = angular.copy(settingsBackup);
+  };
+
+  $scope.save = function() {
+    consolidateUriPolicies(uriPolicies, userPath, null, $scope.settings);
+
+    var uriSuccess = function(value/*, responseHeaders*/) {
+      settingsBackup.accessRoles = $scope.settings.accessRoles;
+      settingsBackup.createEntryRoles = $scope.settings.createEntryRoles;
+      settingsBackup.readAllRoles = $scope.settings.readAllRoles;
+      settingsBackup.updateAllRoles = $scope.settings.updateAllRoles;
+      settingsBackup.deleteAllRoles = $scope.settings.deleteAllRoles = $scope.settings.deleteAllRoles;
+      doWatch();
+
+      newUriPolicies = undefined;
+      uriPolicies = value;
+      Notifications.success('The application URI Policies have been updated.');
+    };
+
+    var uriFailure = function (httpResponse) {
+      Notifications.error('Failed to update the application URI Policies.', httpResponse);
+    };
+
+    if (newUriPolicies) {
+      newUriPolicies.$create({appId: currentApp.name}, uriSuccess, uriFailure);
+    }
+    else {
+      // TODO: save only on diff
+      uriPolicies.$save({appId: currentApp.name}, uriSuccess, uriFailure);
+    }
+
+    var hasACLPermissions = false;
+    for (var i = 0; i < aclPolicies.autoRules.length; i++) {
+      if (aclPolicies.autoRules[i].resourcePath === userPath) {
+        aclPolicies.autoRules[i].autoAddedOwnerPermissions = $scope.settings.ownerPermissions;
+        hasACLPermissions = true;
+      }
+    }
+
+    if (!hasACLPermissions) {
+      aclPolicies.autoRules.push({resourcePath: userPath, autoAddedOwnerPermissions: $scope.settings.ownerPermissions });
+    }
+
+    var aclSuccess = function(value/*, responseHeaders*/) {
+      settingsBackup.ownerPermissions = $scope.settings.ownerPermissions = $scope.settings.ownerPermissions;
+      doWatch();
+
+      newAclPolicies = undefined;
+      aclPolicies = value;
+      Notifications.success('The application ACL Policies have been updated.');
+    };
+    var aclFailure = function (httpResponse) {
+      Notifications.error('Failed to update the application ACL Policies.', httpResponse);
+    };
+
+    if(newAclPolicies) {
+      newAclPolicies.$create({appId: currentApp.name}, aclSuccess, aclFailure);
+    }
+    else {
+      // TODO: save only on diff
+      aclPolicies.$save({appId: currentApp.name}, aclSuccess, aclFailure);
+    }
+  };
+
+  $scope.modalAddRole = function() {
+    modalAddRole($modal, $scope, LoRealmAppRoles, currentApp);
+  }
+
+});
+
+// -- Security / Clients -------------------------------------------------------
+
+loMod.controller('SecurityClientsCtrl', function($scope, $rootScope, $location, $route, $log, $filter, $modal, Notifications, LoSecurity, LoACL, LoRealmAppRoles, currentApp, loAppExpanded, loRealmAppRoles, uriPolicies, aclPolicies) {
+
+  $rootScope.curApp = currentApp;
+
+  $scope.breadcrumbs = [
+    {'label': 'Applications', 'href': '#/applications'},
+    {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
+    {'label': 'Security', 'href': '#/applications/' + currentApp.id + '/security'},
+    {'label': 'Secure Clients', 'href': '#/applications/' + currentApp.id + '/security/secure-clients'}
+  ];
+
+  // list of roles fetched from Keycloak
+  $scope.appRoles = loRealmAppRoles;
+  // list of available permissions for the creator
+  $scope.availablePermissions = ['READ','UPDATE','DELETE'];
+
+  // define security uris for user and superuser
+  var userPath = '/' + currentApp.id + '/clients';
+  var superUserPath = userPath + '/*';
+
+  // settings object we will work with for storing information
+  $scope.settings = {};
+
+  // initialize URI Policies in case they are not present
+  var newUriPolicies;
+  if(!uriPolicies) {
+    newUriPolicies = new LoSecurity();
+    newUriPolicies.type = 'uri-policy';
+    newUriPolicies.config = {
+      id : 'uri-policy',
+      rules : [
+        newUriPolicyRule(userPath, ['READ'], ['']),
+        newUriPolicyRule(userPath, ['CREATE'], ['']),
+        newUriPolicyRule(superUserPath, ['READ'], ['']),
+        newUriPolicyRule(superUserPath, ['UPDATE'], ['']),
+        newUriPolicyRule(superUserPath, ['DELETE'], [''])
+      ]
+    };
+    uriPolicies = newUriPolicies.config;
+  }
+
+  var newAclPolicies;
+  if(!aclPolicies) {
+    newAclPolicies = new LoACL();
+    newAclPolicies.type = 'acl-policy';
+    newAclPolicies.config = {
+      id: 'acl-policy',
+      autoRules: [{
+        resourcePath: userPath,
+        autoAddedOwnerPermissions: []
+      }]
+    };
+    aclPolicies = newAclPolicies.config;
+  }
+
+  // initialize resource uri policies
+  var resUriPolicies = $filter('filter')(uriPolicies.rules, {'uriPattern': userPath });
+  $scope.settings = initializeUriPolicies(resUriPolicies, userPath, superUserPath, $filter);
+
+  // initialize auto added owner permissions (resource creator can...)
+  $scope.settings.ownerPermissions = initializeAutoAddedOwnerPermissions(aclPolicies, userPath);
+
+  // settings backup to compare for changes and rollback
+  var settingsBackup = angular.copy($scope.settings);
+
+  $scope.changed = false;
+
+  // add/remove item from array
+  $scope.toggleItem = function(item, array) {
+    toggleItem(item, array);
+  };
+
+  // keep a watch on setting to be aware of changes
+  function doWatch() {
+    $scope.$watch('settings', function() {
+      $scope.changed = !angular.equals($scope.settings, settingsBackup);
+    }, true);
+  }
+  doWatch();
+
+  $scope.clear = function() {
+    $scope.settings = angular.copy(settingsBackup);
+  };
+
+  $scope.save = function() {
+    consolidateUriPolicies(uriPolicies, userPath, superUserPath, $scope.settings);
+
+    var uriSuccess = function(value/*, responseHeaders*/) {
+      settingsBackup.accessRoles = $scope.settings.accessRoles;
+      settingsBackup.createEntryRoles = $scope.settings.createEntryRoles;
+      settingsBackup.readAllRoles = $scope.settings.readAllRoles;
+      settingsBackup.updateAllRoles = $scope.settings.updateAllRoles;
+      settingsBackup.deleteAllRoles = $scope.settings.deleteAllRoles = $scope.settings.deleteAllRoles;
+      doWatch();
+
+      newUriPolicies = undefined;
+      uriPolicies = value;
+      Notifications.success('The application URI Policies have been updated.');
+    };
+
+    var uriFailure = function (httpResponse) {
+      Notifications.error('Failed to update the application URI Policies.', httpResponse);
+    };
+
+    if (newUriPolicies) {
+      newUriPolicies.$create({appId: currentApp.name}, uriSuccess, uriFailure);
+    }
+    else {
+      // TODO: save only on diff
+      uriPolicies.$save({appId: currentApp.name}, uriSuccess, uriFailure);
+    }
+
+    var hasACLPermissions = false;
+    for (var i = 0; i < aclPolicies.autoRules.length; i++) {
+      if (aclPolicies.autoRules[i].resourcePath === userPath) {
+        aclPolicies.autoRules[i].autoAddedOwnerPermissions = $scope.settings.ownerPermissions;
+        hasACLPermissions = true;
+      }
+    }
+
+    if (!hasACLPermissions) {
+      aclPolicies.autoRules.push({resourcePath: userPath, autoAddedOwnerPermissions: $scope.settings.ownerPermissions });
+    }
+
+    var aclSuccess = function(value/*, responseHeaders*/) {
+      settingsBackup.ownerPermissions = $scope.settings.ownerPermissions = $scope.settings.ownerPermissions;
+      doWatch();
+
+      newAclPolicies = undefined;
+      aclPolicies = value;
+      Notifications.success('The application ACL Policies have been updated.');
+    };
+    var aclFailure = function (httpResponse) {
+      Notifications.error('Failed to update the application ACL Policies.', httpResponse);
+    };
+
+    if(newAclPolicies) {
+      newAclPolicies.$create({appId: currentApp.name}, aclSuccess, aclFailure);
+    }
+    else {
+      // TODO: save only on diff
+      aclPolicies.$save({appId: currentApp.name}, aclSuccess, aclFailure);
+    }
+  };
+
+  $scope.modalAddRole = function() {
+    modalAddRole($modal, $scope, LoRealmAppRoles, currentApp);
+  };
+
+});
+
+// -- Security / Business Logic ------------------------------------------------
+
+loMod.controller('SecurityBusinessLogicCtrl', function($scope, $rootScope, $location, $route, $log, $filter, $modal, Notifications, LoSecurity, LoACL, LoRealmAppRoles, currentApp, loRealmAppRoles, uriPolicies, aclPolicies) {
+
+  $scope.curApp = currentApp;
+
+  $scope.breadcrumbs = [
+    {'label': 'Applications', 'href': '#/applications'},
+    {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
+    {'label': 'Security', 'href': '#/applications/' + currentApp.id + '/security'},
+    {'label': 'Secure Business Logic', 'href': '#/applications/' + currentApp.id + '/security/secure-logic'}
+  ];
+
+  // list of roles fetched from Keycloak
+  $scope.appRoles = loRealmAppRoles;
+  // list of available permissions for the creator
+  $scope.availablePermissions = ['READ','UPDATE','DELETE'];
+
+  // define security uris for user and superuser
+  var userPath = '/admin/applications/' + currentApp.id + '/resources/scripts';
+  var superUserPath = userPath + '/*';
+
+  // settings object we will work with for storing information
+  $scope.settings = {};
+
+  // initialize URI Policies in case they are not present
+  var newUriPolicies;
+  if(!uriPolicies) {
+    newUriPolicies = new LoSecurity();
+    newUriPolicies.type = 'uri-policy';
+    newUriPolicies.config = {
+      id : 'uri-policy',
+      rules : [
+        newUriPolicyRule(userPath, ['READ'], ['']),
+        newUriPolicyRule(userPath, ['CREATE'], ['']),
+        newUriPolicyRule(superUserPath, ['READ'], ['']),
+        newUriPolicyRule(superUserPath, ['UPDATE'], ['']),
+        newUriPolicyRule(superUserPath, ['DELETE'], [''])
+      ]
+    };
+    uriPolicies = newUriPolicies.config;
+  }
+
+  var newAclPolicies;
+  if(!aclPolicies) {
+    newAclPolicies = new LoACL();
+    newAclPolicies.type = 'acl-policy';
+    newAclPolicies.config = {
+      id: 'acl-policy',
+      autoRules: [{
+        resourcePath: userPath,
+        autoAddedOwnerPermissions: []
+      }]
+    };
+    aclPolicies = newAclPolicies.config;
+  }
+
+  // initialize resource uri policies
+  var resUriPolicies = $filter('filter')(uriPolicies.rules, {'uriPattern': userPath });
+  $scope.settings = initializeUriPolicies(resUriPolicies, userPath, superUserPath, $filter);
+
+  // initialize auto added owner permissions (resource creator can...)
+  $scope.settings.ownerPermissions = initializeAutoAddedOwnerPermissions(aclPolicies, userPath);
+
+  // settings backup to compare for changes and rollback
+  var settingsBackup = angular.copy($scope.settings);
+
+  $scope.changed = false;
+
+  // add/remove item from array
+  $scope.toggleItem = function(item, array) {
+    toggleItem(item, array);
+  };
+
+  // keep a watch on setting to be aware of changes
+  function doWatch() {
+    $scope.$watch('settings', function() {
+      $scope.changed = !angular.equals($scope.settings, settingsBackup);
+    }, true);
+  }
+  doWatch();
+
+  $scope.clear = function() {
+    $scope.settings = angular.copy(settingsBackup);
+  };
+
+  $scope.save = function() {
+    consolidateUriPolicies(uriPolicies, userPath, superUserPath, $scope.settings);
+
+    var uriSuccess = function(value/*, responseHeaders*/) {
+      settingsBackup.accessRoles = $scope.settings.accessRoles;
+      settingsBackup.createEntryRoles = $scope.settings.createEntryRoles;
+      settingsBackup.readAllRoles = $scope.settings.readAllRoles;
+      settingsBackup.updateAllRoles = $scope.settings.updateAllRoles;
+      settingsBackup.deleteAllRoles = $scope.settings.deleteAllRoles = $scope.settings.deleteAllRoles;
+      doWatch();
+
+      newUriPolicies = undefined;
+      uriPolicies = value;
+      Notifications.success('The application URI Policies have been updated.');
+    };
+
+    var uriFailure = function (httpResponse) {
+      Notifications.error('Failed to update the application URI Policies.', httpResponse);
+    };
+
+    if (newUriPolicies) {
+      newUriPolicies.$create({appId: currentApp.name}, uriSuccess, uriFailure);
+    }
+    else {
+      // TODO: save only on diff
+      uriPolicies.$save({appId: currentApp.name}, uriSuccess, uriFailure);
+    }
+
+    var hasACLPermissions = false;
+    for (var i = 0; i < aclPolicies.autoRules.length; i++) {
+      if (aclPolicies.autoRules[i].resourcePath === userPath) {
+        aclPolicies.autoRules[i].autoAddedOwnerPermissions = $scope.settings.ownerPermissions;
+        hasACLPermissions = true;
+      }
+    }
+
+    if (!hasACLPermissions) {
+      aclPolicies.autoRules.push({resourcePath: userPath, autoAddedOwnerPermissions: $scope.settings.ownerPermissions });
+    }
+
+    var aclSuccess = function(value/*, responseHeaders*/) {
+      settingsBackup.ownerPermissions = $scope.settings.ownerPermissions = $scope.settings.ownerPermissions;
+      doWatch();
+
+      newAclPolicies = undefined;
+      aclPolicies = value;
+      Notifications.success('The application ACL Policies have been updated.');
+    };
+    var aclFailure = function (httpResponse) {
+      Notifications.error('Failed to update the application ACL Policies.', httpResponse);
+    };
+
+    if(newAclPolicies) {
+      newAclPolicies.$create({appId: currentApp.name}, aclSuccess, aclFailure);
+    }
+    else {
+      // TODO: save only on diff
+      aclPolicies.$save({appId: currentApp.name}, aclSuccess, aclFailure);
+    }
+  };
+
+  $scope.modalAddRole = function() {
+    modalAddRole($modal, $scope, LoRealmAppRoles, currentApp);
+  };
+
 });
 
 // -- Security Roles -----------------------------------------------------------
@@ -723,3 +1365,134 @@ loMod.controller('SecurityUsersAddCtrl', function($scope, $rootScope, $log, $rou
 
 
 });
+
+
+var toggleItem = function(item, array) {
+  var found = $.inArray(item, array);
+  if (found >= 0) {
+    array.splice(found, 1);
+  }
+  else {
+    array.push(item);
+  }
+};
+
+var newUriPolicyRule = function(uriPattern, requestTypes, allowedRoles) {
+  return {
+    uriPattern : uriPattern,
+    requestTypes : requestTypes,
+    allowedRoles : allowedRoles,
+    deniedRoles : null,
+    allowedUsers : null,
+    deniedUsers : null
+  };
+};
+
+var initializeAutoAddedOwnerPermissions = function(aclPolicies, path) {
+  for (var i = 0; i < aclPolicies.autoRules.length; i++) {
+    if(aclPolicies.autoRules[i].resourcePath === path) {
+      return aclPolicies.autoRules[i].autoAddedOwnerPermissions;
+    }
+  }
+
+  return [];
+};
+
+var initializeUriPolicies = function(uriPolicies, userPath, superUserPath, $filter) {
+  var settings = {};
+  if (uriPolicies.length > 0) {
+    if (userPath) {
+      var _access = ($filter('filter')(uriPolicies, {'uriPattern': userPath, requestTypes: 'READ' }, true));
+      var _create = ($filter('filter')(uriPolicies, {'uriPattern': userPath, requestTypes: 'CREATE' }, true));
+      settings.accessRoles = _access.length > 0 ? _access[0].allowedRoles : [];
+      settings.createEntryRoles = _create.length > 0 ? _create[0].allowedRoles : [];
+    }
+    if (superUserPath) {
+      var _readAll = ($filter('filter')(uriPolicies, {'uriPattern': superUserPath, requestTypes: 'READ' }, true));
+      var _updateAll = ($filter('filter')(uriPolicies, {'uriPattern': superUserPath, requestTypes: 'UPDATE' }, true));
+      var _deleteAll = ($filter('filter')(uriPolicies, {'uriPattern': superUserPath, requestTypes: 'DELETE' }, true));
+      settings.readAllRoles = _readAll.length > 0 ? _readAll[0].allowedRoles : [];
+      settings.updateAllRoles = _updateAll.length > 0 ? _updateAll[0].allowedRoles : [];
+      settings.deleteAllRoles = _deleteAll.length > 0 ? _deleteAll[0].allowedRoles : [];
+    }
+  }
+  else {
+    settings.accessRoles      = [];
+    settings.createEntryRoles = [];
+    settings.readAllRoles     = [];
+    settings.updateAllRoles   = [];
+    settings.deleteAllRoles   = [];
+  }
+  return settings;
+};
+
+var consolidateUriPolicies = function(uriPolicies, userPath, superUserPath, settings) {
+  var hasUserRead, hasUserCreate, hasSuperRead, hasSuperUpdate, hasSuperDelete = false;
+  for (var u = 0; u < uriPolicies.rules.length; u++) {
+    if (userPath && uriPolicies.rules[u].uriPattern === userPath) {
+      if (angular.equals(uriPolicies.rules[u].requestTypes, ['READ'])) {
+        uriPolicies.rules[u].allowedRoles = settings.accessRoles;
+        hasUserRead = true;
+      }
+      else if (angular.equals(uriPolicies.rules[u].requestTypes, ['CREATE'])) {
+        uriPolicies.rules[u].allowedRoles = settings.createEntryRoles;
+        hasUserCreate = true;
+      }
+    }
+    else if (superUserPath && uriPolicies.rules[u].uriPattern === superUserPath) {
+      if (angular.equals(uriPolicies.rules[u].requestTypes, ['READ'])) {
+        uriPolicies.rules[u].allowedRoles = settings.readAllRoles;
+        hasSuperRead = true;
+      }
+      else if (angular.equals(uriPolicies.rules[u].requestTypes, ['UPDATE'])) {
+        uriPolicies.rules[u].allowedRoles = settings.updateAllRoles;
+        hasSuperUpdate = true;
+      }
+      else if (angular.equals(uriPolicies.rules[u].requestTypes, ['DELETE'])) {
+        uriPolicies.rules[u].allowedRoles = settings.deleteAllRoles;
+        hasSuperDelete = true;
+      }
+    }
+  }
+
+  if(userPath && !hasUserRead) { uriPolicies.rules.push(newUriPolicyRule(userPath, ['READ'], settings.accessRoles)); }
+  if(userPath && !hasUserCreate) { uriPolicies.rules.push(newUriPolicyRule(userPath, ['CREATE'], settings.createEntryRoles)); }
+  if(superUserPath && !hasSuperRead) { uriPolicies.rules.push(newUriPolicyRule(superUserPath, ['READ'], settings.readAllRoles)); }
+  if(superUserPath && !hasSuperUpdate) { uriPolicies.rules.push(newUriPolicyRule(superUserPath, ['UPDATE'], settings.updateAllRoles)); }
+  if(superUserPath && !hasSuperDelete) { uriPolicies.rules.push(newUriPolicyRule(superUserPath, ['DELETE'], settings.deleteAllRoles)); }
+};
+
+loMod.controller('NoSecurityCtrl', function($scope, $rootScope, $location, $log, $filter, $modal, currentApp) {
+
+  $rootScope.curApp = currentApp;
+
+  $scope.breadcrumbs = [
+    {'label': 'Applications', 'href': '#/applications'},
+    {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
+    {'label': 'Security Policies', 'href': '#/applications/' + currentApp.id + '/security'}
+  ];
+
+});
+
+var modalAddRole = function($modal, $scope, LoRealmAppRoles, currentApp) {
+  var modalAddRole = $modal.open({
+    templateUrl: '/admin/console/templates/modal/application/role-add.html',
+    controller: 'AddRoleModalCtrl',
+    scope: $scope,
+    resolve: {
+      roles: function () {
+        return $scope.appRoles;
+      },
+      currentApp: function () {
+        return currentApp;
+      }
+    }
+  });
+
+  modalAddRole.result.then(
+    function(newRole) { // modal completion
+      $scope.appRoles = LoRealmAppRoles.query({appId: currentApp.id});
+      $scope.settings.accessRoles.push(currentApp.name + '/' + newRole);
+    }
+  );
+};

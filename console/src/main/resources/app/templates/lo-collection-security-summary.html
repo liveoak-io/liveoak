@@ -1,6 +1,6 @@
 <div class="panel" ng-show="($parent.uriPolicies|filter:{'uriPattern': '/'+app.id+'/'+storage+'/'+collection}:true).length > 0 || ($parent.acl|filter:{'resourcePath': '/'+app.id+'/'+storage+'/'+collection}:true).length > 0">
   <div class="panel-heading">
-    <h2 class="panel-title">{{storage}} / <a href="#/applications/{{app.id}}/security/policies/{{storage}}/{{collection}}">{{collection}}</a></h2>
+    <h2 class="panel-title">{{storage}} / <a href="#/applications/{{app.id}}/security/policies/storage/{{storage}}/{{collection}}">{{collection}}</a></h2>
     <div class="pull-right" data-tooltip-placement="top" data-tooltip="Delete Security">
       <a href="" ng-click="debugger;$parent.$parent.modalCollectionSecurityDelete(storage, collection);"><i class="fa fa-trash-o"></i></a>
     </div>

@@ -1,0 +1,97 @@
+<div id="lo-content-row" class="row">
+  <div class="col-md-10 lo-main-pane">
+    <div class="row">
+      <ul class="nav nav-tabs nav-tabs-pf">
+        <li class="active"><a href="#/applications/{{curApp.id}}/security/policies">Policies</a></li>
+        <li><a href="#/applications/{{curApp.id}}/security/roles">Roles</a></li>
+        <li><a href="#/applications/{{curApp.id}}/security/users">Users</a></li>
+      </ul>
+
+      <div class="lo-content-area col-md-9">
+
+        <lo-breadcrumbs></lo-breadcrumbs>
+
+        <h3 style="margin-bottom: 0;">
+          <ul class="nav nav-tabs">
+            <li><a href="#/applications/{{curApp.id}}/security/secure-storage" role="tab">Storage</a></li>
+            <li><a href="#/applications/{{curApp.id}}/security/secure-collections">Collections</a></li>
+            <li class="active"><a href="" role="tab">Push</a></li>
+            <li><a href="#/applications/{{curApp.id}}/security/secure-clients" role="tab">Clients</a></li>
+            <li><a href="#/applications/{{curApp.id}}/security/secure-logic" role="tab">Business Logic</a></li>
+          </ul>
+        </h3>
+
+        <h2 class="pull-left"><span>Push</span> Security</h2>
+        <p class="subtitle"><span class="required">*</span> Required fields</p>
+
+        <div class="alert alert-info" ng-show="appRoles.length === 0">
+          <span class="pficon pficon-info"></span>
+          <strong>To secure a resource, you need roles.</strong> <a href="" ng-click="modalAddRole()">Create a role</a>.
+        </div>
+
+        <form class="lo-form-horizontal clearfix" name="securityForm" novalidate>
+          <fieldset>
+            <legend lo-collapse class="collapsible"><span class="text">Push Settings</span></legend>
+            <div class="form-group clearfix">
+              <label class="col-sm-3 control-label" for="access">Can access configuration <span class="required">*</span></label>
+              <div class="dropdown btn-group bootstrap-select col-sm-9" style="z-index: 998;">
+                <button class="btn btn-default dropdown-toggle col-sm-12" id ="access" type="button">
+                  <span class="pull-left" ng-show="appRoles.length === 0">The application has no roles</span>
+                  <span class="pull-left" ng-show="appRoles.length > 0 && settings.accessRoles.length === 0">Nothing selected</span>
+                  <span class="pull-left" ng-show="settings.accessRoles.length > 0">{{settings.accessRoles.join(', ')}}</span>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li ng-repeat="role in appRoles" class="">
+                    <a role="menuitem" tabindex="-1" ng-click="toggleItem(curApp.name + '/' + role.name, settings.accessRoles)">
+                      <span class="text">{{curApp.name}} / {{role.name}}</span>
+                      <i class="fa fa-check pull-right" ng-show="(settings.accessRoles | filter:curApp.name + '/' + role.name:true).length > 0"></i>
+                    </a>
+                  </li>
+                  <li role="presentation" class="divider" ng-hide="appRoles.length === 0"></li>
+                  <li role="presentation">
+                    <a role="menuitem" tabindex="-1" ng-click="modalAddRole()">New Role...</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend lo-collapse class="collapsible"><span class="text">Entry Settings</span></legend>
+            <div class="form-group clearfix">
+              <label class="col-sm-3 control-label" for="create">Can create configuration <span class="required">*</span></label>
+              <div class="dropdown btn-group bootstrap-select col-sm-9">
+                <button class="btn btn-default dropdown-toggle col-sm-12" id="create" type="button" ng-disabled="settings.accessRoles.length === 0">
+                  <span class="pull-left" ng-show="settings.accessRoles.length === 0">No Roles can access the configuration</span>
+                  <span class="pull-left" ng-show="settings.accessRoles.length > 0 && settings.createEntryRoles.length === 0">Nothing selected</span>
+                  <span class="pull-left" ng-show="settings.createEntryRoles.length > 0">{{settings.createEntryRoles.join(', ')}}</span>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li ng-repeat="role in settings.accessRoles">
+                    <a role="menuitem" tabindex="-1" ng-click="toggleItem(role, settings.createEntryRoles)">
+                      <span class="text">{{role}}</span>
+                      <i class="fa fa-check pull-right" ng-show="(settings.createEntryRoles | filter:role).length > 0"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="form-group clearfix">
+              <label class="col-sm-3 control-label" for="creator">Configuration creator can <span class="required">*</span></label>
+              <select pf-select class="col-sm-9" multiple id="creator" ng-options="permission for permission in availablePermissions" ng-model="settings.ownerPermissions">
+              </select>
+            </div>
+          </fieldset>
+
+          <div class="pull-right form-actions">
+            <button lo-button-clear="clear()" ng-hide="create" ng-disabled="!changed">Clear changes</button>
+            <button lo-button-clear="cancelCreate()" ng-show="create">Cancel</button>
+            <button lo-button-save="save()" ng-disabled="!changed || !securityForm.$valid">Save</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
