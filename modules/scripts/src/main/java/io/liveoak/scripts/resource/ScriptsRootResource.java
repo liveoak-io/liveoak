@@ -15,6 +15,7 @@ import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+ * @author Ken Finnigan
  */
 public class ScriptsRootResource implements RootResource {
 
@@ -76,6 +77,7 @@ public class ScriptsRootResource implements RootResource {
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("name", "LiveOak Scripts");
         sink.accept("description", "Manages server side scripts for the application.");
+        sink.accept(DIRECTORY, this.getScriptDirectory());
         sink.close();
     }
 
@@ -104,7 +106,7 @@ public class ScriptsRootResource implements RootResource {
     }
 
     @Override
-    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+    public void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         Object dirProperty = state.getProperty(DIRECTORY);
         if (dirProperty != null && dirProperty instanceof String) {
             this.scriptDirectory = (String) dirProperty;

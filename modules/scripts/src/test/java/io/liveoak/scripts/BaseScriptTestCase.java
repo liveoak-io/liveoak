@@ -22,6 +22,7 @@ import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+ * @author Ken Finnigan
  */
 public class BaseScriptTestCase extends AbstractHTTPResourceTestCase {
 
@@ -30,13 +31,14 @@ public class BaseScriptTestCase extends AbstractHTTPResourceTestCase {
     public final static String SCRIPT_PATH = "/admin/applications/testApp/resources/scripts";
 
     protected MockInMemoryRootResource rootResource;
+    protected File scriptDirectory;
 
     @Override
     public void loadExtensions() throws Exception {
 
         //set up Scripting
         //create the directory to store the files
-        File scriptDirectory = Files.createTempDirectory("io.liveoak.scripts.test").toFile();
+        scriptDirectory = Files.createTempDirectory("io.liveoak.scripts.test").toFile();
         scriptDirectory.mkdir();
         //configure and load the extension
         ObjectNode config = JsonNodeFactory.instance.objectNode();
@@ -108,7 +110,7 @@ public class BaseScriptTestCase extends AbstractHTTPResourceTestCase {
 //        }
 //    }
 
-    public ByteBuf readFile(String name) throws Exception  {
+    public ByteBuf readFile(String name) throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("scripts/" + name);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -122,7 +124,7 @@ public class BaseScriptTestCase extends AbstractHTTPResourceTestCase {
     }
 
     public ResourceState getMember(ResourceState parent, String id) {
-        for (ResourceState resourceState: parent.members()) {
+        for (ResourceState resourceState : parent.members()) {
             if (resourceState.id().equals(id)) {
                 return resourceState;
             }
