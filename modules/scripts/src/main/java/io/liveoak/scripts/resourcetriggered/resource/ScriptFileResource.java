@@ -6,6 +6,10 @@ import io.liveoak.spi.resource.async.BinaryContentSink;
 import io.liveoak.spi.resource.async.BinaryResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.BinaryResourceState;
+import io.liveoak.spi.state.LazyResourceState;
+import io.liveoak.spi.state.ResourceState;
+import io.netty.buffer.ByteBuf;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -53,7 +57,26 @@ public class ScriptFileResource implements BinaryResource {
     }
 
     @Override
-    public void delete(RequestContext ctx, Responder responder) throws Exception {
-        parent.deleteMember(ctx, this.id(), responder);
+    public void updateContent(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        ByteBuf content = null;
+
+        if (state instanceof LazyResourceState) {
+            content = ((LazyResourceState) state).contentAsByteBuf();
+        } else if (state instanceof BinaryResourceState) {
+            content = ((BinaryResourceState) state).getBuffer();
+        }
+
+        if (content != null) {
+            parent.updateScript(content);
+            responder.resourceUpdated(this);
+            return;
+        }
+
+        responder.invalidRequest("The uploaded script must be a binary javascript file.");
+    }
+
+    @Override
+    public boolean willProcessUpdate(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        return true;
     }
 }

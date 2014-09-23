@@ -57,7 +57,7 @@ public class ResourceScript implements Resource {
             }
         }
 
-        String target = (String)getProperty(TARGET_PATH, state, true, String.class);
+        String target = (String) getProperty(TARGET_PATH, state, true, String.class);
 
         Script.Builder builder = new Script.Builder(id, target);
 
@@ -66,7 +66,7 @@ public class ResourceScript implements Resource {
             builder.setName(name);
         }
 
-        String description = (String)getProperty(DESCRIPTION, state, false, String.class);
+        String description = (String) getProperty(DESCRIPTION, state, false, String.class);
         if (description != null) {
             builder.setDescription(description);
         }
@@ -87,9 +87,9 @@ public class ResourceScript implements Resource {
         List librariesProperty = (List) getProperty(LIBRARIES, state, false, ArrayList.class);
         if (librariesProperty != null) {
             List<String> libraries = new ArrayList<String>(librariesProperty.size());
-            for (Object libName: librariesProperty) {
+            for (Object libName : librariesProperty) {
                 if (libName instanceof String) {
-                    libraries.add((String)libName);
+                    libraries.add((String) libName);
                 } else {
                     throw new InvalidPropertyTypeException(LIBRARIES, String.class, true);
                 }
@@ -116,6 +116,11 @@ public class ResourceScript implements Resource {
 
     public Script getScript() {
         return script;
+    }
+
+    public void updateScript(ByteBuf content) throws Exception {
+        script.setScriptBuffer(content);
+        parent.writeSourceFile(this.id(), script.getScriptBuffer());
     }
 
     @Override
@@ -160,21 +165,16 @@ public class ResourceScript implements Resource {
 
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        ByteBuf content = null;
+
         if (state instanceof LazyResourceState) {
-            LazyResourceState lazyResourceState = (LazyResourceState) state;
-            ByteBuf content = lazyResourceState.contentAsByteBuf();
-
-            script.setScriptBuffer(content);
-            parent.writeSourceFile(this.id(), script.getScriptBuffer());
-
-            responder.resourceCreated(new ScriptFileResource(this));
-            return;
+            content = ((LazyResourceState) state).contentAsByteBuf();
         } else if (state instanceof BinaryResourceState) {
-            ByteBuf content = ((BinaryResourceState)state).getBuffer();
+            content = ((BinaryResourceState) state).getBuffer();
+        }
 
-            script.setScriptBuffer(content);
-            parent.writeSourceFile(this.id(), script.getScriptBuffer());
-
+        if (content != null) {
+            updateScript(content);
             responder.resourceCreated(new ScriptFileResource(this));
             return;
         }
@@ -202,16 +202,5 @@ public class ResourceScript implements Resource {
     public void delete(RequestContext ctx, Responder responder) throws Exception {
         parent.deleteMember(ctx, script.getId(), responder);
         this.script = null;
-    }
-
-    //TODO: add DeleteMember to the Resource object?
-    public void deleteMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        if (id == ScriptFileResource.ID && script.getScriptBuffer() != null) {
-            Resource resource = new ScriptFileResource(this);
-            this.script.setScriptBuffer(null);
-            responder.resourceDeleted(resource);
-        } else {
-            responder.noSuchResource(id);
-        }
     }
 }
