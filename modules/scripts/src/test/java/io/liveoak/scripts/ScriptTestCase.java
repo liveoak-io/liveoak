@@ -42,4 +42,49 @@ public class ScriptTestCase extends BaseScriptTestCase {
 
     //TODO: write up more tests
 
+
+//    @Test
+//    public void testGetEmptySubscriptions() throws Exception {
+//
+//        ResourceState result = client.read( new RequestContext.Builder().build(), "/admin/applications/testApp/resources/scripts");
+//        result = client.read( new RequestContext.Builder().build(), "/testApp/mock");
+//        //System.out.println("PROPERTIES : " + System.getProperties().keySet());
+//        System.err.println("RESULT : " + result);
+//
+//        result.putProperty("Foo", "Bar");
+//        client.update(new RequestContext.Builder().build(), "/testApp/mock", result);
+//
+//        result = client.read( new RequestContext.Builder().build(), "/testApp/mock");
+//        System.err.println("RESULT2 : " + result);
+//
+//        ResourceState child = new DefaultResourceState("baz");
+//        client.create(new RequestContext.Builder().build(),"/testApp/mock", child);
+//        result = client.read( new RequestContext.Builder().build(), "/testApp/mock/baz");
+//        System.err.println("CHILD : " + result);
+//
+//        ResourceState resource = new DefaultResourceState("testScript");
+//        resource.putProperty("target-path", "/testApp/**");
+//
+//        client.create(new RequestContext.Builder().build(), "/admin/applications/testApp/resources/scripts/resource-triggered-scripts", resource );
+//
+//        Buffer buffer = readFile("hello.js");
+//        //Buffer buffer = new Buffer("function preRead(request, libraries) { print('HELLO WORLD'); }");
+//
+//
+//
+//
+//        ResourceState binaryResourceState = new JavaScriptResourceState(buffer.getByteBuf());
+//        ResourceState binResult = client.create(new RequestContext.Builder().build(), "/admin/applications/testApp/resources/scripts/resource-triggered-scripts/testScript", binaryResourceState);
+//
+//        ResourceState reRead = client.read(new RequestContext.Builder().build(), "/testApp/mock");
+//
+//
+//        ClassLoader cl = ClassLoader.getSystemClassLoader();
+//
+//        URL[] urls = ((URLClassLoader)cl).getURLs();
+//
+//        for(URL url: urls){
+//            System.out.println(url.getFile());
+//        }
+//    }
 }

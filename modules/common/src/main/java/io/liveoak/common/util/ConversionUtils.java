@@ -1,14 +1,17 @@
 package io.liveoak.common.util;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.*;
-import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.spi.state.ResourceState;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
@@ -23,6 +26,16 @@ public class ConversionUtils {
             copy(src, dest, fieldIter.next());
         }
 
+        return dest;
+    }
+
+    public static ResourceState convert(JsonNode src) {
+        ResourceState dest = new DefaultResourceState();
+        Iterator<String> fieldIter = src.fieldNames();
+
+        while (fieldIter.hasNext()) {
+            copy(src, dest, fieldIter.next());
+        }
         return dest;
     }
 
@@ -88,7 +101,7 @@ public class ConversionUtils {
         dest.put(name, toJSON(value));
     }
 
-    private static void copy(ObjectNode src, ResourceState dest, String name) {
+    private static void copy(JsonNode src, ResourceState dest, String name) {
         JsonNode value = src.get(name);
         dest.putProperty( name, toRS( value ));
     }
