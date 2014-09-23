@@ -12,7 +12,7 @@ import io.liveoak.spi.state.ResourceState;
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  * @author Ken Finnigan
  */
-public class BaseResourceTriggeredTestCase extends BaseScriptTestCase{
+public class BaseResourceTriggeredTestCase extends BaseScriptTestCase {
     public static final String RESOURCE_ID = "resource-triggered-scripts";
     public static final String RESOURCE_SCRIPT_PATH = SCRIPT_PATH + "/" + RESOURCE_ID;
 

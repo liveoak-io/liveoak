@@ -198,6 +198,7 @@ public class Script{
     private void analyseProvides() {
         ScriptEngineFactory nsef = new NashornScriptEngineFactory();
         ScriptEngine engine = nsef.getScriptEngine();
+        provides.clear();
 
         try {
             //Load the script
