@@ -66,7 +66,7 @@ public class Script{
         private String id, name, description, target;
         private boolean enabled = true;
         private List<String> libraries;
-        private int priority = 1;
+        private int priority = 5;
         private ByteBuf scriptBuffer;
 
         public Builder(String id, String target) {

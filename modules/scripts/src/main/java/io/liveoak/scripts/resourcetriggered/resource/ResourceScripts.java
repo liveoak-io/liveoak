@@ -10,6 +10,7 @@ import io.liveoak.scripts.resource.ScriptResource;
 import io.liveoak.scripts.resource.ScriptsResource;
 import io.liveoak.scripts.resource.ScriptsRootResource;
 import io.liveoak.spi.InvalidPropertyTypeException;
+import io.liveoak.spi.PropertyException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -160,7 +161,7 @@ public class ResourceScripts extends ScriptsResource {
             writeMetadataFile(resourceScript.id(), objectNode);
 
             responder.resourceCreated(resourceScript);
-        } catch (InvalidPropertyTypeException e) {
+        } catch (PropertyException e) {
             responder.invalidRequest(e.getMessage());
         }
     }

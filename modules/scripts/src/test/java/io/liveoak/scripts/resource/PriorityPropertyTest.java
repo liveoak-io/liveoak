@@ -50,4 +50,16 @@ public class PriorityPropertyTest extends BaseResourceTriggeredTestCase {
         result.putProperty("priority", 12);
         client.update(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/invalidupdate", result);
     }
+
+    @Test
+    public void checkPrioritySetToDefaultWhenNullPassed() throws Exception {
+        ResourceState result = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("validtodefault", "targetPath").priority(2).build());
+        assertThat(result).isNotNull();
+        assertThat(result.getProperty("priority")).isEqualTo(2);
+
+        result.putProperty("priority", null);
+        result = client.update(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/validtodefault", result);
+        assertThat(result).isNotNull();
+        assertThat(result.getProperty("priority")).isEqualTo(5);
+    }
 }

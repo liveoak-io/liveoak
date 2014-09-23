@@ -78,6 +78,9 @@ public class ResourceScript implements Resource {
 
         Integer priority = (Integer) getProperty(PRIORITY, state, false, Integer.class);
         if (priority != null) {
+            if (priority < 1 || priority > 10) {
+                throw new PropertyException("'priority' must be between 1 and 10.");
+            }
             builder.setPriority(priority);
         }
 
