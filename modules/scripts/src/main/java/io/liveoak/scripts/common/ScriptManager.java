@@ -50,7 +50,7 @@ public class ScriptManager {
 
         DynJS dynJS = new DynJS(config);
 
-        GlobalObject globalObject = dynJS.getExecutionContext().getGlobalObject();
+        GlobalObject globalObject = dynJS.getDefaultExecutionContext().getGlobalObject();
         configureGlobalObject(globalObject);
 
         dynJS.evaluate(script.getScriptBuffer().toString(Charset.forName("UTF-8")));

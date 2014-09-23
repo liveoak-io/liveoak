@@ -1,6 +1,11 @@
 package io.liveoak.scripts;
 
+import java.util.UUID;
+
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.resources.MockInMemoryResource;
 
 /**
@@ -10,5 +15,14 @@ public class MockInMemoryRootResource extends MockInMemoryResource implements Ro
 
     public MockInMemoryRootResource(String id) {
         super(id);
+    }
+
+    @Override
+    public void createMember(RequestContext ctx, ResourceState child, Responder responder) throws Exception {
+        if (child.id() == null) {
+            child.id(UUID.randomUUID().toString());
+        }
+
+        super.createMember(ctx, child, responder);
     }
 }

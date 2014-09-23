@@ -55,7 +55,13 @@ public class Script{
         this.name = name;
         this.description = description;
         this.enabled = enabled;
-        this.libraries = libraries;
+
+        if (libraries == null) {
+            this.libraries = new ArrayList<>();
+        } else {
+            this.libraries = libraries;
+        }
+
         this.target = target;
         this.priority = priority;
         this.scriptBuffer = scriptBuffer;

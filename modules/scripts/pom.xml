@@ -72,6 +72,14 @@
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-test-tools</artifactId>
         </dependency>
+
+       <!-- Remove this when LIVEOAK-457 is resolved -->
+       <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-security</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

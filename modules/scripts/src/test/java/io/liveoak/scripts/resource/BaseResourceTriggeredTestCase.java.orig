@@ -1,8 +1,11 @@
 package io.liveoak.scripts.resource;
 
-import java.util.ArrayList;
+<<<<<<< Updated upstream
 import java.util.HashMap;
 import java.util.Map;
+=======
+import java.util.ArrayList;
+>>>>>>> Stashed changes
 
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.scripts.BaseScriptTestCase;
@@ -19,13 +22,13 @@ public class BaseResourceTriggeredTestCase extends BaseScriptTestCase{
     public static class MetadataState {
         String id;
         Map<String, Object> values = new HashMap<>();
-        ArrayList<String> libraries = new ArrayList<>();
 
         public MetadataState(String id, String targetPath) {
             this.id = id;
             this.values.put("target-path", targetPath);
         }
 
+<<<<<<< Updated upstream
         public MetadataState name(String name) {
             this.values.put("name", name);
             return this;
@@ -35,6 +38,14 @@ public class BaseResourceTriggeredTestCase extends BaseScriptTestCase{
             this.values.put("description", description);
             return this;
         }
+=======
+        ArrayList<String> libraries = new ArrayList<>();
+        libraries.add("client");
+
+        resourceState.putProperty("libraries", libraries);
+        return resourceState;
+    }
+>>>>>>> Stashed changes
 
         public MetadataState enabled(boolean enabled) {
             this.values.put("enabled", enabled);
@@ -46,19 +57,10 @@ public class BaseResourceTriggeredTestCase extends BaseScriptTestCase{
             return this;
         }
 
-        public MetadataState libraries(String... libraries) {
-            for (String library:libraries) {
-                this.libraries.add(library);
-            }
-            return this;
-        }
-
         public ResourceState build() {
             ResourceState state = new DefaultResourceState(id);
             values.forEach((key, value) -> state.putProperty(key, value));
-            state.putProperty("libraries", libraries);
             return state;
         }
     }
-
 }
