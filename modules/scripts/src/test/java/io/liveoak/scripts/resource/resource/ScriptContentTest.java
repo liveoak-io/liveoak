@@ -11,6 +11,7 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -65,8 +66,16 @@ public class ScriptContentTest extends BaseResourceTriggeredTestCase {
 
     @Test
     public void scriptFilePresentAfterCreate() throws Exception {
-        ResourceState result = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("filecheck", "targetPath").build());
-        assertThat(result).isNotNull();
+        HttpPost post = new HttpPost("http://localhost:8080" + RESOURCE_SCRIPT_PATH);
+        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, MediaType.JSON.toString());
+        post.setEntity(new StringEntity("{ \"id\": \"filecheck\", \"target-path\": \"targetPath\" }"));
+
+        CloseableHttpResponse response = httpClient.execute(post);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
+        assertThat(response.getEntity()).isNotNull();
+        response.close();
 
         File resourceBasedDir = new File(scriptDirectory, "resource-based");
         assertThat(resourceBasedDir.exists()).isTrue();
@@ -76,7 +85,7 @@ public class ScriptContentTest extends BaseResourceTriggeredTestCase {
         assertThat(fileCheckDir.listFiles().length).isEqualTo(1);
         assertThat(fileCheckDir.listFiles()[0].getName()).isEqualTo("metadata.json");
 
-        HttpPost post = new HttpPost("http://localhost:8080" + RESOURCE_SCRIPT_PATH + "/filecheck");
+        post = new HttpPost("http://localhost:8080" + RESOURCE_SCRIPT_PATH + "/filecheck");
         post.setHeader(HttpHeaders.Names.CONTENT_TYPE, MediaType.JAVASCRIPT.toString());
         post.setHeader(HttpHeaders.Names.ACCEPT, MediaType.JAVASCRIPT.toString());
 
@@ -84,7 +93,7 @@ public class ScriptContentTest extends BaseResourceTriggeredTestCase {
         StringEntity entity = new StringEntity(content, ContentType.create(MediaType.JAVASCRIPT.toString(), "UTF-8"));
         post.setEntity(entity);
 
-        CloseableHttpResponse response = httpClient.execute(post);
+        response = httpClient.execute(post);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
@@ -96,6 +105,44 @@ public class ScriptContentTest extends BaseResourceTriggeredTestCase {
         File source = new File(fileCheckDir, "source.js");
         assertThat(source.exists()).isTrue();
         assertThat(source.length()).isGreaterThan(0);
+    }
+
+    @Test
+    public void deleteScriptFailsHttp() throws Exception {
+        HttpPost post = new HttpPost("http://localhost:8080" + RESOURCE_SCRIPT_PATH);
+        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, MediaType.JSON.toString());
+        post.setEntity(new StringEntity("{ \"id\": \"deletefailhttp\", \"target-path\": \"targetPath\" }"));
+
+        CloseableHttpResponse response = httpClient.execute(post);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
+        assertThat(response.getEntity()).isNotNull();
+        response.close();
+
+        post = new HttpPost("http://localhost:8080" + RESOURCE_SCRIPT_PATH + "/deletefailhttp");
+        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, MediaType.JAVASCRIPT.toString());
+        post.setHeader(HttpHeaders.Names.ACCEPT, MediaType.JAVASCRIPT.toString());
+
+        String content = "function preRead(request, libraries) { print('Hello');}";
+        StringEntity entity = new StringEntity(content, ContentType.create(MediaType.JAVASCRIPT.toString(), "UTF-8"));
+        post.setEntity(entity);
+
+        response = httpClient.execute(post);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
+        assertThat(response.getEntity()).isNotNull();
+        assertThat(EntityUtils.toString(response.getEntity())).isEqualTo(content);
+        response.close();
+
+        HttpDelete delete = new HttpDelete("http://localhost:8080" + RESOURCE_SCRIPT_PATH + "/deletefailhttp/script");
+
+        response = httpClient.execute(delete);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(405);
+        response.close();
     }
 
     @Test(expected = DeleteNotSupportedException.class)
