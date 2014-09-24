@@ -55,7 +55,7 @@
       </span>
       
       <h3 class="collapsible panel-separator" ng-show="securedPush.uriPolicies.length > 0 || securedPush.aclPolicies.length > 0" lo-collapse>Push</h3>
-      <div class="panel">
+      <div class="panel" ng-show="securedPush.uriPolicies.length > 0 || securedPush.aclPolicies.length > 0">
         <div class="panel-heading">
           <h2 class="panel-title"><a href="#/applications/{{curApp.id}}/security/secure-push">Push Configuration</a></h2>
           <div class="pull-right" data-tooltip-placement="top" data-tooltip="Delete Security">
@@ -72,7 +72,7 @@
       </div>
       
       <h3 class="collapsible panel-separator" ng-show="securedClients.uriPolicies.length > 0 || securedClients.aclPolicies.length > 0" lo-collapse>Clients</h3>
-      <div class="panel">
+      <div class="panel" ng-show="securedClients.uriPolicies.length > 0 || securedClients.aclPolicies.length > 0">
         <div class="panel-heading">
           <h2 class="panel-title"><a href="#/applications/{{curApp.id}}/security/secure-clients">Clients Management</a></h2>
           <div class="pull-right" data-tooltip-placement="top" data-tooltip="Delete Security">
@@ -89,9 +89,9 @@
       </div>
 
       <h3 class="collapsible panel-separator" ng-show="securedBusinessLogic.uriPolicies.length > 0 || securedBusinessLogic.aclPolicies.length > 0" lo-collapse>Business Logic</h3>
-      <div class="panel">
+      <div class="panel" ng-show="securedBusinessLogic.uriPolicies.length > 0 || securedBusinessLogic.aclPolicies.length > 0">
         <div class="panel-heading">
-          <h2 class="panel-title"><a href="#/applications/{{curApp.id}}/security/secure-clients">Clients Management</a></h2>
+          <h2 class="panel-title"><a href="#/applications/{{curApp.id}}/security/secure-logic">Clients Management</a></h2>
           <div class="pull-right" data-tooltip-placement="top" data-tooltip="Delete Security">
             <a href="" ng-click="modalCollectionSecurityDelete(storage, collection);"><i class="fa fa-trash-o"></i></a>
           </div>
