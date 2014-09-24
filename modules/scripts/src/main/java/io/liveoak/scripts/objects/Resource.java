@@ -1,6 +1,5 @@
 package io.liveoak.scripts.objects;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,5 +16,5 @@ public interface Resource {
 
     Map<String, Object> getProperties();
 
-    List<Resource> getMembers();
+    Resource[] getMembers();
 }

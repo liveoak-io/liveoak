@@ -86,8 +86,7 @@ public class LiveOakResource implements Resource {
     }
 
     @Override
-    public List<Resource> getMembers() {
-        return members;
+    public Resource[] getMembers() {
+        return members.toArray(new Resource[members.size()]);
     }
-
 }

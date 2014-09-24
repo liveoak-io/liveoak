@@ -1,7 +1,6 @@
 package io.liveoak.scripts.objects.impl;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import io.liveoak.common.codec.DefaultResourceState;
@@ -40,16 +39,7 @@ public class LiveOakStateProperties extends LiveOakMap<String, Object> {
     }
 
     public Object convertToProperty(ResourceState state, String key, Object value) {
-        if (value instanceof Map) {
-            ResourceState resourceState = new DefaultResourceState();
-            Map<String, Object> map = (Map)value;
-            for (String mapKey : map.keySet()) {
-                convertToProperty(resourceState, mapKey, map.get(mapKey));
-            }
-            state.putProperty(key, resourceState);
-        } else {
-            state.putProperty(key, value);
-        }
+        state.putProperty(key, value);
 
         return state;
     }

@@ -5,4 +5,6 @@ package io.liveoak.scripts.resource.scripting;
  */
 public class ScriptingTestCase extends BaseScriptingTestCase {
     //TODO: tests beyond individual object tests
+    //TODO: tests such as invalid javascript code, logical errors, etc.
+
 }
