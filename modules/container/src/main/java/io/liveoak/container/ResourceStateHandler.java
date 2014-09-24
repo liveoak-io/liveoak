@@ -17,6 +17,7 @@ import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.state.ResourceState;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -76,7 +77,7 @@ public class ResourceStateHandler extends ChannelOutboundHandlerAdapter {
         RootEncodingDriver driver = new RootEncodingDriver(response.inReplyTo().requestContext(), encoder, response.resource(), () -> {
             ResourceState state = encoder.root();
             response.setState(state);
-            ctx.writeAndFlush(response, promise);
+            ctx.writeAndFlush(response, promise).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
         }, t -> handleError(ctx, response, ResourceErrorResponse.ErrorType.INTERNAL_ERROR, t));
 
         try {

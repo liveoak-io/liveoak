@@ -25,7 +25,7 @@ public class MockInMemoryResource implements SynchronousResource {
 
     protected Resource parent;
     private String id;
-    private Map<String, String> properties = new LinkedHashMap<>();
+    private Map<String, Object> properties = new LinkedHashMap<>();
     private Map<String, MockInMemoryResource> members = new LinkedHashMap<>();
 
     public MockInMemoryResource(String id) {
@@ -82,7 +82,7 @@ public class MockInMemoryResource implements SynchronousResource {
     public void createMember(RequestContext ctx, ResourceState child, Responder responder) throws Exception {
         MockInMemoryResource createdChild = addMember(child.id());
         for (String key : child.getPropertyNames()) {
-            createdChild.putProperty(key, (String)child.getProperty(key));
+            createdChild.putProperty(key, child.getProperty(key));
         }
 
         Resource resource = ResourceConversionUtils.convertResourceState(child, this);
@@ -99,7 +99,7 @@ public class MockInMemoryResource implements SynchronousResource {
         }
     }
 
-    public MockInMemoryResource putProperty(String key, String value) {
+    public MockInMemoryResource putProperty(String key, Object value) {
         properties.put(key, value);
         return this;
     }

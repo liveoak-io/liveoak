@@ -37,7 +37,7 @@ public class LiveOakResourceParameters extends LiveOakMap<String, Object> {
         Entry fields = new LiveOakMapEntry<>("fields", Util.generateReturnFieldsString(context.returnFields()));
         entrySet.add(fields);
 
-        if (context.sorting().iterator().hasNext()) {
+        if (context.sorting() != null && context.sorting().iterator() != null && context.sorting().iterator().hasNext()) {
             Entry sort = new LiveOakMapEntry<>("sort", Util.generateSortString(context.sorting()));
             entrySet.add(sort);
         }

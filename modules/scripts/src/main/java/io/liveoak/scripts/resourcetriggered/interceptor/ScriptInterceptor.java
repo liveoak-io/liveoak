@@ -70,7 +70,7 @@ public class ScriptInterceptor extends DefaultInterceptor {
                     return;
                 }
             }
-                context.replyWith(new DefaultResourceErrorResponse(context.request(), ResourceErrorResponse.ErrorType.INTERNAL_ERROR, message));
+            context.replyWith(new DefaultResourceErrorResponse(context.request(), ResourceErrorResponse.ErrorType.INTERNAL_ERROR, "Error processing script"));
 
         }
     }
@@ -107,7 +107,7 @@ public class ScriptInterceptor extends DefaultInterceptor {
                     return;
                 }
             }
-            context.forward(new DefaultResourceErrorResponse(context.response().inReplyTo(), ResourceErrorResponse.ErrorType.INTERNAL_ERROR, message));
+            context.forward(new DefaultResourceErrorResponse(context.response().inReplyTo(), ResourceErrorResponse.ErrorType.INTERNAL_ERROR, "Error processing script"));
         }
     }
 
