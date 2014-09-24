@@ -564,7 +564,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
             function() {
               new LoRealmApp({'name': $route.current.params.appId, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'},
                 function() {
-                  //$route.reload();
+                  return undefined;
                 });
             }
           );
@@ -613,7 +613,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
             function() {
               new LoRealmApp({'name': $route.current.params.appId, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'},
                 function() {
-                  //$route.reload();
+                  return undefined;
                 });
             }
           );
@@ -662,7 +662,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
             function() {
               new LoRealmApp({'name': $route.current.params.appId, 'bearerOnly': true}).$create({realmId: 'liveoak-apps'},
                 function() {
-                  //$route.reload();
+                  return undefined;
                 });
             }
           );

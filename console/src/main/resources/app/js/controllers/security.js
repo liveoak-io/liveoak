@@ -38,24 +38,24 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
       $scope.securedBusinessLogic.uriPolicies.push($scope.uriPolicies[i]);
     }
     else {
-      var pathElems = $scope.uriPolicies[i].uriPattern.split("/");
-      var extra = pathElems[pathElems.length-1] === "*" ? -1 : 0;
-      if (pathElems.length + extra === 3) {
+      var pathElemsUri = $scope.uriPolicies[i].uriPattern.split('/');
+      var extraUri = pathElemsUri[pathElemsUri.length-1] === '*' ? -1 : 0;
+      if (pathElemsUri.length + extraUri === 3) {
         // storage
-        if ($filter('filter')($scope.storageList, {'id': pathElems[2]})) {
+        if ($filter('filter')($scope.storageList, {'id': pathElemsUri[2]})) {
           $scope.securedStorages.uriPolicies.push($scope.uriPolicies[i]);
         }
       }
-      else if (pathElems.length + extra === 4) {
+      else if (pathElemsUri.length + extraUri === 4) {
         // collection
-        if ($filter('filter')($scope.storageList, {'id': pathElems[2]})) {
+        if ($filter('filter')($scope.storageList, {'id': pathElemsUri[2]})) {
           $scope.securedCollections.uriPolicies.push($scope.uriPolicies[i]);
         }
       }
     }
   }
 
-  for (var i = 0; i < $scope.acl.length; i++) {
+  for (i = 0; i < $scope.acl.length; i++) {
     if ($scope.acl[i].resourcePath === '/' + currentApp.id + '/push') {
       $scope.securedPush.aclPolicies.push($scope.acl[i]);
     }
@@ -66,18 +66,18 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
       $scope.securedBusinessLogic.aclPolicies.push($scope.acl[i]);
     }
     else {
-      var pathElems = $scope.acl[i].resourcePath.split("/");
-      var extra = pathElems[pathElems.length-1] === "*" ? -1 : 0;
-      if (pathElems.length + extra === 3) {
+      var pathElemsAcl = $scope.acl[i].resourcePath.split('/');
+      var extraAcl = pathElemsAcl[pathElemsAcl.length-1] === '*' ? -1 : 0;
+      if (pathElemsAcl.length + extraAcl === 3) {
         // storage
-        if ($filter('filter')($scope.storageList, {'id': pathElems[2]})) {
+        if ($filter('filter')($scope.storageList, {'id': pathElemsAcl[2]})) {
           $scope.securedStorages.aclPolicies.push($scope.acl[i]);
           console.log($scope.acl[i]);
         }
       }
-      else if (pathElems.length + extra === 4) {
+      else if (pathElemsAcl.length + extraAcl === 4) {
         // collection
-        if ($filter('filter')($scope.storageList, {'id': pathElems[2]})) {
+        if ($filter('filter')($scope.storageList, {'id': pathElemsAcl[2]})) {
           $scope.securedCollections.aclPolicies.push($scope.acl[i]);
         }
       }
@@ -698,7 +698,7 @@ loMod.controller('SecurityPushCtrl', function($scope, $rootScope, $location, $ro
 
   $scope.modalAddRole = function() {
     modalAddRole($modal, $scope, LoRealmAppRoles, currentApp);
-  }
+  };
 
 });
 
