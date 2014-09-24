@@ -31,8 +31,10 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
     var app = {
       id: filtered[i].id,
       name: filtered[i].name,
-      visible: filtered[i].visible
+      visible: filtered[i].visible,
+      htmlapp: filtered[i]['html-app']
     };
+    app.url = $location.protocol() + '://' + $location.host() + ':' + $location.port() + '/' + app.id;
     app.storage = LoStorage.getList({appId: app.id});
 
     app.mongoStorages = 0;

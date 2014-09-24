@@ -1,7 +1,7 @@
 <div class="panel lo-panel-app" ng-class="{'animated flipInY': created == app.id}">
   <div class="panel-heading">
     <h3 class="panel-title"><a href="#/applications/{{app.id}}">{{app.name}}</a></h3>
-    <a class="btn btn-link btn-icon" href="#" target="_blank">
+    <a class="btn btn-link btn-icon" href="{{app.url}}" target="_blank" ng-show="app.htmlapp">
       <i class="fa fa-external-link" data-tooltip="Go to Application"></i>
       <span>Go to Application</span>
     </a>
