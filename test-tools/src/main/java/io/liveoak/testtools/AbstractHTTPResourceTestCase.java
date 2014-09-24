@@ -6,6 +6,7 @@
 package io.liveoak.testtools;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,9 +18,14 @@ import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.container.zero.extension.ZeroExtension;
+import io.liveoak.spi.MediaType;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.state.ResourceState;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufOutputStream;
+import io.netty.buffer.Unpooled;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -70,6 +76,27 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
         return installResource( extId, resourceId, ConversionUtils.convert(resourceConfig) );
     }
 
+    protected ResourceState decode(HttpResponse response, MediaType contentType) throws Exception {
+        ByteBuf buffer = Unpooled.buffer();
+        ByteBufOutputStream out = new ByteBufOutputStream(buffer);
+        response.getEntity().writeTo(out);
+        out.flush();
+        out.close();
+        return this.system.codecManager().decode(contentType, buffer);
+    }
+
+    protected ResourceState decodeJson(HttpResponse response) throws Exception {
+        return decode(response, MediaType.JSON);
+    }
+
+    protected ResourceState decode(ByteBuf buffer, MediaType contentType) throws Exception {
+        return this.system.codecManager().decode(contentType, buffer);
+    }
+
+    protected ResourceState decodeJson(ByteBuf buffer) throws Exception {
+        return decode(buffer, MediaType.JSON);
+    }
+
     @Before
     public void setUpSystem() throws Exception {
         try {
@@ -99,7 +126,7 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
         this.system.stop();
     }
 
-    public void removeAllResources() throws InterruptedException {
+    protected void removeAllResources() throws InterruptedException {
         for (InternalApplicationExtension extension : this.extensions) {
             extension.remove();
         }
