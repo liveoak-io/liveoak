@@ -18,24 +18,45 @@
         <div class="panel-body text-center empty-instance">
           <i class="fa fa-code"></i>
           <p>This application currently has no business logic scripts.</p>
+          <a href="#/applications/{{curApp.id}}/create-logic" class="btn btn-primary btn-lg" type="button">New Script</a>
         </div>
       </div>
 
+      <style type="text/css">
+        .CodeMirror {
+          display: block;
+          padding: 9.5px;
+          margin: 10px 0 10px;
+          word-break: break-all;
+          word-wrap: break-word;
+          color: #333333;
+          background-color: #f5f5f5;
+          border: 1px solid #cccccc;
+          border-radius: 1px;
+          font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+          font-size: 11px;
+          line-height: 1.3;
+        }
+      </style>
       <div class="panel" ng-show="scripts.members" ng-repeat="script in scripts.members">
         <div class="panel-heading">
-          <h2 class="panel-title">{{script.name}} <span>({{script.id}})</span></h2>
+          <h2 class="panel-title" ng-show="script.name"><a href="#/applications/{{curApp.id}}/business-logic/{{script.id}}"> {{script.name}} </a><span>({{script.id}})</span></h2>
+          <h2 class="panel-title" ng-hide="script.name"><a href="#/applications/{{curApp.id}}/business-logic/{{script.id}}"> {{script.id}} </a></h2>
           <span class="label label-success" ng-show="script.enabled">Enabled</span>
           <span class="label label-default" ng-hide="script.enabled">Disabled</span>
+          <div class="pull-right">
+            <a href="" data-tooltip-placement="top" data-tooltip="Delete Script" ng-click="modalScriptDelete(script)"><i class="fa fa-trash-o"></i></a>
+          </div>
         </div>
         <div class="panel-body">
           <p class="panel-description">{{script.description}}</p>
           <ul class="lo-app-opts">
             <li><i class="fa fa-link" tooltip="Target"></i>{{script['target-path']}}</li>
             <li><i class="fa fa-level-up" tooltip="Priority"></i>{{script.priority}}</li>
-            <li><i class="fa fa-hand-o-right" tooltip="Triggers"></i><span ng-show="script.provides">{{script.provides}}</span><span ng-hide="script.provides">None</span></li>
+            <li><i class="fa fa-hand-o-right" tooltip="Triggers"></i><span ng-show="script.provides">{{script.provides.join(', ')}}</span><span ng-hide="script.provides">None</span></li>
             <li><a href="" class="link-color" ng-click="showScript(script)" ng-hide="script.show"><i class="fa fa-code" tooltip="Script"></i>Show script</a><a href="" class="link-color" ng-click="showScript(script)" ng-show="script.show"><i class="fa fa-code" tooltip="Script"></i>Hide script</a> <span ng-show="script.size">({{script.size}}kb)</span></li>
           </ul>
-          <pre ng-show="script.show && script.src">{{script.src}}</pre>
+          <ui-codemirror ng-show="script.show && script.src" ng-model="script.src" ui-refresh='script.show' ui-codemirror-opts="viewerOptions"></ui-codemirror>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.application', []);
 
-loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $location, $modal, $filter, $route, Notifications, examplesList, loAppList, LoApp, LoStorage, LoPush, LoRealmApp) {
+loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $location, $modal, $filter, $route, Notifications, examplesList, loAppList, LoApp, LoStorage, LoPush, LoRealmApp, LoBusinessLogicScripts) {
 
   $rootScope.hideSidebar = true;
 
@@ -26,6 +26,15 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
     };
   };
 
+  var getScriptsInfo = function(data) {
+    app.scripts = [];
+    app.scriptsCount = 0;
+    for(var i = 0; i < data.members.length; i++) {
+      app.scripts.push({type: data.members[i].id, count: data.members[i].count});
+      app.scriptsCount += data.members[i].count;
+    }
+  };
+
   var filtered = $filter('orderBy')($filter('filter')(loAppList.members, {'visible': true}), 'name');
   for (var i = 0; i < filtered.length; i++) {
     var app = {
@@ -40,6 +49,8 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
     app.mongoStorages = 0;
     app.storage.$promise.then(increaseStorages(app));
 
+    LoBusinessLogicScripts.get({appId: app.id}, getScriptsInfo);
+
     if ($filter('filter')(examplesList, {'id': app.id}, true).length > 0) {
       app.example = true;
       $scope.exampleApplications.push(app);
@@ -48,7 +59,6 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
       $scope.applications.push(app);
     }
   }
-
 
   // Delete Application
   $scope.modalApplicationDelete = function(appId) {

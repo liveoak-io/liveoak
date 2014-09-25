@@ -13,7 +13,8 @@ var loMod = angular.module('loApp', [
   'patternfly.notification',
   'patternfly.select',
   'patternfly.validation',
-  'ui.bootstrap'
+  'ui.bootstrap',
+  'ui.codemirror'
 ]);
 
 loMod.config(function($compileProvider){
@@ -56,26 +57,38 @@ loMod.config(['$routeProvider', function($routeProvider) {
       }
     })
     .when('/applications/:appId/business-logic', {
-      templateUrl : '/admin/console/partials/business-logic.html',
+      templateUrl : '/admin/console/partials/business-logic-list.html',
       controller : 'BusinessLogicListCtrl',
       resolve: {
         currentApp: function(LoAppLoader) {
           return new LoAppLoader();
         },
         triggeredScripts: function(LoBusinessLogicScripts, $route) {
-          return LoBusinessLogicScripts.getTriggered({appId: $route.current.params.appId});
+          return LoBusinessLogicScripts.get({appId: $route.current.params.appId, type:'resource-triggered-scripts'});
         }
       }
     })
     .when('/applications/:appId/create-logic', {
       templateUrl : '/admin/console/partials/business-logic-create.html',
-      controller : 'BusinessLogicListCtrl',
+      controller : 'BusinessLogicDetailsCtrl',
       resolve: {
         currentApp: function(LoAppLoader) {
           return new LoAppLoader();
         },
-        triggeredScripts: function(LoBusinessLogicScripts, $route) {
-          return LoBusinessLogicScripts.getTriggered({appId: $route.current.params.appId});
+        currentScript: function(LoBusinessLogicScripts) {
+          return new LoBusinessLogicScripts();
+        }
+      }
+    })
+    .when('/applications/:appId/business-logic/:scriptId', {
+      templateUrl : '/admin/console/partials/business-logic-create.html',
+      controller : 'BusinessLogicDetailsCtrl',
+      resolve: {
+        currentApp: function(LoAppLoader) {
+          return new LoAppLoader();
+        },
+        currentScript: function(LoBusinessLogicScripts, $route) {
+          return LoBusinessLogicScripts.get({appId: $route.current.params.appId, type:'resource-triggered-scripts', scriptId: $route.current.params.scriptId}).$promise;
         }
       }
     })

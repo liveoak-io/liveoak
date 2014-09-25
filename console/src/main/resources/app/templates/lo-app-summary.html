@@ -19,7 +19,8 @@
       <li ng-show="app.push.upsURL"><a href="#/applications/{{app.id}}/push"><i class="fa fa-mobile" tooltip="Push"></i>Push set up</a></li>
       <li ng-hide="app.push.upsURL" class="empty"><a href="#/applications/{{app.id}}/push"><i class="fa fa-mobile" tooltip="Push"></i>No Push set up</a></li>
       <li class="empty"><a href="#/applications/{{app.id}}/application-clients"><i class="fa fa-globe" tooltip="Clients"></i>No Clients set up</a></li>
-      <li class="empty"><a href="#/applications/{{app.id}}/business-logic"><i class="fa fa-code" tooltip="Business Logic"></i>No Logic set up</a></li>
+      <li ng-show="!app.scriptsCount || app.scriptsCount <= 0" class="empty"><a href="#/applications/{{app.id}}/business-logic"><i class="fa fa-code" tooltip="Business Logic"></i> No Logic set up</a></li>
+      <li ng-show="app.scriptsCount > 0"><a href="#/applications/{{app.id}}/business-logic"><i class="fa fa-code" tooltip="Business Logic"></i>{{(app.scripts|filter:'resource-triggered-scripts')[0].count}} Script(s) installed</a></li>
     </ul>
   </div>
 </div>

@@ -1,43 +1,38 @@
 <div class="col-md-10 lo-main-pane">
   <div class="row">
     <div class="lo-content-area col-md-10">
-      <ol class="breadcrumb">
-        <li><a href="#/applications">Applications</a></li>
-        <li><a href="#">application_name</a></li>
-        <li><a href="#">Business Logic</a></li>
-        <li>New Script</li>
-      </ol>
-      
-      <h2 class="pull-left"><span>{{curApp.name}}</span> New Logic</h2>
+      <lo-breadcrumbs></lo-breadcrumbs>
+
+      <h2 class="pull-left"><span>{{curApp.name}}</span> {{script.name || script.id || "New Script"}}</h2>
       <p class="subtitle"><span class="required">*</span> Required fields</p>
 
-      <form class="lo-form-horizontal clearfix" name="storageForm" novalidate>
+      <form class="lo-form-horizontal clearfix" name="logicForm" novalidate>
         <fieldset>
           <legend lo-collapse class="collapsible"><span class="text">Settings</span></legend>
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="name">Script Name</label>
             <div class="col-sm-4">
-              <input class="form-control" type="text" id="name">
+              <input class="form-control" type="text" id="name" ng-model="script.name">
             </div>
           </div>
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="id">Script ID</label>
             <div class="col-sm-4">
-              <input class="form-control" type="text" id="id">
-              <span class="help-block info">The script ID cannot be modified once created.</span>
+              <input class="form-control" type="text" id="id" ng-model="script.id" ng-readonly="!create">
+              <span class="help-block info" ng-show="create">The script ID cannot be modified once created.</span>
             </div>
           </div>
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="description">Description</label>
             <div class="col-sm-4">
-              <textarea class="form-control" rows="3" id="description"></textarea>
+              <textarea class="form-control" rows="3" id="description" ng-model="script.description"></textarea>
             </div>
           </div>
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="enable">Enable Script</label>
             <div class="col-sm-4">
               <div class="onoffswitch">
-                <input type="checkbox" id="enable" class="onoffswitch-checkbox">
+                <input type="checkbox" id="enable" class="onoffswitch-checkbox" ng-model="script.enabled">
                 <label class="onoffswitch-label" for="enable">
                   <span class="onoffswitch-inner">
                     <span class="onoffswitch-active ng-binding">ON</span>
@@ -51,13 +46,13 @@
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="priority">Priority</label>
             <div class="col-sm-2">
-              <input class="form-control" type="number" min="0" max="10" value="5">
+              <input class="form-control" id="priority" type="number" min="0" max="10" value="5" ng-model="script.priority">
             </div>
           </div>
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="path">Resource Path <span class="required">*</span></label>
             <div class="col-sm-4">
-              <input class="form-control" type="text" id="path" value="/<app-name>/">
+              <input class="form-control" type="text" id="path" value="/<app-name>/" ng-model="script['target-path']" required>
             </div>
             <span data-toggle="modal" data-target="#path-help" class="input-help">
               <button class="btn btn-link btn-icon">
@@ -70,12 +65,29 @@
         <fieldset>
           <legend lo-collapse class="collapsible"><span class="text">Script</span> <span class="required">*</span></legend>
           <div class="form-group clearfix">
-            <textarea class="form-control" rows="15" id="description"></textarea>
+            <style type="text/css">
+              .CodeMirror {
+                font-size: 110%;
+                border: 1px solid #63b474;
+                font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+                font-size: 11px;
+                line-height: 1.3;
+              }
+              .CodeMirror-hint {
+                font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+              }
+              .CodeMirror-activeline-background {
+                background: #DDEEDD;
+              }
+            </style>
+            <div style="width: 100%; text-align: right;"><small>Use Ctrl+Space for auto-completion where available</small> </div>
+            <ui-codemirror ui-codemirror-opts="editorOptions" ng-model="script.code" required></ui-codemirror>
           </div>
         </fieldset>
         <div class="pull-right form-actions">
-          <button lo-button-clear="clear()">Cancel</button>
-          <button lo-button-save="save()">Save</button>
+          <a href="" class="btn btn-default btn-lg" ng-show="create">Cancel</a>
+          <button lo-button-clear="clear()" ng-hide="create" ng-disabled="!changed">Clear changes</button>
+          <button lo-button-save="save()" ng-disabled="!changed || !logicForm.$valid">Save</button>
         </div>
       </form>
     </div>
