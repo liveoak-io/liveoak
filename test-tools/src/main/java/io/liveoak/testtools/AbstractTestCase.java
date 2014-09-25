@@ -5,8 +5,11 @@
  */
 package io.liveoak.testtools;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.mongo.launcher.MongoInstaller;
 import io.liveoak.mongo.launcher.MongoLauncher;
+import org.apache.http.HttpEntity;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -172,5 +175,13 @@ public class AbstractTestCase {
 
             mongoLauncher = null;
         }
+    }
+
+    protected JsonNode toJSON(String value) throws IOException {
+        return ObjectMapperFactory.create().readTree(value);
+    }
+
+    protected JsonNode toJSON(HttpEntity entity) throws IOException {
+        return ObjectMapperFactory.create().readTree(entity.getContent());
     }
 }

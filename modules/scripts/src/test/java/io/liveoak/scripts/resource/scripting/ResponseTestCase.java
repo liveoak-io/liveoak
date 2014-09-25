@@ -48,7 +48,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testRead() throws Exception {
         // Trigger a read
-        getHttpResource("http://localhost:8080/testApp/mock/foo");
+        httpGet("http://localhost:8080/testApp/mock/foo");
 
         ResourceState readState = client.read(new RequestContext.Builder().build(), "/testApp/mock/postRead");
 
@@ -60,7 +60,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     public void testCreate() throws Exception {
         // Trigger a create
         JsonNode postObject = ObjectMapperFactory.create().readTree("{'id': 'ABC', 'foo' : 'bar'}");
-        postHttpResource("http://localhost:8080/testApp/mock", postObject);
+        createResource("http://localhost:8080/testApp/mock", postObject);
 
         ResourceState postCreate = client.read(new RequestContext.Builder().build(), "/testApp/mock/postCreate");
 
@@ -68,7 +68,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
         assertThat(postCreate.getProperty("resource.id")).isEqualTo("ABC");
         assertThat(postCreate.getProperty("resource.uri")).isEqualTo("/testApp/mock/ABC");
 
-        Map resourceProperties = (Map)postCreate.getProperty("resource.properties");
+        Map resourceProperties = (Map) postCreate.getProperty("resource.properties");
         assertThat(resourceProperties.get("foo")).isEqualTo("bar");
     }
 
@@ -76,7 +76,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     public void testUpdate() throws Exception {
         // Trigger an update
         JsonNode putObject = ObjectMapperFactory.create().readTree("{'Hello' : 'World'}");
-        putHttpResource("http://localhost:8080/testApp/mock/foo", putObject);
+        updateResource("http://localhost:8080/testApp/mock/foo", putObject);
 
         ResourceState updateState = client.read(new RequestContext.Builder().build(), "/testApp/mock/postUpdate");
 
@@ -84,7 +84,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
         assertThat(updateState.getProperty("resource.id")).isEqualTo("foo");
         assertThat(updateState.getProperty("resource.uri")).isEqualTo("/testApp/mock/foo");
 
-        Map resourceProperties = (Map)updateState.getProperty("resource.properties");
+        Map resourceProperties = (Map) updateState.getProperty("resource.properties");
         assertThat(resourceProperties.get("Hello")).isEqualTo("World");
         assertThat(resourceProperties.get("baz")).isNull();
         assertThat(resourceProperties.get("hello")).isNull();
@@ -95,7 +95,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testDelete() throws Exception {
         // Trigger a delete
-        deleteHttpResource("http://localhost:8080/testApp/mock/foo");
+        httpDelete("http://localhost:8080/testApp/mock/foo");
 
         ResourceState deleteState = client.read(new RequestContext.Builder().build(), "/testApp/mock/postDelete");
 
@@ -112,7 +112,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
         assertThat(resourceState.getProperty("resource.id")).isEqualTo("foo");
         assertThat(resourceState.getProperty("resource.uri")).isEqualTo("/testApp/mock/foo");
 
-        Map resourceProperties = (Map)resourceState.getProperty("resource.properties");
+        Map resourceProperties = (Map) resourceState.getProperty("resource.properties");
         assertThat(resourceProperties.get("hello")).isEqualTo("world");
         assertThat(resourceProperties.get("baz")).isEqualTo(123);
 

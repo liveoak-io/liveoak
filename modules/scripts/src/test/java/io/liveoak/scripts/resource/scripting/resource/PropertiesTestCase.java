@@ -37,7 +37,7 @@ public class PropertiesTestCase extends BaseScriptingTestCase {
     @Test
     public void testPropertiesCreate() throws Exception {
         JsonNode postObject = ObjectMapperFactory.create().readTree("{'cat' : 'Charles', 'rabbit' : 'Richard', 'urchin' : 'Uriel', 'dog' : 'Danielle' }");
-        JsonNode jsonResult = postHttpResource("http://localhost:8080/testApp/mock", postObject);
+        JsonNode jsonResult = createResource("http://localhost:8080/testApp/mock", postObject);
 
 
         // Read the values actually stored, eg what would have been modified by the preCreate method
@@ -64,7 +64,7 @@ public class PropertiesTestCase extends BaseScriptingTestCase {
         JsonNode postObject = ObjectMapperFactory.create().readTree("{'cat' : 'Charles', 'rabbit' : 'Richard', 'urchin' : 'Uriel', 'dog' : 'Danielle' }");
         ResourceState resource = client.create(new RequestContext.Builder().build(), "/testApp/mock", ConversionUtils.convert(postObject));
 
-        JsonNode result = getHttpResource("http://localhost:8080/testApp/mock/" + resource.id());
+        JsonNode result = getResourceAsJson("http://localhost:8080/testApp/mock/" + resource.id());
 
         assertThat(result).isNotNull();
         assertThat(result.get("cat").textValue()).isEqualTo("Charles");
@@ -81,7 +81,7 @@ public class PropertiesTestCase extends BaseScriptingTestCase {
         ResourceState resource = client.create(new RequestContext.Builder().build(), "/testApp/mock", ConversionUtils.convert(postObject));
 
         JsonNode putObject = ObjectMapperFactory.create().readTree("{'cat' : 'Cleo', 'rabbit' : 'Rex', 'urchin' : 'Urkel', 'dog' : 'Dan' }");
-        JsonNode jsonResult = putHttpResource("http://localhost:8080/testApp/mock/" + resource.id(), putObject);
+        JsonNode jsonResult = updateResource("http://localhost:8080/testApp/mock/" + resource.id(), putObject);
 
         // Read the values actually stored, eg what would have been modified by the preUpdate method
         ResourceState clientResult = client.read(new RequestContext.Builder().build(), "/testApp/mock/" + resource.id());
@@ -109,7 +109,7 @@ public class PropertiesTestCase extends BaseScriptingTestCase {
         JsonNode postObject = ObjectMapperFactory.create().readTree("{'cat' : 'Charles', 'rabbit' : 'Richard', 'urchin' : 'Uriel', 'dog' : 'Danielle' }");
         ResourceState resource = client.create(new RequestContext.Builder().build(), "/testApp/mock", ConversionUtils.convert(postObject));
 
-        JsonNode jsonResult = deleteHttpResource("http://localhost:8080/testApp/mock/" + resource.id());
+        JsonNode jsonResult = deleteResourceAsJson("http://localhost:8080/testApp/mock/" + resource.id());
 
         // Check the returned value for what would have been done by the postDelete method
         assertThat(jsonResult).isNotNull();

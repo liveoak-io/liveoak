@@ -51,7 +51,7 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     public void testRead() throws Exception {
         // Trigger a read
         String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
-        getHttpResource("http://localhost:8080" + uri);
+        httpGet("http://localhost:8080" + uri);
 
         ResourceState readState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preRead");
         testState(readState, uri, "GET");
@@ -62,7 +62,7 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
         // Trigger a create
         String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
         JsonNode postObject = ObjectMapperFactory.create().readTree("{'id': 'ABC', 'foo' : 'bar'}");
-        postHttpResource("http://localhost:8080" + uri, postObject);
+        createResource("http://localhost:8080" + uri, postObject);
 
         ResourceState createState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preCreate");
         testState(createState, uri, "POST");
@@ -73,7 +73,7 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
         // Trigger an update
         String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
         JsonNode putObject = ObjectMapperFactory.create().readTree("{'id': 'ABC', 'foo' : 'bar'}");
-        putHttpResource("http://localhost:8080" + uri, putObject);
+        updateResource("http://localhost:8080" + uri, putObject);
 
         ResourceState updateState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preUpdate");
         testState(updateState, uri, "PUT");
@@ -83,7 +83,7 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     public void testDelete() throws Exception {
         // Trigger a delete
         String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
-        deleteHttpResource("http://localhost:8080" + uri);
+        httpDelete("http://localhost:8080" + uri);
 
         ResourceState deleteState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preDelete");
         testState(deleteState, uri, "DELETE");

@@ -5,28 +5,15 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.interceptor.extension.InterceptorExtension;
 import io.liveoak.security.extension.SecurityExtension;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
 import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.HttpHeaders;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.vertx.java.core.buffer.Buffer;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -83,93 +70,7 @@ public class BaseScriptTestCase extends AbstractHTTPResourceTestCase {
         return config;
     }
 
-    public JsonNode getHttpResource(String uri) throws Exception {
-        HttpGet get = new HttpGet(uri);
-        get.addHeader("Accept", "application/json");
-        try {
-            CloseableHttpResponse result = httpClient.execute(get);
-
-            HttpEntity entity = result.getEntity();
-
-            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(200);
-
-            JsonNode jsonNode = ObjectMapperFactory.create().readTree(entity.getContent());
-
-            return jsonNode;
-
-        } finally {
-            httpClient.close();
-        }
-    }
-
-    public JsonNode postHttpResource(String uri, JsonNode data) throws Exception {
-        HttpPost post = new HttpPost(uri);
-        post.addHeader(HttpHeaders.Names.ACCEPT, "application/json");
-        post.addHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
-        try {
-            post.setEntity(new StringEntity(data.toString(),ContentType.create("application/json", "UTF-8")));
-
-            CloseableHttpResponse result = httpClient.execute(post);
-
-            //result.close();
-            HttpEntity entity = result.getEntity();
-            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(201);
-            JsonNode jsonNode = ObjectMapperFactory.create().readTree(entity.getContent());
-
-            return jsonNode;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        } finally {
-            httpClient.close();
-        }
-    }
-
-    public JsonNode putHttpResource(String uri, JsonNode data) throws Exception {
-        HttpPut put = new HttpPut(uri);
-        put.addHeader(HttpHeaders.Names.ACCEPT, "application/json");
-        put.addHeader(HttpHeaders.Names.CONTENT_TYPE, "application/json");
-        try {
-            put.setEntity(new StringEntity(data.toString(), ContentType.create("application/json", "UTF-8")));
-
-            CloseableHttpResponse result = httpClient.execute(put);
-
-            HttpEntity entity = result.getEntity();
-            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(200);
-            JsonNode jsonNode = ObjectMapperFactory.create().readTree(entity.getContent());
-
-            return jsonNode;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        } finally {
-            httpClient.close();
-        }
-    }
-
-    public JsonNode deleteHttpResource(String uri) throws Exception {
-        HttpDelete put = new HttpDelete(uri);
-        put.addHeader(HttpHeaders.Names.ACCEPT, "application/json");
-        try {
-            CloseableHttpResponse result = httpClient.execute(put);
-
-            HttpEntity entity = result.getEntity();
-
-            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(200);
-
-            JsonNode jsonNode = ObjectMapperFactory.create().readTree(entity.getContent());
-
-            return jsonNode;
-
-        } finally {
-            httpClient.close();
-        }
-    }
-
-
-    public ByteBuf readFile(String name) throws Exception {
+    protected ByteBuf readFile(String name) throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("scripts/" + name);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -182,7 +83,7 @@ public class BaseScriptTestCase extends AbstractHTTPResourceTestCase {
         return new Buffer(outputStream.toByteArray()).getByteBuf();
     }
 
-    public ResourceState getMember(ResourceState parent, String id) {
+    protected ResourceState getMember(ResourceState parent, String id) {
         for (ResourceState resourceState : parent.members()) {
             if (resourceState.id().equals(id)) {
                 return resourceState;

@@ -1,15 +1,15 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
 package io.liveoak.testtools;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
@@ -25,17 +25,29 @@ import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
-import org.apache.http.HttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.vertx.java.core.Vertx;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
 
@@ -76,25 +88,113 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
         return installResource( extId, resourceId, ConversionUtils.convert(resourceConfig) );
     }
 
-    protected ResourceState decode(HttpResponse response, MediaType contentType) throws Exception {
+    protected ResourceState toResourceState(HttpEntity entity, MediaType contentType) throws Exception {
         ByteBuf buffer = Unpooled.buffer();
         ByteBufOutputStream out = new ByteBufOutputStream(buffer);
-        response.getEntity().writeTo(out);
+        entity.writeTo(out);
         out.flush();
         out.close();
         return this.system.codecManager().decode(contentType, buffer);
     }
 
-    protected ResourceState decodeJson(HttpResponse response) throws Exception {
-        return decode(response, MediaType.JSON);
+    protected ResourceState jsonToResourceState(HttpEntity entity) throws Exception {
+        return toResourceState(entity, MediaType.JSON);
     }
 
-    protected ResourceState decode(ByteBuf buffer, MediaType contentType) throws Exception {
+    protected ResourceState toResourceState(ByteBuf buffer, MediaType contentType) throws Exception {
         return this.system.codecManager().decode(contentType, buffer);
     }
 
-    protected ResourceState decodeJson(ByteBuf buffer) throws Exception {
-        return decode(buffer, MediaType.JSON);
+    protected ResourceState jsonToResourceState(ByteBuf buffer) throws Exception {
+        return toResourceState(buffer, MediaType.JSON);
+    }
+
+    protected HttpEntity httpGet(String uri) throws Exception {
+        HttpGet get = new HttpGet(uri);
+        get.addHeader(HttpHeaders.Names.ACCEPT, MediaType.JSON.toString());
+
+        try (CloseableHttpResponse response = httpClient.execute(get)) {
+            assertThat(response).isNotNull();
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+            HttpEntity entity = response.getEntity();
+            assertThat(entity).isNotNull();
+            return entity;
+        }
+    }
+
+    protected String getResourceAsString(String uri) throws Exception {
+        return EntityUtils.toString(httpGet(uri));
+    }
+
+    protected JsonNode getResourceAsJson(String uri) throws Exception {
+        return toJSON(httpGet(uri));
+    }
+
+    protected HttpEntity httpPost(String uri, String data) throws Exception {
+        HttpPost post = new HttpPost(uri);
+        post.addHeader(HttpHeaders.Names.ACCEPT, MediaType.JSON.toString());
+        post.addHeader(HttpHeaders.Names.CONTENT_TYPE, MediaType.JSON.toString());
+        post.setEntity(new StringEntity(data, ContentType.create(MediaType.JSON.toString(), "UTF-8")));
+
+        try (CloseableHttpResponse response = httpClient.execute(post)) {
+            assertThat(response).isNotNull();
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
+            HttpEntity entity = response.getEntity();
+            assertThat(entity).isNotNull();
+            return entity;
+        }
+    }
+
+    protected String createResource(String uri, String data) throws Exception {
+        return EntityUtils.toString(httpPost(uri, data));
+    }
+
+    protected JsonNode createResource(String uri, JsonNode data) throws Exception {
+        return toJSON(httpPost(uri, data.toString()));
+    }
+
+    protected HttpEntity httpPut(String uri, String data) throws Exception {
+        HttpPut put = new HttpPut(uri);
+        put.addHeader(HttpHeaders.Names.ACCEPT, MediaType.JSON.toString());
+        put.addHeader(HttpHeaders.Names.CONTENT_TYPE, MediaType.JSON.toString());
+        put.setEntity(new StringEntity(data, ContentType.create(MediaType.JSON.toString(), "UTF-8")));
+
+        try (CloseableHttpResponse response = httpClient.execute(put)) {
+            assertThat(response).isNotNull();
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+            HttpEntity entity = response.getEntity();
+            assertThat(entity).isNotNull();
+            return entity;
+        }
+    }
+
+    protected String updateResource(String uri, String data) throws Exception {
+        return EntityUtils.toString(httpPut(uri, data));
+    }
+
+    protected JsonNode updateResource(String uri, JsonNode data) throws Exception {
+        return toJSON(httpPut(uri, data.toString()));
+    }
+
+    protected HttpEntity httpDelete(String uri) throws Exception {
+        HttpDelete delete = new HttpDelete(uri);
+        delete.addHeader(HttpHeaders.Names.ACCEPT, MediaType.JSON.toString());
+
+        try (CloseableHttpResponse response = httpClient.execute(delete)) {
+            assertThat(response).isNotNull();
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+            HttpEntity entity = response.getEntity();
+            assertThat(entity).isNotNull();
+            return entity;
+        }
+    }
+
+    protected String deleteResourceAsString(String uri) throws Exception {
+        return EntityUtils.toString(httpDelete(uri));
+    }
+
+    protected JsonNode deleteResourceAsJson(String uri) throws Exception {
+        return toJSON(httpDelete(uri));
     }
 
     @Before
