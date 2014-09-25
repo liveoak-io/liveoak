@@ -58,42 +58,22 @@ loMod.factory('FileReader', function($q) {
 /* Loaders - Loaders are used in the route configuration as resolve parameters */
 loMod.factory('Loader', function($q) {
   var loader = {};
-  loader.get = function(service, id) {
-    return function() {
-      var i = id && id();
-      var delay = $q.defer();
-      service.get(i, function(entry) {
-        delay.resolve(entry);
-      }, function() {
-        delay.reject('Unable to fetch ' + i);
-      });
-      return delay.promise;
+  var methods = [ 'get', 'getList', 'query'];
+
+  angular.forEach(methods, function(method){
+    loader[method] = function(service, id) {
+      return function() {
+        var i = id && id();
+        var delay = $q.defer();
+        service[method](i, function(entry) {
+          delay.resolve(entry);
+        }, function() {
+          delay.reject('Unable to fetch ' + i);
+        });
+        return delay.promise;
+      };
     };
-  };
-  loader.getList = function(service, id) {
-    return function() {
-      var i = id && id();
-      var delay = $q.defer();
-      service.getList(i, function(entry) {
-        delay.resolve(entry);
-      }, function() {
-        delay.reject('Unable to fetch ' + i);
-      });
-      return delay.promise;
-    };
-  };
-  loader.query = function(service, id) {
-    return function() {
-      var i = id && id();
-      var delay = $q.defer();
-      service.query(i, function(entry) {
-        delay.resolve(entry);
-      }, function() {
-        delay.reject('Unable to fetch ' + i);
-      });
-      return delay.promise;
-    };
-  };
+  });
   return loader;
 });
 
