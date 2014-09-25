@@ -27,7 +27,9 @@
         "font-awesome": "4.0.3",
         "less": "1.6.1",
         "jquery": "2.0.3",
-        "patternfly": "1.0.3"
+        "patternfly": "1.0.3",
+        "angular-ui-codemirror": "latest",
+        "jshint": "latest"
     },
   "exportsOverride": {
     "font-awesome": {
@@ -40,6 +42,13 @@
       "components/bootstrap/dist/js": "components/bootstrap/dist/js/bootstrap.js",
       "components/bootstrap-select": "components/bootstrap-select/bootstrap-select.js",
       "components/font-awesome/fonts": "components/font-awesome/fonts/*"
+    },
+    "codemirror": {
+      ".":       "lib/*",
+      "addon":   "addon",
+      "keymap":  "keymap",
+      "mode":    "mode",
+      "theme":   "theme"
     }
   }
 }

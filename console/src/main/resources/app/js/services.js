@@ -529,33 +529,25 @@ loMod.factory('LoClient', function($resource) {
 });
 
 loMod.factory('LoBusinessLogicScripts', function($resource) {
-  return $resource('/admin/applications/:appId/resources/scripts', {
+  return $resource('/admin/applications/:appId/resources/scripts/:type/:scriptId', {
     appId : '@appId',
-    clientId: '@clientId'
   }, {
     get : {
       method : 'GET',
-      params: { fields : '*(*)' }
+      params : { fields: '*(*)' }
     },
-    getTriggered: {
-      method: 'GET',
-      url: '/admin/applications/:appId/resources/scripts/resource-triggered-scripts',
-      params: { fields : '*(*)' }
+    create: {
+      method: 'POST'
     },
-    getEndpoint: {
-      method: 'GET',
-      url: '/admin/applications/:appId/resources/scripts/endpoint-scripts/:scriptId',
-      params: { fields : '*(*)' }
+    getSource : {
+      method : 'GET',
+      url: '/admin/applications/:appId/resources/scripts/:type/:scriptId/script'
     },
-    getScheduled: {
-      method: 'GET',
-      url: '/admin/applications/:appId/resources/scripts/scheduled-scripts/:scriptId',
-      params: { fields : '*(*)' }
-    },
-    getLibraries: {
-      method: 'GET',
-      url: '/admin/applications/:appId/resources/scripts/libraries/:scriptId',
-      params: { fields : '*(*)' }
+    setSource: {
+      method: 'POST',
+      headers: {
+        'Content-Type':'application/javascript'
+      }
     }
   });
 });
