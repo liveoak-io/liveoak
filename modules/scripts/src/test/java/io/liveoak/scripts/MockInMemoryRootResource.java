@@ -2,8 +2,10 @@ package io.liveoak.scripts;
 
 import java.util.UUID;
 
+import io.liveoak.spi.NotAcceptableException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.resources.MockInMemoryResource;
@@ -24,5 +26,14 @@ public class MockInMemoryRootResource extends MockInMemoryResource implements Ro
         }
 
         super.createMember(ctx, child, responder);
+    }
+
+    @Override
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+        if (properties().getPropertyNames().contains("throwError")) {
+            throw new NotAcceptableException("error");
+        } else {
+            super.readProperties(ctx, sink);
+        }
     }
 }

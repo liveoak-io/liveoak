@@ -14,4 +14,21 @@ public interface Request {
     Resource getResource();
 
     RequestContext getContext();
+
+    default void setId(Object id) throws Exception {
+        throw Util.notEditable("id");
+    }
+
+    default void setPath(Object path) throws Exception {
+        throw Util.notEditable("path");
+    }
+
+    default void setType(Object type) throws Exception {
+        throw Util.notEditable("type");
+    }
+
+    default void setResource(Object resource) throws Exception {
+        throw Util.notEditable("resource");
+    }
+
 }

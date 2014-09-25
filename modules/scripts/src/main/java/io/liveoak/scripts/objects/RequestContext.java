@@ -14,4 +14,15 @@ public interface RequestContext {
 
     Map<String, Object> getParameters();
 
+    default void setParameters(Object parameters) throws Exception {
+        throw Util.notEditable("parameters");
+    }
+
+    default void setAttributes(Object attributes) throws Exception {
+        throw Util.notEditable("attributes");
+    }
+
+    default void setSecurityContext(Object securityContext) throws Exception {
+        throw Util.notEditable("securityContext");
+    }
 }

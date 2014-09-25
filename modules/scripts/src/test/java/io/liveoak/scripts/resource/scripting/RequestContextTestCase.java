@@ -110,4 +110,28 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
         assertThat(security.get("token")).isEqualTo(null);
     }
 
+    @Test
+    public void testSetParameters() throws Exception {
+        // Trigger a read
+        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setParameters", 406));
+        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
+        assertThat(result.get("message").textValue()).isEqualTo("parameters cannot be modified");
+    }
+
+    @Test
+    public void testSetAttributes() throws Exception {
+        // Trigger a read
+        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setAttributes", 406));
+        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
+        assertThat(result.get("message").textValue()).isEqualTo("attributes cannot be modified");
+    }
+
+    @Test
+    public void testSetSecurityContext() throws Exception {
+        // Trigger a read
+        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setSecurityContext", 406));
+        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
+        assertThat(result.get("message").textValue()).isEqualTo("securityContext cannot be modified");
+    }
+
 }

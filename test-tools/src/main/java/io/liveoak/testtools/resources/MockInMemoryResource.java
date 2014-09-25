@@ -6,15 +6,22 @@
 
 package io.liveoak.testtools.resources;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.ResourceConversionUtils;
+import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.Sorting;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
@@ -87,6 +94,63 @@ public class MockInMemoryResource implements SynchronousResource {
 
         Resource resource = ResourceConversionUtils.convertResourceState(child, this);
         responder.resourceCreated(resource);
+    }
+
+    @Override
+    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
+
+        List<MockInMemoryResource> members = new ArrayList<>(this.members.values());
+
+        Sorting sorting = ctx.sorting();
+        if (sorting != null) {
+            for (Sorting.Spec spec : sorting.specs()) {
+                sort(members, spec.name(), spec.ascending());
+            }
+        }
+
+        Pagination pagination = ctx.pagination();
+        if (pagination != null) {
+            int offset = pagination.offset();
+            int limit = pagination.limit();
+
+            int endpoint = offset + limit;
+            if (endpoint < members.size()) {
+                members = members.subList(offset, endpoint);
+            } else {
+                members = members.subList(offset, members.size());
+            }
+
+        }
+
+        if (members != null) {
+            for (Resource each : members) {
+                sink.accept(each);
+            }
+        }
+
+        sink.close();
+    }
+
+    public void sort(List<MockInMemoryResource> resources, String property, boolean ascending) {
+        Collections.sort(resources, new Comparator<MockInMemoryResource>() {
+                    @Override
+                    public int compare(MockInMemoryResource resource1, MockInMemoryResource resource2) {
+                        Object prop1 = resource1.properties.get(property);
+                        Object prop2 = resource2.properties.get(property);
+
+                        if (prop1 instanceof Comparable && prop2 instanceof Comparable) {
+                            Integer compared = ((Comparable)prop1).compareTo((Comparable)prop2);
+                            if (ascending) {
+                                return compared;
+                            } else {
+                                return (-1 * compared);
+                            }
+                        } else {
+                            return 0;
+                        }
+                    }
+                }
+        );
     }
 
     @Override

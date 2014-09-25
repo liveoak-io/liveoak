@@ -42,7 +42,6 @@ public class LiveOakResourceParameters extends LiveOakMap<String, Object> {
             entrySet.add(sort);
         }
 
-
         for (String paramName : resourceParams.names()) {
             if (!definedFields.contains(paramName)) {
                 Entry entry = new LiveOakMapEntry<>(paramName, resourceParams.value(paramName));

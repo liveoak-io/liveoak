@@ -110,12 +110,16 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
     }
 
     protected HttpEntity httpGet(String uri) throws Exception {
+        return httpGet(uri, 200);
+    }
+
+    protected HttpEntity httpGet(String uri, int statusCode) throws Exception {
         HttpGet get = new HttpGet(uri);
         get.addHeader(HttpHeaders.Names.ACCEPT, MediaType.JSON.toString());
 
         try (CloseableHttpResponse response = httpClient.execute(get)) {
             assertThat(response).isNotNull();
-            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(statusCode);
             HttpEntity entity = response.getEntity();
             assertThat(entity).isNotNull();
             return entity;
@@ -131,6 +135,10 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
     }
 
     protected HttpEntity httpPost(String uri, String data) throws Exception {
+        return httpPost(uri, data, 201);
+    }
+
+    protected HttpEntity httpPost(String uri, String data, int statusCode) throws Exception {
         HttpPost post = new HttpPost(uri);
         post.addHeader(HttpHeaders.Names.ACCEPT, MediaType.JSON.toString());
         post.addHeader(HttpHeaders.Names.CONTENT_TYPE, MediaType.JSON.toString());
@@ -138,7 +146,7 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
 
         try (CloseableHttpResponse response = httpClient.execute(post)) {
             assertThat(response).isNotNull();
-            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(statusCode);
             HttpEntity entity = response.getEntity();
             assertThat(entity).isNotNull();
             return entity;
@@ -154,6 +162,10 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
     }
 
     protected HttpEntity httpPut(String uri, String data) throws Exception {
+        return httpPut(uri, data, 200);
+    }
+
+    protected HttpEntity httpPut(String uri, String data, int statusCode) throws Exception {
         HttpPut put = new HttpPut(uri);
         put.addHeader(HttpHeaders.Names.ACCEPT, MediaType.JSON.toString());
         put.addHeader(HttpHeaders.Names.CONTENT_TYPE, MediaType.JSON.toString());
@@ -161,7 +173,7 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
 
         try (CloseableHttpResponse response = httpClient.execute(put)) {
             assertThat(response).isNotNull();
-            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(statusCode);
             HttpEntity entity = response.getEntity();
             assertThat(entity).isNotNull();
             return entity;
@@ -177,12 +189,16 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
     }
 
     protected HttpEntity httpDelete(String uri) throws Exception {
+        return httpDelete(uri, 200);
+    }
+
+    protected HttpEntity httpDelete(String uri, int statusCode) throws Exception {
         HttpDelete delete = new HttpDelete(uri);
         delete.addHeader(HttpHeaders.Names.ACCEPT, MediaType.JSON.toString());
 
         try (CloseableHttpResponse response = httpClient.execute(delete)) {
             assertThat(response).isNotNull();
-            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(statusCode);
             HttpEntity entity = response.getEntity();
             assertThat(entity).isNotNull();
             return entity;

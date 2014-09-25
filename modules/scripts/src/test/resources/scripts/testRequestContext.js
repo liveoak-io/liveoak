@@ -1,5 +1,24 @@
 function preRead(request, libraries) {
-  preOperation(request, libraries, "preRead");
+  var test = request.context.parameters.test;
+  if (test != null) {
+    try {
+      if (test == "setParameters") {
+        testSetParameters(request, libraries);    
+      } else if (test == "setAttributes") {
+        testSetAttributes(request, libraries);
+      } else if (test == "setSecurityContext") {
+        testSetSecurityContext(request, libraries);
+      }
+    } catch (err) {
+       // Note: returning a NotAcceptableError so that the error message gets propagated back to the
+       // client (eg the testsuite). Otherwise the error would be a generic 'scripting error' with the
+       // actual error written to the logs
+       throw new liveoak.NotAcceptableError(err.message);
+    }
+     
+  } else {
+    preOperation(request, libraries, "preRead");
+  }
 }
 
 function preCreate(request, libraries) {
@@ -17,12 +36,6 @@ function preDelete(request, libraries) {
 
 function preOperation (request, libraries, name) {
   var client = libraries.client;
-
-  //check that the values are read only  
-  request.context = null;
-  request.context.attributes = null;
-  request.context.parameteres = null;
-  request.securityContext = null;
 
   //check that we can add and modify values to parameters
   request.context.parameters.baz = "bat";
@@ -46,4 +59,16 @@ function preOperation (request, libraries, name) {
   }
 
   client.create("/testApp/mock", resource);
+}
+
+function testSetParameters(request, libraries) {
+  request.context.parameters = { "foo" : "bar"};
+}
+
+function testSetAttributes(request, libraries) {
+  request.context.attributes = { "foo" : "bar"};
+}
+
+function testSetSecurityContext(request, libraries) {
+  request.context.securityContext = null;
 }
