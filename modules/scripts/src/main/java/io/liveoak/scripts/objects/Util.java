@@ -2,6 +2,8 @@ package io.liveoak.scripts.objects;
 
 import java.util.Iterator;
 
+import javax.naming.OperationNotSupportedException;
+
 import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.scripts.objects.impl.exception.LiveOakCreateNotSupportedException;
 import io.liveoak.scripts.objects.impl.exception.LiveOakDeleteNotSupportedException;
@@ -136,5 +138,9 @@ public class Util {
         } else {
             return e;
         }
+    }
+
+    public static Exception notEditable(String name) {
+        return new OperationNotSupportedException(name + " cannot be modified");
     }
 }

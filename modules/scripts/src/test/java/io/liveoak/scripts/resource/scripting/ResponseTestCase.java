@@ -25,7 +25,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
         assertThat(initialState.members()).isEmpty();
 
         //create the metadata for the script
-        ResourceState resourceState = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("requestTest", "/testApp/mock/*").libraries("client").build());
+        ResourceState resourceState = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("requestTest", "/testApp/**").libraries("client").build());
 
         ResourceState foo = new DefaultResourceState("foo");
         foo.putProperty("hello", "world");
@@ -105,7 +105,19 @@ public class ResponseTestCase extends BaseScriptingTestCase {
 
     @Test
     public void testError() throws Exception {
+        // Trigger an exception to be thrown in the resource
+        httpPut("http://localhost:8080/testApp/mock", "{'throwError': 'true'}", 406);
 
+        ResourceState onErrorState = client.read(new RequestContext.Builder().build(), "/testApp/mock/onError");
+
+        assertThat(onErrorState.getProperty("type")).isEqualTo("error");
+        assertThat(onErrorState.getProperty("resource.id")).isNull();
+        assertThat(onErrorState.getProperty("resource.uri")).isNull();
+
+        Map resourceProperties = (Map)onErrorState.getProperty("resource.properties");
+        assertThat(resourceProperties.get("error-type")).isEqualTo("NOT_ACCEPTABLE");
+        assertThat(resourceProperties.get("cause")).isNotNull();
+        assertThat(resourceProperties.get("message")).isNotNull();
     }
 
     protected void testResource(ResourceState resourceState) throws Exception {
@@ -117,5 +129,32 @@ public class ResponseTestCase extends BaseScriptingTestCase {
         assertThat(resourceProperties.get("baz")).isEqualTo(123);
 
         assertThat(resourceState.getProperty("resource.member.0.id")).isEqualTo("baz");
+    }
+
+    @Test
+    public void testSetType() throws Exception {
+        // Trigger a read
+        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setType", 406));
+
+        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
+        assertThat(result.get("message").textValue()).isEqualTo("type cannot be modified");
+    }
+
+    @Test
+    public void testSetResource() throws Exception {
+        // Trigger a read
+        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setResource", 406));
+
+        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
+        assertThat(result.get("message").textValue()).isEqualTo("resource cannot be modified");
+    }
+
+    @Test
+    public void testSetRequest() throws Exception {
+        // Trigger a read
+        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setRequest", 406));
+
+        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
+        assertThat(result.get("message").textValue()).isEqualTo("request cannot be modified");
     }
 }

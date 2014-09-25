@@ -20,4 +20,24 @@ public interface SecurityContext {
     String getToken();
 
     Boolean hasRole(String role);
+
+    default void setAuthenticated(Object object) {
+        Util.notEditable("authenticated");
+    }
+
+    default void setRealm(Object object) {
+        Util.notEditable("realm");
+    }
+
+    default void setLastVerified(Object object) {
+        Util.notEditable("lastVerified");
+    }
+
+    default void setRoles(Object object) {
+        Util.notEditable("roles");
+    }
+
+    default void setToken(Object object) {
+        Util.notEditable("token");
+    }
 }

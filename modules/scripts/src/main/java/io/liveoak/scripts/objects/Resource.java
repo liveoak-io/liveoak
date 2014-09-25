@@ -16,5 +16,12 @@ public interface Resource {
 
     Map<String, Object> getProperties();
 
+    void setProperties(Map<String, Object> properties);
+
     Resource[] getMembers();
+
+    default void setMembers(Object id) throws Exception {
+        throw Util.notEditable("members");
+    }
+
 }

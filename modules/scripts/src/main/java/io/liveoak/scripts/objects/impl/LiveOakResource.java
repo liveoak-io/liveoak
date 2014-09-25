@@ -71,9 +71,9 @@ public class LiveOakResource implements Resource {
         return properties;
     }
 
+    @Override
     public void setProperties (Map<String, Object> properties) {
         //TODO: remove this section once DynJS implements .entrySet
-
         Set<String> propertyNames = new HashSet(state.getPropertyNames());
         for (String propertyName : propertyNames) {
             state.removeProperty(propertyName);
