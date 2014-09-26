@@ -10,6 +10,7 @@ import io.liveoak.spi.MediaType;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.handler.codec.http.HttpHeaders;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -20,7 +21,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static io.liveoak.testtools.assertions.Assertions.assertThat;
 
 /**
  * @author Ken Finnigan
@@ -28,40 +29,20 @@ import static org.fest.assertions.Assertions.assertThat;
 public class ScriptContentTest extends BaseResourceTriggeredTestCase {
 
     @Test
-    public void noScriptOnResourceCreate() throws Exception {
-        ResourceState result = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("noscript", "targetPath").build());
-        assertThat(result).isNotNull();
+    public void scriptCreation() throws Exception {
+        // Test #1 - No Script present after resource creation
+        assertThat(post(RESOURCE_SCRIPT_PATH).data("{ \"id\": \"noscript\", \"target-path\": \"targetPath\" }").execute()).hasStatus(201);
 
-        HttpGet get = new HttpGet("http://localhost:8080" + RESOURCE_SCRIPT_PATH + "/noscript/script");
-        get.setHeader(HttpHeaders.Names.ACCEPT, MediaType.JAVASCRIPT.toString());
+        assertThat(get(RESOURCE_SCRIPT_PATH + "/noscript/script").execute()).hasStatus(404);
 
-        CloseableHttpResponse response = httpClient.execute(get);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(404);
-        response.close();
-    }
-
-    @Test
-    public void createScript() throws Exception {
-        ResourceState result = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("create", "targetPath").build());
-        assertThat(result).isNotNull();
-
-        HttpPost post = new HttpPost("http://localhost:8080" + RESOURCE_SCRIPT_PATH + "/create");
-        post.setHeader(HttpHeaders.Names.CONTENT_TYPE, MediaType.JAVASCRIPT.toString());
-        post.setHeader(HttpHeaders.Names.ACCEPT, MediaType.JAVASCRIPT.toString());
+        // Test #2 - Create Resource and Script
+        assertThat(post(RESOURCE_SCRIPT_PATH).data("{ \"id\": \"create\", \"target-path\": \"targetPath\" }").execute()).hasStatus(201);
 
         String content = "function preRead(request, libraries) { print('Hello');}";
-        StringEntity entity = new StringEntity(content, ContentType.create(MediaType.JAVASCRIPT.toString(), "UTF-8"));
-        post.setEntity(entity);
+        HttpResponse response = post(RESOURCE_SCRIPT_PATH + "/create").accept(MediaType.JAVASCRIPT).data(content, MediaType.JAVASCRIPT).execute();
 
-        CloseableHttpResponse response = httpClient.execute(post);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
-        assertThat(response.getEntity()).isNotNull();
-        assertThat(EntityUtils.toString(response.getEntity())).isEqualTo(content);
-        response.close();
+        assertThat(response).hasStatus(201);
+        assertThat(response.getEntity()).matches(content);
     }
 
     @Test

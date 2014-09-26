@@ -9,12 +9,12 @@ import io.liveoak.spi.state.ResourceState;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static io.liveoak.testtools.assertions.Assertions.assertThat;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class RequestModifyTestCase extends BaseScriptingTestCase{
+public class RequestModifyTestCase extends BaseScriptingTestCase {
     @Before
     public void setupTests() throws Exception {
         //check that there are no other scripts configured
@@ -36,7 +36,8 @@ public class RequestModifyTestCase extends BaseScriptingTestCase{
     @Test
     public void testSetId() throws Exception {
         // Trigger a read
-        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setId", 406));
+        assertThat(get("/testApp/mock/foo?test=setId").execute()).hasStatus(406);
+        JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
         assertThat(result.get("message").textValue()).isEqualTo("id cannot be modified");
@@ -45,7 +46,8 @@ public class RequestModifyTestCase extends BaseScriptingTestCase{
     @Test
     public void testSetPath() throws Exception {
         // Trigger a read
-        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setPath", 406));
+        assertThat(get("/testApp/mock/foo?test=setPath").execute()).hasStatus(406);
+        JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
         assertThat(result.get("message").textValue()).isEqualTo("path cannot be modified");
@@ -54,7 +56,8 @@ public class RequestModifyTestCase extends BaseScriptingTestCase{
     @Test
     public void testSetType() throws Exception {
         // Trigger a read
-        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setType", 406));
+        assertThat(get("/testApp/mock/foo?test=setType").execute()).hasStatus(406);
+        JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
         assertThat(result.get("message").textValue()).isEqualTo("type cannot be modified");
@@ -63,7 +66,8 @@ public class RequestModifyTestCase extends BaseScriptingTestCase{
     @Test
     public void testSetResource() throws Exception {
         // Trigger a read
-        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setResource", 406));
+        assertThat(get("/testApp/mock/foo?test=setResource").execute()).hasStatus(406);
+        JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
         assertThat(result.get("message").textValue()).isEqualTo("resource cannot be modified");

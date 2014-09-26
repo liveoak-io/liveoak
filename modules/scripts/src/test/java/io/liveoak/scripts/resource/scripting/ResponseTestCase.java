@@ -4,14 +4,13 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.scripts.JavaScriptResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static io.liveoak.testtools.assertions.Assertions.assertThat;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -48,7 +47,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testRead() throws Exception {
         // Trigger a read
-        httpGet("http://localhost:8080/testApp/mock/foo");
+        get("/testApp/mock/foo").execute();
 
         ResourceState readState = client.read(new RequestContext.Builder().build(), "/testApp/mock/postRead");
 
@@ -59,8 +58,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testCreate() throws Exception {
         // Trigger a create
-        JsonNode postObject = ObjectMapperFactory.create().readTree("{'id': 'ABC', 'foo' : 'bar'}");
-        createResource("http://localhost:8080/testApp/mock", postObject);
+        post("/testApp/mock").data("{'id': 'ABC', 'foo' : 'bar'}").execute();
 
         ResourceState postCreate = client.read(new RequestContext.Builder().build(), "/testApp/mock/postCreate");
 
@@ -75,8 +73,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testUpdate() throws Exception {
         // Trigger an update
-        JsonNode putObject = ObjectMapperFactory.create().readTree("{'Hello' : 'World'}");
-        updateResource("http://localhost:8080/testApp/mock/foo", putObject);
+        put("/testApp/mock/foo").data("{'Hello' : 'World'}").execute();
 
         ResourceState updateState = client.read(new RequestContext.Builder().build(), "/testApp/mock/postUpdate");
 
@@ -95,7 +92,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testDelete() throws Exception {
         // Trigger a delete
-        httpDelete("http://localhost:8080/testApp/mock/foo");
+        delete("/testApp/mock/foo").execute();
 
         ResourceState deleteState = client.read(new RequestContext.Builder().build(), "/testApp/mock/postDelete");
 
@@ -106,7 +103,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testError() throws Exception {
         // Trigger an exception to be thrown in the resource
-        httpPut("http://localhost:8080/testApp/mock", "{'throwError': 'true'}", 406);
+        assertThat(put("/testApp/mock").data("{'throwError': 'true'}").execute()).hasStatus(406);
 
         ResourceState onErrorState = client.read(new RequestContext.Builder().build(), "/testApp/mock/onError");
 
@@ -114,7 +111,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
         assertThat(onErrorState.getProperty("resource.id")).isNull();
         assertThat(onErrorState.getProperty("resource.uri")).isNull();
 
-        Map resourceProperties = (Map)onErrorState.getProperty("resource.properties");
+        Map resourceProperties = (Map) onErrorState.getProperty("resource.properties");
         assertThat(resourceProperties.get("error-type")).isEqualTo("NOT_ACCEPTABLE");
         assertThat(resourceProperties.get("cause")).isNotNull();
         assertThat(resourceProperties.get("message")).isNotNull();
@@ -134,7 +131,8 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetType() throws Exception {
         // Trigger a read
-        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setType", 406));
+        assertThat(get("/testApp/mock/foo?test=setType").execute()).hasStatus(406);
+        JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
         assertThat(result.get("message").textValue()).isEqualTo("type cannot be modified");
@@ -143,7 +141,8 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetResource() throws Exception {
         // Trigger a read
-        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setResource", 406));
+        assertThat(get("/testApp/mock/foo?test=setResource").execute()).hasStatus(406);
+        JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
         assertThat(result.get("message").textValue()).isEqualTo("resource cannot be modified");
@@ -152,7 +151,8 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetRequest() throws Exception {
         // Trigger a read
-        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setRequest", 406));
+        assertThat(get("/testApp/mock/foo?test=setRequest").execute()).hasStatus(406);
+        JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
         assertThat(result.get("message").textValue()).isEqualTo("request cannot be modified");

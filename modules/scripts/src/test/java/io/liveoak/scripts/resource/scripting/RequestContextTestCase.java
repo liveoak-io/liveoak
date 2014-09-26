@@ -5,14 +5,13 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.scripts.JavaScriptResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static io.liveoak.testtools.assertions.Assertions.assertThat;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -51,7 +50,7 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     public void testRead() throws Exception {
         // Trigger a read
         String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
-        httpGet("http://localhost:8080" + uri);
+        get(uri).execute();
 
         ResourceState readState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preRead");
         testState(readState, uri, "GET");
@@ -61,8 +60,7 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     public void testCreate() throws Exception {
         // Trigger a create
         String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
-        JsonNode postObject = ObjectMapperFactory.create().readTree("{'id': 'ABC', 'foo' : 'bar'}");
-        createResource("http://localhost:8080" + uri, postObject);
+        post(uri).data("{'id': 'ABC', 'foo' : 'bar'}").execute();
 
         ResourceState createState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preCreate");
         testState(createState, uri, "POST");
@@ -72,8 +70,7 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     public void testUpdate() throws Exception {
         // Trigger an update
         String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
-        JsonNode putObject = ObjectMapperFactory.create().readTree("{'id': 'ABC', 'foo' : 'bar'}");
-        updateResource("http://localhost:8080" + uri, putObject);
+        put(uri).data("{'id': 'ABC', 'foo' : 'bar'}").execute();
 
         ResourceState updateState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preUpdate");
         testState(updateState, uri, "PUT");
@@ -83,7 +80,7 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     public void testDelete() throws Exception {
         // Trigger a delete
         String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
-        httpDelete("http://localhost:8080" + uri);
+        delete(uri).execute();
 
         ResourceState deleteState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preDelete");
         testState(deleteState, uri, "DELETE");
@@ -113,7 +110,8 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetParameters() throws Exception {
         // Trigger a read
-        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setParameters", 406));
+        assertThat(get("/testApp/mock/foo?test=setParameters").execute()).hasStatus(406);
+        JsonNode result = toJSON(httpResponse.getEntity());
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
         assertThat(result.get("message").textValue()).isEqualTo("parameters cannot be modified");
     }
@@ -121,7 +119,8 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetAttributes() throws Exception {
         // Trigger a read
-        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setAttributes", 406));
+        assertThat(get("/testApp/mock/foo?test=setAttributes").execute()).hasStatus(406);
+        JsonNode result = toJSON(httpResponse.getEntity());
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
         assertThat(result.get("message").textValue()).isEqualTo("attributes cannot be modified");
     }
@@ -129,7 +128,8 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetSecurityContext() throws Exception {
         // Trigger a read
-        JsonNode result = toJSON(httpGet("http://localhost:8080/testApp/mock/foo?test=setSecurityContext", 406));
+        assertThat(get("/testApp/mock/foo?test=setSecurityContext").execute()).hasStatus(406);
+        JsonNode result = toJSON(httpResponse.getEntity());
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
         assertThat(result.get("message").textValue()).isEqualTo("securityContext cannot be modified");
     }

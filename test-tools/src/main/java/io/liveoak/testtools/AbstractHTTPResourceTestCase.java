@@ -6,6 +6,7 @@
 package io.liveoak.testtools;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
+import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.tenancy.InternalApplication;
@@ -27,23 +29,19 @@ import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.vertx.java.core.Vertx;
 
 import static org.fest.assertions.Assertions.assertThat;
-
 
 /**
  * @author Bob McWhirter
@@ -54,6 +52,7 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
     protected LiveOakSystem system;
     protected Client client;
     protected CloseableHttpClient httpClient;
+    protected CloseableHttpResponse httpResponse;
     protected InternalApplication application;
 
     private Set<String> extensionIds = new HashSet<>();
@@ -73,7 +72,7 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
 
     protected void loadExtension(String id, Extension ext, ObjectNode config) throws Exception {
         ObjectNode fullConfig = JsonNodeFactory.instance.objectNode();
-        fullConfig.put( "config", config );
+        fullConfig.put("config", config);
         this.system.extensionInstaller().load(id, ext, fullConfig);
         this.extensionIds.add(id);
     }
@@ -85,7 +84,7 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
     }
 
     protected InternalApplicationExtension installResource(String extId, String resourceId, ResourceState resourceConfig) throws Exception {
-        return installResource( extId, resourceId, ConversionUtils.convert(resourceConfig) );
+        return installResource(extId, resourceId, ConversionUtils.convert(resourceConfig));
     }
 
     protected ResourceState toResourceState(HttpEntity entity, MediaType contentType) throws Exception {
@@ -109,108 +108,86 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
         return toResourceState(buffer, MediaType.JSON);
     }
 
-    protected HttpEntity httpGet(String uri) throws Exception {
-        return httpGet(uri, 200);
+    protected JsonNode toJSON(HttpEntity entity) throws IOException {
+        return ObjectMapperFactory.create().readTree(entity.getContent());
     }
 
-    protected HttpEntity httpGet(String uri, int statusCode) throws Exception {
-        HttpGet get = new HttpGet(uri);
-        get.addHeader(HttpHeaders.Names.ACCEPT, MediaType.JSON.toString());
+    protected HttpRequest get(String path) throws Exception {
+        return new HttpRequest().get(path);
+    }
 
-        try (CloseableHttpResponse response = httpClient.execute(get)) {
-            assertThat(response).isNotNull();
-            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(statusCode);
-            HttpEntity entity = response.getEntity();
-            assertThat(entity).isNotNull();
-            return entity;
+    protected HttpRequest post(String path) throws Exception {
+        return new HttpRequest().post(path);
+    }
+
+    protected HttpRequest put(String path) throws Exception {
+        return new HttpRequest().put(path);
+    }
+
+    protected HttpRequest delete(String path) throws Exception {
+        return new HttpRequest().delete(path);
+    }
+
+    public class HttpRequest {
+        RequestBuilder builder;
+        final static String HOST = "http://localhost:8080";
+
+        public HttpRequest accept(MediaType mediaType) {
+            if (builder != null) {
+                builder.addHeader(HttpHeaders.Names.ACCEPT, mediaType.toString());
+            }
+            return this;
         }
-    }
 
-    protected String getResourceAsString(String uri) throws Exception {
-        return EntityUtils.toString(httpGet(uri));
-    }
-
-    protected JsonNode getResourceAsJson(String uri) throws Exception {
-        return toJSON(httpGet(uri));
-    }
-
-    protected HttpEntity httpPost(String uri, String data) throws Exception {
-        return httpPost(uri, data, 201);
-    }
-
-    protected HttpEntity httpPost(String uri, String data, int statusCode) throws Exception {
-        HttpPost post = new HttpPost(uri);
-        post.addHeader(HttpHeaders.Names.ACCEPT, MediaType.JSON.toString());
-        post.addHeader(HttpHeaders.Names.CONTENT_TYPE, MediaType.JSON.toString());
-        post.setEntity(new StringEntity(data, ContentType.create(MediaType.JSON.toString(), "UTF-8")));
-
-        try (CloseableHttpResponse response = httpClient.execute(post)) {
-            assertThat(response).isNotNull();
-            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(statusCode);
-            HttpEntity entity = response.getEntity();
-            assertThat(entity).isNotNull();
-            return entity;
+        public HttpRequest data(String data) {
+            return data(data, MediaType.JSON);
         }
-    }
 
-    protected String createResource(String uri, String data) throws Exception {
-        return EntityUtils.toString(httpPost(uri, data));
-    }
-
-    protected JsonNode createResource(String uri, JsonNode data) throws Exception {
-        return toJSON(httpPost(uri, data.toString()));
-    }
-
-    protected HttpEntity httpPut(String uri, String data) throws Exception {
-        return httpPut(uri, data, 200);
-    }
-
-    protected HttpEntity httpPut(String uri, String data, int statusCode) throws Exception {
-        HttpPut put = new HttpPut(uri);
-        put.addHeader(HttpHeaders.Names.ACCEPT, MediaType.JSON.toString());
-        put.addHeader(HttpHeaders.Names.CONTENT_TYPE, MediaType.JSON.toString());
-        put.setEntity(new StringEntity(data, ContentType.create(MediaType.JSON.toString(), "UTF-8")));
-
-        try (CloseableHttpResponse response = httpClient.execute(put)) {
-            assertThat(response).isNotNull();
-            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(statusCode);
-            HttpEntity entity = response.getEntity();
-            assertThat(entity).isNotNull();
-            return entity;
+        public HttpRequest data(String data, MediaType mediaType) {
+            if (builder != null) {
+                builder.setEntity(new StringEntity(data, ContentType.create(mediaType.toString(), "UTF-8")));
+            }
+            return this;
         }
-    }
 
-    protected String updateResource(String uri, String data) throws Exception {
-        return EntityUtils.toString(httpPut(uri, data));
-    }
-
-    protected JsonNode updateResource(String uri, JsonNode data) throws Exception {
-        return toJSON(httpPut(uri, data.toString()));
-    }
-
-    protected HttpEntity httpDelete(String uri) throws Exception {
-        return httpDelete(uri, 200);
-    }
-
-    protected HttpEntity httpDelete(String uri, int statusCode) throws Exception {
-        HttpDelete delete = new HttpDelete(uri);
-        delete.addHeader(HttpHeaders.Names.ACCEPT, MediaType.JSON.toString());
-
-        try (CloseableHttpResponse response = httpClient.execute(delete)) {
-            assertThat(response).isNotNull();
-            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(statusCode);
-            HttpEntity entity = response.getEntity();
-            assertThat(entity).isNotNull();
-            return entity;
+        public HttpRequest data(JsonNode data) {
+            return data(data, MediaType.JSON);
         }
-    }
 
-    protected String deleteResourceAsString(String uri) throws Exception {
-        return EntityUtils.toString(httpDelete(uri));
-    }
+        public HttpRequest data(JsonNode data, MediaType mediaType) {
+            if (builder != null) {
+                builder.setEntity(new StringEntity(data.toString(), ContentType.create(mediaType.toString(), "UTF-8")));
+            }
+            return this;
+        }
 
-    protected JsonNode deleteResourceAsJson(String uri) throws Exception {
-        return toJSON(httpDelete(uri));
+        public HttpRequest get(String path) {
+            builder = RequestBuilder.get().setUri(HOST + path);
+            return this;
+        }
+
+        public HttpRequest post(String path) {
+            builder = RequestBuilder.post().setUri(HOST + path);
+            return this;
+        }
+
+        public HttpRequest put(String path) {
+            builder = RequestBuilder.put().setUri(HOST + path);
+            return this;
+        }
+
+        public HttpRequest delete(String path) {
+            builder = RequestBuilder.delete().setUri(HOST + path);
+            return this;
+        }
+
+        public HttpResponse execute() throws Exception {
+            try (CloseableHttpResponse response = httpClient.execute(builder.build())) {
+                assertThat(response).isNotNull();
+                httpResponse = response;
+                return httpResponse;
+            }
+        }
     }
 
     @Before

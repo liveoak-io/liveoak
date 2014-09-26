@@ -1,8 +1,6 @@
 package io.liveoak.scripts.resource.scripting;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.scripts.JavaScriptResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
@@ -37,8 +35,7 @@ public class RequestTestCase extends BaseScriptingTestCase {
     @Test
     public void testCreate() throws Exception {
         // Trigger a create
-        JsonNode postObject = ObjectMapperFactory.create().readTree("{'foo' : 'BAR'}");
-        createResource("http://localhost:8080/testApp/mock/", postObject);
+        post("/testApp/mock/").data("{'foo' : 'BAR'}").execute();
 
         ResourceState preCreate = client.read(new RequestContext.Builder().build(), "/testApp/mock/preCreate");
         ResourceState postCreate = client.read(new RequestContext.Builder().build(), "/testApp/mock/postCreate");
@@ -51,7 +48,7 @@ public class RequestTestCase extends BaseScriptingTestCase {
     @Test
     public void testRead() throws Exception {
         // Trigger a read
-        httpGet("http://localhost:8080/testApp/mock/foo");
+        get("/testApp/mock/foo").execute();
 
         ResourceState preRead = client.read(new RequestContext.Builder().build(), "/testApp/mock/preRead");
         ResourceState postRead = client.read(new RequestContext.Builder().build(), "/testApp/mock/postRead");
@@ -64,8 +61,7 @@ public class RequestTestCase extends BaseScriptingTestCase {
     @Test
     public void testUpdate() throws Exception {
         // Trigger an update
-        JsonNode putObject = ObjectMapperFactory.create().readTree("{'foo' : 'BAR'}");
-        updateResource("http://localhost:8080/testApp/mock/foo", putObject);
+        put("/testApp/mock/foo").data("{'foo' : 'BAR'}").execute();
 
         ResourceState preUpdate = client.read(new RequestContext.Builder().build(), "/testApp/mock/preUpdate");
         ResourceState postUpdate = client.read(new RequestContext.Builder().build(), "/testApp/mock/postUpdate");
@@ -78,7 +74,7 @@ public class RequestTestCase extends BaseScriptingTestCase {
     @Test
     public void testDelete() throws Exception {
         // Trigger an update
-        httpDelete("http://localhost:8080/testApp/mock/foo");
+        delete("/testApp/mock/foo").execute();
 
         ResourceState preDelete = client.read(new RequestContext.Builder().build(), "/testApp/mock/preDelete");
         ResourceState postDelete = client.read(new RequestContext.Builder().build(), "/testApp/mock/postDelete");
