@@ -2,7 +2,6 @@ package io.liveoak.scripts.resource.scripting;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.scripts.JavaScriptResourceState;
 import io.liveoak.spi.RequestContext;
@@ -132,29 +131,20 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     public void testSetType() throws Exception {
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setType")).hasStatus(406);
-        JsonNode result = toJSON(httpResponse.getEntity());
-
-        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
-        assertThat(result.get("message").textValue()).isEqualTo("type cannot be modified");
+        assertThat(httpResponse).isNotAcceptable("type cannot be modified");
     }
 
     @Test
     public void testSetResource() throws Exception {
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setResource")).hasStatus(406);
-        JsonNode result = toJSON(httpResponse.getEntity());
-
-        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
-        assertThat(result.get("message").textValue()).isEqualTo("resource cannot be modified");
+        assertThat(httpResponse).isNotAcceptable("resource cannot be modified");
     }
 
     @Test
     public void testSetRequest() throws Exception {
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setRequest")).hasStatus(406);
-        JsonNode result = toJSON(httpResponse.getEntity());
-
-        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
-        assertThat(result.get("message").textValue()).isEqualTo("request cannot be modified");
+        assertThat(httpResponse).isNotAcceptable("request cannot be modified");
     }
 }

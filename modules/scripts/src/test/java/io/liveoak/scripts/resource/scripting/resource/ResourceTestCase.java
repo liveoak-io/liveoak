@@ -70,9 +70,7 @@ public class ResourceTestCase extends BaseScriptingTestCase {
     public void testSetMembers() throws Exception {
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setMembers")).hasStatus(406);
-        JsonNode result = toJSON(httpResponse.getEntity());
-        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
-        assertThat(result.get("message").textValue()).isEqualTo("members cannot be modified");
+        assertThat(httpResponse).isNotAcceptable("members cannot be modified");
     }
 
     @Test

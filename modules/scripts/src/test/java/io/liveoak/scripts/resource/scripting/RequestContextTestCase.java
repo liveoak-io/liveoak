@@ -3,7 +3,6 @@ package io.liveoak.scripts.resource.scripting;
 import java.util.ArrayList;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.scripts.JavaScriptResourceState;
 import io.liveoak.spi.RequestContext;
@@ -111,27 +110,21 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     public void testSetParameters() throws Exception {
         // Trigger a read
         assertThat(get("/testApp/mock/foo?test=setParameters").execute()).hasStatus(406);
-        JsonNode result = toJSON(httpResponse.getEntity());
-        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
-        assertThat(result.get("message").textValue()).isEqualTo("parameters cannot be modified");
+        assertThat(httpResponse).isNotAcceptable("parameters cannot be modified");
     }
 
     @Test
     public void testSetAttributes() throws Exception {
         // Trigger a read
         assertThat(get("/testApp/mock/foo?test=setAttributes").execute()).hasStatus(406);
-        JsonNode result = toJSON(httpResponse.getEntity());
-        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
-        assertThat(result.get("message").textValue()).isEqualTo("attributes cannot be modified");
+        assertThat(httpResponse).isNotAcceptable("attributes cannot be modified");
     }
 
     @Test
     public void testSetSecurityContext() throws Exception {
         // Trigger a read
         assertThat(get("/testApp/mock/foo?test=setSecurityContext").execute()).hasStatus(406);
-        JsonNode result = toJSON(httpResponse.getEntity());
-        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
-        assertThat(result.get("message").textValue()).isEqualTo("securityContext cannot be modified");
+        assertThat(httpResponse).isNotAcceptable("securityContext cannot be modified");
     }
 
 }

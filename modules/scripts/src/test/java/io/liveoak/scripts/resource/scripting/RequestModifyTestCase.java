@@ -1,6 +1,5 @@
 package io.liveoak.scripts.resource.scripting;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.scripts.JavaScriptResourceState;
 import io.liveoak.scripts.resource.BaseResourceTriggeredTestCase;
@@ -37,39 +36,27 @@ public class RequestModifyTestCase extends BaseScriptingTestCase {
     public void testSetId() throws Exception {
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setId")).hasStatus(406);
-        JsonNode result = toJSON(httpResponse.getEntity());
-
-        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
-        assertThat(result.get("message").textValue()).isEqualTo("id cannot be modified");
+        assertThat(httpResponse).isNotAcceptable("id cannot be modified");
     }
 
     @Test
     public void testSetPath() throws Exception {
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setPath")).hasStatus(406);
-        JsonNode result = toJSON(httpResponse.getEntity());
-
-        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
-        assertThat(result.get("message").textValue()).isEqualTo("path cannot be modified");
+        assertThat(httpResponse).isNotAcceptable("path cannot be modified");
     }
 
     @Test
     public void testSetType() throws Exception {
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setType")).hasStatus(406);
-        JsonNode result = toJSON(httpResponse.getEntity());
-
-        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
-        assertThat(result.get("message").textValue()).isEqualTo("type cannot be modified");
+        assertThat(httpResponse).isNotAcceptable("type cannot be modified");
     }
 
     @Test
     public void testSetResource() throws Exception {
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setResource")).hasStatus(406);
-        JsonNode result = toJSON(httpResponse.getEntity());
-
-        assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
-        assertThat(result.get("message").textValue()).isEqualTo("resource cannot be modified");
+        assertThat(httpResponse).isNotAcceptable("resource cannot be modified");
     }
 }
