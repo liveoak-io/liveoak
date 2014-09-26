@@ -26,13 +26,15 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
     };
   };
 
-  var getScriptsInfo = function(data) {
-    app.scripts = [];
-    app.scriptsCount = 0;
-    for(var i = 0; i < data.members.length; i++) {
-      app.scripts.push({type: data.members[i].id, count: data.members[i].count});
-      app.scriptsCount += data.members[i].count;
-    }
+  var getScriptsInfo = function(app) {
+    return function (data) {
+      app.scripts = [];
+      app.scriptsCount = 0;
+      for(var i = 0; i < data.members.length; i++) {
+        app.scripts.push({type: data.members[i].id, count: data.members[i].count});
+        app.scriptsCount += data.members[i].count;
+      }
+    };
   };
 
   var filtered = $filter('orderBy')($filter('filter')(loAppList.members, {'visible': true}), 'name');
@@ -49,7 +51,7 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
     app.mongoStorages = 0;
     app.storage.$promise.then(increaseStorages(app));
 
-    LoBusinessLogicScripts.get({appId: app.id}, getScriptsInfo);
+    LoBusinessLogicScripts.get({appId: app.id}).$promise.then(getScriptsInfo(app));
 
     if ($filter('filter')(examplesList, {'id': app.id}, true).length > 0) {
       app.example = true;

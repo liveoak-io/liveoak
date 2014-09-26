@@ -77,6 +77,18 @@ loMod.config(['$routeProvider', function($routeProvider) {
         },
         currentScript: function(LoBusinessLogicScripts) {
           return new LoBusinessLogicScripts();
+        },
+        hasResource: function(LoBusinessLogicScripts, $route) {
+          return LoBusinessLogicScripts.getResource({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              // Lazily create the resource if not present
+              var data = { name: 'scripts', type:'scripts', config: { 'script-directory' : '${application.dir}/scripts' } };
+              LoBusinessLogicScripts.createResource({appId: $route.current.params.appId}, data);
+              return false;
+            }
+          );
         }
       }
     })
@@ -84,11 +96,11 @@ loMod.config(['$routeProvider', function($routeProvider) {
       templateUrl : '/admin/console/partials/business-logic-create.html',
       controller : 'BusinessLogicDetailsCtrl',
       resolve: {
-        currentApp: function(LoAppLoader) {
+        currentApp: function (LoAppLoader) {
           return new LoAppLoader();
         },
-        currentScript: function(LoBusinessLogicScripts, $route) {
-          return LoBusinessLogicScripts.get({appId: $route.current.params.appId, type:'resource-triggered-scripts', scriptId: $route.current.params.scriptId}).$promise;
+        currentScript: function (LoBusinessLogicScripts, $route) {
+          return LoBusinessLogicScripts.get({appId: $route.current.params.appId, type: 'resource-triggered-scripts', scriptId: $route.current.params.scriptId}).$promise;
         }
       }
     })
