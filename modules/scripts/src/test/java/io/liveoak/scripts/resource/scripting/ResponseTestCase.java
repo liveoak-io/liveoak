@@ -47,7 +47,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testRead() throws Exception {
         // Trigger a read
-        get("/testApp/mock/foo").execute();
+        execGet("/testApp/mock/foo");
 
         ResourceState readState = client.read(new RequestContext.Builder().build(), "/testApp/mock/postRead");
 
@@ -58,7 +58,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testCreate() throws Exception {
         // Trigger a create
-        post("/testApp/mock").data("{'id': 'ABC', 'foo' : 'bar'}").execute();
+        execPost("/testApp/mock", "{'id': 'ABC', 'foo' : 'bar'}");
 
         ResourceState postCreate = client.read(new RequestContext.Builder().build(), "/testApp/mock/postCreate");
 
@@ -73,7 +73,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testUpdate() throws Exception {
         // Trigger an update
-        put("/testApp/mock/foo").data("{'Hello' : 'World'}").execute();
+        execPut("/testApp/mock/foo", "{'Hello' : 'World'}");
 
         ResourceState updateState = client.read(new RequestContext.Builder().build(), "/testApp/mock/postUpdate");
 
@@ -92,7 +92,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testDelete() throws Exception {
         // Trigger a delete
-        delete("/testApp/mock/foo").execute();
+        execDelete("/testApp/mock/foo");
 
         ResourceState deleteState = client.read(new RequestContext.Builder().build(), "/testApp/mock/postDelete");
 
@@ -103,7 +103,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testError() throws Exception {
         // Trigger an exception to be thrown in the resource
-        assertThat(put("/testApp/mock").data("{'throwError': 'true'}").execute()).hasStatus(406);
+        assertThat(execPut("/testApp/mock", "{'throwError': 'true'}")).hasStatus(406);
 
         ResourceState onErrorState = client.read(new RequestContext.Builder().build(), "/testApp/mock/onError");
 
@@ -131,7 +131,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetType() throws Exception {
         // Trigger a read
-        assertThat(get("/testApp/mock/foo?test=setType").execute()).hasStatus(406);
+        assertThat(execGet("/testApp/mock/foo?test=setType")).hasStatus(406);
         JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
@@ -141,7 +141,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetResource() throws Exception {
         // Trigger a read
-        assertThat(get("/testApp/mock/foo?test=setResource").execute()).hasStatus(406);
+        assertThat(execGet("/testApp/mock/foo?test=setResource")).hasStatus(406);
         JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
@@ -151,7 +151,7 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetRequest() throws Exception {
         // Trigger a read
-        assertThat(get("/testApp/mock/foo?test=setRequest").execute()).hasStatus(406);
+        assertThat(execGet("/testApp/mock/foo?test=setRequest")).hasStatus(406);
         JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");

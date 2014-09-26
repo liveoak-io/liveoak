@@ -36,7 +36,7 @@ public class RequestModifyTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetId() throws Exception {
         // Trigger a read
-        assertThat(get("/testApp/mock/foo?test=setId").execute()).hasStatus(406);
+        assertThat(execGet("/testApp/mock/foo?test=setId")).hasStatus(406);
         JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
@@ -46,7 +46,7 @@ public class RequestModifyTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetPath() throws Exception {
         // Trigger a read
-        assertThat(get("/testApp/mock/foo?test=setPath").execute()).hasStatus(406);
+        assertThat(execGet("/testApp/mock/foo?test=setPath")).hasStatus(406);
         JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
@@ -56,7 +56,7 @@ public class RequestModifyTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetType() throws Exception {
         // Trigger a read
-        assertThat(get("/testApp/mock/foo?test=setType").execute()).hasStatus(406);
+        assertThat(execGet("/testApp/mock/foo?test=setType")).hasStatus(406);
         JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");
@@ -66,7 +66,7 @@ public class RequestModifyTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetResource() throws Exception {
         // Trigger a read
-        assertThat(get("/testApp/mock/foo?test=setResource").execute()).hasStatus(406);
+        assertThat(execGet("/testApp/mock/foo?test=setResource")).hasStatus(406);
         JsonNode result = toJSON(httpResponse.getEntity());
 
         assertThat(result.get("error-type").textValue()).isEqualTo("NOT_ACCEPTABLE");

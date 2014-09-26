@@ -81,7 +81,7 @@ public class ClientTestCase extends BaseScriptingTestCase {
     @Test
     public void testFields() throws Exception {
         // Trigger a read
-        get("/testApp/mock/test?test=testFields").execute();
+        execGet("/testApp/mock/test?test=testFields");
 
         ResourceState data = client.read(new RequestContext.Builder().build(), "/testApp/mock/data/testFields");
         System.out.println("DATA : " + data);
@@ -114,7 +114,7 @@ public class ClientTestCase extends BaseScriptingTestCase {
     @Test
     public void testSort() throws Exception {
         // Trigger a read
-        get("/testApp/mock/test?test=testSort").execute();
+        execGet("/testApp/mock/test?test=testSort");
 
         ResourceState data = client.read(new RequestContext.Builder().build(), "/testApp/mock/data/testSort");
         System.out.println("DATA : " + data);
@@ -139,7 +139,7 @@ public class ClientTestCase extends BaseScriptingTestCase {
     @Test
     public void testOffset() throws Exception {
         // Trigger a read
-        get("/testApp/mock/test?test=testOffset").execute();
+        execGet("/testApp/mock/test?test=testOffset");
 
         ResourceState data = client.read(new RequestContext.Builder().build(), "/testApp/mock/data/testOffset");
         System.out.println("DATA : " + data);
@@ -162,7 +162,7 @@ public class ClientTestCase extends BaseScriptingTestCase {
     @Test
     public void testLimit() throws Exception {
         // Trigger a read
-        get("/testApp/mock/test?test=testLimit").execute();
+        execGet("/testApp/mock/test?test=testLimit");
 
         ResourceState data = client.read(new RequestContext.Builder().build(), "/testApp/mock/data/testLimit");
         System.out.println("DATA : " + data);

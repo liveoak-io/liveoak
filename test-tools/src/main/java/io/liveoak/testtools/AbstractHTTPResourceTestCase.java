@@ -116,16 +116,36 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
         return new HttpRequest().get(path);
     }
 
+    protected HttpResponse execGet(String path) throws Exception {
+        return get(path).execute();
+    }
+
+    protected JsonNode getJson(String path) throws Exception {
+        return toJSON(get(path).execute().getEntity());
+    }
+
     protected HttpRequest post(String path) throws Exception {
         return new HttpRequest().post(path);
+    }
+
+    protected HttpResponse execPost(String path, String data) throws Exception {
+        return post(path).data(data).execute();
     }
 
     protected HttpRequest put(String path) throws Exception {
         return new HttpRequest().put(path);
     }
 
+    protected HttpResponse execPut(String path, String data) throws Exception {
+        return put(path).data(data).execute();
+    }
+
     protected HttpRequest delete(String path) throws Exception {
         return new HttpRequest().delete(path);
+    }
+
+    protected HttpResponse execDelete(String path) throws Exception {
+        return delete(path).execute();
     }
 
     public class HttpRequest {

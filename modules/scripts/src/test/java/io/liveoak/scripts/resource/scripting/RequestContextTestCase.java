@@ -50,7 +50,7 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     public void testRead() throws Exception {
         // Trigger a read
         String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
-        get(uri).execute();
+        execGet(uri);
 
         ResourceState readState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preRead");
         testState(readState, uri, "GET");
@@ -60,7 +60,7 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     public void testCreate() throws Exception {
         // Trigger a create
         String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
-        post(uri).data("{'id': 'ABC', 'foo' : 'bar'}").execute();
+        execPost(uri, "{'id': 'ABC', 'foo' : 'bar'}");
 
         ResourceState createState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preCreate");
         testState(createState, uri, "POST");
@@ -70,7 +70,7 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     public void testUpdate() throws Exception {
         // Trigger an update
         String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
-        put(uri).data("{'id': 'ABC', 'foo' : 'bar'}").execute();
+        execPut(uri, "{'id': 'ABC', 'foo' : 'bar'}");
 
         ResourceState updateState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preUpdate");
         testState(updateState, uri, "PUT");
@@ -80,7 +80,7 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     public void testDelete() throws Exception {
         // Trigger a delete
         String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
-        delete(uri).execute();
+        execDelete(uri);
 
         ResourceState deleteState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preDelete");
         testState(deleteState, uri, "DELETE");

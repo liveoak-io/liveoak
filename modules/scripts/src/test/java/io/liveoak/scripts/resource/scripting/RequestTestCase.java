@@ -35,7 +35,7 @@ public class RequestTestCase extends BaseScriptingTestCase {
     @Test
     public void testCreate() throws Exception {
         // Trigger a create
-        post("/testApp/mock/").data("{'foo' : 'BAR'}").execute();
+        execPost("/testApp/mock/", "{'foo' : 'BAR'}");
 
         ResourceState preCreate = client.read(new RequestContext.Builder().build(), "/testApp/mock/preCreate");
         ResourceState postCreate = client.read(new RequestContext.Builder().build(), "/testApp/mock/postCreate");
@@ -48,7 +48,7 @@ public class RequestTestCase extends BaseScriptingTestCase {
     @Test
     public void testRead() throws Exception {
         // Trigger a read
-        get("/testApp/mock/foo").execute();
+        execGet("/testApp/mock/foo");
 
         ResourceState preRead = client.read(new RequestContext.Builder().build(), "/testApp/mock/preRead");
         ResourceState postRead = client.read(new RequestContext.Builder().build(), "/testApp/mock/postRead");
@@ -61,7 +61,7 @@ public class RequestTestCase extends BaseScriptingTestCase {
     @Test
     public void testUpdate() throws Exception {
         // Trigger an update
-        put("/testApp/mock/foo").data("{'foo' : 'BAR'}").execute();
+        execPut("/testApp/mock/foo", "{'foo' : 'BAR'}");
 
         ResourceState preUpdate = client.read(new RequestContext.Builder().build(), "/testApp/mock/preUpdate");
         ResourceState postUpdate = client.read(new RequestContext.Builder().build(), "/testApp/mock/postUpdate");
@@ -74,7 +74,7 @@ public class RequestTestCase extends BaseScriptingTestCase {
     @Test
     public void testDelete() throws Exception {
         // Trigger an update
-        delete("/testApp/mock/foo").execute();
+        execDelete("/testApp/mock/foo");
 
         ResourceState preDelete = client.read(new RequestContext.Builder().build(), "/testApp/mock/preDelete");
         ResourceState postDelete = client.read(new RequestContext.Builder().build(), "/testApp/mock/postDelete");

@@ -36,8 +36,7 @@ public class PropertiesTestCase extends BaseScriptingTestCase {
 
     @Test
     public void testPropertiesCreate() throws Exception {
-        JsonNode postObject = ObjectMapperFactory.create().readTree("{'cat' : 'Charles', 'rabbit' : 'Richard', 'urchin' : 'Uriel', 'dog' : 'Danielle' }");
-        JsonNode jsonResult = toJSON(post("/testApp/mock").data(postObject).execute().getEntity());
+        JsonNode jsonResult = toJSON(execPost("/testApp/mock", "{'cat' : 'Charles', 'rabbit' : 'Richard', 'urchin' : 'Uriel', 'dog' : 'Danielle' }").getEntity());
 
 
         // Read the values actually stored, eg what would have been modified by the preCreate method
@@ -64,7 +63,7 @@ public class PropertiesTestCase extends BaseScriptingTestCase {
         JsonNode postObject = ObjectMapperFactory.create().readTree("{'cat' : 'Charles', 'rabbit' : 'Richard', 'urchin' : 'Uriel', 'dog' : 'Danielle' }");
         ResourceState resource = client.create(new RequestContext.Builder().build(), "/testApp/mock", ConversionUtils.convert(postObject));
 
-        JsonNode result = toJSON(get("/testApp/mock/" + resource.id()).execute().getEntity());
+        JsonNode result = getJson("/testApp/mock/" + resource.id());
 
         assertThat(result).isNotNull();
         assertThat(result.get("cat").textValue()).isEqualTo("Charles");
@@ -80,8 +79,7 @@ public class PropertiesTestCase extends BaseScriptingTestCase {
         JsonNode postObject = ObjectMapperFactory.create().readTree("{'cat' : 'Charles', 'rabbit' : 'Richard', 'urchin' : 'Uriel', 'dog' : 'Danielle' }");
         ResourceState resource = client.create(new RequestContext.Builder().build(), "/testApp/mock", ConversionUtils.convert(postObject));
 
-        JsonNode putObject = ObjectMapperFactory.create().readTree("{'cat' : 'Cleo', 'rabbit' : 'Rex', 'urchin' : 'Urkel', 'dog' : 'Dan' }");
-        JsonNode jsonResult = toJSON(put("/testApp/mock/" + resource.id()).data(putObject).execute().getEntity());
+        JsonNode jsonResult = toJSON(execPut("/testApp/mock/" + resource.id(), "{'cat' : 'Cleo', 'rabbit' : 'Rex', 'urchin' : 'Urkel', 'dog' : 'Dan' }").getEntity());
 
         // Read the values actually stored, eg what would have been modified by the preUpdate method
         ResourceState clientResult = client.read(new RequestContext.Builder().build(), "/testApp/mock/" + resource.id());
@@ -109,7 +107,7 @@ public class PropertiesTestCase extends BaseScriptingTestCase {
         JsonNode postObject = ObjectMapperFactory.create().readTree("{'cat' : 'Charles', 'rabbit' : 'Richard', 'urchin' : 'Uriel', 'dog' : 'Danielle' }");
         ResourceState resource = client.create(new RequestContext.Builder().build(), "/testApp/mock", ConversionUtils.convert(postObject));
 
-        JsonNode jsonResult = toJSON(delete("/testApp/mock/" + resource.id()).execute().getEntity());
+        JsonNode jsonResult = toJSON(execDelete("/testApp/mock/" + resource.id()).getEntity());
 
         // Check the returned value for what would have been done by the postDelete method
         assertThat(jsonResult).isNotNull();
