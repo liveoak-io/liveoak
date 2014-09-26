@@ -120,7 +120,7 @@ public abstract class AbstractHTTPResourceTestCase extends AbstractTestCase {
         return get(path).execute();
     }
 
-    protected JsonNode getJson(String path) throws Exception {
+    protected JsonNode getJSON(String path) throws Exception {
         return toJSON(get(path).execute().getEntity());
     }
 

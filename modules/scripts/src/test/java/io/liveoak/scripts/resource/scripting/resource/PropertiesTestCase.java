@@ -63,7 +63,7 @@ public class PropertiesTestCase extends BaseScriptingTestCase {
         JsonNode postObject = ObjectMapperFactory.create().readTree("{'cat' : 'Charles', 'rabbit' : 'Richard', 'urchin' : 'Uriel', 'dog' : 'Danielle' }");
         ResourceState resource = client.create(new RequestContext.Builder().build(), "/testApp/mock", ConversionUtils.convert(postObject));
 
-        JsonNode result = getJson("/testApp/mock/" + resource.id());
+        JsonNode result = getJSON("/testApp/mock/" + resource.id());
 
         assertThat(result).isNotNull();
         assertThat(result.get("cat").textValue()).isEqualTo("Charles");

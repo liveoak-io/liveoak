@@ -47,7 +47,7 @@ public class ResourceTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetId() throws Exception {
         // Trigger a read
-        JsonNode result = getJson("/testApp/mock/foo?test=setId");
+        JsonNode result = getJSON("/testApp/mock/foo?test=setId");
         assertThat(result.get("id").textValue()).isEqualTo("bar");
         assertThat(result.get("self").get("href").textValue()).isEqualTo("/testApp/mock/foo");
         assertThat(result.get("hello").textValue()).isEqualTo("world");
@@ -58,7 +58,7 @@ public class ResourceTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetPath() throws Exception {
         // Trigger a read
-        JsonNode result = getJson("/testApp/mock/foo?test=setPath");
+        JsonNode result = getJSON("/testApp/mock/foo?test=setPath");
         assertThat(result.get("id").textValue()).isEqualTo("foo");
         assertThat(result.get("self").get("href").textValue()).isEqualTo("foobar");
         assertThat(result.get("hello").textValue()).isEqualTo("world");
@@ -78,7 +78,7 @@ public class ResourceTestCase extends BaseScriptingTestCase {
     @Test
     public void testSetProperties() throws Exception {
         // Trigger a read
-        JsonNode result = getJson("/testApp/mock/foo?test=setProperties");
+        JsonNode result = getJSON("/testApp/mock/foo?test=setProperties");
         assertThat(result.get("id").textValue()).isEqualTo("foo");
         assertThat(result.get("self").get("href").textValue()).isEqualTo("/testApp/mock/foo");
         assertThat(result.get("testing").textValue()).isEqualTo("123");
