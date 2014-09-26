@@ -12,6 +12,7 @@ import static org.fest.assertions.Formatting.*;
  */
 public class HttpResponseAssert extends GenericAssert<HttpResponseAssert, HttpResponse> {
     private static final String NOT_ACCEPTABLE = "NOT_ACCEPTABLE";
+    private static final String RESOURCE_ALREADY_EXISTS = "RESOURCE_ALREADY_EXISTS";
 
     private JsonNode json;
 
@@ -29,6 +30,15 @@ public class HttpResponseAssert extends GenericAssert<HttpResponseAssert, HttpRe
         if (actual.getStatusLine().getStatusCode() == expected) return this;
         failIfCustomMessageIsSet();
         throw failure(format("response code - expected:<%s> but was:<%s>", expected, actual.getStatusLine().getStatusCode()));
+    }
+
+    public HttpResponseAssert isDuplicate() throws Exception {
+        isNotNull();
+        readJson();
+        String errorType = json.get("error-type").textValue();
+        if (errorType.equals(RESOURCE_ALREADY_EXISTS)) return this;
+        failIfCustomMessageIsSet();
+        throw failure(format("response error - expected error type:<%s> but was:<%s>", RESOURCE_ALREADY_EXISTS, errorType));
     }
 
     public HttpResponseAssert isNotAcceptable() throws Exception {

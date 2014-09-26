@@ -152,6 +152,10 @@ public class ResourceScripts extends ScriptsResource {
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         try {
+            if (scripts.get(state.id()) != null) {
+                responder.resourceAlreadyExists(state.id());
+            }
+
             ResourceScript resourceScript = new ResourceScript(this, state);
 
             scripts.add(resourceScript.getScript());
