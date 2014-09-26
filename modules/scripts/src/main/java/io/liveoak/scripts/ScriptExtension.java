@@ -5,6 +5,7 @@ import io.liveoak.scripts.libraries.manager.LibraryManager;
 import io.liveoak.scripts.libraries.manager.LibraryManagerService;
 import io.liveoak.scripts.libraries.resources.ScriptLibraries;
 import io.liveoak.scripts.libraries.resources.ScriptLibraryService;
+import io.liveoak.scripts.resource.ScriptsRootResource;
 import io.liveoak.scripts.resourcetriggered.interceptor.ScriptInterceptor;
 import io.liveoak.scripts.resourcetriggered.interceptor.ScriptInterceptorService;
 import io.liveoak.scripts.resourcetriggered.manager.ResourceScriptManagerService;
@@ -88,6 +89,8 @@ public class ScriptExtension implements Extension {
                 .addDependency(LIBRARY_MANAGER_SERVICE_NAME.append(applicationId), LibraryManager.class, resourceInterceptorManagerService.libraryManagerInjector)
                 .addDependency(SCRIPT_INTERCEPTOR_SERVICE_NAME, ScriptInterceptor.class, resourceInterceptorManagerService.interceptorInjector)
                 .addDependency(RESOURCE_SCRIPT_MAP_SERVICE_NAME.append(applicationId), ScriptMap.class, resourceInterceptorManagerService.scriptMapInjector)
+                .addDependency(Services.resource(context.application().id(), context.resourceId()).append("apply-config"))
+                .addDependency(Services.resource(context.application().id(), context.resourceId()), ScriptsRootResource.class,resourceInterceptorManagerService.scriptRootInjector)
                 .addInjection(resourceInterceptorManagerService.applicationNameInjector, applicationId)
                 .install();
 

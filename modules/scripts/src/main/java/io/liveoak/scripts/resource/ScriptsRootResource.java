@@ -32,8 +32,9 @@ public class ScriptsRootResource implements RootResource {
 
     // Configuration Keys
     private static final String DIRECTORY = "script-directory";
+    private static final String TIMEOUT = "default-timeout";
 
-    private String scriptDirectory;
+    private ScriptConfig scriptConfig;
 
     public ScriptsRootResource(String id, ScriptLibraries scriptLibraries, ResourceScripts resourceTriggeredScripts, ScheduledScriptsResource scheduledScripts) {
         this.resourceTriggeredScripts = resourceTriggeredScripts;
@@ -77,7 +78,8 @@ public class ScriptsRootResource implements RootResource {
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("name", "LiveOak Scripts");
         sink.accept("description", "Manages server side scripts for the application.");
-        sink.accept(DIRECTORY, this.getScriptDirectory());
+        sink.accept(DIRECTORY, this.scriptConfig.getScriptDirectory());
+        sink.accept(TIMEOUT, this.scriptConfig.getTimeout());
         sink.close();
     }
 
@@ -109,15 +111,50 @@ public class ScriptsRootResource implements RootResource {
     public void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         Object dirProperty = state.getProperty(DIRECTORY);
         if (dirProperty != null && dirProperty instanceof String) {
-            this.scriptDirectory = (String) dirProperty;
+            ScriptConfig.Builder configBuilder = new ScriptConfig.Builder((String) dirProperty);
+
+            Object timeout = state.getProperty(TIMEOUT);
+            if (timeout != null && timeout instanceof Integer && (Integer)timeout >= 0) {
+                configBuilder.setTimeout((Integer)timeout);
+            } else if (timeout != null) {
+                responder.invalidRequest("A '" + TIMEOUT + "' property must be a positive integer.");
+                return;
+            }
+
+            this.scriptConfig = configBuilder.build();
+
             responder.resourceUpdated(this);
         } else {
             responder.invalidRequest("A '" + DIRECTORY + "' property is required and must be a String.");
         }
     }
 
-    public String getScriptDirectory() {
-        return scriptDirectory;
+    @Override
+    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        Object dirProperty = state.getProperty(DIRECTORY);
+        if (dirProperty != null && dirProperty instanceof String) {
+            if (!scriptConfig.getScriptDirectory().equals((String)dirProperty)) {
+                responder.invalidRequest("A '" + DIRECTORY + "' property cannot be updated." );
+                return;
+            }
+        } else {
+            responder.invalidRequest("A '" + DIRECTORY + "' property is required and must be a String");
+            return;
+        }
+
+        Object timeout = state.getProperty(TIMEOUT);
+        if (timeout != null && timeout instanceof Integer && (Integer)timeout >= 0) {
+            scriptConfig.setTimeout((Integer)timeout);
+        } else if (timeout != null) {
+            responder.invalidRequest("A '" + TIMEOUT + "' property must be a positive integer.");
+            return;
+        }
+
+        responder.resourceUpdated(this);
+    }
+
+    public ScriptConfig getScriptConfig() {
+        return scriptConfig;
     }
 
     public Logger logger() {

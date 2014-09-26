@@ -9,7 +9,6 @@ import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.scripts.resource.ScriptResource;
 import io.liveoak.scripts.resource.ScriptsResource;
 import io.liveoak.scripts.resource.ScriptsRootResource;
-import io.liveoak.spi.InvalidPropertyTypeException;
 import io.liveoak.spi.PropertyException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceParams;
@@ -47,7 +46,7 @@ public class ResourceScripts extends ScriptsResource {
     protected File getScriptsDirectory() {
         if (resourceDirectory == null) {
             //get a reference to where the scripts should be held
-            String resourceBasedDir = parent.getScriptDirectory() + File.separator + "/" + RESOURCE_DIRNAME;
+            String resourceBasedDir = parent.getScriptConfig().getScriptDirectory() + File.separator + "/" + RESOURCE_DIRNAME;
             resourceDirectory = new File(resourceBasedDir);
 
             // create the directory if it doesn't already exist
@@ -73,7 +72,7 @@ public class ResourceScripts extends ScriptsResource {
     public void start() throws IOException {
 
         //get a reference to where the resource triggred scripts should be held
-        String resourceBasedDir = parent.getScriptDirectory() + File.separator + "/" + RESOURCE_DIRNAME;
+        String resourceBasedDir = parent.getScriptConfig().getScriptDirectory() + File.separator + "/" + RESOURCE_DIRNAME;
         resourceDirectory = new File(resourceBasedDir);
 
         // create the directory if it doesn't already exist
@@ -183,13 +182,13 @@ public class ResourceScripts extends ScriptsResource {
         ResourceParams resourceParams = ctx.resourceParams();
         if (resourceParams != null && resourceParams.value(TARGET_PARAMETER) != null) {
             String target = resourceParams.value(TARGET_PARAMETER);
-            for (Script script: scripts.getByTarget(target)) {
+            for (ResourceTriggeredScript script: scripts.getByTarget(target)) {
                 sink.accept(new ResourceScript(this, script));
             }
 
         } else {
 
-            for (Script script : scripts.values()) {
+            for (ResourceTriggeredScript script : scripts.values()) {
                 sink.accept(new ResourceScript(this, script));
             }
         }
@@ -198,7 +197,7 @@ public class ResourceScripts extends ScriptsResource {
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        Script script = scripts.get(id);
+        ResourceTriggeredScript script = scripts.get(id);
         if (script != null) {
             responder.resourceRead(new ResourceScript(this, script));
         } else {
@@ -207,7 +206,7 @@ public class ResourceScripts extends ScriptsResource {
     }
 
     public void deleteMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        Script script = scripts.get(id);
+        ResourceTriggeredScript script = scripts.get(id);
         if (script != null) {
             if (script.getScriptBuffer() != null) {
                 deleteSourceFile(id);

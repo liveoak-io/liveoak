@@ -1,8 +1,9 @@
 package io.liveoak.scripts;
 
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.scripts.resource.ScriptConfig;
+import io.liveoak.spi.NotAcceptableException;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.UpdateNotSupportedException;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
 
@@ -27,64 +28,56 @@ public class ScriptTestCase extends BaseScriptTestCase {
         assertThat(getMember(result, "scheduled-scripts")).isNotNull();
     }
 
-    @Test(expected = UpdateNotSupportedException.class)
-    public void testUnableToUpdateScriptResourceDirectory() throws Exception {
+    @Test(expected = NotAcceptableException.class)
+    public void testEmptyConfigUpdate() throws Exception {
         client.update(new RequestContext.Builder().build(), SCRIPT_PATH, new DefaultResourceState());
     }
 
     @Test
-    public void testReadScriptResourceDirectory() throws Exception {
+    public void testUpdateConfig() throws Exception {
+        ResourceState config = new DefaultResourceState();
+        config.putProperty("script-directory", scriptDirectory.getAbsolutePath());
+        client.update(new RequestContext.Builder().build(), SCRIPT_PATH, config);
+
+        try {
+            config.putProperty("script-directory", scriptDirectory.getParentFile().getAbsolutePath());
+            client.update(new RequestContext.Builder().build(), SCRIPT_PATH, config);
+        } catch (NotAcceptableException e) {
+            //expected
+        }
+        // read the result to make sure nothing was changed
+        testReadScriptConfig();
+
+        // try and modify the timeout
+        config.putProperty("script-directory", scriptDirectory.getAbsolutePath());
+        config.putProperty("default-timeout", 10000);
+        ResourceState result = client.update(new RequestContext.Builder().build(), SCRIPT_PATH, config);
+        assertThat(result.getProperty("script-directory").toString()).isEqualTo(scriptDirectory.getAbsolutePath());
+        assertThat((Integer)result.getProperty("default-timeout")).isEqualTo(10000);
+
+        // try and modify the timout with an invalid entry
+        config.putProperty("default-timeout", "foo");
+        try {
+            client.update(new RequestContext.Builder().build(), SCRIPT_PATH, config);
+        } catch (NotAcceptableException e) {
+            // expected
+        }
+
+        config.putProperty("default-timeout", -10);
+        try {
+            client.update(new RequestContext.Builder().build(), SCRIPT_PATH, config);
+        } catch (NotAcceptableException e) {
+            // expected
+        }
+    }
+
+    @Test
+    public void testReadScriptConfig() throws Exception {
         ResourceState result = client.read(new RequestContext.Builder().build(), SCRIPT_PATH);
         assertThat(result).isNotNull();
         assertThat(result.getProperty("script-directory")).isNotNull();
         assertThat(result.getProperty("script-directory").toString()).isEqualTo(scriptDirectory.getAbsolutePath());
+        assertThat(result.getProperty("default-timeout")).isNotNull();
+        assertThat((Integer)result.getProperty("default-timeout")).isEqualTo(ScriptConfig.DEFAULT_TIMEOUT);
     }
-
-    //TODO: write up more tests
-
-
-//    @Test
-//    public void testGetEmptySubscriptions() throws Exception {
-//
-//        ResourceState result = client.read( new RequestContext.Builder().build(), "/admin/applications/testApp/resources/scripts");
-//        result = client.read( new RequestContext.Builder().build(), "/testApp/mock");
-//        //System.out.println("PROPERTIES : " + System.getProperties().keySet());
-//        System.err.println("RESULT : " + result);
-//
-//        result.putProperty("Foo", "Bar");
-//        client.update(new RequestContext.Builder().build(), "/testApp/mock", result);
-//
-//        result = client.read( new RequestContext.Builder().build(), "/testApp/mock");
-//        System.err.println("RESULT2 : " + result);
-//
-//        ResourceState child = new DefaultResourceState("baz");
-//        client.create(new RequestContext.Builder().build(),"/testApp/mock", child);
-//        result = client.read( new RequestContext.Builder().build(), "/testApp/mock/baz");
-//        System.err.println("CHILD : " + result);
-//
-//        ResourceState resource = new DefaultResourceState("testScript");
-//        resource.putProperty("target-path", "/testApp/**");
-//
-//        client.create(new RequestContext.Builder().build(), "/admin/applications/testApp/resources/scripts/resource-triggered-scripts", resource );
-//
-//        Buffer buffer = readFile("hello.js");
-//        //Buffer buffer = new Buffer("function preRead(request, libraries) { print('HELLO WORLD'); }");
-//
-//
-//
-//
-//        ResourceState binaryResourceState = new JavaScriptResourceState(buffer.getByteBuf());
-//        ResourceState binResult = client.create(new RequestContext.Builder().build(), "/admin/applications/testApp/resources/scripts/resource-triggered-scripts/testScript", binaryResourceState);
-//
-//        ResourceState reRead = client.read(new RequestContext.Builder().build(), "/testApp/mock");
-//
-//
-//        ClassLoader cl = ClassLoader.getSystemClassLoader();
-//
-//        URL[] urls = ((URLClassLoader)cl).getURLs();
-//
-//        for(URL url: urls){
-//            System.out.println(url.getFile());
-//        }
-//    }
 }

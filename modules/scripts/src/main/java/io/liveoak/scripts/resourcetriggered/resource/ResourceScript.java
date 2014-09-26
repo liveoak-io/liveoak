@@ -34,19 +34,19 @@ public class ResourceScript implements Resource {
     private ResourceScripts parent;
 
     // The script which this resource represents
-    private Script script;
+    private ResourceTriggeredScript script;
 
     public ResourceScript(ResourceScripts parent, ResourceState state) throws Exception {
         this.parent = parent;
         this.script = createScript(state);
     }
 
-    public ResourceScript(ResourceScripts parent, Script script) throws Exception {
+    public ResourceScript(ResourceScripts parent, ResourceTriggeredScript script) throws Exception {
         this.parent = parent;
         this.script = script;
     }
 
-    protected Script createScript(ResourceState state) throws PropertyException {
+    protected ResourceTriggeredScript createScript(ResourceState state) throws PropertyException {
 
         String id = state.id();
         if (id == null) {
@@ -59,7 +59,7 @@ public class ResourceScript implements Resource {
 
         String target = (String) getProperty(TARGET_PATH, state, true, String.class);
 
-        Script.Builder builder = new Script.Builder(id, target);
+        ResourceTriggeredScript.Builder builder = new ResourceTriggeredScript.Builder(id, target);
 
         String name = (String) getProperty(NAME, state, false, String.class);
         if (name != null) {
@@ -78,9 +78,6 @@ public class ResourceScript implements Resource {
 
         Integer priority = (Integer) getProperty(PRIORITY, state, false, Integer.class);
         if (priority != null) {
-            if (priority < 1 || priority > 10) {
-                throw new PropertyException("'priority' must be between 1 and 10.");
-            }
             builder.setPriority(priority);
         }
 
@@ -114,7 +111,7 @@ public class ResourceScript implements Resource {
         }
     }
 
-    public Script getScript() {
+    public ResourceTriggeredScript getScript() {
         return script;
     }
 

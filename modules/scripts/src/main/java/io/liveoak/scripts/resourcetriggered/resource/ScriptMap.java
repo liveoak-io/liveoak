@@ -16,17 +16,17 @@ import io.liveoak.spi.ResourcePath;
  */
 public class ScriptMap {
 
-    Map<String, Script> idMap = new HashMap<String, Script>();
+    Map<String, ResourceTriggeredScript> idMap = new HashMap<String, ResourceTriggeredScript>();
     PathMap pathMap = new PathMap();
 
-    public void add(Script script) {
+    public void add(ResourceTriggeredScript script) {
         String id = script.getId();
         idMap.put(id, script);
         pathMap.add(script.getTarget(), id);
     }
 
     public void remove(String id) {
-        Script script = idMap.get(id);
+        ResourceTriggeredScript script = idMap.get(id);
         if (script != null) {
             idMap.remove(id);
             pathMap.remove(script.getTarget(), id);
@@ -37,17 +37,17 @@ public class ScriptMap {
         return idMap.size();
     }
 
-    public Collection<Script> values() {
+    public Collection<ResourceTriggeredScript> values() {
         return idMap.values();
     }
 
-    public Script get(String id) {
+    public ResourceTriggeredScript get(String id) {
         return idMap.get(id);
     }
 
-    public Set<Script> getByPath(String path) {
+    public Set<ResourceTriggeredScript> getByPath(String path) {
 
-        Set<Script> scripts = new TreeSet<>(new Script.PriorityComparator());
+        Set<ResourceTriggeredScript> scripts = new TreeSet<>(new ResourceTriggeredScript.PriorityComparator());
 
         Set<String> ids = pathMap.get(path);
         if (ids != null) {
@@ -59,14 +59,14 @@ public class ScriptMap {
         return scripts;
     }
 
-    public Set<Script> getByPath(String path, Script.FUNCTIONS function, Boolean enabled ) {
-        Set<Script> scripts = new TreeSet<>(new Script.PriorityComparator());
+    public Set<ResourceTriggeredScript> getByPath(String path, ResourceTriggeredScript.FUNCTIONS function, Boolean enabled ) {
+        Set<ResourceTriggeredScript> scripts = new TreeSet<>(new ResourceTriggeredScript.PriorityComparator());
 
         Set<String> ids = pathMap.get(path);
 
         if (ids != null) {
             for (String id: ids) {
-                Script script = idMap.get(id);
+                ResourceTriggeredScript script = idMap.get(id);
                 if ((script.isEnabled() == enabled) && script.getProvides().contains(function)) {
                     scripts.add(idMap.get(id));
                 }
@@ -76,16 +76,16 @@ public class ScriptMap {
         return scripts;
     }
 
-    public Set<Script> getByTarget(String target) {
-        Set<Script> scripts = new TreeSet<>(new Script.PriorityComparator());
+    public Set<ResourceTriggeredScript> getByTarget(String target) {
+        Set<ResourceTriggeredScript> scripts = new TreeSet<>(new ResourceTriggeredScript.PriorityComparator());
         for (String path: generatePaths(target)) {
             scripts.addAll(getByPath(path));
         }
         return scripts;
     }
 
-    public Set<Script> getByTarget(String target, Script.FUNCTIONS function, Boolean enabled) {
-        Set<Script> scripts = new TreeSet<>(new Script.PriorityComparator());
+    public Set<ResourceTriggeredScript> getByTarget(String target, ResourceTriggeredScript.FUNCTIONS function, Boolean enabled) {
+        Set<ResourceTriggeredScript> scripts = new TreeSet<>(new ResourceTriggeredScript.PriorityComparator());
         for (String path: generatePaths(target)) {
             scripts.addAll(getByPath(path, function, enabled));
         }

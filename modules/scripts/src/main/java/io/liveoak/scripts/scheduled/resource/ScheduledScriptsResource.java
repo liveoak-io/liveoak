@@ -80,7 +80,7 @@ public class ScheduledScriptsResource extends ScriptsResource {
     protected File getScriptsDirectory() {
         if (scriptDirectory == null) {
             //get a reference to where the scripts should be held
-            String resourceBasedDir = parent.getScriptDirectory() + File.separator + "/" + RESOURCE_DIRNAME;
+            String resourceBasedDir = parent.getScriptConfig().getScriptDirectory() + File.separator + "/" + RESOURCE_DIRNAME;
             scriptDirectory = new File(resourceBasedDir);
 
             // create the directory if it doesn't already exist

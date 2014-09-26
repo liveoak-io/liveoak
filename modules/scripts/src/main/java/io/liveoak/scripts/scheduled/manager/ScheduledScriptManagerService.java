@@ -16,7 +16,7 @@ public class ScheduledScriptManagerService implements Service<ScheduledScriptMan
 
     @Override
     public void start(StartContext startContext) throws StartException {
-        this.manager = new ScheduledScriptManager(libraryManagerInjector.getValue());
+        this.manager = new ScheduledScriptManager(null, libraryManagerInjector.getValue());
     }
 
     @Override

@@ -1,9 +1,10 @@
 package io.liveoak.scripts.scheduled.manager;
 
-import io.liveoak.scripts.libraries.manager.LibraryManager;
 import io.liveoak.scripts.common.ScriptManager;
+import io.liveoak.scripts.libraries.manager.LibraryManager;
 import io.liveoak.scripts.objects.ScheduledContext;
 import io.liveoak.scripts.objects.ScheduledContextBuilder;
+import io.liveoak.scripts.resource.ScriptConfig;
 import io.liveoak.scripts.scheduled.ScheduledScript;
 import org.quartz.JobExecutionContext;
 
@@ -14,8 +15,8 @@ public class ScheduledScriptManager extends ScriptManager {
 
     public static final String EXECUTIONS = "executions";
 
-    public ScheduledScriptManager(LibraryManager libraryManager) {
-        super(libraryManager);
+    public ScheduledScriptManager(ScriptConfig scriptConfig, LibraryManager libraryManager) {
+        super(scriptConfig, libraryManager);
     }
 
     public void execute(ScheduledScript script, JobExecutionContext context) throws Exception {
