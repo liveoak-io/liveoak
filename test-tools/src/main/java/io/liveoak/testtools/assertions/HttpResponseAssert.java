@@ -13,6 +13,7 @@ import static org.fest.assertions.Formatting.*;
 public class HttpResponseAssert extends GenericAssert<HttpResponseAssert, HttpResponse> {
     private static final String NOT_ACCEPTABLE = "NOT_ACCEPTABLE";
     private static final String RESOURCE_ALREADY_EXISTS = "RESOURCE_ALREADY_EXISTS";
+    private static final String NO_SUCH_RESOURCE = "NO_SUCH_RESOURCE";
 
     private JsonNode json;
 
@@ -32,22 +33,16 @@ public class HttpResponseAssert extends GenericAssert<HttpResponseAssert, HttpRe
         throw failure(format("response code - expected:<%s> but was:<%s>", expected, actual.getStatusLine().getStatusCode()));
     }
 
+    public HttpResponseAssert hasNoSuchResource() throws Exception {
+        return validateErrorType(NO_SUCH_RESOURCE);
+    }
+
     public HttpResponseAssert isDuplicate() throws Exception {
-        isNotNull();
-        readJson();
-        String errorType = json.get("error-type").textValue();
-        if (errorType.equals(RESOURCE_ALREADY_EXISTS)) return this;
-        failIfCustomMessageIsSet();
-        throw failure(format("response error - expected error type:<%s> but was:<%s>", RESOURCE_ALREADY_EXISTS, errorType));
+        return validateErrorType(RESOURCE_ALREADY_EXISTS);
     }
 
     public HttpResponseAssert isNotAcceptable() throws Exception {
-        isNotNull();
-        readJson();
-        String errorType = json.get("error-type").textValue();
-        if (errorType.equals(NOT_ACCEPTABLE)) return this;
-        failIfCustomMessageIsSet();
-        throw failure(format("response error - expected error type:<%s> but was:<%s>", NOT_ACCEPTABLE, errorType));
+        return validateErrorType(NOT_ACCEPTABLE);
     }
 
     public HttpResponseAssert with(String message) throws Exception {
@@ -57,6 +52,15 @@ public class HttpResponseAssert extends GenericAssert<HttpResponseAssert, HttpRe
         if (errorMsg.equals(message)) return this;
         failIfCustomMessageIsSet();
         throw failure(format("response error - expected error message:<%s> but was:<%s>", message, errorMsg));
+    }
+
+    private HttpResponseAssert validateErrorType(String expected) throws Exception {
+        isNotNull();
+        readJson();
+        String errorType = json.get("error-type").textValue();
+        if (errorType.equals(expected)) return this;
+        failIfCustomMessageIsSet();
+        throw failure(format("response error - expected error type:<%s> but was:<%s>", expected, errorType));
     }
 
     private void readJson() throws Exception {

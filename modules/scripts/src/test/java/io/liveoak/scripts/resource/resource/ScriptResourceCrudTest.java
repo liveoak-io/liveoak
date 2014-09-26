@@ -1,9 +1,7 @@
 package io.liveoak.scripts.resource.resource;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.scripts.resource.BaseResourceTriggeredTestCase;
-import io.liveoak.spi.ResourceAlreadyExistsException;
-import io.liveoak.spi.ResourceNotFoundException;
 import org.junit.Test;
 
 import static io.liveoak.testtools.assertions.Assertions.assertThat;
@@ -17,7 +15,7 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
     @Test
     public void restCrud() throws Exception {
         // Test #1 - extension installed but no script
-        JsonNode node = getJSON(RESOURCE_SCRIPT_PATH);
+        ObjectNode node = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH);
 
         assertThat(node).isNotNull();
         assertThat(node.get("id").asText()).isEqualTo(RESOURCE_ID);
@@ -25,11 +23,11 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
 
         // Test #2 - extension installed with script resource
         assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"basic\", \"target-path\": \"targetPath\" }")).hasStatus(201);
-        node = toJSON(httpResponse.getEntity());
+        node = (ObjectNode) toJSON(httpResponse.getEntity());
         assertThat(node.get("id").asText()).isEqualTo("basic");
         assertThat(node.get("target-path").asText()).isEqualTo("targetPath");
 
-        node = getJSON(RESOURCE_SCRIPT_PATH + "/basic");
+        node = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/basic");
 
         assertThat(node).isNotNull();
         assertThat(node.get("id").asText()).isEqualTo("basic");
@@ -37,30 +35,47 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
 
         // Test #3 - script resource create fails with duplicate
         assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"basic\", \"target-path\": \"targetPath\" }")).hasStatus(406).isDuplicate();
-    }
 
-//    @Test(expected = ResourceAlreadyExistsException.class)
-    public void installFailsWithDuplicate() throws Exception {
+        // Test #4 - delete fails as script resource does not exist
+        assertThat(execDelete(RESOURCE_SCRIPT_PATH + "/unknown")).hasStatus(404).hasNoSuchResource();
 
-    }
+        // Test #5 - update is converted to create if it doesn't exist
+        assertThat(execPut(RESOURCE_SCRIPT_PATH + "/updatetocreate", "{ \"target-path\": \"targetPath\" }")).hasStatus(201);
 
-//    @Test
-    public void updateResourceMetadata() throws Exception {
+        // Test #6 - update script resource metadata
+        node = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/basic");
+        assertThat(node.get("id").asText()).isEqualTo("basic");
+        assertThat(node.get("target-path").asText()).isEqualTo("targetPath");
+        assertThat(node.get("priority").asInt()).isEqualTo(5);
+        assertThat(node.get("name").isNull()).isTrue();
+        assertThat(node.get("description").isNull()).isTrue();
+        assertThat(node.get("enabled").asBoolean()).isTrue();
 
-    }
+        node.put("name", "some name");
+        assertThat(put(RESOURCE_SCRIPT_PATH + "/basic").data(node).execute()).hasStatus(200);
 
-//    @Test
-    public void resourceRemoved() throws Exception {
+        node = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/basic");
+        assertThat(node.get("id").asText()).isEqualTo("basic");
+        assertThat(node.get("target-path").asText()).isEqualTo("targetPath");
+        assertThat(node.get("priority").asInt()).isEqualTo(5);
+        assertThat(node.get("name").asText()).isEqualTo("some name");
+        assertThat(node.get("description").isNull()).isTrue();
+        assertThat(node.get("enabled").asBoolean()).isTrue();
 
-    }
+        node.put("target-path", "newTargetPath");
+        node.put("enabled", false);
+        assertThat(put(RESOURCE_SCRIPT_PATH + "/basic").data(node).execute()).hasStatus(200);
 
-//    @Test(expected = ResourceNotFoundException.class)
-    public void deleteFailsAsResourceDoesNotExist() throws Exception {
+        node = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/basic");
+        assertThat(node.get("id").asText()).isEqualTo("basic");
+        assertThat(node.get("target-path").asText()).isEqualTo("newTargetPath");
+        assertThat(node.get("priority").asInt()).isEqualTo(5);
+        assertThat(node.get("name").asText()).isEqualTo("some name");
+        assertThat(node.get("description").isNull()).isTrue();
+        assertThat(node.get("enabled").asBoolean()).isFalse();
 
-    }
-
-//    @Test(expected = ResourceNotFoundException.class)
-    public void updateFailsAsResourceDoesNotExist() throws Exception {
-
+        // Test #7 - remove script resource
+        assertThat(execDelete(RESOURCE_SCRIPT_PATH + "/updatetocreate")).hasStatus(200);
+        assertThat(execGet(RESOURCE_SCRIPT_PATH + "/updatetocreate")).hasStatus(404).hasNoSuchResource();
     }
 }
