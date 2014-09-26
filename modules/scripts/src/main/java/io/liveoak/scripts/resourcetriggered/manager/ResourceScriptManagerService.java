@@ -1,6 +1,7 @@
 package io.liveoak.scripts.resourcetriggered.manager;
 
 import io.liveoak.scripts.libraries.manager.LibraryManager;
+import io.liveoak.scripts.resource.ScriptsRootResource;
 import io.liveoak.scripts.resourcetriggered.interceptor.ScriptInterceptor;
 import io.liveoak.scripts.resourcetriggered.resource.ScriptMap;
 import org.jboss.msc.service.Service;
@@ -18,7 +19,7 @@ public class ResourceScriptManagerService implements Service<ResourceScriptManag
 
     @Override
     public void start(StartContext startContext) throws StartException {
-        this.scriptManager = new ResourceScriptManager(scriptMapInjector.getValue(), libraryManagerInjector.getValue());
+        this.scriptManager = new ResourceScriptManager(scriptMapInjector.getValue(), scriptRootInjector.getValue().getScriptConfig(), libraryManagerInjector.getValue());
         // add the manager to the script interceptor
         interceptorInjector.getValue().addManager(applicationNameInjector.getValue(), this.scriptManager);
     }
@@ -42,4 +43,6 @@ public class ResourceScriptManagerService implements Service<ResourceScriptManag
     public InjectedValue<ScriptMap> scriptMapInjector = new InjectedValue<>();
 
     public InjectedValue<String> applicationNameInjector = new InjectedValue<>();
+
+    public InjectedValue<ScriptsRootResource> scriptRootInjector = new InjectedValue<>();
 }

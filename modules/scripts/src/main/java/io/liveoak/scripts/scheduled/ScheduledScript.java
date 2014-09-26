@@ -40,8 +40,8 @@ public class ScheduledScript extends Script {
         this.cron = cron;
     }
 
-    protected ScheduledScript(String id, String name, String description, boolean enabled, List<String> libraries, ByteBuf scriptBuffer, Date at, Date until, String cron) {
-        super(id, name, description, enabled, libraries, scriptBuffer);
+    protected ScheduledScript(String id, String name, String description, boolean enabled, Integer timeout, List<String> libraries, ByteBuf scriptBuffer, Date at, Date until, String cron) {
+        super(id, name, description, enabled, timeout, libraries, scriptBuffer);
         this.at = at;
         this.until = until;
         this.cron = cron;
@@ -93,7 +93,7 @@ public class ScheduledScript extends Script {
         }
 
         public ScheduledScript build() {
-            return new ScheduledScript(id, name, description, enabled, libraries, scriptBuffer, at, until, cron);
+            return new ScheduledScript(id, name, description, enabled, timeout, libraries, scriptBuffer, at, until, cron);
         }
     }
 }

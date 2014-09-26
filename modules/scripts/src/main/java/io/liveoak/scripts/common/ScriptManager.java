@@ -3,6 +3,12 @@ package io.liveoak.scripts.common;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.scripts.libraries.manager.LibraryManager;
@@ -17,6 +23,7 @@ import io.liveoak.scripts.objects.impl.exception.LiveOakResourceAlreadyExistsExc
 import io.liveoak.scripts.objects.impl.exception.LiveOakResourceNotFoundException;
 import io.liveoak.scripts.objects.impl.exception.LiveOakUpdateNotSupportedException;
 import io.liveoak.scripts.objects.scripting.ScriptingResourceRequest;
+import io.liveoak.scripts.resource.ScriptConfig;
 import io.liveoak.spi.ResourceErrorResponse;
 import org.dynjs.Config;
 import org.dynjs.runtime.DynJS;
@@ -29,9 +36,11 @@ import org.dynjs.runtime.Runner;
 public class ScriptManager {
 
     LibraryManager libraryManager;
+    ScriptConfig scriptConfig;
 
-    public ScriptManager(LibraryManager libraryManager) {
+    public ScriptManager(ScriptConfig scriptConfig, LibraryManager libraryManager) {
         this.libraryManager = libraryManager;
+        this.scriptConfig = scriptConfig;
     }
 
     protected Object getLibrary(Script script) {
@@ -44,7 +53,47 @@ public class ScriptManager {
         return library;
     }
 
-    protected Object runScript(String functionName, Script script, Object... functionArguments) {
+    protected Object runScript(String functionName, Script script, Object... functionArguments) throws Exception {
+        ExecutorService executor = Executors.newCachedThreadPool();
+
+
+
+        Future<Object> future = executor.submit( () -> {
+                return executeScript(functionName, script, functionArguments);
+        });
+
+        try {
+            Integer timeout = script.timeout;
+            if (timeout == null) {
+                //TODO: remove this once the script config is a separate service and not part of the main root resource
+                if (scriptConfig != null) {
+                    timeout = scriptConfig.getTimeout();
+                } else {
+                    timeout = ScriptConfig.DEFAULT_TIMEOUT;
+                }
+            }
+            return future.get(timeout, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            return e;
+        } catch (ExecutionException e) {
+            if (e.getCause() != null && e.getCause() instanceof LiveOakException) {
+                return e.getCause();
+            } else {
+                if (e.getCause() != null && e.getCause() instanceof Exception) {
+                    throw (Exception) e.getCause();
+                }
+                else {
+                    throw e;
+                }
+            }
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            executor.awaitTermination(1000, TimeUnit.MILLISECONDS);
+            return e;
+        }
+    }
+
+    protected Object executeScript(String functionName, Script script, Object... functionArguments) {
         Config config = new Config();
         config.setCompileMode(Config.CompileMode.OFF); //TODO: probably shouldn't be needed, check with a newer version of DynJS
 
@@ -119,6 +168,12 @@ public class ScriptManager {
             }
 
             ResourceErrorResponse resourceErrorResponse = new DefaultResourceErrorResponse(request, errorType, liveOakException.getMessage());
+            return resourceErrorResponse;
+        } else if (response instanceof TimeoutException) {
+            ResourceErrorResponse resourceErrorResponse = new DefaultResourceErrorResponse(request, ResourceErrorResponse.ErrorType.INTERNAL_ERROR , "A timeout occurred when running the script.");
+            return resourceErrorResponse;
+        } else if (response instanceof Exception) {
+            ResourceErrorResponse resourceErrorResponse = new DefaultResourceErrorResponse(request, ResourceErrorResponse.ErrorType.INTERNAL_ERROR , "An error occurred while running the script.");
             return resourceErrorResponse;
         }
         return null;

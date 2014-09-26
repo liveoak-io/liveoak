@@ -20,10 +20,11 @@ public abstract class Script {
     List<String> libraries;
     ByteBuf scriptBuffer;
     private List<Function> provides = new ArrayList<>();
+    Integer timeout;
 
     protected abstract Function[] getFunctions();
 
-    protected Script(String id, String name, String description, boolean enabled, List<String> libraries, ByteBuf scriptBuffer) {
+    protected Script(String id, String name, String description, boolean enabled, Integer timeout, List<String> libraries, ByteBuf scriptBuffer) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -60,6 +61,14 @@ public abstract class Script {
         this.enabled = enabled;
     }
 
+    public Integer getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(Integer timeout) {
+        this.timeout = timeout;
+    }
+
     public List<String> getLibraries() {
         return libraries;
     }
@@ -69,7 +78,11 @@ public abstract class Script {
     }
 
     public ByteBuf getScriptBuffer() {
-        return scriptBuffer.copy();
+        if (scriptBuffer != null) {
+            return scriptBuffer.copy();
+        } else {
+            return null;
+        }
     }
 
     public void setScriptBuffer(ByteBuf scriptBuffer) {
@@ -88,6 +101,7 @@ public abstract class Script {
         protected boolean enabled = true;
         protected List<String> libraries;
         protected ByteBuf scriptBuffer;
+        protected Integer timeout;
 
         public Builder(String id) {
             this.id = id;
@@ -117,10 +131,13 @@ public abstract class Script {
             this.scriptBuffer = buffer;
             return this;
         }
+
+        public Builder setTimeout(Integer timeout) {
+            this.timeout = timeout;
+            return this;
+        }
     }
 
-
-    //TODO: move this over to DynJS
     private void analyseProvides() {
         ScriptEngineFactory nsef = new NashornScriptEngineFactory();
         ScriptEngine engine = nsef.getScriptEngine();
