@@ -70,7 +70,7 @@ public class ResourceTestCase extends BaseScriptingTestCase {
     public void testSetMembers() throws Exception {
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setMembers")).hasStatus(406);
-        assertThat(httpResponse).isNotAcceptable("members cannot be modified");
+        assertThat(httpResponse).isNotAcceptable().with("members cannot be modified");
     }
 
     @Test

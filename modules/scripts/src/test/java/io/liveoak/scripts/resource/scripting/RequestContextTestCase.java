@@ -110,21 +110,21 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     public void testSetParameters() throws Exception {
         // Trigger a read
         assertThat(get("/testApp/mock/foo?test=setParameters").execute()).hasStatus(406);
-        assertThat(httpResponse).isNotAcceptable("parameters cannot be modified");
+        assertThat(httpResponse).isNotAcceptable().with("parameters cannot be modified");
     }
 
     @Test
     public void testSetAttributes() throws Exception {
         // Trigger a read
         assertThat(get("/testApp/mock/foo?test=setAttributes").execute()).hasStatus(406);
-        assertThat(httpResponse).isNotAcceptable("attributes cannot be modified");
+        assertThat(httpResponse).isNotAcceptable().with("attributes cannot be modified");
     }
 
     @Test
     public void testSetSecurityContext() throws Exception {
         // Trigger a read
         assertThat(get("/testApp/mock/foo?test=setSecurityContext").execute()).hasStatus(406);
-        assertThat(httpResponse).isNotAcceptable("securityContext cannot be modified");
+        assertThat(httpResponse).isNotAcceptable().with("securityContext cannot be modified");
     }
 
 }

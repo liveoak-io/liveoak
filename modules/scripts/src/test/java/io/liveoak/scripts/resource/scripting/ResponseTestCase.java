@@ -131,20 +131,20 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     public void testSetType() throws Exception {
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setType")).hasStatus(406);
-        assertThat(httpResponse).isNotAcceptable("type cannot be modified");
+        assertThat(httpResponse).isNotAcceptable().with("type cannot be modified");
     }
 
     @Test
     public void testSetResource() throws Exception {
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setResource")).hasStatus(406);
-        assertThat(httpResponse).isNotAcceptable("resource cannot be modified");
+        assertThat(httpResponse).isNotAcceptable().with("resource cannot be modified");
     }
 
     @Test
     public void testSetRequest() throws Exception {
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setRequest")).hasStatus(406);
-        assertThat(httpResponse).isNotAcceptable("request cannot be modified");
+        assertThat(httpResponse).isNotAcceptable().with("request cannot be modified");
     }
 }

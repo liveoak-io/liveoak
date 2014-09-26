@@ -13,6 +13,8 @@ import static org.fest.assertions.Formatting.*;
 public class HttpResponseAssert extends GenericAssert<HttpResponseAssert, HttpResponse> {
     private static final String NOT_ACCEPTABLE = "NOT_ACCEPTABLE";
 
+    private JsonNode json;
+
     /**
      * Creates a new <code>HttpResponseAssert</code>.
      *
@@ -31,20 +33,25 @@ public class HttpResponseAssert extends GenericAssert<HttpResponseAssert, HttpRe
 
     public HttpResponseAssert isNotAcceptable() throws Exception {
         isNotNull();
-        JsonNode json = ObjectMapperFactory.create().readTree(actual.getEntity().getContent());
+        readJson();
         String errorType = json.get("error-type").textValue();
         if (errorType.equals(NOT_ACCEPTABLE)) return this;
         failIfCustomMessageIsSet();
         throw failure(format("response error - expected error type:<%s> but was:<%s>", NOT_ACCEPTABLE, errorType));
     }
 
-    public HttpResponseAssert isNotAcceptable(String message) throws Exception {
+    public HttpResponseAssert with(String message) throws Exception {
         isNotNull();
-        JsonNode json = ObjectMapperFactory.create().readTree(actual.getEntity().getContent());
-        String errorType = json.get("error-type").textValue();
+        readJson();
         String errorMsg = json.get("message").textValue();
-        if (errorType.equals(NOT_ACCEPTABLE) && errorMsg.equals(message)) return this;
+        if (errorMsg.equals(message)) return this;
         failIfCustomMessageIsSet();
-        throw failure(format("response error - expected error type:<%s> but was:<%s> \n expected error message:<%s> but was:<%s>", NOT_ACCEPTABLE, errorType, message, errorMsg));
+        throw failure(format("response error - expected error message:<%s> but was:<%s>", message, errorMsg));
+    }
+
+    private void readJson() throws Exception {
+        if (json == null) {
+            json = ObjectMapperFactory.create().readTree(actual.getEntity().getContent());
+        }
     }
 }
