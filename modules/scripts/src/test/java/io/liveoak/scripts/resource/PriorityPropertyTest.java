@@ -1,11 +1,8 @@
 package io.liveoak.scripts.resource;
 
-import io.liveoak.spi.NotAcceptableException;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static io.liveoak.testtools.assertions.Assertions.assertThat;
 
 /**
  * @author Ken Finnigan
@@ -13,53 +10,37 @@ import static org.fest.assertions.Assertions.assertThat;
 public class PriorityPropertyTest extends BaseResourceTriggeredTestCase {
 
     @Test
-    public void ensureScriptCreatedWithDefaultValue() throws Exception {
-        ResourceState result = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("default", "targetPath").build());
-        assertThat(result).isNotNull();
-        assertThat(result.getProperty("priority")).isEqualTo(5);
-    }
+    public void priorityProperty() throws Exception {
+        // Test #1 - ensureScriptCreatedWithDefaultValue
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"default\", \"target-path\": \"targetPath\" }")).hasStatus(201);
+        assertThat(toJSON(httpResponse.getEntity()).get("priority").asInt()).isEqualTo(5);
 
-    @Test(expected = NotAcceptableException.class)
-    public void checkNegativePriorityFails() throws Exception {
-        client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("negative", "targetPath").priority(-1).build());
-    }
+        // Test #2 - negative priority fails
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"negative\", \"target-path\": \"targetPath\", \"priority\": -1 }")).hasStatus(406);
+        assertThat(httpResponse).isNotAcceptable();
 
-    @Test(expected = NotAcceptableException.class)
-    public void checkZeroPriorityFails() throws Exception {
-        client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("zero", "targetPath").priority(0).build());
-    }
+        // Test #3 - zero priority fails
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"zero\", \"target-path\": \"targetPath\", \"priority\": 0 }")).hasStatus(406);
+        assertThat(httpResponse).isNotAcceptable();
 
-    @Test(expected = NotAcceptableException.class)
-    public void checkPriorityGreaterThanTenFails() throws Exception {
-        client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("toolarge", "targetPath").priority(11).build());
-    }
+        // Test #4 - > 10 priority fails
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"toolarge\", \"target-path\": \"targetPath\", \"priority\": 11 }")).hasStatus(406);
+        assertThat(httpResponse).isNotAcceptable();
 
-    @Test
-    public void checkValidPriority() throws Exception {
-        ResourceState result = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("valid", "targetPath").priority(7).build());
-        assertThat(result).isNotNull();
-        assertThat(result.getProperty("priority")).isEqualTo(7);
-    }
+        // Test #5 - valid priority
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"valid\", \"target-path\": \"targetPath\", \"priority\": 7 }")).hasStatus(201);
+        assertThat(toJSON(httpResponse.getEntity()).get("priority").asInt()).isEqualTo(7);
 
-    @Test(expected = NotAcceptableException.class)
-    public void checkUpdateFromValidFails() throws Exception {
-        ResourceState result = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("invalidupdate", "targetPath").priority(2).build());
-        assertThat(result).isNotNull();
-        assertThat(result.getProperty("priority")).isEqualTo(2);
+        // Test #6 - updating a valid priority with invalid fails
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"invalidupdate\", \"target-path\": \"targetPath\", \"priority\": 2 }")).hasStatus(201);
+        assertThat(toJSON(httpResponse.getEntity()).get("priority").asInt()).isEqualTo(2);
+        assertThat(execPut(RESOURCE_SCRIPT_PATH + "/invalidupdate", "{ \"priority\": 12 }")).hasStatus(406);
+        assertThat(httpResponse).isNotAcceptable();
 
-        result.putProperty("priority", 12);
-        client.update(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/invalidupdate", result);
-    }
-
-    @Test
-    public void checkPrioritySetToDefaultWhenNullPassed() throws Exception {
-        ResourceState result = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("validtodefault", "targetPath").priority(2).build());
-        assertThat(result).isNotNull();
-        assertThat(result.getProperty("priority")).isEqualTo(2);
-
-        result.putProperty("priority", null);
-        result = client.update(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/validtodefault", result);
-        assertThat(result).isNotNull();
-        assertThat(result.getProperty("priority")).isEqualTo(5);
+        // Test #7 - updating a valid priority with null sets it to default
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"validtodefault\", \"target-path\": \"targetPath\", \"priority\": 2 }")).hasStatus(201);
+        assertThat(toJSON(httpResponse.getEntity()).get("priority").asInt()).isEqualTo(2);
+        assertThat(execPut(RESOURCE_SCRIPT_PATH + "/validtodefault", "{ \"target-path\": \"targetPath\", \"priority\": null }")).hasStatus(200);
+        assertThat(toJSON(httpResponse.getEntity()).get("priority").asInt()).isEqualTo(5);
     }
 }

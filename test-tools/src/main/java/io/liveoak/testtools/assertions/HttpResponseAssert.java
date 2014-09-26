@@ -29,6 +29,15 @@ public class HttpResponseAssert extends GenericAssert<HttpResponseAssert, HttpRe
         throw failure(format("response code - expected:<%s> but was:<%s>", expected, actual.getStatusLine().getStatusCode()));
     }
 
+    public HttpResponseAssert isNotAcceptable() throws Exception {
+        isNotNull();
+        JsonNode json = ObjectMapperFactory.create().readTree(actual.getEntity().getContent());
+        String errorType = json.get("error-type").textValue();
+        if (errorType.equals(NOT_ACCEPTABLE)) return this;
+        failIfCustomMessageIsSet();
+        throw failure(format("response error - expected error type:<%s> but was:<%s>", NOT_ACCEPTABLE, errorType));
+    }
+
     public HttpResponseAssert isNotAcceptable(String message) throws Exception {
         isNotNull();
         JsonNode json = ObjectMapperFactory.create().readTree(actual.getEntity().getContent());

@@ -2,6 +2,8 @@ package io.liveoak.scripts.resource;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
@@ -15,97 +17,90 @@ import static io.liveoak.testtools.assertions.Assertions.assertThat;
 public class ProvidesPropertyTest extends BaseResourceTriggeredTestCase {
 
     @Test
-    public void checkSingleProvides() throws Exception {
-        ResourceState result = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("single", "targetPath").build());
-        assertThat(result).isNotNull();
+    public void providesChecks() throws Exception {
+        // Test #1 - Single provides method
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"single\", \"target-path\": \"targetPath\" }")).hasStatus(201);
 
         String content = "function preRead(request, libraries) { print('Hello');}";
         assertThat(post(RESOURCE_SCRIPT_PATH + "/single").accept(MediaType.JAVASCRIPT).data(content, MediaType.JAVASCRIPT).execute()).hasStatus(201);
+        assertThat(httpResponse.getEntity()).matches(content);
 
-        result = client.read(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/single");
+        JsonNode result = getJSON(RESOURCE_SCRIPT_PATH + "/single");
 
         assertThat(result).isNotNull();
-        assertThat(result.getProperty("provides")).isNotNull();
-        List<String> provides = result.getPropertyAsList("provides");
+        assertThat(result.get("provides")).isNotNull();
+        ArrayNode provides = (ArrayNode) result.get("provides");
         assertThat(provides.size()).isEqualTo(1);
-        assertThat(provides.get(0)).isEqualTo("PREREAD");
-    }
+        assertThat(provides.get(0).asText()).isEqualTo("PREREAD");
 
-    @Test
-    public void checkMultipleProvides() throws Exception {
-        ResourceState result = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("multiple", "targetPath").build());
-        assertThat(result).isNotNull();
+        // Test #2 - Multiple provides
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"multiple\", \"target-path\": \"targetPath\" }")).hasStatus(201);
 
-        String content = "function preRead(request, libraries) { print('Hello');} function postRead(response, libraries) { print('Goodbye');}";
+        content = "function preRead(request, libraries) { print('Hello');} function postRead(response, libraries) { print('Goodbye');}";
         assertThat(post(RESOURCE_SCRIPT_PATH + "/multiple").accept(MediaType.JAVASCRIPT).data(content, MediaType.JAVASCRIPT).execute()).hasStatus(201);
+        assertThat(httpResponse.getEntity()).matches(content);
 
-        result = client.read(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/multiple");
+        result = getJSON(RESOURCE_SCRIPT_PATH + "/multiple");
 
         assertThat(result).isNotNull();
-        assertThat(result.getProperty("provides")).isNotNull();
-        List<String> provides = result.getPropertyAsList("provides");
+        assertThat(result.get("provides")).isNotNull();
+        provides = (ArrayNode) result.get("provides");
         assertThat(provides.size()).isEqualTo(2);
-        assertThat(provides.contains("PREREAD")).isTrue();
-        assertThat(provides.contains("POSTREAD")).isTrue();
-    }
+        provides.forEach(node -> assertThat(node.asText().equals("PREREAD") || node.asText().equals("POSTREAD")).isTrue());
 
-    @Test
-    public void checkProvidesAfterScriptUpdateWithDifferentMethods() throws Exception {
-        ResourceState result = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("update", "targetPath").build());
+        // Test #3 - non matching method case
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"case\", \"target-path\": \"targetPath\" }")).hasStatus(201);
+
+        content = "function preread(request, libraries) { print('Hello');}";
+        assertThat(post(RESOURCE_SCRIPT_PATH + "/case").accept(MediaType.JAVASCRIPT).data(content, MediaType.JAVASCRIPT).execute()).hasStatus(201);
+        assertThat(httpResponse.getEntity()).matches(content);
+
+        result = getJSON(RESOURCE_SCRIPT_PATH + "/case");
+
         assertThat(result).isNotNull();
+        assertThat(result.get("provides")).isNotNull();
+        provides = (ArrayNode) result.get("provides");
+        assertThat(provides.size()).isEqualTo(0);
 
-        String content = "function preRead(request, libraries) { print('Hello');}";
+        // Test #4 - non matching method names
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"count\", \"target-path\": \"targetPath\" }")).hasStatus(201);
+
+        content = "function preReads(request, libraries) { print('Hello');}";
+        assertThat(post(RESOURCE_SCRIPT_PATH + "/count").accept(MediaType.JAVASCRIPT).data(content, MediaType.JAVASCRIPT).execute()).hasStatus(201);
+        assertThat(httpResponse.getEntity()).matches(content);
+
+        result = getJSON(RESOURCE_SCRIPT_PATH + "/count");
+
+        assertThat(result).isNotNull();
+        assertThat(result.get("provides")).isNotNull();
+        provides = (ArrayNode) result.get("provides");
+        assertThat(provides.size()).isEqualTo(0);
+
+        // Test #5 - check provides list is updated when script updated
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"update\", \"target-path\": \"targetPath\" }")).hasStatus(201);
+
+        content = "function preRead(request, libraries) { print('Hello');}";
         assertThat(post(RESOURCE_SCRIPT_PATH + "/update").accept(MediaType.JAVASCRIPT).data(content, MediaType.JAVASCRIPT).execute()).hasStatus(201);
+        assertThat(httpResponse.getEntity()).matches(content);
 
-        result = client.read(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/update");
+        result = getJSON(RESOURCE_SCRIPT_PATH + "/update");
 
         assertThat(result).isNotNull();
-        assertThat(result.getProperty("provides")).isNotNull();
-        List<String> provides = result.getPropertyAsList("provides");
+        assertThat(result.get("provides")).isNotNull();
+        provides = (ArrayNode) result.get("provides");
         assertThat(provides.size()).isEqualTo(1);
-        assertThat(provides.get(0)).isEqualTo("PREREAD");
+        assertThat(provides.get(0).asText()).isEqualTo("PREREAD");
 
         content = "function postRead(response, libraries) { print('Goodbye');}";
         assertThat(put(RESOURCE_SCRIPT_PATH + "/update/script").accept(MediaType.JAVASCRIPT).data(content, MediaType.JAVASCRIPT).execute()).hasStatus(200);
+        assertThat(httpResponse.getEntity()).matches(content);
 
-        result = client.read(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/update");
+        result = getJSON(RESOURCE_SCRIPT_PATH + "/update");
 
         assertThat(result).isNotNull();
-        assertThat(result.getProperty("provides")).isNotNull();
-        provides = result.getPropertyAsList("provides");
+        assertThat(result.get("provides")).isNotNull();
+        provides = (ArrayNode) result.get("provides");
         assertThat(provides.size()).isEqualTo(1);
-        assertThat(provides.get(0)).isEqualTo("POSTREAD");
-    }
-
-    @Test
-    public void checkInvalidMethodsAreNotCounted() throws Exception {
-        ResourceState result = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("count", "targetPath").build());
-        assertThat(result).isNotNull();
-
-        String content = "function preReads(request, libraries) { print('Hello');}";
-        assertThat(post(RESOURCE_SCRIPT_PATH + "/count").accept(MediaType.JAVASCRIPT).data(content, MediaType.JAVASCRIPT).execute()).hasStatus(201);
-
-        result = client.read(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/count");
-
-        assertThat(result).isNotNull();
-        assertThat(result.getProperty("provides")).isNotNull();
-        List<String> provides = result.getPropertyAsList("provides");
-        assertThat(provides.size()).isEqualTo(0);
-    }
-
-    @Test
-    public void checkLowerCaseMethodsAreNotCounted() throws Exception {
-        ResourceState result = client.create(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH, new MetadataState("case", "targetPath").build());
-        assertThat(result).isNotNull();
-
-        String content = "function preread(request, libraries) { print('Hello');}";
-        assertThat(post(RESOURCE_SCRIPT_PATH + "/case").accept(MediaType.JAVASCRIPT).data(content, MediaType.JAVASCRIPT).execute()).hasStatus(201);
-
-        result = client.read(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/case");
-
-        assertThat(result).isNotNull();
-        assertThat(result.getProperty("provides")).isNotNull();
-        List<String> provides = result.getPropertyAsList("provides");
-        assertThat(provides.size()).isEqualTo(0);
+        assertThat(provides.get(0).asText()).isEqualTo("POSTREAD");
     }
 }
