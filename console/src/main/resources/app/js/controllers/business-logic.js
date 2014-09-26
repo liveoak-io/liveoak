@@ -160,7 +160,7 @@ loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $route
         finally(function() {
           $scope.create = false;
         });
-        $location.path('/applications/' + currentApp.id + '/business-logic/' + $scope.script.id);
+        $location.path('/applications/' + currentApp.id + '/business-logic');
       },
       function(httpResponse) {
         console.log(httpResponse);
