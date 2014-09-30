@@ -54,7 +54,11 @@
             <li><i class="fa fa-link" tooltip="Target"></i>{{script['target-path']}}</li>
             <li><i class="fa fa-level-up" tooltip="Priority"></i>{{script.priority}}</li>
             <li><i class="fa fa-hand-o-right" tooltip="Triggers"></i><span ng-show="script.provides">{{script.provides.join(', ')}}</span><span ng-hide="script.provides">None</span></li>
-            <li><a href="" class="link-color" ng-click="showScript(script)" ng-hide="script.show"><i class="fa fa-code" tooltip="Script"></i>Show script</a><a href="" class="link-color" ng-click="showScript(script)" ng-show="script.show"><i class="fa fa-code" tooltip="Script"></i>Hide script</a> <span ng-show="script.size">({{script.size}}kb)</span></li>
+            <li>
+              <i class="fa fa-code" tooltip="Script"></i><span ng-hide="script.members">Script not available</span><!-- avoid whitespace
+           --><a href="" class="link-color" ng-click="showScript(script)" ng-show="script.members && !script.show">Show script</a><!-- avoid whitespace
+           --><a href="" class="link-color" ng-click="showScript(script)" ng-show="script.members && script.show">Hide script</a> <span ng-show="script.size">({{script.size}}kb)</span>
+            </li>
           </ul>
           <ui-codemirror ng-show="script.show && script.src" ng-model="script.src" ui-refresh='script.show' ui-codemirror-opts="viewerOptions"></ui-codemirror>
         </div>
