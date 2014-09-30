@@ -30,6 +30,7 @@ public class ResourceScript implements Resource {
     protected static final String TARGET_PATH = "target-path";
     protected static final String PRIORITY = "priority";
     protected static final String PROVIDES = "provides";
+    protected static final String TIMEOUT = "timeout";
 
     private ResourceScripts parent;
 
@@ -38,7 +39,7 @@ public class ResourceScript implements Resource {
 
     public ResourceScript(ResourceScripts parent, ResourceState state) throws Exception {
         this.parent = parent;
-        this.script = createScript(state);
+        this.script = createScript(state, null);
     }
 
     public ResourceScript(ResourceScripts parent, ResourceTriggeredScript script) throws Exception {
@@ -46,7 +47,8 @@ public class ResourceScript implements Resource {
         this.script = script;
     }
 
-    protected ResourceTriggeredScript createScript(ResourceState state) throws PropertyException {
+
+    protected ResourceTriggeredScript createScript(ResourceState state, ByteBuf buffer) throws PropertyException {
 
         String id = state.id();
         if (id == null) {
@@ -81,6 +83,11 @@ public class ResourceScript implements Resource {
             builder.setPriority(priority);
         }
 
+        Integer timeout = (Integer) getProperty(TIMEOUT, state, false, Integer.class);
+        if (timeout != null) {
+            builder.setTimeout(timeout);
+        }
+
         List librariesProperty = (List) getProperty(LIBRARIES, state, false, ArrayList.class);
         if (librariesProperty != null) {
             List<String> libraries = new ArrayList<String>(librariesProperty.size());
@@ -92,6 +99,10 @@ public class ResourceScript implements Resource {
                 }
             }
             builder.setLibraries(libraries);
+        }
+
+        if (buffer != null) {
+            builder.setScriptBuffer(buffer);
         }
 
         return builder.build();
@@ -139,6 +150,7 @@ public class ResourceScript implements Resource {
         sink.accept(PRIORITY, script.getPriority());
         sink.accept(LIBRARIES, script.getLibraries());
         sink.accept(PROVIDES, script.getProvides());
+        sink.accept(TIMEOUT, script.getTimeout());
         sink.close();
     }
 
@@ -149,7 +161,7 @@ public class ResourceScript implements Resource {
                 responder.invalidRequest("The resource ID cannot be changed during an update.");
             } else {
                 // since we don't do partial updates, we need to overwrite everything here with the new state
-                this.script = createScript(state);
+                this.script = createScript(state, script.getScriptBuffer());
                 parent.updateChild(this);
                 responder.resourceUpdated(this);
             }

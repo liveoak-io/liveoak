@@ -7,6 +7,7 @@ import java.util.List;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 
+import io.liveoak.spi.PropertyException;
 import io.netty.buffer.ByteBuf;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
@@ -31,6 +32,11 @@ public abstract class Script {
         this.enabled = enabled;
         this.libraries = libraries;
         this.scriptBuffer = scriptBuffer;
+        this.timeout = timeout;
+
+        if (scriptBuffer != null) {
+            analyseProvides();
+        }
     }
 
     public String getId() {
@@ -132,9 +138,13 @@ public abstract class Script {
             return this;
         }
 
-        public Builder setTimeout(Integer timeout) {
-            this.timeout = timeout;
-            return this;
+        public Builder setTimeout(Integer timeout) throws PropertyException {
+            if (timeout < 0) {
+                throw new PropertyException("'timeout' must be a positive number.");
+            } else {
+                this.timeout = timeout;
+                return this;
+            }
         }
     }
 

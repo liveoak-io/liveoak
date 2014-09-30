@@ -2,6 +2,8 @@ package io.liveoak.scripts.resource.resource;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.scripts.resource.BaseResourceTriggeredTestCase;
+import org.apache.http.HttpResponse;
+import org.fest.assertions.Assertions;
 import org.junit.Test;
 
 import static io.liveoak.testtools.assertions.Assertions.assertThat;
@@ -77,5 +79,63 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
         // Test #7 - remove script resource
         assertThat(execDelete(RESOURCE_SCRIPT_PATH + "/updatetocreate")).hasStatus(200);
         assertThat(execGet(RESOURCE_SCRIPT_PATH + "/updatetocreate")).hasStatus(404).hasNoSuchResource();
+
+        // Other tests:
+        testCreateTimeout();
+        testCreateInvalidTimeout();
+        testUpdateTimeout();
+        testUpdateInvalidTimeout();
+    }
+
+    public void testCreateTimeout() throws Exception {
+        String id = "testTimeout";
+        HttpResponse createResponse =   execPost(RESOURCE_SCRIPT_PATH, "{ 'id': '" + id + "', 'target-path': 'targetPath', 'timeout': 1234 }");
+        assertThat(createResponse).hasStatus(201);
+        ObjectNode createNode = (ObjectNode) toJSON(createResponse.getEntity());
+        Assertions.assertThat(createNode.get("id").asText()).isEqualTo(id);
+        assertThat(createNode.get("timeout").isNumber());
+        Assertions.assertThat(createNode.get("timeout").asInt()).isEqualTo(1234);
+
+        ObjectNode readNode = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/" + id);
+
+        Assertions.assertThat(readNode).isNotNull();
+        Assertions.assertThat(readNode.get("id").asText()).isEqualTo(id);
+        Assertions.assertThat(createNode.get("timeout").asInt()).isEqualTo(1234);
+    }
+
+    public void testUpdateTimeout() throws Exception {
+        //testCreateTimeout();
+        String id = "testTimeout";
+        HttpResponse updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': 'targetPath', 'timeout': 4567 }");
+        assertThat(updateResponse).hasStatus(200);
+        ObjectNode createNode = (ObjectNode) toJSON(updateResponse.getEntity());
+        Assertions.assertThat(createNode.get("id").asText()).isEqualTo(id);
+        assertThat(createNode.get("timeout").isNumber());
+        Assertions.assertThat(createNode.get("timeout").asInt()).isEqualTo(4567);
+
+        ObjectNode readNode = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/" + id);
+
+        Assertions.assertThat(readNode).isNotNull();
+        Assertions.assertThat(readNode.get("id").asText()).isEqualTo(id);
+        Assertions.assertThat(createNode.get("timeout").asInt()).isEqualTo(4567);
+    }
+
+    public void testCreateInvalidTimeout() throws Exception {
+        String id = "testInvalidTimeoutCreate";
+        HttpResponse createResponse =   execPost(RESOURCE_SCRIPT_PATH, "{ 'id': '" + id + "', 'target-path': 'targetPath', 'timeout': -1234 }");
+        assertThat(createResponse).hasStatus(406);
+        ObjectNode createNode = (ObjectNode) toJSON(createResponse.getEntity());
+        assertThat(createNode.get("error-type").asText()).isEqualTo("NOT_ACCEPTABLE");
+        assertThat(createNode.get("message").asText()).isEqualTo("'timeout' must be a positive number.");
+    }
+
+    public void testUpdateInvalidTimeout() throws Exception {
+        //testCreateTimeout();
+        String id = "testInvalidTimeoutUpdate";
+        HttpResponse updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': 'targetPath', 'timeout': 'foo' }");
+        assertThat(updateResponse).hasStatus(406);
+        ObjectNode createNode = (ObjectNode) toJSON(updateResponse.getEntity());
+        assertThat(createNode.get("error-type").asText()).isEqualTo("NOT_ACCEPTABLE");
+        assertThat(createNode.get("message").asText()).isEqualTo("Invalid property type. The property named 'timeout' expects a type of Integer");
     }
 }

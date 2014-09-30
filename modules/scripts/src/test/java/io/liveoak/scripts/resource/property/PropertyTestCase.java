@@ -39,17 +39,50 @@ public class PropertyTestCase extends BasePropertyTestCase {
     }
 
 
-    @Test(timeout = 10000)
+    @Test (timeout = 6000)
     public void testTimeout() throws Exception {
         Long startTime = System.currentTimeMillis();
         // Trigger a read
         JsonNode result = getJSON("/testApp/mock?test=testTimeout");
         Long endTime = System.currentTimeMillis();
 
-        System.err.print("RESULT : " + result);
-        System.err.println("EXECUTION TOOK : " + (endTime - startTime));
+        assertThat(result.get("error-type").textValue()).isEqualTo("INTERNAL_ERROR");
+        assertThat(result.get("message").textValue()).isEqualTo("A timeout occurred when running the script.");
 
         Long executionTime = endTime - startTime;
         assertThat(executionTime).isGreaterThan(5000); //5000 is the timeout value
+    }
+
+    @Test (timeout = 11000)
+    public void testTimeoutWithForce() throws Exception {
+        Long startTime = System.currentTimeMillis();
+        // Trigger a read
+        JsonNode result = getJSON("/testApp/mock?test=testTimeoutWithForce");
+        Long endTime = System.currentTimeMillis();
+
+        assertThat(result.get("error-type").textValue()).isEqualTo("INTERNAL_ERROR");
+        assertThat(result.get("message").textValue()).isEqualTo("A timeout occurred when running the script.");
+
+        Long executionTime = endTime - startTime;
+        assertThat(executionTime).isGreaterThan(10000); //5000 is the timeout value for the script + 5000 to wait until we kill the thread
+    }
+
+    @Test(timeout = 2000)
+    public void testCustomTimeout() throws Exception {
+        int timeout = 1000;
+        ResourceState resourceState = client.update(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/propertyTest",
+                new BaseResourceTriggeredTestCase.MetadataState("propertyTest", "/testApp/*")
+                        .libraries("client").timeout(timeout).build());
+
+        Long startTime = System.currentTimeMillis();
+        // Trigger a read
+        JsonNode result = getJSON("/testApp/mock?test=testTimeout");
+        Long endTime = System.currentTimeMillis();
+
+        assertThat(result.get("error-type").textValue()).isEqualTo("INTERNAL_ERROR");
+        assertThat(result.get("message").textValue()).isEqualTo("A timeout occurred when running the script.");
+
+        Long executionTime = endTime - startTime;
+        assertThat(executionTime).isGreaterThan(1000); //1000 is the timeout value
     }
 }
