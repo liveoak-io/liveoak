@@ -8,22 +8,22 @@ import org.jboss.msc.service.StopContext;
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class ScriptMapService implements Service<ScriptMap> {
+public class ScriptRegistryService implements Service<ScriptRegistry> {
 
-    ScriptMap scriptMap;
+    private ScriptRegistry scriptRegistry;
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.scriptMap = new ScriptMap();
+        this.scriptRegistry = new ScriptRegistry();
     }
 
     @Override
     public void stop(StopContext context) {
-        this.scriptMap = null;
+        this.scriptRegistry = null;
     }
 
     @Override
-    public ScriptMap getValue() throws IllegalStateException, IllegalArgumentException {
-        return this.scriptMap;
+    public ScriptRegistry getValue() throws IllegalStateException, IllegalArgumentException {
+        return this.scriptRegistry;
     }
 }

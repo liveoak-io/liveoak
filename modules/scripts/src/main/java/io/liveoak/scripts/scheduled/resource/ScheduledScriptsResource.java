@@ -1,8 +1,8 @@
 package io.liveoak.scripts.scheduled.resource;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.liveoak.scripts.resource.ScriptResource;
 import io.liveoak.scripts.resource.ScriptsResource;
@@ -30,7 +30,7 @@ public class ScheduledScriptsResource extends ScriptsResource {
     private final ScheduleManager scheduleManager;
     private File scriptDirectory;
 
-    private Map<String, ScheduledScript> scripts = new HashMap<>();
+    private Map<String, ScheduledScript> scripts = new ConcurrentHashMap<>();
 
     public ScheduledScriptsResource(Vertx vertx, ScheduleManager scheduleManager) {
         super(vertx);

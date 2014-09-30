@@ -10,7 +10,7 @@ import io.liveoak.scripts.objects.impl.LiveOakResourceResponse;
 import io.liveoak.scripts.objects.scripting.ScriptingResourceRequest;
 import io.liveoak.scripts.resource.ScriptConfig;
 import io.liveoak.scripts.resourcetriggered.resource.ResourceTriggeredScript;
-import io.liveoak.scripts.resourcetriggered.resource.ScriptMap;
+import io.liveoak.scripts.resourcetriggered.resource.ScriptRegistry;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourceRequest;
@@ -24,11 +24,11 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class ResourceScriptManager extends ScriptManager {
 
-    private ScriptMap scriptMap;
+    private ScriptRegistry scriptRegistry;
 
-    public ResourceScriptManager(ScriptMap scriptMap, ScriptConfig scriptConfig, LibraryManager libraryManager) {
+    public ResourceScriptManager(ScriptRegistry scriptRegistry, ScriptConfig scriptConfig, LibraryManager libraryManager) {
         super(scriptConfig, libraryManager);
-        this.scriptMap = scriptMap;
+        this.scriptRegistry = scriptRegistry;
     }
 
     public Object executeScripts(ResourceRequest request) throws Exception {
@@ -50,11 +50,11 @@ public class ResourceScriptManager extends ScriptManager {
                 break;
         }
 
-        Set<ResourceTriggeredScript> scripts = scriptMap.getByTarget(resourcePath, resourceFunction, true);
+        Set<ResourceTriggeredScript> scripts = scriptRegistry.getByTarget(resourcePath, resourceFunction, true);
 
         // CREATE is special since we apply the create to /foo/bar to create /foo/bar/baz so we should also check /foo/bar/*
         if (resourceFunction == ResourceTriggeredScript.FUNCTIONS.PRECREATE) {
-            scripts.addAll(scriptMap.getByPath(resourcePath + "/*", resourceFunction, true)) ;
+            scripts.addAll(scriptRegistry.getByPath(resourcePath + "/*", resourceFunction, true)) ;
         }
 
         for (ResourceTriggeredScript script : scripts) {
@@ -91,11 +91,11 @@ public class ResourceScriptManager extends ScriptManager {
                 break;
         }
 
-        Set<ResourceTriggeredScript> scripts = scriptMap.getByTarget(resourcePath, resourceFunction, true);
+        Set<ResourceTriggeredScript> scripts = scriptRegistry.getByTarget(resourcePath, resourceFunction, true);
 
         // CREATE is special since we apply the create to /foo/bar to create /foo/bar/baz so we should also check /foo/bar/*
         if (resourceFunction == ResourceTriggeredScript.FUNCTIONS.POSTCREATE) {
-            scripts.addAll(scriptMap.getByPath(resourcePath + "/*", resourceFunction, true)) ;
+            scripts.addAll(scriptRegistry.getByPath(resourcePath + "/*", resourceFunction, true)) ;
         }
 
         for (ResourceTriggeredScript script : scripts) {
@@ -135,7 +135,7 @@ public class ResourceScriptManager extends ScriptManager {
                 });
                 memberResponse.setState(memberState);
 
-                Set<ResourceTriggeredScript> memberScripts = scriptMap.getByTarget(memberState.uri().toString(), ResourceTriggeredScript.FUNCTIONS.POSTREAD, true);
+                Set<ResourceTriggeredScript> memberScripts = scriptRegistry.getByTarget(memberState.uri().toString(), ResourceTriggeredScript.FUNCTIONS.POSTREAD, true);
                 for (ResourceTriggeredScript memberScript: memberScripts) {
                     Object reply = runScript(ResourceTriggeredScript.FUNCTIONS.POSTREAD.getFunctionName(),memberScript , memberResponse);
                     if (reply != null) {

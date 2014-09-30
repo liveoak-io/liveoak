@@ -12,11 +12,11 @@ import org.vertx.java.core.Vertx;
  */
 public class ResourceScriptService implements Service<ResourceScripts> {
 
-    ResourceScripts resourceScripts;
+    private ResourceScripts resourceScripts;
 
     @Override
     public void start(StartContext startContext) throws StartException {
-        this.resourceScripts = new ResourceScripts(scriptMapInjector.getValue(), vertxInjector.getValue());
+        this.resourceScripts = new ResourceScripts(scriptRegistryInjector.getValue(), vertxInjector.getValue());
     }
 
     @Override
@@ -29,8 +29,14 @@ public class ResourceScriptService implements Service<ResourceScripts> {
         return resourceScripts;
     }
 
+    public InjectedValue<ScriptRegistry> getScriptRegistryInjector() {
+        return scriptRegistryInjector;
+    }
 
-    public InjectedValue<ScriptMap> scriptMapInjector = new InjectedValue<>();
+    public InjectedValue<Vertx> getVertxInjector() {
+        return vertxInjector;
+    }
 
-    public InjectedValue<Vertx> vertxInjector = new InjectedValue<>();
+    private InjectedValue<ScriptRegistry> scriptRegistryInjector = new InjectedValue<>();
+    private InjectedValue<Vertx> vertxInjector = new InjectedValue<>();
 }

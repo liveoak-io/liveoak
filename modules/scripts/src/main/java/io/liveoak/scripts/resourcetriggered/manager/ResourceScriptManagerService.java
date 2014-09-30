@@ -3,7 +3,7 @@ package io.liveoak.scripts.resourcetriggered.manager;
 import io.liveoak.scripts.libraries.manager.LibraryManager;
 import io.liveoak.scripts.resource.ScriptsRootResource;
 import io.liveoak.scripts.resourcetriggered.interceptor.ScriptInterceptor;
-import io.liveoak.scripts.resourcetriggered.resource.ScriptMap;
+import io.liveoak.scripts.resourcetriggered.resource.ScriptRegistry;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -19,7 +19,7 @@ public class ResourceScriptManagerService implements Service<ResourceScriptManag
 
     @Override
     public void start(StartContext startContext) throws StartException {
-        this.scriptManager = new ResourceScriptManager(scriptMapInjector.getValue(), scriptRootInjector.getValue().getScriptConfig(), libraryManagerInjector.getValue());
+        this.scriptManager = new ResourceScriptManager(scriptRegistryInjector.getValue(), scriptRootInjector.getValue().getScriptConfig(), libraryManagerInjector.getValue());
         // add the manager to the script interceptor
         interceptorInjector.getValue().addManager(applicationNameInjector.getValue(), this.scriptManager);
     }
@@ -36,13 +36,29 @@ public class ResourceScriptManagerService implements Service<ResourceScriptManag
         return scriptManager;
     }
 
-    public InjectedValue<LibraryManager> libraryManagerInjector = new InjectedValue<>();
+    public InjectedValue<LibraryManager> getLibraryManagerInjector() {
+        return libraryManagerInjector;
+    }
 
-    public InjectedValue<ScriptInterceptor> interceptorInjector = new InjectedValue<>();
+    public InjectedValue<ScriptInterceptor> getInterceptorInjector() {
+        return interceptorInjector;
+    }
 
-    public InjectedValue<ScriptMap> scriptMapInjector = new InjectedValue<>();
+    public InjectedValue<ScriptRegistry> getScriptRegistryInjector() {
+        return scriptRegistryInjector;
+    }
 
-    public InjectedValue<String> applicationNameInjector = new InjectedValue<>();
+    public InjectedValue<String> getApplicationNameInjector() {
+        return applicationNameInjector;
+    }
 
-    public InjectedValue<ScriptsRootResource> scriptRootInjector = new InjectedValue<>();
+    public InjectedValue<ScriptsRootResource> getScriptRootInjector() {
+        return scriptRootInjector;
+    }
+
+    private InjectedValue<LibraryManager> libraryManagerInjector = new InjectedValue<>();
+    private InjectedValue<ScriptInterceptor> interceptorInjector = new InjectedValue<>();
+    private InjectedValue<ScriptRegistry> scriptRegistryInjector = new InjectedValue<>();
+    private InjectedValue<String> applicationNameInjector = new InjectedValue<>();
+    private InjectedValue<ScriptsRootResource> scriptRootInjector = new InjectedValue<>();
 }

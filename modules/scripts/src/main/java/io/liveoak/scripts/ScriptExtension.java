@@ -11,8 +11,8 @@ import io.liveoak.scripts.resourcetriggered.interceptor.ScriptInterceptorService
 import io.liveoak.scripts.resourcetriggered.manager.ResourceScriptManagerService;
 import io.liveoak.scripts.resourcetriggered.resource.ResourceScriptService;
 import io.liveoak.scripts.resourcetriggered.resource.ResourceScripts;
-import io.liveoak.scripts.resourcetriggered.resource.ScriptMap;
-import io.liveoak.scripts.resourcetriggered.resource.ScriptMapService;
+import io.liveoak.scripts.resourcetriggered.resource.ScriptRegistry;
+import io.liveoak.scripts.resourcetriggered.resource.ScriptRegistryService;
 import io.liveoak.scripts.scheduled.manager.ScheduleManager;
 import io.liveoak.scripts.scheduled.manager.ScheduleManagerService;
 import io.liveoak.scripts.scheduled.manager.ScheduledScriptManager;
@@ -38,7 +38,7 @@ public class ScriptExtension implements Extension {
 
     public static final ServiceName SCRIPT_SERVICE_NAME = Services.LIVEOAK.append("scripts");
     public static final ServiceName RESOURCE_SCRIPT_MANAGER_SERVICE_NAME = SCRIPT_SERVICE_NAME.append("resource-script-manager");
-    public static final ServiceName RESOURCE_SCRIPT_MAP_SERVICE_NAME = SCRIPT_SERVICE_NAME.append("resource-map");
+    public static final ServiceName RESOURCE_SCRIPT_REGISTRY_SERVICE_NAME = SCRIPT_SERVICE_NAME.append("resource-registry");
     public static final ServiceName LIBRARY_MANAGER_SERVICE_NAME = SCRIPT_SERVICE_NAME.append("library-manager");
     public static final ServiceName LIBRARIES_RESOURCE_SERVICE_NAME = SCRIPT_SERVICE_NAME.append("libraries-resource");
     public static final ServiceName RESOURCE_SCRIPTS_SERVICE_NAME = SCRIPT_SERVICE_NAME.append("resource-scripts");
@@ -79,26 +79,26 @@ public class ScriptExtension implements Extension {
 
 
         // RESOURCE TRIGGERED SCRIPTS
-        ScriptMapService scriptMapService = new ScriptMapService();
-        context.target().addService(RESOURCE_SCRIPT_MAP_SERVICE_NAME.append(applicationId), scriptMapService)
+        ScriptRegistryService scriptRegistryService = new ScriptRegistryService();
+        context.target().addService(RESOURCE_SCRIPT_REGISTRY_SERVICE_NAME.append(applicationId), scriptRegistryService)
                 .install();
 
 
         ResourceScriptManagerService resourceInterceptorManagerService = new ResourceScriptManagerService();
         context.target().addService(RESOURCE_SCRIPT_MANAGER_SERVICE_NAME.append(applicationId), resourceInterceptorManagerService)
-                .addDependency(LIBRARY_MANAGER_SERVICE_NAME.append(applicationId), LibraryManager.class, resourceInterceptorManagerService.libraryManagerInjector)
-                .addDependency(SCRIPT_INTERCEPTOR_SERVICE_NAME, ScriptInterceptor.class, resourceInterceptorManagerService.interceptorInjector)
-                .addDependency(RESOURCE_SCRIPT_MAP_SERVICE_NAME.append(applicationId), ScriptMap.class, resourceInterceptorManagerService.scriptMapInjector)
+                .addDependency(LIBRARY_MANAGER_SERVICE_NAME.append(applicationId), LibraryManager.class, resourceInterceptorManagerService.getLibraryManagerInjector())
+                .addDependency(SCRIPT_INTERCEPTOR_SERVICE_NAME, ScriptInterceptor.class, resourceInterceptorManagerService.getInterceptorInjector())
+                .addDependency(RESOURCE_SCRIPT_REGISTRY_SERVICE_NAME.append(applicationId), ScriptRegistry.class, resourceInterceptorManagerService.getScriptRegistryInjector())
                 .addDependency(Services.resource(context.application().id(), context.resourceId()).append("apply-config"))
-                .addDependency(Services.resource(context.application().id(), context.resourceId()), ScriptsRootResource.class,resourceInterceptorManagerService.scriptRootInjector)
-                .addInjection(resourceInterceptorManagerService.applicationNameInjector, applicationId)
+                .addDependency(Services.resource(context.application().id(), context.resourceId()), ScriptsRootResource.class, resourceInterceptorManagerService.getScriptRootInjector())
+                .addInjection(resourceInterceptorManagerService.getApplicationNameInjector(), applicationId)
                 .install();
 
 
         ResourceScriptService resourceScriptsService = new ResourceScriptService();
         context.target().addService(RESOURCE_SCRIPTS_SERVICE_NAME.append(applicationId), resourceScriptsService)
-                .addDependency(RESOURCE_SCRIPT_MAP_SERVICE_NAME.append(applicationId), ScriptMap.class, resourceScriptsService.scriptMapInjector)
-                .addDependency(Services.VERTX, Vertx.class, resourceScriptsService.vertxInjector)
+                .addDependency(RESOURCE_SCRIPT_REGISTRY_SERVICE_NAME.append(applicationId), ScriptRegistry.class, resourceScriptsService.getScriptRegistryInjector())
+                .addDependency(Services.VERTX, Vertx.class, resourceScriptsService.getVertxInjector())
                 .install();
 
 

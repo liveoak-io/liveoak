@@ -16,7 +16,7 @@ public class ScriptLibraries implements Resource {
     private Resource parent;
     private static final String ID = "libraries";
 
-    LibraryManager libraryManager;
+    private LibraryManager libraryManager;
 
     public ScriptLibraries(LibraryManager libraryManager) {
         this.libraryManager = libraryManager;

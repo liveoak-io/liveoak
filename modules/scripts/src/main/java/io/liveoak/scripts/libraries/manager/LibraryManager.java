@@ -1,7 +1,7 @@
 package io.liveoak.scripts.libraries.manager;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.liveoak.scripts.objects.impl.LiveOakClient;
 import io.liveoak.spi.client.Client;
@@ -11,7 +11,7 @@ import io.liveoak.spi.client.Client;
  */
 public class LibraryManager {
 
-    Map<String, Library> libraries;
+    private Map<String, Library> libraries;
 
     private static final String CLIENT_NAME = "client";
 
@@ -21,7 +21,7 @@ public class LibraryManager {
         String liveOakClientDescription = "Used to communicate and manage other LiveOak resources.";
         Library liveOakLibrary = new Library(CLIENT_NAME, liveOakClientDescription, liveOakClient);
 
-        libraries = new HashMap<>();
+        libraries = new ConcurrentHashMap<>();
         libraries.put(CLIENT_NAME, liveOakLibrary);
     }
 

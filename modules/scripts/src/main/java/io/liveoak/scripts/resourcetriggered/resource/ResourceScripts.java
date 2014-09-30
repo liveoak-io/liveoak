@@ -11,6 +11,7 @@ import io.liveoak.scripts.resource.ScriptsResource;
 import io.liveoak.scripts.resource.ScriptsRootResource;
 import io.liveoak.spi.PropertyException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourceAlreadyExistsException;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
@@ -34,13 +35,13 @@ public class ResourceScripts extends ScriptsResource {
 
     private static final String TARGET_PARAMETER = "target";
 
-    private ScriptMap scripts;
+    private ScriptRegistry scripts;
 
-    File resourceDirectory;
+    private File resourceDirectory;
 
-    public ResourceScripts(ScriptMap scriptMap, Vertx vertx) {
+    public ResourceScripts(ScriptRegistry scriptRegistry, Vertx vertx) {
         super(vertx);
-        this.scripts = scriptMap;
+        this.scripts = scriptRegistry;
     }
 
     protected File getScriptsDirectory() {
@@ -151,13 +152,13 @@ public class ResourceScripts extends ScriptsResource {
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         try {
-            if (scripts.get(state.id()) != null) {
+            ResourceScript resourceScript = null;
+            try {
+                resourceScript = scripts.addFromState(this, state);
+            } catch (ResourceAlreadyExistsException e) {
                 responder.resourceAlreadyExists(state.id());
+                return;
             }
-
-            ResourceScript resourceScript = new ResourceScript(this, state);
-
-            scripts.add(resourceScript.getScript());
 
             //Write to the file system
             ObjectNode objectNode = ConversionUtils.convert(state);
@@ -170,10 +171,7 @@ public class ResourceScripts extends ScriptsResource {
     }
 
     public void updateChild(ResourceScript resourceScript) {
-        if (scripts.get(resourceScript.id()) != null) {
-            scripts.remove(resourceScript.id());
-            scripts.add(resourceScript.getScript());
-        }
+        scripts.updateScript(resourceScript);
     }
 
     @Override
