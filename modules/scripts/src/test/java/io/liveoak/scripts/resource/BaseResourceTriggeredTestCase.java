@@ -46,6 +46,11 @@ public class BaseResourceTriggeredTestCase extends BaseScriptTestCase {
             return this;
         }
 
+        public MetadataState timeout(int timeout) {
+            this.values.put("timeout", timeout);
+            return this;
+        }
+
         public MetadataState libraries(String... libraries) {
             for (String library:libraries) {
                 this.libraries.add(library);

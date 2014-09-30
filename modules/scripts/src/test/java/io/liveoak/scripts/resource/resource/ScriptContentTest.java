@@ -4,10 +4,11 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.scripts.resource.BaseResourceTriggeredTestCase;
 import io.liveoak.spi.MediaType;
-import io.netty.handler.codec.http.HttpHeaders;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.http.HttpResponse;
 import org.junit.Test;
 
 import static io.liveoak.testtools.assertions.Assertions.assertThat;
@@ -105,5 +106,39 @@ public class ScriptContentTest extends BaseResourceTriggeredTestCase {
         assertThat(source.length()).isGreaterThan(0);
         String fileContent = new String(Files.readAllBytes(Paths.get(source.toURI())));
         assertThat(fileContent).isEqualTo(content);
+
+        // Test #8 - check that the script is not overwritten when the metadata is updated
+        testUpdateDataResource();
+    }
+
+    // Test that a script is not overwritten when the metadata is updated
+    public void testUpdateDataResource() throws Exception {
+        String id = "checkDataUpdate";
+        HttpResponse response =  execPost(RESOURCE_SCRIPT_PATH, "{ 'id': '" + id +"', 'target-path': 'targetPath' }");
+        assertThat(response).hasStatus(201);
+        String content = "function preRead(request, libraries) { print('Hello');}";
+        HttpResponse scriptResponse = post(RESOURCE_SCRIPT_PATH + "/" + id).accept(MediaType.JAVASCRIPT).data(content, MediaType.JAVASCRIPT).execute();
+        assertThat(scriptResponse).hasStatus(201);
+        assertThat(scriptResponse.getEntity()).matches(content);
+
+        ObjectNode jsonData = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/" + id);
+        assertThat(jsonData.get("target-path").textValue()).isEqualTo("targetPath");
+        assertThat(((ArrayNode)jsonData.get("provides")).size()).isEqualTo(1);
+        assertThat(((ArrayNode)jsonData.get("provides")).get(0).textValue()).isEqualTo("PREREAD");
+        assertThat(jsonData.get("enabled").booleanValue()).isEqualTo(true);
+
+        // Update the metadata
+        HttpResponse updateResponse =  execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id +"', 'target-path': 'targetPath', 'enabled': false }");
+        assertThat(response).hasStatus(201);
+
+        ObjectNode updatedData = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/" + id);
+        assertThat(updatedData.get("target-path").textValue()).isEqualTo("targetPath");
+        assertThat(updatedData.get("provides").size()).isEqualTo(1);
+        assertThat(updatedData.get("provides").get(0).textValue()).isEqualTo("PREREAD");
+        assertThat(updatedData.get("enabled").booleanValue()).isEqualTo(false);
+
+        HttpResponse scriptReadResponse = get(RESOURCE_SCRIPT_PATH + "/" + id + "/script").accept(MediaType.JAVASCRIPT).execute();
+        assertThat(scriptReadResponse).hasStatus(200);
+        assertThat(scriptReadResponse.getEntity()).matches(content);
     }
 }

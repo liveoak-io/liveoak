@@ -3,7 +3,9 @@ function preRead(request, libraries) {
 
   try {
     if (test == "testTimeout") {
-      testTimeout(request);
+      testTimeout(request, libraries.client, true);
+    } else if (test == "testTimeoutWithForce") {
+      testTimeout(request, libraries.client, false);
     } else {
      throw new Error("Unknown Test : " + test);
     }
@@ -15,14 +17,17 @@ function preRead(request, libraries) {
   } 
 }
 
-function testTimeout(request) {
+function testTimeout(request, client, withSleep) {
   var intervalTime = 500;
   var start = Date.now();
   while (true) {
     var current = Date.now();
     if (current - start >= intervalTime) {
       start = current
-      //print("HELLO WORLD");
+      print("RUNNING SCRIPT");
+      if (withSleep) {
+        java.lang.Thread.sleep(50);
+      }
     }
   }
 }

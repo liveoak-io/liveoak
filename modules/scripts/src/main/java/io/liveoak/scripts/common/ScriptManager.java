@@ -3,10 +3,8 @@ package io.liveoak.scripts.common;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -26,9 +24,11 @@ import io.liveoak.scripts.objects.scripting.ScriptingResourceRequest;
 import io.liveoak.scripts.resource.ScriptConfig;
 import io.liveoak.spi.ResourceErrorResponse;
 import org.dynjs.Config;
+import org.dynjs.exception.ThrowException;
 import org.dynjs.runtime.DynJS;
 import org.dynjs.runtime.GlobalObject;
 import org.dynjs.runtime.Runner;
+import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -37,6 +37,8 @@ public class ScriptManager {
 
     LibraryManager libraryManager;
     ScriptConfig scriptConfig;
+
+    protected static final Logger log = Logger.getLogger("io.liveoak.scripts");
 
     public ScriptManager(ScriptConfig scriptConfig, LibraryManager libraryManager) {
         this.libraryManager = libraryManager;
@@ -54,13 +56,21 @@ public class ScriptManager {
     }
 
     protected Object runScript(String functionName, Script script, Object... functionArguments) throws Exception {
-        ExecutorService executor = Executors.newCachedThreadPool();
+        CompletableFuture<Object> future = new CompletableFuture<>();
 
-
-
-        Future<Object> future = executor.submit( () -> {
-                return executeScript(functionName, script, functionArguments);
+        Thread myThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+               try {
+                   future.complete(executeScript(functionName, script, functionArguments));
+                } catch (Exception e) {
+                   e.printStackTrace();
+                   future.complete(e);
+                }
+            }
         });
+
+        myThread.start();
 
         try {
             Integer timeout = script.timeout;
@@ -87,8 +97,23 @@ public class ScriptManager {
                 }
             }
         } catch (TimeoutException e) {
+            // The script ran too long and we need to stop it.
+            // First try to interrupt the thread, then, if that doesn't
+            // work after another timeout, go nuclear and stop the thread itself.
             future.cancel(true);
-            executor.awaitTermination(1000, TimeUnit.MILLISECONDS);
+            myThread.interrupt();
+            log.error("A script went over the timeout. Interrupting the thread.");
+            Long startTime = System.currentTimeMillis();
+            while (myThread.isAlive()) {
+                if (System.currentTimeMillis() - startTime >= 5000 ) {
+                    log.error("A resource based script did not terminate after the timeout. Killing the thread.");
+                    myThread.stop();
+                    break;
+                } else {
+                    Thread.sleep(10);
+                }
+            }
+
             return e;
         }
     }
@@ -146,6 +171,14 @@ public class ScriptManager {
     }
 
     protected Object handleResponse(Object response, ScriptingResourceRequest request) {
+
+        if (response instanceof ThrowException) {
+            Object value = ((ThrowException)response).getValue();
+            if (value instanceof LiveOakException) {
+                response = value;
+            }
+        }
+
         if (response instanceof LiveOakException) {
             LiveOakException liveOakException = (LiveOakException)response;
             ResourceErrorResponse.ErrorType errorType = ResourceErrorResponse.ErrorType.INTERNAL_ERROR;
