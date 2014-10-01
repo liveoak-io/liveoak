@@ -58,7 +58,7 @@ public abstract class ScriptResource implements Resource {
             sink.error(e);
         } finally {
             if (close) {
-                sink.close();
+                sink.complete();
             }
         }
     }

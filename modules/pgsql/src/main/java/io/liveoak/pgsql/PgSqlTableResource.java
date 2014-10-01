@@ -83,7 +83,7 @@ public class PgSqlTableResource implements Resource {
         for (Row row: results.rows()) {
             sink.accept(new PgSqlRowResource(this, row));
         }
-        sink.close();
+        sink.complete();
     }
 
     @Override

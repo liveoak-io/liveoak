@@ -130,7 +130,7 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
         } catch (Throwable e) {
             sink.error(e);
         } finally {
-            sink.close();
+            sink.complete();
         }
     }
 

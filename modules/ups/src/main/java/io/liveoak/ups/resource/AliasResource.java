@@ -51,7 +51,7 @@ public class AliasResource implements SubscriptionResourceParent {
         } catch (Throwable e) {
             sink.error(e);
         } finally {
-            sink.close();
+            sink.complete();
         }
     }
 

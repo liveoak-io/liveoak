@@ -44,7 +44,7 @@ public class GridFSUserspaceResource extends GridFSDirectoryResource {
         String rootId = getRootDirId(col);
         if (rootId == null) {
             // no root yet => no children
-            sink.close();
+            sink.complete();
             return;
         }
 
@@ -54,7 +54,7 @@ public class GridFSUserspaceResource extends GridFSDirectoryResource {
             DBObject child = result.next();
             sink.accept(wrapDBObject(path(), new GridFSDBObject(child)));
         }
-        sink.close();
+        sink.complete();
     }
 
 

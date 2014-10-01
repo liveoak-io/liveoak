@@ -163,7 +163,7 @@ public interface Resource {
      * @param sink The sink to stream members to.
      */
     default void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.close();
+        sink.complete();
     }
 
     default void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
@@ -172,7 +172,7 @@ public interface Resource {
             private Throwable error;
 
             @Override
-            public void close() {
+            public void complete() {
                 if (error != null) {
                     responder.internalError(error);
                 } else if ( ! found ) {

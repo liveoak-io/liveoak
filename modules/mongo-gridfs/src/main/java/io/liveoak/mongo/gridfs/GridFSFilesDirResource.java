@@ -88,7 +88,7 @@ public class GridFSFilesDirResource extends GridFSDirectoryResource {
             sink.accept(wrapDBObject(path(), new GridFSDBObject(child)));
         }
 
-        sink.close();
+        sink.complete();
     }
 
     @Override

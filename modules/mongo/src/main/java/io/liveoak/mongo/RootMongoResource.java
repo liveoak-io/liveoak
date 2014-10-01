@@ -98,7 +98,7 @@ public class RootMongoResource extends MongoResource implements RootResource {
         });
 
 
-        sink.close();
+        sink.complete();
     }
 
     @Override

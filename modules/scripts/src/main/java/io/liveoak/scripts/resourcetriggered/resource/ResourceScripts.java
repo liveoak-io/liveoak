@@ -193,7 +193,7 @@ public class ResourceScripts extends ScriptsResource {
         } catch (Throwable e) {
             sink.error(e);
         } finally {
-            sink.close();
+            sink.complete();
         }
     }
 

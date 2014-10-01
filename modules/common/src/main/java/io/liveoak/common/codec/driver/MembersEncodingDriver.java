@@ -75,7 +75,7 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
         }
 
         @Override
-        public void close() {
+        public void complete() {
             try {
                 if (error == null) {
                     encodeNext();

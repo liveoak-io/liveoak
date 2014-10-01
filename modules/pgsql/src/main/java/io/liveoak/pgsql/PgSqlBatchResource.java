@@ -180,7 +180,7 @@ public class PgSqlBatchResource implements Resource {
                 sink.accept(member);
             }
         }
-        sink.close();
+        sink.complete();
     }
 
     @Override

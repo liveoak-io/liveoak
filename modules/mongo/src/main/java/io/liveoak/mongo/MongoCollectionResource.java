@@ -126,7 +126,7 @@ public class MongoCollectionResource extends MongoResource {
         if (resourceParams != null && ctx.resourceParams().contains("explain")) {
             if (ctx.resourceParams().value("explain").equalsIgnoreCase("true")) {
                 sink.accept( new MongoEmbeddedObjectResource(this, dbCursor.explain()));
-                sink.close();
+                sink.complete();
                 return;
             }
         }
@@ -156,7 +156,7 @@ public class MongoCollectionResource extends MongoResource {
         });
 
         try {
-            sink.close();
+            sink.complete();
         } catch (Exception e) {
             logger().error("", e);  //TODO: properly handle errors
         }

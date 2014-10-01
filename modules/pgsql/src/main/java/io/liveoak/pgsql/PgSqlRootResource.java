@@ -102,7 +102,7 @@ public class PgSqlRootResource extends DefaultRootResource {
         for (String table: tables) {
             sink.accept(new PgSqlTableResource(this, table));
         }
-        sink.close();
+        sink.complete();
     }
 
     public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {

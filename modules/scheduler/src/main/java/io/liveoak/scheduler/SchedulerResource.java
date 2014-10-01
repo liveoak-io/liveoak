@@ -115,7 +115,7 @@ public class SchedulerResource implements RootResource {
         } catch (Throwable e) {
             sink.error(e);
         } finally {
-            sink.close();
+            sink.complete();
         }
     }
 

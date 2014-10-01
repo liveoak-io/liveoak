@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  *
  * @author Bob McWhirter
  */
-public interface ResourceSink extends Consumer<Resource>, AutoCloseable {
+public interface ResourceSink extends Consumer<Resource> {
 
     /**
      * Complete request processing.
@@ -41,12 +41,12 @@ public interface ResourceSink extends Consumer<Resource>, AutoCloseable {
      *
      * <p>When this method returns request processing should be considered complete.
      */
-    void close();
+    void complete();
 
     /**
      * Report an error during processing.
      *
-     * <p>When {@link #close()} is called normal processing will be skipped,
+     * <p>When {@link #complete()} is called normal processing will be skipped,
      * and error response will be composed instead.
      */
     void error(Throwable th);

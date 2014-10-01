@@ -203,7 +203,7 @@ public class GridFSDirectoryResource extends GridFSResource {
             sink.accept(wrapDBObject(path(), new GridFSDBObject(child)));
         }
 
-        sink.close();
+        sink.complete();
     }
 
     protected GridFSResource wrapDBObject(GridFSResourcePath parentPath, GridFSDBObject item) {

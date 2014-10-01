@@ -80,7 +80,7 @@ public class LocalApplicationsResource implements RootResource, SynchronousResou
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.close();
+        sink.complete();
     }
 
     @Override

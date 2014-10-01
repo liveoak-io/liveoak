@@ -55,7 +55,7 @@ public class TriggerResource implements Resource {
         } catch (Throwable e) {
             sink.error(e);
         } finally {
-            sink.close();
+            sink.complete();
         }
     }
 

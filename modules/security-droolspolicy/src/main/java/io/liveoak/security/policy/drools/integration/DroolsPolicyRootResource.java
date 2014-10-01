@@ -60,7 +60,7 @@ public class DroolsPolicyRootResource implements RootResource {
         } catch (Throwable e) {
             sink.error(e);
         } finally {
-            sink.close();
+            sink.complete();
         }
     }
 

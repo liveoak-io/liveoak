@@ -130,7 +130,7 @@ public class MockInMemoryResource implements SynchronousResource {
         } catch (Throwable e) {
             sink.error(e);
         } finally {
-            sink.close();
+            sink.complete();
         }
     }
 

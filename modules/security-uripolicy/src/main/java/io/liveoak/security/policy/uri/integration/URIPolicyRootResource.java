@@ -54,7 +54,7 @@ public class URIPolicyRootResource implements RootResource {
         } catch (Throwable e) {
             sink.error(e);
         } finally {
-            sink.close();
+            sink.complete();
         }
     }
 }

@@ -172,7 +172,7 @@ public class ScheduledScriptResource extends ScriptResource {
         } catch (Throwable t) {
             sink.error(t);
         } finally {
-            sink.close();
+            sink.complete();
         }
     }
 

@@ -81,7 +81,7 @@ public class DirectoryResource implements FSResource {
             } catch (Throwable e) {
                 sink.error(e);
             } finally {
-                sink.close();
+                sink.complete();
             }
         });
     }
