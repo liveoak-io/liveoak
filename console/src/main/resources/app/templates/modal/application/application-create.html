@@ -11,17 +11,17 @@
     <div class="form-group clearfix">
       <label for="application-name" class="col-sm-4 control-label">Application Name</label>
       <div class="col-sm-6">
-        <input type="text" class="form-control" id="application-name" ng-model="appModel.id" pf-focused="$parent.setupStep == 1">
+        <input type="text" class="form-control" id="application-name" ng-model="appModel.id" pf-focused="$parent.setupStep == 1"/>
       </div>
     </div>
     <div class="form-group">
       <label class="col-sm-4 control-label">Type of Setup</label>
       <div class="col-sm-6">
         <label class="checkbox-inline">
-          <input id="radio-app-basic" type="radio" ng-model="$parent.setupType" value="basic"> Basic
+          <input id="radio-app-basic" type="radio" ng-model="$parent.setupType" value="basic"/> Basic
         </label>
         <label class="checkbox-inline">
-          <input id="radio-app-diy" type="radio" ng-model="$parent.setupType" value="diy"> Do-It-Yourself
+          <input id="radio-app-diy" type="radio" ng-model="$parent.setupType" value="diy"/> Do-It-Yourself
         </label>
       </div>
     </div>
@@ -47,7 +47,7 @@
       <div class="form-group clearfix">
         <label for="dburl" class="col-sm-4 control-label">URL Path</label>
         <div class="col-sm-6">
-          <input type="text" class="form-control" id="dburl" ng-model="$parent.$parent.storagePath" pf-focused="$parent.setupStep == 2">
+          <input type="text" class="form-control" id="dburl" ng-model="$parent.$parent.storagePath" pf-focused="$parent.setupStep == 2"/>
         </div>
       </div>
     </fieldset>
@@ -82,20 +82,20 @@
       <div class="form-group clearfix">
         <label for="pushUrl" class="col-sm-4 control-label">AeroGear UPS URL</label>
         <div class="col-sm-6">
-          <input type="text" class="form-control" id="pushUrl" ng-model="$parent.$parent.pushModel.upsURL" lo-http-prefix pf-focused="$parent.setupStep == 3">
+          <input type="text" class="form-control" id="pushUrl" ng-model="$parent.$parent.pushModel.upsURL" lo-http-prefix pf-focused="$parent.setupStep == 3"/>
           <span class="help-block" ng-show="new-app-form.pushUrl.$error.url">Not a valid URL.</span>
         </div>
       </div>
       <div class="form-group clearfix">
         <label for="appId" class="col-sm-4 control-label">Application ID</label>
         <div class="col-sm-6">
-          <input type="text" class="form-control" id="appId" ng-model="$parent.$parent.pushModel.applicationId">
+          <input type="text" class="form-control" id="appId" ng-model="$parent.$parent.pushModel.applicationId"/>
         </div>
       </div>
       <div class="form-group clearfix">
         <label for="secret" class="col-sm-4 control-label">Master Secret</label>
         <div class="col-sm-6">
-          <input type="text" class="form-control" id="secret" ng-model="$parent.$parent.pushModel.masterSecret">
+          <input type="text" class="form-control" id="secret" ng-model="$parent.$parent.pushModel.masterSecret"/>
         </div>
       </div>
     </fieldset>

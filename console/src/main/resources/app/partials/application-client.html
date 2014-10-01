@@ -6,7 +6,7 @@
       <lo-breadcrumbs></lo-breadcrumbs>
       <h2 class="pull-left"><span>{{ appClient.name || 'New Client' }}</span> Configuration</h2>
 
-      <hr>
+      <hr/>
 
       <form class="lo-form-horizontal clearfix" name="clientsForm">
         <fieldset>
@@ -24,17 +24,17 @@
             <label class="col-sm-2 control-label" for="platform">Platform</label>
             <div class="lo-instances col-sm-offset-2">
               <label class="checkbox-inline html5" ng-class="{'active': settings.type == 'html5'}">
-                <input type="radio" name="platform" ng-model="settings.type" value="html5"> HTML 5
+                <input type="radio" name="platform" ng-model="settings.type" value="html5"/> HTML 5
               </label>
               <label class="checkbox-inline android" ng-class="{'active': settings.type == 'android'}">
-                <input type="radio" name="platform" ng-model="settings.type" value="android"> Android
+                <input type="radio" name="platform" ng-model="settings.type" value="android"/> Android
               </label>
               <label class="checkbox-inline ios" ng-class="{'active': settings.type == 'ios'}">
-                <input type="radio" name="platform" ng-model="settings.type" value="ios"> iOS
+                <input type="radio" name="platform" ng-model="settings.type" value="ios"/> iOS
               </label>
               <label ng-repeat="platform in platformsCustom" class="checkbox-inline custom"
                      ng-class="{'active': settings.type == platform}">
-                <input type="radio" name="platform" ng-model="settings.type" value="{{platform}}">{{platform}}
+                <input type="radio" name="platform" ng-model="settings.type" value="{{platform}}"/>{{platform}}
               </label>
               <span data-tooltip-placement="top" data-tooltip="Add Platform">
                 <button type="button" class="btn btn-link btn-icon inline add-condition" ng-click="modalPlatformAdd()">
@@ -43,7 +43,7 @@
             </div>
           </div>
           <div class="form-group multiple clearfix hover-menu" data-ng-show="!appClient.bearerOnly">
-            <label class="col-sm-2 control-label" for="newRedirectUri">Redirect URIs <span class="required">*</span></label></label>
+            <label class="col-sm-2 control-label" for="newRedirectUri">Redirect URIs <span class="required">*</span></label>
             <div class="col-sm-4 row" ng-repeat="redirectUri in redirectUris">
               <div class="col-sm-12">
                 <input class="form-control" type="text" name="newRedirectUri" id="newRedirectUri"

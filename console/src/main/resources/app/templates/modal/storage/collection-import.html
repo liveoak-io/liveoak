@@ -14,7 +14,7 @@
           <!-- Before upload file -->
           <div class="button-input-file" ng-show="!inProgress">
             <a href="#" class="btn btn-default"><i class="fa fa-upload"></i> Choose a JSON or CSV...</a>
-            <input type="file" class="input-file" ng-file-select="onFileSelect($files)" id="data-file">
+            <input type="file" class="input-file" ng-file-select="onFileSelect($files)" id="data-file"/>
           </div>
           <div ng-show="inProgress" class="uploaded-file">
             <i class="lo-color-success fa fa-spinner fa-spin" ng-show="progress < 1 && !isError"></i>

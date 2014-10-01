@@ -8,7 +8,7 @@
         <span class="label label-success" ng-show="example.installed"><i class="fa fa-check"></i> Installed</span>
         <div class="panel-body row">
           <div class="pull-left">
-            <img alt="{{ example['icon-alt'] }}" src="/admin/console/img/example-apps/{{example.icon}}">
+            <img alt="{{ example['icon-alt'] }}" src="/admin/console/img/example-apps/{{example.icon}}"/>
 
             <button class="btn btn-lg" type="button" onclick="event.stopPropagation();" ng-hide="example.instructions" ng-class="{installing: example.installing, 'btn-default': !example.installed, 'btn-primary': example.installed}" ng-click="example.installed ? goto(example) : install(example)" ng-disabled="example.installing">
               <span class="spinner spinner-xs spinner-inline"></span>
