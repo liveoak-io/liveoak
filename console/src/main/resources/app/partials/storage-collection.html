@@ -66,7 +66,7 @@
             <th colspan="{{ columns.length + 1 }}" class="table-actions">
               <div class="search-comp clearfix">
                 <input type="text" class="form-control search ng-pristine ng-valid" placeholder="Search..."
-                       ng-model="searchQuery">
+                       ng-model="searchQuery"/>
                 <button class="btn btn-link btn-icon" tooltip="Search" type="submit" disabled>
                   <i class="fa fa-search"></i>
                   <span>Search</span>
@@ -84,7 +84,6 @@
                     <label for="columns-select">Search in Columns</label>
                     <select pf-select class="select selectpicker" multiple id="columns-select"
                             ng-model="searchColumns" ng-options="o as o for o in columns"></select>
-                    </select>
                   </div>
                   <div class="form-group">
                     <label for="condition-input">Condition</label>
@@ -98,7 +97,7 @@
                       </select>
 
                       <input class="inline form-control" type="text" placeholder="Contains text"
-                             ng-model="condition.text">
+                             ng-model="condition.text"/>
 
                       <button type="button" ng-click="searchConditionRemove($index)" ng-show="$index > 0"
                               class="btn btn-link btn-icon inline add-condition">

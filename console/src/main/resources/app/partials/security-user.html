@@ -27,37 +27,37 @@
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="username">Username <span class="required" ng-show="create">*</span></label>
             <div class="col-sm-4">
-              <input class="form-control" type="text" id="username" name="username" ng-model="userModel.profile.username" ng-readonly="!create" pf-focused="create" required>
+              <input class="form-control" type="text" id="username" name="username" ng-model="userModel.profile.username" ng-readonly="!create" pf-focused="create" required/>
               <!--<span class="help-block" ng-show="pushForm.pushUrl.$error.url">Not a valid URL.</span>-->
             </div>
           </div>
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="firstName">First Name</label>
             <div class="col-sm-4">
-              <input class="form-control" type="text" id="firstName" name="firstName" ng-model="userModel.profile.firstName">
+              <input class="form-control" type="text" id="firstName" name="firstName" ng-model="userModel.profile.firstName"/>
             </div>
           </div>
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="lastName">Last Name</label>
             <div class="col-sm-4">
-              <input class="form-control" type="text" id="lastName" name="lastName" ng-model="userModel.profile.lastName">
+              <input class="form-control" type="text" id="lastName" name="lastName" ng-model="userModel.profile.lastName"/>
             </div>
           </div>
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="email">Email</label>
             <div class="col-sm-4">
-              <input class="form-control" type="email" id="email" name="email" ng-model="userModel.profile.email">
+              <input class="form-control" type="email" id="email" name="email" ng-model="userModel.profile.email"/>
             </div>
           </div>
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="access">Access the application</label>
             <div class="col-sm-4">
               <div class="onoffswitch">
-                <input type="checkbox" id="access" name="access" class="onoffswitch-checkbox" checked ng-model="userModel.profile.enabled">
+                <input type="checkbox" id="access" name="access" class="onoffswitch-checkbox" checked ng-model="userModel.profile.enabled"/>
                 <label class="onoffswitch-label" for="access">
                   <span class="onoffswitch-inner">
                     <span class="onoffswitch-active ng-binding">ON</span>
-                    <span class="onoffswitch-inactive ng-binding">OFF</span></span>
+                    <span class="onoffswitch-inactive ng-binding">OFF</span>
                   </span>
                   <span class="onoffswitch-switch"></span>
                 </label>
@@ -78,7 +78,7 @@
             </div>
             <div class="col-sm-4" ng-show="create || resetPassword">
               <div class="search-comp clearfix" style="width: 100%;">
-              <input class="form-control" type="{{inputType}}" id="password" name="password" autocomplete="off" ng-model="userModel.password" pf-focused="resetPassword">
+              <input class="form-control" type="{{inputType}}" id="password" name="password" autocomplete="off" ng-model="userModel.password" pf-focused="resetPassword"/>
               <button class="btn btn-link btn-icon ng-scope" ng-click="changeInputType()" type="button" tooltip="Show/Hide Password" >
                 <i class="fa fa-eye-slash" ng-show="inputType === 'password'"></i>
                 <i class="fa fa-eye" ng-show="inputType === 'text'"></i>

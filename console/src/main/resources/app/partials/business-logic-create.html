@@ -12,13 +12,13 @@
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="name">Script Name</label>
             <div class="col-sm-4">
-              <input class="form-control" type="text" id="name" ng-model="script.name">
+              <input class="form-control" type="text" id="name" ng-model="script.name"/>
             </div>
           </div>
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="id">Script ID</label>
             <div class="col-sm-4">
-              <input class="form-control" type="text" id="id" ng-model="script.id" ng-readonly="!create">
+              <input class="form-control" type="text" id="id" ng-model="script.id" ng-readonly="!create"/>
               <span class="help-block info" ng-show="create">The script ID cannot be modified once created.</span>
             </div>
           </div>
@@ -32,11 +32,11 @@
             <label class="col-sm-3 control-label" for="enable">Enable Script</label>
             <div class="col-sm-4">
               <div class="onoffswitch">
-                <input type="checkbox" id="enable" class="onoffswitch-checkbox" ng-model="script.enabled">
+                <input type="checkbox" id="enable" class="onoffswitch-checkbox" ng-model="script.enabled"/>
                 <label class="onoffswitch-label" for="enable">
                   <span class="onoffswitch-inner">
                     <span class="onoffswitch-active ng-binding">ON</span>
-                    <span class="onoffswitch-inactive ng-binding">OFF</span></span>
+                    <span class="onoffswitch-inactive ng-binding">OFF</span>
                   </span>
                   <span class="onoffswitch-switch"></span>
                 </label>
@@ -46,13 +46,13 @@
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="priority">Priority</label>
             <div class="col-sm-2">
-              <input class="form-control" id="priority" type="number" min="0" max="10" value="5" ng-model="script.priority">
+              <input class="form-control" id="priority" type="number" min="0" max="10" value="5" ng-model="script.priority"/>
             </div>
           </div>
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="path">Resource Path <span class="required">*</span></label>
             <div class="col-sm-4">
-              <input class="form-control" type="text" id="path" value="/<app-name>/" ng-model="script['target-path']" required>
+              <input class="form-control" type="text" id="path" value="/<app-name>/" ng-model="script['target-path']" required/>
             </div>
             <span data-toggle="modal" data-target="#path-help" class="input-help">
               <button class="btn btn-link btn-icon">
@@ -109,7 +109,7 @@
         <p>The resource path starts with the application name, and it follows patterns like:</p>
         <ul>
           <li>/app-name/* <span class="lo-emph">(the children of the application)</span></li>
-          <li>/app-name/** <span class="lo-emph">(all descendents of the application></span></li>
+          <li>/app-name/** <span class="lo-emph">(all descendents of the application)</span></li>
           <li>/app-name/resource-name <span class="lo-emph">(just this particular resource)</span></li>
           <li>/app-name/myResource/* <span class="lo-emph">(the children of this resource)</span></li>
           <li>/app-name/myResource/** <span class="lo-emph">(all descendents of this resource)</span></li>
