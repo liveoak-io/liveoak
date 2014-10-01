@@ -8,8 +8,8 @@ package io.liveoak.container;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
@@ -17,12 +17,13 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * @author Bob McWhirter
  */
-public class InMemoryCollectionResource implements Resource {
+public class InMemoryCollectionResource implements SynchronousResource {
 
     public InMemoryCollectionResource(Resource parent, String id) {
         this.parent = parent;
@@ -39,13 +40,14 @@ public class InMemoryCollectionResource implements Resource {
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
+    public Resource member(RequestContext ctx, String id) {
+        return this.collection.get(id);
+    }
 
-        if (this.collection.containsKey(id)) {
-            responder.resourceRead(this.collection.get(id));
-        } else {
-            responder.noSuchResource(id);
-        }
+    @Override
+    public Collection<Resource> members(RequestContext ctx) {
+        Stream<Resource> stream = applyPagination(ctx.pagination(), this.collection.values());
+        return stream.collect(Collectors.toList());
     }
 
     @Override
@@ -70,20 +72,6 @@ public class InMemoryCollectionResource implements Resource {
         state.removeProperty(LiveOak.ID);
         state.removeProperty(LiveOak.SELF);
         return state;
-    }
-
-    @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) {
-        try {
-            Stream<Resource> stream = applyPagination(ctx.pagination(), this.collection.values());
-            stream.forEach((m) -> {
-                sink.accept(m);
-            });
-        } catch (Throwable e) {
-            sink.error(e);
-        } finally {
-            sink.complete();
-        }
     }
 
     private Stream<Resource> applyPagination(Pagination pagination, Collection<Resource> values) {

@@ -1,16 +1,18 @@
 package io.liveoak.keycloak;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
-import io.liveoak.spi.resource.async.Responder;
 import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
-public class KeycloakRootResource implements RootResource {
+public class KeycloakRootResource implements RootResource, SynchronousResource {
 
     private static final Logger log = Logger.getLogger("io.liveoak.keycloak");
 
@@ -39,23 +41,18 @@ public class KeycloakRootResource implements RootResource {
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
+    public Resource member(RequestContext ctx, String id) {
         if (id.equals(this.tokensResource.id())) {
-            responder.resourceRead(this.tokensResource);
-        } else {
-            responder.noSuchResource(id);
+            return this.tokensResource;
         }
+        return null;
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        try {
-            sink.accept(this.tokensResource);
-        } catch (Throwable e) {
-            sink.error(e);
-        } finally {
-            sink.complete();
-        }
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+        LinkedList<Resource> members = new LinkedList<>();
+        members.add(this.tokensResource);
+        return members;
     }
 
     public Logger logger() {

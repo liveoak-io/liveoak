@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -45,12 +46,12 @@ public class SimpleResourceRegistry implements MountPointResource, RootResource,
     }
 
     @Override
-    public Collection<Resource> members() {
+    public Collection<Resource> members(RequestContext ctx) {
         return this.registry.values();
     }
 
     @Override
-    public Resource member(String id) {
+    public Resource member(RequestContext ctx, String id) {
         return this.registry.get(id);
     }
 

@@ -86,7 +86,7 @@ public class ApplicationSubscriptionsResource implements SynchronousResource, Ro
     }
 
     @Override
-    public Collection<? extends Resource> members() {
+    public Collection<? extends Resource> members(RequestContext ctx) {
         Stream<Subscription> subscriptionStream = subscriptionManager.treeFor(applicationResourcePath()).objects();
         return subscriptionStream.map((e) -> {
             if (e instanceof StompSubscription) {
@@ -102,7 +102,7 @@ public class ApplicationSubscriptionsResource implements SynchronousResource, Ro
     }
 
     @Override
-    public Resource member(String id) {
+    public Resource member(RequestContext ctx, String id) {
         Optional<Subscription> result = subscriptionManager.treeFor(applicationResourcePath())
                 .objects()
                 .filter(e -> e.id().equals(id))

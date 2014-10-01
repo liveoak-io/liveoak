@@ -5,6 +5,9 @@
  */
 package io.liveoak.mongo;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -12,13 +15,13 @@ import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.Sorting;
-import io.liveoak.spi.resource.async.PropertySink;
-import io.liveoak.spi.resource.async.ResourceSink;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
@@ -41,20 +44,18 @@ public class MongoCollectionResource extends MongoResource {
     }
 
     @Override
-    public void readMember(RequestContext ctx, String childId, Responder responder) {
+    public Resource member(RequestContext ctx, String childId) {
 
         if ("_aggregate".equals(childId)) {
-            responder.resourceRead(new MongoAggregationResource(this));
-            return;
+            return new MongoAggregationResource(this);
         }
 
         DBObject object = dbCollection.findOne(getMongoID(childId));
 
-        if (object == null) {
-            responder.noSuchResource(childId);
-        } else {
-            responder.resourceRead(new MongoBaseObjectResource(this, object));
+        if (object != null) {
+            return new MongoBaseObjectResource(this, object);
         }
+        return null;
     }
 
     @Override
@@ -85,7 +86,9 @@ public class MongoCollectionResource extends MongoResource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+
+        LinkedList<Resource> members = new LinkedList<>();
         DBObject queryObject = new BasicDBObject();
 
         ResourceParams resourceParams = ctx.resourceParams();
@@ -125,9 +128,8 @@ public class MongoCollectionResource extends MongoResource {
 
         if (resourceParams != null && ctx.resourceParams().contains("explain")) {
             if (ctx.resourceParams().value("explain").equalsIgnoreCase("true")) {
-                sink.accept( new MongoEmbeddedObjectResource(this, dbCursor.explain()));
-                sink.complete();
-                return;
+                members.add(new MongoEmbeddedObjectResource(this, dbCursor.explain()));
+                return members;
             }
         }
 
@@ -152,14 +154,10 @@ public class MongoCollectionResource extends MongoResource {
         }
 
         dbCursor.forEach((dbObject) -> {
-            sink.accept(new MongoBaseObjectResource(this, dbObject));
+            members.add(new MongoBaseObjectResource(this, dbObject));
         });
 
-        try {
-            sink.complete();
-        } catch (Exception e) {
-            logger().error("", e);  //TODO: properly handle errors
-        }
+        return members;
     }
 
     @Override
@@ -188,20 +186,21 @@ public class MongoCollectionResource extends MongoResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("type", "collection");
-        sink.accept("count", dbCollection.getCount());
-        sink.accept( "capped", dbCollection.isCapped());
+    public ResourceState properties() throws Exception {
+        ResourceState result = new DefaultResourceState();
+        result.putProperty("type", "collection");
+        result.putProperty("count", dbCollection.getCount());
+        result.putProperty("capped", dbCollection.isCapped());
 
         DBObject collectionDBObject = getDBCollection().getDB().getCollection( "system" ).getCollection( "namespaces" ).findOne( new BasicDBObject ( "name", this.getDBCollection().getFullName()));
 
         if (collectionDBObject != null && collectionDBObject.get("options") != null) {
             DBObject collectionOptions = (DBObject) collectionDBObject.get( "options" );
-            sink.accept("max", collectionOptions.get( "max" ));
-            sink.accept("size", collectionOptions.get("size"));
+            result.putProperty("max", collectionOptions.get( "max" ));
+            result.putProperty("size", collectionOptions.get("size"));
         }
 
-        sink.close();
+        return result;
     }
 
     @Override

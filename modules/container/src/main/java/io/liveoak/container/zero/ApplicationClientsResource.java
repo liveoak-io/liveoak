@@ -55,12 +55,12 @@ public class ApplicationClientsResource implements RootResource, SynchronousReso
     }
 
     @Override
-    public Collection<? extends Resource> members() {
+    public Collection<? extends Resource> members(RequestContext ctx) {
         return this.applicationClients.values();
     }
 
     @Override
-    public Resource member(String id) {
+    public Resource member(RequestContext ctx, String id) {
         return this.applicationClients.get(id);
     }
 

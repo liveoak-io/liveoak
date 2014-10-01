@@ -5,7 +5,9 @@
  */
 package io.liveoak.mongo;
 
+import java.util.Collection;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.mongodb.BasicDBObject;
@@ -14,14 +16,13 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
@@ -75,30 +76,25 @@ public class RootMongoResource extends MongoResource implements RootResource {
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
+    public Resource member(RequestContext ctx, String id) {
         if (db().collectionExists(id)) {
-            responder.resourceRead(new MongoCollectionResource(this, db().getCollection(id)));
-        } else {
-            responder.noSuchResource(id);
+            return new MongoCollectionResource(this, db().getCollection(id));
         }
+        return null;
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
+    public Collection<Resource> members(RequestContext ctx) {
         Pagination pagination = ctx.pagination();
         Stream<String> members = this.db().getCollectionNames().stream().skip(pagination.offset());
         if (pagination.limit() > 0) {
             members = members.limit(pagination.limit());
         }
 
-        members.forEach((name) -> {
-            if (!name.equals("system.indexes")) {
-                sink.accept(new MongoCollectionResource(this, db().getCollection(name)));
-            }
-        });
-
-
-        sink.complete();
+        return members
+                .filter(name -> !name.equals("system.indexes"))
+                .map(name -> new MongoCollectionResource(this, db().getCollection(name)))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -143,14 +139,15 @@ public class RootMongoResource extends MongoResource implements RootResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("type", "database");
+    public ResourceState properties() {
+        ResourceState result = new DefaultResourceState();
+        result.putProperty("type", "database");
         int count = this.db().getCollectionNames().size();
         if (count >= 1) {
             count = count - 1; // -1 due to not showing internal 'system.index' collection, which exists if another collection exists
         }
-        sink.accept("count", count);
-        sink.close();
+        result.putProperty("count", count);
+        return result;
     }
 
     @Override

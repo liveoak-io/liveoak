@@ -9,20 +9,22 @@ import io.liveoak.spi.Services;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.container.Server;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceName;
 import org.vertx.java.core.Vertx;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
  * @author Bob McWhirter
  */
-public class LiveOakSystem implements Resource {
+public class LiveOakSystem implements SynchronousResource {
 
     public LiveOakSystem(ServiceContainer serviceContainer) {
         this.serviceContainer = serviceContainer;
@@ -89,16 +91,11 @@ public class LiveOakSystem implements Resource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        try {
-            sink.accept(this.serversResource);
-            sink.accept(this.propertiesResource);
-
-        } catch (Throwable e) {
-            sink.error(e);
-        } finally {
-            sink.complete();
-        }
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+        LinkedList<Resource> members = new LinkedList<>();
+        members.add(this.serversResource);
+        members.add(this.propertiesResource);
+        return members;
     }
 
     private ServiceContainer serviceContainer;

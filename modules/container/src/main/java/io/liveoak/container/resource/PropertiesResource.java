@@ -5,29 +5,30 @@
  */
 package io.liveoak.container.resource;
 
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceState;
 
 import java.util.Properties;
 
 /**
  * @author Bob McWhirter
  */
-public class PropertiesResource implements Resource {
+public class PropertiesResource implements SynchronousResource {
 
     public PropertiesResource(Resource parent) {
         this.parent = parent;
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+    public ResourceState properties() throws Exception {
+        ResourceState result = new DefaultResourceState();
         Properties allProps = System.getProperties();
         for (String key : allProps.stringPropertyNames()) {
-            sink.accept(key, allProps.getProperty(key));
+            result.putProperty(key, allProps.getProperty(key));
         }
-
-        sink.close();
+        return result;
     }
 
     @Override

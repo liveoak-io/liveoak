@@ -58,12 +58,12 @@ public class MockInMemoryResource implements SynchronousResource {
     }
 
     @Override
-    public Collection<? extends Resource> members() {
+    public Collection<? extends Resource> members(RequestContext ctx) {
         return members.values();
     }
 
     @Override
-    public Resource member(String id) {
+    public Resource member(RequestContext ctx, String id) {
         return members.get(id);
     }
 

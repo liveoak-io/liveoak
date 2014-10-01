@@ -10,14 +10,17 @@ import io.liveoak.container.zero.ApplicationExtensionsResource;
 import io.liveoak.container.zero.ApplicationsResource;
 import io.liveoak.container.zero.extension.ApplicationClientsExtension;
 import io.liveoak.container.zero.extension.ZeroExtension;
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
+import org.fest.assertions.Assertions;
 import org.jboss.msc.service.*;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceController.State;
 import org.jboss.msc.value.ImmediateValue;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,7 +59,7 @@ public class TenancyTest {
     }
 
     @Test
-    public void testBootstrapPiecemeal() throws InterruptedException {
+    public void testBootstrapPiecemeal() throws Exception {
         InternalApplicationRegistry registry = new InternalApplicationRegistry(this.serviceContainer);
         this.serviceContainer.addService(Services.APPLICATION_REGISTRY, new ValueService<>(new ImmediateValue<>(registry)))
                 .install();
@@ -113,7 +116,8 @@ public class TenancyTest {
 
         this.serviceContainer.awaitStability();
 
-        Collection<? extends Resource> appResources = appContext.getValue().members();
+        RequestContext ctx = new RequestContext.Builder().build();
+        Collection<? extends Resource> appResources = appContext.getValue().members(ctx);
         assertThat(appResources).isNotNull();
         assertThat(appResources).hasSize(1);
 
@@ -125,7 +129,7 @@ public class TenancyTest {
         assertThat(appContext.getState()).isEqualTo(State.UP);
 
 
-        assertThat(globalContext.member(ZeroExtension.APPLICATION_ID)).isSameAs(appContext.getValue());
+        assertThat(globalContext.member(ctx, ZeroExtension.APPLICATION_ID)).isSameAs(appContext.getValue());
         assertThat(appContext.getValue().parent()).isSameAs(globalContext);
 
         assertThat(installedApp.context()).isSameAs(appContext.getValue());
@@ -182,18 +186,19 @@ public class TenancyTest {
         assertThat(appContextMount.getMode()).isEqualTo(Mode.ACTIVE);
         assertThat(appContextMount.getState()).isEqualTo(State.UP);
 
-        ApplicationsResource appsAdminResource = (ApplicationsResource) app.getValue().context().member("applications");
+        RequestContext ctx = new RequestContext.Builder().build();
+        ApplicationsResource appsAdminResource = (ApplicationsResource) app.getValue().context().member(ctx, "applications");
 
-        Collection<Resource> registeredApps = appsAdminResource.members();
+        Collection<Resource> registeredApps = appsAdminResource.members(ctx);
         assertThat(registeredApps).isNotNull();
         assertThat(registeredApps).hasSize(1);
         assertThat(((ApplicationResource) registeredApps.iterator().next()).application()).isSameAs(app.getValue());
 
-        Collection<? extends Resource> appResources = appContext.getValue().members();
+        Collection<? extends Resource> appResources = appContext.getValue().members(ctx);
         assertThat(appResources).isNotNull();
         assertThat(appResources).hasSize(2);
 
-        ApplicationResource zeroApp = (ApplicationResource) appsAdminResource.member(ZeroExtension.APPLICATION_ID);
+        ApplicationResource zeroApp = (ApplicationResource) appsAdminResource.member(ctx, ZeroExtension.APPLICATION_ID);
         assertThat(zeroApp).isNotNull();
 
         ApplicationExtensionsResource extsResource = zeroApp.extensionsResource();

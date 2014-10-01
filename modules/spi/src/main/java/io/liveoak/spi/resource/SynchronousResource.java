@@ -14,11 +14,11 @@ import io.liveoak.spi.state.ResourceState;
  */
 public interface SynchronousResource extends Resource {
 
-    default Collection<? extends Resource> members() {
+    default Collection<? extends Resource> members(RequestContext ctx) throws Exception {
         return null;
     }
 
-    default Resource member(String id) {
+    default Resource member(RequestContext ctx, String id) throws Exception {
         return null;
     }
 
@@ -32,8 +32,8 @@ public interface SynchronousResource extends Resource {
 
     @Override
     default void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        Collection<? extends Resource> members = members();
         try {
+            Collection<? extends Resource> members = members(ctx);
             if (members != null) {
                 for (Resource each : members) {
                     sink.accept(each);
@@ -48,7 +48,7 @@ public interface SynchronousResource extends Resource {
 
     @Override
     default void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        Resource member = member(id);
+        Resource member = member(ctx, id);
         if (member == null) {
             responder.noSuchResource(id);
             return;
