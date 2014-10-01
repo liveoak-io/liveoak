@@ -8,5 +8,5 @@
   "src-not-empty": true,
   "style-disabled": true,
   "img-alt-require": true,
-  "spec-char-escape": true
+  "spec-char-escape": false
 }
