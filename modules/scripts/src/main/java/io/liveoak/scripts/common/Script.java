@@ -18,7 +18,7 @@ public abstract class Script {
 
     protected String id, name, description;
     boolean enabled;
-    List<String> libraries;
+    List<String> libraries = new ArrayList<String>();
     ByteBuf scriptBuffer;
     private List<Function> provides = new ArrayList<>();
     Integer timeout;
@@ -30,7 +30,11 @@ public abstract class Script {
         this.name = name;
         this.description = description;
         this.enabled = enabled;
-        this.libraries = libraries;
+
+        if (libraries != null) {
+            this.libraries = libraries;
+        }
+
         this.scriptBuffer = scriptBuffer;
         this.timeout = timeout;
 

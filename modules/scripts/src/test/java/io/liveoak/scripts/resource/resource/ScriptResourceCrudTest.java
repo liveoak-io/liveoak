@@ -80,11 +80,17 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
         assertThat(execDelete(RESOURCE_SCRIPT_PATH + "/updatetocreate")).hasStatus(200);
         assertThat(execGet(RESOURCE_SCRIPT_PATH + "/updatetocreate")).hasStatus(404).hasNoSuchResource();
 
-        // Other tests:
+        // Timeout Tests:
         testCreateTimeout();
         testCreateInvalidTimeout();
         testUpdateTimeout();
         testUpdateInvalidTimeout();
+
+        // Library Tests
+        testLibraries();
+        testCreateEmptyLibraries();
+        testUpdateToEmptyLibraries();
+
     }
 
     public void testCreateTimeout() throws Exception {
@@ -137,5 +143,65 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
         ObjectNode createNode = (ObjectNode) toJSON(updateResponse.getEntity());
         assertThat(createNode.get("error-type").asText()).isEqualTo("NOT_ACCEPTABLE");
         assertThat(createNode.get("message").asText()).isEqualTo("Invalid property type. The property named 'timeout' expects a type of Integer");
+    }
+
+    //@Test
+    public void testCreateEmptyLibraries() throws Exception {
+        String id = "testCreateEmptyLibraries";
+        HttpResponse createResponse =   execPost(RESOURCE_SCRIPT_PATH, "{ 'id': '" + id + "', 'target-path': 'targetPath'}");
+        assertThat(createResponse).hasStatus(201);
+        ObjectNode createNode = (ObjectNode) toJSON(createResponse.getEntity());
+        Assertions.assertThat(createNode.get("id").asText()).isEqualTo(id);
+        assertThat(createNode.get("libraries").isArray());
+        assertThat(createNode.get("libraries").size()).isEqualTo(0);
+
+        ObjectNode readNode = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/" + id);
+
+        assertThat(readNode).isNotNull();
+        assertThat(readNode.get("id").asText()).isEqualTo(id);
+        assertThat(readNode.get("libraries").isArray()).isTrue();
+        assertThat(readNode.get("libraries").size()).isEqualTo(0);
+    }
+
+    //@Test
+    public void testLibraries() throws Exception {
+        String id = "testLibraries";
+        HttpResponse createResponse =   execPost(RESOURCE_SCRIPT_PATH, "{ 'id': '" + id + "', 'target-path': 'targetPath', 'libraries': ['foo', 'bar']}");
+        assertThat(createResponse).hasStatus(201);
+        ObjectNode createNode = (ObjectNode) toJSON(createResponse.getEntity());
+        Assertions.assertThat(createNode.get("id").asText()).isEqualTo(id);
+        assertThat(createNode.get("libraries").isArray());
+        assertThat(createNode.get("libraries").size()).isEqualTo(2);
+        assertThat(createNode.get("libraries").get(0).textValue()).isEqualTo("foo");
+        assertThat(createNode.get("libraries").get(1).textValue()).isEqualTo("bar");
+
+        ObjectNode readNode = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/" + id);
+        assertThat(readNode).isNotNull();
+        assertThat(readNode.get("id").asText()).isEqualTo(id);
+        assertThat(readNode.get("libraries").isArray()).isTrue();
+        assertThat(readNode.get("libraries").size()).isEqualTo(2);
+        assertThat(readNode.get("libraries").get(0).textValue()).isEqualTo("foo");
+        assertThat(readNode.get("libraries").get(1).textValue()).isEqualTo("bar");
+    }
+
+    //@Test
+    public void testUpdateToEmptyLibraries() throws Exception {
+        //testLibraries();
+        String id = "testLibraries";
+
+        HttpResponse updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': 'targetPath'}");
+        assertThat(updateResponse).hasStatus(200);
+
+        ObjectNode updateNode = (ObjectNode) toJSON(updateResponse.getEntity());
+        Assertions.assertThat(updateNode.get("id").asText()).isEqualTo(id);
+        assertThat(updateNode.get("libraries").isArray());
+        assertThat(updateNode.get("libraries").size()).isEqualTo(0);
+
+        ObjectNode readNode = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/" + id);
+
+        assertThat(readNode).isNotNull();
+        assertThat(readNode.get("id").asText()).isEqualTo(id);
+        assertThat(readNode.get("libraries").isArray()).isTrue();
+        assertThat(readNode.get("libraries").size()).isEqualTo(0);
     }
 }
