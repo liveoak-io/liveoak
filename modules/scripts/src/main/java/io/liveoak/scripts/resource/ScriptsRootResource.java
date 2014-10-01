@@ -75,9 +75,14 @@ public class ScriptsRootResource implements RootResource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.accept(resourceTriggeredScripts);
-        sink.accept(scriptLibraries);
-        sink.close();
+        try {
+            sink.accept(resourceTriggeredScripts);
+            sink.accept(scriptLibraries);
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
+        }
     }
 
     @Override

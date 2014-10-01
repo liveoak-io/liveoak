@@ -55,8 +55,13 @@ public class DroolsPolicyRootResource implements RootResource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.accept(this.policyCheckResource);
-        sink.close();
+        try {
+            sink.accept(this.policyCheckResource);
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
+        }
     }
 
 }

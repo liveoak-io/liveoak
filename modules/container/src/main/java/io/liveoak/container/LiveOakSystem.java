@@ -90,9 +90,15 @@ public class LiveOakSystem implements Resource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.accept(this.serversResource);
-        sink.accept(this.propertiesResource);
-        sink.close();
+        try {
+            sink.accept(this.serversResource);
+            sink.accept(this.propertiesResource);
+
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
+        }
     }
 
     private ServiceContainer serviceContainer;

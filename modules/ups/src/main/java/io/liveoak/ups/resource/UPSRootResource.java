@@ -71,9 +71,14 @@ public class UPSRootResource implements RootResource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.accept(aliasesResource);
-        sink.accept(subscriptionsResource);
-        sink.close();
+        try {
+            sink.accept(aliasesResource);
+            sink.accept(subscriptionsResource);
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
+        }
     }
 
     @Override

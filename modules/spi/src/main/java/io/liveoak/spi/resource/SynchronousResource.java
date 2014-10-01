@@ -35,14 +35,17 @@ public interface SynchronousResource extends Resource {
     @Override
     default void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         Collection<? extends Resource> members = members();
-
-        if (members != null) {
-            for (Resource each : members) {
-                sink.accept(each);
+        try {
+            if (members != null) {
+                for (Resource each : members) {
+                    sink.accept(each);
+                }
             }
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
         }
-
-        sink.close();
     }
 
     @Override

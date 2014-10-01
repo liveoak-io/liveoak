@@ -49,14 +49,17 @@ public class KeycloakRootResource implements RootResource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.accept(this.tokensResource);
-        sink.close();
+        try {
+            sink.accept(this.tokensResource);
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
+        }
     }
 
     public Logger logger() {
         return log;
     }
-
-    ;
 }
 

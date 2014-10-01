@@ -46,11 +46,16 @@ public class ScriptLibraries implements Resource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        for (Library library : libraryManager.getLibraries().values()) {
-            LibraryResource libraryResource = new LibraryResource(this, library);
-            sink.accept(libraryResource);
+        try {
+            for (Library library : libraryManager.getLibraries().values()) {
+                LibraryResource libraryResource = new LibraryResource(this, library);
+                sink.accept(libraryResource);
+            }
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
         }
-        sink.close();
     }
 
     @Override

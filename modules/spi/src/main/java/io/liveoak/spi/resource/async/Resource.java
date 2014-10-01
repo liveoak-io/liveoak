@@ -169,9 +169,13 @@ public interface Resource {
     default void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
         readMembers( ctx, new ResourceSink() {
             private boolean found = false;
+            private Throwable error;
+
             @Override
             public void close() {
-                if ( ! found ) {
+                if (error != null) {
+                    responder.internalError(error);
+                } else if ( ! found ) {
                     responder.noSuchResource( id );
                 }
             }
@@ -185,6 +189,11 @@ public interface Resource {
                     responder.resourceRead( resource );
                     found = true;
                 }
+            }
+
+            @Override
+            public void error(Throwable e) {
+                error = e;
             }
         });
     }

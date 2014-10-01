@@ -192,10 +192,15 @@ public class ResourceScript implements Resource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        if (script.getScriptBuffer() != null) {
-            sink.accept(new ScriptFileResource(this));
+        try {
+            if (script.getScriptBuffer() != null) {
+                sink.accept(new ScriptFileResource(this));
+            }
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
         }
-        sink.close();
     }
 
     @Override

@@ -39,16 +39,21 @@ public class SubscriptionsResource implements SubscriptionResourceParent {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        DBCursor cursor = collection.find();
-        while (cursor.hasNext()) {
-            DBObject dbObject = cursor.next();
-            UPSSubscription subscription = UPSSubscription.create(dbObject);
-            if (subscription != null) {
-                SubscriptionResource subscriptionResource = new SubscriptionResource(this, subscription);
-                sink.accept(subscriptionResource);
+        try {
+            DBCursor cursor = collection.find();
+            while (cursor.hasNext()) {
+                DBObject dbObject = cursor.next();
+                UPSSubscription subscription = UPSSubscription.create(dbObject);
+                if (subscription != null) {
+                    SubscriptionResource subscriptionResource = new SubscriptionResource(this, subscription);
+                    sink.accept(subscriptionResource);
+                }
             }
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
         }
-        sink.close();
     }
 
     @Override

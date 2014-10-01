@@ -33,16 +33,20 @@ public class ServersResource implements Resource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        List<ServiceName> names = this.serviceContainer.getServiceNames();
-        for (ServiceName name : names) {
-            if (Services.NETWORK_SERVER.equals(name.getParent())) {
-                sink.accept(new NetworkServerResource(this, name.getSimpleName(), (NetworkServer) this.serviceContainer.getService(name).getValue()));
-            } else if (Services.LOCAL_SERVER.equals(name.getParent())) {
-                sink.accept(new LocalServerResource(this, name.getSimpleName(), (LocalServer) this.serviceContainer.getService(name).getValue()));
+        try {
+            List<ServiceName> names = this.serviceContainer.getServiceNames();
+            for (ServiceName name : names) {
+                if (Services.NETWORK_SERVER.equals(name.getParent())) {
+                    sink.accept(new NetworkServerResource(this, name.getSimpleName(), (NetworkServer) this.serviceContainer.getService(name).getValue()));
+                } else if (Services.LOCAL_SERVER.equals(name.getParent())) {
+                    sink.accept(new LocalServerResource(this, name.getSimpleName(), (LocalServer) this.serviceContainer.getService(name).getValue()));
+                }
             }
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
         }
-
-        sink.close();
     }
 
     private Resource parent;

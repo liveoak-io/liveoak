@@ -48,10 +48,15 @@ public class TriggerResource implements Resource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        this.fires.stream().forEach((e) -> {
-            sink.accept(e);
-        });
-        sink.close();
+        try {
+            this.fires.stream().forEach((e) -> {
+                sink.accept(e);
+            });
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
+        }
     }
 
     public void createFire(JobExecutionContext context) {

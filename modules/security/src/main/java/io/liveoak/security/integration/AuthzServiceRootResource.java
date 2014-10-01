@@ -69,7 +69,12 @@ public class AuthzServiceRootResource implements RootResource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.accept(authzCheckResource);
-        sink.close();
+        try {
+            sink.accept(authzCheckResource);
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
+        }
     }
 }

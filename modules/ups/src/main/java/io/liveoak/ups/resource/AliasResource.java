@@ -43,11 +43,16 @@ public class AliasResource implements SubscriptionResourceParent {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        List<UPSSubscription> subscriptions = alias.getSubscriptions();
-        for (UPSSubscription subscription : subscriptions) {
-            sink.accept(new SubscriptionResource(this, subscription));
+        try {
+            List<UPSSubscription> subscriptions = alias.getSubscriptions();
+            for (UPSSubscription subscription : subscriptions) {
+                sink.accept(new SubscriptionResource(this, subscription));
+            }
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
         }
-        sink.close();
     }
 
     @Override

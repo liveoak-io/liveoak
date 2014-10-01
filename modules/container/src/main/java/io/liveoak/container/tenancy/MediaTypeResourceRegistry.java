@@ -114,20 +114,24 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        if (!this.registry.isEmpty()) {
-            MediaType mediaType = mediaType(ctx);
+        try {
+            if (!this.registry.isEmpty()) {
+                MediaType mediaType = mediaType(ctx);
 
-            for (Map<MediaType, Resource> resourceMap : this.registry.values()) {
-                Resource resource = resourceMap.get(mediaType);
-                if (resource == null) {
-                    resource = resourceMap.get(DEFAULT);
+                for (Map<MediaType, Resource> resourceMap : this.registry.values()) {
+                    Resource resource = resourceMap.get(mediaType);
+                    if (resource == null) {
+                        resource = resourceMap.get(DEFAULT);
+                    }
+
+                    sink.accept(resource);
                 }
-
-                sink.accept(resource);
             }
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
         }
-
-        sink.close();
     }
 
     @Override

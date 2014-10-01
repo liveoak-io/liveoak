@@ -40,44 +40,47 @@ public class DirectoryResource implements FSResource {
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) {
         vertx().fileSystem().readDir(file().getPath(), (result) -> {
-            if (result.failed()) {
-                sink.close();
-            } else {
-                List<File> sorted = new ArrayList<>();
+            try {
+                if (!result.failed()) {
+                    List<File> sorted = new ArrayList<>();
 
-                for (String filename : result.result()) {
-                    File child = new File(filename);
-                    sorted.add(child);
-                }
+                    for (String filename : result.result()) {
+                        File child = new File(filename);
+                        sorted.add(child);
+                    }
 
-                sorted.sort((left, right) -> {
-                    if (left.isDirectory() && right.isDirectory()) {
+                    sorted.sort((left, right) -> {
+                        if (left.isDirectory() && right.isDirectory()) {
+                            return 0;
+                        }
+
+                        if (left.isFile() && right.isFile()) {
+                            return 0;
+                        }
+
+                        if (left.isDirectory()) {
+                            return -1;
+                        }
+
+                        if (left.isFile()) {
+                            return 1;
+                        }
+
                         return 0;
-                    }
 
-                    if (left.isFile() && right.isFile()) {
-                        return 0;
-                    }
+                    });
 
-                    if (left.isDirectory()) {
-                        return -1;
-                    }
-
-                    if (left.isFile()) {
-                        return 1;
-                    }
-
-                    return 0;
-
-                });
-
-                for (File each : sorted) {
-                    if (each.isDirectory()) {
-                        sink.accept(createDirectoryResource(each));
-                    } else {
-                        sink.accept(createFileResource(each));
+                    for (File each : sorted) {
+                        if (each.isDirectory()) {
+                            sink.accept(createDirectoryResource(each));
+                        } else {
+                            sink.accept(createFileResource(each));
+                        }
                     }
                 }
+            } catch (Throwable e) {
+                sink.error(e);
+            } finally {
                 sink.close();
             }
         });

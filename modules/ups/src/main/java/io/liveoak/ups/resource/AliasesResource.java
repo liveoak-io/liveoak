@@ -88,11 +88,16 @@ public class AliasesResource implements Resource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        DBCursor cursor = collection.find();
-        while (cursor.hasNext()) {
-            sink.accept(new AliasResource(this, Alias.create(cursor.next())));
+        try {
+            DBCursor cursor = collection.find();
+            while (cursor.hasNext()) {
+                sink.accept(new AliasResource(this, Alias.create(cursor.next())));
+            }
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.close();
         }
-        sink.close();
     }
 
     @Override

@@ -50,11 +50,16 @@ public abstract class ScriptResource implements Resource {
     }
 
     protected void readMembers(RequestContext ctx, ResourceSink sink, boolean close) throws Exception {
-        if (getScriptBuffer() != null) {
-            sink.accept(new ScriptFileResource(this));
-        }
-        if (close) {
-            sink.close();
+        try {
+            if (getScriptBuffer() != null) {
+                sink.accept(new ScriptFileResource(this));
+            }
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            if (close) {
+                sink.close();
+            }
         }
     }
 
