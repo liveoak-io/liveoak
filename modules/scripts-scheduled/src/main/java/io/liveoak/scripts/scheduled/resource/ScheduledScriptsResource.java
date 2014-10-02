@@ -1,7 +1,14 @@
-package io.liveoak.scripts.resource;
+package io.liveoak.scripts.scheduled.resource;
 
-import io.liveoak.scripts.libraries.resources.ScriptLibraries;
-import io.liveoak.scripts.resourcetriggered.resource.ResourceScripts;
+import java.io.File;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import io.liveoak.scripts.resource.ScriptConfig;
+import io.liveoak.scripts.resource.ScriptResource;
+import io.liveoak.scripts.resource.ScriptsResource;
+import io.liveoak.scripts.scheduled.ScheduledScript;
+import io.liveoak.scripts.scheduled.manager.ScheduleManager;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -10,18 +17,23 @@ import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
+import org.vertx.java.core.Vertx;
 
 /**
+ * Scripts to run based on an schedule.
+ *
+ * This is to script methods such as: at, until, cron/interval
+ *
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
- * @author Ken Finnigan
  */
-public class ScriptsRootResource implements RootResource {
+public class ScheduledScriptsResource extends ScriptsResource implements RootResource {
 
-    private Resource parent;
     private String id;
 
-    ResourceScripts resourceTriggeredScripts;
-    ScriptLibraries scriptLibraries;
+    private final ScheduleManager scheduleManager;
+    private File scriptDirectory;
+
+    Resource parent;
 
     protected static final Logger log = Logger.getLogger("io.liveoak.scripts");
 
@@ -30,24 +42,8 @@ public class ScriptsRootResource implements RootResource {
     private static final String DIRECTORY = "script-directory";
     private static final String TIMEOUT = "default-timeout";
 
+    private Map<String, ScheduledScript> scripts = new ConcurrentHashMap<>();
     private ScriptConfig scriptConfig;
-
-    public ScriptsRootResource(String id, ScriptLibraries scriptLibraries, ResourceScripts resourceTriggeredScripts) {
-        this.resourceTriggeredScripts = resourceTriggeredScripts;
-        this.resourceTriggeredScripts.parent(this);
-
-        this.scriptLibraries = scriptLibraries;
-        scriptLibraries.parent(this);
-
-        this.id = id;
-
-    }
-
-    @Override
-    public void start() throws Exception {
-        resourceTriggeredScripts.start();
-    }
-
 
     @Override
     public void parent(Resource parent) {
@@ -59,6 +55,16 @@ public class ScriptsRootResource implements RootResource {
         return parent;
     }
 
+    public ScheduledScriptsResource(String id, Vertx vertx, ScheduleManager scheduleManager) {
+        super(vertx);
+        this.id = id;
+        this.scheduleManager = scheduleManager;
+    }
+
+    public ScheduleManager getScheduleManager() {
+        return this.scheduleManager;
+    }
+
     @Override
     public String id() {
         return id;
@@ -66,31 +72,57 @@ public class ScriptsRootResource implements RootResource {
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("name", "LiveOak Scripts");
-        sink.accept("description", "Manages server side scripts for the application.");
-        sink.accept(DIRECTORY, this.scriptConfig.getScriptDirectory());
-        sink.accept(TIMEOUT, this.scriptConfig.getTimeout());
+        sink.accept("name", "Scheduled Scripts");
+        sink.accept("description", "Scripts to be run based on a schedule.");
+        sink.accept("count", scripts.size());
+
+        if (scheduleManager != null && scheduleManager.getScheduler() != null) {
+            sink.accept("scheduler", new SchedulerStateResource(this, scheduleManager.getScheduler()));
+        }
+
         sink.close();
     }
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.accept(resourceTriggeredScripts);
-        sink.accept(scriptLibraries);
+        for (ScheduledScript script: scripts.values()) {
+            sink.accept(new ScheduledScriptResource(this, script));
+        }
         sink.close();
     }
 
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        if (id.equals(resourceTriggeredScripts.id())) {
-            responder.resourceRead(this.resourceTriggeredScripts);
-        } else if (id.equals(scriptLibraries.id())) {
-            responder.resourceRead(scriptLibraries);
+        ScheduledScript script = scripts.get(id);
+        if (script != null) {
+            responder.resourceRead(new ScheduledScriptResource(this, script));
         } else {
             responder.noSuchResource(id);
         }
     }
 
+    protected File getScriptsDirectory() {
+        if (scriptDirectory == null) {
+            //get a reference to where the scripts should be held
+            String resourceBasedDir = getScriptConfig().getScriptDirectory();
+            scriptDirectory = new File(resourceBasedDir);
+
+            // create the directory if it doesn't already exist
+            if (!scriptDirectory.exists()) {
+                scriptDirectory.mkdirs();
+            }
+        }
+        return scriptDirectory;
+    }
+
+    @Override
+    protected ScriptResource generateChildResource(ResourceState state) throws Exception {
+        ScheduledScriptResource resource = new ScheduledScriptResource(this, state);
+        scripts.put(resource.id(), resource.getScript());
+        return resource;
+    }
+
+    //TODO: move to common class
     @Override
     public void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         Object dirProperty = state.getProperty(DIRECTORY);
@@ -113,6 +145,7 @@ public class ScriptsRootResource implements RootResource {
         }
     }
 
+    //TODO: move to common class
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         Object dirProperty = state.getProperty(DIRECTORY);
@@ -137,6 +170,7 @@ public class ScriptsRootResource implements RootResource {
         responder.resourceUpdated(this);
     }
 
+    //TODO: move to common class
     public ScriptConfig getScriptConfig() {
         return scriptConfig;
     }

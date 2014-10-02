@@ -25,6 +25,7 @@ public class ScriptTestCase extends BaseScriptTestCase {
         assertThat(result.id()).isEqualTo("scripts");
 
         assertThat(getMember(result, "resource-triggered-scripts")).isNotNull();
+        assertThat(getMember(result, "scheduled-scripts")).isNotNull();
     }
 
     @Test(expected = NotAcceptableException.class)

@@ -1,7 +1,9 @@
 package io.liveoak.scripts.resource;
 
+import io.liveoak.scripts.endpoints.EndpointScripts;
 import io.liveoak.scripts.libraries.resources.ScriptLibraries;
 import io.liveoak.scripts.resourcetriggered.resource.ResourceScripts;
+import io.liveoak.scripts.scheduled.resource.ScheduledScriptsResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -21,6 +23,8 @@ public class ScriptsRootResource implements RootResource {
     private String id;
 
     ResourceScripts resourceTriggeredScripts;
+    EndpointScripts endpointScripts;
+    ScheduledScriptsResource scheduledScripts;
     ScriptLibraries scriptLibraries;
 
     protected static final Logger log = Logger.getLogger("io.liveoak.scripts");
@@ -32,12 +36,17 @@ public class ScriptsRootResource implements RootResource {
 
     private ScriptConfig scriptConfig;
 
-    public ScriptsRootResource(String id, ScriptLibraries scriptLibraries, ResourceScripts resourceTriggeredScripts) {
+    public ScriptsRootResource(String id, ScriptLibraries scriptLibraries, ResourceScripts resourceTriggeredScripts, ScheduledScriptsResource scheduledScripts) {
         this.resourceTriggeredScripts = resourceTriggeredScripts;
         this.resourceTriggeredScripts.parent(this);
 
         this.scriptLibraries = scriptLibraries;
         scriptLibraries.parent(this);
+
+        this.endpointScripts = new EndpointScripts(this);
+
+        this.scheduledScripts = scheduledScripts;
+        this.scheduledScripts.parent(this);
 
         this.id = id;
 
@@ -46,6 +55,7 @@ public class ScriptsRootResource implements RootResource {
     @Override
     public void start() throws Exception {
         resourceTriggeredScripts.start();
+        scheduledScripts.start();
     }
 
 
@@ -76,6 +86,8 @@ public class ScriptsRootResource implements RootResource {
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         sink.accept(resourceTriggeredScripts);
+        sink.accept(endpointScripts);
+        sink.accept(scheduledScripts);
         sink.accept(scriptLibraries);
         sink.close();
     }
@@ -84,6 +96,10 @@ public class ScriptsRootResource implements RootResource {
     public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
         if (id.equals(resourceTriggeredScripts.id())) {
             responder.resourceRead(this.resourceTriggeredScripts);
+        } else if (id.equals(endpointScripts.id())) {
+            responder.resourceRead(this.endpointScripts);
+        } else if (id.equals(scheduledScripts.id())) {
+            responder.resourceRead(scheduledScripts);
         } else if (id.equals(scriptLibraries.id())) {
             responder.resourceRead(scriptLibraries);
         } else {

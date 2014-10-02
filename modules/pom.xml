@@ -116,6 +116,7 @@
         <module>security-aclpolicy</module>
         <module>security-droolspolicy</module>
         <module>scripts</module>
+        <module>scripts-scheduled</module>
         <module>ups</module>
     </modules>
 </project>

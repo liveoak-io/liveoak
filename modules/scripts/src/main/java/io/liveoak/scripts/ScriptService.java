@@ -3,7 +3,6 @@ package io.liveoak.scripts;
 import io.liveoak.scripts.libraries.resources.ScriptLibraries;
 import io.liveoak.scripts.resource.ScriptsRootResource;
 import io.liveoak.scripts.resourcetriggered.resource.ResourceScripts;
-import io.liveoak.scripts.scheduled.resource.ScheduledScriptsResource;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -24,7 +23,7 @@ public class ScriptService implements Service<ScriptsRootResource> {
 
     @Override
     public void start(StartContext startContext) throws StartException {
-        this.rootResource = new ScriptsRootResource(id, librariesResourceInjector.getValue(), resourceScriptsInjector.getValue(), scheduledScriptsInjectedValue.getValue());
+        this.rootResource = new ScriptsRootResource(id, librariesResourceInjector.getValue(), resourceScriptsInjector.getValue());
     }
 
     @Override
@@ -38,8 +37,6 @@ public class ScriptService implements Service<ScriptsRootResource> {
     }
 
     public InjectedValue<ResourceScripts> resourceScriptsInjector = new InjectedValue<>();
-
-    public InjectedValue<ScheduledScriptsResource> scheduledScriptsInjectedValue = new InjectedValue<>();
 
     public InjectedValue<ScriptLibraries> librariesResourceInjector = new InjectedValue<>();
 }
