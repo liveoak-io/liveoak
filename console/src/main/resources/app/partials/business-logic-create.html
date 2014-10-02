@@ -32,7 +32,7 @@
             <label class="col-sm-3 control-label" for="enable">Enable Script</label>
             <div class="col-sm-4">
               <div class="onoffswitch">
-                <input type="checkbox" id="enable" class="onoffswitch-checkbox" ng-model="script.enabled">
+                <input type="checkbox" id="enable" class="onoffswitch-checkbox" ng-model="script.enabled" ng-init="script.enabled = script.enabled || false">
                 <label class="onoffswitch-label" for="enable">
                   <span class="onoffswitch-inner">
                     <span class="onoffswitch-active ng-binding">ON</span>
