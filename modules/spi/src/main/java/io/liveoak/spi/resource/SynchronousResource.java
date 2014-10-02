@@ -19,10 +19,19 @@ public interface SynchronousResource extends Resource {
     }
 
     default Resource member(RequestContext ctx, String id) throws Exception {
+        Collection<? extends Resource> members = members(ctx);
+        if (members == null) {
+            return null;
+        }
+        for (Resource member: members) {
+            if (id.equals(member.id())) {
+                return member;
+            }
+        }
         return null;
     }
 
-    default ResourceState properties() throws Exception {
+    default ResourceState properties(RequestContext ctx) throws Exception {
         return null;
     }
 
@@ -59,7 +68,7 @@ public interface SynchronousResource extends Resource {
 
     @Override
     default void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        ResourceState props = properties();
+        ResourceState props = properties(ctx);
 
         if (props != null) {
             for (String key : props.getPropertyNames() ) {

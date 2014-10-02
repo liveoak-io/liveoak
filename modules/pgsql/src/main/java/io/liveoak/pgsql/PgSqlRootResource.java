@@ -7,9 +7,12 @@ package io.liveoak.pgsql;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.pgsql.meta.Catalog;
 import io.liveoak.pgsql.meta.QueryBuilder;
 import io.liveoak.pgsql.meta.Table;
@@ -18,17 +21,16 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.resource.MapResource;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.DefaultRootResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class PgSqlRootResource extends DefaultRootResource {
+public class PgSqlRootResource extends DefaultRootResource implements SynchronousResource {
 
     private static final String TABLE_NAMES = "pg.table.names";
 
@@ -73,7 +75,7 @@ public class PgSqlRootResource extends DefaultRootResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
 
         // determine table names
         List<String> tables = catalog().tableIds();
@@ -86,29 +88,22 @@ public class PgSqlRootResource extends DefaultRootResource {
         batch.put("rel", "batch");
         batch.put(LiveOak.HREF, uri() + "/" + BATCH_ENDPOINT);
         links.add(batch);
-        sink.accept("links", links);
+
+        ResourceState result = new DefaultResourceState();
+        result.putProperty("links", links);
 
         // here only set num of tables as size
-        sink.accept("count", tables.size());
+        result.putProperty("count", tables.size());
 
         // maybe some other things to do with db as a whole
-        sink.accept("type", "database");
-        sink.close();
+        result.putProperty("type", "database");
+        return result;
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        List<String> tables = (List<String>) ctx.requestAttributes().getAttribute(TABLE_NAMES);
-        for (String table: tables) {
-            sink.accept(new PgSqlTableResource(this, table));
-        }
-        sink.complete();
-    }
-
-    public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
+    public Resource member(RequestContext ctx, String id) throws Exception {
         if (BATCH_ENDPOINT.equals(id)) {
-            responder.resourceRead(new PgSqlBatchResource(this, BATCH_ENDPOINT));
-            return;
+            return new PgSqlBatchResource(this, BATCH_ENDPOINT);
         }
 
         String tableId = id;
@@ -122,12 +117,20 @@ public class PgSqlRootResource extends DefaultRootResource {
         List<String> tables = catalog().tableIds();
         int pos = tables.indexOf(tableId);
         if (pos == -1) {
-            responder.noSuchResource(tableId);
+            return null;
         } else if (schemaReq) {
-            responder.resourceRead(new PgSqlTableSchemaResource(this, tail.name()));
+            return new PgSqlTableSchemaResource(this, tail.name());
         } else {
-            responder.resourceRead(new PgSqlTableResource(this, tables.get(pos)));
+            return new PgSqlTableResource(this, tables.get(pos));
         }
+    }
+
+    @Override
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+        List<String> tables = (List<String>) ctx.requestAttributes().getAttribute(TABLE_NAMES);
+        return tables.stream()
+                .map(table -> new PgSqlTableResource(this, table))
+                .collect(Collectors.toList());
     }
 
     @Override

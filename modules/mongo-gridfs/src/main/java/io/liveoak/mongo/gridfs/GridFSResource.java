@@ -14,6 +14,7 @@ import java.util.Set;
 import com.mongodb.DBObject;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -23,7 +24,7 @@ import org.bson.types.ObjectId;
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class GridFSResource implements Resource {
+public class GridFSResource implements SynchronousResource {
 
     protected static Set<String> FILTERED = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             new String[]{"aliases", "chunkSize", "_id", LiveOak.ID})));
@@ -147,7 +148,7 @@ public class GridFSResource implements Resource {
         responder.resourceUpdated(this);
     }
 
-    public void readFileInfo(RequestContext ctx, PropertySink sink) {
+    public void readFileInfo(PropertySink sink) {
         DBObject dbobj = fileInfo().dbObject();
         for (String key: dbobj.keySet()) {
             if (getFiltered().contains(key)) {

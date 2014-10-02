@@ -6,6 +6,7 @@
 package io.liveoak.container.resource;
 
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
@@ -22,7 +23,7 @@ public class PropertiesResource implements SynchronousResource {
     }
 
     @Override
-    public ResourceState properties() throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
         ResourceState result = new DefaultResourceState();
         Properties allProps = System.getProperties();
         for (String key : allProps.stringPropertyNames()) {

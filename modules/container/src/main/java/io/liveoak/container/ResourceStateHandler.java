@@ -78,7 +78,7 @@ public class ResourceStateHandler extends ChannelOutboundHandlerAdapter {
             ResourceState state = encoder.root();
             response.setState(state);
             ctx.writeAndFlush(response, promise).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
-        }, t -> handleError(ctx, response, ResourceErrorResponse.ErrorType.INTERNAL_ERROR, t));
+        }, t -> handleError(ctx, response, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, t));
 
         try {
             driver.encode();

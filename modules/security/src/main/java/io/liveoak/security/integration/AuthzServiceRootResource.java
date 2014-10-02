@@ -1,5 +1,8 @@
 package io.liveoak.security.integration;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.liveoak.common.security.AuthzConstants;
@@ -7,6 +10,7 @@ import io.liveoak.security.spi.AuthzServiceConfig;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
@@ -17,7 +21,7 @@ import org.jboss.logging.Logger;
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class AuthzServiceRootResource implements RootResource {
+public class AuthzServiceRootResource implements RootResource, SynchronousResource {
 
     private static final Logger log = Logger.getLogger(AuthzServiceRootResource.class);
 
@@ -59,22 +63,17 @@ public class AuthzServiceRootResource implements RootResource {
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
+    public Resource member(RequestContext ctx, String id) {
         if (id.equals(this.authzCheckResource.id())) {
-            responder.resourceRead(authzCheckResource);
-        } else {
-            responder.noSuchResource(id);
+            return authzCheckResource;
         }
+        return null;
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        try {
-            sink.accept(authzCheckResource);
-        } catch (Throwable e) {
-            sink.error(e);
-        } finally {
-            sink.complete();
-        }
+    public Collection<? extends Resource> members(RequestContext ctx) {
+        LinkedList<Resource> members = new LinkedList<>();
+        members.add(authzCheckResource);
+        return members;
     }
 }

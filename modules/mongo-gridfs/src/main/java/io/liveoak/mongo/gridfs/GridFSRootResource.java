@@ -6,14 +6,15 @@
 package io.liveoak.mongo.gridfs;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Collections;
 
 import com.mongodb.DB;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import org.vertx.java.core.Vertx;
@@ -51,23 +52,22 @@ public class GridFSRootResource extends GridFSDirectoryResource implements RootR
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
+    public ResourceState properties(RequestContext ctx) throws Exception {
+        ResourceState result = new DefaultResourceState();
+        result.putProperty("name", "GridFS");
+        result.putProperty("version", "1.0");
+        return result;
+    }
+
+    @Override
+    public Resource member(RequestContext ctx, String id) {
         // here id always has the value of userspace which we use to map to appropriate db collection name
-        responder.resourceRead(
-                new GridFSUserspaceResource(ctx, this, id, new GridFSResourcePath(ctx.resourcePath()).top(3)));
-    }
-
-
-    @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.complete();
+        return new GridFSUserspaceResource(ctx, this, id, new GridFSResourcePath(ctx.resourcePath()).top(3));
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("name", "GridFS");
-        sink.accept("version", "1.0");
-        sink.close();
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+        return Collections.emptyList();
     }
 
     @Override

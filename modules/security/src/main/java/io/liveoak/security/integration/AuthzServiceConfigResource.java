@@ -16,6 +16,7 @@ import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.security.spi.AuthzServiceConfig;
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -53,7 +54,7 @@ public class AuthzServiceConfigResource implements RootResource, SynchronousReso
     }
 
     @Override
-    public ResourceState properties() throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
         ObjectMapper om = ObjectMapperFactory.create();
         // TODO: performance as Object is converted couple of times into various formats...
         String str = om.writeValueAsString(this.authzRootResource.getConfig());

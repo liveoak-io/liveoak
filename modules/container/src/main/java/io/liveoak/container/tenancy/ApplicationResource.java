@@ -8,7 +8,6 @@ import io.liveoak.container.zero.ApplicationExtensionsResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
@@ -62,7 +61,7 @@ public class ApplicationResource implements RootResource, SynchronousResource {
     }
 
     @Override
-    public ResourceState properties() throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
         ResourceState result = new DefaultResourceState();
         result.putProperty("name", this.app.name());
         result.putProperty("html-app", this.app.htmlApplicationResourcePath());

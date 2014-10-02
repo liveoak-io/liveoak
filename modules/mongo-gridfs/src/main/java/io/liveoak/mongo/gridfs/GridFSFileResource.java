@@ -8,9 +8,10 @@ package io.liveoak.mongo.gridfs;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.mongo.gridfs.util.ResourceStatePropertySink;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.spi.resource.MapResource;
@@ -40,34 +41,31 @@ public class GridFSFileResource extends GridFSResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        try {
+    public ResourceState properties(RequestContext ctx) throws Exception {
 
-            readFileInfo(ctx, sink);
+        ResourceState result = new DefaultResourceState();
+        readFileInfo(new ResourceStatePropertySink(result));
 
-            String blobPath = getBlobUri();
-            String selfPath = getSelfUri();
-            String parentPath = getParentUri();
+        String blobPath = getBlobUri();
+        String selfPath = getSelfUri();
+        String parentPath = getParentUri();
 
-            List links = new LinkedList();
+        List links = new LinkedList();
 
-            links.add(new MapResource()
-                    .put("rel", "self")
-                    .put(LiveOak.HREF, selfPath));
+        links.add(new MapResource()
+                .put("rel", "self")
+                .put(LiveOak.HREF, selfPath));
 
-            links.add(new MapResource()
-                    .put("rel", "parent")
-                    .put(LiveOak.HREF, parentPath));
+        links.add(new MapResource()
+                .put("rel", "parent")
+                .put(LiveOak.HREF, parentPath));
 
-            links.add(new MapResource()
-                    .put("rel", "blob")
-                    .put(LiveOak.HREF, blobPath));
+        links.add(new MapResource()
+                .put("rel", "blob")
+                .put(LiveOak.HREF, blobPath));
 
-            sink.accept("links", links);
-
-        } finally {
-            sink.close();
-        }
+        result.putProperty("links", links);
+        return result;
     }
 
     @Override

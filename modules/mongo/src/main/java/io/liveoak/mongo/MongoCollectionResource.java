@@ -186,7 +186,7 @@ public class MongoCollectionResource extends MongoResource {
     }
 
     @Override
-    public ResourceState properties() throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
         ResourceState result = new DefaultResourceState();
         result.putProperty("type", "collection");
         result.putProperty("count", dbCollection.getCount());

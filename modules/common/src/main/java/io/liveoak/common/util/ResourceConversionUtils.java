@@ -3,6 +3,7 @@ package io.liveoak.common.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
@@ -34,7 +35,7 @@ public class ResourceConversionUtils {
             }
 
             @Override
-            public ResourceState properties() throws Exception {
+            public ResourceState properties(RequestContext ctx) throws Exception {
                 return resourceState;
             }
         };

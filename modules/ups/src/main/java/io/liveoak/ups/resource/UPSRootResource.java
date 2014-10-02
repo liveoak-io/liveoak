@@ -1,14 +1,16 @@
 package io.liveoak.ups.resource;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import io.liveoak.mongo.internal.InternalStorage;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
-import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.ups.AliasUPSSubscription;
 import io.liveoak.ups.BaseUPSSubscription;
 import io.liveoak.ups.UPS;
@@ -17,17 +19,17 @@ import io.liveoak.ups.resource.config.UPSRootConfigResource;
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class UPSRootResource implements RootResource {
+public class UPSRootResource implements RootResource, SynchronousResource {
 
-    Resource parent;
-    String id;
-    UPSRootConfigResource configResource;
-    SubscriptionManager subscriptionManager;
-    AliasesResource aliasesResource;
-    SubscriptionsResource subscriptionsResource;
-    InternalStorage internalStorage;
+    private Resource parent;
+    private String id;
+    private UPSRootConfigResource configResource;
+    private SubscriptionManager subscriptionManager;
+    private AliasesResource aliasesResource;
+    private SubscriptionsResource subscriptionsResource;
+    private InternalStorage internalStorage;
 
-    UPS upsService;
+    private UPS upsService;
 
     public UPSRootResource(String id, UPSRootConfigResource configResource, SubscriptionManager subscriptionManager, InternalStorage internalStorage) {
         this.id = id;
@@ -70,26 +72,21 @@ public class UPSRootResource implements RootResource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        try {
-            sink.accept(aliasesResource);
-            sink.accept(subscriptionsResource);
-        } catch (Throwable e) {
-            sink.error(e);
-        } finally {
-            sink.complete();
-        }
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+        LinkedList<Resource> members = new LinkedList<>();
+        members.add(aliasesResource);
+        members.add(subscriptionsResource);
+        return members;
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
+    public Resource member(RequestContext ctx, String id) throws Exception {
         if (id.equals(AliasesResource.ID)) {
-            responder.resourceRead(this.aliasesResource);
+            return this.aliasesResource;
         } else if (id.equals(SubscriptionsResource.ID)) {
-            responder.resourceRead(this.subscriptionsResource);
-        } else {
-            responder.noSuchResource(id);
+            return this.subscriptionsResource;
         }
+        return null;
     }
 
     public UPSRootConfigResource configuration() {

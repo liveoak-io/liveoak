@@ -1,15 +1,16 @@
 package io.liveoak.scheduler;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Notifier;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
@@ -25,7 +26,7 @@ import org.quartz.TriggerBuilder;
 /**
  * @author Bob McWhirter
  */
-public class SchedulerResource implements RootResource {
+public class SchedulerResource implements RootResource, SynchronousResource {
 
     public SchedulerResource(String id, Scheduler scheduler, Notifier notifier) {
         this.id = id;
@@ -53,30 +54,34 @@ public class SchedulerResource implements RootResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
+        ResourceState result = new DefaultResourceState();
         if (this.scheduler.isStarted()) {
-            sink.accept("status", "started");
+            result.putProperty("status", "started");
         } else {
-            sink.accept("stats", "stopped");
+            result.putProperty("stats", "stopped");
         }
 
-        sink.accept("name", this.scheduler.getSchedulerName());
-        sink.accept("instance-id", this.scheduler.getSchedulerInstanceId());
+        result.putProperty("name", this.scheduler.getSchedulerName());
+        result.putProperty("instance-id", this.scheduler.getSchedulerInstanceId());
+
         SchedulerMetaData metaData = this.scheduler.getMetaData();
-
-        sink.accept("running-since", metaData.getRunningSince());
-
-        sink.close();
+        result.putProperty("running-since", metaData.getRunningSince());
+        return result;
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
+    public Resource member(RequestContext ctx, String id) {
         TriggerResource resource = this.children.get(id);
-        if (resource == null) {
-            responder.noSuchResource(id);
-        } else {
-            responder.resourceRead(resource);
+        if (resource != null) {
+            return resource;
         }
+        return null;
+    }
+
+    @Override
+    public Collection<? extends Resource> members(RequestContext ctx) throws Exception {
+        return this.children.values();
     }
 
     @Override
@@ -104,19 +109,6 @@ public class SchedulerResource implements RootResource {
         this.scheduler.scheduleJob(jobDetail, trigger);
         this.children.put(id, resource);
         responder.resourceCreated(resource);
-    }
-
-    @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        try {
-            this.children.values().stream().forEach((e) -> {
-                sink.accept(e);
-            });
-        } catch (Throwable e) {
-            sink.error(e);
-        } finally {
-            sink.complete();
-        }
     }
 
     Notifier notifier() {

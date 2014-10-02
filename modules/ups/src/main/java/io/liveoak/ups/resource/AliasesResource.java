@@ -1,5 +1,7 @@
 package io.liveoak.ups.resource;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.UUID;
 
 import com.mongodb.BasicDBObject;
@@ -8,9 +10,8 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.SecurityContext;
-import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.ups.Alias;
@@ -18,11 +19,10 @@ import io.liveoak.ups.Alias;
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class AliasesResource implements Resource {
+public class AliasesResource implements SynchronousResource {
 
-    UPSRootResource parent;
-
-    DBCollection collection;
+    private UPSRootResource parent;
+    private DBCollection collection;
 
     public static final String ID = "aliases";
 
@@ -39,11 +39,6 @@ public class AliasesResource implements Resource {
     @Override
     public String id() {
         return this.ID;
-    }
-
-    @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.close();
     }
 
     @Override
@@ -87,27 +82,22 @@ public class AliasesResource implements Resource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        try {
-            DBCursor cursor = collection.find();
-            while (cursor.hasNext()) {
-                sink.accept(new AliasResource(this, Alias.create(cursor.next())));
-            }
-        } catch (Throwable e) {
-            sink.error(e);
-        } finally {
-            sink.complete();
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+        LinkedList<Resource> members = new LinkedList<>();
+        DBCursor cursor = collection.find();
+        while (cursor.hasNext()) {
+            members.add(new AliasResource(this, Alias.create(cursor.next())));
         }
+        return members;
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
+    public Resource member(RequestContext ctx, String id) throws Exception {
         DBObject dbObject = collection.findOne(new BasicDBObject("_id", id));
         if (dbObject != null) {
-            responder.resourceRead(new AliasResource(this, Alias.create(dbObject)));
-        } else {
-            responder.noSuchResource(id);
+            return new AliasResource(this, Alias.create(dbObject));
         }
+        return null;
     }
 
     public void saveAlias(Alias alias) {

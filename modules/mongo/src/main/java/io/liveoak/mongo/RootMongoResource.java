@@ -139,7 +139,7 @@ public class RootMongoResource extends MongoResource implements RootResource {
     }
 
     @Override
-    public ResourceState properties() {
+    public ResourceState properties(RequestContext ctx) {
         ResourceState result = new DefaultResourceState();
         result.putProperty("type", "database");
         int count = this.db().getCollectionNames().size();

@@ -181,7 +181,7 @@ public class AclPolicyTestCase extends AbstractTestCase {
             @Override
             public Resource parent() {
                 String parentId = new ResourcePath(parentResourcePath).tail().name();
-                return mockResource.member(parentId);
+                return mockResource.member(reqContext, parentId);
             }
 
             @Override

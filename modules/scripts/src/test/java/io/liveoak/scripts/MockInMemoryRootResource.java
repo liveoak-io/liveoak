@@ -30,7 +30,7 @@ public class MockInMemoryRootResource extends MockInMemoryResource implements Ro
 
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        if (properties().getPropertyNames().contains("throwError")) {
+        if (properties(ctx).getPropertyNames().contains("throwError")) {
             throw new NotAcceptableException("error");
         } else {
             super.readProperties(ctx, sink);
