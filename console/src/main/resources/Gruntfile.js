@@ -11,6 +11,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-htmlhint');
 
   // configurable paths
   var projectConfig = {
@@ -56,9 +57,9 @@ module.exports = function (grunt) {
       },
       html: {
         files: ['<%= config.src %>/partials/**',
-          '<%= config.src %>/templates/**',
+          '<%= config.src %>/templates/**/*.html',
           '<%= config.src %>/*.html'],
-        tasks: ['copy']
+        tasks: ['copy', 'htmlhint']
       },
       livereload: {
         files: [
@@ -75,6 +76,14 @@ module.exports = function (grunt) {
         src: [ 'js/**', 'img/**', 'css/**', 'lib/**', 'partials/**', 'templates/**', '*.html' ],
         dest: '<%= config.dist %>',
         expand: true
+      }
+    },
+    htmlhint: {
+      html: {
+        src: ['<%= config.src %>/*.html','<%= config.src %>/partials/*.html','<%= config.src %>/templates/**/*.html'],
+        options: {
+          htmlhintrc: '.htmlhintrc'
+        }
       }
     },
     // Make sure code styles are up to par and there are no obvious mistakes
@@ -106,9 +115,10 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('build', [
-    'less','jshint','copy'
+    'less','lint','copy'
   ]);
 
   grunt.registerTask('default', ['build', 'watch']);
   grunt.registerTask('mvnBuild', ['bower']);
+  grunt.registerTask('lint', ['jshint', 'htmlhint']);
 };
