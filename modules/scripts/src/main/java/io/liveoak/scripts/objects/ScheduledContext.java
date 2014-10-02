@@ -2,7 +2,6 @@ package io.liveoak.scripts.objects;
 
 import java.util.Date;
 
-import io.liveoak.scripts.scheduled.manager.ScheduledScriptManager;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 
@@ -26,7 +25,7 @@ public class ScheduledContext {
         if (executionCount == null) {
             JobDetail jobDetail = context.getJobDetail();
             if (jobDetail != null && jobDetail.getJobDataMap() != null) {
-                Long executions = (Long) jobDetail.getJobDataMap().get(ScheduledScriptManager.EXECUTIONS);
+                Long executions = (Long) jobDetail.getJobDataMap().get("executions");
                 if (executions != null) {
                     executionCount = executions;
                 } else {
