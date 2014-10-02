@@ -78,7 +78,7 @@
 
         <!-- Maven Plugins -->
         <version.assembly.plugin>2.4</version.assembly.plugin>
-        <version.resourceStates.plugin>2.4.2</version.resourceStates.plugin>
+        <version.resources.plugin>2.4.2</version.resources.plugin>
         <version.vertx.plugin>2.0.1-final</version.vertx.plugin>
         <version.codehaus.helper.plugin>1.8</version.codehaus.helper.plugin>
         <version.google.formatter.plugin>0.3.1</version.google.formatter.plugin>
@@ -659,11 +659,6 @@
                     <version>${version.failsafe.plugin}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resourceStates-plugin</artifactId>
-                    <version>${version.resourceStates.plugin}</version>
-                </plugin>
-                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>${version.codehaus.helper.plugin}</version>
@@ -712,7 +707,7 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resourceStates-plugin</artifactId>
+                <artifactId>maven-resources-plugin</artifactId>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
