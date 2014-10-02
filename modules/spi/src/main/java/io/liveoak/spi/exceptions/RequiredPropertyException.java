@@ -1,7 +1,5 @@
 package io.liveoak.spi.exceptions;
 
-import io.liveoak.spi.exceptions.InvalidPropertyTypeException;
-
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
