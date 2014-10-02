@@ -17,7 +17,7 @@ import com.mongodb.MongoClient;
 import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceProcessingException;
+import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;

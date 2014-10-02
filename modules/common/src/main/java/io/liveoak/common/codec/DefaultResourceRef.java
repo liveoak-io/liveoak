@@ -4,7 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import io.liveoak.spi.ResourcePath;
-import io.liveoak.spi.ResourceProcessingException;
+import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.state.ResourceRef;
 import io.liveoak.spi.state.ResourceState;
 

@@ -2,7 +2,7 @@ package io.liveoak.scripts;
 
 import java.util.UUID;
 
-import io.liveoak.spi.NotAcceptableException;
+import io.liveoak.spi.exceptions.NotAcceptableException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;

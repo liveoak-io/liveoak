@@ -11,7 +11,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceAlreadyExistsException;
+import io.liveoak.spi.exceptions.ResourceAlreadyExistsException;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
 

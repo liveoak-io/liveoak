@@ -24,9 +24,9 @@ import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.spi.NotAcceptableException;
+import io.liveoak.spi.exceptions.NotAcceptableException;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceNotFoundException;
+import io.liveoak.spi.exceptions.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
 
 /**

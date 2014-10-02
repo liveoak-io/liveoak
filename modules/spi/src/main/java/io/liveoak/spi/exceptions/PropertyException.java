@@ -1,4 +1,4 @@
-package io.liveoak.spi;
+package io.liveoak.spi.exceptions;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>

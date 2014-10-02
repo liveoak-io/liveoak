@@ -7,7 +7,7 @@ package io.liveoak.mongo;
 
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceProcessingException;
+import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Responder;

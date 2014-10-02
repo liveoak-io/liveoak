@@ -21,10 +21,10 @@ import org.junit.Test;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 
-import io.liveoak.spi.NotAcceptableException;
+import io.liveoak.spi.exceptions.NotAcceptableException;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceNotFoundException;
+import io.liveoak.spi.exceptions.ResourceNotFoundException;
 import io.liveoak.spi.Sorting;
 import io.liveoak.spi.state.ResourceState;
 

@@ -4,7 +4,7 @@ import io.liveoak.container.*;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceNotFoundException;
+import io.liveoak.spi.exceptions.ResourceNotFoundException;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.After;

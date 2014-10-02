@@ -1,7 +1,7 @@
 package io.liveoak.mongo;
 
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.spi.DeleteNotSupportedException;
+import io.liveoak.spi.exceptions.DeleteNotSupportedException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import org.fest.assertions.Fail;

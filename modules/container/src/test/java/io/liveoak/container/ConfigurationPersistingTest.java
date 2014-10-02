@@ -13,7 +13,7 @@ import io.liveoak.container.extension.MockExtension;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceException;
+import io.liveoak.spi.exceptions.ResourceException;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.async.Resource;

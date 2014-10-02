@@ -19,7 +19,7 @@ import io.liveoak.pgsql.meta.Table;
 import io.liveoak.pgsql.meta.TableRef;
 import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourcePath;
-import io.liveoak.spi.ResourceProcessingException;
+import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.state.ResourceState;
 
 /**

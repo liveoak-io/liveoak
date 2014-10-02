@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import io.liveoak.spi.ResourceAlreadyExistsException;
+import io.liveoak.spi.exceptions.ResourceAlreadyExistsException;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.state.ResourceState;
 
@@ -50,8 +50,8 @@ public class ScriptRegistry {
      * @param state Resource state containing script definition
      *
      * @return ResourceScript resource representing the added script
-     * @throws io.liveoak.spi.ResourceAlreadyExistsException
-     * @throws io.liveoak.spi.PropertyException
+     * @throws io.liveoak.spi.exceptions.ResourceAlreadyExistsException
+     * @throws io.liveoak.spi.exceptions.PropertyException
      */
     public synchronized ResourceScript addFromState(ResourceScripts parent, ResourceState state) throws Exception {
         if (scripts.get(state.id()) != null) {

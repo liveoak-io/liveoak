@@ -24,7 +24,7 @@ import io.liveoak.pgsql.meta.PrimaryKey;
 import io.liveoak.pgsql.meta.QueryBuilder;
 import io.liveoak.pgsql.meta.Table;
 import io.liveoak.pgsql.meta.TableRef;
-import io.liveoak.spi.InitializationException;
+import io.liveoak.spi.exceptions.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.DefaultRootResource;
 import io.liveoak.spi.resource.async.PropertySink;

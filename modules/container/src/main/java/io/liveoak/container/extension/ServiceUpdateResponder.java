@@ -1,8 +1,8 @@
 package io.liveoak.container.extension;
 
-import io.liveoak.spi.ResourceAlreadyExistsException;
+import io.liveoak.spi.exceptions.ResourceAlreadyExistsException;
 import io.liveoak.spi.ResourceErrorResponse;
-import io.liveoak.spi.ResourceNotFoundException;
+import io.liveoak.spi.exceptions.ResourceNotFoundException;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import org.jboss.msc.service.StartContext;

@@ -2,7 +2,7 @@ package io.liveoak.ups;
 
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceNotFoundException;
+import io.liveoak.spi.exceptions.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
 import org.fest.assertions.Fail;
 import org.junit.Test;

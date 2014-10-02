@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -7,10 +7,6 @@ package io.liveoak.git;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.git.extension.GitExtension;
-import io.liveoak.spi.Config;
-import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -22,7 +18,7 @@ import java.io.File;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
- * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
+ * @author Ken Finnigan
  */
 public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
 

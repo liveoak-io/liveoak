@@ -6,7 +6,7 @@
 package io.liveoak.pgsql;
 
 import io.liveoak.spi.LiveOak;
-import io.liveoak.spi.ResourceNotFoundException;
+import io.liveoak.spi.exceptions.ResourceNotFoundException;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Assert;

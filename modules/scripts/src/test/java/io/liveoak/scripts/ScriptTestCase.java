@@ -2,7 +2,7 @@ package io.liveoak.scripts;
 
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.scripts.resource.ScriptConfig;
-import io.liveoak.spi.NotAcceptableException;
+import io.liveoak.spi.exceptions.NotAcceptableException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;

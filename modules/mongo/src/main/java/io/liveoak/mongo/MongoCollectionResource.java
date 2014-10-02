@@ -15,7 +15,7 @@ import com.mongodb.util.JSON;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceParams;
-import io.liveoak.spi.ResourceProcessingException;
+import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.Sorting;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.ResourceSink;

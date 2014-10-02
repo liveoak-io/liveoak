@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import io.liveoak.spi.InvalidPropertyTypeException;
-import io.liveoak.spi.PropertyException;
+import io.liveoak.spi.exceptions.InvalidPropertyTypeException;
+import io.liveoak.spi.exceptions.PropertyException;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.RequiredPropertyException;
+import io.liveoak.spi.exceptions.RequiredPropertyException;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;

@@ -14,19 +14,19 @@ import io.liveoak.scripts.objects.impl.exception.LiveOakReadNotSupportedExceptio
 import io.liveoak.scripts.objects.impl.exception.LiveOakResourceAlreadyExistsException;
 import io.liveoak.scripts.objects.impl.exception.LiveOakResourceNotFoundException;
 import io.liveoak.scripts.objects.impl.exception.LiveOakUpdateNotSupportedException;
-import io.liveoak.spi.CreateNotSupportedException;
-import io.liveoak.spi.DeleteNotSupportedException;
-import io.liveoak.spi.NotAcceptableException;
-import io.liveoak.spi.NotAuthorizedException;
-import io.liveoak.spi.ReadNotSupportedException;
-import io.liveoak.spi.ResourceAlreadyExistsException;
+import io.liveoak.spi.exceptions.CreateNotSupportedException;
+import io.liveoak.spi.exceptions.DeleteNotSupportedException;
+import io.liveoak.spi.exceptions.NotAcceptableException;
+import io.liveoak.spi.exceptions.NotAuthorizedException;
+import io.liveoak.spi.exceptions.ReadNotSupportedException;
+import io.liveoak.spi.exceptions.ResourceAlreadyExistsException;
 import io.liveoak.spi.ResourceErrorResponse;
-import io.liveoak.spi.ResourceNotFoundException;
+import io.liveoak.spi.exceptions.ResourceNotFoundException;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.ReturnFields;
-import io.liveoak.spi.UpdateNotSupportedException;
-import io.liveoak.spi.ResourceException;
+import io.liveoak.spi.exceptions.UpdateNotSupportedException;
+import io.liveoak.spi.exceptions.ResourceException;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>

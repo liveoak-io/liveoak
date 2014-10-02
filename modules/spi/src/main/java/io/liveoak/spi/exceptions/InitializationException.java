@@ -3,25 +3,25 @@
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-package io.liveoak.spi;
+package io.liveoak.spi.exceptions;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  */
-public class ConfigurationException extends InitializationException {
-    public ConfigurationException() {
+public class InitializationException extends Exception {
+    public InitializationException() {
         super();
     }
 
-    public ConfigurationException(String message) {
+    public InitializationException(String message) {
         super(message);
     }
 
-    public ConfigurationException(String message, Throwable cause) {
+    public InitializationException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ConfigurationException(Throwable cause) {
+    public InitializationException(Throwable cause) {
         super(cause);
     }
 }

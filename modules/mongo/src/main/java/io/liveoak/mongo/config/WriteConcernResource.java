@@ -1,7 +1,7 @@
 package io.liveoak.mongo.config;
 
 import com.mongodb.WriteConcern;
-import io.liveoak.spi.InitializationException;
+import io.liveoak.spi.exceptions.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;

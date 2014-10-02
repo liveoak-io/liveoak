@@ -16,7 +16,7 @@ import io.liveoak.pgsql.meta.Table;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
-import io.liveoak.spi.ResourceProcessingException;
+import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.resource.MapResource;
 import io.liveoak.spi.resource.async.DefaultRootResource;
 import io.liveoak.spi.resource.async.PropertySink;

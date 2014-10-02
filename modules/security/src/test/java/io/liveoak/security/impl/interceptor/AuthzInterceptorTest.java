@@ -17,7 +17,7 @@ import io.liveoak.security.extension.SecurityExtension;
 import io.liveoak.security.integration.AuthzServiceConfigResource;
 import io.liveoak.security.integration.AuthzServiceRootResource;
 import io.liveoak.spi.Services;
-import io.liveoak.spi.NotAuthorizedException;
+import io.liveoak.spi.exceptions.NotAuthorizedException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;

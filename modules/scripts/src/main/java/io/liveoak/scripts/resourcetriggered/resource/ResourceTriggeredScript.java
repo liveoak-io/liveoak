@@ -5,7 +5,7 @@ import java.util.List;
 
 import io.liveoak.scripts.common.Function;
 import io.liveoak.scripts.common.Script;
-import io.liveoak.spi.PropertyException;
+import io.liveoak.spi.exceptions.PropertyException;
 import io.netty.buffer.ByteBuf;
 
 /**

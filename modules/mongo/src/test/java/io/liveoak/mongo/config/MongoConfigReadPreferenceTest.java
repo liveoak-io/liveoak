@@ -1,7 +1,7 @@
 package io.liveoak.mongo.config;
 
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.spi.InitializationException;
+import io.liveoak.spi.exceptions.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import org.fest.assertions.Fail;

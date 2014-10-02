@@ -4,7 +4,7 @@ import java.net.URI;
 
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
-import io.liveoak.spi.ResourceProcessingException;
+import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 

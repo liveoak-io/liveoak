@@ -3,15 +3,14 @@
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-package io.liveoak.spi;
+package io.liveoak.spi.exceptions;
 
 /**
  * @author Bob McWhirter
  */
-public class CreateNotSupportedException extends ResourceException {
+public class ResourceNotFoundException extends ResourceException {
 
-    public CreateNotSupportedException(String path) {
-        super(path, "Create not supported for '" + path + "'");
+    public ResourceNotFoundException(String path) {
+        super(path, "Resource with id '" + path + "' not found");
     }
-
 }

@@ -7,7 +7,7 @@ import java.util.List;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 
-import io.liveoak.spi.PropertyException;
+import io.liveoak.spi.exceptions.PropertyException;
 import io.netty.buffer.ByteBuf;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 

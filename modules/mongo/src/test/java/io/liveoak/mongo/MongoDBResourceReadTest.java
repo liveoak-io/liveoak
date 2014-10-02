@@ -10,7 +10,7 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.ResourceNotFoundException;
+import io.liveoak.spi.exceptions.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
 import org.bson.types.ObjectId;
 import org.fest.assertions.Fail;
