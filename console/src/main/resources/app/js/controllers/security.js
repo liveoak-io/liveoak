@@ -42,13 +42,13 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
       var extraUri = pathElemsUri[pathElemsUri.length-1] === '*' ? -1 : 0;
       if (pathElemsUri.length + extraUri === 3) {
         // storage
-        if ($filter('filter')($scope.storageList, {'id': pathElemsUri[2]})) {
+        if ($filter('filter')($scope.storageList, {'id': pathElemsUri[2]}).length > 0) {
           $scope.securedStorages.uriPolicies.push($scope.uriPolicies[i]);
         }
       }
       else if (pathElemsUri.length + extraUri === 4) {
         // collection
-        if ($filter('filter')($scope.storageList, {'id': pathElemsUri[2]})) {
+        if ($filter('filter')($scope.storageList, {'id': pathElemsUri[2]}).length > 0) {
           $scope.securedCollections.uriPolicies.push($scope.uriPolicies[i]);
         }
       }
@@ -70,14 +70,14 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
       var extraAcl = pathElemsAcl[pathElemsAcl.length-1] === '*' ? -1 : 0;
       if (pathElemsAcl.length + extraAcl === 3) {
         // storage
-        if ($filter('filter')($scope.storageList, {'id': pathElemsAcl[2]})) {
+        if ($filter('filter')($scope.storageList, {'id': pathElemsAcl[2]}).length > 0) {
           $scope.securedStorages.aclPolicies.push($scope.acl[i]);
           console.log($scope.acl[i]);
         }
       }
       else if (pathElemsAcl.length + extraAcl === 4) {
         // collection
-        if ($filter('filter')($scope.storageList, {'id': pathElemsAcl[2]})) {
+        if ($filter('filter')($scope.storageList, {'id': pathElemsAcl[2]}).length > 0) {
           $scope.securedCollections.aclPolicies.push($scope.acl[i]);
         }
       }
