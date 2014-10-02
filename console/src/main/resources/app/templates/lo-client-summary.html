@@ -7,9 +7,9 @@
   </div>
   <div class="panel-body">
     <ul class="lo-app-opts">
-      <li><i class="fa fa-rocket" tooltip="Platform"></i>{{client.type}}</a></li>
-      <li><i class="fa fa-link" tooltip="Redirect URIs"></i><span ng-class="{'text-muted': client.kcClient.redirectUris.length == 0}">{{ client.kcClient.redirectUris.length > 0 && client.kcClient.redirectUris.join(", ") || "No Redirect URIs defined" }}<span></a></li>
-      <li><i class="fa fa-unlock" tooltip="Scope"></i><span ng-hide="client.realmRoles.length > 0" class="text-muted">No Roles specified</span><span ng-repeat="realmRole in client.realmRoles">{{ realmRole.name + ($last ? '' : ', ')}}</span></a></li>
+      <li><i class="fa fa-rocket" tooltip="Platform"></i>{{client.type}}</li>
+      <li><i class="fa fa-link" tooltip="Redirect URIs"></i><span ng-class="{'text-muted': client.kcClient.redirectUris.length == 0}">{{ client.kcClient.redirectUris.length > 0 && client.kcClient.redirectUris.join(", ") || "No Redirect URIs defined" }}</span></li>
+      <li><i class="fa fa-unlock" tooltip="Scope"></i><span ng-hide="client.realmRoles.length > 0" class="text-muted">No Roles specified</span><span ng-repeat="realmRole in client.realmRoles">{{ realmRole.name + ($last ? '' : ', ')}}</span></li>
     </ul>
   </div>
 </div>

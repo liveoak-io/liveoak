@@ -42,9 +42,9 @@
         </div>
         <div class="panel-body">
           <ul class="lo-app-opts">
-            <li><i class="fa fa-users" tooltip="Who can access"></i>{{ (securedStorages.uriPolicies | filter: {'uriPattern': '/'+curApp.id+'/'+s.id}:true | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
-            <li><i class="fa fa-plus" tooltip="Who can create"></i>{{ (securedStorages.uriPolicies | filter: {'uriPattern': '/'+curApp.id+'/'+s.id}:true | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
-            <li><i class="fa fa-unlock" tooltip="Entry creator can"></i>{{ (securedStorages.aclPolicies | filter: {'resourcePath': '/'+curApp.id+'/'+s.id}:true)[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</a></li>
+            <li><i class="fa fa-users" tooltip="Who can access"></i>{{ (securedStorages.uriPolicies | filter: {'uriPattern': '/'+curApp.id+'/'+s.id}:true | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</li>
+            <li><i class="fa fa-plus" tooltip="Who can create"></i>{{ (securedStorages.uriPolicies | filter: {'uriPattern': '/'+curApp.id+'/'+s.id}:true | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</li>
+            <li><i class="fa fa-unlock" tooltip="Entry creator can"></i>{{ (securedStorages.aclPolicies | filter: {'resourcePath': '/'+curApp.id+'/'+s.id}:true)[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</li>
           </ul>
         </div>
       </div>
@@ -64,9 +64,9 @@
         </div>
         <div class="panel-body">
           <ul class="lo-app-opts">
-            <li><i class="fa fa-users" tooltip="Who can access"></i>{{ (securedPush.uriPolicies | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
-            <li><i class="fa fa-plus" tooltip="Who can create"></i>{{ (securedPush.uriPolicies | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
-            <li><i class="fa fa-unlock" tooltip="Entry creator can"></i>{{ securedPush.aclPolicies[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</a></li>
+            <li><i class="fa fa-users" tooltip="Who can access"></i>{{ (securedPush.uriPolicies | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</li>
+            <li><i class="fa fa-plus" tooltip="Who can create"></i>{{ (securedPush.uriPolicies | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</li>
+            <li><i class="fa fa-unlock" tooltip="Entry creator can"></i>{{ securedPush.aclPolicies[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</li>
           </ul>
         </div>
       </div>
@@ -81,9 +81,9 @@
         </div>
         <div class="panel-body">
           <ul class="lo-app-opts">
-            <li><i class="fa fa-users" tooltip="Who can access"></i>{{ (securedClients.uriPolicies | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
-            <li><i class="fa fa-plus" tooltip="Who can create"></i>{{ (securedClients.uriPolicies | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
-            <li><i class="fa fa-unlock" tooltip="Entry creator can"></i>{{ securedClients.aclPolicies[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</a></li>
+            <li><i class="fa fa-users" tooltip="Who can access"></i>{{ (securedClients.uriPolicies | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</li>
+            <li><i class="fa fa-plus" tooltip="Who can create"></i>{{ (securedClients.uriPolicies | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</li>
+            <li><i class="fa fa-unlock" tooltip="Entry creator can"></i>{{ securedClients.aclPolicies[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</li>
           </ul>
         </div>
       </div>
@@ -98,9 +98,9 @@
         </div>
         <div class="panel-body">
           <ul class="lo-app-opts">
-            <li><i class="fa fa-users" tooltip="Who can access"></i>{{ (securedBusinessLogic.uriPolicies | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
-            <li><i class="fa fa-plus" tooltip="Who can create"></i>{{ (securedBusinessLogic.uriPolicies | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</a></li>
-            <li><i class="fa fa-unlock" tooltip="Entry creator can"></i>{{ securedBusinessLogic.aclPolicies[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</a></li>
+            <li><i class="fa fa-users" tooltip="Who can access"></i>{{ (securedBusinessLogic.uriPolicies | filter: {'requestTypes': 'READ'})[0].allowedRoles.join(', ') || 'Unsecured' }}</li>
+            <li><i class="fa fa-plus" tooltip="Who can create"></i>{{ (securedBusinessLogic.uriPolicies | filter: {'requestTypes': 'CREATE'})[0].allowedRoles.join(', ') || 'Unsecured' }}</li>
+            <li><i class="fa fa-unlock" tooltip="Entry creator can"></i>{{ securedBusinessLogic.aclPolicies[0].autoAddedOwnerPermissions.join(', ') || 'N/A'}}</li>
           </ul>
         </div>
       </div>
@@ -197,7 +197,7 @@
         <li><i class="fa fa-chevron-right"></i><a href="#">logic_name</a></li>
       </ul>
 
-      
+      </section>
     </div>
   </div>
 </div>
