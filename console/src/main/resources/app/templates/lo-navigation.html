@@ -2,7 +2,7 @@
   <div class="dropdown">
     <a class="dropdown-toggle" href="#">{{curApp.name}}<b class="caret"></b></a>
     <ul class="dropdown-menu">
-      <li ng-repeat="app in applications" ng-class="{active: app.id == curApp.id}"><a ng-href="#/applications/{{app.id}}/{{current}}">{{ app.name | characters: 35 :true }}</a></li>
+      <li ng-repeat="app in applications | filter: {visible: true}" ng-class="{active: app.id == curApp.id}"><a ng-href="#/applications/{{app.id}}/{{current}}">{{ app.name | characters: 35 :true }}</a></li>
     </ul>
   </div>
 

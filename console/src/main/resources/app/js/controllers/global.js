@@ -69,10 +69,10 @@ loMod.controller('HomeCtrl', function($log, $rootScope, $scope, $location, $filt
   }
 });
 
-loMod.controller('NavigationCtrl', function($scope, $rootScope, $filter, LoApp) {
+loMod.controller('NavigationCtrl', function($scope, $rootScope, $filter, loLiveLoader, LoLiveAppList) {
 
-  LoApp.getList(function(data){
-    $rootScope.applications = $filter('filter')(data.members, {'visible': true});
+  loLiveLoader(LoLiveAppList.getList).then(function(data){
+    $scope.applications = data.members;
   });
 
   $scope.$watch('oPath', function() {
