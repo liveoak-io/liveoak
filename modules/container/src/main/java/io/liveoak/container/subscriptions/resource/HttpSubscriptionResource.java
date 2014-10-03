@@ -1,12 +1,13 @@
 package io.liveoak.container.subscriptions.resource;
 
-import io.liveoak.common.codec.DefaultResourceState;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.liveoak.container.subscriptions.HttpSubscription;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
-import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
@@ -29,11 +30,11 @@ public class HttpSubscriptionResource implements SynchronousResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
-        result.putProperty("type", "http");
-        result.putProperty("path", this.subscription.resourcePath().toString());
-        result.putProperty("destination", this.subscription.destination().toString());
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, String> result = new HashMap<>();
+        result.put("type", "http");
+        result.put("path", this.subscription.resourcePath().toString());
+        result.put("destination", this.subscription.destination().toString());
         return result;
     }
 

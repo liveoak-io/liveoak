@@ -8,9 +8,10 @@ package io.liveoak.mongo.gridfs;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.mongodb.DB;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
@@ -52,10 +53,10 @@ public class GridFSRootResource extends GridFSDirectoryResource implements RootR
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
-        result.putProperty("name", "GridFS");
-        result.putProperty("version", "1.0");
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, String> result = new HashMap<>();
+        result.put("name", "GridFS");
+        result.put("version", "1.0");
         return result;
     }
 

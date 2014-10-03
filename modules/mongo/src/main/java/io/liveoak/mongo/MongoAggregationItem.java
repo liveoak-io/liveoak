@@ -6,14 +6,14 @@
 package io.liveoak.mongo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -30,8 +30,8 @@ public class MongoAggregationItem extends MongoObjectResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, Object> result = new HashMap<>();
         Set<String> keys = this.dbObject.keySet();
         for (String key : keys) {
             Object value = this.dbObject.get(key);
@@ -42,7 +42,7 @@ public class MongoAggregationItem extends MongoObjectResource {
             }
 
             if (supportedObject(value)) {
-                result.putProperty(key, value);
+                result.put(key, value);
             } else {
                 log.warn("Unsupported Property type: " + value.getClass() + " cannot encode.");
             }

@@ -8,10 +8,12 @@ package io.liveoak.security.policy.drools.integration;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.common.util.ResourceConversionUtils;
@@ -56,7 +58,7 @@ public class DroolsPolicyConfigResource implements RootResource, SynchronousReso
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
         ObjectMapper om = ObjectMapperFactory.create();
         // TODO: performance as Object is converted couple of times into various formats...
         String str = om.writeValueAsString(this.droolsPolicyConfig);
@@ -65,7 +67,7 @@ public class DroolsPolicyConfigResource implements RootResource, SynchronousReso
         List<ResourceState> childResourceStates = (List<ResourceState>) resourceState.getProperty(RULES_PROPERTY);
         List<Resource> childResources = ResourceConversionUtils.convertList(childResourceStates, this);
         resourceState.putProperty(RULES_PROPERTY, childResources);
-        return resourceState;
+        return new DefaultResourceState(resourceState).propertyMap();
     }
 
     @Override

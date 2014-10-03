@@ -1,7 +1,9 @@
 package io.liveoak.container.extension;
 
 import java.util.List;
+import java.util.Map;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
@@ -28,8 +30,8 @@ public class MockAdminResource extends MockResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        return this.props;
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        return new DefaultResourceState(this.props).propertyMap();
     }
 
     @Override

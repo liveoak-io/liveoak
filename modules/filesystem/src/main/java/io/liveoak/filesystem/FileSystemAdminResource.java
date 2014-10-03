@@ -1,6 +1,5 @@
 package io.liveoak.filesystem;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
@@ -9,6 +8,8 @@ import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Bob McWhirter
@@ -36,9 +37,9 @@ public class FileSystemAdminResource implements RootResource, SynchronousResourc
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
-        result.putProperty("directory", this.directory.getAbsolutePath());
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, String> result = new HashMap<>();
+        result.put("directory", this.directory.getAbsolutePath());
         return result;
     }
 

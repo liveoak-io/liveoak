@@ -1,6 +1,7 @@
 package io.liveoak.spi.resource;
 
 import java.util.Collection;
+import java.util.Map;
 
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -31,7 +32,7 @@ public interface SynchronousResource extends Resource {
         return null;
     }
 
-    default ResourceState properties(RequestContext ctx) throws Exception {
+    default Map<String, ?> properties(RequestContext ctx) throws Exception {
         return null;
     }
 
@@ -68,11 +69,11 @@ public interface SynchronousResource extends Resource {
 
     @Override
     default void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        ResourceState props = properties(ctx);
+        Map<String, ?> props = properties(ctx);
 
         if (props != null) {
-            for (String key : props.getPropertyNames() ) {
-                sink.accept(key, props.getProperty( key ) );
+            for (Map.Entry<String, ?> entry : props.entrySet() ) {
+                sink.accept(entry.getKey(), entry.getValue());
             }
         }
 

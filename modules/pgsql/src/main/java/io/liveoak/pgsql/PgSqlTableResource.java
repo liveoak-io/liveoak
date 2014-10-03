@@ -10,11 +10,12 @@ import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.meta.Catalog;
 import io.liveoak.pgsql.meta.Column;
@@ -58,7 +59,7 @@ public class PgSqlTableResource implements SynchronousResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
 
         // perform select and store it for readMembers
         if (results != null) {
@@ -72,10 +73,10 @@ public class PgSqlTableResource implements SynchronousResource {
         batch.put(LiveOak.HREF, uri() + SCHEMA_ENDPOINT);
         links.add(batch);
 
-        ResourceState result = new DefaultResourceState();
-        result.putProperty("links", links);
-        result.putProperty("count", results.count());
-        result.putProperty("type", "collection");
+        Map<String, Object> result = new HashMap<>();
+        result.put("links", links);
+        result.put("count", results.count());
+        result.put("type", "collection");
         return result;
     }
 

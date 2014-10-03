@@ -6,7 +6,9 @@
 package io.liveoak.mongo;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -15,7 +17,6 @@ import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceParams;
@@ -186,18 +187,18 @@ public class MongoCollectionResource extends MongoResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
-        result.putProperty("type", "collection");
-        result.putProperty("count", dbCollection.getCount());
-        result.putProperty("capped", dbCollection.isCapped());
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, Object> result = new HashMap<>();
+        result.put("type", "collection");
+        result.put("count", dbCollection.getCount());
+        result.put("capped", dbCollection.isCapped());
 
         DBObject collectionDBObject = getDBCollection().getDB().getCollection( "system" ).getCollection( "namespaces" ).findOne( new BasicDBObject ( "name", this.getDBCollection().getFullName()));
 
         if (collectionDBObject != null && collectionDBObject.get("options") != null) {
             DBObject collectionOptions = (DBObject) collectionDBObject.get( "options" );
-            result.putProperty("max", collectionOptions.get( "max" ));
-            result.putProperty("size", collectionOptions.get("size"));
+            result.put("max", collectionOptions.get( "max" ));
+            result.put("size", collectionOptions.get("size"));
         }
 
         return result;

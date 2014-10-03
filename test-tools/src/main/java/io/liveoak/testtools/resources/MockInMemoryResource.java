@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
@@ -68,13 +67,8 @@ public class MockInMemoryResource implements SynchronousResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState state = new DefaultResourceState(id);
-        for (String id : properties.keySet()) {
-            state.putProperty(id, properties.get(id));
-        }
-        state.uri(uri());
-        return state;
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        return properties;
     }
 
     @Override

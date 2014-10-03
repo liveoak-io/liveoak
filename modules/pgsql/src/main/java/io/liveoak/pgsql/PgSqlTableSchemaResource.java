@@ -6,10 +6,11 @@
 package io.liveoak.pgsql;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.pgsql.meta.Column;
 import io.liveoak.pgsql.meta.ForeignKey;
 import io.liveoak.pgsql.meta.Table;
@@ -17,9 +18,7 @@ import io.liveoak.pgsql.meta.TableRef;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.MapResource;
 import io.liveoak.spi.resource.SynchronousResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -45,7 +44,7 @@ public class PgSqlTableSchemaResource  implements SynchronousResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
 
         Table table = parent.catalog().table(new TableRef(id));
 
@@ -65,8 +64,8 @@ public class PgSqlTableSchemaResource  implements SynchronousResource {
             cols.add(col);
         }
 
-        ResourceState result = new DefaultResourceState();
-        result.putProperty("columns", cols);
+        Map<String, Object> result = new HashMap<>();
+        result.put("columns", cols);
 
         List<Column> pkColumns = table.pk().columns();
         List<String> pkcols = new LinkedList<>();
@@ -74,7 +73,7 @@ public class PgSqlTableSchemaResource  implements SynchronousResource {
             pkcols.add(c.name());
         }
 
-        result.putProperty("primary-key", pkcols);
+        result.put("primary-key", pkcols);
 
         List<ForeignKey> fks = table.foreignKeys();
         if (fks != null && fks.size() > 0) {
@@ -91,10 +90,10 @@ public class PgSqlTableSchemaResource  implements SynchronousResource {
                 fkspec.put("columns", fkcols);
                 fkspecs.add(fkspec);
             }
-            result.putProperty("foreign-keys", fkspecs);
+            result.put("foreign-keys", fkspecs);
         }
 
-        result.putProperty("ddl", table.ddl());
+        result.put("ddl", table.ddl());
         return result;
     }
 }

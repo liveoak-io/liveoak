@@ -1,8 +1,9 @@
 package io.liveoak.interceptor.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.container.interceptor.InterceptorManager;
@@ -42,9 +43,9 @@ public class InterceptorSystemResource implements RootResource, SynchronousResou
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
 
-        ResourceState result = new DefaultResourceState();
+        Map<String, Object> result = new HashMap<>();
         ResourceState resourceState = this.interceptorManager.getInterceptorsConfig();
 
         for (String key : resourceState.getPropertyNames()) {
@@ -52,7 +53,7 @@ public class InterceptorSystemResource implements RootResource, SynchronousResou
 
             // Convert "ResourceState" to "Resource" as this is expected by encoders
             List<Resource> resources = ResourceConversionUtils.convertList(resourceStates, this);
-            result.putProperty(key, resources);
+            result.put(key, resources);
         }
         return result;
     }

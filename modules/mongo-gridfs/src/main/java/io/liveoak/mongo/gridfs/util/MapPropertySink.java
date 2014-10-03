@@ -1,24 +1,24 @@
 package io.liveoak.mongo.gridfs.util;
 
+import java.util.Map;
 import java.util.function.BiFunction;
 
 import io.liveoak.spi.resource.async.PropertySink;
-import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class ResourceStatePropertySink implements PropertySink {
+public class MapPropertySink implements PropertySink {
 
-    private ResourceState state;
+    private Map<String, Object> properties;
 
-    public ResourceStatePropertySink(ResourceState state) {
-        this.state = state;
+    public MapPropertySink(Map<String, Object> properties) {
+        this.properties = properties;
     }
 
     @Override
     public void accept(String name, Object value) {
-        state.putProperty(name, value);
+        properties.put(name, value);
     }
 
     @Override

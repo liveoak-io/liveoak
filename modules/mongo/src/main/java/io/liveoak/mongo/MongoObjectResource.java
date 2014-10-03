@@ -8,17 +8,17 @@ package io.liveoak.mongo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
@@ -55,9 +55,9 @@ public class MongoObjectResource extends MongoResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
         // TODO: only read properties specified in the return fields and not everything
-        ResourceState result = new DefaultResourceState();
+        Map<String, Object> result = new HashMap<>();
         Set<String> keys = getDBObject().keySet();
         for (String key : keys) {
             if (!key.equals(MONGO_ID_FIELD) && !key.equals(LiveOak.ID)) {
@@ -71,7 +71,7 @@ public class MongoObjectResource extends MongoResource {
                 }
 
                 if (supportedObject(value)) {
-                    result.putProperty(key, value);
+                    result.put(key, value);
                 } else {
                     log.warn("Unsupported Property type " + value.getClass() + " cannot encode.");
                 }

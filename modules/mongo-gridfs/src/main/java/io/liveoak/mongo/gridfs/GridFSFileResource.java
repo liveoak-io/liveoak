@@ -5,11 +5,12 @@
  */
 package io.liveoak.mongo.gridfs;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.mongo.gridfs.util.ResourceStatePropertySink;
+import io.liveoak.mongo.gridfs.util.MapPropertySink;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Responder;
@@ -41,10 +42,10 @@ public class GridFSFileResource extends GridFSResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
 
-        ResourceState result = new DefaultResourceState();
-        readFileInfo(new ResourceStatePropertySink(result));
+        Map<String, Object> result = new HashMap<>();
+        readFileInfo(new MapPropertySink(result));
 
         String blobPath = getBlobUri();
         String selfPath = getSelfUri();
@@ -64,7 +65,7 @@ public class GridFSFileResource extends GridFSResource {
                 .put("rel", "blob")
                 .put(LiveOak.HREF, blobPath));
 
-        result.putProperty("links", links);
+        result.put("links", links);
         return result;
     }
 

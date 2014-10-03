@@ -2,10 +2,11 @@ package io.liveoak.ups.resource;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -37,9 +38,9 @@ public class AliasResource implements SubscriptionResourceParent {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
-        result.putProperty("subject", alias.subject());
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, String> result = new HashMap();
+        result.put("subject", alias.subject());
         return result;
     }
 

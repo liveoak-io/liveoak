@@ -8,11 +8,12 @@ package io.liveoak.pgsql;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.pgsql.meta.Catalog;
 import io.liveoak.pgsql.meta.QueryBuilder;
 import io.liveoak.pgsql.meta.Table;
@@ -75,7 +76,7 @@ public class PgSqlRootResource extends DefaultRootResource implements Synchronou
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
 
         // determine table names
         List<String> tables = catalog().tableIds();
@@ -89,14 +90,14 @@ public class PgSqlRootResource extends DefaultRootResource implements Synchronou
         batch.put(LiveOak.HREF, uri() + "/" + BATCH_ENDPOINT);
         links.add(batch);
 
-        ResourceState result = new DefaultResourceState();
-        result.putProperty("links", links);
+        Map<String, Object> result = new HashMap<>();
+        result.put("links", links);
 
         // here only set num of tables as size
-        result.putProperty("count", tables.size());
+        result.put("count", tables.size());
 
         // maybe some other things to do with db as a whole
-        result.putProperty("type", "database");
+        result.put("type", "database");
         return result;
     }
 

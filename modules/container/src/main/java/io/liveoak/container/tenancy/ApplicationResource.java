@@ -2,8 +2,9 @@ package io.liveoak.container.tenancy;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.zero.ApplicationExtensionsResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
@@ -61,12 +62,12 @@ public class ApplicationResource implements RootResource, SynchronousResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
-        result.putProperty("name", this.app.name());
-        result.putProperty("html-app", this.app.htmlApplicationResourcePath());
-        result.putProperty("visible", this.app.visible());
-        result.putProperty("directory", this.app.directory().getAbsolutePath());
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, Object> result = new HashMap<>();
+        result.put("name", this.app.name());
+        result.put("html-app", this.app.htmlApplicationResourcePath());
+        result.put("visible", this.app.visible());
+        result.put("directory", this.app.directory().getAbsolutePath());
         return result;
     }
 

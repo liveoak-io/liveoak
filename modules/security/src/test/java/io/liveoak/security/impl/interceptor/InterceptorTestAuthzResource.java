@@ -6,15 +6,15 @@
 
 package io.liveoak.security.impl.interceptor;
 
-import io.liveoak.common.codec.DefaultResourceState;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -49,10 +49,10 @@ public class InterceptorTestAuthzResource implements RootResource, SynchronousRe
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, String> result = new HashMap<>();
         AuthzDecision decision = worker == null ? AuthzDecision.IGNORE : worker.isAuthorized(ctx);
-        result.putProperty(AuthzConstants.ATTR_AUTHZ_POLICY_RESULT, decision.toString());
+        result.put(AuthzConstants.ATTR_AUTHZ_POLICY_RESULT, decision.toString());
         return result;
     }
 

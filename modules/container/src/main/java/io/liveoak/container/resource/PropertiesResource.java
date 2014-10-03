@@ -5,12 +5,12 @@
  */
 package io.liveoak.container.resource;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -23,11 +23,11 @@ public class PropertiesResource implements SynchronousResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, String> result = new HashMap<>();
         Properties allProps = System.getProperties();
         for (String key : allProps.stringPropertyNames()) {
-            result.putProperty(key, allProps.getProperty(key));
+            result.put(key, allProps.getProperty(key));
         }
         return result;
     }

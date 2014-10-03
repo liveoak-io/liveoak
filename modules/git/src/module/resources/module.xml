@@ -13,7 +13,6 @@
 
     <dependencies>
         <module name="io.liveoak.spi"/>
-        <module name="io.liveoak.common"/>
         <module name="io.liveoak.filesystem"/>
         <module name="org.eclipse.jgit"/>
     </dependencies>

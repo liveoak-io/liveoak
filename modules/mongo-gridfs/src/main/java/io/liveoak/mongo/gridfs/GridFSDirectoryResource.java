@@ -8,17 +8,18 @@ package io.liveoak.mongo.gridfs;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.mongo.gridfs.util.ResourceStatePropertySink;
+import io.liveoak.mongo.gridfs.util.MapPropertySink;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
@@ -84,15 +85,15 @@ public class GridFSDirectoryResource extends GridFSResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
 
-        ResourceState result = new DefaultResourceState();
+        Map<String, Object> result = new HashMap<>();
 
         if (fileInfo() != null) {
-            readFileInfo(new ResourceStatePropertySink(result));
+            readFileInfo(new MapPropertySink(result));
         }
         //sink.accept("owner", fileInfo.get("owner"));
-        result.putProperty("dir", true);
+        result.put("dir", true);
 
         String selfPath = getSelfUri();
         String parentPath = getParentUri();
@@ -107,7 +108,7 @@ public class GridFSDirectoryResource extends GridFSResource {
                     .put("rel", "parent")
                     .put(LiveOak.HREF, parentPath));
         }
-        result.putProperty("links", links);
+        result.put("links", links);
 
         return result;
     }

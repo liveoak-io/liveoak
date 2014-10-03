@@ -1,8 +1,10 @@
 package io.liveoak.container.zero;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;
@@ -33,10 +35,10 @@ public class SimpleApplicationClientResource implements SynchronousResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
-        result.putProperty("type", this.type);
-        result.putProperty("security-key", this.securityKey);
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, String> result = new HashMap<>();
+        result.put("type", this.type);
+        result.put("security-key", this.securityKey);
         return result;
     }
 

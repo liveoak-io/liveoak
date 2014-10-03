@@ -13,7 +13,6 @@
 
     <dependencies>
         <module name="io.liveoak.spi"/>
-        <module name="io.liveoak.common"/>
     </dependencies>
 
 </module>

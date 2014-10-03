@@ -28,7 +28,6 @@ import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.resource.SynchronousResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
@@ -83,12 +82,12 @@ public class PgSqlRowResource implements SynchronousResource {
         return id;
     }
 
-    public ResourceState properties(RequestContext ctx) throws Exception {
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
         if (row == null) {
             return null;
         }
 
-        ResourceState result = new DefaultResourceState();
+        Map<String, Object> result = new HashMap<>();
         Catalog cat = parent.parent().catalog();
         Table table = cat.table(new TableRef(parent.id()));
         HashMap<ForeignKey, String[]> fkMap = new HashMap<>();
@@ -120,7 +119,7 @@ public class PgSqlRowResource implements SynchronousResource {
                     i++;
                 }
             } else {
-                result.putProperty(ent.getKey(), ent.getValue());
+                result.put(ent.getKey(), ent.getValue());
             }
         }
 
@@ -159,7 +158,7 @@ public class PgSqlRowResource implements SynchronousResource {
         }
 
         for (Map.Entry<String, ?> ent: new TreeMap<>(stacked).entrySet()) {
-            result.putProperty(ent.getKey(), ent.getValue());
+            result.put(ent.getKey(), ent.getValue());
         }
 
 
@@ -167,7 +166,7 @@ public class PgSqlRowResource implements SynchronousResource {
         for (Map.Entry<ForeignKey, String[]> ent : fkMap.entrySet()) {
             String fkTable = cat.table(ent.getKey().tableRef()).id();
             String fkField = ent.getKey().fieldName();
-            result.putProperty(fkField, new PgSqlResourceRef(
+            result.put(fkField, new PgSqlResourceRef(
                     new PgSqlTableResource(parent.parent(), fkTable),
                     PrimaryKey.spliceId(ent.getValue())));
         }

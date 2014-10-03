@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
@@ -54,19 +53,19 @@ public class SchedulerResource implements RootResource, SynchronousResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, Object> result = new HashMap<>();
         if (this.scheduler.isStarted()) {
-            result.putProperty("status", "started");
+            result.put("status", "started");
         } else {
-            result.putProperty("stats", "stopped");
+            result.put("stats", "stopped");
         }
 
-        result.putProperty("name", this.scheduler.getSchedulerName());
-        result.putProperty("instance-id", this.scheduler.getSchedulerInstanceId());
+        result.put("name", this.scheduler.getSchedulerName());
+        result.put("instance-id", this.scheduler.getSchedulerInstanceId());
 
         SchedulerMetaData metaData = this.scheduler.getMetaData();
-        result.putProperty("running-since", metaData.getRunningSince());
+        result.put("running-since", metaData.getRunningSince());
         return result;
     }
 

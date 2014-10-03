@@ -19,7 +19,6 @@
 
     <dependencies>
         <module name="io.liveoak.spi"/>
-        <module name="io.liveoak.common"/>
         <module name="io.liveoak.mongo"/>
         <module name="net.iharder"/>
         <system>

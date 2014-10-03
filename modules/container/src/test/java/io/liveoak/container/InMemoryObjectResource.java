@@ -5,6 +5,9 @@
  */
 package io.liveoak.container;
 
+import java.util.Map;
+
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.resource.SynchronousResource;
@@ -42,8 +45,8 @@ public class InMemoryObjectResource implements SynchronousResource, BlockingReso
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        return state;
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        return new DefaultResourceState(state).propertyMap();
     }
 
     @Override

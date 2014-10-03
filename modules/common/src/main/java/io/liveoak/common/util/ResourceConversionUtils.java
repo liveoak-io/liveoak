@@ -2,7 +2,9 @@ package io.liveoak.common.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -35,8 +37,8 @@ public class ResourceConversionUtils {
             }
 
             @Override
-            public ResourceState properties(RequestContext ctx) throws Exception {
-                return resourceState;
+            public Map<String, ?> properties(RequestContext ctx) throws Exception {
+                return new DefaultResourceState(resourceState).propertyMap();
             }
         };
     }

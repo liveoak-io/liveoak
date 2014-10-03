@@ -1,10 +1,10 @@
 package io.liveoak.keycloak;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
@@ -48,11 +48,11 @@ public class KeycloakConfigRootResource implements RootResource, SynchronousReso
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
-        result.putProperty(KEYCLOAK_URL, config.getBaseUrl());
-        result.putProperty(PUBLIC_KEYS, config.getPublicKeyPems());
-        result.putProperty(LOAD_PUBLIC_KEYS, config.isLoadKeys());
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, Object> result = new HashMap<>();
+        result.put(KEYCLOAK_URL, config.getBaseUrl());
+        result.put(PUBLIC_KEYS, config.getPublicKeyPems());
+        result.put(LOAD_PUBLIC_KEYS, config.isLoadKeys());
         return result;
     }
 

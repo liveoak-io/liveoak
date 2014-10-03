@@ -26,11 +26,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-common</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <scope>compile</scope>

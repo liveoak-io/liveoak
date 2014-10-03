@@ -7,6 +7,7 @@ package io.liveoak.common.codec;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,17 @@ public class DefaultResourceState implements ResourceState {
 
     public DefaultResourceState(String id) {
         this.id = id;
+    }
+
+    public DefaultResourceState(ResourceState state) {
+        this.id = state.id();
+        this.uri = state.uri();
+        for (String name: state.getPropertyNames()) {
+            properties.put(name, state.getProperty(name));
+        }
+        for (ResourceState member: state.members()) {
+            members.add(member);
+        }
     }
 
     @Override
@@ -60,6 +72,10 @@ public class DefaultResourceState implements ResourceState {
     @Override
     public Object removeProperty(String name) {
         return this.properties.remove(name);
+    }
+
+    public Map<String, ?> propertyMap() {
+        return Collections.unmodifiableMap(this.properties);
     }
 
     @Override

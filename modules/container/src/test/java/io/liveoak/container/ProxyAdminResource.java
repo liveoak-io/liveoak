@@ -1,6 +1,8 @@
 package io.liveoak.container;
 
-import io.liveoak.common.codec.DefaultResourceState;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.extension.ServiceRestarter;
 import io.liveoak.spi.resource.RootResource;
@@ -50,9 +52,9 @@ public class ProxyAdminResource implements SynchronousResource, RootResource, Pr
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        DefaultResourceState state = new DefaultResourceState();
-        state.putProperty("blocking", this.blocking);
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, Object> state = new HashMap<>();
+        state.put("blocking", this.blocking);
         return state;
     }
 

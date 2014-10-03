@@ -6,6 +6,8 @@
 package io.liveoak.mongo;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,7 +18,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.mongo.config.RootMongoConfigResource;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
@@ -139,14 +140,14 @@ public class RootMongoResource extends MongoResource implements RootResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) {
-        ResourceState result = new DefaultResourceState();
-        result.putProperty("type", "database");
+    public Map<String, ?> properties(RequestContext ctx) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("type", "database");
         int count = this.db().getCollectionNames().size();
         if (count >= 1) {
             count = count - 1; // -1 due to not showing internal 'system.index' collection, which exists if another collection exists
         }
-        result.putProperty("count", count);
+        result.put("count", count);
         return result;
     }
 

@@ -1,21 +1,18 @@
 package io.liveoak.scheduler;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import io.liveoak.common.DefaultResourceResponse;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.resource.SynchronousResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
-import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 import org.quartz.CronTrigger;
 import org.quartz.JobExecutionContext;
-import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 
 /**
@@ -39,12 +36,12 @@ public class TriggerResource implements SynchronousResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
-        result.putProperty("cron", ((CronTrigger) this.trigger).getCronExpression());
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, Object> result = new HashMap<>();
+        result.put("cron", ((CronTrigger) this.trigger).getCronExpression());
 
         Trigger.TriggerState state = this.parent.scheduler().getTriggerState(this.trigger.getKey());
-        result.putProperty("state", state.toString().toLowerCase());
+        result.put("state", state.toString().toLowerCase());
         return result;
     }
 

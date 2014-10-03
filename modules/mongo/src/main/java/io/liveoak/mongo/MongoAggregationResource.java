@@ -5,13 +5,16 @@
  */
 package io.liveoak.mongo;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBList;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 
-import io.liveoak.common.codec.DefaultResourceState;
+
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 
@@ -62,9 +65,9 @@ public class MongoAggregationResource extends MongoAggregationItem {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
-        result.putProperty("result", getResourceCollection(aggregate(ctx)));
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, Object> result = new HashMap<>();
+        result.put("result", getResourceCollection(aggregate(ctx)));
         return result;
     }
 

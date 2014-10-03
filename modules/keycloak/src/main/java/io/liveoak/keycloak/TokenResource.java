@@ -3,15 +3,14 @@ package io.liveoak.keycloak;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
 import org.keycloak.VerificationException;
 import org.keycloak.jose.jws.JWSInput;
 import org.keycloak.jose.jws.crypto.RSAProvider;
@@ -43,15 +42,15 @@ public class TokenResource implements SynchronousResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
 
-        ResourceState result = new DefaultResourceState();
+        Map<String, Object> result = new HashMap<>();
         try {
             AccessToken token = parseToken(id);
 
-            result.putProperty("realm", token.getAudience());
-            result.putProperty("subject", token.getSubject());
-            result.putProperty("issued-at", new Date(token.getIssuedAt()));
+            result.put("realm", token.getAudience());
+            result.put("subject", token.getSubject());
+            result.put("issued-at", new Date(token.getIssuedAt()));
 
             Set<String> roles = new HashSet<>();
 
@@ -73,10 +72,10 @@ public class TokenResource implements SynchronousResource {
                 }
             }
 
-            result.putProperty("roles", roles);
+            result.put("roles", roles);
 
         } catch (Throwable e) {
-            result.putProperty("error", e.getMessage());
+            result.put("error", e.getMessage());
         }
         return result;
     }

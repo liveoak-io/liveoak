@@ -5,7 +5,6 @@
  */
 package io.liveoak.mongo;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.ResourceProcessingException;
@@ -16,7 +15,9 @@ import io.liveoak.spi.state.ResourceState;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.mongodb.BasicDBList;
@@ -66,9 +67,9 @@ public class MongoBaseObjectResource extends MongoObjectResource {
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
         // TODO: only read properties specified in the return fields and not everything
-        ResourceState result = new DefaultResourceState();
+        Map<String, Object> result = new HashMap<>();
         ReturnFields returnFields = ctx.returnFields();
 
         DBObject dbObject = getDBObject();
@@ -90,7 +91,7 @@ public class MongoBaseObjectResource extends MongoObjectResource {
                 }
 
                 if (supportedObject(value)) {
-                    result.putProperty(key, value);
+                    result.put(key, value);
                 } else {
                     log.warn("Unsupported Property type " + value.getClass() + " cannot encode.");
                 }

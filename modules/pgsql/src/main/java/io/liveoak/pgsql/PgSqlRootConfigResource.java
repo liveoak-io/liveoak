@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.pgsql.meta.Catalog;
 import io.liveoak.pgsql.meta.Column;
 import io.liveoak.pgsql.meta.ForeignKey;
@@ -29,7 +28,6 @@ import io.liveoak.spi.exceptions.InitializationException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.DefaultRootResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
@@ -92,30 +90,30 @@ public class PgSqlRootConfigResource extends DefaultRootResource implements Sync
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, Object> result = new HashMap<>();
         PGPoolingDataSource ds = this.ds;
-        result.putProperty("server", ds.getServerName() );
-        result.putProperty("port", ds.getPortNumber());
-        result.putProperty("db", ds.getDatabaseName());
-        result.putProperty("user", ds.getUser());
-        result.putProperty("password", ds.getPassword());
-        result.putProperty("max-connections", ds.getMaxConnections());
-        result.putProperty("initial-connections", ds.getInitialConnections());
+        result.put("server", ds.getServerName() );
+        result.put("port", ds.getPortNumber());
+        result.put("db", ds.getDatabaseName());
+        result.put("user", ds.getUser());
+        result.put("password", ds.getPassword());
+        result.put("max-connections", ds.getMaxConnections());
+        result.put("initial-connections", ds.getInitialConnections());
 
         List<String> schemas = configuration.exposedSchemas();
         if (schemas != null && schemas.size() > 0) {
-            result.putProperty("schemas", schemas);
+            result.put("schemas", schemas);
         }
 
         schemas = configuration.blockedSchemas();
         if (schemas != null && schemas.size() > 0) {
-            result.putProperty("blocked-schemas", schemas);
+            result.put("blocked-schemas", schemas);
         }
         if (configuration.defaultSchema() != null) {
-            result.putProperty("default-schema", configuration.defaultSchema());
+            result.put("default-schema", configuration.defaultSchema());
         }
-        result.putProperty("allow-create-schema", configuration.allowCreateSchema());
+        result.put("allow-create-schema", configuration.allowCreateSchema());
         return result;
     }
 

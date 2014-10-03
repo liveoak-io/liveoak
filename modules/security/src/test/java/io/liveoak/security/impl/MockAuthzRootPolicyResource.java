@@ -1,15 +1,14 @@
 package io.liveoak.security.impl;
 
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
@@ -52,9 +51,9 @@ public class MockAuthzRootPolicyResource implements RootResource, SynchronousRes
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
-        ResourceState result = new DefaultResourceState();
-        result.putProperty(AuthzConstants.ATTR_AUTHZ_POLICY_RESULT, authzDecision.toString());
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        Map<String, String> result = new HashMap<>();
+        result.put(AuthzConstants.ATTR_AUTHZ_POLICY_RESULT, authzDecision.toString());
         return result;
     }
 

@@ -1,5 +1,8 @@
 package io.liveoak.container;
 
+import java.util.Map;
+
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.BlockingResource;
@@ -37,10 +40,10 @@ public class BlockingProxyResource implements RootResource, BlockingResource, Sy
     }
 
     @Override
-    public ResourceState properties(RequestContext ctx) throws Exception {
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
         RequestContext requestContext = new RequestContext.Builder().build();
         ResourceState result = client.read(requestContext, "/testApp/db/people/blockingproxybob");
-        return result;
+        return new DefaultResourceState(result).propertyMap();
     }
 
 }
