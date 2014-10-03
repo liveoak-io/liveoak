@@ -2,7 +2,7 @@ package io.liveoak.container.zero;
 
 import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
-import io.liveoak.container.tenancy.MediaTypeResourceRegistry;
+import io.liveoak.common.MediaTypeMountPointResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.resource.async.Responder;
@@ -11,7 +11,7 @@ import io.liveoak.spi.state.ResourceState;
 /**
  * @author Bob McWhirter
  */
-public class ApplicationExtensionsResource extends MediaTypeResourceRegistry implements BlockingResource {
+public class ApplicationExtensionsResource extends MediaTypeMountPointResource implements BlockingResource {
 
     public ApplicationExtensionsResource(ApplicationResource parent, String id) {
         super(parent, id);

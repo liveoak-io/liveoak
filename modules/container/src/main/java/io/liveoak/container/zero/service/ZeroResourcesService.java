@@ -6,7 +6,7 @@ import io.liveoak.container.extension.MediaTypeMountService;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
-import io.liveoak.container.tenancy.MountPointResource;
+import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.container.zero.SystemResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.Services;

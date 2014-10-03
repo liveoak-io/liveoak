@@ -1,9 +1,11 @@
 package io.liveoak.container.tenancy;
 
+import io.liveoak.common.MediaTypeMountPointResource;
+
 /**
  * @author Bob McWhirter
  */
-public class ApplicationContext extends MediaTypeResourceRegistry {
+public class ApplicationContext extends MediaTypeMountPointResource {
 
     public ApplicationContext(InternalApplication application) {
         super(application.id());

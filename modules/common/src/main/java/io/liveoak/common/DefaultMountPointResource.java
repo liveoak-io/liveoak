@@ -1,10 +1,11 @@
-package io.liveoak.container.tenancy;
+package io.liveoak.common;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -12,14 +13,14 @@ import io.liveoak.spi.resource.async.Resource;
 /**
  * @author Bob McWhirter
  */
-public class SimpleResourceRegistry implements MountPointResource, RootResource, SynchronousResource {
+public class DefaultMountPointResource implements MountPointResource, RootResource, SynchronousResource {
 
-    public SimpleResourceRegistry(Resource parent, String id) {
+    public DefaultMountPointResource(Resource parent, String id) {
         this.parent = parent;
         this.id = id;
     }
 
-    public SimpleResourceRegistry(String id) {
+    public DefaultMountPointResource(String id) {
         this.id = id;
     }
 

@@ -1,6 +1,7 @@
 package io.liveoak.container.tenancy;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import io.liveoak.common.DefaultMountPointResource;
 import io.liveoak.container.extension.ExtensionInstaller;
 import io.liveoak.container.extension.ExtensionService;
 import io.liveoak.container.extension.MountService;
@@ -12,6 +13,7 @@ import io.liveoak.container.zero.extension.ApplicationClientsExtension;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Services;
+import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import org.fest.assertions.Assertions;
@@ -66,7 +68,7 @@ public class TenancyTest {
 
         InternalApplication installedApp = registry.createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
 
-        SimpleResourceRegistry adminMount = new SimpleResourceRegistry("admin-mount");
+        DefaultMountPointResource adminMount = new DefaultMountPointResource("admin-mount");
         this.serviceContainer.addService(Services.resource(ZeroExtension.APPLICATION_ID, "applications"), new ValueService<MountPointResource>(new ImmediateValue<>(adminMount)))
                 .install();
 

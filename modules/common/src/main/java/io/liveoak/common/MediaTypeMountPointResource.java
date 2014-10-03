@@ -1,4 +1,4 @@
-package io.liveoak.container.tenancy;
+package io.liveoak.common;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
+import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -19,13 +20,13 @@ import static io.liveoak.spi.RequestType.*;
 /**
  * @author Ken Finnigan
  */
-public class MediaTypeResourceRegistry implements MountPointResource, RootResource, SynchronousResource {
-    public MediaTypeResourceRegistry(Resource parent, String id) {
+public class MediaTypeMountPointResource implements MountPointResource, RootResource, SynchronousResource {
+    public MediaTypeMountPointResource(Resource parent, String id) {
         this.parent = parent;
         this.id = id;
     }
 
-    public MediaTypeResourceRegistry(String id) {
+    public MediaTypeMountPointResource(String id) {
         this.id = id;
     }
 
@@ -178,5 +179,5 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
     private String id;
     private Map<String, Map<MediaType, Resource>> registry = new ConcurrentHashMap<>();
 
-    static final Logger log = Logger.getLogger(MediaTypeResourceRegistry.class);
+    static final Logger log = Logger.getLogger(MediaTypeMountPointResource.class);
 }

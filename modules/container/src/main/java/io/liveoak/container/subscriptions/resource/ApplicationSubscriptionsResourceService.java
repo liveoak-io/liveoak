@@ -4,7 +4,7 @@ import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.subscriptions.DefaultSubscriptionManager;
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.tenancy.MountPointResource;
+import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.Services;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;

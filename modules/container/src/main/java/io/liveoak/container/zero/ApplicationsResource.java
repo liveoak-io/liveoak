@@ -4,7 +4,7 @@ import java.io.File;
 
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
-import io.liveoak.container.tenancy.SimpleResourceRegistry;
+import io.liveoak.common.DefaultMountPointResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
@@ -12,7 +12,7 @@ import io.liveoak.spi.state.ResourceState;
 /**
  * @author Bob McWhirter
  */
-public class ApplicationsResource extends SimpleResourceRegistry {
+public class ApplicationsResource extends DefaultMountPointResource {
 
     public ApplicationsResource(InternalApplicationRegistry applicationRegistry) {
         super("applications");

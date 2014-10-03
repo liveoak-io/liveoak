@@ -1,4 +1,4 @@
-package io.liveoak.container.tenancy;
+package io.liveoak.spi.resource;
 
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.resource.async.Resource;

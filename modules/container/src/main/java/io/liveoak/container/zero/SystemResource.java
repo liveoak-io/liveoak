@@ -1,11 +1,11 @@
 package io.liveoak.container.zero;
 
-import io.liveoak.container.tenancy.SimpleResourceRegistry;
+import io.liveoak.common.DefaultMountPointResource;
 
 /**
  * @author Bob McWhirter
  */
-public class SystemResource extends SimpleResourceRegistry {
+public class SystemResource extends DefaultMountPointResource {
 
     public SystemResource() {
         super("system");

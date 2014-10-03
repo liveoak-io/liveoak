@@ -1,7 +1,6 @@
 package io.liveoak.container.extension;
 
-import io.liveoak.container.tenancy.MountPointResource;
-import io.liveoak.spi.MediaType;
+import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;

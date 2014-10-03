@@ -5,7 +5,7 @@ import java.util.Properties;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
-import io.liveoak.container.tenancy.MountPointResource;
+import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.Services;

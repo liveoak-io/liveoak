@@ -1,7 +1,7 @@
 package io.liveoak.container.extension;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.container.tenancy.MountPointResource;
+import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.SystemExtensionContext;
 import io.liveoak.spi.resource.RootResource;

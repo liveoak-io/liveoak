@@ -1,7 +1,7 @@
 package io.liveoak.container.extension;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import io.liveoak.container.tenancy.MountPointResource;
-import io.liveoak.container.tenancy.SimpleResourceRegistry;
+import io.liveoak.spi.resource.MountPointResource;
+import io.liveoak.common.DefaultMountPointResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Services;
@@ -22,12 +22,12 @@ import static org.fest.assertions.Assertions.assertThat;
 public class ExtensionLoaderTest {
 
     private ServiceContainer serviceContainer;
-    private SimpleResourceRegistry systemAdminMount;
+    private DefaultMountPointResource systemAdminMount;
 
     @Before
     public void setUpServiceContainer() {
         this.serviceContainer = ServiceContainer.Factory.create();
-        this.systemAdminMount = new SimpleResourceRegistry("admin" );
+        this.systemAdminMount = new DefaultMountPointResource("admin" );
         this.serviceContainer.addService( Services.resource(ZeroExtension.APPLICATION_ID, "system"), new ValueService<MountPointResource>( new ImmediateValue<>( this.systemAdminMount )))
                 .install();
         this.serviceContainer.addService( Services.SERVICE_CONTAINER, new ValueService<ServiceContainer>( new ImmediateValue<>( this.serviceContainer ) ) )

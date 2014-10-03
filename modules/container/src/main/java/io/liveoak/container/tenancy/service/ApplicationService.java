@@ -18,7 +18,7 @@ import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
-import io.liveoak.container.tenancy.MountPointResource;
+import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.container.zero.service.ApplicationClientsInstallService;
 import io.liveoak.spi.LiveOak;
