@@ -521,3 +521,138 @@ loMod.factory('LoBusinessLogicScripts', function($resource) {
     }
   });
 });
+
+// Loader service using the subscriptions to maintain live data. The service name starts with lowercase character,
+// because it's supposed to be used as a function.
+loMod.service('loLiveLoader', function($q, loSuperSubscribe) {
+  return function(resourceMethod, resourceParameters, forceReload){
+    // function for actual loading of the data
+    function restGet(method, parameters){
+      var i = parameters && parameters();
+
+      // The live data are stored as a function "field" (in JS, even function is an object and can have fields)
+      // It's important to understand, that we're storing the data in a promise.
+      // (Naming it $live is not a best practice, I personally like it, but should probably rename it to loLive)
+      method.$live = method(i).$promise;
+      return method.$live;
+    }
+
+    // You can force to reload the data
+    if (forceReload){
+      resourceMethod.$live = restGet(resourceMethod, resourceParameters);
+      return resourceMethod.$live;
+    }
+    if (resourceMethod.loSubscription) {
+
+      if (!resourceMethod.$live){
+        resourceMethod.$live = $q.defer().promise;
+      }
+
+      // If the method doesn't have callbacks subscribed
+      if (!resourceMethod.loSubscription.$promise) {
+        // Load the current data
+        resourceMethod.$live = restGet(resourceMethod, resourceParameters);
+
+        // Subscribe callbacks
+        loSuperSubscribe(resourceMethod);
+
+        // And return
+        return resourceMethod.$live;
+
+        // If the method has already callbacks subscribed
+      } else {
+        // Just return the actual state (which is maintained by callbacks) in form of promise
+        var delay = $q.defer();
+        delay.resolve(resourceMethod.$live);
+
+        return delay.promise;
+      }
+    }
+  };
+});
+
+// No magic here, just a service used for subscribing callback on particular URL. Have a look on resource definition
+// for better understanding.
+loMod.factory('loSuperSubscribe', function($resource, LiveOak, $rootScope, $q) {
+  return function(method){
+
+    var delay = $q.defer();
+    method.loSubscription.$promise = delay.promise;
+
+    var url = method.loSubscription.url,
+      callbacks = method.loSubscription.callbacks;
+
+    function _callback(){
+      // Once the subscription is successful, the id is set. This is persistent as a field in the $resource itself, so
+      // for each $resource we can tests if it has subscription callbacks already registered.
+      // TODO: check if it's possible to find out if subscribe wasn't successful
+      delay.resolve(LiveOak.subscribe(url, function (data, action) {
+        $rootScope.$apply(function(){
+          if (callbacks[action]) {
+            callbacks[action](data);
+          }
+        });
+      }));
+    }
+
+    LiveOak.auth.updateToken(5).success(function() {
+      LiveOak.connect('Bearer', LiveOak.auth.token, _callback);
+    }).error(function() {
+      LiveOak.connect(_callback);
+    });
+  };
+});
+
+// The resource definition. This resource could be used as a common $resource (as we did before), but if loaded
+// with loLiveLoader, it automatically updates it's data according to registered callback functions.
+loMod.factory('LoLiveAppList', function($resource) {
+
+  // Url of the original resource
+  var url = '/admin/applications/',
+    res = $resource(url, {}, {
+      getList: {
+        method: 'GET',
+        params: { fields: '*(*)' }
+      }
+    });
+
+  // For each $resource functions we can register subscription callbacks. The subscription URL can be different to
+  // the $resource URL.
+  res.getList.loSubscription = {
+    url: url,
+    // Callbacks are maintaining the data structure based on subscription calls. The property is the subscription "action"
+    // and the value is a function(data), where data are data returned by subscription call. The only tricky part here
+    // is to have in mind, that we're working with promises, so the body would be often in the "then" method and we
+    // need to return the result in a form of promise, too.
+    callbacks: {
+      create: function (data) {
+        res.getList.$live.then(function(promise){
+          if(!promise.members) {
+            promise.members = [];
+          }
+
+          promise.members.push(data);
+          return promise;
+        });
+      },
+      delete: function (data) {
+        res.getList.$live.then(function(promise){
+          if(!promise.members) {
+            return promise;
+          }
+
+          for(var i = 0; i < promise.members.length; i++){
+            if (data.id === promise.members[i].id) {
+              promise.members.splice(i, 1);
+              break;
+            }
+          }
+
+          return promise;
+        });
+      }
+    }
+  };
+
+  return res;
+});

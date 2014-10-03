@@ -27,8 +27,8 @@ loMod.config(['$routeProvider', function($routeProvider) {
       template: '',
       controller: 'HomeCtrl',
       resolve: {
-        loAppList : function(LoAppListLoader) {
-          return new LoAppListLoader();
+        loAppList : function(loLiveLoader, LoLiveAppList) {
+          return loLiveLoader(LoLiveAppList.getList);
         }
       }
     })
@@ -36,8 +36,8 @@ loMod.config(['$routeProvider', function($routeProvider) {
       templateUrl : '/admin/console/partials/applications.html',
       controller : 'AppListCtrl',
       resolve: {
-        loAppList : function(LoAppListLoader) {
-          return new LoAppListLoader();
+        loAppList : function(loLiveLoader, LoLiveAppList) {
+          return loLiveLoader(LoLiveAppList.getList);
         },
         examplesList : function(LoAppExamples) {
           return LoAppExamples.query().$promise;
@@ -51,8 +51,8 @@ loMod.config(['$routeProvider', function($routeProvider) {
         examplesList : function(LoAppExamples) {
           return LoAppExamples.query().$promise;
         },
-        loAppList : function(LoAppListLoader) {
-          return new LoAppListLoader();
+        loAppList : function(loLiveLoader, LoLiveAppList) {
+          return loLiveLoader(LoLiveAppList.getList);
         }
       }
     })
