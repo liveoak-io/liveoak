@@ -55,28 +55,6 @@ loMod.factory('FileReader', function($q) {
   };
 });
 
-/* Loaders - Loaders are used in the route configuration as resolve parameters */
-loMod.factory('Loader', function($q) {
-  var loader = {};
-  var methods = [ 'get', 'getList', 'query'];
-
-  angular.forEach(methods, function(method){
-    loader[method] = function(service, id) {
-      return function() {
-        var i = id && id();
-        var delay = $q.defer();
-        service[method](i, function(entry) {
-          delay.resolve(entry);
-        }, function() {
-          delay.reject('Unable to fetch ' + i);
-        });
-        return delay.promise;
-      };
-    };
-  });
-  return loader;
-});
-
 loMod.factory('LoStorage', function($resource) {
   return $resource('/admin/applications/:appId/resources/:storageId', {
     appId : '@appId',
@@ -187,61 +165,64 @@ loMod.factory('LoApp', function($resource) {
   });
 });
 
-loMod.factory('LoStorageLoader', function(Loader, LoStorage, $route) {
-  return Loader.get(LoStorage, function() {
-    return {
+loMod.factory('LoStorageLoader', function(LoStorage, $route) {
+  return function() {
+    return LoStorage.get({
       appId : $route.current.params.appId,
       storageId: $route.current.params.storageId
-    };
-  });
+    }).$promise;
+  };
 });
 
-loMod.factory('LoStorageListLoader', function(Loader, LoStorage, $route) {
-  return Loader.getList(LoStorage, function() {
-    return {
+loMod.factory('LoStorageListLoader', function(LoStorage, $route) {
+  return function() {
+    return LoStorage.getList({
       appId : $route.current.params.appId
-    };
-  });
+    }).$promise;
+  };
 });
 
-loMod.factory('LoCollectionListLoader', function(Loader, LoCollection, $route) {
-  return Loader.get(LoCollection, function() {
-    return {
-      appId : $route.current.params.appId,
-      storageId : $route.current.params.storageId
-    };
-  });
+loMod.factory('LoCollectionListLoader', function(LoCollection, $route) {
+  return function() {
+    return LoCollection.get({
+      appId: $route.current.params.appId,
+      storageId: $route.current.params.storageId
+    }).$promise;
+  };
 });
 
-loMod.factory('LoPushLoader', function(Loader, LoPush, $route) {
-  return Loader.get(LoPush, function() {
-      return {
+loMod.factory('LoPushLoader', function(LoPush, $route, $log) {
+  return function() {
+    return LoPush.get({
         appId : $route.current.params.appId
-      };
-    },
-    function(httpResponse) {
-      console.log(httpResponse);
-      return {
-        appId : $route.current.params.appId
-      };
-    }
-  );
+      },
+      function(httpResponse) {
+        $log.error(httpResponse);
+        return {
+          appId : $route.current.params.appId
+        };
+      }).$promise;
+  };
 });
 
-loMod.factory('LoAppLoader', function(Loader, LoApp, $route) {
-  return Loader.get(LoApp, function() {
-    return {
+loMod.factory('LoAppLoader', function(LoApp, $route) {
+  return function() {
+    return LoApp.get({
       appId : $route.current.params.appId
-    };
-  });
+    }).$promise;
+  };
 });
 
-loMod.factory('LoAppListLoader', function(Loader, LoApp) {
-  return Loader.getList(LoApp);
+loMod.factory('LoAppListLoader', function(LoApp) {
+  return function() {
+    return LoApp.getList().$promise;
+  };
 });
 
-loMod.factory('LoCollectionLoader', function(Loader, LoCollection) {
-  return Loader.get(LoCollection);
+loMod.factory('LoCollectionLoader', function(LoCollection) {
+  return function() {
+    return LoCollection.get().$promise;
+  };
 });
 
 loMod.factory('LoPush', function($resource) {
@@ -314,57 +295,57 @@ loMod.factory('LoRealmAppClientScopeMapping', function($resource, LiveOak) {
   });
 });
 
-loMod.factory('LoRealmAppClientScopeMappingLoader', function(Loader, LoRealmAppClientScopeMapping, $route) {
-  return Loader.query(LoRealmAppClientScopeMapping, function() {
-    return {
+loMod.factory('LoRealmAppClientScopeMappingLoader', function(LoRealmAppClientScopeMapping, $route) {
+  return function(){
+    return LoRealmAppClientScopeMapping.query({
       realmId: 'liveoak-apps',
       appId: $route.current.params.appId,
       clientId: $route.current.params.clientId
-    };
-  });
+    }).$promise;
+  };
 });
 
-loMod.factory('LoRealmAppLoader', function(Loader, LoRealmApp, $route) {
-  return Loader.get(LoRealmApp, function() {
-    return {
+loMod.factory('LoRealmAppLoader', function(LoRealmApp, $route) {
+  return function(){
+    return LoRealmApp.get({
       realmId: 'liveoak-apps',
       appId : $route.current.params.appId
-    };
-  });
+    }).$promise;
+  };
 });
 
-loMod.factory('LoRealmRolesLoader', function(Loader, LoRealmRoles) {
-  return Loader.query(LoRealmRoles, function() {
-    return {
+loMod.factory('LoRealmRolesLoader', function(LoRealmRoles) {
+  return function(){
+    return LoRealmRoles.query({
       realmId: 'liveoak-apps'
-    };
-  });
+    }).$promise;
+  };
 });
 
-loMod.factory('LoRealmAppListLoader', function(Loader, LoRealmApp) {
-  return Loader.query(LoRealmApp, function() {
-    return {
+loMod.factory('LoRealmAppListLoader', function(LoRealmApp) {
+  return function(){
+    return LoRealmApp.query({
       realmId: 'liveoak-apps'
-    };
-  });
+    }).$promise;
+  };
 });
 
-loMod.factory('LoRealmAppRolesLoader', function(Loader, LoRealmAppRoles, $route) {
-  return Loader.query(LoRealmAppRoles, function() {
-    return {
+loMod.factory('LoRealmAppRolesLoader', function(LoRealmAppRoles, $route) {
+  return function(){
+    return LoRealmAppRoles.query({
       realmId: 'liveoak-apps',
       appId : $route.current.params.appId
-    };
-  });
+    }).$promise;
+  };
 });
 
-loMod.factory('LoRealmClientRolesLoader', function(Loader, LoRealmClientRoles, $route) {
-  return Loader.query(LoRealmClientRoles, function() {
-    return {
+loMod.factory('LoRealmClientRolesLoader', function(LoRealmClientRoles, $route) {
+  return function(){
+    return LoRealmClientRoles.query({
       realmId: 'liveoak-apps',
       appId : $route.current.params.appId
-    };
-  });
+    }).$promise;
+  };
 });
 
 
@@ -379,12 +360,12 @@ loMod.factory('LoSecurityCollections', function($resource) {
   });
 });
 
-loMod.factory('LoSecurityCollectionsLoader', function(Loader, LoSecurityCollections, $route) {
-  return Loader.get(LoSecurityCollections, function() {
-    return {
+loMod.factory('LoSecurityCollectionsLoader', function(LoSecurityCollections, $route) {
+  return function(){
+    return LoSecurityCollections.get({
       appId : $route.current.params.appId
-    };
-  });
+    }).$promise;
+  };
 });
 
 loMod.factory('LoSecurity', function($resource) {
@@ -400,12 +381,12 @@ loMod.factory('LoSecurity', function($resource) {
   });
 });
 
-loMod.factory('LoSecurityLoader', function(Loader, LoSecurity, $route) {
-  return Loader.get(LoSecurity, function() {
-    return {
+loMod.factory('LoSecurityLoader', function(LoSecurity, $route) {
+  return function(){
+    return LoSecurity.get( {
       appId : $route.current.params.appId
-    };
-  });
+    }).$promise;
+  };
 });
 
 loMod.factory('LoACL', function($resource) {
@@ -421,12 +402,12 @@ loMod.factory('LoACL', function($resource) {
   });
 });
 
-loMod.factory('LoACLLoader', function(Loader, LoACL, $route) {
-  return Loader.get(LoACL, function() {
-    return {
+loMod.factory('LoACLLoader', function(LoACL, $route) {
+  return function(){
+    return LoACL.get({
       appId : $route.current.params.appId
-    };
-  });
+    }).$promise;
+  };
 });
 
 loMod.factory('LoRealmUsers', function($resource, LiveOak) {
@@ -457,12 +438,12 @@ loMod.factory('LoRealmUsers', function($resource, LiveOak) {
   });
 });
 
-loMod.factory('LoRealmUserLoader', function(Loader, LoRealmUsers, $route) {
-  return Loader.get(LoRealmUsers, function() {
-    return {
+loMod.factory('LoRealmUserLoader', function(LoRealmUsers, $route) {
+  return function(){
+    return LoRealmUsers.get({
       userId : $route.current.params.userId
-    };
-  });
+    }).$promise;
+  };
 });
 
 loMod.factory('LoAppExamples', function($resource) {
