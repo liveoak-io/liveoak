@@ -45,7 +45,7 @@ public class UPSMessageResource implements Resource {
             }
         }
 
-        sink.close();
+        sink.complete();
     }
 
     // embedded resources, cannot update the properties here, must do so from the parent resources

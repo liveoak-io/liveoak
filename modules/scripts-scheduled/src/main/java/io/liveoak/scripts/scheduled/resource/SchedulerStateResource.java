@@ -44,7 +44,7 @@ public class SchedulerStateResource implements Resource {
             sink.accept(STATUS, STOPPED);
         }
 
-        sink.close();
+        sink.complete();
     }
 
     @Override

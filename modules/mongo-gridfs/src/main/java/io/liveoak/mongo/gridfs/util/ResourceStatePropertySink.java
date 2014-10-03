@@ -22,7 +22,12 @@ public class ResourceStatePropertySink implements PropertySink {
     }
 
     @Override
-    public void close() throws Exception {
+    public void error(Throwable e) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void complete() {
         throw new UnsupportedOperationException();
     }
 

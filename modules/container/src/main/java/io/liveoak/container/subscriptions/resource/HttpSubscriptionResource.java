@@ -1,11 +1,12 @@
 package io.liveoak.container.subscriptions.resource;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.subscriptions.HttpSubscription;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
@@ -28,11 +29,12 @@ public class HttpSubscriptionResource implements SynchronousResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("type", "http");
-        sink.accept("path", this.subscription.resourcePath().toString());
-        sink.accept("destination", this.subscription.destination().toString());
-        sink.close();
+    public ResourceState properties(RequestContext ctx) throws Exception {
+        ResourceState result = new DefaultResourceState();
+        result.putProperty("type", "http");
+        result.putProperty("path", this.subscription.resourcePath().toString());
+        result.putProperty("destination", this.subscription.destination().toString());
+        return result;
     }
 
     @Override

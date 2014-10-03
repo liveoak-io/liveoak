@@ -39,7 +39,7 @@ public class WrappingConfigResource implements RootResource, ConfigResource {
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         readConfigProperties(ctx, sink, this.configurable);
-        sink.close();
+        sink.complete();
     }
 
     @Override

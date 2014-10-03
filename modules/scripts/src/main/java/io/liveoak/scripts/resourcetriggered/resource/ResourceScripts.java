@@ -146,7 +146,7 @@ public class ResourceScripts extends ScriptsResource {
         } else {
             sink.accept("count", scripts.size());
         }
-        sink.close();
+        sink.complete();
     }
 
     @Override

@@ -39,6 +39,6 @@ public class TagResource implements Resource {
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept(tagName, value);
-        sink.close();
+        sink.complete();
     }
 }

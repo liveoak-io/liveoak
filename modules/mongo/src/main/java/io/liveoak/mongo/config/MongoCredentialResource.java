@@ -38,7 +38,7 @@ public class MongoCredentialResource implements Resource {
             sink.accept("password", new String(credential.getPassword()));
             sink.accept("database", credential.getSource());
         }
-        sink.close();
+        sink.complete();
     }
 
 

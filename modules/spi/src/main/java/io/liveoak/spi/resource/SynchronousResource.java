@@ -76,7 +76,7 @@ public interface SynchronousResource extends Resource {
             }
         }
 
-        sink.close();
+        sink.complete();
     }
 
     @Override

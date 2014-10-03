@@ -11,8 +11,9 @@ import java.util.Set;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -29,7 +30,8 @@ public class MongoAggregationItem extends MongoObjectResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
+        ResourceState result = new DefaultResourceState();
         Set<String> keys = this.dbObject.keySet();
         for (String key : keys) {
             Object value = this.dbObject.get(key);
@@ -40,12 +42,12 @@ public class MongoAggregationItem extends MongoObjectResource {
             }
 
             if (supportedObject(value)) {
-                sink.accept(key, value);
+                result.putProperty(key, value);
             } else {
                 log.warn("Unsupported Property type: " + value.getClass() + " cannot encode.");
             }
         }
-        sink.close();
+        return result;
     }
 
     @Override

@@ -151,7 +151,7 @@ public class ResourceScript implements Resource {
         sink.accept(LIBRARIES, script.getLibraries());
         sink.accept(PROVIDES, script.getProvides());
         sink.accept(TIMEOUT, script.getTimeout());
-        sink.close();
+        sink.complete();
     }
 
     @Override

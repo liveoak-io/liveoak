@@ -101,7 +101,7 @@ public class ScriptContextResource implements Resource {
                 sink.accept(TRIGGER_STATE, null);
             }
         }
-        sink.close();
+        sink.complete();
     }
 
 }

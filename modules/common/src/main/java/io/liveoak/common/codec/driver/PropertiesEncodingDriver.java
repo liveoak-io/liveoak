@@ -85,14 +85,37 @@ public class PropertiesEncodingDriver extends ResourceEncodingDriver {
         }
 
         @Override
-        public void close() throws Exception {
-            encodeNext();
+        public void error(Throwable e) {
+            error = e;
+        }
+
+        @Override
+        public void complete() {
+            try {
+                if (error == null) {
+                    encodeNext();
+                }
+            } catch (Exception e) {
+                error = e;
+            }
+            if (error != null) {
+                PropertiesEncodingDriver.this.error(error);
+                // TODO proper exception hierarchy would discern between container exceptions and resource exceptions
+                // Resource exception should be mappable to response codes in straight away fashion
+                if (error instanceof RuntimeException) {
+                    throw (RuntimeException) error;
+                } else {
+                    throw new RuntimeException("Exception while processing request: ", error);
+                }
+            }
         }
 
         @Override
         public void replaceConfig(BiFunction<String[], Object, Object> function) {
             setReplaceConfigFunction(function);
         }
+
+        private Throwable error;
     }
 
     private boolean hasProperties;

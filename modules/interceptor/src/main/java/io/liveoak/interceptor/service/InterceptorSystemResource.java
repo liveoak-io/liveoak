@@ -2,11 +2,12 @@ package io.liveoak.interceptor.service;
 
 import java.util.List;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.container.interceptor.InterceptorManager;
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
@@ -14,7 +15,7 @@ import io.liveoak.spi.state.ResourceState;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class InterceptorSystemResource implements RootResource {
+public class InterceptorSystemResource implements RootResource, SynchronousResource {
 
     private final String id;
     private final InterceptorManager interceptorManager;
@@ -41,7 +42,9 @@ public class InterceptorSystemResource implements RootResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
+
+        ResourceState result = new DefaultResourceState();
         ResourceState resourceState = this.interceptorManager.getInterceptorsConfig();
 
         for (String key : resourceState.getPropertyNames()) {
@@ -49,9 +52,9 @@ public class InterceptorSystemResource implements RootResource {
 
             // Convert "ResourceState" to "Resource" as this is expected by encoders
             List<Resource> resources = ResourceConversionUtils.convertList(resourceStates, this);
-            sink.accept(key, resources);
+            result.putProperty(key, resources);
         }
-        sink.close();
+        return result;
     }
 
     @Override

@@ -38,14 +38,15 @@ public class NonBlockingProxyResource implements RootResource {
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         RequestContext requestContext = new RequestContext.Builder().build();
         client.read(requestContext, "/testApp/db/people/proxybob", (r) -> {
-            ResourceState result = r.state();
-            for (String n : result.getPropertyNames()) {
-                sink.accept(n, result.getProperty(n));
-            }
             try {
-                sink.close();
-            } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                ResourceState result = r.state();
+                for (String n : result.getPropertyNames()) {
+                    sink.accept(n, result.getProperty(n));
+                }
+            } catch (Throwable e) {
+                sink.error(e);
+            } finally {
+                sink.complete();
             }
         });
     }

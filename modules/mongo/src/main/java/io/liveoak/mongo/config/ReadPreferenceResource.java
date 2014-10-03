@@ -79,7 +79,7 @@ public class ReadPreferenceResource implements Resource {
             sink.accept(Options.TAGS.toString(), tagResources);
         }
 
-        sink.close();
+        sink.complete();
     }
 
     public void updateReadPreference(ResourceState state) throws Exception {

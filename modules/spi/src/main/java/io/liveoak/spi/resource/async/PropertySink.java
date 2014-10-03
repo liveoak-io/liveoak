@@ -25,9 +25,21 @@ public interface PropertySink {
     void accept(String name, Object value);
 
     /**
-     * Close the sink, indicating all properties have been sunk.
+     * Complete request processing.
+     *
+     * <p>This method has to be invoked exactly once,
+     * indicating all properties have been sunk.
      */
-    void close() throws Exception;
+    void complete();
+
+    /**
+     * Signal that an error occured during request processing.
+     *
+     * <p>Must be called before {@link #complete()}.
+     *
+     * @param throwable A throwable containing a cause of error
+     */
+    void error(Throwable throwable);
 
     /**
      * Specify a function to replace the config value that will be returned.

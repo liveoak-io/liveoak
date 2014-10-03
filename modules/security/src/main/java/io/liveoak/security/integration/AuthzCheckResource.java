@@ -181,7 +181,7 @@ public class AuthzCheckResource implements Resource {
     private void writeAuthzResponse(PropertySink sink, boolean accepted) {
         sink.accept(AuthzConstants.ATTR_AUTHZ_RESULT, accepted);
         try {
-            sink.close();
+            sink.complete();
         } catch (Exception e) {
             log.error("", e);
         }

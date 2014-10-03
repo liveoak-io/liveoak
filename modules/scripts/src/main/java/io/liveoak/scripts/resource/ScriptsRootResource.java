@@ -70,7 +70,7 @@ public class ScriptsRootResource implements RootResource {
         sink.accept("description", "Manages server side scripts for the application.");
         sink.accept(DIRECTORY, this.scriptConfig.getScriptDirectory());
         sink.accept(TIMEOUT, this.scriptConfig.getTimeout());
-        sink.close();
+        sink.complete();
     }
 
     @Override

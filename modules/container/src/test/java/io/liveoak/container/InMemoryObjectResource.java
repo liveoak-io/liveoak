@@ -7,7 +7,7 @@ package io.liveoak.container;
 
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.BlockingResource;
-import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
@@ -15,7 +15,7 @@ import io.liveoak.spi.state.ResourceState;
 /**
  * @author Bob McWhirter
  */
-public class InMemoryObjectResource implements Resource, BlockingResource {
+public class InMemoryObjectResource implements SynchronousResource, BlockingResource {
 
     public InMemoryObjectResource(InMemoryCollectionResource parent, String id, ResourceState state) {
         this.parent = parent;
@@ -42,11 +42,8 @@ public class InMemoryObjectResource implements Resource, BlockingResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        for (String name : this.state.getPropertyNames()) {
-            sink.accept(name, this.state.getProperty(name));
-        }
-        sink.close();
+    public ResourceState properties(RequestContext ctx) throws Exception {
+        return state;
     }
 
     @Override

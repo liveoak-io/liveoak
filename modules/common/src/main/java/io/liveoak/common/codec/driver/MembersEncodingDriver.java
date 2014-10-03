@@ -85,6 +85,13 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
             }
             if (error != null) {
                 MembersEncodingDriver.this.error(error);
+                // TODO proper exception hierarchy would discern between container exceptions and resource exceptions
+                // Resource exception should be mappable to response codes in straight away fashion
+                if (error instanceof RuntimeException) {
+                    throw (RuntimeException) error;
+                } else {
+                    throw new RuntimeException("Exception while processing request: ", error);
+                }
             }
         }
 

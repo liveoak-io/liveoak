@@ -14,12 +14,11 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.exceptions.ResourceProcessingException;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
@@ -34,28 +33,31 @@ public class MongoObjectResource extends MongoResource {
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
+    public Resource member(RequestContext ctx, String id) throws Exception {
         Object object = getDBObject().get(id);
         if (object != null) {
             if (object instanceof BasicDBObject || object instanceof BasicDBList) {
-                responder.noSuchResource(id);
+                return null;
             } else if (object instanceof DBRef) {
-                try {
-                    responder.resourceRead(getResource((DBRef) object, ctx.returnFields().child(id).isEmpty()));
-                } catch (ResourceProcessingException e) {
-                    responder.invalidRequest(e.getMessage());
-                }
+                //try {
+                // TODO throw exception that will end up as InvalidRequest
+                return getResource((DBRef) object, ctx.returnFields().child(id).isEmpty());
+                //} catch (ResourceProcessingException e) {
+                //    responder.invalidRequest(e.getMessage());
+                //}
             } else {
-                responder.internalError("ERROR: Object type (" + object.getClass() + ") not recognized");
+                // TODO throw exception that will end up as InternalError
+                //responder.internalError("ERROR: Object type (" + object.getClass() + ") not recognized");
+                throw new RuntimeException("ERROR: Object type (" + object.getClass() + ") not recognized");
             }
-        } else {
-            responder.noSuchResource(id);
         }
+        return null;
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
         // TODO: only read properties specified in the return fields and not everything
+        ResourceState result = new DefaultResourceState();
         Set<String> keys = getDBObject().keySet();
         for (String key : keys) {
             if (!key.equals(MONGO_ID_FIELD) && !key.equals(LiveOak.ID)) {
@@ -69,13 +71,13 @@ public class MongoObjectResource extends MongoResource {
                 }
 
                 if (supportedObject(value)) {
-                    sink.accept(key, value);
+                    result.putProperty(key, value);
                 } else {
                     log.warn("Unsupported Property type " + value.getClass() + " cannot encode.");
                 }
             }
         }
-        sink.close();
+        return result;
     }
 
     protected boolean supportedObject(Object object) {

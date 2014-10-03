@@ -41,7 +41,7 @@ public class MockRootResource implements RootResource {
     @Override
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         requests.add(ctx);
-        sink.close();
+        sink.complete();
     }
 
     public RequestContext pollRequest(long timeout, TimeUnit timeUnit) throws InterruptedException {

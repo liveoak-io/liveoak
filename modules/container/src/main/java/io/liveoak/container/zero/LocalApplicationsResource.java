@@ -79,21 +79,6 @@ public class LocalApplicationsResource implements RootResource, SynchronousResou
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.complete();
-    }
-
-    @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        responder.readNotSupported(this);
-    }
-
-    @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.close();
-    }
-
-    @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         responder.updateNotSupported(this);
     }

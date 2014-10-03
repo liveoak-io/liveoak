@@ -41,7 +41,7 @@ public class ScriptLibraries implements Resource {
         sink.accept("name", "Script Libraries");
         sink.accept("description", "Libraries which can be exposed to individual script resources.");
         sink.accept("count", libraryManager.getLibraries().size());
-        sink.close();
+        sink.complete();
     }
 
     @Override

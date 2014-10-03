@@ -4,9 +4,10 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
@@ -15,7 +16,7 @@ import org.jboss.logging.Logger;
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
-public class KeycloakConfigRootResource implements RootResource {
+public class KeycloakConfigRootResource implements RootResource, SynchronousResource {
 
     private static final Logger log = Logger.getLogger("io.liveoak.keycloak");
     public static final String LOAD_PUBLIC_KEYS = "load-public-keys";
@@ -47,12 +48,12 @@ public class KeycloakConfigRootResource implements RootResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept(KEYCLOAK_URL, config.getBaseUrl());
-        sink.accept(PUBLIC_KEYS, config.getPublicKeyPems());
-        sink.accept(LOAD_PUBLIC_KEYS, config.isLoadKeys());
-
-        sink.close();
+    public ResourceState properties(RequestContext ctx) throws Exception {
+        ResourceState result = new DefaultResourceState();
+        result.putProperty(KEYCLOAK_URL, config.getBaseUrl());
+        result.putProperty(PUBLIC_KEYS, config.getPublicKeyPems());
+        result.putProperty(LOAD_PUBLIC_KEYS, config.isLoadKeys());
+        return result;
     }
 
     @Override

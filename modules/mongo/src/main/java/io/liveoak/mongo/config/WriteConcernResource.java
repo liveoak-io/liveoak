@@ -47,7 +47,7 @@ public class WriteConcernResource implements Resource {
         sink.accept(Options.J.propertyName, writeConcern.getJ());
         sink.accept(Options.FSYNC.propertyName, writeConcern.getFsync());
         sink.accept(Options.CONTINUEONERRORFORINSERT.propertyName, writeConcern.getContinueOnErrorForInsert());
-        sink.close();
+        sink.complete();
     }
 
     public void updateWriteConcern(ResourceState state) throws Exception {

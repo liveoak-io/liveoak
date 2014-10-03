@@ -4,14 +4,14 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
  */
-public class BlockingProxyResource implements RootResource, BlockingResource {
+public class BlockingProxyResource implements RootResource, BlockingResource, SynchronousResource {
     private final String id;
     private Client client;
     private Resource parent;
@@ -37,17 +37,10 @@ public class BlockingProxyResource implements RootResource, BlockingResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
         RequestContext requestContext = new RequestContext.Builder().build();
         ResourceState result = client.read(requestContext, "/testApp/db/people/blockingproxybob");
-        for (String n : result.getPropertyNames()) {
-            sink.accept(n, result.getProperty(n));
-        }
-        try {
-            sink.close();
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+        return result;
     }
 
 }

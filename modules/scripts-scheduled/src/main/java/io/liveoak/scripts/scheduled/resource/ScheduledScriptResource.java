@@ -160,7 +160,7 @@ public class ScheduledScriptResource extends ScriptResource {
         }
 
         sink.accept(CRON, script.getCron());
-        sink.close();
+        sink.complete();
     }
 
     @Override

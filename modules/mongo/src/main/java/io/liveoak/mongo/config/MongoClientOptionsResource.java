@@ -59,7 +59,7 @@ public class MongoClientOptionsResource implements Resource {
         sink.accept(Options.CURSOR_FINALIZER_ENABLED.toString(), mongoClientOptions.isCursorFinalizerEnabled());
         sink.accept(Options.ALWAYS_USE_MBEANS.toString(), mongoClientOptions.isAlwaysUseMBeans());
 
-        sink.close();
+        sink.complete();
     }
 
     public MongoClientOptions updateMongoClientOptions(ResourceState state) throws Exception {

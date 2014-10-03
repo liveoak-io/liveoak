@@ -41,7 +41,7 @@ public class LibraryResource implements Resource {
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("name", name);
         sink.accept("description", description);
-        sink.close();
+        sink.complete();
     }
 
     //TODO: add in more stuff here? Instructions on how to use the library? methods/functions/etc...
