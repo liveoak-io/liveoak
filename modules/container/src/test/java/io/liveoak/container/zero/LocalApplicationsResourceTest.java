@@ -21,6 +21,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -94,6 +95,7 @@ public class LocalApplicationsResourceTest {
         HttpPost postRequest;
         CloseableHttpResponse response;
 
+        // Test #1 - App Creation failure with no local path
         // Post an application
         postRequest = new HttpPost("http://localhost:8080/admin/applications");
         postRequest.setEntity(new StringEntity("{ \"id\": \"myapp\", \"name\": \"My Application\" }"));
@@ -102,15 +104,9 @@ public class LocalApplicationsResourceTest {
         response = httpClient.execute(postRequest);
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(406);
-
         response.close();
-    }
 
-    @Test
-    public void testAppCreationFailureWithEmptyLocalPath() throws Exception {
-        HttpPost postRequest;
-        CloseableHttpResponse response;
-
+        // Test #2 - App Creation failure with empty local path
         // Post an application
         postRequest = new HttpPost("http://localhost:8080/admin/applications");
         postRequest.setEntity(new StringEntity("{ \"id\": \"myapp\", \"name\": \"My Application\", \"localPath\": \"\" }"));
@@ -119,15 +115,9 @@ public class LocalApplicationsResourceTest {
         response = httpClient.execute(postRequest);
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(406);
-
         response.close();
-    }
 
-    @Test
-    public void testAppCreationFailureWithBadLocalPath() throws Exception {
-        HttpPost postRequest;
-        CloseableHttpResponse response;
-
+        // Test #3 - App Creation failure with bad local path
         // Post an application
         postRequest = new HttpPost("http://localhost:8080/admin/applications");
         postRequest.setEntity(new StringEntity("{ \"id\": \"myapp\", \"name\": \"My Application\", \"localPath\": \"myDodgyPath\" }"));
@@ -136,15 +126,9 @@ public class LocalApplicationsResourceTest {
         response = httpClient.execute(postRequest);
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(406);
-
         response.close();
-    }
 
-    @Test
-    public void testAppCreationFailureWithNonExistantApplicationJson() throws Exception {
-        HttpPost postRequest;
-        CloseableHttpResponse response;
-
+        // Test #4 - App Creation failure with non existent application json
         // Post an application
         String badAppPath = new File(getClass().getClassLoader().getResource("importApps/badApp").getFile()).getAbsolutePath();
         // make sure to escape special chars in order to compose valid JSON
@@ -156,12 +140,9 @@ public class LocalApplicationsResourceTest {
         response = httpClient.execute(postRequest);
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(406);
-
         response.close();
-    }
 
-    @Test
-    public void testAppCreation() throws Exception {
+        // Test #5 - App Creation
         CompletableFuture<StompMessage> appCreationNotification = new CompletableFuture<>();
 
         StompClient stompClient = new StompClient();
@@ -184,9 +165,7 @@ public class LocalApplicationsResourceTest {
 
         subscriptionLatch.await();
 
-        HttpPost postRequest;
         HttpGet getRequest;
-        CloseableHttpResponse response;
 
         // Post an application
         String appPath = new File(getClass().getClassLoader().getResource("importApps/app1").getFile()).getAbsolutePath();
@@ -235,10 +214,28 @@ public class LocalApplicationsResourceTest {
         state = decode(response);
         assertThat(state).isNotNull();
         assertThat(state.members().size()).isEqualTo(3);
-
         response.close();
 
         // Check files were copied across
         assertThat(this.system.vertx().fileSystem().existsSync(appDir.getPath() + "/myapp/app/index.html")).isTrue();
+
+        // Test #6 - Check that READ is unsupported
+        //TODO Need to support different media types for Accept
+//        getRequest = new HttpGet("http://localhost:8080/admin/applications");
+//        getRequest.setHeader("Accept", MediaType.LOCAL_APP_JSON.toString());
+//
+//        response = httpClient.execute(getRequest);
+//        assertThat(response).isNotNull();
+//        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(405);
+//        response.close();
+
+        // Test #7 - Check that UPDATE is unsupported
+        HttpPut putRequest = new HttpPut("http://localhost:8080/admin/applications");
+        putRequest.setHeader("Content-Type", MediaType.LOCAL_APP_JSON.toString());
+
+        response = httpClient.execute(putRequest);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(405);
+        response.close();
     }
 }
