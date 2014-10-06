@@ -58,17 +58,17 @@ public class MockInMemoryResource implements SynchronousResource {
     }
 
     @Override
-    public Collection<? extends Resource> members() {
+    public Collection<? extends Resource> members(RequestContext ctx) {
         return members.values();
     }
 
     @Override
-    public Resource member(String id) {
+    public Resource member(RequestContext ctx, String id) {
         return members.get(id);
     }
 
     @Override
-    public ResourceState properties() throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
         ResourceState state = new DefaultResourceState(id);
         for (String id : properties.keySet()) {
             state.putProperty(id, properties.get(id));
@@ -98,37 +98,40 @@ public class MockInMemoryResource implements SynchronousResource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
+        try {
+            List<MockInMemoryResource> members = new ArrayList<>(this.members.values());
 
-        List<MockInMemoryResource> members = new ArrayList<>(this.members.values());
-
-        Sorting sorting = ctx.sorting();
-        if (sorting != null) {
-            for (Sorting.Spec spec : sorting.specs()) {
-                sort(members, spec.name(), spec.ascending());
-            }
-        }
-
-        Pagination pagination = ctx.pagination();
-        if (pagination != null) {
-            int offset = pagination.offset();
-            int limit = pagination.limit();
-
-            int endpoint = offset + limit;
-            if (endpoint < members.size()) {
-                members = members.subList(offset, endpoint);
-            } else {
-                members = members.subList(offset, members.size());
+            Sorting sorting = ctx.sorting();
+            if (sorting != null) {
+                for (Sorting.Spec spec : sorting.specs()) {
+                    sort(members, spec.name(), spec.ascending());
+                }
             }
 
-        }
+            Pagination pagination = ctx.pagination();
+            if (pagination != null) {
+                int offset = pagination.offset();
+                int limit = pagination.limit();
 
-        if (members != null) {
-            for (Resource each : members) {
-                sink.accept(each);
+                int endpoint = offset + limit;
+                if (endpoint < members.size()) {
+                    members = members.subList(offset, endpoint);
+                } else {
+                    members = members.subList(offset, members.size());
+                }
+
             }
-        }
 
-        sink.close();
+            if (members != null) {
+                for (Resource each : members) {
+                    sink.accept(each);
+                }
+            }
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.complete();
+        }
     }
 
     public void sort(List<MockInMemoryResource> resources, String property, boolean ascending) {

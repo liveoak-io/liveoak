@@ -146,7 +146,7 @@ public class ResourceScripts extends ScriptsResource {
         } else {
             sink.accept("count", scripts.size());
         }
-        sink.close();
+        sink.complete();
     }
 
     @Override
@@ -176,21 +176,25 @@ public class ResourceScripts extends ScriptsResource {
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
+        try {
+            ResourceParams resourceParams = ctx.resourceParams();
+            if (resourceParams != null && resourceParams.value(TARGET_PARAMETER) != null) {
+                String target = resourceParams.value(TARGET_PARAMETER);
+                for (ResourceTriggeredScript script : scripts.getByTarget(target)) {
+                    sink.accept(new ResourceScript(this, script));
+                }
 
-        ResourceParams resourceParams = ctx.resourceParams();
-        if (resourceParams != null && resourceParams.value(TARGET_PARAMETER) != null) {
-            String target = resourceParams.value(TARGET_PARAMETER);
-            for (ResourceTriggeredScript script: scripts.getByTarget(target)) {
-                sink.accept(new ResourceScript(this, script));
+            } else {
+
+                for (ResourceTriggeredScript script : scripts.values()) {
+                    sink.accept(new ResourceScript(this, script));
+                }
             }
-
-        } else {
-
-            for (ResourceTriggeredScript script : scripts.values()) {
-                sink.accept(new ResourceScript(this, script));
-            }
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.complete();
         }
-        sink.close();
     }
 
     @Override

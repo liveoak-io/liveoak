@@ -5,14 +5,17 @@
  */
 package io.liveoak.mongo.gridfs;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFS;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.async.ResourceSink;
-import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.resource.async.Resource;
 import org.bson.types.ObjectId;
 
 /**
@@ -27,34 +30,35 @@ public class GridFSUserspaceResource extends GridFSDirectoryResource {
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
+    public Resource member(RequestContext ctx, String id) {
         // delegate to the proper resource based on url
         if (".files".equals(id)) {
-            responder.resourceRead(new GridFSFilesDirResource(ctx, this, id, path().append(id)));
+            return new GridFSFilesDirResource(ctx, this, id, path().append(id));
         } else if (".blobs".equals(id)) {
-            responder.resourceRead(new GridFSBlobsDirResource(ctx, this, id, path().append(id)));
+            return new GridFSBlobsDirResource(ctx, this, id, path().append(id));
         } else {
-            super.readMember(ctx, id, responder);
+            return super.member(ctx, id);
         }
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+
         DBCollection col = getFilesCollection();
         String rootId = getRootDirId(col);
         if (rootId == null) {
             // no root yet => no children
-            sink.close();
-            return;
+            return Collections.emptyList();
         }
 
+        LinkedList members = new LinkedList<>();
         // find children of root
         DBCursor result =  col.find(new BasicDBObject("parent", new ObjectId(rootId)));
         while (result.hasNext()) {
             DBObject child = result.next();
-            sink.accept(wrapDBObject(path(), new GridFSDBObject(child)));
+            members.add(wrapDBObject(path(), new GridFSDBObject(child)));
         }
-        sink.close();
+        return members;
     }
 
 

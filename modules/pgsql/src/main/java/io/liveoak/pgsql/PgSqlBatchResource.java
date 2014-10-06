@@ -7,6 +7,8 @@ package io.liveoak.pgsql;
 
 import java.net.URI;
 import java.sql.Connection;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,15 +20,15 @@ import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.resource.StatusResource;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class PgSqlBatchResource implements Resource {
+public class PgSqlBatchResource implements SynchronousResource {
 
     private static final String CREATE = "create";
     private static final String UPDATE = "update";
@@ -174,18 +176,10 @@ public class PgSqlBatchResource implements Resource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        if (members != null) {
-            for (Resource member: members) {
-                sink.accept(member);
-            }
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+        if (members == null) {
+            return Collections.emptyList();
         }
-        sink.close();
+        return members;
     }
-
-    @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        responder.noSuchResource(id);
-    }
-
 }

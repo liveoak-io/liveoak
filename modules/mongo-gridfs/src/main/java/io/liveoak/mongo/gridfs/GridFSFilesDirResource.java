@@ -5,13 +5,15 @@
  */
 package io.liveoak.mongo.gridfs;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.async.ResourceSink;
-import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.resource.async.Resource;
 import org.bson.types.ObjectId;
 
 /**
@@ -44,27 +46,6 @@ public class GridFSFilesDirResource extends GridFSDirectoryResource {
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
-
-        // processing the last uri segment
-        DBCollection col = parent().getFilesCollection();
-        DBObject result = col.findOne(new BasicDBObject("_id", new ObjectId(id)));
-        if (result == null) {
-            responder.noSuchResource(id);
-            return;
-        }
-
-        GridFSDBObject info = new GridFSDBObject(result);
-        if (info.isTrue("dir")) {
-            // if directory
-            responder.resourceRead(newChildDir(new GridFSResourcePath(id), info));
-        } else {
-            // if file
-            responder.resourceRead(newChildItem(info));
-        }
-    }
-
-    @Override
     protected GridFSDirectoryResource newChildDir(GridFSResourcePath path, GridFSDBObject item) {
         return new GridFSFilesDirItemResource(requestContext(), (GridFSFilesDirResource) getChildParent(),
                 item.getId().toString(), path.append(item.getId().toString()), item);
@@ -77,7 +58,28 @@ public class GridFSFilesDirResource extends GridFSDirectoryResource {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
+    public Resource member(RequestContext ctx, String id) {
+
+        // processing the last uri segment
+        DBCollection col = parent().getFilesCollection();
+        DBObject result = col.findOne(new BasicDBObject("_id", new ObjectId(id)));
+        if (result == null) {
+            return null;
+        }
+
+        GridFSDBObject info = new GridFSDBObject(result);
+        if (info.isTrue("dir")) {
+            // if directory
+            return newChildDir(new GridFSResourcePath(id), info);
+        } else {
+            // if file
+            return newChildItem(info);
+        }
+    }
+
+    @Override
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+        LinkedList<Resource> members = new LinkedList<>();
 
         // if children requested query children info
         DBCollection col = getUserspace().getFilesCollection();
@@ -85,10 +87,10 @@ public class GridFSFilesDirResource extends GridFSDirectoryResource {
 
         while (result.hasNext()) {
             DBObject child = result.next();
-            sink.accept(wrapDBObject(path(), new GridFSDBObject(child)));
+            members.add(wrapDBObject(path(), new GridFSDBObject(child)));
         }
 
-        sink.close();
+        return members;
     }
 
     @Override

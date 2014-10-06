@@ -6,7 +6,6 @@
 package io.liveoak.spi.resource;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -48,7 +47,7 @@ public class MapResource implements Resource {
         for (String key: map.keySet()) {
             sink.accept(key, map.get(key));
         }
-        sink.close();
+        sink.complete();
     }
 
     @Override

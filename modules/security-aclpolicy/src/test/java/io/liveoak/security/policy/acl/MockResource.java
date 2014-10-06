@@ -56,7 +56,7 @@ public class MockResource implements RootResource {
                         sink.accept("user", "john");
                         sink.accept("roles", Arrays.asList("test-app/admin", "test-app/foo"));
                         sink.accept("something", "something-which-does-not-matter");
-                        sink.close();
+                        sink.complete();
                     }
                 });
                 break;
@@ -77,7 +77,7 @@ public class MockResource implements RootResource {
                     @Override
                     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
                         sink.accept("something", "something-which-does-not-matter");
-                        sink.close();
+                        sink.complete();
                     }
                 });
                 break;

@@ -112,7 +112,7 @@ public interface Resource {
      * @param sink The sink to capture the properties.
      */
     default void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.close();
+        sink.complete();
     }
 
     /**
@@ -163,15 +163,19 @@ public interface Resource {
      * @param sink The sink to stream members to.
      */
     default void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.close();
+        sink.complete();
     }
 
     default void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
         readMembers( ctx, new ResourceSink() {
             private boolean found = false;
+            private Throwable error;
+
             @Override
-            public void close() {
-                if ( ! found ) {
+            public void complete() {
+                if (error != null) {
+                    responder.internalError(error);
+                } else if ( ! found ) {
                     responder.noSuchResource( id );
                 }
             }
@@ -185,6 +189,11 @@ public interface Resource {
                     responder.resourceRead( resource );
                     found = true;
                 }
+            }
+
+            @Override
+            public void error(Throwable e) {
+                error = e;
             }
         });
     }

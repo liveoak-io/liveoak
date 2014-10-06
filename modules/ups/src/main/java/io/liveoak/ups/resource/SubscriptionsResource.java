@@ -1,5 +1,8 @@
 package io.liveoak.ups.resource;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -7,7 +10,6 @@ import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.ups.UPSSubscription;
@@ -19,8 +21,8 @@ public class SubscriptionsResource implements SubscriptionResourceParent {
 
     public static final String ID = "subscriptions";
 
-    protected UPSRootResource parent;
-    protected DBCollection collection;
+    private UPSRootResource parent;
+    private DBCollection collection;
 
     public SubscriptionsResource(UPSRootResource parent, DBCollection collection) {
         this.parent = parent;
@@ -38,32 +40,30 @@ public class SubscriptionsResource implements SubscriptionResourceParent {
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
+    public Collection<? extends Resource> members(RequestContext ctx) throws Exception {
+        LinkedList<Resource> members = new LinkedList<>();
+
         DBCursor cursor = collection.find();
         while (cursor.hasNext()) {
             DBObject dbObject = cursor.next();
             UPSSubscription subscription = UPSSubscription.create(dbObject);
             if (subscription != null) {
-                SubscriptionResource subscriptionResource = new SubscriptionResource(this, subscription);
-                sink.accept(subscriptionResource);
+                members.add(new SubscriptionResource(this, subscription));
             }
         }
-        sink.close();
+        return members;
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
+    public Resource member(RequestContext ctx, String id) throws Exception {
         DBObject dbObject = collection.findOne(new BasicDBObject("_id", id));
         if (dbObject != null) {
             UPSSubscription subscription = UPSSubscription.create(dbObject);
             if (subscription != null) {
-                SubscriptionResource subscriptionResource = new SubscriptionResource(this, subscription);
-                responder.resourceRead(subscriptionResource);
-                return;
+                return new SubscriptionResource(this, subscription);
             }
         }
-
-        responder.noSuchResource(id);
+        return null;
     }
 
     @Override

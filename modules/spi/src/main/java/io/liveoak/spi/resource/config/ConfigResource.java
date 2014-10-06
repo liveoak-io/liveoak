@@ -28,7 +28,7 @@ public interface ConfigResource extends Resource {
     @Override
     default void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         readConfigProperties(ctx, sink, this.parent());
-        sink.close();
+        sink.complete();
     }
 
     default void readConfigProperties(RequestContext ctx, PropertySink sink, Resource resource) throws Exception {

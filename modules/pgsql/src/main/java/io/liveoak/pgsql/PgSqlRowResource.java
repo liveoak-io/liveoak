@@ -27,6 +27,7 @@ import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceParams;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -35,7 +36,7 @@ import io.liveoak.spi.state.ResourceState;
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class PgSqlRowResource implements Resource {
+public class PgSqlRowResource implements SynchronousResource {
 
     private PgSqlTableResource parent;
     private String id;
@@ -82,12 +83,12 @@ public class PgSqlRowResource implements Resource {
         return id;
     }
 
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
         if (row == null) {
-            sink.close();
-            return;
+            return null;
         }
 
+        ResourceState result = new DefaultResourceState();
         Catalog cat = parent.parent().catalog();
         Table table = cat.table(new TableRef(parent.id()));
         HashMap<ForeignKey, String[]> fkMap = new HashMap<>();
@@ -119,7 +120,7 @@ public class PgSqlRowResource implements Resource {
                     i++;
                 }
             } else {
-                sink.accept(ent.getKey(), ent.getValue());
+                result.putProperty(ent.getKey(), ent.getValue());
             }
         }
 
@@ -158,7 +159,7 @@ public class PgSqlRowResource implements Resource {
         }
 
         for (Map.Entry<String, ?> ent: new TreeMap<>(stacked).entrySet()) {
-            sink.accept(ent.getKey(), ent.getValue());
+            result.putProperty(ent.getKey(), ent.getValue());
         }
 
 
@@ -166,12 +167,12 @@ public class PgSqlRowResource implements Resource {
         for (Map.Entry<ForeignKey, String[]> ent : fkMap.entrySet()) {
             String fkTable = cat.table(ent.getKey().tableRef()).id();
             String fkField = ent.getKey().fieldName();
-            sink.accept(fkField, new PgSqlResourceRef(
+            result.putProperty(fkField, new PgSqlResourceRef(
                     new PgSqlTableResource(parent.parent(), fkTable),
                     PrimaryKey.spliceId(ent.getValue())));
         }
 
-        sink.close();
+        return result;
     }
 
     @Override

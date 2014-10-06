@@ -1,9 +1,13 @@
 package io.liveoak.security.policy.uri.integration;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.security.policy.uri.impl.URIPolicy;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
@@ -11,7 +15,7 @@ import io.liveoak.spi.resource.async.Responder;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class URIPolicyRootResource implements RootResource {
+public class URIPolicyRootResource implements RootResource, SynchronousResource {
 
     private Resource parent;
     private String id;
@@ -39,17 +43,17 @@ public class URIPolicyRootResource implements RootResource {
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
+    public Resource member(RequestContext ctx, String id) {
         if (id.equals(this.policyCheckResource.id())) {
-            responder.resourceRead(this.policyCheckResource);
-        } else {
-            responder.noSuchResource(id);
+            return this.policyCheckResource;
         }
+        return null;
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.accept(this.policyCheckResource);
-        sink.close();
+    public Collection<Resource> members(RequestContext ctx) {
+        LinkedList<Resource> members = new LinkedList<>();
+        members.add(this.policyCheckResource);
+        return members;
     }
 }

@@ -80,7 +80,7 @@ public class ScheduledScriptsResource extends ScriptsResource implements RootRes
             sink.accept("scheduler", new SchedulerStateResource(this, scheduleManager.getScheduler()));
         }
 
-        sink.close();
+        sink.complete();
     }
 
     @Override
@@ -88,7 +88,7 @@ public class ScheduledScriptsResource extends ScriptsResource implements RootRes
         for (ScheduledScript script: scripts.values()) {
             sink.accept(new ScheduledScriptResource(this, script));
         }
-        sink.close();
+        sink.complete();
     }
 
     @Override

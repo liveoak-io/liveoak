@@ -1,17 +1,15 @@
 package io.liveoak.container.tenancy;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
-import io.liveoak.spi.resource.async.Responder;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.jboss.logging.Logger;
 
@@ -88,12 +86,11 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
+    public Resource member(RequestContext ctx, String id) throws Exception {
         Map<MediaType, Resource> resourceMap = this.registry.get(id);
 
         if (resourceMap == null) {
-            responder.noSuchResource(id);
-            return;
+            return null;
         }
 
         MediaType mediaType = mediaType(ctx);
@@ -105,15 +102,16 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
 
         if (member == null) {
             log.trace("We can't handle this mediatype: " + mediaType + " (resourceMap: " + resourceMap + ")");
-            responder.noSuchResource(id);
-            return;
+            return null;
         }
 
-        responder.resourceRead(member);
+        return member;
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+        LinkedList<Resource> members = new LinkedList<>();
+
         if (!this.registry.isEmpty()) {
             MediaType mediaType = mediaType(ctx);
 
@@ -123,25 +121,10 @@ public class MediaTypeResourceRegistry implements MountPointResource, RootResour
                     resource = resourceMap.get(DEFAULT);
                 }
 
-                sink.accept(resource);
+                members.add(resource);
             }
         }
-
-        sink.close();
-    }
-
-    @Override
-    public Collection<Resource> members() {
-        return this.registry.values().stream().flatMap(resourceList -> resourceList.values().stream().distinct()).collect(Collectors.toList());
-    }
-
-    @Override
-    public Resource member(String id) {
-        Map<MediaType, Resource> resourceMap = this.registry.get(id);
-        if (resourceMap != null) {
-            return resourceMap.get(DEFAULT);
-        }
-        return null;
+        return members;
     }
 
     private MediaType mediaType(RequestContext ctx) {

@@ -17,6 +17,7 @@ import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.security.policy.drools.impl.DroolsPolicy;
 import io.liveoak.security.policy.drools.impl.DroolsPolicyConfigurator;
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -55,7 +56,7 @@ public class DroolsPolicyConfigResource implements RootResource, SynchronousReso
     }
 
     @Override
-    public ResourceState properties() throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
         ObjectMapper om = ObjectMapperFactory.create();
         // TODO: performance as Object is converted couple of times into various formats...
         String str = om.writeValueAsString(this.droolsPolicyConfig);

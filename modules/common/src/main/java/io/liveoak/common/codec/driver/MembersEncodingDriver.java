@@ -53,7 +53,10 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
                 try {
                     encoder().startMembers();
                 } catch (Exception e) {
-                    log.error("", e);
+                    // TODO repackage into RuntimeException and rethrow?
+                    // Or introduce EncoderException extends RuntimeException?
+                    // Or use ResourceProcessingException and make it extend RuntimeException?
+                    log.error("Encoder exception: ", e);
                 }
                 hasMembers = true;
             }
@@ -67,13 +70,32 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
         }
 
         @Override
-        public void close() {
+        public void error(Throwable t) {
+            error = t;
+        }
+
+        @Override
+        public void complete() {
             try {
-                encodeNext();
+                if (error == null) {
+                    encodeNext();
+                }
             } catch (Exception e) {
-                error(e);
+                error = e;
+            }
+            if (error != null) {
+                MembersEncodingDriver.this.error(error);
+                // TODO proper exception hierarchy would discern between container exceptions and resource exceptions
+                // Resource exception should be mappable to response codes in straight away fashion
+                if (error instanceof RuntimeException) {
+                    throw (RuntimeException) error;
+                } else {
+                    throw new RuntimeException("Exception while processing request: ", error);
+                }
             }
         }
+
+        private Throwable error;
     }
 
     private boolean hasMembers;

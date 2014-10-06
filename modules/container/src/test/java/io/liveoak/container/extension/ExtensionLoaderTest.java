@@ -3,6 +3,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.container.tenancy.MountPointResource;
 import io.liveoak.container.tenancy.SimpleResourceRegistry;
 import io.liveoak.container.zero.extension.ZeroExtension;
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Services;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
@@ -52,7 +53,7 @@ public class ExtensionLoaderTest {
         assertThat( adminResource.getValue() ).isInstanceOf( MockAdminResource.class );
         assertThat( ((MockAdminResource)adminResource.getValue()).flavor() ).isEqualTo( "system" );
 
-        assertThat( this.systemAdminMount.member( "mock" ) ).isSameAs( adminResource.getValue() );
+        assertThat( this.systemAdminMount.member(new RequestContext.Builder().build(), "mock" ) ).isSameAs( adminResource.getValue() );
     }
 }
 

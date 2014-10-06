@@ -160,17 +160,20 @@ public class ScheduledScriptResource extends ScriptResource {
         }
 
         sink.accept(CRON, script.getCron());
-        sink.close();
+        sink.complete();
     }
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
         // call the parent readMembers but don't close the stream since we have an extra ContextResource to add.
-        super.readMembers(ctx, sink, false);
-
-        sink.accept(new ScriptContextResource(this, parent.getScheduleManager().getScheduler()));
-
-        sink.close();
+        try {
+            super.readMembers(ctx, sink, false);
+            sink.accept(new ScriptContextResource(this, parent.getScheduleManager().getScheduler()));
+        } catch (Throwable t) {
+            sink.error(t);
+        } finally {
+            sink.complete();
+        }
     }
 
     @Override

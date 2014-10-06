@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.pgsql.meta.Catalog;
 import io.liveoak.pgsql.meta.Column;
 import io.liveoak.pgsql.meta.ForeignKey;
@@ -26,6 +27,7 @@ import io.liveoak.pgsql.meta.Table;
 import io.liveoak.pgsql.meta.TableRef;
 import io.liveoak.spi.exceptions.InitializationException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.DefaultRootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Responder;
@@ -36,7 +38,7 @@ import org.postgresql.ds.PGPoolingDataSource;
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class PgSqlRootConfigResource extends DefaultRootResource {
+public class PgSqlRootConfigResource extends DefaultRootResource implements SynchronousResource {
 
     private static Logger log = Logger.getLogger(PgSqlRootConfigResource.class);
     private PGPoolingDataSource ds;
@@ -90,30 +92,31 @@ public class PgSqlRootConfigResource extends DefaultRootResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
+        ResourceState result = new DefaultResourceState();
         PGPoolingDataSource ds = this.ds;
-        sink.accept("server", ds.getServerName() );
-        sink.accept("port", ds.getPortNumber());
-        sink.accept("db", ds.getDatabaseName());
-        sink.accept("user", ds.getUser());
-        sink.accept("password", ds.getPassword());
-        sink.accept("max-connections", ds.getMaxConnections());
-        sink.accept("initial-connections", ds.getInitialConnections());
+        result.putProperty("server", ds.getServerName() );
+        result.putProperty("port", ds.getPortNumber());
+        result.putProperty("db", ds.getDatabaseName());
+        result.putProperty("user", ds.getUser());
+        result.putProperty("password", ds.getPassword());
+        result.putProperty("max-connections", ds.getMaxConnections());
+        result.putProperty("initial-connections", ds.getInitialConnections());
 
         List<String> schemas = configuration.exposedSchemas();
         if (schemas != null && schemas.size() > 0) {
-            sink.accept("schemas", schemas);
+            result.putProperty("schemas", schemas);
         }
 
         schemas = configuration.blockedSchemas();
         if (schemas != null && schemas.size() > 0) {
-            sink.accept("blocked-schemas", schemas);
+            result.putProperty("blocked-schemas", schemas);
         }
         if (configuration.defaultSchema() != null) {
-            sink.accept("default-schema", configuration.defaultSchema());
+            result.putProperty("default-schema", configuration.defaultSchema());
         }
-        sink.accept("allow-create-schema", configuration.allowCreateSchema());
-        sink.close();
+        result.putProperty("allow-create-schema", configuration.allowCreateSchema());
+        return result;
     }
 
     @Override

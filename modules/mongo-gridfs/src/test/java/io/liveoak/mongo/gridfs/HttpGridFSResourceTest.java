@@ -13,14 +13,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URLEncoder;
-import java.util.Arrays;
 
 import static org.fest.assertions.Assertions.assertThat;
 

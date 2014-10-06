@@ -1,8 +1,9 @@
 package io.liveoak.filesystem;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
@@ -12,7 +13,7 @@ import java.io.File;
 /**
  * @author Bob McWhirter
  */
-public class FileSystemAdminResource implements RootResource {
+public class FileSystemAdminResource implements RootResource, SynchronousResource {
 
     public FileSystemAdminResource(String id, File directory) {
         this.id = id;
@@ -35,9 +36,10 @@ public class FileSystemAdminResource implements RootResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("directory", this.directory.getAbsolutePath());
-        sink.close();
+    public ResourceState properties(RequestContext ctx) throws Exception {
+        ResourceState result = new DefaultResourceState();
+        result.putProperty("directory", this.directory.getAbsolutePath());
+        return result;
     }
 
     @Override

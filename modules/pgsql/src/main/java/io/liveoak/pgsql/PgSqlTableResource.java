@@ -9,11 +9,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.pgsql.data.QueryResults;
-import io.liveoak.pgsql.data.Row;
 import io.liveoak.pgsql.meta.Catalog;
 import io.liveoak.pgsql.meta.Column;
 import io.liveoak.pgsql.meta.QueryBuilder;
@@ -23,16 +25,15 @@ import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Sorting;
 import io.liveoak.spi.resource.MapResource;
-import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class PgSqlTableResource implements Resource {
+public class PgSqlTableResource implements SynchronousResource {
     private static final String SCHEMA_ENDPOINT = ";schema";
 
     private PgSqlRootResource parent;
@@ -57,12 +58,11 @@ public class PgSqlTableResource implements Resource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
 
         // perform select and store it for readMembers
         if (results != null) {
-            sink.close();
-            return;
+            return null;
         }
         results = queryTable(id, null, ctx);
 
@@ -71,30 +71,30 @@ public class PgSqlTableResource implements Resource {
         batch.put("rel", "schema");
         batch.put(LiveOak.HREF, uri() + SCHEMA_ENDPOINT);
         links.add(batch);
-        sink.accept("links", links);
 
-        sink.accept("count", results.count());
-        sink.accept("type", "collection");
-        sink.close();
+        ResourceState result = new DefaultResourceState();
+        result.putProperty("links", links);
+        result.putProperty("count", results.count());
+        result.putProperty("type", "collection");
+        return result;
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        for (Row row: results.rows()) {
-            sink.accept(new PgSqlRowResource(this, row));
-        }
-        sink.close();
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+        return results.rows()
+                .stream()
+                .map(row -> new PgSqlRowResource(this, row))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void readMember(RequestContext ctx, String childId, Responder responder) throws Exception {
+    public Resource member(RequestContext ctx, String childId) throws Exception {
         QueryResults results = queryTable(id, childId, ctx);
 
-        if (results.count() == 0) {
-            responder.noSuchResource( id );
-        } else {
-            responder.resourceRead(new PgSqlRowResource(this, results.rows().get(0)));
+        if (results.count() != 0) {
+            return new PgSqlRowResource(this, results.rows().get(0));
         }
+        return null;
     }
 
     @Override
@@ -126,7 +126,7 @@ public class PgSqlTableResource implements Resource {
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         System.out.println("Table updateProperties");
-        Resource.super.updateProperties(ctx, state, responder);
+        SynchronousResource.super.updateProperties(ctx, state, responder);
     }
 
     @Override

@@ -61,7 +61,7 @@ public class URIPolicyCheckResource implements Resource {
         }
 
         sink.accept(AuthzConstants.ATTR_AUTHZ_POLICY_RESULT, decision.toString());
-        sink.close();
+        sink.complete();
     }
 
 }

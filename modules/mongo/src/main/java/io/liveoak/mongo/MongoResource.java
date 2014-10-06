@@ -15,6 +15,7 @@ import com.mongodb.DBRef;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.resource.BlockingResource;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import org.bson.types.ObjectId;
@@ -23,7 +24,7 @@ import org.jboss.logging.Logger;
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  */
-public abstract class MongoResource implements Resource, BlockingResource {
+public abstract class MongoResource implements SynchronousResource, BlockingResource {
 
     private MongoResource parent;
 

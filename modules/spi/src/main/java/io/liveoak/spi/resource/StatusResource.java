@@ -53,6 +53,6 @@ public class StatusResource implements Resource {
                 sink.accept("cause", error.getCause().toString());
             }
         }
-        sink.close();
+        sink.complete();
     }
 }

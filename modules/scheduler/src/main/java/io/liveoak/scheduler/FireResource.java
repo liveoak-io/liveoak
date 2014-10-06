@@ -33,7 +33,7 @@ public class FireResource implements Resource {
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("fire_time", this.fireTime);
         sink.accept("scheduled_fire_time", this.scheduledFireTime);
-        sink.close();
+        sink.complete();
     }
 
     private TriggerResource parent;

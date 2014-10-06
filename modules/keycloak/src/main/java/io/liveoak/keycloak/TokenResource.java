@@ -7,9 +7,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.async.PropertySink;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.state.ResourceState;
 import org.keycloak.VerificationException;
 import org.keycloak.jose.jws.JWSInput;
 import org.keycloak.jose.jws.crypto.RSAProvider;
@@ -18,7 +20,7 @@ import org.keycloak.representations.AccessToken;
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
-public class TokenResource implements Resource {
+public class TokenResource implements SynchronousResource {
 
     private final TokensResource parent;
     private KeycloakConfig config;
@@ -41,14 +43,15 @@ public class TokenResource implements Resource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
 
+        ResourceState result = new DefaultResourceState();
         try {
             AccessToken token = parseToken(id);
 
-            sink.accept("realm", token.getAudience());
-            sink.accept("subject", token.getSubject());
-            sink.accept("issued-at", new Date(token.getIssuedAt()));
+            result.putProperty("realm", token.getAudience());
+            result.putProperty("subject", token.getSubject());
+            result.putProperty("issued-at", new Date(token.getIssuedAt()));
 
             Set<String> roles = new HashSet<>();
 
@@ -70,12 +73,12 @@ public class TokenResource implements Resource {
                 }
             }
 
-            sink.accept("roles", roles);
-        } catch (Throwable t) {
-            sink.accept("error", t.getMessage());
-        }
-        sink.close();
+            result.putProperty("roles", roles);
 
+        } catch (Throwable e) {
+            result.putProperty("error", e.getMessage());
+        }
+        return result;
     }
 
     private AccessToken parseToken(String tokenString) throws VerificationException {

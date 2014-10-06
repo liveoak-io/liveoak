@@ -8,6 +8,7 @@ package io.liveoak.mongo.gridfs;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import org.bson.types.ObjectId;
 
@@ -21,15 +22,14 @@ public class GridFSBlobsDirResource extends GridFSDirectoryResource {
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
+    public Resource member(RequestContext ctx, String id) {
         DBCollection col = getUserspace().getFilesCollection();
         DBObject result = col.findOne(new ObjectId(id));
         if (result == null) {
-            responder.noSuchResource(id);
-            return;
+            return null;
         }
 
-        responder.resourceRead(new GridFSBlobResource(ctx, this, id, new GridFSDBObject(result), path().append(id)));
+        return new GridFSBlobResource(ctx, this, id, new GridFSDBObject(result), path().append(id));
     }
 
     @Override

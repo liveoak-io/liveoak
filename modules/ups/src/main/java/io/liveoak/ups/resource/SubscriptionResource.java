@@ -57,7 +57,7 @@ public class SubscriptionResource implements Resource {
         sink.accept(this.SIMPLE_PUSH, subscription.simplePush());
         sink.accept(this.MESSAGE, new UPSMessageResource(this, subscription.message()));
         sink.accept(this.ENABLED, subscription.enabled());
-        sink.close();
+        sink.complete();
     }
 
     @Override

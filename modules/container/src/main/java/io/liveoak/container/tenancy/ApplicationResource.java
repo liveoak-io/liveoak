@@ -3,11 +3,11 @@ package io.liveoak.container.tenancy;
 import java.util.Collection;
 import java.util.Collections;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.zero.ApplicationExtensionsResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
@@ -44,12 +44,12 @@ public class ApplicationResource implements RootResource, SynchronousResource {
     }
 
     @Override
-    public Collection<Resource> members() {
+    public Collection<Resource> members(RequestContext ctx) {
         return Collections.singletonList(this.extensions);
     }
 
     @Override
-    public Resource member(String id) {
+    public Resource member(RequestContext ctx, String id) {
         if (id.equals(this.extensions.id())) {
             return this.extensions;
         }
@@ -61,12 +61,13 @@ public class ApplicationResource implements RootResource, SynchronousResource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("name", this.app.name());
-        sink.accept("html-app", this.app.htmlApplicationResourcePath());
-        sink.accept("visible", this.app.visible());
-        sink.accept("directory", this.app.directory().getAbsolutePath());
-        sink.close();
+    public ResourceState properties(RequestContext ctx) throws Exception {
+        ResourceState result = new DefaultResourceState();
+        result.putProperty("name", this.app.name());
+        result.putProperty("html-app", this.app.htmlApplicationResourcePath());
+        result.putProperty("visible", this.app.visible());
+        result.putProperty("directory", this.app.directory().getAbsolutePath());
+        return result;
     }
 
     @Override

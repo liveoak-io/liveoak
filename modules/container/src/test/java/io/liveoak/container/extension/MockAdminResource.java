@@ -3,6 +3,7 @@ package io.liveoak.container.extension;
 import java.util.List;
 
 import io.liveoak.common.util.ResourceConversionUtils;
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 
 /**
@@ -27,7 +28,7 @@ public class MockAdminResource extends MockResource {
     }
 
     @Override
-    public ResourceState properties() throws Exception {
+    public ResourceState properties(RequestContext ctx) throws Exception {
         return this.props;
     }
 

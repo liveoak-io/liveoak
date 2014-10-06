@@ -39,6 +39,6 @@ public class ServerAddressResource implements Resource {
     public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept("host", serverAddress.getHost());
         sink.accept("port", serverAddress.getPort());
-        sink.close();
+        sink.complete();
     }
 }

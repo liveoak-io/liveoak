@@ -1,8 +1,6 @@
 package io.liveoak.spi.resource;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
 
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -16,15 +14,24 @@ import io.liveoak.spi.state.ResourceState;
  */
 public interface SynchronousResource extends Resource {
 
-    default Collection<? extends Resource> members() {
+    default Collection<? extends Resource> members(RequestContext ctx) throws Exception {
         return null;
     }
 
-    default Resource member(String id) {
+    default Resource member(RequestContext ctx, String id) throws Exception {
+        Collection<? extends Resource> members = members(ctx);
+        if (members == null) {
+            return null;
+        }
+        for (Resource member: members) {
+            if (id.equals(member.id())) {
+                return member;
+            }
+        }
         return null;
     }
 
-    default ResourceState properties() throws Exception {
+    default ResourceState properties(RequestContext ctx) throws Exception {
         return null;
     }
 
@@ -34,20 +41,23 @@ public interface SynchronousResource extends Resource {
 
     @Override
     default void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        Collection<? extends Resource> members = members();
-
-        if (members != null) {
-            for (Resource each : members) {
-                sink.accept(each);
+        try {
+            Collection<? extends Resource> members = members(ctx);
+            if (members != null) {
+                for (Resource each : members) {
+                    sink.accept(each);
+                }
             }
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.complete();
         }
-
-        sink.close();
     }
 
     @Override
     default void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        Resource member = member(id);
+        Resource member = member(ctx, id);
         if (member == null) {
             responder.noSuchResource(id);
             return;
@@ -58,7 +68,7 @@ public interface SynchronousResource extends Resource {
 
     @Override
     default void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        ResourceState props = properties();
+        ResourceState props = properties(ctx);
 
         if (props != null) {
             for (String key : props.getPropertyNames() ) {
@@ -66,7 +76,7 @@ public interface SynchronousResource extends Resource {
             }
         }
 
-        sink.close();
+        sink.complete();
     }
 
     @Override

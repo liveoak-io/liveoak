@@ -6,10 +6,14 @@
 
 package io.liveoak.security.policy.drools.integration;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.security.policy.drools.impl.DroolsPolicy;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
@@ -17,7 +21,7 @@ import io.liveoak.spi.resource.async.Responder;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class DroolsPolicyRootResource implements RootResource {
+public class DroolsPolicyRootResource implements RootResource, SynchronousResource {
 
     private Resource parent;
     private String id;
@@ -45,18 +49,18 @@ public class DroolsPolicyRootResource implements RootResource {
     }
 
     @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) {
+    public Resource member(RequestContext ctx, String id) {
         if (id.equals(this.policyCheckResource.id())) {
-            responder.resourceRead(this.policyCheckResource);
-        } else {
-            responder.noSuchResource(id);
+            return this.policyCheckResource;
         }
+        return null;
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        sink.accept(this.policyCheckResource);
-        sink.close();
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+        LinkedList<Resource> members = new LinkedList<>();
+        members.add(this.policyCheckResource);
+        return members;
     }
 
 }

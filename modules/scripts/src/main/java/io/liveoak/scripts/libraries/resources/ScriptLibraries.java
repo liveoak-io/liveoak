@@ -41,16 +41,21 @@ public class ScriptLibraries implements Resource {
         sink.accept("name", "Script Libraries");
         sink.accept("description", "Libraries which can be exposed to individual script resources.");
         sink.accept("count", libraryManager.getLibraries().size());
-        sink.close();
+        sink.complete();
     }
 
     @Override
     public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        for (Library library : libraryManager.getLibraries().values()) {
-            LibraryResource libraryResource = new LibraryResource(this, library);
-            sink.accept(libraryResource);
+        try {
+            for (Library library : libraryManager.getLibraries().values()) {
+                LibraryResource libraryResource = new LibraryResource(this, library);
+                sink.accept(libraryResource);
+            }
+        } catch (Throwable e) {
+            sink.error(e);
+        } finally {
+            sink.complete();
         }
-        sink.close();
     }
 
     @Override

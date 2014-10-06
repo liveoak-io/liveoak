@@ -7,6 +7,7 @@ import java.util.Map;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.security.policy.acl.AclPolicyConstants;
 import io.liveoak.security.policy.acl.impl.AclPolicy;
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -43,12 +44,12 @@ public class AclPolicyRootResource implements RootResource, SynchronousResource 
     }
 
     @Override
-    public Resource member(String id) {
+    public Resource member(RequestContext ctx, String id) {
         return children.get(id);
     }
 
     @Override
-    public Collection<? extends Resource> members() {
+    public Collection<? extends Resource> members(RequestContext ctx) {
         return children.values();
     }
 }

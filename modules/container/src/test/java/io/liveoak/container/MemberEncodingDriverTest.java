@@ -193,7 +193,7 @@ public class MemberEncodingDriverTest {
         @Override
         public void readMembers( RequestContext ctx, ResourceSink sink ) throws Exception {
             readMembers = true;
-            sink.close();
+            sink.complete();
         }
     }
 

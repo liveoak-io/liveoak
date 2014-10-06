@@ -1,12 +1,13 @@
 package io.liveoak.ups.resource;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.ups.Alias;
@@ -17,8 +18,8 @@ import io.liveoak.ups.UPSSubscription;
  */
 public class AliasResource implements SubscriptionResourceParent {
 
-    AliasesResource parent;
-    Alias alias;
+    private AliasesResource parent;
+    private Alias alias;
 
     public AliasResource(AliasesResource parent, Alias alias) {
         this.parent = parent;
@@ -36,31 +37,18 @@ public class AliasResource implements SubscriptionResourceParent {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        sink.accept("subject", alias.subject());
-        sink.close();
+    public ResourceState properties(RequestContext ctx) throws Exception {
+        ResourceState result = new DefaultResourceState();
+        result.putProperty("subject", alias.subject());
+        return result;
     }
 
     @Override
-    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
-        List<UPSSubscription> subscriptions = alias.getSubscriptions();
-        for (UPSSubscription subscription : subscriptions) {
-            sink.accept(new SubscriptionResource(this, subscription));
-        }
-        sink.close();
-    }
-
-    @Override
-    public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        List<UPSSubscription> subscriptions = alias.getSubscriptions();
-        for (UPSSubscription subscription : subscriptions) {
-            if (subscription.id().equals(id)) {
-                responder.resourceRead(new SubscriptionResource(this, subscription));
-                return;
-            }
-        }
-
-        responder.noSuchResource(id);
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+        return alias.getSubscriptions()
+                .stream()
+                .map(subs -> new SubscriptionResource(this, subs))
+                .collect(Collectors.toList());
     }
 
     @Override
