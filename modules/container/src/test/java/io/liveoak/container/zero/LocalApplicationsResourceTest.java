@@ -19,6 +19,7 @@ import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -220,20 +221,28 @@ public class LocalApplicationsResourceTest {
         assertThat(this.system.vertx().fileSystem().existsSync(appDir.getPath() + "/myapp/app/index.html")).isTrue();
 
         // Test #6 - Check that READ is unsupported
-        //TODO Need to support different media types for Accept
-//        getRequest = new HttpGet("http://localhost:8080/admin/applications");
-//        getRequest.setHeader("Accept", MediaType.LOCAL_APP_JSON.toString());
-//
-//        response = httpClient.execute(getRequest);
-//        assertThat(response).isNotNull();
-//        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(405);
-//        response.close();
+        getRequest = new HttpGet("http://localhost:8080/admin/applications/members");
+        getRequest.setHeader("Accept", MediaType.LOCAL_APP_JSON.toString());
+
+        response = httpClient.execute(getRequest);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(405);
+        response.close();
 
         // Test #7 - Check that UPDATE is unsupported
         HttpPut putRequest = new HttpPut("http://localhost:8080/admin/applications");
         putRequest.setHeader("Content-Type", MediaType.LOCAL_APP_JSON.toString());
 
         response = httpClient.execute(putRequest);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(405);
+        response.close();
+
+        // Test #8 - Check that DELETE is unsupported
+        HttpDelete deleteRequest = new HttpDelete("http://localhost:8080/admin/applications");
+        getRequest.setHeader("Accept", MediaType.LOCAL_APP_JSON.toString());
+
+        response = httpClient.execute(deleteRequest);
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(405);
         response.close();

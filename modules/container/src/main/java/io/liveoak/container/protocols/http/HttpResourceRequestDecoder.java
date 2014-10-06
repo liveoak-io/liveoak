@@ -114,6 +114,7 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<DefaultH
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .requestAttribute(HttpHeaders.Names.AUTHORIZATION, msg.headers().get(HttpHeaders.Names.AUTHORIZATION))
+                    .requestAttribute(HttpHeaders.Names.ACCEPT, new MediaType(acceptHeader))
                     .requestAttribute(HTTP_REQUEST, msg)
                     .pagination(decodePagination(params))
                     .returnFields(decodeReturnFields(params))
@@ -135,6 +136,7 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<DefaultH
                     .resourceParams(params)
                     .mediaTypeMatcher(mediaTypeMatcher)
                     .requestAttribute(HttpHeaders.Names.AUTHORIZATION, msg.headers().get(HttpHeaders.Names.AUTHORIZATION))
+                    .requestAttribute(HttpHeaders.Names.ACCEPT, new MediaType(acceptHeader))
                     .requestAttribute(HTTP_REQUEST, msg)
                     .build());
         }
