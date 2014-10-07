@@ -21,6 +21,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.support.FindBy;
 
 import java.io.IOException;
@@ -72,6 +74,18 @@ public abstract class AbstractLiveOakTest {
     public void after() throws IOException {
         if (client != null) {
             client.close();
+        }
+    }
+
+    /**
+     * Output the content within the logType. Use {@link org.openqa.selenium.logging.LogType} to specify
+     * which logType to output.
+     *
+     * @param logType
+     */
+    protected void outputLog(String logType) {
+        for (LogEntry o : browser.manage().logs().get(logType).getAll()) {
+            System.out.println(logType + " Log: " + o.getMessage());
         }
     }
 
