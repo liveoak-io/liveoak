@@ -37,14 +37,19 @@ public class BaseUPSTestCase extends AbstractResourceTestCase {
         System.setProperty("mongo.host", host);
         System.setProperty("mongo.port", "" + port);
 
-        ObjectNode config = JsonNodeFactory.instance.objectNode();
-        config.put( "db", "MongoInternalTest");
+        ObjectNode internalDatabase = JsonNodeFactory.instance.objectNode();
+        internalDatabase.put("db", database);
+
+        internalDatabase.put( "db", "MongoInternalTest");
 
         ObjectNode server = JsonNodeFactory.instance.objectNode();
         server.put( "host", host );
         server.put( "port", port );
 
-        config.putArray("servers").add( server );
+        internalDatabase.putArray("servers").add( server );
+
+        ObjectNode config = JsonNodeFactory.instance.objectNode();
+        config.put("internal-database", internalDatabase);
         loadExtension( "mongo", new MongoExtension(), config );
 
         try {

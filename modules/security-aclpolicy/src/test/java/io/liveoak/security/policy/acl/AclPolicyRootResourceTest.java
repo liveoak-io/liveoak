@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -71,15 +70,20 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
         String host = System.getProperty("mongo.host", "localhost");
         log.debug("Using Mongo for ACL on " + host + ":" + port + ", database: " + database);
 
-        ResourceState config = new DefaultResourceState();
-        config.putProperty("db", database);
+
+        ResourceState internalDatabase = new DefaultResourceState();
+        internalDatabase.putProperty("db", database);
 
         List<ResourceState> servers = new ArrayList<ResourceState>();
         ResourceState server = new DefaultResourceState();
         server.putProperty("port", port);
         server.putProperty("host", host);
         servers.add(server);
-        config.putProperty("servers", servers);
+        internalDatabase.putProperty("servers", servers);
+
+        ResourceState config = new DefaultResourceState();
+        config.putProperty("internal-database", internalDatabase);
+
         return ConversionUtils.convert(config);
     }
 
