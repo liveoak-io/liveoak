@@ -42,7 +42,7 @@ public class ReceiptHandler extends ChannelDuplexHandler {
         if (msg instanceof StompControlFrame) {
 
             StompControlFrame frame = (StompControlFrame) msg;
-            if (((StompControlFrame) msg).command().equals(Stomp.Command.RECEIPT)) {
+            if (frame.command().equals(Stomp.Command.RECEIPT)) {
                 ReceiptReceiver receiver = this.receiptReceivers.remove(((StompControlFrame) msg).headers().get(Headers.RECEIPT_ID));
                 if (receiver != null) {
                     this.executor.execute(() -> {

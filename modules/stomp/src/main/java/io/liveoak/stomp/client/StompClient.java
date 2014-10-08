@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -25,6 +25,7 @@ import io.liveoak.stomp.client.protocol.ReceiptHandler;
 import io.liveoak.stomp.client.protocol.StompClientContext;
 import io.liveoak.stomp.client.protocol.StompErrorClientHandler;
 import io.liveoak.stomp.client.protocol.SubscriptionEncoder;
+import io.liveoak.stomp.client.protocol.UnsubscribeEncoder;
 import io.liveoak.stomp.common.DefaultStompMessage;
 import io.liveoak.stomp.common.HeadersImpl;
 import io.liveoak.stomp.common.StompFrame;
@@ -46,6 +47,7 @@ import org.jboss.logging.Logger;
  * <p>This client may be used in synchronous or asynchronous environments</p>
  *
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class StompClient {
 
@@ -85,6 +87,7 @@ public class StompClient {
                 ch.pipeline().addLast(new StompFrameEncoder());
                 ch.pipeline().addLast(new StompFrameDecoder());
                 ch.pipeline().addLast(new SubscriptionEncoder());
+                ch.pipeline().addLast(new UnsubscribeEncoder());
                 ch.pipeline().addLast(new ReceiptHandler(executor));
                 //ch.pipeline().addLast( new DebugHandler( "client-frames" ) );
                 ch.pipeline().addLast(new ConnectionNegotiatingHandler(clientContext, callback));
@@ -265,9 +268,11 @@ public class StompClient {
      *
      * @param destination       The destination to subscribe to.
      * @param subscriptionSetup Code to setup subscription
+     *
+     * @return The subscription id.
      */
-    public void subscribe(String destination, Consumer<Subscription> subscriptionSetup) {
-        subscribe(destination, new HeadersImpl(), subscriptionSetup);
+    public String subscribe(String destination, Consumer<Subscription> subscriptionSetup) {
+        return subscribe(destination, new HeadersImpl(), subscriptionSetup);
     }
 
     /**
@@ -280,11 +285,34 @@ public class StompClient {
      * @param destination       The destination to subscribe to.
      * @param headers           Additional headers.
      * @param subscriptionSetup Code to setup subscription
+     *
+     * @return The subscription id.
      */
-    public void subscribe(String destination, Headers headers, Consumer<Subscription> subscriptionSetup) {
+    public String subscribe(String destination, Headers headers, Consumer<Subscription> subscriptionSetup) {
         SubscriptionImpl subscription = new SubscriptionImpl(destination, headers);
         subscriptionSetup.accept(subscription);
         this.channel.writeAndFlush(subscription);
+        return subscription.subscriptionId();
+    }
+
+    /**
+     * Unsubscribe.
+     *
+     * @param subscriptionId Id of the subscription to unsubscribe from.
+     */
+    public void unsubscribe(String subscriptionId) {
+        unsubscribe(subscriptionId, new HeadersImpl());
+    }
+
+    /**
+     * Unsubscribe.
+     *
+     * @param subscriptionId Id of the subscription to unsubscribe from.
+     * @param headers           Additional headers.
+     */
+    public void unsubscribe(String subscriptionId, Headers headers) {
+        Unsubscribe unsubscribe = new Unsubscribe(subscriptionId, headers);
+        this.channel.writeAndFlush(unsubscribe);
     }
 
     private String host;

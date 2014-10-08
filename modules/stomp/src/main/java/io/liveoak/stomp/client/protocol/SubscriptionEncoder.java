@@ -31,6 +31,4 @@ public class SubscriptionEncoder extends MessageToMessageEncoder<SubscriptionImp
         frame.headers().put(Headers.RECEIPT, msg.subscriptionId());
         out.add(frame);
     }
-
-    private boolean server;
 }

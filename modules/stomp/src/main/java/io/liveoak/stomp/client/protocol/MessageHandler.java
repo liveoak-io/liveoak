@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -13,12 +13,14 @@ import java.util.function.Consumer;
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.StompMessage;
 import io.liveoak.stomp.client.SubscriptionImpl;
+import io.liveoak.stomp.client.Unsubscribe;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class MessageHandler extends ChannelDuplexHandler {
 
@@ -30,6 +32,8 @@ public class MessageHandler extends ChannelDuplexHandler {
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         if (msg instanceof SubscriptionImpl) {
             this.subscriptions.put(((SubscriptionImpl) msg).subscriptionId(), (SubscriptionImpl) msg);
+        } else if (msg instanceof Unsubscribe) {
+            this.subscriptions.remove(((Unsubscribe) msg).subscriptionId());
         }
         super.write(ctx, msg, promise);
     }
