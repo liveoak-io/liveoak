@@ -2,7 +2,7 @@ package io.liveoak.mongo.internal;
 
 import java.net.UnknownHostException;
 
-import io.liveoak.mongo.config.RootMongoConfigResource;
+import io.liveoak.mongo.config.MongoSystemConfigResource;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -35,6 +35,5 @@ public class InternalMongoService implements Service<InternalStorageManager> {
         return internalStorageManager;
     }
 
-
-    public InjectedValue<RootMongoConfigResource> configResourceInjector = new InjectedValue<RootMongoConfigResource>();
+    public InjectedValue<MongoSystemConfigResource> configResourceInjector = new InjectedValue<>();
 }

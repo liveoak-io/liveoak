@@ -1,25 +1,26 @@
 package io.liveoak.mongo.internal;
 
+import java.net.UnknownHostException;
+
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import io.liveoak.mongo.config.RootMongoConfigResource;
-
-import java.net.UnknownHostException;
+import io.liveoak.mongo.config.MongoSystemConfigResource;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
 public class InternalStorageManager {
 
-    DB database;
+    MongoSystemConfigResource mongoSystemConfigResource;
 
-    public InternalStorageManager(RootMongoConfigResource rootMongoConfigResource) throws UnknownHostException {
-        this.database = rootMongoConfigResource.getDB();
+    public InternalStorageManager(MongoSystemConfigResource mongoSystemConfigResource) throws UnknownHostException {
+        this.mongoSystemConfigResource = mongoSystemConfigResource;
     }
 
     public InternalStorage getInternalStorage(String appName, String serviceName) {
         appName = replaceCollectionName(appName);
         serviceName = replaceCollectionName(serviceName);
+        DB database = mongoSystemConfigResource.getSystemDatabase();
         DBCollection collection = database.getCollection(appName).getCollection(serviceName);
         return new InternalStorage(collection);
     }

@@ -17,8 +17,8 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
-import com.mongodb.MongoClient;
 import io.liveoak.mongo.config.RootMongoConfigResource;
+import io.liveoak.mongo.config.MongoSystemConfigResource;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.ResourceProcessingException;
@@ -34,30 +34,26 @@ import io.liveoak.spi.state.ResourceState;
 public class RootMongoResource extends MongoResource implements RootResource {
 
     private Resource parent;
-    private RootMongoConfigResource mongoConfigResource;
     private String id;
+    private RootMongoConfigResource mongoConfigResource;
 
-    public RootMongoResource(String id) {
+    public RootMongoResource(String id, MongoSystemConfigResource mongoSystemConfigResource, RootMongoConfigResource mongoConfigResource) {
         super(null);
         this.id = id;
-        mongoConfigResource = new RootMongoConfigResource(id);
+        this.mongoConfigResource = mongoConfigResource;
     }
 
     public RootMongoConfigResource configuration() {
         return mongoConfigResource;
     }
 
-    MongoClient client() {
-        return this.mongoConfigResource.getMongoClient();
-    }
-
     DB db() {
-        return this.mongoConfigResource.getDB();
+        return mongoConfigResource.getDB();
     }
 
     @Override
     public Resource parent() {
-        return this.parent;
+        return parent;
     }
 
     @Override
@@ -67,13 +63,11 @@ public class RootMongoResource extends MongoResource implements RootResource {
 
     @Override
     public String id() {
-        return this.id;
+        return id;
     }
 
     public void destroy() {
-        if (client() != null) {
-            client().close();
-        }
+        mongoConfigResource.close();
     }
 
     @Override

@@ -12,11 +12,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Set;
 
 import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.exceptions.InvalidPropertyTypeException;
+import io.liveoak.spi.exceptions.PropertyException;
+import io.liveoak.spi.exceptions.RequiredPropertyException;
 
 /**
  * Opaque state of a resource.
@@ -194,6 +196,28 @@ public interface ResourceState {
             return (ResourceState) val;
         }
         throw new RuntimeException("Value can't be returned as ResourceState: " + val + " [" + val.getClass() + "]");
+    }
+
+    default <P> P getProperty(String name, boolean required, Class<P> requestedType) throws PropertyException {
+        return getProperty(name, required, requestedType, false);
+    }
+
+    default <P> P getProperty(String name, boolean required, Class<P> requestedType, boolean ignoreType) throws PropertyException {
+        Object propertyObject = getProperty(name);
+        if (required && (propertyObject == null || (propertyObject instanceof String && ((String) propertyObject).isEmpty()))) {
+                throw new RequiredPropertyException(name, requestedType);
+        } else if (propertyObject == null) {
+            return null;
+        } else if (requestedType.isInstance(propertyObject)) {
+            return requestedType.cast(propertyObject);
+        } else if (requestedType == Long.class && propertyObject.getClass() == Integer.class) {
+            //special check for numbers
+            return (P) new Long((Integer)propertyObject);
+        } else if (ignoreType == false) {
+            throw new InvalidPropertyTypeException(name, requestedType);
+        } else {
+            return null;
+        }
     }
 
     Object removeProperty(String name);

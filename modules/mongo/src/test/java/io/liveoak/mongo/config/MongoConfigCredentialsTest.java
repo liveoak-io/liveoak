@@ -1,12 +1,12 @@
 package io.liveoak.mongo.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -173,6 +173,7 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
 
 
         ResourceState updatedConfig = new DefaultResourceState();
+        updatedConfig.putProperty("db", "ConfigureMultipleCredentialsDB");
         List<ResourceState> updatedCredentials = new ArrayList<ResourceState>();
 
         ResourceState updatedCredentialA = new DefaultResourceState();

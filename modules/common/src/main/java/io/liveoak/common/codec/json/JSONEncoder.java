@@ -6,6 +6,7 @@
 package io.liveoak.common.codec.json;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -166,6 +167,10 @@ public class JSONEncoder implements StateEncoder {
             writeValue((Long) value);
         } else if (value instanceof Boolean) {
             writeValue((Boolean) value);
+        } else if (value instanceof Collection) {
+            writeList((Collection) value);
+        } else if (value == null) {
+            writeNullValue();
         } else {
             throw new NonEncodableValueException(value);
         }
@@ -179,6 +184,14 @@ public class JSONEncoder implements StateEncoder {
             writeValue(value.get(key));
         }
         this.generator.writeEndObject();
+    }
+
+    public void writeList(Collection values) throws Exception {
+        this.generator.writeStartArray();
+        for (Object value: values) {
+            writeValue(value);
+        }
+        this.generator.writeEndArray();
     }
 
     @Override

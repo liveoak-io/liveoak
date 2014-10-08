@@ -2,6 +2,12 @@
     module-id:  'io.liveoak.mongo',
     dependencies: ['mongo-launcher'],
     config: {
-      db: "liveoak"
+      internal-database: {
+        db: "liveoak",
+        datastore: "liveoak"
+      },
+      datastores: {
+        "liveoak" : {}
+      }
     }
 }
