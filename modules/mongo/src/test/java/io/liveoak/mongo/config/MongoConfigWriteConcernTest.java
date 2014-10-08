@@ -23,14 +23,14 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
         assertThat( result.getProperty( "db" ) ).isEqualTo("testDefaultDB");
         assertThat(result.getProperty("servers")).isNotNull();
 
-        assertThat(result.getProperty(WriteConcernResource.ID)).isNotNull();
+        assertThat(result.getProperty(WriteConcernState.ID)).isNotNull();
 
-        ResourceState writeConcernState = (ResourceState)result.getProperty(WriteConcernResource.ID);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.W.toString())).isEqualTo(1);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.WTIMEOUT.toString())).isEqualTo(0);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.J.toString())).isEqualTo(false);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.FSYNC.toString())).isEqualTo(false);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.CONTINUEONERRORFORINSERT.toString())).isEqualTo(false);
+        ResourceState writeConcernState = (ResourceState)result.getProperty(WriteConcernState.ID);
+        assertThat(writeConcernState.getProperty(WriteConcernState.W)).isEqualTo(1);
+        assertThat(writeConcernState.getProperty(WriteConcernState.WTIMEOUT)).isEqualTo(0);
+        assertThat(writeConcernState.getProperty(WriteConcernState.J)).isEqualTo(false);
+        assertThat(writeConcernState.getProperty(WriteConcernState.FSYNC)).isEqualTo(false);
+        assertThat(writeConcernState.getProperty(WriteConcernState.CONTINUEONERRORFORINSERT)).isEqualTo(false);
     }
 
     @Test
@@ -39,13 +39,13 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
         config.putProperty("db", "testDefaultDB");
 
         ResourceState configWriteConcernState = new DefaultResourceState();
-        configWriteConcernState.putProperty(WriteConcernResource.Options.W.toString(), 2);
-        configWriteConcernState.putProperty(WriteConcernResource.Options.WTIMEOUT.toString(), 100);
-        configWriteConcernState.putProperty(WriteConcernResource.Options.J.toString(), true);
-        configWriteConcernState.putProperty(WriteConcernResource.Options.FSYNC.toString(), true);
-        configWriteConcernState.putProperty(WriteConcernResource.Options.CONTINUEONERRORFORINSERT.toString(), true);
+        configWriteConcernState.putProperty(WriteConcernState.W, 2);
+        configWriteConcernState.putProperty(WriteConcernState.WTIMEOUT, 100);
+        configWriteConcernState.putProperty(WriteConcernState.J, true);
+        configWriteConcernState.putProperty(WriteConcernState.FSYNC, true);
+        configWriteConcernState.putProperty(WriteConcernState.CONTINUEONERRORFORINSERT, true);
 
-        config.putProperty(WriteConcernResource.ID, configWriteConcernState);
+        config.putProperty(WriteConcernState.ID, configWriteConcernState);
 
         setUpSystem(config);
 
@@ -55,14 +55,14 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
         assertThat( result.getProperty( "db" ) ).isEqualTo("testDefaultDB");
         assertThat(result.getProperty("servers")).isNotNull();
 
-        assertThat(result.getProperty(WriteConcernResource.ID)).isNotNull();
+        assertThat(result.getProperty(WriteConcernState.ID)).isNotNull();
 
-        ResourceState writeConcernState = (ResourceState)result.getProperty(WriteConcernResource.ID);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.W.toString())).isEqualTo(2);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.WTIMEOUT.toString())).isEqualTo(100);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.J.toString())).isEqualTo(true);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.FSYNC.toString())).isEqualTo(true);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.CONTINUEONERRORFORINSERT.toString())).isEqualTo(true);
+        ResourceState writeConcernState = (ResourceState)result.getProperty(WriteConcernState.ID);
+        assertThat(writeConcernState.getProperty(WriteConcernState.W)).isEqualTo(2);
+        assertThat(writeConcernState.getProperty(WriteConcernState.WTIMEOUT)).isEqualTo(100);
+        assertThat(writeConcernState.getProperty(WriteConcernState.J)).isEqualTo(true);
+        assertThat(writeConcernState.getProperty(WriteConcernState.FSYNC)).isEqualTo(true);
+        assertThat(writeConcernState.getProperty(WriteConcernState.CONTINUEONERRORFORINSERT)).isEqualTo(true);
     }
 
     @Test
@@ -71,13 +71,13 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
         config.putProperty("db", "testTaggedDB");
 
         ResourceState configWriteConcernState = new DefaultResourceState();
-        configWriteConcernState.putProperty(WriteConcernResource.Options.W.toString(), "majority");
-        configWriteConcernState.putProperty(WriteConcernResource.Options.WTIMEOUT.toString(), 250);
-        configWriteConcernState.putProperty(WriteConcernResource.Options.J.toString(), false);
-        configWriteConcernState.putProperty(WriteConcernResource.Options.FSYNC.toString(), true);
-        configWriteConcernState.putProperty(WriteConcernResource.Options.CONTINUEONERRORFORINSERT.toString(), false);
+        configWriteConcernState.putProperty(WriteConcernState.W, "majority");
+        configWriteConcernState.putProperty(WriteConcernState.WTIMEOUT, 250);
+        configWriteConcernState.putProperty(WriteConcernState.J, false);
+        configWriteConcernState.putProperty(WriteConcernState.FSYNC, true);
+        configWriteConcernState.putProperty(WriteConcernState.CONTINUEONERRORFORINSERT, false);
 
-        config.putProperty(WriteConcernResource.ID, configWriteConcernState);
+        config.putProperty(WriteConcernState.ID, configWriteConcernState);
 
         setUpSystem(config);
 
@@ -86,14 +86,14 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
         assertThat( result.getProperty( "db" ) ).isEqualTo("testTaggedDB");
         assertThat(result.getProperty("servers")).isNotNull();
 
-        assertThat(result.getProperty(WriteConcernResource.ID)).isNotNull();
+        assertThat(result.getProperty(WriteConcernState.ID)).isNotNull();
 
-        ResourceState writeConcernState = (ResourceState)result.getProperty(WriteConcernResource.ID);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.W.toString())).isEqualTo("majority");
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.WTIMEOUT.toString())).isEqualTo(250);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.J.toString())).isEqualTo(false);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.FSYNC.toString())).isEqualTo(true);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.CONTINUEONERRORFORINSERT.toString())).isEqualTo(false);
+        ResourceState writeConcernState = (ResourceState)result.getProperty(WriteConcernState.ID);
+        assertThat(writeConcernState.getProperty(WriteConcernState.W)).isEqualTo("majority");
+        assertThat(writeConcernState.getProperty(WriteConcernState.WTIMEOUT)).isEqualTo(250);
+        assertThat(writeConcernState.getProperty(WriteConcernState.J)).isEqualTo(false);
+        assertThat(writeConcernState.getProperty(WriteConcernState.FSYNC)).isEqualTo(true);
+        assertThat(writeConcernState.getProperty(WriteConcernState.CONTINUEONERRORFORINSERT)).isEqualTo(false);
     }
 
     @Test
@@ -102,13 +102,13 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
         config.putProperty("db", "testUpdateWriteConcernDB");
 
         ResourceState configWriteConcernState = new DefaultResourceState();
-        configWriteConcernState.putProperty(WriteConcernResource.Options.W.toString(), 2);
-        configWriteConcernState.putProperty(WriteConcernResource.Options.WTIMEOUT.toString(), 100);
-        configWriteConcernState.putProperty(WriteConcernResource.Options.J.toString(), true);
-        configWriteConcernState.putProperty(WriteConcernResource.Options.FSYNC.toString(), true);
-        configWriteConcernState.putProperty(WriteConcernResource.Options.CONTINUEONERRORFORINSERT.toString(), true);
+        configWriteConcernState.putProperty(WriteConcernState.W, 2);
+        configWriteConcernState.putProperty(WriteConcernState.WTIMEOUT, 100);
+        configWriteConcernState.putProperty(WriteConcernState.J, true);
+        configWriteConcernState.putProperty(WriteConcernState.FSYNC, true);
+        configWriteConcernState.putProperty(WriteConcernState.CONTINUEONERRORFORINSERT, true);
 
-        config.putProperty(WriteConcernResource.ID, configWriteConcernState);
+        config.putProperty(WriteConcernState.ID, configWriteConcernState);
 
         setUpSystem(config);
 
@@ -117,29 +117,14 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
         assertThat( result.getProperty( "db" ) ).isEqualTo("testUpdateWriteConcernDB");
         assertThat(result.getProperty("servers")).isNotNull();
 
-        assertThat(result.getProperty(WriteConcernResource.ID)).isNotNull();
+        assertThat(result.getProperty(WriteConcernState.ID)).isNotNull();
 
-        ResourceState writeConcernState = (ResourceState)result.getProperty(WriteConcernResource.ID);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.W.toString())).isEqualTo(2);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.WTIMEOUT.toString())).isEqualTo(100);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.J.toString())).isEqualTo(true);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.FSYNC.toString())).isEqualTo(true);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.CONTINUEONERRORFORINSERT.toString())).isEqualTo(true);
-
-        ResourceState updateWriteConcernState = new DefaultResourceState();
-        ResourceState updatedConfigWriteConcernState = new DefaultResourceState();
-        updatedConfigWriteConcernState.putProperty(WriteConcernResource.Options.W.toString(), "majority");
-        updatedConfigWriteConcernState.putProperty(WriteConcernResource.Options.J.toString(), false );
-        updateWriteConcernState.putProperty(WriteConcernResource.ID, updatedConfigWriteConcernState);
-
-        ResourceState updatedResult = client.update(new RequestContext.Builder().build(), ADMIN_PATH, updateWriteConcernState);
-
-        ResourceState updatedWCResult = (ResourceState) updatedResult.getProperty(WriteConcernResource.ID);
-        assertThat(updatedWCResult.getProperty(WriteConcernResource.Options.W.toString())).isEqualTo("majority");
-        assertThat(updatedWCResult.getProperty(WriteConcernResource.Options.WTIMEOUT.toString())).isEqualTo(100);
-        assertThat(updatedWCResult.getProperty(WriteConcernResource.Options.J.toString())).isEqualTo(false);
-        assertThat(updatedWCResult.getProperty(WriteConcernResource.Options.FSYNC.toString())).isEqualTo(true);
-        assertThat(updatedWCResult.getProperty(WriteConcernResource.Options.CONTINUEONERRORFORINSERT.toString())).isEqualTo(true);
+        ResourceState writeConcernState = (ResourceState)result.getProperty(WriteConcernState.ID);
+        assertThat(writeConcernState.getProperty(WriteConcernState.W)).isEqualTo(2);
+        assertThat(writeConcernState.getProperty(WriteConcernState.WTIMEOUT)).isEqualTo(100);
+        assertThat(writeConcernState.getProperty(WriteConcernState.J)).isEqualTo(true);
+        assertThat(writeConcernState.getProperty(WriteConcernState.FSYNC)).isEqualTo(true);
+        assertThat(writeConcernState.getProperty(WriteConcernState.CONTINUEONERRORFORINSERT)).isEqualTo(true);
     }
 
     @Test
@@ -147,7 +132,7 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testTaggedDB");
 
-        config.putProperty(WriteConcernResource.ID, null);
+        config.putProperty(WriteConcernState.ID, null);
 
         setUpSystem(config);
 
@@ -156,14 +141,14 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
         assertThat( result.getProperty( "db" ) ).isEqualTo("testTaggedDB");
         assertThat(result.getProperty("servers")).isNotNull();
 
-        assertThat(result.getProperty(WriteConcernResource.ID)).isNotNull();
+        assertThat(result.getProperty(WriteConcernState.ID)).isNotNull();
 
-        ResourceState writeConcernState = (ResourceState)result.getProperty(WriteConcernResource.ID);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.W.toString())).isEqualTo(1);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.WTIMEOUT.toString())).isEqualTo(0);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.J.toString())).isEqualTo(false);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.FSYNC.toString())).isEqualTo(false);
-        assertThat(writeConcernState.getProperty(WriteConcernResource.Options.CONTINUEONERRORFORINSERT.toString())).isEqualTo(false);
+        ResourceState writeConcernState = (ResourceState)result.getProperty(WriteConcernState.ID);
+        assertThat(writeConcernState.getProperty(WriteConcernState.W)).isEqualTo(1);
+        assertThat(writeConcernState.getProperty(WriteConcernState.WTIMEOUT)).isEqualTo(0);
+        assertThat(writeConcernState.getProperty(WriteConcernState.J)).isEqualTo(false);
+        assertThat(writeConcernState.getProperty(WriteConcernState.FSYNC)).isEqualTo(false);
+        assertThat(writeConcernState.getProperty(WriteConcernState.CONTINUEONERRORFORINSERT)).isEqualTo(false);
     }
 }
 

@@ -19,16 +19,25 @@ public class InvalidPropertyTypeException extends PropertyException {
         this.collection = collection;
     }
 
+    public InvalidPropertyTypeException(String message) {
+        this.message = message;
+    }
+
     protected String name;
     protected Class<?> requestedType;
     protected boolean collection;
+    protected String message;
 
     @Override
     public String getMessage() {
-        if (!collection) {
-            return "Invalid property type. The property named '" + name + "' expects a type of " + requestedType.getSimpleName();
+        if (message != null) {
+            return message;
         } else {
-            return "Invalid property type. The property name '" + name + "' expects a collection of type " + requestedType.getSimpleName();
+            if (!collection) {
+                return "Invalid property type. The property named '" + name + "' expects a type of " + requestedType.getSimpleName();
+            } else {
+                return "Invalid property type. The property name '" + name + "' expects a collection of type " + requestedType.getSimpleName();
+            }
         }
     }
 }

@@ -1,13 +1,13 @@
 package io.liveoak.mongo.config;
 
-import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.spi.exceptions.InitializationException;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.state.ResourceState;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.exceptions.InitializationException;
+import io.liveoak.spi.state.ResourceState;
+import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.fest.assertions.Fail.fail;
@@ -85,9 +85,9 @@ public class MongoServersConfigTest extends BaseMongoConfigTest {
         assertThat(result.members()).isNotNull();
         assertThat(result.members().size()).isEqualTo(0);
 
-        assertThat(result.getProperty(WriteConcernResource.ID)).isNotNull();
-        assertThat(result.getProperty(ReadPreferenceResource.ID)).isNotNull();
-        assertThat(result.getProperty(MongoClientOptionsResource.ID)).isNotNull();
+        assertThat(result.getProperty(WriteConcernState.ID)).isNotNull();
+        assertThat(result.getProperty(ReadPreferenceState.ID)).isNotNull();
+        assertThat(result.getProperty(MongoClientOptionsState.ID)).isNotNull();
     }
 
     @Test
@@ -302,6 +302,7 @@ public class MongoServersConfigTest extends BaseMongoConfigTest {
     @Test
     public void testNullHost() throws Exception {
         ResourceState config = new DefaultResourceState();
+
         config.putProperty("db", "testNullHostDB");
 
         ResourceState server = new DefaultResourceState();
@@ -327,6 +328,7 @@ public class MongoServersConfigTest extends BaseMongoConfigTest {
     @Test
     public void testInvalidPort() throws Exception {
         ResourceState config = new DefaultResourceState();
+
         config.putProperty("db", "testSingleServerHostOnlyDB");
 
         ResourceState server = new DefaultResourceState();
@@ -378,6 +380,7 @@ public class MongoServersConfigTest extends BaseMongoConfigTest {
     @Test
     public void testNullPort() throws Exception {
         ResourceState config = new DefaultResourceState();
+
         config.putProperty("db", "testNullPortDB");
 
         ResourceState server = new DefaultResourceState();
@@ -424,6 +427,7 @@ public class MongoServersConfigTest extends BaseMongoConfigTest {
 
         ResourceState updatedConfig = new DefaultResourceState();
         List<ResourceState> updatedServers = new ArrayList<ResourceState>();
+        updatedConfig.putProperty("db", "testUpdateServersDB");
 
         ResourceState updatedServerB = new DefaultResourceState();
         updatedServerB.putProperty("host", "127.0.0.3");

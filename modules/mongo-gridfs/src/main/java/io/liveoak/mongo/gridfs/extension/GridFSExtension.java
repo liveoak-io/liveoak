@@ -33,7 +33,7 @@ public class GridFSExtension extends MongoExtension {
 
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
-        RootMongoConfigResource privateResource = new RootMongoConfigResource(context.resourceId());
+        RootMongoConfigResource privateResource = new RootMongoConfigResource(context.resourceId(), null);
         context.mountPrivate(privateResource);
 
         GridFSResourceService publicResource = new GridFSResourceService(context.resourceId());
