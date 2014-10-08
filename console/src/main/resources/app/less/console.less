@@ -618,6 +618,12 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   }
 }
 
+.panel-missing {
+  .panel-heading, .panel-body {
+    background-color : #888888;
+  }
+}
+
 .applications .panel .panel-body.empty-instance p {
   margin-bottom: 15px;
 }
@@ -1053,6 +1059,24 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   font-size: 11px;
   color: @c_graylight;
   margin-top: 3px;
+}
+
+/* FIXME: Mixing with above rule did not worked */
+.security-list .lo-info-pane .fa-check {
+  font-size: 11px;
+  color: @c_graylight;
+  margin-top: 3px;
+}
+
+.security-list .lo-info-pane .fa-info {
+  font-size: 11px;
+  color: @c_graylight;
+  margin-top: 3px;
+}
+
+.lo-tutorials .unsecured-list span {
+  padding-left: 10px;
+  font-size: 13px;
 }
 
 .lo-tutorials .unsecured-list a {
