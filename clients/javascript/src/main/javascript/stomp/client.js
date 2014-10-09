@@ -123,7 +123,7 @@ Stomp.Client.prototype = {
 
     Versions: {
         VERSION_1_0: "1.0",
-        VERSION_1_1: "1.1",
+        VERSION_1_1: "1.1"
 
     },
 
@@ -151,7 +151,11 @@ Stomp.Client.prototype = {
             this._errorCallback = arguments[3];
         }
 
-        this._connectTransport(this._connectCallback);
+        if (this._transport === undefined) {
+            this._connectTransport(this._connectCallback);
+        } else {
+            this._connectCallback();
+        }
 
     },
 
@@ -191,7 +195,7 @@ Stomp.Client.prototype = {
                     transports[i].connect(function () {
                         client._transport = transports[i];
                         callback();
-                    }, client.connectionFailed.bind(this));
+                    }, fallback);
                 } catch (err) {
                     fallback();
                 }
@@ -293,6 +297,6 @@ Stomp.Client.prototype = {
 
     _transmit: function (command, headers, body) {
         this._transport.transmit(command, headers, body);
-    },
+    }
 
 }
