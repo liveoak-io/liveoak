@@ -9,6 +9,8 @@ import io.liveoak.spi.ResourceParams;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,11 +33,16 @@ public class DefaultResourceParams implements ResourceParams {
     }
 
     private DefaultResourceParams(Map<String, List<String>> params) {
-        this.params = params;
+        LinkedHashMap<String, List<String>> result = new LinkedHashMap<>();
+        for (Map.Entry<String, List<String>> ent: params.entrySet()) {
+            result.put(ent.getKey(), Collections.unmodifiableList(ent.getValue()));
+        }
+
+        this.params = Collections.unmodifiableMap(result);
     }
 
     public Collection<String> names() {
-        return Collections.unmodifiableCollection(params.keySet());
+        return params.keySet();
     }
 
     public boolean contains(String name) {
@@ -51,7 +58,7 @@ public class DefaultResourceParams implements ResourceParams {
     }
 
     public List<String> values(String name) {
-        return Collections.unmodifiableList(params.get(name));
+        return params.get(name);
     }
 
     public int intValue(String name, int def) {
@@ -64,5 +71,29 @@ public class DefaultResourceParams implements ResourceParams {
 
     public String toString() {
         return "[ResourceParams: params=" + this.params + "]";
+    }
+
+
+
+    public static class Builder {
+
+        private LinkedHashMap<String, List<String>> params = new LinkedHashMap<>();
+
+        public Builder() {
+        }
+
+        public Builder add(String name, String value) {
+            List<String> values = params.get(name);
+            if (values == null) {
+                values = new LinkedList<>();
+                params.put(name, values);
+            }
+            values.add(value);
+            return this;
+        }
+
+        public ResourceParams build() {
+            return new DefaultResourceParams(params);
+        }
     }
 }
