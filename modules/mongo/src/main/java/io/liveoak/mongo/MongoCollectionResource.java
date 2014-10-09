@@ -51,7 +51,7 @@ public class MongoCollectionResource extends MongoResource {
             return new MongoAggregationResource(this);
         }
 
-        DBObject object = dbCollection.findOne(getMongoID(childId));
+        DBObject object = dbCollection.findOne(getMongoIDDBOBject(childId));
 
         if (object != null) {
             return new MongoBaseObjectResource(this, object);
@@ -72,14 +72,14 @@ public class MongoCollectionResource extends MongoResource {
 
     protected WriteResult deleteChild(RequestContext ctx, String childId) {
         WriteResult wResult = null;
-        wResult = getDBCollection().remove(getMongoID(childId));
+        wResult = getDBCollection().remove(getMongoIDDBOBject(childId));
         return wResult;
     }
 
     protected Object updateChild(RequestContext ctx, String childId, Object child) {
         if (child instanceof DBObject) {
             DBObject childObject = (DBObject) child;
-            WriteResult wResult = dbCollection.update(new BasicDBObject(MONGO_ID_FIELD, childObject.get(MONGO_ID_FIELD)), childObject);
+            WriteResult wResult = dbCollection.update(getMongoIDDBOBject(childId), childObject);
             return wResult;
         } else {
             throw new RuntimeException("ERROR"); // TODO: fix this
@@ -230,7 +230,7 @@ public class MongoCollectionResource extends MongoResource {
 
     public DBObject getChild(String id) {
         DBCursor cursor = getDBCollection().find();
-        return getDBCollection().findOne(getMongoID(id));
+        return getDBCollection().findOne(getMongoIDDBOBject(id));
     }
 
     protected DBCollection getDBCollection() {

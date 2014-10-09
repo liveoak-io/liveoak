@@ -49,12 +49,18 @@ public abstract class MongoResource implements SynchronousResource, BlockingReso
         return this.parent;
     }
 
-    protected DBObject getMongoID(String liveOakID) {
-        if (liveOakID.startsWith(MBAAS_MONGO_OBJECT_ID_PREFIX) && liveOakID.endsWith(MBAAS_MONGO_OBJECT_ID_SUFFIX)) {
+    protected DBObject getMongoIDDBOBject(String liveOakID) {
+            return new BasicDBObject(MONGO_ID_FIELD, getMongoID(liveOakID));
+    }
+
+    protected Object getMongoID(String liveOakID) {
+        if (liveOakID == null) {
+            return null;
+        } else if (liveOakID.startsWith(MBAAS_MONGO_OBJECT_ID_PREFIX) && liveOakID.endsWith(MBAAS_MONGO_OBJECT_ID_SUFFIX)) {
             String id = liveOakID.substring(MBAAS_MONGO_OBJECT_ID_PREFIX.length(), liveOakID.length() - MBAAS_MONGO_OBJECT_ID_SUFFIX.length());
-            return new BasicDBObject(MONGO_ID_FIELD, new ObjectId(id));
+            return new ObjectId(id);
         } else {
-            return new BasicDBObject(MONGO_ID_FIELD, liveOakID);
+            return liveOakID;
         }
     }
 
@@ -67,6 +73,8 @@ public abstract class MongoResource implements SynchronousResource, BlockingReso
     protected String getResourceID(Object id) {
         if (id instanceof ObjectId) {
             return MBAAS_MONGO_OBJECT_ID_PREFIX + id.toString() + MBAAS_MONGO_OBJECT_ID_SUFFIX;
+        } else if (id == null) {
+            return null;
         } else {
             return id.toString();
         }
@@ -86,7 +94,7 @@ public abstract class MongoResource implements SynchronousResource, BlockingReso
         // if the state already has an id set, use it here. Otherwise one will be autocreated on insert
         String rid = resourceState.id();
         if (rid != null) {
-            basicDBObject.append(MONGO_ID_FIELD, rid);
+            basicDBObject.append(MONGO_ID_FIELD, getMongoID(rid));
         }
 
         Set<String> keys = resourceState.getPropertyNames();
