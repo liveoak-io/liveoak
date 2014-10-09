@@ -10,6 +10,7 @@ import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.container.Subscription;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.stomp.Headers;
 import io.liveoak.stomp.StompMessage;
@@ -59,6 +60,11 @@ public class ContainerStompServerContext implements StompServerContext {
 
     @Override
     public void handleUnsubscribe(StompConnection connection, String subscriptionId) {
+        handleUnsubscribeSecured(this.subscriptionManager.getSubscription(StompSubscription.generateId(connection, subscriptionId)));
+    }
+
+    protected void handleUnsubscribeSecured(Subscription subscription) {
+        this.subscriptionManager.removeSubscription(subscription);
     }
 
     @Override
@@ -66,6 +72,6 @@ public class ContainerStompServerContext implements StompServerContext {
     }
 
     private ResourceCodecManager codecManager;
-    private SubscriptionManager subscriptionManager;
+    protected SubscriptionManager subscriptionManager;
 
 }

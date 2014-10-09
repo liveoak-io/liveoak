@@ -3,7 +3,6 @@
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package io.liveoak.container.auth;
 
 import java.util.Collection;
@@ -11,6 +10,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.function.Consumer;
 
 import io.liveoak.common.DefaultRequestAttributes;
 import io.liveoak.common.DefaultSecurityContext;
@@ -18,6 +18,7 @@ import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.container.subscriptions.ContainerStompServerContext;
+import io.liveoak.container.subscriptions.StompSubscription;
 import io.liveoak.spi.RequestAttributes;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
@@ -25,6 +26,7 @@ import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.SecurityContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
+import io.liveoak.spi.container.Subscription;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.stomp.Headers;
@@ -36,6 +38,7 @@ import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
+ * @author Ken Finnigan
  */
 public class SecuredStompServerContext extends ContainerStompServerContext {
 
@@ -49,40 +52,84 @@ public class SecuredStompServerContext extends ContainerStompServerContext {
     }
 
     @Override
-    public void handleSubscribe(StompConnection connection, String destination, String subscriptionId, Headers header) {
-        String prefix = getApplicationPrefix(destination, subscriptionId);
+    public void handleSubscribe(StompConnection connection, String destination, String subscriptionId, Headers headers) {
+        String prefix = getApplicationPrefix(destination);
         if (prefix == null) {
             sendError(connection, "Invalid destination: " + destination, null, subscriptionId, HttpResponseStatus.INTERNAL_SERVER_ERROR.code());
             return;
         }
 
-        String token = null;
-
-        // Token will remain null for anonymous requests
-        if (connection.getLogin() != null) {
-
-            // Fow now asume that "login" has always value "Bearer" and passcode is value of accessToken
-            if (!"Bearer".equalsIgnoreCase(connection.getLogin())) {
-                sendError(connection, "Invalid authentication type: " + connection.getLogin(), null, subscriptionId, HttpResponseStatus.UNAUTHORIZED.code());
-                return;
-            }
-            token = connection.getPasscode();
+        String token;
+        try {
+            token = retrieveToken(connection, subscriptionId);
+        } catch (Exception e) {
+            // Error already handled within retrieveToken, just return
+            return;
         }
+
         if (log.isTraceEnabled()) {
             log.trace("Token from request: " + token);
         }
 
-        SecuredSubscriptionFlow flow = new SecuredSubscriptionFlow(connection, destination, subscriptionId, header, token, prefix);
-        flow.triggerAuth();
+        new SecuredSubscriptionFlow(connection, destination, subscriptionId, token, prefix, securityContext -> {
+            SecuredStompServerContext.super.handleSubscribeSecured(connection, destination, subscriptionId, headers, securityContext);
+        }).triggerAuth();
     }
 
-    protected String getApplicationPrefix(String uri, String subscriptionId) {
+    @Override
+    public void handleUnsubscribe(StompConnection connection, String subscriptionId) {
+        Subscription subscription = this.subscriptionManager.getSubscription(StompSubscription.generateId(connection, subscriptionId));
+
+        if (subscription == null) {
+            sendError(connection, "Invalid subscriptionId for connectionId: " + connection.getConnectionId(), null, subscriptionId, HttpResponseStatus.INTERNAL_SERVER_ERROR.code());
+            return;
+        }
+
+        String prefix = getApplicationPrefix(subscription.resourcePath().toString());
+        if (prefix == null) {
+            sendError(connection, "Invalid destination: " + subscription.resourcePath(), null, subscriptionId, HttpResponseStatus.INTERNAL_SERVER_ERROR.code());
+            return;
+        }
+
+        String token;
+        try {
+            token = retrieveToken(connection, subscriptionId);
+        } catch (Exception e) {
+            // Error already handled within retrieveToken, just return
+            return;
+        }
+
+        if (log.isTraceEnabled()) {
+            log.trace("Token from request: " + token);
+        }
+
+        new SecuredSubscriptionFlow(connection, subscription.resourcePath().toString(), subscriptionId, token, prefix, securityContext -> {
+            SecuredStompServerContext.super.handleUnsubscribeSecured(subscription);
+        }).triggerAuth();
+    }
+
+    protected String getApplicationPrefix(String uri) {
         StringTokenizer tokens = new StringTokenizer(uri, "/");
         if (tokens.hasMoreElements()) {
             return tokens.nextToken();
         } else {
             return null;
         }
+    }
+
+    protected String retrieveToken(StompConnection connection, String subscriptionId) throws Exception {
+        String token = null;
+
+        // Token will remain null for anonymous requests
+        if (connection.getLogin() != null) {
+            // For now assume that "login" has always value "Bearer" and passcode is value of accessToken
+            if (!"Bearer".equalsIgnoreCase(connection.getLogin())) {
+                sendError(connection, "Invalid authentication type: " + connection.getLogin(), null, subscriptionId, HttpResponseStatus.UNAUTHORIZED.code());
+                throw new Exception();
+            }
+            token = connection.getPasscode();
+        }
+        return token;
     }
 
     private void sendError(StompConnection connection, String message, Throwable cause, String subscriptionId, int status) {
@@ -103,19 +150,18 @@ public class SecuredStompServerContext extends ContainerStompServerContext {
         private final StompConnection connection;
         private final String destination;
         private final String subscriptionId;
-        private final Headers headers;
         private final String applicationPrefix;
         private final String token;
+        private final Consumer<SecurityContext> callable;
         private SecurityContext securityContext;
 
-        public SecuredSubscriptionFlow(StompConnection connection, String destination, String subscriptionId, Headers headers,
-                                       String token, String applicationPrefix) {
+        public SecuredSubscriptionFlow(StompConnection connection, String destination, String subscriptionId, String token, String applicationPrefix, Consumer<SecurityContext> callable) {
             this.connection = connection;
             this.destination = destination;
             this.subscriptionId = subscriptionId;
-            this.headers = headers;
             this.applicationPrefix = applicationPrefix;
             this.token = token;
+            this.callable = callable;
         }
 
         protected void triggerAuth() {
@@ -179,7 +225,7 @@ public class SecuredStompServerContext extends ContainerStompServerContext {
 
                     // Authorize automatically if Authz service is not available
                     if (resourceResponse.responseType() == ClientResourceResponse.ResponseType.NO_SUCH_RESOURCE) {
-                        SecuredStompServerContext.super.handleSubscribeSecured(connection, destination, subscriptionId, headers, securityContext);
+                        this.callable.accept(securityContext);
                         return;
                     }
 
@@ -188,7 +234,7 @@ public class SecuredStompServerContext extends ContainerStompServerContext {
                         boolean authorized = (Boolean) state.getProperty(AuthzConstants.ATTR_AUTHZ_RESULT);
 
                         if (authorized) {
-                            SecuredStompServerContext.super.handleSubscribeSecured(connection, destination, subscriptionId, headers, securityContext);
+                            this.callable.accept(securityContext);
                         } else {
                             boolean authenticated = securityContext.isAuthenticated();
                             int errorType = authenticated ? HttpResponseStatus.FORBIDDEN.code() : HttpResponseStatus.UNAUTHORIZED.code();

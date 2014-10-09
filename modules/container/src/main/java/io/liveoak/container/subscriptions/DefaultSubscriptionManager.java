@@ -1,5 +1,8 @@
 package io.liveoak.container.subscriptions;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import io.liveoak.common.util.ObjectsTree;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceResponse;
@@ -15,17 +18,23 @@ import org.jboss.logging.Logger;
 public class DefaultSubscriptionManager implements SubscriptionManager {
 
     public DefaultSubscriptionManager() {
-
     }
 
     @Override
     public void addSubscription(Subscription subscription) {
         this.subscriptionsTree.addObject(subscription, subscription.resourcePath());
+        this.subscriptionsMap.put(subscription.id(), subscription);
     }
 
     @Override
     public void removeSubscription(Subscription subscription) {
         this.subscriptionsTree.removeObject(subscription, subscription.resourcePath());
+        this.subscriptionsMap.remove(subscription.id());
+    }
+
+    @Override
+    public Subscription getSubscription(String subscriptionId) {
+        return this.subscriptionsMap.get(subscriptionId);
     }
 
     @Override
@@ -91,6 +100,7 @@ public class DefaultSubscriptionManager implements SubscriptionManager {
         return this.subscriptionsTree.findLeaf(path);
     }
 
-    private ObjectsTree<Subscription> subscriptionsTree = new ObjectsTree<Subscription>();
+    private ObjectsTree<Subscription> subscriptionsTree = new ObjectsTree<>();
+    private Map<String, Subscription> subscriptionsMap = new ConcurrentHashMap<>();
     private static final Logger log = Logger.getLogger(DefaultSubscriptionManager.class);
 }
