@@ -139,14 +139,53 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
     });
   };
 
-  var DeleteResourceSecurityModalCtrl = function ($scope, $modalInstance) {
+  var DeleteResourceSecurityModalCtrl = function ($scope, $route, $modalInstance) {
+
+    function deleteResourceSecurity(paths, resourceId, parentId) {
+      var newAclPolicies = new LoACL();
+      newAclPolicies.autoRules = $scope.acl;
+
+      var newUriPolicies = new LoSecurity();
+      newUriPolicies.rules = $scope.uriPolicies;
+
+      for(var p in paths) {
+        newAclPolicies.autoRules = $filter('filter')(newAclPolicies.autoRules, {'resourcePath': ('!' + paths[p])}, true);
+        newUriPolicies.rules = $filter('filter')(newUriPolicies.rules, {'uriPattern': ('!' + paths[p])}, true);
+      }
+
+      var deleteUriSuccess = function(value/*, responseHeaders*/) {
+        newAclPolicies.$save({appId: currentApp.name}, deleteAclSuccess, deleteFailure);
+      };
+
+      var deleteAclSuccess = function(/*value, responseHeaders*/) {
+        Notifications.success('Deleted the application Security Policies for "' + (parentId ? (parentId + ' / ') : '') + resourceId + '".');
+        $modalInstance.close();
+        $route.reload();
+      };
+
+      var deleteFailure = function (httpResponse) {
+        Notifications.error('Failed to delete the application Security Policies for "' + (parentId ? (parentId + ' / ') : '') + resourceId + '".', httpResponse);
+      };
+
+      newUriPolicies.$save({appId: currentApp.name}, deleteUriSuccess, deleteFailure);
+    }
 
     $scope.resourceSecurityDelete = function (resourceId, parentId) {
-      Notifications.warn('Just kidding, Security settings for "' + (parentId ? (parentId + ' / ') : '') + resourceId + '" were not deleted.. yet!');
-      $modalInstance.close();
-      // FIXME: Delete only single security config, not all!
-      // new LoSecurity().$delete({appId: currentApp.id});
-      // new LoACL().$delete({appId: currentApp.id});
+      if (resourceId === 'Push') {
+        deleteResourceSecurity(['/' + currentApp.id + '/push'], resourceId, parentId);
+      }
+      else if (resourceId === 'Business Logic') {
+        deleteResourceSecurity(['/admin/applications/' + currentApp.id + '/resources/scripts'], resourceId, parentId);
+      }
+      else if (resourceId === 'Clients') {
+        deleteResourceSecurity(['/' + currentApp.id + '/clients', '/' + currentApp.id + '/clients/*'], resourceId, parentId);
+      }
+      else if (!parentId) {
+        deleteResourceSecurity(['/' + currentApp.id + '/' + resourceId, '/' + currentApp.id + '/' + resourceId + '/*'], resourceId, parentId);
+      }
+      else {
+        deleteResourceSecurity(['/' + currentApp.id + '/' + parentId + '/' + resourceId, '/' + currentApp.id + '/' + parentId + '/' + resourceId + '/*'], resourceId, parentId);
+      }
     };
 
     $scope.cancel = function () {
@@ -234,15 +273,7 @@ loMod.controller('SecurityCollectionsCtrl', function($scope, $rootScope, $locati
 
   var newAclPolicies;
   if(!aclPolicies) {
-    newAclPolicies = new LoACL();
-    newAclPolicies.type = 'acl-policy';
-    newAclPolicies.config = {
-      id: 'acl-policy',
-      autoRules: [{
-        resourcePath: userPath,
-        autoAddedOwnerPermissions: []
-      }]
-    };
+    newAclPolicies = createAclPolicies(userPath, LoACL);
     aclPolicies = newAclPolicies.config;
   }
 
@@ -426,15 +457,7 @@ loMod.controller('SecurityStorageCtrl', function($scope, $rootScope, $location, 
 
   var newAclPolicies;
   if(!aclPolicies) {
-    newAclPolicies = new LoACL();
-    newAclPolicies.type = 'acl-policy';
-    newAclPolicies.config = {
-      id: 'acl-policy',
-      autoRules: [{
-        resourcePath: userPath,
-        autoAddedOwnerPermissions: []
-      }]
-    };
+    newAclPolicies = createAclPolicies(userPath, LoACL);
     aclPolicies = newAclPolicies.config;
   }
 
@@ -560,15 +583,7 @@ loMod.controller('SecurityPushCtrl', function($scope, $rootScope, $location, $ro
 
   var newAclPolicies;
   if(!aclPolicies) {
-    newAclPolicies = new LoACL();
-    newAclPolicies.type = 'acl-policy';
-    newAclPolicies.config = {
-      id: 'acl-policy',
-      autoRules: [{
-        resourcePath: userPath,
-        autoAddedOwnerPermissions: []
-      }]
-    };
+    newAclPolicies = createAclPolicies(userPath, LoACL);
     aclPolicies = newAclPolicies.config;
   }
 
@@ -695,15 +710,7 @@ loMod.controller('SecurityClientsCtrl', function($scope, $rootScope, $location, 
 
   var newAclPolicies;
   if(!aclPolicies) {
-    newAclPolicies = new LoACL();
-    newAclPolicies.type = 'acl-policy';
-    newAclPolicies.config = {
-      id: 'acl-policy',
-      autoRules: [{
-        resourcePath: userPath,
-        autoAddedOwnerPermissions: []
-      }]
-    };
+    newAclPolicies = createAclPolicies(userPath, LoACL);
     aclPolicies = newAclPolicies.config;
   }
 
@@ -830,15 +837,7 @@ loMod.controller('SecurityBusinessLogicCtrl', function($scope, $rootScope, $loca
 
   var newAclPolicies;
   if(!aclPolicies) {
-    newAclPolicies = new LoACL();
-    newAclPolicies.type = 'acl-policy';
-    newAclPolicies.config = {
-      id: 'acl-policy',
-      autoRules: [{
-        resourcePath: userPath,
-        autoAddedOwnerPermissions: []
-      }]
-    };
+    newAclPolicies = createAclPolicies(userPath, LoACL);
     aclPolicies = newAclPolicies.config;
   }
 
@@ -1411,6 +1410,20 @@ var consolidateUriPolicies = function(uriPolicies, userPath, superUserPath, sett
   if(superUserPath && !hasSuperRead) { uriPolicies.rules.push(newUriPolicyRule(superUserPath, ['READ'], settings.readAllRoles)); }
   if(superUserPath && !hasSuperUpdate) { uriPolicies.rules.push(newUriPolicyRule(superUserPath, ['UPDATE'], settings.updateAllRoles)); }
   if(superUserPath && !hasSuperDelete) { uriPolicies.rules.push(newUriPolicyRule(superUserPath, ['DELETE'], settings.deleteAllRoles)); }
+};
+
+var createAclPolicies = function(userPath, LoACL) {
+  var newAclPolicies = new LoACL();
+  newAclPolicies.type = 'acl-policy';
+  newAclPolicies.config = {
+    id: 'acl-policy',
+    autoRules: [{
+      resourcePath: userPath,
+      autoAddedOwnerPermissions: []
+    }]
+  };
+
+  return newAclPolicies;
 };
 
 loMod.controller('NoSecurityCtrl', function($scope, $rootScope, $location, $log, $filter, $modal, currentApp) {
