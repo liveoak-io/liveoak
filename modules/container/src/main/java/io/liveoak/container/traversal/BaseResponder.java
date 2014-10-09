@@ -107,6 +107,13 @@ public class BaseResponder implements Responder {
     }
 
     @Override
+    public void internalError(String message, Throwable cause) {
+        log.error(message, cause);
+        this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR, message, cause));
+        resumeRead();
+    }
+
+    @Override
     public void internalError(Throwable cause) {
         log.error("Internal error: ", cause);
         this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR, cause));

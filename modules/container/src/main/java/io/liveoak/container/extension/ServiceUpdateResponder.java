@@ -78,6 +78,11 @@ public class ServiceUpdateResponder implements Responder {
     }
 
     @Override
+    public void internalError(String message, Throwable cause) {
+        this.context.failed(new StartException(message, cause));
+    }
+
+    @Override
     public void internalError(Throwable cause) {
         this.context.failed(new StartException(cause));
     }

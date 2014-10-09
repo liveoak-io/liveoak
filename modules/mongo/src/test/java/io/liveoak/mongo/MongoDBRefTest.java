@@ -5,29 +5,28 @@
  */
 package io.liveoak.mongo;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.net.URI;
 import java.util.List;
-
-import io.liveoak.common.DefaultReturnFields;
-import io.liveoak.spi.state.ResourceRef;
-import org.fest.assertions.Fail;
-import org.junit.Test;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
-
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.spi.exceptions.NotAcceptableException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.exceptions.NotAcceptableException;
+import io.liveoak.spi.exceptions.ResourceException;
 import io.liveoak.spi.exceptions.ResourceNotFoundException;
+import io.liveoak.spi.state.ResourceRef;
 import io.liveoak.spi.state.ResourceState;
+import org.fest.assertions.Fail;
+import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -344,7 +343,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         try {
             client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/johnSmith", getResource);
             fail();
-        } catch (NotAcceptableException e) {
+        } catch (ResourceException e) {
             // expected
         }
 
@@ -355,7 +354,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         try {
             client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/johnSmith", getResource);
             fail();
-        } catch (NotAcceptableException e) {
+        } catch (ResourceException e) {
             // expected
         }
 
@@ -366,7 +365,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         try {
             client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/johnSmith", getResource);
             fail();
-        } catch (NotAcceptableException e) {
+        } catch (ResourceException e) {
             // expected
         }
 
@@ -376,7 +375,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         try {
             client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/johnSmith", getResource);
             fail();
-        } catch (NotAcceptableException e) {
+        } catch (ResourceException e) {
             // expected
         }
 
@@ -386,7 +385,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         try {
             client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/johnSmith", getResource);
             fail();
-        } catch (NotAcceptableException e) {
+        } catch (ResourceException e) {
             // expected
         }
     }

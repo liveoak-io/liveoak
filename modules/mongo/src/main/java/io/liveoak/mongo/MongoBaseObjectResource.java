@@ -5,14 +5,6 @@
  */
 package io.liveoak.mongo;
 
-import io.liveoak.spi.LiveOak;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.exceptions.ResourceProcessingException;
-import io.liveoak.spi.ReturnFields;
-import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.Responder;
-import io.liveoak.spi.state.ResourceState;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,6 +16,13 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
+import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ReturnFields;
+import io.liveoak.spi.exceptions.ResourceProcessingException;
+import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -109,38 +108,38 @@ public class MongoBaseObjectResource extends MongoObjectResource {
             return;
         }
 
-        state.getPropertyNames().stream().forEach((name) -> {
-            if (!name.equals(MONGO_ID_FIELD) && !name.equals(LiveOak.ID)) {
-                Object value = state.getProperty(name);
-                if(value instanceof Collection) {
-                    value = convertCollection(responder, (Collection<?>)value);
-                }
-                if (value instanceof ResourceState) {
-                    value = convertResourceState(responder, (ResourceState)value);
-                }
-                if (value == null) {
-                    dbObject.removeField( name );
-                } else {
-                    // if the previous value was a DBRef, check to make sure they are not trying to modify the referenced
-                    // resource directly through the referencing resource.
-                    if (dbObject.get( name ) instanceof DBRef) {
-                        if (value instanceof DBObject) {
-                            DBObject valueDBObject = (DBObject) value;
-                            if (valueDBObject.get( MONGO_ID_FIELD ) != null)
-                            {
-                                responder.invalidRequest("Cannot update a DBRef directly");
-                                throw new RuntimeException("Invalid request: Cannot update a DBRef directly!");
-                            }
+        try {
+
+            state.getPropertyNames().stream().forEach((name) -> {
+                //if the previous value was a DBRef, check to make sure they are not trying to modify the referenced
+                //resource directly through the referencing resource.
+                if (dbObject.get( name ) instanceof DBRef) {
+                    Object value = state.getProperty(name);
+                    if (value instanceof ResourceState) {
+                        ResourceState valueResourceState = (ResourceState) value;
+                        if (valueResourceState.id() != null)
+                        {
+                            responder.invalidRequest("Cannot update a DBRef directly");
+                            throw new RuntimeException("Invalid request: Cannot update a DBRef directly!");
                         }
                     }
-                    dbObject.put(name, value);
                 }
+            });
+
+            DBObject basicDBObject = (BasicDBObject) createObject(state);
+            if (getResourceID(basicDBObject) != null && !getResourceID(basicDBObject).equals(this.id())) {
+                responder.invalidRequest("Modifying an id is not allowed on an update.");
             }
-        });
 
-        getParent().updateChild(ctx, this.id(), dbObject);
+            basicDBObject.put(MONGO_ID_FIELD, getMongoID(this.id()));
 
-        responder.resourceUpdated(this);
+            this.dbObject = basicDBObject;
+            getParent().updateChild(ctx, this.id(), basicDBObject);
+
+            responder.resourceUpdated(this);
+        } catch (Exception e) {
+            responder.internalError("An error occured while updating the mongo resource. Resource Not updated.", e);
+        }
     }
 
     private Object convertCollection(Responder responder, Collection<?> value) {
