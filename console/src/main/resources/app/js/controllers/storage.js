@@ -934,9 +934,8 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
       var value = rData[key];
 
-      // If the value is empty
+      // If the value is empty then ignore
       if(value === '') {
-        newObj[key] = null;
       // If it's a string
       } else if (value[0] === '"' && value[value.length - 1] === '"') {
         newObj[key] = value.substr(1, value.length - 2);
