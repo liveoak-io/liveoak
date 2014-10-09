@@ -222,7 +222,7 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
 
 loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $route, currentApp, $modal, Notifications,
                                                    currentCollectionList, LoCollection, $routeParams, LoCollectionItem,
-                                                   LiveOak, $location, $window, $cookieStore, $q) {
+                                                   LiveOak, $location, $window, $cookieStore, $q, loRemoteCheck) {
 
   $log.debug('StorageCollectionCtrl');
   $rootScope.curApp = currentApp;
@@ -446,11 +446,13 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     };
 
     $scope.checkColName = function (collectionName) {
-      LoCollection.get({appId: currentApp.id, storageId: $routeParams.storageId, collectionId: collectionName}, function () {
-        $scope.modalScope.loCollectionCreate.collectionName.$setValidity('collectionName', false);
-      }, function() {
-        $scope.modalScope.loCollectionCreate.collectionName.$setValidity('collectionName', true);
-      });
+      var _resMethod = LoCollection.check;
+      var _resParams = {appId: currentApp.id, storageId: $routeParams.storageId, collectionId: collectionName};
+
+      var _formCtrl = $scope.modalScope.loCollectionCreate;
+      var _inputCtrl = _formCtrl.collectionName;
+
+      this.timeout = loRemoteCheck(this.timeout, _resMethod, _resParams, _formCtrl, _inputCtrl, 'collectionName');
     };
 
     $scope.getFile = function () {

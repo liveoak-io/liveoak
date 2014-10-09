@@ -83,17 +83,22 @@ loMod.factory('LoStorage', function($resource) {
 });
 
 loMod.factory('LoCollection', function($resource) {
-  return $resource('/:appId/:storageId/:collectionId?fields=*(*)', {
+  return $resource('/:appId/:storageId/:collectionId', {
     appId : '@appId',
     storageId : '@storageId',
     collectionId : '@collectionId'
   }, {
+    check : {
+      method : 'GET',
+      params: { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId' }
+    },
     get : {
       method : 'GET',
-      params: { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId'}
+      params: { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId', fields : '*(*)' }
     },
     getList : {
-      method : 'GET'
+      method : 'GET',
+      params: { fields : '*(*)' }
     },
     create : {
       method : 'POST',
@@ -655,4 +660,39 @@ loMod.factory('LoLiveAppList', function($resource) {
   };
 
   return res;
+});
+
+loMod.provider('loRemoteCheck', function() {
+
+  this.delay = 300;
+  this.validityStringDefault = 'remoteValidation';
+
+  this.$get = ['$rootScope', '$timeout', '$log', function($rootScope, $timeout) {
+    var delay = this.delay;
+    var validityDefault = this.validityStringDefault;
+
+    return function (timeoutPointer, resourceMethod, resourceParameters, formCtrl, inputCtrl, validityString) {
+
+      if (!validityString) {
+        validityString = validityDefault;
+      }
+
+      formCtrl.$setValidity(validityString, false);
+
+      if (timeoutPointer){
+        $timeout.cancel(timeoutPointer);
+      }
+
+      var timeoutId = $timeout(function(){
+        resourceMethod(resourceParameters, function(){
+          inputCtrl.$setValidity(validityString, false);
+        }, function(){
+          inputCtrl.$setValidity(validityString, true);
+          formCtrl.$setValidity(validityString, true);
+        });
+      }, delay);
+
+      return timeoutId;
+    };
+  }];
 });
