@@ -833,8 +833,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       $log.debug('Creating: ' + newRowToSave);
       var decodedNewRowToSave = decodeJSON(newRowToSave);
 
-      console.log(decodedNewRowToSave);
-
       var promiseCreate = LoCollectionItem.create({appId: currentApp.id, storageId: $routeParams.storageId,
         collectionId: $scope.collectionId}, decodedNewRowToSave, angular.noop, errorCreate).$promise;
 

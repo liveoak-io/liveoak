@@ -373,7 +373,6 @@ loMod.config(['$routeProvider', function($routeProvider) {
         },
         userRoles: function(LoRealmUsers, $route) {
           return LoRealmUsers.getRoles({appId: $route.current.params.appId, userId: $route.current.params.userId}).$promise.then(function(data) {
-              console.log(data);
               return data;
             },
             function() {
