@@ -696,3 +696,65 @@ loMod.provider('loRemoteCheck', function() {
     };
   }];
 });
+
+loMod.service('loJSON', function() {
+
+  this.toStringObject = function(jsonObject){
+    var stringObject = {};
+
+    for(var key in jsonObject){
+      var dType = typeof jsonObject[key];
+      if (dType === 'string'){
+        stringObject[key] = '"' + jsonObject[key] + '"';
+      } else {
+        stringObject[key] = angular.toJson(jsonObject[key]);
+      }
+    }
+
+    return stringObject;
+  };
+
+  this.parseJSON = function(stringObject){
+    var jsonObject = {};
+
+    // The doubled casting is to trim off angular stuff like the $$hashKey from properties
+    for(var key in angular.fromJson(angular.toJson(stringObject))){
+
+      var value = stringObject[key];
+
+      // If the value is empty then ignore
+      if(value === '') {
+        // If it's a string
+      } else if (value[0] === '"' && value[value.length - 1] === '"') {
+        jsonObject[key] = value.substr(1, value.length - 2);
+        // If it's a numbers
+      } else if (!isNaN(value)) {
+        jsonObject[key] = parseFloat(value);
+        // If it's a boolean
+      } else if (value === 'true' || value === 'false') {
+        jsonObject[key] = (value === 'true');
+        // If it's null
+      } else if (value === 'null') {
+        jsonObject[key] = null;
+      } else {
+        jsonObject[key] = JSON.parse(value);
+      }
+    }
+
+    return jsonObject;
+  };
+
+  this.isValidJSON = function(jsonObject) {
+
+    var valid = true;
+    try {
+      // The function is false only in case of error
+      JSON.parse(jsonObject);
+    } catch(e) {
+      valid = false;
+    }
+
+    return valid;
+  };
+
+});
