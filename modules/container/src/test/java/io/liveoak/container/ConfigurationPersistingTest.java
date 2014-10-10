@@ -1,5 +1,11 @@
 package io.liveoak.container;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,21 +19,15 @@ import io.liveoak.container.extension.MockExtension;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.exceptions.ResourceException;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.client.Client;
+import io.liveoak.spi.exceptions.ResourceException;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 import org.fest.assertions.Condition;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -74,15 +74,16 @@ public class ConfigurationPersistingTest {
     }
 
     protected ObjectNode readConfig() throws IOException {
-        System.err.println( "read-from-disk: " + this.application.configurationFile() + " // " + this.application.configurationFile().exists() );
-        if ( this.application.configurationFile().exists() ) {
-            System.err.println( "file size: " + this.application.configurationFile().length() );
+        System.err.println("read-from-disk: " + this.application.configurationFile() + " // " + this.application.configurationFile().exists());
+        if (this.application.configurationFile().exists()) {
+            System.err.println("file size: " + this.application.configurationFile().length());
         }
         return (ObjectNode) mapper.readTree(this.application.configurationFile());
     }
 
     @Test
-    public void testPersistRuntimeAddedResource() throws Exception {
+    public void testConfigPersisting() throws Exception {
+        System.out.println("TEST #1 - Persist runtime added resource");
         ObjectNode tree = readConfig();
 
         assertThat(tree.get("resources")).isNotNull();
@@ -90,55 +91,53 @@ public class ConfigurationPersistingTest {
 
         ObjectNode initialConfig = JsonNodeFactory.instance.objectNode();
         initialConfig.put("cheese", "cheddar");
-        this.application.extend("mock", initialConfig);
+        this.application.extend("mock", "one", initialConfig);
 
         this.system.awaitStability();
 
-        ResourceState configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "mock");
+        ResourceState configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "one");
         assertThat(configState).isNotNull();
 
         tree = readConfig();
-        JsonNode mockTree = tree.get("resources").get("mock");
-
+        JsonNode mockTree = tree.get("resources").get("one");
         assertThat(mockTree).isNotNull();
         assertThat(mockTree.get("type").asText()).isEqualTo("mock");
 
         JsonNode mockConfig = mockTree.get("config");
         assertThat(mockConfig).isNotNull();
         assertThat(mockConfig.get("cheese").asText()).isEqualTo("cheddar");
-    }
 
-    @Test
-    public void testRuntimeUpdatedConfiguration() throws Exception {
-        ObjectNode initialConfig = JsonNodeFactory.instance.objectNode();
+
+        System.out.println("TEST #2 - Runtime updated configuration");
+        initialConfig = JsonNodeFactory.instance.objectNode();
         initialConfig.put("cheese", "cheddar");
-        this.application.extend("mock", initialConfig);
+        this.application.extend("mock", "two", initialConfig);
         this.system.awaitStability();
 
-        ResourceState configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "mock");
+        configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "two");
         assertThat(configState).isNotNull();
 
-        JsonNode tree = readConfig();
-        JsonNode mockTree = tree.get("resources").get("mock");
+        tree = readConfig();
+        mockTree = tree.get("resources").get("two");
 
         assertThat(mockTree).isNotNull();
         assertThat(mockTree.get("type").asText()).isEqualTo("mock");
 
-        JsonNode mockConfig = mockTree.get("config");
+        mockConfig = mockTree.get("config");
         assertThat(mockConfig).isNotNull();
         assertThat(mockConfig.get("cheese").asText()).isEqualTo("cheddar");
 
         configState = new DefaultResourceState();
         configState.putProperty("dog", "moses");
 
-        ResourceState result = this.client.update(new RequestContext.Builder().build(), ADMIN_PATH + "mock", configState);
+        ResourceState result = this.client.update(new RequestContext.Builder().build(), ADMIN_PATH + "two", configState);
 
         assertThat(result).isNotNull();
         assertThat(result.getProperty("cheese")).isNull();
         assertThat(result.getProperty("dog")).isEqualTo("moses");
 
         tree = readConfig();
-        mockTree = tree.get("resources").get("mock");
+        mockTree = tree.get("resources").get("two");
 
         assertThat(mockTree).isNotNull();
         assertThat(mockTree.get("type").asText()).isEqualTo("mock");
@@ -147,45 +146,42 @@ public class ConfigurationPersistingTest {
         assertThat(mockConfig).isNotNull();
         assertThat(mockConfig.get("cheese")).isNull();
         assertThat(mockConfig.get("dog").asText()).isEqualTo("moses");
-    }
 
-    @Test
-    public void testRuntimeRemoval() throws Exception {
-        ObjectNode initialConfig = JsonNodeFactory.instance.objectNode();
+
+        System.out.println("TEST #3 - Runtime removal");
+        initialConfig = JsonNodeFactory.instance.objectNode();
         initialConfig.put("cheese", "cheddar");
-        this.application.extend("mock", initialConfig);
+        this.application.extend("mock", "three", initialConfig);
         this.system.awaitStability();
 
-        ResourceState configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "mock");
+        configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "three");
         assertThat(configState).isNotNull();
 
-        JsonNode tree = readConfig();
-        JsonNode mockTree = tree.get("resources").get("mock");
+        tree = readConfig();
+        mockTree = tree.get("resources").get("three");
 
         assertThat(mockTree).isNotNull();
         assertThat(mockTree.get("type").asText()).isEqualTo("mock");
 
-        this.client.delete(new RequestContext.Builder().build(), ADMIN_PATH + "mock");
+        this.client.delete(new RequestContext.Builder().build(), ADMIN_PATH + "three");
 
         try {
-            this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "mock");
+            this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "three");
             fail("should be gone");
         } catch (ResourceException e) {
             // expected
         }
 
         tree = readConfig();
-        mockTree = tree.get("resources").get("mock");
+        mockTree = tree.get("resources").get("three");
+        assertThat(mockTree).isNull();
 
-        assertThat( mockTree ).isNull();
-    }
 
-    @Test
-    public void testReadNonRuntimeValues() throws Exception {
+        System.out.println("TEST #4 - Read non runtime values");
         String appDir = "${application.dir}/app/";
         String randomDir = "/my/path/${application.name}/random";
 
-        ObjectNode tree = readConfig();
+        tree = readConfig();
         assertThat(tree.get("resources")).isNotNull();
         assertThat(tree.get("resources").get("filter")).isNull();
 
@@ -194,7 +190,7 @@ public class ConfigurationPersistingTest {
         this.system.awaitStability();
 
         // Check config values to make sure we're receiving the unparsed versions
-        ResourceState configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "filter");
+        configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "filter");
         validateEquals(configState, appDir, randomDir);
 
         // Check that the Resource itself is dealing with parsed values
@@ -279,8 +275,8 @@ public class ConfigurationPersistingTest {
         assertThat(configState.getProperty("randomDir")).isEqualTo(expectedRandomDir);
         assertThat(configState.getProperty("unknownDir")).isEqualTo("/my/unknown/path");
         assertThat(configState.getProperty("notVar")).isEqualTo("testApp");
-        assertThat(((ResourceState)((List<Resource>)configState.getProperty("sub")).get(0)).getProperty("appDir")).isEqualTo("/my/app/dir");
-        assertThat(((ResourceState)((List<Resource>)configState.getProperty("sub")).get(0)).getProperty("subAppDir")).isEqualTo(expectedAppDir);
+        assertThat(((ResourceState) ((List<Resource>) configState.getProperty("sub")).get(0)).getProperty("appDir")).isEqualTo("/my/app/dir");
+        assertThat(((ResourceState) ((List<Resource>) configState.getProperty("sub")).get(0)).getProperty("subAppDir")).isEqualTo(expectedAppDir);
     }
 
     private void validateNotEquals(ResourceState configState, String expectedAppDir, String expectedRandomDir, String extraRandomEnding) {
@@ -289,8 +285,8 @@ public class ConfigurationPersistingTest {
         assertThat(configState.getProperty("randomDir")).isNotEqualTo(expectedRandomDir);
         assertThat(configState.getProperty("unknownDir")).isEqualTo("/my/unknown/path");
         assertThat(configState.getProperty("notVar")).isEqualTo("testApp");
-        assertThat(((ResourceState)((List<Resource>)configState.getProperty("sub")).get(0)).getProperty("appDir")).isEqualTo("/my/app/dir");
-        assertThat(((ResourceState)((List<Resource>)configState.getProperty("sub")).get(0)).getProperty("subAppDir")).isNotEqualTo(expectedAppDir);
+        assertThat(((ResourceState) ((List<Resource>) configState.getProperty("sub")).get(0)).getProperty("appDir")).isEqualTo("/my/app/dir");
+        assertThat(((ResourceState) ((List<Resource>) configState.getProperty("sub")).get(0)).getProperty("subAppDir")).isNotEqualTo(expectedAppDir);
         assertThat(configState.getProperty("appDir")).satisfies(new Condition<Object>() {
             @Override
             public boolean matches(Object value) {
@@ -309,7 +305,7 @@ public class ConfigurationPersistingTest {
                 return ((String) value).endsWith("/random" + extraRandomEnding);
             }
         });
-        assertThat(((ResourceState)((List<Resource>)configState.getProperty("sub")).get(0)).getProperty("subAppDir")).satisfies(new Condition<Object>() {
+        assertThat(((ResourceState) ((List<Resource>) configState.getProperty("sub")).get(0)).getProperty("subAppDir")).satisfies(new Condition<Object>() {
             @Override
             public boolean matches(Object value) {
                 if (!(value instanceof String)) {

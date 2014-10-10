@@ -1,7 +1,9 @@
-package io.liveoak.container;
+package io.liveoak.container.codec;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultReturnFields;
+import io.liveoak.container.LiveOakFactory;
+import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
@@ -22,6 +24,7 @@ import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+ * @author Ken Finnigan
  */
 public class MemberEncodingDriverTest {
 
@@ -31,7 +34,6 @@ public class MemberEncodingDriverTest {
 
     private static final String PATH = "/testApp/";
     private static final String RESOURCE_ID = "readMembers";
-
 
     TestReadingMembersResource resource;
 
@@ -56,89 +58,75 @@ public class MemberEncodingDriverTest {
 
     @Test
     public void testReadNoReturnFields() throws Exception {
+        // Test #1 - Test Read with no ReturnFields
         // by default the members are returned
         ResourceState configState = this.client.read(new RequestContext.Builder().build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
-
         assertThat(resource.getReadMembers()).isTrue();
-    }
 
-    @Test
-    public void testReadAllReturnFields() throws Exception {
+        // Test #2 - Test Read with All ReturnFields
         // when all is specified, the members should be returned
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( ReturnFields.ALL).build(), PATH + RESOURCE_ID);
+        resource.resetFlag();
+        configState = this.client.read(new RequestContext.Builder().returnFields( ReturnFields.ALL).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
-
         assertThat(resource.getReadMembers()).isTrue();
-    }
 
-    @Test
-    public void testReadAsteriskReturnFields() throws Exception {
+        // Test #3 - Test Read with Asterisk ReturnFields
         // when all is specified, the members should be returned
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*")).build(), PATH + RESOURCE_ID);
+        resource.resetFlag();
+        configState = this.client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*")).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
-
         assertThat(resource.getReadMembers()).isTrue();
-    }
 
-    @Test
-    public void testReadNoneReturnFields() throws Exception {
+        // Test #4 - Test Read with None ReturnFields
         // when requesting no return fields, we should not get the members
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( ReturnFields.NONE).build(), PATH + RESOURCE_ID);
+        resource.resetFlag();
+        configState = this.client.read(new RequestContext.Builder().returnFields( ReturnFields.NONE).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
-
         assertThat(resource.getReadMembers()).isFalse();
-    }
 
-    @Test
-    public void testReadOtherReturnFields() throws Exception {
+        // Test #5 - Test Read with other ReturnFields
         // when requesting return fields and not members, should not be reading the members
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("foo")).build(), PATH + RESOURCE_ID);
+        resource.resetFlag();
+        configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("foo")).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
-
         assertThat(resource.getReadMembers()).isFalse();
-    }
 
-    @Test
-    public void testReadMembersReturnFields() throws Exception {
+        // Test #6 - Test Read with members ReturnFields
         // when requesting 'members' as part of the return fields, should be reading the members
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields(LiveOak.MEMBERS)).build(), PATH + RESOURCE_ID);
+        resource.resetFlag();
+        configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields(LiveOak.MEMBERS)).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
-
         assertThat(resource.getReadMembers()).isTrue();
-    }
 
-    @Test
-    public void testReadMembersAndOtherReturnFields() throws Exception {
+        // Test #7 - Test Read with members and other ReturnFields
         // when requesting 'members' as part of the return fields, should be reading the members
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("foo,members")).build(), PATH + RESOURCE_ID);
+        resource.resetFlag();
+        configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("foo,members")).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
-
         assertThat(resource.getReadMembers()).isTrue();
-    }
 
-    @Test
-    public void testReadMultiReturnFields() throws Exception {
+        // Test #8 - Test Read with multiple ReturnFields
         // when requesting 'members' as part of the return fields, should be reading the members
-        ResourceState configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("bar,foo, members")).build(), PATH + RESOURCE_ID);
+        resource.resetFlag();
+        configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("bar,foo, members")).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
-
         assertThat(resource.getReadMembers()).isFalse();
     }
 
@@ -166,6 +154,10 @@ public class MemberEncodingDriverTest {
         Resource parent;
         String id;
         boolean readMembers = false;
+
+        public void resetFlag() {
+            readMembers = false;
+        }
 
         public TestReadingMembersResource(String id) {
             this.id = id;

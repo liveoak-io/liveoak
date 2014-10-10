@@ -100,7 +100,8 @@ public class ApplicationDeleteTest {
     }
 
     @Test
-    public void testAppDeleteAndRecreate() throws Throwable {
+    public void deleteTests() throws Throwable {
+        // Test #1 - Test deleting and recreating an application with the same id
         this.system.applicationRegistry().createApplication("testApp1", "Test Application 1");
         this.system.awaitStability();
 
@@ -136,17 +137,12 @@ public class ApplicationDeleteTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
         response.close();
-    }
 
-    @Test
-    public void testAppDeleteAndRecreateWithResources() throws Throwable {
+
+        // Test #2 - Test deleting and recreating an application with the same id and resources
         InternalApplication app = this.system.applicationRegistry().createApplication("testApp2", "Test Application 2");
         app.extend("dummy");
         this.system.awaitStability();
-
-        HttpDelete deleteRequest;
-        HttpPost postRequest;
-        CloseableHttpResponse response;
 
         // Delete app
         deleteRequest = new HttpDelete("http://localhost:8080/admin/applications/testApp2");

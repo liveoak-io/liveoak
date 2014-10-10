@@ -88,18 +88,16 @@ public class ConfigurationResourceTest {
     }
 
     @Test
-    public void testReadConfiguration() throws Exception {
+    public void configTests() throws Exception {
+        System.out.println("TEST #1 - Read configuration");
         ResourceState configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(CONFIG_RESOURCE_ID);
         assertThat(configState.uri().toString()).isEqualTo(ADMIN_PATH + CONFIG_RESOURCE_ID);
 
-    }
-
-    @Test
-    public void testConfigPropertyString() throws Exception {
-        ResourceState configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_RESOURCE_ID);
+        System.out.println("TEST #2 - Config property string");
+        configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(CONFIG_RESOURCE_ID);
@@ -114,10 +112,8 @@ public class ConfigurationResourceTest {
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
         assertThat(value).toString().equals(SECOND_VALUE);
-    }
 
-    @Test
-    public void testConfigPropertyNotFound() throws Exception {
+        System.out.println("TEST #3 - Config property not found");
         try {
             ObjectNode configNode = JsonNodeFactory.instance.objectNode();
             configNode.put(SECOND_KEY, SECOND_VALUE);
@@ -126,10 +122,8 @@ public class ConfigurationResourceTest {
         } catch (Exception e) {
             // expected and correct
         }
-    }
 
-    @Test
-    public void testConfigPropertyConverter() throws Exception {
+        System.out.println("TEST #4 - Config property converter");
         this.system.extensionInstaller().load("config-converter", new InMemoryConfigConverterExtension());
 
         ObjectNode configNode = JsonNodeFactory.instance.objectNode();
@@ -137,31 +131,29 @@ public class ConfigurationResourceTest {
         this.application.extend("config-converter", CONFIG_CONVERTER_RESOURCE_ID, configNode);
         this.system.awaitStability();
 
-        ResourceState configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_CONVERTER_RESOURCE_ID);
+        configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_CONVERTER_RESOURCE_ID);
 
         assertThat(configState).isNotNull();
 
-        Object value = configState.getProperty("file");
+        value = configState.getProperty("file");
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
         assertThat(value).toString().equals(this.projectRoot.getAbsolutePath());
-    }
 
-    @Test
-    public void testConfigMultiPropertyConversion() throws Exception {
+        System.out.println("TEST #5 - Config multi property conversion");
         this.system.extensionInstaller().load("config-multi", new InMemoryConfigMultiValueExtension());
 
-        ObjectNode configNode = JsonNodeFactory.instance.objectNode();
+        configNode = JsonNodeFactory.instance.objectNode();
         configNode.put("firstValue", "firstValue");
         configNode.put("secondValue", "another");
         this.application.extend("config-multi", CONFIG_MULTI_RESOURCE_ID, configNode);
         this.system.awaitStability();
 
-        ResourceState configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_MULTI_RESOURCE_ID);
+        configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_MULTI_RESOURCE_ID);
 
         assertThat(configState).isNotNull();
 
-        Object value = configState.getProperty("firstValue");
+        value = configState.getProperty("firstValue");
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
         assertThat(value).toString().equals("firstValue");
@@ -170,13 +162,11 @@ public class ConfigurationResourceTest {
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
         assertThat(value).toString().equals("another");
-    }
 
-    @Test
-    public void testConfigPropertyTypeConversion() throws Exception {
+        System.out.println("TEST #6 - Config property type conversion");
         this.system.extensionInstaller().load("config-types", new InMemoryConfigTypesExtension());
 
-        ObjectNode configNode = JsonNodeFactory.instance.objectNode();
+        configNode = JsonNodeFactory.instance.objectNode();
         configNode.put("file", this.projectRoot.getAbsolutePath());
         configNode.put("flag", true);
         configNode.put("url", "http://liveoak.io");
@@ -186,11 +176,10 @@ public class ConfigurationResourceTest {
         this.application.extend("config-types", CONFIG_TYPE_RESOURCE_ID, configNode);
         this.system.awaitStability();
 
-        ResourceState configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_TYPE_RESOURCE_ID);
-
+        configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_TYPE_RESOURCE_ID);
         assertThat(configState).isNotNull();
 
-        Object value = configState.getProperty("file");
+        value = configState.getProperty("file");
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
         assertThat(value).toString().equals(this.projectRoot.getAbsolutePath());
