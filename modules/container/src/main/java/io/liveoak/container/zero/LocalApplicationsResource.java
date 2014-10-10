@@ -8,11 +8,10 @@ import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.eclipse.jgit.api.Git;
 import org.vertx.java.core.Vertx;
 
 /**
@@ -64,12 +63,16 @@ public class LocalApplicationsResource implements RootResource, SynchronousResou
         // Copy from 'localPath' to application path
         String id = state.id();
         File installDir = new File(this.applicationsDirectory, id);
+        final String copyFromPath = localPath;
+        Git gitRepo = GitHelper.initRepo(installDir);
+
         this.vertx.fileSystem().copy(localDir.getAbsolutePath(), installDir.getAbsolutePath(), true, event -> {
             if (event.succeeded()) {
                 try {
                     InternalApplication app = this.applicationRegistry.createApplication(id, (String) state.getProperty("name"), installDir);
+                    GitHelper.addAllAndCommit(gitRepo, ctx.securityContext().getUser(), "Import LiveOak application from: " + copyFromPath);
                     responder.resourceCreated(app.resource());
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     responder.internalError(e);
                 }
             } else if (event.failed()) {
