@@ -72,7 +72,6 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
         // storage
         if ($filter('filter')($scope.storageList, {'id': pathElemsAcl[2]}).length > 0) {
           $scope.securedStorages.aclPolicies.push($scope.acl[i]);
-          console.log($scope.acl[i]);
         }
       }
       else if (pathElemsAcl.length + extraAcl === 4) {
@@ -1316,7 +1315,6 @@ loMod.controller('SecurityUsersAddCtrl', function($scope, $rootScope, $log, $rou
   };
 
   $scope.save = function() {
-    console.log($scope.userModel);
     if (!$scope.userModel.profile.username) {
       Notifications.error('The "Username" field is required for user creation.');
     }

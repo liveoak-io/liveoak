@@ -83,17 +83,22 @@ loMod.factory('LoStorage', function($resource) {
 });
 
 loMod.factory('LoCollection', function($resource) {
-  return $resource('/:appId/:storageId/:collectionId?fields=*(*)', {
+  return $resource('/:appId/:storageId/:collectionId', {
     appId : '@appId',
     storageId : '@storageId',
     collectionId : '@collectionId'
   }, {
+    check : {
+      method : 'GET',
+      params: { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId' }
+    },
     get : {
       method : 'GET',
-      params: { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId'}
+      params: { appId : '@appId', storageId : '@storageId', collectionId: '@collectionId', fields : '*(*)' }
     },
     getList : {
-      method : 'GET'
+      method : 'GET',
+      params: { fields : '*(*)' }
     },
     create : {
       method : 'POST',
@@ -655,4 +660,101 @@ loMod.factory('LoLiveAppList', function($resource) {
   };
 
   return res;
+});
+
+loMod.provider('loRemoteCheck', function() {
+
+  this.delay = 300;
+  this.validityStringDefault = 'remoteValidation';
+
+  this.$get = ['$rootScope', '$timeout', '$log', function($rootScope, $timeout) {
+    var delay = this.delay;
+    var validityDefault = this.validityStringDefault;
+
+    return function (timeoutPointer, resourceMethod, resourceParameters, formCtrl, inputCtrl, validityString) {
+
+      if (!validityString) {
+        validityString = validityDefault;
+      }
+
+      formCtrl.$setValidity(validityString, false);
+
+      if (timeoutPointer){
+        $timeout.cancel(timeoutPointer);
+      }
+
+      var timeoutId = $timeout(function(){
+        resourceMethod(resourceParameters, function(){
+          inputCtrl.$setValidity(validityString, false);
+        }, function(){
+          inputCtrl.$setValidity(validityString, true);
+          formCtrl.$setValidity(validityString, true);
+        });
+      }, delay);
+
+      return timeoutId;
+    };
+  }];
+});
+
+loMod.service('loJSON', function() {
+
+  this.toStringObject = function(jsonObject){
+    var stringObject = {};
+
+    for(var key in jsonObject){
+      var dType = typeof jsonObject[key];
+      if (dType === 'string'){
+        stringObject[key] = '"' + jsonObject[key] + '"';
+      } else {
+        stringObject[key] = angular.toJson(jsonObject[key]);
+      }
+    }
+
+    return stringObject;
+  };
+
+  this.parseJSON = function(stringObject){
+    var jsonObject = {};
+
+    // The doubled casting is to trim off angular stuff like the $$hashKey from properties
+    for(var key in angular.fromJson(angular.toJson(stringObject))){
+
+      var value = stringObject[key];
+
+      // If the value is empty then ignore
+      if(value === '') {
+        // If it's a string
+      } else if (value[0] === '"' && value[value.length - 1] === '"') {
+        jsonObject[key] = value.substr(1, value.length - 2);
+        // If it's a numbers
+      } else if (!isNaN(value)) {
+        jsonObject[key] = parseFloat(value);
+        // If it's a boolean
+      } else if (value === 'true' || value === 'false') {
+        jsonObject[key] = (value === 'true');
+        // If it's null
+      } else if (value === 'null') {
+        jsonObject[key] = null;
+      } else {
+        jsonObject[key] = JSON.parse(value);
+      }
+    }
+
+    return jsonObject;
+  };
+
+  this.isValidJSON = function(jsonObject) {
+
+    var valid = true;
+    try {
+      // The function is false only in case of error
+      JSON.parse(jsonObject);
+    } catch(e) {
+      valid = false;
+    }
+
+    return valid;
+  };
+
 });

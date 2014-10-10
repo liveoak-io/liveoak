@@ -163,7 +163,6 @@ loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $route
         $location.path('/applications/' + currentApp.id + '/business-logic');
       },
       function(httpResponse) {
-        console.log(httpResponse);
         Notifications.httpError('Failed to ' + ($scope.create ? 'create' : 'update') + ' the script "' + $scope.script.id + '".', httpResponse);
       }
     );

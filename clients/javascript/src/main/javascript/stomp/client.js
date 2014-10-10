@@ -110,9 +110,6 @@ var Stomp = {
 
 };
 
-Stomp
-
-
 Stomp.Client = function (host, port, secure) {
     this._host = host || Stomp.DEFAULT_HOST;
     this._port = port || Stomp.DEFAULT_PORT || 8080;
@@ -124,7 +121,6 @@ Stomp.Client.prototype = {
     Versions: {
         VERSION_1_0: "1.0",
         VERSION_1_1: "1.1"
-
     },
 
     supportedVersions: function () {

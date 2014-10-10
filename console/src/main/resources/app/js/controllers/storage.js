@@ -222,7 +222,7 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
 
 loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $route, currentApp, $modal, Notifications,
                                                    currentCollectionList, LoCollection, $routeParams, LoCollectionItem,
-                                                   LiveOak, $location, $window, $cookieStore, $q) {
+                                                   LiveOak, $location, $window, $cookieStore, $q, loRemoteCheck, loJSON) {
 
   $log.debug('StorageCollectionCtrl');
   $rootScope.curApp = currentApp;
@@ -446,11 +446,13 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     };
 
     $scope.checkColName = function (collectionName) {
-      LoCollection.get({appId: currentApp.id, storageId: $routeParams.storageId, collectionId: collectionName}, function () {
-        $scope.modalScope.loCollectionCreate.collectionName.$setValidity('collectionName', false);
-      }, function() {
-        $scope.modalScope.loCollectionCreate.collectionName.$setValidity('collectionName', true);
-      });
+      var _resMethod = LoCollection.check;
+      var _resParams = {appId: currentApp.id, storageId: $routeParams.storageId, collectionId: collectionName};
+
+      var _formCtrl = $scope.modalScope.loCollectionCreate;
+      var _inputCtrl = _formCtrl.collectionName;
+
+      this.timeout = loRemoteCheck(this.timeout, _resMethod, _resParams, _formCtrl, _inputCtrl, 'collectionName');
     };
 
     $scope.getFile = function () {
@@ -550,7 +552,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
         if (dataObj[row].hasOwnProperty('self')) {
           delete dataObj[row].self;
         }
-        dataExportObj.push(angular.toJson(decodeJSON(dataObj[row])));
+        dataExportObj.push(angular.toJson(loJSON.parseJSON(dataObj[row])));
       }
 
       var blob = new Blob(['[' + dataExportObj.toString() + ']'], { type: 'text/plain' });
@@ -731,7 +733,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
         }
       }
 
-      $scope.newRows.push(encodeJSON(row));
+      $scope.newRows.push(loJSON.toStringObject(row));
     }
 
   };
@@ -805,7 +807,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
         $log.debug('Checking for update: ' + angular.toJson(itemToSave));
         if (itemFromBackup && !angular.equals(itemToSave, itemFromBackup)) {
 
-          var decodedItemToSave = decodeJSON(itemToSave);
+          var decodedItemToSave = loJSON.parseJSON(itemToSave);
           var updatePromise = LoCollectionItem.update({appId: currentApp.id, storageId: $routeParams.storageId,
             collectionId: $scope.collectionId, itemId: decodedItemToSave.id}, decodedItemToSave).$promise;
 
@@ -829,9 +831,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     for (var l in $scope.newRows){
       var newRowToSave = $scope.newRows[l];
       $log.debug('Creating: ' + newRowToSave);
-      var decodedNewRowToSave = decodeJSON(newRowToSave);
-
-      console.log(decodedNewRowToSave);
+      var decodedNewRowToSave = loJSON.parseJSON(newRowToSave);
 
       var promiseCreate = LoCollectionItem.create({appId: currentApp.id, storageId: $routeParams.storageId,
         collectionId: $scope.collectionId}, decodedNewRowToSave, angular.noop, errorCreate).$promise;
@@ -884,7 +884,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
       for (var rIndex in data.members){
         var rData = data.members[rIndex];
-        $scope.collectionData.push(encodeJSON(rData));
+        $scope.collectionData.push(loJSON.toStringObject(rData));
       }
 
       $scope.collectionDataBackup = angular.copy($scope.collectionData);
@@ -911,63 +911,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     }
   }
 
-  function encodeJSON(rData){
-    var newObj = {};
-
-    for(var key in rData){
-      var dType = typeof rData[key];
-      if (dType === 'string'){
-        newObj[key] = '"' + rData[key] + '"';
-      } else {
-        newObj[key] = angular.toJson(rData[key]);
-      }
-    }
-
-    return newObj;
-  }
-
-  function decodeJSON(rData){
-    var newObj = {};
-
-    // The doubled casting is to trim off angular stuff like the $$hashKey from properties
-    for(var key in angular.fromJson(angular.toJson(rData))){
-
-      var value = rData[key];
-
-      // If the value is empty then ignore
-      if(value === '') {
-      // If it's a string
-      } else if (value[0] === '"' && value[value.length - 1] === '"') {
-        newObj[key] = value.substr(1, value.length - 2);
-      // If it's a numbers
-      } else if (!isNaN(value)) {
-        newObj[key] = parseFloat(value);
-      // If it's a boolean
-      } else if (value === 'true' || value === 'false') {
-        newObj[key] = (value === 'true');
-      // If it's null
-      } else if (value === 'null') {
-        newObj[key] = null;
-      } else {
-        newObj[key] = JSON.parse(value);
-      }
-    }
-
-    return newObj;
-  }
-
-  $scope.isValidJSON = function(input) {
-
-    var valid = true;
-    try {
-      // The function is false only in case of error
-      JSON.parse(input);
-    } catch(e) {
-      valid = false;
-    }
-
-    return valid;
-  };
+  $scope.isValidJSON = loJSON.isValidJSON;
 
   function loadCollectionList(callback) {
     $log.debug('Loading collection list');

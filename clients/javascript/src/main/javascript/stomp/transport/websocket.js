@@ -81,7 +81,7 @@ Stomp.Transport.WebSocket.prototype = {
             return "wss://" + this._host + ":" + this._port + "/";
         }
         return "ws://" + this._host + ":" + this._port + "/";
-    },
+    }
 }
 
 
