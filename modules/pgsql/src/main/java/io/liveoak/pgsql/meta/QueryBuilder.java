@@ -75,6 +75,10 @@ public class QueryBuilder {
         return "SELECT * FROM " + table.quotedSchemaName();
     }
 
+    public String selectAllCountFromTable(Table table) {
+        return "SELECT count(*) FROM " + table.quotedSchemaName();
+    }
+
     public String selectFromTable(Table table, List<Column> columns) {
         if (columns == null) {
             throw new IllegalArgumentException("columns == null");
@@ -100,6 +104,11 @@ public class QueryBuilder {
             throw new IllegalStateException("No such table: " + table);
         }
         return prepareSelectAllFromTable(con, tableDef, sorting, pagination);
+    }
+
+    public PreparedStatement prepareSelectAllCountFromTable(Connection con, Table table) throws SQLException {
+        String select = selectAllCountFromTable(table);
+        return con.prepareStatement(select);
     }
 
     public PreparedStatement prepareSelectAllFromTable(Connection con, Table table, Sorting sorting, Pagination pagination) throws SQLException {
@@ -442,6 +451,10 @@ public class QueryBuilder {
 
     public QueryResults querySelectFromTable(Connection con, String table, Sorting sorting, Pagination pagination) throws SQLException {
         return query(prepareSelectAllFromTable(con, table, sorting, pagination), pagination);
+    }
+
+    public int querySelectCountFromTable(Connection con, Table table) throws SQLException {
+        return query(prepareSelectAllCountFromTable(con, table), Pagination.NONE).rows().get(0).valueAsInt(0);
     }
 
     public QueryResults querySelectFromTableWhere(Connection con, Table table, List<Column> whereColumns, List<Object> whereValues, Sorting sorting, Pagination pagination) throws SQLException {
@@ -879,7 +892,30 @@ public class QueryBuilder {
         return query(ps, pagination);
     }
 
+    public int querySelectCountFromTable(Connection con, Table table, String query) throws IOException, SQLException {
+        // if query can't be parsed to JSON throw exception
+        JsonNode q = parseJson(query);
+
+        if (!q.isObject()) {
+            throw new IllegalArgumentException("Invalid query: not an object (" + query + ")");
+        }
+
+        // convert Mongo query to SQL WHERE expression
+        Expression expression = parseRelational(q);
+
+        PreparedStatement ps = prepareSelectCountFromTableWhere(con, table, expression);
+        return query(ps, null).rows().get(0).valueAsInt(0);
+    }
+
+    private PreparedStatement prepareSelectCountFromTableWhere(Connection con, Table table, Expression expression) throws SQLException {
+        return prepareSelectFromTableWhere(con, table, expression, (Sorting) null, (Pagination) null, true);
+    }
+
     private PreparedStatement prepareSelectFromTableWhere(Connection con, Table table, Expression expression, Sorting sorting, Pagination pagination) throws SQLException {
+        return prepareSelectFromTableWhere(con, table, expression, sorting, pagination, false);
+    }
+
+    private PreparedStatement prepareSelectFromTableWhere(Connection con, Table table, Expression expression, Sorting sorting, Pagination pagination, boolean countOnly) throws SQLException {
         List<Pair<Key, Key>> joins = new LinkedList<>();
 
         Column[] col = new Column[1];
@@ -935,7 +971,7 @@ public class QueryBuilder {
 
         // prepare join part of the query
         StringBuilder select = new StringBuilder()
-                .append(selectJoinTables(table, joins))
+                .append(selectJoinTables(table, joins, countOnly))
                 .append(" WHERE ")
                 .append(expression.toString());
 
@@ -963,8 +999,16 @@ public class QueryBuilder {
         return ps;
     }
 
-    private String selectJoinTables(Table table, List<Pair<Key, Key>> joins) {
-        StringBuilder sb = new StringBuilder("SELECT " + table.quotedSchemaName() + ".* FROM " + table.quotedSchemaName());
+    private String selectJoinTables(Table table, List<Pair<Key, Key>> joins, boolean countOnly) {
+        StringBuilder sb = new StringBuilder("SELECT ");
+        if (countOnly) {
+            sb.append("count(");
+        }
+        sb.append(table.quotedSchemaName() + ".*");
+        if (countOnly) {
+            sb.append(")");
+        }
+        sb.append(" FROM " + table.quotedSchemaName());
 
         // track processed joins to avoid duplicates
         HashSet<Pair<Key, Key>> processed = new HashSet<>();

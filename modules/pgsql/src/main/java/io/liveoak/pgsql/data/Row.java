@@ -7,6 +7,7 @@ package io.liveoak.pgsql.data;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.IllegalFormatException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +100,21 @@ public class Row {
             throw new IllegalArgumentException("No such column: " + columnName);
         }
         return values.get(pos);
+    }
+
+    public Object value(int pos) {
+        return values.get(pos);
+    }
+
+    public int valueAsInt(int pos) {
+        Object val = values.get(pos);
+        if (val instanceof Integer || val instanceof Long || val instanceof Short) {
+            return ((Number) val).intValue();
+        }
+        if (val instanceof String) {
+            return Integer.parseInt((String) val);
+        }
+        throw new NumberFormatException("Value not an int: " + val);
     }
 
     class ColumnSet implements Set<String> {

@@ -10,12 +10,13 @@ import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.liveoak.common.util.PagingLinksBuilder;
 import io.liveoak.pgsql.data.QueryResults;
 import io.liveoak.pgsql.meta.Catalog;
 import io.liveoak.pgsql.meta.Column;
@@ -68,12 +69,24 @@ public class PgSqlTableResource implements SynchronousResource {
         results = queryTable(id, null, ctx);
 
         List<Resource> links = new LinkedList<>();
-        MapResource batch = new MapResource();
-        batch.put("rel", "schema");
-        batch.put(LiveOak.HREF, uri() + SCHEMA_ENDPOINT);
-        links.add(batch);
+        MapResource link = new MapResource();
+        link.put("rel", "schema");
+        link.put(LiveOak.HREF, uri() + SCHEMA_ENDPOINT);
+        links.add(link);
 
-        Map<String, Object> result = new HashMap<>();
+        PagingLinksBuilder linksBuilder = new PagingLinksBuilder(ctx)
+                .uri(uri())
+                .count(results.count());
+
+        if (parent.configuration().configuration().includeTotalCount()) {
+            int totalCount = queryTableCount(id, ctx);
+            linksBuilder.totalCount(totalCount);
+        }
+
+        links.addAll(linksBuilder.build());
+
+        // keep predictable ordering by using LinkedHashMap
+        Map<String, Object> result = new LinkedHashMap<>();
         result.put("links", links);
         result.put("count", results.count());
         result.put("type", "collection");
@@ -164,6 +177,20 @@ public class PgSqlTableResource implements SynchronousResource {
                 }
             } else {
                 return queryBuilder.querySelectFromTableWhereId(con, t, id);
+            }
+        }
+    }
+
+    public int queryTableCount(String table, RequestContext ctx) throws SQLException, IOException {
+        Catalog cat = parent.catalog();
+        Table t = cat.tableById(table);
+        try (Connection con = parent.connection()) {
+            String q = ctx.resourceParams().value("q");
+
+            if (q != null) {
+                return queryBuilder.querySelectCountFromTable(con, t, q);
+            } else {
+                return queryBuilder.querySelectCountFromTable(con, t);
             }
         }
     }

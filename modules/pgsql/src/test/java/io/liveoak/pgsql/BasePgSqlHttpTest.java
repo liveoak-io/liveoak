@@ -201,6 +201,7 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
         int maxConnections = 10;
         int initialConnections = 1;
         boolean canCreateSchema = Boolean.valueOf(System.getProperty("pgsql.allow_create_schema", "true"));
+        boolean includeTotalCount = Boolean.valueOf(System.getProperty("pgsql.include_total_count", "true"));
 
         log.debug("Using PostgreSQL on " + server + ":" + port + ", database: " + db + " with user: " + user);
 
@@ -217,6 +218,7 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
         config.putProperty("schemas", Arrays.asList(new String[]{schema, schema_two}));
         config.putProperty("default-schema", schema);
         config.putProperty("allow-create-schema", canCreateSchema);
+        config.putProperty("include-total-count", includeTotalCount);
 
         return config;
     }
