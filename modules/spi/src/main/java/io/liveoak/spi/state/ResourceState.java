@@ -7,11 +7,7 @@ package io.liveoak.spi.state;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -143,29 +139,6 @@ public interface ResourceState {
             return Boolean.valueOf((String) val);
         }
         throw new RuntimeException("Value can't be returned as Boolean: " + val + " [" + val.getClass() + "]");
-    }
-
-    default Date getPropertyAsDate(String name) {
-        Object val = getProperty(name);
-        if (val == null) {
-            return null;
-        }
-        if (val instanceof Date || val instanceof Timestamp) {
-            return (Date) val;
-        }
-        if (val instanceof Calendar) {
-            return ((Calendar) val).getTime();
-        }
-        if (val instanceof Long) {
-            return new Date(((Long) val).longValue());
-        }
-        if (val instanceof String) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            try {
-                return sdf.parse((String) val);
-            } catch (Exception ignored) {}
-        }
-        throw new RuntimeException("Value can't be returned as Date: " + val + " [" + val.getClass() + "]");
     }
 
     default boolean isListPropertyOrNull(String name) {

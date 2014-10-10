@@ -12,9 +12,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -63,8 +63,8 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
     protected static String schema_two;
     private static boolean skipTests;
 
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
-    private SimpleDateFormat iso = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.S");
+    private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss");
+    private static DateTimeFormatter iso = DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss.S");
 
     @BeforeClass
     public static void initDriver() throws Exception {
@@ -211,9 +211,9 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
             }
 
             try (PreparedStatement ps = c.prepareStatement("insert into " + schema_two + ".orders VALUES (?,?,?,?)")) {
-                insertOrder(ps, "014-1003095", sdf.parse("2014-06-07 15:10:15").getTime(), 18990, 1);
-                insertOrder(ps, "014-2004096", sdf.parse("2014-04-02 11:06:12").getTime(), 43800, 2);
-                insertOrder(ps, "014-2004345", sdf.parse("2014-06-01 18:06:12").getTime(), 32500, 2);
+                insertOrder(ps, "014-1003095", parseTime("2014-06-07 15:10:15"), 18990, 1);
+                insertOrder(ps, "014-2004096", parseTime("2014-04-02 11:06:12"), 43800, 2);
+                insertOrder(ps, "014-2004345", parseTime("2014-06-01 18:06:12"), 32500, 2);
             }
         }
     }
@@ -252,8 +252,12 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
                 .build();
     }
 
-    protected Timestamp time(String dt) throws ParseException {
-        return new Timestamp(iso.parse(dt).getTime());
+    protected Timestamp time(String dt) throws DateTimeParseException {
+        return Timestamp.valueOf(LocalDateTime.parse(dt, iso));
+    }
+
+    protected static Long parseTime(String dt) throws DateTimeParseException {
+        return Timestamp.valueOf(LocalDateTime.parse(dt, dtf)).getTime();
     }
 
     protected List list(Object... objs) {

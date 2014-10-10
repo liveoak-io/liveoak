@@ -6,8 +6,9 @@
 package io.liveoak.pgsql.meta;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 /**
@@ -34,7 +35,7 @@ public class ValueConverter {
             return new Timestamp(((Number) val).longValue());
         }
         if (val instanceof String) {
-            return new Timestamp(parseIsoDateTime((String) val).getTime());
+            return parseIsoDateTime((String) val);
         }
         if (val instanceof Timestamp) {
             return (Timestamp) val;
@@ -45,18 +46,24 @@ public class ValueConverter {
         throw new IllegalArgumentException("Unsupported type: " + val.getClass());
     }
 
-    private static Date parseIsoDateTime(String val) {
+    private static Timestamp parseIsoDateTime(String val) {
         try {
-            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(val);
-        } catch (ParseException ignored) {}
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            LocalDateTime ldt = LocalDateTime.parse(val, dtf);
+            Timestamp.valueOf(ldt);
+        } catch (DateTimeParseException ignored) {}
 
         try {
-            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(val);
-        } catch (ParseException ignored) {}
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            LocalDateTime ldt = LocalDateTime.parse(val, dtf);
+            Timestamp.valueOf(ldt);
+        } catch (DateTimeParseException ignored) {}
 
         try {
-            return new SimpleDateFormat("yyyy-MM-dd").parse(val);
-        } catch (ParseException ignored) {}
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDateTime ldt = LocalDateTime.parse(val, dtf);
+            Timestamp.valueOf(ldt);
+        } catch (DateTimeParseException ignored) {}
 
         throw new IllegalArgumentException("Value could not be parsed as ISO DateTime: " + val);
     }
