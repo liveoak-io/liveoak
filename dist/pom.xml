@@ -23,6 +23,10 @@
             <type>zip</type>
         </dependency>
         <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-js-adapter</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-keycloak-server</artifactId>
             <type>war</type>
@@ -59,6 +63,17 @@
                   <phase>prepare-package</phase>
                   <configuration>
                     <artifact>org.wildfly:wildfly-dist:${wildfly.version}:zip</artifact>
+                  </configuration>
+                </execution>
+                <execution>
+                  <id>unpack-keycloakjs</id>
+                  <goals>
+                      <goal>unpack</goal>
+                  </goals>
+                  <phase>prepare-package</phase>
+                  <configuration>
+                      <artifact>org.keycloak:keycloak-js-adapter:${keycloak.version}:jar</artifact>
+                      <outputDirectory>${project.build.directory}/dependency/keycloak-js</outputDirectory>
                   </configuration>
                 </execution>
               </executions>

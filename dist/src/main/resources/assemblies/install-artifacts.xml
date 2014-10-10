@@ -10,26 +10,30 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <files>
-      <file>
-         <source>./src/main/resources/conf/standalone.sh</source>
-         <outputDirectory>/bin/</outputDirectory>
-      </file>
-      <file>
-         <source>./src/main/resources/conf/standalone.bat</source>
-         <outputDirectory>/bin/</outputDirectory>
-      </file>
-      <file>
-        <source>./src/main/resources/conf/standalone.xml</source>
-        <outputDirectory>/standalone/configuration/</outputDirectory>
-      </file>
-      <file>
-        <source>../keycloak/target/auth-server.war</source>
-        <outputDirectory>/standalone/deployments</outputDirectory>
-      </file>
-      <file>
-        <source>./src/main/resources/deployments/auth-server.war.dodeploy</source>
-        <outputDirectory>/standalone/deployments/</outputDirectory>
-      </file>
+        <file>
+            <source>./src/main/resources/conf/standalone.sh</source>
+            <outputDirectory>/bin/</outputDirectory>
+        </file>
+        <file>
+            <source>./src/main/resources/conf/standalone.bat</source>
+            <outputDirectory>/bin/</outputDirectory>
+        </file>
+        <file>
+            <source>./src/main/resources/conf/standalone.xml</source>
+            <outputDirectory>/standalone/configuration/</outputDirectory>
+        </file>
+        <file>
+            <source>../keycloak/target/auth-server.war</source>
+            <outputDirectory>/standalone/deployments</outputDirectory>
+        </file>
+        <file>
+            <source>./src/main/resources/deployments/auth-server.war.dodeploy</source>
+            <outputDirectory>/standalone/deployments/</outputDirectory>
+        </file>
+        <file>
+            <source>${project.build.directory}/dependency/keycloak-js/keycloak.js</source>
+            <outputDirectory>/client/auth/</outputDirectory>
+        </file>
     </files>
     <fileSets>
         <fileSet>
