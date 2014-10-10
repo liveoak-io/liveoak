@@ -78,8 +78,9 @@ public class PgSqlTableResource implements SynchronousResource {
                 .uri(uri())
                 .count(results.count());
 
+        int totalCount = -1;
         if (parent.configuration().configuration().includeTotalCount()) {
-            int totalCount = queryTableCount(id, ctx);
+            totalCount = queryTableCount(id, ctx);
             linksBuilder.totalCount(totalCount);
         }
 
@@ -88,7 +89,7 @@ public class PgSqlTableResource implements SynchronousResource {
         // keep predictable ordering by using LinkedHashMap
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("links", links);
-        result.put("count", results.count());
+        result.put("count", totalCount != -1 ? totalCount : results.count());
         result.put("type", "collection");
         return result;
     }

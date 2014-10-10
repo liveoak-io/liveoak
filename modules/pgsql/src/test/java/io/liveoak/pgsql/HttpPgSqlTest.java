@@ -1017,7 +1017,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "    'rel' : 'prev',                                                             \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders?fields=*%28*%29&sort=total&limit=1'            \n" +
                 "  }],                                                                           \n" +
-                "  'count' : 1,                                                                  \n" +
+                "  'count' : 2,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
                 "  'members' : [ {                                                               \n" +
                 "    'id' : '014-2004096',                                                       \n" +
@@ -1055,13 +1055,13 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "    'rel' : 'schema',                                                           \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders;schema'                \n" +
                 "  },{                                                                           \n" +
-                "    'rel' : 'next',                                                            \n" +
-                "    'href' : '/testApp/sqldata/" + schema_two + ".orders?fields=*%28*%29&sort=total&offset=1&limit=1'           \n" +
+                "    'rel' : 'next',                                                             \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders?fields=*%28*%29&sort=total&offset=1&limit=1'   \n" +
                 "  },{                                                                           \n" +
                 "    'rel' : 'last',                                                             \n" +
-                "    'href' : '/testApp/sqldata/" + schema_two + ".orders?fields=*%28*%29&sort=total&offset=1&limit=1'           \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders?fields=*%28*%29&sort=total&offset=1&limit=1'   \n" +
                 "  }],                                                                           \n" +
-                "  'count' : 1,                                                                  \n" +
+                "  'count' : 2,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
                 "  'members' : [ {                                                               \n" +
                 "    'id' : '014-1003095',                                                       \n" +
@@ -1105,7 +1105,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "    'rel' : 'prev',                                                             \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders?fields=*%28*%29&sort=-total&limit=1'           \n" +
                 "  }],                                                                           \n" +
-                "  'count' : 1,                                                                  \n" +
+                "  'count' : 2,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
                 "  'members' : [ {                                                               \n" +
                 "    'id' : '014-1003095',                                                       \n" +
