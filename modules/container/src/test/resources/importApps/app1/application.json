@@ -1,18 +1,18 @@
 {
-  name: 'app1',
-  html-app: '/app/index.html',
-  resources : {
-    app: {
-      type: 'dummy',
-      config: {
-        directory: "${application.dir}/app/"
+  "name" : "app1",
+  "html-app" : "/app/index.html",
+  "resources" : {
+    "app" : {
+      "type" : "dummy",
+      "config" : {
+        "directory" : "${application.dir}/app/"
       }
     },
 
-    client: {
-      type: 'dummy',
-      config: {
-        directory: "${io.liveoak.js.dir}"
+    "client" : {
+      "type" : "dummy",
+      "config" : {
+        "directory" : "${io.liveoak.js.dir}"
       }
     }
   }

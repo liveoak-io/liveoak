@@ -26,6 +26,8 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -219,6 +221,18 @@ public class LocalApplicationsResourceTest {
 
         // Check files were copied across
         assertThat(this.system.vertx().fileSystem().existsSync(appDir.getPath() + "/myapp/app/index.html")).isTrue();
+
+        // Check git present
+        File myApp = new File(appDir, "myapp");
+        assertThat(new File(myApp, ".git").exists()).isTrue();
+        Git git = Git.open(myApp);
+        assertThat(git.status().call().hasUncommittedChanges()).isTrue();
+        Iterable<RevCommit> commits = git.log().call();
+        int count = 0;
+        for (RevCommit rev : commits) {
+            count++;
+        }
+        assertThat(count).isEqualTo(1);
 
         // Test #6 - Check that READ is unsupported
         getRequest = new HttpGet("http://localhost:8080/admin/applications/members");
