@@ -21,6 +21,7 @@
     <properties>
         <module-name/>
         <console.app.res>${project.basedir}/target/</console.app.res>
+        <console.test>${project.basedir}/src/main/resources/test</console.test>
         <html.unit.version>2.13</html.unit.version>
         <version.jasmine.plugin>1.3.1.3</version.jasmine.plugin>
         <version.lesscss.plugin>1.3.3</version.lesscss.plugin>
@@ -88,7 +89,7 @@
                         <include>*.js</include>
                         <include>controllers/*.js</include>
                     </sourceIncludes>
-                    <jsTestSrcDir>${console.app.res}/test/unit</jsTestSrcDir>
+                    <jsTestSrcDir>${console.test}/unit</jsTestSrcDir>
                     <specIncludes>
                         <include>*Spec.js</include>
                     </specIncludes>
