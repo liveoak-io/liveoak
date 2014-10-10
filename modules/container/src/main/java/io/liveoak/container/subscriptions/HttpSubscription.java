@@ -4,7 +4,7 @@ import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceResponse;
-import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.security.SecurityContext;
 import io.liveoak.spi.container.Subscription;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;

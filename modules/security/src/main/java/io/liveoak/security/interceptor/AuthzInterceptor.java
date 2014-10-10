@@ -20,7 +20,7 @@ import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
-import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.security.SecurityContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.container.interceptor.DefaultInterceptor;

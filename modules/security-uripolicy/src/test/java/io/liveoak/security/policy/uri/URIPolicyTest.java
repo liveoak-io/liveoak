@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import io.liveoak.common.DefaultSecurityContext;
+import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.security.policy.uri.impl.URIPolicy;
 import io.liveoak.security.policy.uri.impl.URIPolicyConfigurator;

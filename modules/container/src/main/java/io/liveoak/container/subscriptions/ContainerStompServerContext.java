@@ -5,11 +5,11 @@
  */
 package io.liveoak.container.subscriptions;
 
-import io.liveoak.common.DefaultSecurityContext;
+import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.spi.MediaType;
-import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.security.SecurityContext;
 import io.liveoak.spi.container.Subscription;
 import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.stomp.Headers;

@@ -20,7 +20,7 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceResponse;
-import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.security.SecurityContext;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 

@@ -6,7 +6,7 @@
 
 package io.liveoak.security.impl.interceptor;
 
-import io.liveoak.common.DefaultSecurityContext;
+import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.container.interceptor.DefaultInterceptor;

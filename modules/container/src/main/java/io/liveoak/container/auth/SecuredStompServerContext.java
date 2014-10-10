@@ -13,7 +13,7 @@ import java.util.StringTokenizer;
 import java.util.function.Consumer;
 
 import io.liveoak.common.DefaultRequestAttributes;
-import io.liveoak.common.DefaultSecurityContext;
+import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.common.security.AuthzConstants;
@@ -23,7 +23,7 @@ import io.liveoak.spi.RequestAttributes;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
-import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.security.SecurityContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.container.Subscription;

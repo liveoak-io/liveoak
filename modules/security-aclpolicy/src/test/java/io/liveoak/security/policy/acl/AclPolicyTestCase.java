@@ -16,7 +16,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
 import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.common.DefaultResourceResponse;
-import io.liveoak.common.DefaultSecurityContext;
+import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.security.policy.acl.impl.AclPolicy;
 import io.liveoak.security.policy.acl.impl.AclPolicyConfig;

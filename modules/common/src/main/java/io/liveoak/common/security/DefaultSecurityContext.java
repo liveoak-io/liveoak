@@ -1,6 +1,7 @@
-package io.liveoak.common;
+package io.liveoak.common.security;
 
-import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.security.SecurityContext;
+import io.liveoak.spi.security.UserProfile;
 
 import java.util.Set;
 
@@ -14,6 +15,7 @@ public class DefaultSecurityContext implements SecurityContext {
     private Set<String> roles;
     private long lastVerified;
     private String original;
+    private UserProfile userProfile;
 
     public DefaultSecurityContext() {
     }
@@ -67,6 +69,15 @@ public class DefaultSecurityContext implements SecurityContext {
     @Override
     public String getToken() {
         return original;
+    }
+
+    @Override
+    public UserProfile getUser() {
+        return userProfile;
+    }
+
+    public void setUser(UserProfile userProfile) {
+        this.userProfile = userProfile;
     }
 
     public void setOriginal(String original) {

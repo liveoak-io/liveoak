@@ -6,7 +6,7 @@
 package io.liveoak.security.policy.drools;
 
 import io.liveoak.common.DefaultResourceParams;
-import io.liveoak.common.DefaultSecurityContext;
+import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.security.policy.drools.impl.DroolsPolicy;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.security.policy.drools.impl.DroolsPolicyConfigurator;

@@ -18,6 +18,7 @@ import org.keycloak.representations.AccessToken;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
+ * @author Ken Finnigan
  */
 public class TokenResource implements SynchronousResource {
 
@@ -51,6 +52,12 @@ public class TokenResource implements SynchronousResource {
             result.put("realm", token.getAudience());
             result.put("subject", token.getSubject());
             result.put("issued-at", new Date(token.getIssuedAt()));
+
+            // Capture User info
+            result.put("name", token.getName());
+            result.put("given-name", token.getGivenName());
+            result.put("family-name", token.getFamilyName());
+            result.put("email", token.getEmail());
 
             Set<String> roles = new HashSet<>();
 

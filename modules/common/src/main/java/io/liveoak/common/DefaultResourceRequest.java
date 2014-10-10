@@ -7,6 +7,7 @@ package io.liveoak.common;
 
 import java.util.UUID;
 
+import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestAttributes;

@@ -7,7 +7,7 @@ import java.util.Set;
 
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.security.SecurityContext;
 
 /**
  * Holds info about allowed and denied roles and users for particular policy entry.

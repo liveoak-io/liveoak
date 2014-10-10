@@ -1,6 +1,6 @@
 package io.liveoak.ups;
 
-import io.liveoak.common.DefaultSecurityContext;
+import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.spi.LiveOak;

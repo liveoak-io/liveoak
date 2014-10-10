@@ -1,9 +1,9 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-package io.liveoak.spi;
+package io.liveoak.spi.security;
 
 import java.util.Collections;
 import java.util.Set;
@@ -13,6 +13,7 @@ import java.util.Set;
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
+ * @author Ken Finnigan
  */
 public interface SecurityContext {
 
@@ -33,7 +34,7 @@ public interface SecurityContext {
 
     /**
      * @return date when credentials was last verified or -1 if not authenticated
-     * */
+     */
     long lastVerified();
 
     /**
@@ -48,6 +49,11 @@ public interface SecurityContext {
      * @return if the authenticated user is assigned the specified role
      */
     boolean hasRole(String role);
+
+    /**
+     * @return user information
+     */
+    UserProfile getUser();
 
     SecurityContext ANONYMOUS = new SecurityContext() {
 
@@ -86,6 +92,30 @@ public interface SecurityContext {
             return null;
         }
 
+        @Override
+        public UserProfile getUser() {
+            return new UserProfile() {
+                @Override
+                public String name() {
+                    return null;
+                }
+
+                @Override
+                public String givenName() {
+                    return null;
+                }
+
+                @Override
+                public String familyName() {
+                    return null;
+                }
+
+                @Override
+                public String email() {
+                    return null;
+                }
+            };
+        }
     };
 
 }

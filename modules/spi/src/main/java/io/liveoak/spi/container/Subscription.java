@@ -7,7 +7,7 @@ package io.liveoak.spi.container;
 
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceResponse;
-import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.security.SecurityContext;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 

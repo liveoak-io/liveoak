@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -9,10 +9,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import io.liveoak.common.DefaultResourceErrorResponse;
-import io.liveoak.common.DefaultSecurityContext;
+import io.liveoak.common.security.DefaultSecurityContext;
+import io.liveoak.common.security.DefaultUserProfile;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourcePath;
@@ -27,6 +27,7 @@ import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
+ * @author Ken Finnigan
  */
 public class AuthInterceptor extends DefaultInterceptor {
 
@@ -61,33 +62,37 @@ public class AuthInterceptor extends DefaultInterceptor {
         final RequestContext tokenRequestContext = new RequestContext.Builder().build();
         String prefix = getPrefix(req.resourcePath());
         try {
-            client.read(tokenRequestContext, prefix + "/auth/token-info/" + token, new Consumer<ClientResourceResponse>() {
-                @Override
-                public void accept(ClientResourceResponse resourceResponse) {
-                    try {
-                        ResourceState state = resourceResponse.state();
-                        if (resourceResponse.responseType().equals(ClientResourceResponse.ResponseType.NO_SUCH_RESOURCE)) {
-                            log.info("Auth not configured for " + prefix);
-                            context.forward();
-                        } else if (state.getProperty("error") != null) {
-                            log.warn("Authentication failed. Request: " + req + ", error: " + state.getProperty("error"));
-                            context.replyWith(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.NOT_AUTHORIZED));
-                        } else {
-                            securityContext.setOriginal(token);
+            client.read(tokenRequestContext, prefix + "/auth/token-info/" + token, resourceResponse -> {
+                try {
+                    ResourceState state = resourceResponse.state();
+                    if (resourceResponse.responseType().equals(ClientResourceResponse.ResponseType.NO_SUCH_RESOURCE)) {
+                        log.info("Auth not configured for " + prefix);
+                        context.forward();
+                    } else if (state.getProperty("error") != null) {
+                        log.warn("Authentication failed. Request: " + req + ", error: " + state.getProperty("error"));
+                        context.replyWith(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.NOT_AUTHORIZED));
+                    } else {
+                        securityContext.setOriginal(token);
 
-                            securityContext.setRealm((String) state.getProperty("realm"));
-                            securityContext.setSubject((String) state.getProperty("subject"));
-                            securityContext.setLastVerified(((Date) state.getProperty("issued-at")).getTime());
+                        securityContext.setRealm((String) state.getProperty("realm"));
+                        securityContext.setSubject((String) state.getProperty("subject"));
+                        securityContext.setLastVerified(((Date) state.getProperty("issued-at")).getTime());
+                        securityContext.setUser(
+                                new DefaultUserProfile()
+                                        .name(state.getPropertyAsString("name"))
+                                        .givenName(state.getPropertyAsString("given-name"))
+                                        .familyName(state.getPropertyAsString("family-name"))
+                                        .email(state.getPropertyAsString("email"))
+                        );
 
-                            Set<String> roles = new HashSet<>();
-                            roles.addAll((Collection<? extends String>) state.getProperty("roles"));
-                            securityContext.setRoles(roles);
-                            context.forward();
-                        }
-                    } catch (Throwable t) {
-                        log.error("Error processing ResourceResponse", t);
-                        context.replyWith(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
+                        Set<String> roles = new HashSet<>();
+                        roles.addAll((Collection<? extends String>) state.getProperty("roles"));
+                        securityContext.setRoles(roles);
+                        context.forward();
                     }
+                } catch (Throwable t) {
+                    log.error("Error processing ResourceResponse", t);
+                    context.replyWith(new DefaultResourceErrorResponse(req, ResourceErrorResponse.ErrorType.INTERNAL_ERROR));
                 }
             });
         } catch (Throwable t) {

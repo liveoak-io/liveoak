@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -11,7 +11,7 @@ import io.liveoak.interceptor.extension.InterceptorExtension;
 import io.liveoak.keycloak.extension.KeycloakExtension;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.SecurityContext;
+import io.liveoak.spi.security.SecurityContext;
 import io.liveoak.testtools.MockExtension;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -24,7 +24,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.keycloak.representations.AccessToken;
@@ -33,7 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
+import static org.fest.assertions.Assertions.assertThat;
 
 public class AuthInterceptorTest extends AbstractKeycloakTest {
 
@@ -78,7 +77,7 @@ public class AuthInterceptorTest extends AbstractKeycloakTest {
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_OK);
 
         RequestContext context = mock.pollRequest(2, TimeUnit.SECONDS);
-        Assert.assertFalse(context.securityContext().isAuthenticated());
+        assertThat(context.securityContext().isAuthenticated()).isFalse();
     }
 
     @Test(timeout = 10000)
@@ -91,11 +90,15 @@ public class AuthInterceptorTest extends AbstractKeycloakTest {
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_OK);
 
         SecurityContext context = mock.pollRequest(10, TimeUnit.SECONDS).securityContext();
-        Assert.assertTrue(context.isAuthenticated());
-        Assert.assertEquals("liveoak-apps", context.getRealm());
-        Assert.assertEquals("user-id", context.getSubject());
-        Assert.assertEquals(3, context.getRoles().size());
-        Assert.assertEquals(token.getIssuedAt(), context.lastVerified());
+        assertThat(context.isAuthenticated()).isTrue();
+        assertThat(context.getRealm()).isEqualTo("liveoak-apps");
+        assertThat(context.getSubject()).isEqualTo("user-id");
+        assertThat(context.getUser()).isNotNull();
+        assertThat(context.getUser().givenName()).isEqualTo("given");
+        assertThat(context.getUser().familyName()).isEqualTo("family");
+        assertThat(context.getUser().email()).isEqualTo("email");
+        assertThat(context.getRoles().size()).isEqualTo(3);
+        assertThat(context.lastVerified()).isEqualTo(token.getIssuedAt());
     }
 
     @Test(timeout = 10000)
@@ -140,7 +143,7 @@ public class AuthInterceptorTest extends AbstractKeycloakTest {
 
     private void sendRequestAndCheckStatus(HttpRequestBase req, int expectedStatusCode) throws IOException {
         CloseableHttpResponse resp = httpClient.execute(req);
-        assertEquals(expectedStatusCode, resp.getStatusLine().getStatusCode());
+        assertThat(resp.getStatusLine().getStatusCode()).isEqualTo(expectedStatusCode);
         resp.close();
     }
 

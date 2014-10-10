@@ -47,6 +47,10 @@ public class TokenUtil {
         token.issuedFor("app-id");
         token.issuedNow();
 
+        token.setGivenName("given");
+        token.setFamilyName("family");
+        token.setEmail("email");
+
         token.setRealmAccess(new AccessToken.Access().roles(Collections.singleton("realm-role")));
         token.addAccess("app-id").roles(Collections.singleton("app-role"));
         token.addAccess("app2-id").roles(Collections.singleton("app-role"));

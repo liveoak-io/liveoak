@@ -11,9 +11,9 @@ import io.liveoak.scripts.objects.SecurityContext;
  */
 public class LiveOakSecurityContext implements SecurityContext {
 
-    io.liveoak.spi.SecurityContext securityContext;
+    io.liveoak.spi.security.SecurityContext securityContext;
 
-    public LiveOakSecurityContext(io.liveoak.spi.SecurityContext securityContext) {
+    public LiveOakSecurityContext(io.liveoak.spi.security.SecurityContext securityContext) {
         this.securityContext = securityContext;
     }
 
