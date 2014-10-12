@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.CreateNotSupportedException;
@@ -15,9 +16,11 @@ import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+ * @author Ken Finnigan
  */
 public class MongoDatastoreTest extends BaseMongoConfigTest {
 
@@ -37,7 +40,8 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
     }
 
     @Test
-    public void testSystemConfigRead() throws Exception {
+    public void internalDatastoreTests() throws Exception {
+        // TEST #1 - System config read
         ResourceState systemConfigState = client.read(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH);
 
         ResourceState internalDB = systemConfigState.getProperty("internal-database", true, ResourceState.class);
@@ -60,11 +64,10 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
         ResourceState bazServer = (ResourceState) baz.getProperty("servers", true, List.class).get(0);
         assertThat(bazServer.getProperty("host")).isEqualTo("127.0.0.1");
         assertThat(bazServer.getProperty("port")).isEqualTo(27017);
-    }
 
-    @Test
-    public void testSystemConfigUpdate() throws Exception {
-        ResourceState systemConfigState = client.read(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH);
+
+        // TEST #2 - System Config update
+        systemConfigState = client.read(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH);
 
         // Try and update with what we got from the read, just to make sure an exception doesn't occur here.
         client.update(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH, systemConfigState);
@@ -85,19 +88,19 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
         ResourceState updateState =  client.update(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH, systemConfigState);
         ResourceState updatedConfigState = client.read(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH);
 
-        ResourceState internalDB = updatedConfigState.getProperty("internal-database", true, ResourceState.class);
+        internalDB = updatedConfigState.getProperty("internal-database", true, ResourceState.class);
         assertThat(internalDB.getProperty("db")).isEqualTo("testDataStoresDB");
         assertThat(internalDB.getProperty("datastore")).isEqualTo("foo");
 
-        ResourceState datastores = updatedConfigState.getProperty("datastores", true, ResourceState.class);
+        datastores = updatedConfigState.getProperty("datastores", true, ResourceState.class);
 
-        ResourceState foo = datastores.getProperty("foo", true, ResourceState.class);
-        ResourceState fooServer = (ResourceState) foo.getProperty("servers", true, List.class).get(0);
+        foo = datastores.getProperty("foo", true, ResourceState.class);
+        fooServer = (ResourceState) foo.getProperty("servers", true, List.class).get(0);
         assertThat(fooServer.getProperty("host")).isEqualTo("localhost");
         assertThat(fooServer.getProperty("port")).isEqualTo(27018);
 
-        ResourceState bar = datastores.getProperty("bar", true, ResourceState.class);
-        ResourceState barServer = (ResourceState) bar.getProperty("servers", true, List.class).get(0);
+        bar = datastores.getProperty("bar", true, ResourceState.class);
+        barServer = (ResourceState) bar.getProperty("servers", true, List.class).get(0);
         assertThat(barServer.getProperty("host")).isEqualTo("localhost");
         assertThat(barServer.getProperty("port")).isEqualTo(27017);
 
@@ -113,23 +116,30 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
 
         updateState = client.update(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH, systemConfigState);
         assertThat(updateState.getProperty("internal-database", true, ResourceState.class).getProperty("datastore")).isEqualTo("foo");
-    }
 
-    @Test (expected = DeleteNotSupportedException.class)
-    public void testSystemConfigDelete() throws Exception {
-        client.delete(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH);
-    }
 
-    @Test (expected = CreateNotSupportedException.class)
-    public void testSystemConfigCreate() throws Exception {
-        client.create(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH, new DefaultResourceState());
-    }
+        // TEST #3 - System Config delete
+        try {
+            client.delete(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH);
+            fail("DeleteNotSupportedException should have been thrown");
+        } catch (DeleteNotSupportedException dnse) {
+            // Expected
+        }
 
-    @Test
-    public void testDatastore() throws Exception {
+
+        // TEST #4 - System Config create
+        try {
+            client.create(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH, new DefaultResourceState());
+            fail("CreateNotSupportedException should have been thrown");
+        } catch (CreateNotSupportedException cnse) {
+            // Expected
+        }
+
+
+        // TEST #5 - Test datastore
         JsonNode configNode = ObjectMapperFactory.create().readTree("{ db: 'testDataStore', datastore: 'foo'}");
 
-        setUpSystem((ObjectNode)configNode);
+        InternalApplicationExtension resource = setUpSystem((ObjectNode)configNode);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
 
@@ -139,32 +149,46 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
         assertThat(result.getProperty("db")).isEqualTo("testDataStore");
         assertThat(result.getProperty("datastore")).isEqualTo("foo");
         assertThat(result.getProperty("servers")).isNull();
-    }
 
-    @Test (expected = InitializationException.class)
-    public void testNullDatastore() throws Exception {
-        JsonNode configNode = ObjectMapperFactory.create().readTree("{ db: 'testDataStore', datastore: null}");
-        setUpSystem((ObjectNode)configNode);
-    }
+        // Reset for next test
+        removeResource(resource);
 
-    @Test (expected = InitializationException.class)
-    public void testEmptyDatastore() throws Exception {
-        JsonNode configNode = ObjectMapperFactory.create().readTree("{ db: 'testDataStore', datastore: ''}");
-        setUpSystem((ObjectNode)configNode);
-    }
 
-    @Test (expected = InitializationException.class)
-    public void testInvalidDatastore() throws Exception {
-        JsonNode configNode = ObjectMapperFactory.create().readTree("{ db: 'testDataStore', datastore: 'bat'}");
-        setUpSystem((ObjectNode)configNode);
-    }
+        // TEST #6 - Null datastore
+        try {
+            configNode = ObjectMapperFactory.create().readTree("{ db: 'testDataStore', datastore: null}");
+            setUpSystem((ObjectNode) configNode);
+            fail("InitializationException should have been thrown");
+        } catch (InitializationException ie) {
+            // Expected
+        }
 
-    @Test
-    public void testUpdateDatastore() throws Exception {
-        JsonNode configNode = ObjectMapperFactory.create().readTree("{ db: 'testDataStore', datastore: 'foo'}");
 
-        setUpSystem((ObjectNode)configNode);
-        ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
+        // TEST #7 - Empty datastore
+        try {
+            configNode = ObjectMapperFactory.create().readTree("{ db: 'testDataStore', datastore: ''}");
+            setUpSystem((ObjectNode) configNode);
+            fail("InitializationException should have been thrown");
+        } catch (InitializationException ie) {
+            // Expected
+        }
+
+
+        // TEST #8 - Invalid datastore
+        try {
+            configNode = ObjectMapperFactory.create().readTree("{ db: 'testDataStore', datastore: 'bat'}");
+            setUpSystem((ObjectNode) configNode);
+            fail("InitializationException should have been thrown");
+        } catch (InitializationException ie) {
+            // Expected
+        }
+
+
+        // TEST #9 - Update datastore
+        configNode = ObjectMapperFactory.create().readTree("{ db: 'testDataStore', datastore: 'foo'}");
+
+        resource = setUpSystem((ObjectNode)configNode);
+        result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
 
         result.putProperty("datastore", "bar");
         ResourceState update = client.update(new RequestContext.Builder().build(), ADMIN_PATH, result);
@@ -175,11 +199,13 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
         assertThat(update.getProperty("db")).isEqualTo("testDataStore");
         assertThat(update.getProperty("datastore")).isEqualTo("bar");
         assertThat(update.getProperty("servers")).isNull();
-    }
 
-    @Test
-    public void testChangeType() throws Exception {
-        JsonNode configNode = ObjectMapperFactory.create().readTree("{ db: 'testDataStore', datastore: 'foo'}");
+        // Reset for next test
+        removeResource(resource);
+
+
+        // TEST #10 - Change type
+        configNode = ObjectMapperFactory.create().readTree("{ db: 'testDataStore', datastore: 'foo'}");
 
         setUpSystem((ObjectNode)configNode);
 

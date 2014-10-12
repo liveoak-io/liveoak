@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -28,6 +28,7 @@ import java.util.Set;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public abstract class AbstractResourceTestCase extends AbstractTestCase {
 
@@ -96,6 +97,13 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+    }
+
+    public void removeResource(InternalApplicationExtension resource) throws InterruptedException {
+        this.extensions.remove(resource);
+        resource.remove();
+
+        this.system.awaitStability();
     }
 
     public void removeAllResources() throws InterruptedException {

@@ -3,6 +3,7 @@ package io.liveoak.mongo.config;
 import java.util.List;
 
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.InitializationException;
 import io.liveoak.spi.state.ResourceState;
@@ -13,14 +14,16 @@ import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+ * @author Ken Finnigan
  */
 public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
 
     @Test
-    public void testDefault() throws Exception {
+    public void readPreferenceTests() throws Exception {
+        // TEST #1 - Default
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testDefaultDB");
-        setUpSystem(config);
+        InternalApplicationExtension resource = setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
         assertThat(result.getProperty("db")).isEqualTo("testDefaultDB");
@@ -31,48 +34,49 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         // the default values
         assertThat(readPreferenceResourceState.getProperty(ReadPreferenceState.TYPE)).isEqualTo(ReadPreferenceState.PRIMARY);
         assertThat(readPreferenceResourceState.getPropertyNames().size()).isEqualTo(1); //Since its a primary type, there cannot be tags
-    }
 
-    @Test
-    public void testConfigureType() throws Exception {
-        ResourceState config = new DefaultResourceState();
+        // Reset for next test
+        removeResource(resource);
+
+
+        // TEST #2 - Configure type
+        config = new DefaultResourceState();
         config.putProperty("db", "testConfigureTypeDB");
 
         ResourceState configReadPref = new DefaultResourceState();
-        configReadPref.putProperty(ReadPreferenceState.TYPE,"secondary"); // use new string value here, if using ReadPreferenceResource.Types.SECONDARY.toString() then '==' will incorrectly work when we should be using equals()
+        configReadPref.putProperty(ReadPreferenceState.TYPE, "secondary"); // use new string value here, if using ReadPreferenceResource.Types.SECONDARY.toString() then '==' will incorrectly work when we should be using equals()
         config.putProperty(ReadPreferenceState.ID, configReadPref);
 
-        setUpSystem(config);
+        resource = setUpSystem(config);
 
-        ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
-
+        result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
 
         assertThat(result.getProperty("db")).isEqualTo("testConfigureTypeDB");
         assertThat(result.getProperty("servers")).isNotNull();
 
         assertThat(result.getProperty(ReadPreferenceState.ID)).isNotNull();
-        ResourceState readPreferenceResourceState = (ResourceState) result.getProperty(ReadPreferenceState.ID);
+        readPreferenceResourceState = (ResourceState) result.getProperty(ReadPreferenceState.ID);
         assertThat(readPreferenceResourceState.getPropertyNames().size()).isEqualTo(2); // since not a primary type, will have a list of tags
         assertThat(readPreferenceResourceState.getProperty(ReadPreferenceState.TYPE)).isEqualTo(ReadPreferenceState.SECONDARY);
         assertThat((List) readPreferenceResourceState.getProperty(ReadPreferenceState.TAGS)).isEmpty();
-    }
 
-    @Test
-    public void testUpdateType() throws Exception {
-        ResourceState config = new DefaultResourceState();
+        // Reset for next test
+        removeResource(resource);
+
+
+        // TEST #3 - Update type
+        config = new DefaultResourceState();
         config.putProperty("db", "testUpdateTypeDB");
-        setUpSystem(config);
+        resource = setUpSystem(config);
 
-        ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
-
+        result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
 
         assertThat(result.getProperty("db")).isEqualTo("testUpdateTypeDB");
         assertThat(result.getProperty("servers")).isNotNull();
 
         assertThat(result.getProperty(ReadPreferenceState.ID)).isNotNull();
-        ResourceState readPreferenceResourceState = (ResourceState) result.getProperty(ReadPreferenceState.ID);
+        readPreferenceResourceState = (ResourceState) result.getProperty(ReadPreferenceState.ID);
         assertThat(readPreferenceResourceState.getProperty(ReadPreferenceState.TYPE)).isEqualTo(ReadPreferenceState.PRIMARY);
-
 
         ResourceState updatedResourceState = new DefaultResourceState();
         updatedResourceState.putProperty(ReadPreferenceState.TYPE, ReadPreferenceState.NEAREST);
@@ -85,14 +89,15 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         ResourceState updatedReadPreferenceResourceState = (ResourceState) result.getProperty(ReadPreferenceState.ID);
         assertThat(updatedReadPreferenceResourceState.getProperty(ReadPreferenceState.TYPE)).isEqualTo(ReadPreferenceState.NEAREST);
 
-    }
+        // Reset for next test
+        removeResource(resource);
 
-    @Test
-    public void testSetWithTags() throws Exception {
-        ResourceState config = new DefaultResourceState();
+
+        // TEST #4 - Set with tags
+        config = new DefaultResourceState();
         config.putProperty("db", "testConfigureWithTagsDB");
 
-        ResourceState configReadPref = new DefaultResourceState();
+        configReadPref = new DefaultResourceState();
         configReadPref.putProperty(ReadPreferenceState.TYPE, ReadPreferenceState.SECONDARY);
 
         ResourceState tagsResourceState = new DefaultResourceState();
@@ -101,75 +106,80 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
 
         configReadPref.putProperty(ReadPreferenceState.TAGS, tagsResourceState);
 
-
         config.putProperty(ReadPreferenceState.ID, configReadPref);
 
-        setUpSystem(config);
+        resource = setUpSystem(config);
 
-        ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
+        result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
 
         assertThat(result.getProperty("db")).isEqualTo("testConfigureWithTagsDB");
         assertThat(result.getProperty("servers")).isNotNull();
 
         assertThat(result.getProperty(ReadPreferenceState.ID)).isNotNull();
-        ResourceState readPreferenceResourceState = (ResourceState) result.getProperty(ReadPreferenceState.ID);
+        readPreferenceResourceState = (ResourceState) result.getProperty(ReadPreferenceState.ID);
         assertThat(readPreferenceResourceState.getPropertyNames().size()).isEqualTo(2);
         assertThat(readPreferenceResourceState.getProperty(ReadPreferenceState.TYPE)).isEqualTo(ReadPreferenceState.SECONDARY);
         List<ResourceState> tagsStates = (List) readPreferenceResourceState.getProperty(ReadPreferenceState.TAGS);
         assertThat(tagsStates.size()).isEqualTo(2);
         assertThat(tagsStates.get(0).getProperty("foo")).isEqualTo("bar");
         assertThat(tagsStates.get(1).getProperty("hello")).isEqualTo("world");
-    }
 
-    @Test
-    public void testInvalidType() throws Exception {
-        ResourceState config = new DefaultResourceState();
+        // Reset for next test
+        removeResource(resource);
+
+
+        // TEST #5 - Invalid type
+        config = new DefaultResourceState();
         config.putProperty("db", "testInvalidTypeDB");
 
-        ResourceState configReadPref = new DefaultResourceState();
+        configReadPref = new DefaultResourceState();
         configReadPref.putProperty(ReadPreferenceState.TYPE, "foobar");
         config.putProperty(ReadPreferenceState.ID, configReadPref);
 
         try {
-            setUpSystem(config);
+            resource = setUpSystem(config);
             Fail.fail();
         } catch (InitializationException e) {
             //expected
         }
-    }
 
-    @Test
-    public void testNullType() throws Exception {
-        ResourceState config = new DefaultResourceState();
+        // Reset for next test
+        removeResource(resource);
+
+
+        // TEST #6 - Null type
+        config = new DefaultResourceState();
         config.putProperty("db", "testNullTypeDB");
 
-        ResourceState configReadPref = new DefaultResourceState();
+        configReadPref = new DefaultResourceState();
         configReadPref.putProperty(ReadPreferenceState.TYPE, null);
         config.putProperty(ReadPreferenceState.ID, configReadPref);
 
-        setUpSystem(config);
+        resource = setUpSystem(config);
 
-        ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
+        result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
 
         assertThat(result.getProperty("db")).isEqualTo("testNullTypeDB");
         assertThat(result.getProperty("servers")).isNotNull();
 
         assertThat(result.getProperty(ReadPreferenceState.ID)).isNotNull();
-        ResourceState readPreferenceResourceState = (ResourceState) result.getProperty(ReadPreferenceState.ID);
+        readPreferenceResourceState = (ResourceState) result.getProperty(ReadPreferenceState.ID);
         // the default values
         assertThat(readPreferenceResourceState.getProperty(ReadPreferenceState.TYPE)).isEqualTo(ReadPreferenceState.PRIMARY);
         assertThat(readPreferenceResourceState.getPropertyNames().size()).isEqualTo(1); //Since its a primary type, there cannot be tags
-    }
 
-    @Test
-    public void testUpdateTags() throws Exception {
-        ResourceState config = new DefaultResourceState();
+        // Reset for next test
+        removeResource(resource);
+
+
+        // TEST #7 - Update tags
+        config = new DefaultResourceState();
         config.putProperty("db", "testUpdateTagsDB");
 
-        ResourceState configReadPref = new DefaultResourceState();
+        configReadPref = new DefaultResourceState();
         configReadPref.putProperty(ReadPreferenceState.TYPE, ReadPreferenceState.SECONDARY);
 
-        ResourceState tagsResourceState = new DefaultResourceState();
+        tagsResourceState = new DefaultResourceState();
         tagsResourceState.putProperty("hello", "world");
         tagsResourceState.putProperty("loc", "east");
 
@@ -187,16 +197,16 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         updatedConfigReadPref.putProperty(ReadPreferenceState.TAGS, updatedTagConfig);
 
         updatedConfig.putProperty(ReadPreferenceState.ID, updatedConfigReadPref);
-        ResourceState result = client.update(new RequestContext.Builder().build(), ADMIN_PATH, updatedConfig);
+        result = client.update(new RequestContext.Builder().build(), ADMIN_PATH, updatedConfig);
 
         assertThat(result.getProperty("db")).isEqualTo("testUpdateTagsDB");
         assertThat(result.getProperty("servers")).isNotNull();
 
         assertThat(result.getProperty(ReadPreferenceState.ID)).isNotNull();
-        ResourceState readPreferenceResourceState = (ResourceState) result.getProperty(ReadPreferenceState.ID);
+        readPreferenceResourceState = (ResourceState) result.getProperty(ReadPreferenceState.ID);
         assertThat(readPreferenceResourceState.getPropertyNames().size()).isEqualTo(2);
         assertThat(readPreferenceResourceState.getProperty(ReadPreferenceState.TYPE)).isEqualTo(ReadPreferenceState.SECONDARY_PREFERRED);
-        List<ResourceState> tagsStates = (List) readPreferenceResourceState.getProperty(ReadPreferenceState.TAGS);
+        tagsStates = (List) readPreferenceResourceState.getProperty(ReadPreferenceState.TAGS);
         assertThat(tagsStates.size()).isEqualTo(1);
         assertThat(tagsStates.get(0).getProperty("loc")).isEqualTo("west");
     }
