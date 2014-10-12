@@ -4,8 +4,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.spi.exceptions.NotAcceptableException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.exceptions.NotAcceptableException;
 import io.liveoak.spi.exceptions.ResourceAlreadyExistsException;
 import io.liveoak.spi.state.ResourceState;
 import org.fest.assertions.Fail;
@@ -19,14 +19,15 @@ import static org.fest.assertions.Assertions.assertThat;
 public class MongoDBCollectionUpdateTest extends BaseMongoDBTest {
 
     @Test
-    public void testUpdateNoChange() throws Exception {
+    public void collectionUpdateTests() throws Exception {
+        // Test #1 - Update no change
         db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one
         assertThat(db.getCollectionNames()).hasSize(0);
 
         // create a collection
         DBCollection collection = db.createCollection("foo", new BasicDBObject());
-        DBObject dbObject = new BasicDBObject( "_id", "testObject");
-        dbObject.put( "hello", "world" );
+        DBObject dbObject = new BasicDBObject("_id", "testObject");
+        dbObject.put("hello", "world");
         collection.insert(dbObject);
 
         // check that the collection is there (Note: there is an internal index collection, so one more than expected)
@@ -36,29 +37,27 @@ public class MongoDBCollectionUpdateTest extends BaseMongoDBTest {
         // set the update resource state to include the same id value
         ResourceState updateResourceState = new DefaultResourceState("foo");
 
-        ResourceState result = client.update( new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/foo", updateResourceState );
+        ResourceState result = client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/foo", updateResourceState);
 
         // verify the result
-        assertThat( result ).isNotNull();
+        assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("foo");
-        assertThat(result.getProperty("count")).isEqualTo( 1L );
-
+        assertThat(result.getProperty("count")).isEqualTo(1L);
 
         // check in mongo directly
         assertThat(db.collectionExists("foo"));
-        assertThat(db.getCollection("foo").count()).isEqualTo( 1L );
-        assertThat(db.getCollection("foo").findOne().get("hello")).isEqualTo( "world" );
-    }
+        assertThat(db.getCollection("foo").count()).isEqualTo(1L);
+        assertThat(db.getCollection("foo").findOne().get("hello")).isEqualTo("world");
 
-    @Test
-    public void testUpdateEmpty() throws Exception {
+
+        // Test #2 - Update empty
         db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one
         assertThat(db.getCollectionNames()).hasSize(0);
 
         // create a collection
-        DBCollection collection = db.createCollection("foo", new BasicDBObject());
-        DBObject dbObject = new BasicDBObject( "_id", "testObject");
-        dbObject.put( "hello", "world" );
+        collection = db.createCollection("foo", new BasicDBObject());
+        dbObject = new BasicDBObject("_id", "testObject");
+        dbObject.put("hello", "world");
         collection.insert(dbObject);
 
         // check that the collection is there (Note: there is an internal index collection, so one more than expected)
@@ -66,31 +65,29 @@ public class MongoDBCollectionUpdateTest extends BaseMongoDBTest {
         assertThat(db.getCollection("foo").count() == 1);
 
         // set the update resource state to be empty
-        ResourceState updateResourceState = new DefaultResourceState();
+        updateResourceState = new DefaultResourceState();
 
-        ResourceState result = client.update( new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/foo", updateResourceState );
+        result = client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/foo", updateResourceState);
 
         // verify the result
-        assertThat( result ).isNotNull();
+        assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("foo");
-        assertThat(result.getProperty("count")).isEqualTo( 1L );
-
+        assertThat(result.getProperty("count")).isEqualTo(1L);
 
         // check in mongo directly
         assertThat(db.collectionExists("foo"));
-        assertThat(db.getCollection("foo").count()).isEqualTo( 1L );
-        assertThat(db.getCollection("foo").findOne().get("hello")).isEqualTo( "world" );
-    }
+        assertThat(db.getCollection("foo").count()).isEqualTo(1L);
+        assertThat(db.getCollection("foo").findOne().get("hello")).isEqualTo("world");
 
-    @Test
-    public void testRenameCollection() throws Exception {
+
+        // Test #3 - Rename collection
         db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one
         assertThat(db.getCollectionNames()).hasSize(0);
 
         // create a collection
-        DBCollection collection = db.createCollection("foo", new BasicDBObject());
-        DBObject dbObject = new BasicDBObject( "_id", "testObject");
-        dbObject.put( "hello", "world" );
+        collection = db.createCollection("foo", new BasicDBObject());
+        dbObject = new BasicDBObject("_id", "testObject");
+        dbObject.put("hello", "world");
         collection.insert(dbObject);
 
         // check that the collection is there (Note: there is an internal index collection, so one more than expected)
@@ -98,25 +95,23 @@ public class MongoDBCollectionUpdateTest extends BaseMongoDBTest {
         assertThat(db.getCollection("foo").count() == 1);
 
         // set the update resource state to include a new id value
-        ResourceState updateResourceState = new DefaultResourceState("bar");
+        updateResourceState = new DefaultResourceState("bar");
 
-        ResourceState result = client.update( new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/foo", updateResourceState );
+        result = client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/foo", updateResourceState);
 
         // verify the result
-        assertThat( result ).isNotNull();
+        assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("bar");
-        assertThat(result.getProperty("count")).isEqualTo( 1L );
-
+        assertThat(result.getProperty("count")).isEqualTo(1L);
 
         // check in mongo directly
-        assertThat( db.collectionExists( "bar" ) );
+        assertThat(db.collectionExists("bar"));
         assertThat(db.collectionExists("foo")).isFalse();
-        assertThat(db.getCollection("bar").count()).isEqualTo( 1L );
-        assertThat(db.getCollection("bar").findOne().get("hello")).isEqualTo( "world" );
-    }
+        assertThat(db.getCollection("bar").count()).isEqualTo(1L);
+        assertThat(db.getCollection("bar").findOne().get("hello")).isEqualTo("world");
 
-    @Test
-    public void testRenameCollectionAlreadyExists() throws Exception {
+
+        // Test #4 - Rename collection already exists
         db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one
         assertThat(db.getCollectionNames()).hasSize(0);
 
@@ -125,31 +120,30 @@ public class MongoDBCollectionUpdateTest extends BaseMongoDBTest {
         db.createCollection("bar", new BasicDBObject());
 
         // check that the collections are there (Note: there is an internal index collection, so one more than expected)
-        assertThat( db.getCollectionNames() ).hasSize(3);
+        assertThat(db.getCollectionNames()).hasSize(3);
         assertThat(db.collectionExists("foo"));
         assertThat(db.collectionExists("bar"));
 
         // set the update resource state to include a new id value
         // Note that this matches an already existing collection
-        ResourceState updateResourceState = new DefaultResourceState("bar");
+        updateResourceState = new DefaultResourceState("bar");
 
         try {
-            client.update( new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/foo", updateResourceState );
+            client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/foo", updateResourceState);
             Fail.fail();
         } catch (ResourceAlreadyExistsException e) {
             //expected
         }
-    }
 
-    @Test
-    public void testUpdateProperty() throws Exception {
+
+        // Test #5 - Update property
         db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one
         assertThat(db.getCollectionNames()).hasSize(0);
 
         // create a collection
-        DBCollection collection = db.createCollection("foo", new BasicDBObject());
-        DBObject dbObject = new BasicDBObject( "_id", "testObject");
-        dbObject.put( "hello", "world" );
+        collection = db.createCollection("foo", new BasicDBObject());
+        dbObject = new BasicDBObject("_id", "testObject");
+        dbObject.put("hello", "world");
         collection.insert(dbObject);
 
         // check that the collection is there (Note: there is an internal index collection, so one more than expected)
@@ -157,12 +151,12 @@ public class MongoDBCollectionUpdateTest extends BaseMongoDBTest {
         assertThat(db.getCollection("foo").count() == 1);
 
         // set the update resource state to include the same id value
-        ResourceState updateResourceState = new DefaultResourceState();
-        updateResourceState.putProperty( "count", 500L );
+        updateResourceState = new DefaultResourceState();
+        updateResourceState.putProperty("count", 500L);
 
         try {
-        ResourceState result = client.update( new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/foo", updateResourceState );
-        Fail.fail();
+            client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/foo", updateResourceState);
+            Fail.fail();
         } catch (NotAcceptableException e) {
             //expected
         }

@@ -1,8 +1,8 @@
 package io.liveoak.mongo;
 
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.spi.exceptions.DeleteNotSupportedException;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.exceptions.DeleteNotSupportedException;
 import io.liveoak.spi.state.ResourceState;
 import org.fest.assertions.Fail;
 import org.junit.Test;
@@ -15,7 +15,8 @@ import static org.fest.assertions.Assertions.assertThat;
 public class MongoDBCappedCollectionTest extends BaseMongoDBTest {
 
     @Test
-    public void testCreateCappedCollection() throws Exception {
+    public void cappedCollectionTests() throws Exception {
+        // Test #1 - Create capped collection
         // check that we can create the resource
         ResourceState state = new DefaultResourceState("lastFive");
         state.putProperty("capped", "true");
@@ -29,53 +30,51 @@ public class MongoDBCappedCollectionTest extends BaseMongoDBTest {
         // test that we get this resource back on a read
         ResourceState lastFive = client.read(new RequestContext.Builder().build(), "/testApp/storage/lastFive");
         assertThat(lastFive).isNotNull();
-        assertThat(lastFive.id()).isEqualTo( "lastFive" );
-        assertThat(lastFive.getProperty( "capped" )).isEqualTo( true );
+        assertThat(lastFive.id()).isEqualTo("lastFive");
+        assertThat(lastFive.getProperty("capped")).isEqualTo(true);
         assertThat(lastFive.getProperty("max")).isEqualTo(5);
-        assertThat( lastFive.members().size() ).isEqualTo( 0 );
-    }
+        assertThat(lastFive.members().size()).isEqualTo(0);
 
-    @Test
-    public void testWriteCappedCollection() throws Exception {
+
+        // Test #2 - Write capped collection
         // check that we can create the resource
-        ResourceState state = new DefaultResourceState("lastTwo");
+        state = new DefaultResourceState("lastTwo");
         state.putProperty("capped", "true");
         state.putProperty("size", 1024);
         state.putProperty("max", 2);
 
-        ResourceState createdResource = client.create(new RequestContext.Builder().build(), "/testApp/storage", state);
+        createdResource = client.create(new RequestContext.Builder().build(), "/testApp/storage", state);
         assertThat(createdResource).isNotNull();
         assertThat(createdResource.id()).isEqualTo("lastTwo");
 
-        client.create(new RequestContext.Builder().build(), "/testApp/storage/lastTwo", new DefaultResourceState( "first" ));
-        client.create(new RequestContext.Builder().build(), "/testApp/storage/lastTwo", new DefaultResourceState( "second" ));
+        client.create(new RequestContext.Builder().build(), "/testApp/storage/lastTwo", new DefaultResourceState("first"));
+        client.create(new RequestContext.Builder().build(), "/testApp/storage/lastTwo", new DefaultResourceState("second"));
         // since the capped collection only holds 2 items, this should remove the first element:
-        client.create(new RequestContext.Builder().build(), "/testApp/storage/lastTwo", new DefaultResourceState( "third" ));
+        client.create(new RequestContext.Builder().build(), "/testApp/storage/lastTwo", new DefaultResourceState("third"));
 
         // test that we get this resource back on a read
         ResourceState lastTwo = client.read(new RequestContext.Builder().build(), "/testApp/storage/lastTwo");
         assertThat(lastTwo).isNotNull();
-        assertThat(lastTwo.id()).isEqualTo( "lastTwo" );
-        assertThat(lastTwo.getProperty("capped")).isEqualTo( true );
+        assertThat(lastTwo.id()).isEqualTo("lastTwo");
+        assertThat(lastTwo.getProperty("capped")).isEqualTo(true);
         assertThat(lastTwo.getProperty("max")).isEqualTo(2);
         assertThat(lastTwo.members().size()).isEqualTo(2);
         assertThat(lastTwo.members().get(0).id()).isEqualTo("second");
         assertThat(lastTwo.members().get(1).id()).isEqualTo("third");
-    }
 
-    @Test
-    public void testDeleteElementCappedCollection() throws Exception {
+
+        // Test #3 - Delete element capped collection
         // check that we can create the resource
-        ResourceState state = new DefaultResourceState("onlyThree");
+        state = new DefaultResourceState("onlyThree");
         state.putProperty("capped", "true");
         state.putProperty("size", 1024);
         state.putProperty("max", 3);
 
-        ResourceState createdResource = client.create(new RequestContext.Builder().build(), "/testApp/storage", state);
+        createdResource = client.create(new RequestContext.Builder().build(), "/testApp/storage", state);
         assertThat(createdResource).isNotNull();
         assertThat(createdResource.id()).isEqualTo("onlyThree");
 
-        client.create(new RequestContext.Builder().build(), "/testApp/storage/onlyThree", new DefaultResourceState( "first" ));
+        client.create(new RequestContext.Builder().build(), "/testApp/storage/onlyThree", new DefaultResourceState("first"));
 
         // this should fail since you cannot delete from a capped collection
         try {
@@ -85,23 +84,20 @@ public class MongoDBCappedCollectionTest extends BaseMongoDBTest {
             //expected
         }
 
-    }
 
-    @Test
-    public void testDeleteCappedCollection() throws Exception {
+        // Test #4 - Delete capped collection
         // check that we can create the resource
-        ResourceState state = new DefaultResourceState("testDelete");
+        state = new DefaultResourceState("testDelete");
         state.putProperty("capped", "true");
         state.putProperty("size", 1024);
         state.putProperty("max", 3);
 
-        ResourceState createdResource = client.create(new RequestContext.Builder().build(), "/testApp/storage", state);
+        createdResource = client.create(new RequestContext.Builder().build(), "/testApp/storage", state);
         assertThat(createdResource).isNotNull();
         assertThat(createdResource.id()).isEqualTo("testDelete");
 
-        ResourceState deleteResource = client.delete( new RequestContext.Builder().build(), "/testApp/storage/testDelete" );
+        ResourceState deleteResource = client.delete(new RequestContext.Builder().build(), "/testApp/storage/testDelete");
         assertThat(deleteResource).isNotNull();
         assertThat(deleteResource.id()).isEqualTo("testDelete");
-
     }
 }

@@ -1,10 +1,12 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package io.liveoak.mongo;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -15,9 +17,6 @@ import io.liveoak.spi.state.ResourceState;
 import org.bson.types.ObjectId;
 import org.fest.assertions.Fail;
 import org.junit.Test;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -30,7 +29,8 @@ import static org.junit.Assert.fail;
 public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
     @Test
-    public void testGetSimple() throws Exception {
+    public void resourceReadTests() throws Exception {
+        // Test #1 - Get simple
         String methodName = "testSimpleGet";
         assertFalse(db.collectionExists(methodName));
 
@@ -46,11 +46,10 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         // verify response
         assertThat(result).isNotNull();
         assertThat(result.getProperty("foo")).isEqualTo("bar");
-    }
 
-    @Test
-    public void testSimilarIDs() throws Exception {
-        String methodName = "testSimpleGet";
+
+        // Test #2 - Similar ids
+        methodName = "testSimilarIds";
         assertFalse(db.collectionExists(methodName));
 
         // create the object using the mongo driver directly
@@ -69,55 +68,53 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
 
         assertThat(resultObject.getProperty("foo")).isEqualTo("bar");
         assertThat(resultString.getProperty("foo")).isEqualTo("baz");
-    }
 
-    @Test
-    public void testGetWithEmbedded() throws Exception {
-        String methodName = "testGetWithEmbedded";
+
+        // Test #3 - Get with embedded
+        methodName = "testGetWithEmbedded";
         assertFalse(db.collectionExists(methodName));
 
         // create the object using the mongo driver directly
-        BasicDBObject object = new BasicDBObject();
+        object = new BasicDBObject();
         object.append("foo", "bar");
         object.append("child", new BasicDBObject().append("ABC", "XYZ"));
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
+        id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
 
-        ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + id);
+        result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + id);
 
         // verify response
         assertThat(result).isNotNull();
         assertThat(result.getProperty("foo")).isEqualTo("bar");
         ResourceState resultChild = (ResourceState) result.getProperty("child");
         assertThat(resultChild.getProperty("ABC")).isEqualTo("XYZ");
-    }
 
-    @Test
-    public void testGetEmbeddedWithReturnFields() throws Exception {
-        String methodName = "testGetEmbeddedWithReturnFields";
+
+        // Test #4 - Get embedded with return fields
+        methodName = "testGetEmbeddedWithReturnFields";
         assertFalse(db.collectionExists(methodName));
 
         // create the object using the mongo driver directly
-        BasicDBObject object = new BasicDBObject();
+        object = new BasicDBObject();
         object.append("foo", "bar");
         object.append("child", new BasicDBObject().append("ABC", "XYZ").append("test", "123").append("grandchild", new BasicDBObject("123", 456)));
         object.append("baz", "123");
 
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
+        id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
 
         // check that we don't get back baz, but that we do get the child and grandchild
         RequestContext rCtx = new RequestContext.Builder().returnFields(new DefaultReturnFields("foo,child")).build();
-        ResourceState result = client.read(rCtx, "/testApp/" + BASEPATH + "/" + methodName + "/" + id);
+        result = client.read(rCtx, "/testApp/" + BASEPATH + "/" + methodName + "/" + id);
 
         // verify response
         assertThat(result).isNotNull();
         assertThat(result.getProperty("foo")).isEqualTo("bar");
         assertThat(result.getProperty("child")).isNotNull();
         assertThat(result.getProperty("baz")).isNull();
-        ResourceState resultChild = (ResourceState) result.getProperty("child");
+        resultChild = (ResourceState) result.getProperty("child");
         assertThat(resultChild.getProperty("ABC")).isEqualTo("XYZ");
         assertThat(resultChild.getProperty("test")).isEqualTo("123");
         ResourceState resultGrandChild = (ResourceState) resultChild.getProperty("grandchild");
@@ -146,36 +143,34 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertThat(resultChild.getProperty("ABC")).isEqualTo("XYZ");
         assertThat(resultChild.getProperty("test")).isEqualTo("123");
         assertThat(resultChild.getProperty("grandchild")).isNull();
-    }
 
-    @Test
-    public void testGetChildDirectly() throws Exception {
-        String methodName = "testGetChildDirectly";
+
+        // Test #5 - Get child directly
+        methodName = "testGetChildDirectly";
         assertThat(db.collectionExists(methodName)).isFalse();
 
         // create the object using the mongo driver directly
-        BasicDBObject object = new BasicDBObject();
+        object = new BasicDBObject();
         object.append("foo", "bar").append("abc", "123").append("obj", new BasicDBObject("foo2", "bar2"));
         object.append("child", new BasicDBObject("grandchild", new BasicDBObject("foo3", "bar3")));
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        String id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
+        id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
 
         try {
-            ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + id + "/child");
+            client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + id + "/child");
             Fail.fail();
         } catch (ResourceNotFoundException e) {
             // expected
         }
-    }
 
-    @Test
-    public void testGetArray() throws Exception {
-        String methodName = "testGetArray";
+
+        // Test #6 - Get array
+        methodName = "testGetArray";
         assertThat(db.collectionExists(methodName)).isFalse();
 
         // create the object using the mongo driver directly
-        BasicDBObject object = new BasicDBObject("_id", "foobaz");
+        object = new BasicDBObject("_id", "foobaz");
 
         BasicDBList list = new BasicDBList();
         list.add(1);
@@ -194,8 +189,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
 
-        ResourceState result = client
-                .read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/foobaz");
+        result = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/foobaz");
 
         // verify the result
         assertThat(result).isNotNull();
@@ -213,22 +207,21 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertThat(((Collection) result.getProperty("eArray"))).isEmpty();
 
         try {
-            result = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/foobaz/child");
+            client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*(*))")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/foobaz/child");
             Fail.fail();
         } catch (ResourceNotFoundException e) {
             // expected
         }
-    }
 
-    @Test
-    public void testGetCollection() throws Exception {
-        String methodName = "testGetCollection";
+
+        // Test #7 - Get collection
+        methodName = "testGetCollection";
         assertThat(db.collectionExists(methodName)).isFalse();
 
         // create the object using the mongo driver directly
-        BasicDBObject object = new BasicDBObject("_id", "foobaz");
+        object = new BasicDBObject("_id", "foobaz");
 
-        BasicDBList list = new BasicDBList();
+        list = new BasicDBList();
         list.add(1);
         list.add("A");
         list.add(new BasicDBObject("_id", "test123").append("foo", "bar"));
@@ -238,35 +231,33 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertEquals(1, db.getCollection(methodName).getCount());
 
         try {
-            ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/foobaz/array");
+            client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/foobaz/array");
             Fail.fail();
         } catch (ResourceNotFoundException e) {
             // expected
         }
-    }
 
-    @Test
-    public void testGetInvalidId() throws Exception {
-        String methodName = "testGetInvalidId";
+
+        // Test #8 - Get invalid id
+        methodName = "testGetInvalidId";
         assertFalse(db.collectionExists(methodName));
 
         try {
-            ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/foobar123");
+            client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/foobar123");
             fail("shouldn't get here");
         } catch (ResourceNotFoundException rnfe) {
             // expected
         }
-    }
 
-    @Test
-    public void testGetNonExistantId() throws Exception {
-        String methodName = "testGetNonExistantId";
+
+        // Test #9 - Get non existent id
+        methodName = "testGetNonExistantId";
         assertFalse(db.collectionExists(methodName));
 
-        ObjectId id = new ObjectId();
+        ObjectId objectId = new ObjectId();
 
         try {
-            ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + id);
+            client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/" + objectId);
             fail("shouldn't get here");
         } catch (ResourceNotFoundException rnfe) {
             // expected

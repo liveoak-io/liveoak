@@ -161,6 +161,7 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
             fail("InitializationException should have been thrown");
         } catch (InitializationException ie) {
             // Expected
+            this.system.awaitStability();
         }
 
 
@@ -171,6 +172,7 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
             fail("InitializationException should have been thrown");
         } catch (InitializationException ie) {
             // Expected
+            this.system.awaitStability();
         }
 
 
@@ -181,6 +183,7 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
             fail("InitializationException should have been thrown");
         } catch (InitializationException ie) {
             // Expected
+            this.system.awaitStability();
         }
 
 

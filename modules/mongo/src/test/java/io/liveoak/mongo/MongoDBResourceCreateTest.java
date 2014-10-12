@@ -1,10 +1,13 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package io.liveoak.mongo;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -14,10 +17,6 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.ResourceAlreadyExistsException;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -31,7 +30,8 @@ import static org.junit.Assert.fail;
 public class MongoDBResourceCreateTest extends BaseMongoDBTest {
 
     @Test
-    public void testSimpleCreate() throws Exception {
+    public void resourceCreateTests() throws Exception {
+        // Test #1 - Simple create
         String methodName = "testSimpleCreate";
         assertFalse(db.collectionExists(methodName));
         db.createCollection(methodName, new BasicDBObject());
@@ -51,17 +51,16 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
 
         DBObject dbObject = db.getCollection(methodName).findOne();
         assertThat(dbObject.get("foo")).isEqualTo("bar");
-    }
 
-    @Test
-    public void testSimpleCreateWithId() throws Exception {
-        String methodName = "testSimpleCreateWithID";
+
+        // Test #2 - Simple create with id
+        methodName = "testSimpleCreateWithID";
         assertFalse(db.collectionExists(methodName));
         db.createCollection(methodName, new BasicDBObject());
 
-        ResourceState state = new DefaultResourceState("helloworld");
+        state = new DefaultResourceState("helloworld");
         state.putProperty("foo", "bar");
-        ResourceState result = client.create(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName, state);
+        result = client.create(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName, state);
 
         // verify response
         assertThat(result).isNotNull();
@@ -71,35 +70,33 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         // verify what is stored in the mongo db
         assertTrue(db.collectionExists(methodName));
         assertEquals(1, db.getCollection(methodName).getCount());
-        DBObject dbObject = db.getCollection(methodName).findOne(new BasicDBObject("_id", "helloworld"));
+        dbObject = db.getCollection(methodName).findOne(new BasicDBObject("_id", "helloworld"));
         assertEquals("bar", dbObject.get("foo"));
-    }
 
-    @Test
-    public void testCreateAlreadyExist() throws Exception {
-        String methodName = "testCreateAlreadyExist";
+
+        // Test #3 - Create already exists
+        methodName = "testCreateAlreadyExist";
         assertFalse(db.collectionExists(methodName));
         db.createCollection(methodName, new BasicDBObject());
         db.getCollection(methodName).insert(new BasicDBObject("_id", "helloworld"));
 
-        ResourceState state = new DefaultResourceState("helloworld");
+        state = new DefaultResourceState("helloworld");
         state.putProperty("foo", "bar");
 
         try {
-            ResourceState result = client.create(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName, state);
+            client.create(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName, state);
             fail();
         } catch (ResourceAlreadyExistsException e) {
             // expected
         }
-    }
 
-    @Test
-    public void testCreateWithArrays() throws Exception {
-        String methodName = "testCreateWithArrays";
+
+        // Test #4 - Create with arrays
+        methodName = "testCreateWithArrays";
         assertFalse(db.collectionExists(methodName));
         db.createCollection(methodName, new BasicDBObject());
 
-        ResourceState state = new DefaultResourceState("testArrays");
+        state = new DefaultResourceState("testArrays");
 
         ArrayList arr = new ArrayList();
         arr.add(1);
@@ -124,7 +121,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         state.putProperty("arr", arr);
 
         RequestContext requestContext = new RequestContext.Builder().build();// .returnFields(new ReturnFieldsImpl("*(arr(*(*)))")).build();
-        ResourceState result = client.create(requestContext, "/testApp/" + BASEPATH + "/" + methodName, state);
+        result = client.create(requestContext, "/testApp/" + BASEPATH + "/" + methodName, state);
 
         // verify the result
         assertThat(result).isNotNull();
@@ -147,7 +144,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         assertThat(grandchildResourceState.getProperty("foo")).isEqualTo("baz");
 
         // verify what is in the database
-        DBObject dbObject = db.getCollection(methodName).findOne();
+        dbObject = db.getCollection(methodName).findOne();
         assertThat(dbObject).isNotNull();
         assertThat(dbObject.keySet().size()).isEqualTo(2);
         assertThat(dbObject.get("_id")).isEqualTo("testArrays");
@@ -167,17 +164,16 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         assertThat(childDBObject2.get("hello")).isEqualTo("world");
         BasicDBObject grandChildDBObject = (BasicDBObject) childDBObject2.get("child");
         assertThat(grandChildDBObject.get("foo")).isEqualTo("baz");
-    }
 
-    @Test
-    public void testCreateWithNestedArrays() throws Exception {
-        String methodName = "testCreateWithArrays";
+
+        // Test #5 - Create with nested arrays
+        methodName = "testCreateWithNestedArrays";
         assertFalse(db.collectionExists(methodName));
         db.createCollection(methodName, new BasicDBObject());
 
-        ResourceState state = new DefaultResourceState("testArraysNested");
+        state = new DefaultResourceState("testArraysNested");
 
-        ArrayList arr = new ArrayList();
+        arr = new ArrayList();
         arr.add(1.123);
 
         ArrayList nest1 = new ArrayList();
@@ -196,15 +192,15 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
 
         state.putProperty("arr", arr);
 
-        RequestContext requestContext = new RequestContext.Builder().build();
-        ResourceState result = client.create(requestContext, "/testApp/" + BASEPATH + "/" + methodName, state);
+        requestContext = new RequestContext.Builder().build();
+        result = client.create(requestContext, "/testApp/" + BASEPATH + "/" + methodName, state);
 
         // verify the result
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("testArraysNested");
         assertThat(result.getProperty("arr")).isNotNull();
 
-        List list = (List) result.getProperty("arr");
+        list = (List) result.getProperty("arr");
         assertThat(list.get(0)).isEqualTo(1.123);
 
         List childList = (List) list.get(1);
@@ -219,13 +215,13 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         assertThat(list.get(2)).isEqualTo("ABC");
 
         // verify what is in the database
-        DBObject dbObject = db.getCollection(methodName).findOne();
+        dbObject = db.getCollection(methodName).findOne();
         assertThat(dbObject).isNotNull();
         assertThat(dbObject.keySet().size()).isEqualTo(2);
         assertThat(dbObject.get("_id")).isEqualTo("testArraysNested");
         assertThat(dbObject.get("arr")).isNotNull();
 
-        BasicDBList dbList = (BasicDBList) dbObject.get("arr");
+        dbList = (BasicDBList) dbObject.get("arr");
         assertThat(dbList.get(0)).isEqualTo(1.123);
 
         BasicDBList nestedDBList = (BasicDBList) dbList.get(1);
@@ -238,24 +234,23 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         assertThat(nestedDBObject.get("foo")).isEqualTo("bar");
 
         assertThat(dbList.get(2)).isEqualTo("ABC");
-    }
 
-    @Test
-    public void testComplexCreate() throws Exception {
-        String methodName = "testComplexCreate";
+
+        // Test #6 - Complex create
+        methodName = "testComplexCreate";
         assertFalse(db.collectionExists(methodName));
         db.createCollection(methodName, new BasicDBObject());
 
-        ResourceState state = new DefaultResourceState("helloworld");
+        state = new DefaultResourceState("helloworld");
         state.putProperty("foo", "bar");
         state.putProperty("test", 123);
-        Object[] arr = { 1, 1, 2, 3, 5, 8, 13, 21 };
-        state.putProperty("arr", Arrays.asList(arr));
-        state.putProperty("arr2", arr);
+        Object[] arr2 = {1, 1, 2, 3, 5, 8, 13, 21};
+        state.putProperty("arr", Arrays.asList(arr2));
+        state.putProperty("arr2", arr2);
 
         ResourceState arrayObj = new DefaultResourceState();
         arrayObj.putProperty("array", "object");
-        ArrayList arrayList = new ArrayList(Arrays.asList(arr));
+        ArrayList arrayList = new ArrayList(Arrays.asList(arr2));
         arrayList.add(arrayObj);
         state.putProperty("arr3", arrayList);
 
@@ -269,7 +264,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         obj.putProperty("subobject", subObj);
         state.putProperty("obj", obj);
 
-        ResourceState result = client.create(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName, state);
+        result = client.create(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName, state);
 
         // verify the result
         assertThat(result).isNotNull();
@@ -284,7 +279,7 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         // check the child object
 
         // verify what is in the database
-        DBObject dbObject = db.getCollection(methodName).findOne();
+        dbObject = db.getCollection(methodName).findOne();
         assertThat(dbObject).isNotNull();
         assertThat(dbObject.keySet().size()).isEqualTo(7);
         assertThat(dbObject.get("_id")).isEqualTo("helloworld");
@@ -293,14 +288,14 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         assertThat(dbObject.get("arr").toString()).isEqualTo("[ 1 , 1 , 2 , 3 , 5 , 8 , 13 , 21]");
         assertThat(dbObject.get("arr2").toString()).isEqualTo("[ 1 , 1 , 2 , 3 , 5 , 8 , 13 , 21]");
 
-        DBObject childDBObject = (DBObject) dbObject.get("obj");
-        assertThat(childDBObject).isNotNull();
-        assertThat(childDBObject.keySet().size()).isEqualTo(3);
-        assertThat(childDBObject.get("_id")).isNull();
-        assertThat(childDBObject.get("foo2")).isEqualTo("bar2");
-        assertThat(childDBObject.get("test2")).isEqualTo(321);
+        DBObject childDBObject1 = (DBObject) dbObject.get("obj");
+        assertThat(childDBObject1).isNotNull();
+        assertThat(childDBObject1.keySet().size()).isEqualTo(3);
+        assertThat(childDBObject1.get("_id")).isNull();
+        assertThat(childDBObject1.get("foo2")).isEqualTo("bar2");
+        assertThat(childDBObject1.get("test2")).isEqualTo(321);
 
-        DBObject grandchildDBObject = (DBObject) childDBObject.get("subobject");
+        DBObject grandchildDBObject = (DBObject) childDBObject1.get("subobject");
         assertThat(grandchildDBObject).isNotNull();
         assertThat(grandchildDBObject.keySet().size()).isEqualTo(1);
         assertThat(grandchildDBObject.get("_id")).isNull();

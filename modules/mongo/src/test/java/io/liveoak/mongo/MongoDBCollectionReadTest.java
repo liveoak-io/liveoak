@@ -1,32 +1,30 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
 package io.liveoak.mongo;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import io.liveoak.common.DefaultReturnFields;
+import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Pagination;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.Sorting;
+import io.liveoak.spi.exceptions.NotAcceptableException;
+import io.liveoak.spi.exceptions.ResourceNotFoundException;
+import io.liveoak.spi.state.ResourceState;
+import org.fest.assertions.Fail;
+import org.junit.Test;
+
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import io.liveoak.common.DefaultReturnFields;
-import io.liveoak.spi.LiveOak;
-import org.fest.assertions.Fail;
-import org.junit.Test;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-
-import io.liveoak.spi.exceptions.NotAcceptableException;
-import io.liveoak.spi.Pagination;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.exceptions.ResourceNotFoundException;
-import io.liveoak.spi.Sorting;
-import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
@@ -34,27 +32,26 @@ import io.liveoak.spi.state.ResourceState;
 public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
     @Test
-    public void testRootFound() throws Exception {
+    public void collectionReadTests() throws Exception {
+        // Test #1 - Root found
         ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/storage");
         assertThat(result).isNotNull();
-    }
 
-    @Test
-    public void testUncreatedCollectionNotFound() throws Exception {
+
+        // Test #2 - Uncreated collection not found
         try {
             client.read(new RequestContext.Builder().build(), "/storage/movies");
             fail("shouldn't get here");
         } catch (ResourceNotFoundException e) {
             assertThat(e.path()).isEqualTo("/storage/movies");
         }
-    }
 
-    @Test
-    public void testGetStorageEmpty() throws Exception {
+
+        // Test #3 - Get storage empty
         db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one
         assertThat(db.getCollectionNames()).hasSize(0);
 
-        ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH);
+        result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH);
 
         // verify response
         assertThat(result).isNotNull();
@@ -63,10 +60,9 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertThat(result.getProperty("type")).isEqualTo("database");
         assertThat(result.getProperty("count")).isEqualTo(0);
         assertThat(result.members()).isEmpty();
-    }
 
-    @Test
-    public void testGetStorageCollections() throws Exception {
+
+        // Test #4 - Get storage collection
         db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one
         assertThat(db.getCollectionNames()).hasSize(0);
 
@@ -78,7 +74,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // check that the collections are there (Note: there is an internal index collection, so 4 instead of 3)
         assertThat(db.getCollectionNames()).hasSize(4);
 
-        ResourceState result = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).build(), "/testApp/" + BASEPATH);
+        result = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).build(), "/testApp/" + BASEPATH);
 
         // verify response
         assertThat(result).isNotNull();
@@ -93,16 +89,15 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
             assertThat(member.getProperty("type")).isEqualTo("collection");
             assertThat(member.members()).isEmpty();
         }
-    }
 
-    @Test
-    public void testGetEmptyCollection() throws Exception {
+
+        // Test #5 - Get empty collection
         String methodName = "testEmptyCollection";
         // check that the collection really is empty
         assertFalse(db.collectionExists(methodName));
 
         try {
-            ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName);
+            result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName);
             Fail.fail();
         } catch (ResourceNotFoundException e) {
             // expected
@@ -110,20 +105,18 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         db.createCollection(methodName, new BasicDBObject());
 
-        ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName);
+        result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName);
 
         // verify the result
         assertThat(result.id()).isEqualTo(methodName);
-
         assertThat(result.getProperty("type")).isEqualTo("collection");
         assertThat(result.members()).isEmpty();
 
         // check that the collection is still empty
         assertEquals(0, db.getCollection(methodName).getCount());
-    }
 
-    @Test
-    public void testGetStorageCollectionsPagination() throws Exception {
+
+        // Test #6 - Get storage collections pagination
         // DB db = mongoClient.getDB("testGetStorageCollectionsPagination");
         db.dropDatabase();
         assertEquals(0, db.getCollectionNames().size());
@@ -137,7 +130,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // This should return 23 collections
         RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS))
                 .pagination(new SimplePagination(11, 23)).build();
-        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH);
+        result = client.read(requestContext, "/testApp/" + BASEPATH);
 
         // verify the result
         assertThat(result.id()).isEqualTo(BASEPATH);
@@ -170,11 +163,9 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
             assertThat(member.getProperty("type")).isEqualTo("collection");
             assertThat(member.members()).isEmpty();
         }
-    }
 
-    @Test
-    public void testGetStorageCollectionsQuery() throws Exception {
 
+        // Test #7 - Get storage collections query
         DBCollection collection = db.getCollection("testQueryCollection");
         if (collection != null) {
             collection.drop();
@@ -188,8 +179,8 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         // This should return 2 items
         SimpleResourceParams resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).resourceParams(resourceParams).build();
-        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
+        requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).resourceParams(resourceParams).build();
+        result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
 
         // verify response
         assertThat(result).isNotNull();
@@ -217,11 +208,13 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertThat(result.members().get(0).getProperty("name")).isEqualTo("John");
         assertThat(result.members().get(1).getPropertyNames().size()).isEqualTo(5);
         assertThat(result.members().get(1).getProperty("name")).isEqualTo("Jane");
-    }
 
-    @Test
-    public void testGetStorageCollectionsQueryNoResult() throws Exception {
-        DBCollection collection = db.getCollection("testQueryCollectionNoResults");
+        // Remove collection
+        client.delete(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
+
+
+        // Test #8 - Get storage collections query no result
+        collection = db.getCollection("testQueryCollectionNoResults");
         if (collection != null) {
             collection.drop();
         }
@@ -232,10 +225,10 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertThat(collection.count()).isEqualTo(6);
 
         // This should return 2 items
-        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:\"foo\"}");
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).resourceParams(resourceParams).build();
-        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollectionNoResults");
+        requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).resourceParams(resourceParams).build();
+        result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollectionNoResults");
 
         // verify response
         assertThat(result).isNotNull();
@@ -243,11 +236,10 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         assertThat(result.getProperty("type")).isEqualTo("collection");
         assertThat(result.members().size()).isEqualTo(0);
-    }
 
-    @Test
-    public void testGetStorageCollectionsInvalidQueryString() throws Exception {
-        DBCollection collection = db.getCollection("testQueryCollectionInvalid");
+
+        // Test #9 - Get storage collections invalid query string
+        collection = db.getCollection("testQueryCollectionInvalid");
         if (collection != null) {
             collection.drop();
         }
@@ -258,24 +250,22 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertThat(collection.count()).isEqualTo(6);
 
         // This should return 2 items
-        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName,\"foo\"}");
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).resourceParams(resourceParams).build();
+        requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).resourceParams(resourceParams).build();
 
         try {
-            ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollectionInvalid");
+            client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollectionInvalid");
             Fail.fail();
         } catch (NotAcceptableException iee) {
             // TODO fix me
             //assertThat(iee.message()).isEqualTo("Invalid JSON format for the 'query' parameter");
             //assertThat(iee.getCause().getClass().getName()).isEqualTo("com.mongodb.util.JSONParseException");
         }
-    }
 
-    @Test
-    public void testGetStorageCollectionsQueryWithHinting() throws Exception {
 
-        DBCollection collection = db.getCollection("testGetStorageCollectionsQueryWithHinting");
+        // Test #10 - Get storage collectoins query with hinting
+        collection = db.getCollection("testGetStorageCollectionsQueryWithHinting");
         if (collection != null) {
             collection.drop();
         }
@@ -286,12 +276,12 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertThat(collection.count()).isEqualTo(6);
 
         // This should return 2 items
-        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
         resourceParams.put("hint", "_id_");
 
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).resourceParams(resourceParams).build();
-        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
+        requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).resourceParams(resourceParams).build();
+        result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
 
         // verify response
         assertThat(result).isNotNull();
@@ -321,12 +311,13 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertThat(result.members().get(0).getProperty("name")).isEqualTo("John");
         assertThat(result.members().get(1).getPropertyNames().size()).isEqualTo(5);
         assertThat(result.members().get(1).getProperty("name")).isEqualTo("Jane");
-    }
 
-    @Test
-    public void testQueryNonExistantIndex() throws Exception {
+        // Rempve collection
+        client.delete(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
 
-        DBCollection collection = db.getCollection("testQueryNonExistantIndex");
+
+        // Test #11 - Query non existent index
+        collection = db.getCollection("testQueryNonExistantIndex");
         if (collection != null) {
             collection.drop();
         }
@@ -337,11 +328,11 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertThat(collection.count()).isEqualTo(6);
 
         // This should return 2 items
-        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
         resourceParams.put("hint", "foobar"); // NOTE: foobar does not correspond to an index we can use
 
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).resourceParams(resourceParams).build();
+        requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).resourceParams(resourceParams).build();
 
         try {
             client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
@@ -355,12 +346,13 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
             //assertThat(iee.getCause().getClass().getName()).isEqualTo("com.mongodb.MongoException");
             //assertThat(iee.getCause().getMessage()).isEqualTo("bad hint");
         }
-    }
 
-    @Test
-    public void testQueryMalformedIndex() throws Exception {
+        // Rempve collection
+        client.delete(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
 
-        DBCollection collection = db.getCollection("testQueryMalformedIndex");
+
+        // Test #12 - Query malformed index
+        collection = db.getCollection("testQueryMalformedIndex");
         if (collection != null) {
             collection.drop();
         }
@@ -371,11 +363,11 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         assertThat(collection.count()).isEqualTo(6);
 
         // This should return 2 items
-        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{lastName:{$gt:'E', $lt:'R'}}");
         resourceParams.put("hint", "{foobar, 1}"); // NOTE: foobar does not correspond to an index we can use
 
-        RequestContext requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).resourceParams(resourceParams).build();
+        requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).resourceParams(resourceParams).build();
 
         try {
             client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
@@ -385,12 +377,10 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
             //assertThat(iee.message()).isEqualTo("Invalid JSON format for the 'hint' parameter");
             //assertThat(iee.getCause().getClass().getName()).isEqualTo("com.mongodb.util.JSONParseException");
         }
-    }
 
-    @Test
-    public void testGetStorageCollectionsSort() throws Exception {
 
-        DBCollection collection = db.getCollection("testSortCollection");
+        // Test #13 - Get storage collections sort
+        collection = db.getCollection("testSortCollection");
         if (collection != null) {
             collection.drop();
         }
@@ -402,23 +392,21 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         // going through DirectConnector will bypass phase where container sets up Pagination, Sorting, ReturnFields
         // so resourceParams are only relevant for 'q' parameter
-        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams = new SimpleResourceParams();
 
         // This should return 6 items ordered by lastName ascending, and name descending
-        RequestContext requestContext = new RequestContext.Builder()
+        requestContext = new RequestContext.Builder()
                 .returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS))
                 .sorting(new Sorting("lastName,-name"))
                 .resourceParams(resourceParams).build();
-        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testSortCollection");
+        result = client.read(requestContext, "/testApp/" + BASEPATH + "/testSortCollection");
 
-        String[] expected = { "Jacqueline", "John", "Jane", "Hans", "Francois", "Helga" };
+        String[] expected = {"Jacqueline", "John", "Jane", "Hans", "Francois", "Helga"};
         assertThat(expected).isEqualTo(getNames(result));
-    }
 
-    @Test
-    public void testGetStorageCollectionsQueryAndSort() throws Exception {
 
-        DBCollection collection = db.getCollection("testQuerySortCollection");
+        // Test #14 - Get storage collections query and sort
+        collection = db.getCollection("testQuerySortCollection");
         if (collection != null) {
             collection.drop();
         }
@@ -430,24 +418,22 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         // going through DirectConnector will bypass phase where container sets up Pagination, Sorting, ReturnFields
         // so resourceParams are only relevant for 'q' parameter
-        SimpleResourceParams resourceParams = new SimpleResourceParams();
+        resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "{country:{$ne:'FR'}}");
 
         // This should return 4 items ordered by lastName descending and name ascending
-        RequestContext requestContext = new RequestContext.Builder()
+        requestContext = new RequestContext.Builder()
                 .returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS))
                 .sorting(new Sorting("-lastName,name"))
                 .resourceParams(resourceParams).build();
-        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQuerySortCollection");
+        result = client.read(requestContext, "/testApp/" + BASEPATH + "/testQuerySortCollection");
 
-        String[] expected = { "Helga", "Hans", "Jane", "John" };
-        assertThat(expected).isEqualTo(getNames(result));
-    }
+        String[] expectedAry = {"Helga", "Hans", "Jane", "John"};
+        assertThat(expectedAry).isEqualTo(getNames(result));
 
-    @Test
-    public void testGetExpandCollectionQuery() throws Exception {
 
-        DBCollection collection = db.getCollection("testExpandQueryCollection");
+        // Test #15 - Get expand collection query
+        collection = db.getCollection("testExpandQueryCollection");
         if (collection != null) {
             collection.drop();
         }
@@ -459,13 +445,13 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         // This should return 3 items
         //
-        SimpleResourceParams resourceParams = new SimpleResourceParams();
-        RequestContext requestContext = new RequestContext.Builder()
+        resourceParams = new SimpleResourceParams();
+        requestContext = new RequestContext.Builder()
                 .returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS))
                 .resourceParams(resourceParams)
                 .build();
 
-        ResourceState result = client.read(requestContext, "/testApp/" + BASEPATH + "/testExpandQueryCollection");
+        result = client.read(requestContext, "/testApp/" + BASEPATH + "/testExpandQueryCollection");
 
         // verify response
         assertThat(result).isNotNull();
