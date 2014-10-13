@@ -494,6 +494,16 @@ loMod.factory('LoClient', function($resource) {
   });
 });
 
+loMod.factory('loPushPing', function($resource) {
+  return function(url){
+    return $resource(url, {}, {
+      ping : {
+        method : 'GET'
+      }
+    });
+  };
+});
+
 loMod.factory('LoBusinessLogicScripts', function($resource) {
   return $resource('/admin/applications/:appId/resources/scripts/:type/:scriptId', {
     appId : '@appId',
@@ -665,30 +675,30 @@ loMod.factory('LoLiveAppList', function($resource) {
 loMod.provider('loRemoteCheck', function() {
 
   this.delay = 300;
-  this.validityStringDefault = 'remoteValidation';
+
+  this.setDelay = function(customDelay) {
+    this.delay = customDelay;
+  };
 
   this.$get = ['$rootScope', '$timeout', '$log', function($rootScope, $timeout) {
+
     var delay = this.delay;
-    var validityDefault = this.validityStringDefault;
 
-    return function (timeoutPointer, resourceMethod, resourceParameters, formCtrl, inputCtrl, validityString) {
-
-      if (!validityString) {
-        validityString = validityDefault;
-      }
-
-      formCtrl.$setValidity(validityString, false);
+    return function (timeoutPointer, resourceMethod, resourceParameters, callbacks) {
 
       if (timeoutPointer){
         $timeout.cancel(timeoutPointer);
       }
 
       var timeoutId = $timeout(function(){
-        resourceMethod(resourceParameters, function(){
-          inputCtrl.$setValidity(validityString, false);
-        }, function(){
-          inputCtrl.$setValidity(validityString, true);
-          formCtrl.$setValidity(validityString, true);
+        resourceMethod(resourceParameters, function(data){
+          if (callbacks.success){
+            callbacks.success(data);
+          }
+        }, function(error){
+          if (callbacks.error){
+            callbacks.error(error);
+          }
         });
       }, delay);
 
