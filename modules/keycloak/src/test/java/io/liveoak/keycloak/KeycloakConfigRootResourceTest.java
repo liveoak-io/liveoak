@@ -21,7 +21,8 @@ public class KeycloakConfigRootResourceTest extends AbstractKeycloakTest {
     }
 
     @Test
-    public void readProperties() throws Exception {
+    public void configTests() throws Exception {
+        // Test #1 - Read properties
         RequestContext requestContext = new RequestContext.Builder().requestAttributes(new DefaultRequestAttributes()).build();
         ResourceState returnedState = client.read(requestContext, "/admin/system/keycloak");
 
@@ -32,22 +33,21 @@ public class KeycloakConfigRootResourceTest extends AbstractKeycloakTest {
         Assert.assertEquals(TokenUtil.PUBLIC_KEY_PEM, keys.get("liveoak-apps"));
 
         Assert.assertEquals(false, returnedState.getProperty(KeycloakConfigRootResource.LOAD_PUBLIC_KEYS));
-    }
 
-    @Test
-    public void updateProperties() throws Exception {
+
+        // Test #2 - Update properties
         ResourceState state = new DefaultResourceState();
         state.putProperty(KeycloakConfigRootResource.KEYCLOAK_URL, "http://test");
 
-        ResourceState keys = new DefaultResourceState();
-        keys.putProperty("test-realm1", "TESTKEY1");
-        keys.putProperty("test-realm2", "TESTKEY2");
-        state.putProperty(KeycloakConfigRootResource.PUBLIC_KEYS, keys);
+        ResourceState keyState = new DefaultResourceState();
+        keyState.putProperty("test-realm1", "TESTKEY1");
+        keyState.putProperty("test-realm2", "TESTKEY2");
+        state.putProperty(KeycloakConfigRootResource.PUBLIC_KEYS, keyState);
 
         state.putProperty(KeycloakConfigRootResource.LOAD_PUBLIC_KEYS, true);
 
-        RequestContext requestContext = new RequestContext.Builder().requestAttributes(new DefaultRequestAttributes()).build();
-        ResourceState returnedState = client.update(requestContext, "/admin/system/keycloak", state);
+        requestContext = new RequestContext.Builder().requestAttributes(new DefaultRequestAttributes()).build();
+        returnedState = client.update(requestContext, "/admin/system/keycloak", state);
 
         Assert.assertEquals(3, returnedState.getPropertyNames().size());
         Assert.assertEquals("http://test", returnedState.getProperty(KeycloakConfigRootResource.KEYCLOAK_URL));

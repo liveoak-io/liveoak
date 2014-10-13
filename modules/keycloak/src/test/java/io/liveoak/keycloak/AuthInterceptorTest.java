@@ -72,48 +72,46 @@ public class AuthInterceptorTest extends AbstractKeycloakTest {
     }
 
     @Test(timeout = 10000)
-    public void testNoAuth() throws Exception {
+    public void authInterceptorTests() throws Exception {
+        // Test #1 - No auth
         HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/testApp/auth-test");
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_OK);
 
         RequestContext context = mock.pollRequest(2, TimeUnit.SECONDS);
         assertThat(context.securityContext().isAuthenticated()).isFalse();
-    }
 
-    @Test(timeout = 10000)
-    public void testAuth() throws Exception {
+
+        // Test #2 - Auth
         System.err.println("******************");
         AccessToken token = tokenUtil.createToken();
 
-        HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/testApp/auth-test");
+        httpMethod = createHttpMethod("GET", "http://localhost:8080/testApp/auth-test");
         httpMethod.addHeader(new BasicHeader("Authorization", "bearer " + tokenUtil.toString(token)));
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_OK);
 
-        SecurityContext context = mock.pollRequest(10, TimeUnit.SECONDS).securityContext();
-        assertThat(context.isAuthenticated()).isTrue();
-        assertThat(context.getRealm()).isEqualTo("liveoak-apps");
-        assertThat(context.getSubject()).isEqualTo("user-id");
-        assertThat(context.getUser()).isNotNull();
-        assertThat(context.getUser().givenName()).isEqualTo("given");
-        assertThat(context.getUser().familyName()).isEqualTo("family");
-        assertThat(context.getUser().email()).isEqualTo("email");
-        assertThat(context.getRoles().size()).isEqualTo(3);
-        assertThat(context.lastVerified()).isEqualTo(token.getIssuedAt());
-    }
+        SecurityContext securityContext = mock.pollRequest(10, TimeUnit.SECONDS).securityContext();
+        assertThat(securityContext.isAuthenticated()).isTrue();
+        assertThat(securityContext.getRealm()).isEqualTo("liveoak-apps");
+        assertThat(securityContext.getSubject()).isEqualTo("user-id");
+        assertThat(securityContext.getUser()).isNotNull();
+        assertThat(securityContext.getUser().givenName()).isEqualTo("given");
+        assertThat(securityContext.getUser().familyName()).isEqualTo("family");
+        assertThat(securityContext.getUser().email()).isEqualTo("email");
+        assertThat(securityContext.getRoles().size()).isEqualTo(3);
+        assertThat(securityContext.lastVerified()).isEqualTo(token.getIssuedAt());
 
-    @Test(timeout = 10000)
-    public void testAuthExpired() throws Exception {
-        AccessToken token = tokenUtil.createToken();
+
+        // Test #3 - Auth expired
+        token = tokenUtil.createToken();
         token.expiration((int) ((System.currentTimeMillis() / 1000) - 10));
 
-        HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/testApp/auth-test");
+        httpMethod = createHttpMethod("GET", "http://localhost:8080/testApp/auth-test");
         httpMethod.addHeader(new BasicHeader("Authorization", "bearer " + tokenUtil.toString(token)));
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_UNAUTHORIZED);
-    }
 
-    @Test(timeout = 10000)
-    public void testInvalidAuth() throws Exception {
-        HttpRequestBase httpMethod = createHttpMethod("GET", "http://localhost:8080/testApp/auth-test");
+
+        // Test #4 - Invalid auth
+        httpMethod = createHttpMethod("GET", "http://localhost:8080/testApp/auth-test");
         httpMethod.addHeader(new BasicHeader("Authorization", "bearer invalid-token"));
         sendRequestAndCheckStatus(httpMethod, HttpStatus.SC_UNAUTHORIZED);
     }
