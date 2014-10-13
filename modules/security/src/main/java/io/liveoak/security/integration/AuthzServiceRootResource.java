@@ -1,6 +1,5 @@
 package io.liveoak.security.integration;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicReference;
@@ -12,8 +11,6 @@ import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.ResourceSink;
-import io.liveoak.spi.resource.async.Responder;
 import org.jboss.logging.Logger;
 
 /**

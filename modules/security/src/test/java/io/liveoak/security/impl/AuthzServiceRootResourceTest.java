@@ -1,30 +1,33 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package io.liveoak.security.impl;
+
+import java.util.Collections;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.DefaultRequestAttributes;
-import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.security.extension.SecurityExtension;
 import io.liveoak.security.integration.AuthzServiceConfigResource;
 import io.liveoak.security.integration.AuthzServiceRootResource;
-import io.liveoak.spi.*;
+import io.liveoak.spi.RequestAttributes;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.RequestType;
+import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractResourceTestCase;
 import io.liveoak.testtools.MockExtension;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -37,9 +40,9 @@ public class AuthzServiceRootResourceTest extends AbstractResourceTestCase {
     @Override
     public void loadExtensions() throws Exception {
         loadExtension("authz", new SecurityExtension());
-        loadExtension( "mock-policy", new MockExtension( MockAuthzRootPolicyResource.class ));
+        loadExtension("mock-policy", new MockExtension(MockAuthzRootPolicyResource.class));
         installResource("authz", "authz", getSecurityConfig());
-        installResource( "mock-policy", "mock-policy", JsonNodeFactory.instance.objectNode() );
+        installResource("mock-policy", "mock-policy", JsonNodeFactory.instance.objectNode());
     }
 
     private ObjectNode getSecurityConfig() throws Exception {
@@ -54,11 +57,12 @@ public class AuthzServiceRootResourceTest extends AbstractResourceTestCase {
     @Before
     public void before() throws Exception {
         this.authzService = (AuthzServiceRootResource) this.system.service(Services.resource("testApp", "authz"));
-        this.mockPolicy = (MockAuthzRootPolicyResource) this.system.service(Services.resource("testApp", "mock-policy") );
+        this.mockPolicy = (MockAuthzRootPolicyResource) this.system.service(Services.resource("testApp", "mock-policy"));
     }
 
     @Test
-    public void testAuthzServiceRequest() throws Exception {
+    public void authzServiceRootResourceTests() throws Exception {
+        // Test #1 - Authz service request
         RequestContext reqCtx = new RequestContext.Builder().build();
         ResourceState state = client.read(reqCtx, "/testApp/authz");
         boolean authzCheckFound = false;
@@ -69,35 +73,17 @@ public class AuthzServiceRootResourceTest extends AbstractResourceTestCase {
             }
         }
         Assert.assertTrue("Child resource 'authzCheck' not found", authzCheckFound);
-    }
 
-    @Test
-    public void testAuthzCheckNullRequestContext() throws Exception {
+
+        // Test #2 - Authz check null request context
         Assert.assertFalse(getAuthzResult(null));
-    }
 
-    @Test
-    public void testAuthzCheckNoPolicies() throws Exception {
-        // Retrieve config  and then remove all policies
-        RequestContext reqCtx = new RequestContext.Builder();
-        ResourceState config = client.read(reqCtx, "/admin/applications/testApp/resources/authz");
-        List<ResourceState> rules = (List<ResourceState>)config.getProperty(AuthzServiceConfigResource.POLICIES_PROPERTY);
-        rules.clear();
 
-        // Update config with removed policies
-        client.update(reqCtx, "/admin/applications/testApp/resources/authz", config);
-
-        // Check that request is permitted if we don't have any policies
-        RequestContext reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some"));
-        Assert.assertTrue(getAuthzResult(reqCtxToCheck));
-    }
-
-    @Test
-    public void testInvalidPolicyEndpoint() throws Exception {
+        // Test #3 - Invalid policy endpoint
         // Retrieve config  and then update policy with invalid endpoint
-        RequestContext reqCtx = new RequestContext.Builder();
+        reqCtx = new RequestContext.Builder();
         ResourceState config = client.read(reqCtx, "/admin/applications/testApp/resources/authz");
-        List<ResourceState> rules = (List<ResourceState>)config.getProperty(AuthzServiceConfigResource.POLICIES_PROPERTY);
+        List<ResourceState> rules = (List<ResourceState>) config.getProperty(AuthzServiceConfigResource.POLICIES_PROPERTY);
         ResourceState policyConfig = rules.get(0);
         policyConfig.putProperty("policyResourceEndpoint", "/testApp/invalid");
 
@@ -107,56 +93,66 @@ public class AuthzServiceRootResourceTest extends AbstractResourceTestCase {
         // Invalid endpoint, so reject
         RequestContext reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some"));
         Assert.assertFalse(getAuthzResult(reqCtxToCheck));
-    }
 
-    @Test
-    public void testAuthzAccept() throws Exception {
+
+        // Test #4 - Authz reject
+        setMockDecision(AuthzDecision.REJECT);
+
+        reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some"));
+        Assert.assertFalse(getAuthzResult(reqCtxToCheck));
+
+
+        // Test #5 - Authz ignore
+        setMockDecision(AuthzDecision.IGNORE);
+
+        reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some"));
+        Assert.assertFalse(getAuthzResult(reqCtxToCheck));
+
+
+        // Test #6 - Authz check no policies
+        // Retrieve config  and then remove all policies
+        reqCtx = new RequestContext.Builder();
+        config = client.read(reqCtx, "/admin/applications/testApp/resources/authz");
+        rules = (List<ResourceState>) config.getProperty(AuthzServiceConfigResource.POLICIES_PROPERTY);
+        rules.clear();
+
+        // Update config with removed policies
+        client.update(reqCtx, "/admin/applications/testApp/resources/authz", config);
+
+        // Check that request is permitted if we don't have any policies
+        reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some"));
+        Assert.assertTrue(getAuthzResult(reqCtxToCheck));
+
+
+        // Test #7 - Authz accept
         setMockDecision(AuthzDecision.ACCEPT);
 
         DefaultSecurityContext securityContext = new DefaultSecurityContext();
         securityContext.setRealm("liveoak-apps");
 
-        RequestContext reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some")).securityContext(securityContext);
+        reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some")).securityContext(securityContext);
         Assert.assertTrue(getAuthzResult(reqCtxToCheck));
-    }
 
-    @Test
-    public void testAuthzInvalidRealm() throws Exception {
+
+        // Test #8 - Authz invalid realm
         setMockDecision(AuthzDecision.ACCEPT);
 
-        DefaultSecurityContext securityContext = new DefaultSecurityContext();
+        securityContext = new DefaultSecurityContext();
         securityContext.setRealm("invalid");
 
-        RequestContext reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some")).securityContext(securityContext);
+        reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some")).securityContext(securityContext);
         Assert.assertFalse(getAuthzResult(reqCtxToCheck));
-    }
 
-    @Test
-    public void testAuthzAdminOverrides() throws Exception {
+
+        // Test #9 - Authz admin overrides
         setMockDecision(AuthzDecision.REJECT);
 
-        DefaultSecurityContext securityContext = new DefaultSecurityContext();
+        securityContext = new DefaultSecurityContext();
         securityContext.setRealm("liveoak-admin");
         securityContext.setRoles(Collections.singleton("admin"));
 
-        RequestContext reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some")).securityContext(securityContext);
+        reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some")).securityContext(securityContext);
         Assert.assertTrue(getAuthzResult(reqCtxToCheck));
-    }
-
-    @Test
-    public void testAuthzReject() throws Exception {
-        setMockDecision(AuthzDecision.REJECT);
-
-        RequestContext reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some"));
-        Assert.assertFalse(getAuthzResult(reqCtxToCheck));
-    }
-
-    @Test
-    public void testAuthzIgnore() throws Exception {
-        setMockDecision(AuthzDecision.IGNORE);
-
-        RequestContext reqCtxToCheck = new RequestContext.Builder().requestType(RequestType.READ).resourcePath(new ResourcePath("/testApp/storage/some"));
-        Assert.assertFalse(getAuthzResult(reqCtxToCheck));
     }
 
     private void setMockDecision(AuthzDecision decision) {
