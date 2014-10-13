@@ -6,16 +6,27 @@
       <p class="subtitle"><span class="required">*</span> Required fields</p>
       <hr>
       <p class="form-info" ng-show="create">To configure push for this application, please enter your AeroGear UnifiedPush Server information. <i class="fa fa-info-circle" data-tooltip-placement="right" data-tooltip="To be able to use this feature, you need to have an application already configured in Aerogear UPS."></i></p>
-
       <div class="panel" ng-hide="create">
         <div class="panel-heading clearfix">
-          <h3 class="pull-left">Connected to <a ng-href="{{pushModel.upsURL}}/#/mobileApps/variants/{{pushModel.applicationId}}">{{pushAppName}}</a> <span class="lo-emph">in AeroGear UPS</span></h3>
-          <span data-toggle="modal" data-target="#delete-push" ng-hide="create || changed">
+          <h3 class="pull-left">
+            <span ng-show="configuredUrlPing"><i class="fa fa-spinner fa-spin"></i> </span>
+            <span ng-show="connected">AeroGear UPS connection defined: </span>
+            <span ng-show="!connected">Unable to reach pre-configured AeroGear UPS server: </span>
+            <a ng-href="{{pushModel.upsURL}}/#/mobileApps/variants/{{pushModel.applicationId}}">{{pushAppName}}</a>
+          </h3>
+          <span data-toggle="modal" data-target="#delete-push" ng-hide="changed">
             <button class="btn btn-link btn-icon pull-right" data-tooltip="Delete Push" data-tooltip-placement="top">
               <i class="fa fa-trash-o"></i>
               <span>Delete Push</span>
             </button>
-          </span>        
+          </span>
+          <span ng-hide="changed">
+            <button class="btn btn-link btn-icon pull-right" data-tooltip="Refresh" data-tooltip-placement="top"
+                    ng-click="checkPushAuth()">
+              <i class="fa fa-refresh"></i>
+              <span>Refresh</span>
+            </button>
+          </span>
         </div>
       </div>
 
@@ -44,8 +55,11 @@
           <div class="form-group clearfix" ng-class="{'has-error': pushForm.pushUrl.$dirty && !pushForm.pushUrl.$valid}">
             <label class="col-sm-3 control-label" for="pushUrl">AeroGear UnifiedPush URL <span class="required">*</span></label>
             <div class="col-sm-4">
-              <input class="form-control" type="url" id="pushUrl" name="pushUrl" ng-model="pushModel.upsURL" lo-http-prefix pf-focused="create" required>
+              <input class="form-control" type="url" id="pushUrl" name="pushUrl" ng-model="pushModel.upsURL"
+                     lo-http-prefix pf-focused="create" required ng-change="checkPushUrl(pushModel.upsURL)">
               <span class="help-block" ng-show="pushForm.pushUrl.$error.url">Not a valid URL.</span>
+              <span class="help-block" ng-show="pushUrlPing"><i class="fa fa-spinner fa-spin"></i> Checking the URL endpoint...</span>
+              <span class="help-block" ng-show="!pushUrlPing && pushUrlInvalid">URL endpoint not responding.</span>
             </div>
           </div>
           <div class="form-group clearfix" ng-class="{'has-error': pushForm.appId.$dirty && !pushForm.appId.$valid}">
