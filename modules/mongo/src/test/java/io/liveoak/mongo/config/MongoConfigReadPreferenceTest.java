@@ -144,7 +144,7 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         }
 
         // Reset for next test
-        removeResource(resource);
+        //removeResource(resource);
 
 
         // TEST #6 - Null type
