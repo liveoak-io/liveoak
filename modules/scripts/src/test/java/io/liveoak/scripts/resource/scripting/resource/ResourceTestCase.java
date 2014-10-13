@@ -45,7 +45,8 @@ public class ResourceTestCase extends BaseScriptingTestCase {
     }
 
     @Test
-    public void testSetId() throws Exception {
+    public void resourceTests() throws Exception {
+        // Test #1 - Set id
         // Trigger a read
         JsonNode result = getJSON("/testApp/mock/foo?test=setId");
         assertThat(result.get("id").textValue()).isEqualTo("bar");
@@ -53,30 +54,27 @@ public class ResourceTestCase extends BaseScriptingTestCase {
         assertThat(result.get("hello").textValue()).isEqualTo("world");
         assertThat(result.get("ABC").getNodeType()).isEqualTo(JsonNodeType.NUMBER);
         assertThat(result.get("ABC").asInt()).isEqualTo(123);
-    }
 
-    @Test
-    public void testSetPath() throws Exception {
+
+        // Test #2 - Set path
         // Trigger a read
-        JsonNode result = getJSON("/testApp/mock/foo?test=setPath");
+        result = getJSON("/testApp/mock/foo?test=setPath");
         assertThat(result.get("id").textValue()).isEqualTo("foo");
         assertThat(result.get("self").get("href").textValue()).isEqualTo("foobar");
         assertThat(result.get("hello").textValue()).isEqualTo("world");
         assertThat(result.get("ABC").getNodeType()).isEqualTo(JsonNodeType.NUMBER);
         assertThat(result.get("ABC").asInt()).isEqualTo(123);
-    }
 
-    @Test
-    public void testSetMembers() throws Exception {
+
+        // Test #3 - Set members
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setMembers")).hasStatus(406);
         assertThat(httpResponse).isNotAcceptable().with("members cannot be modified");
-    }
 
-    @Test
-    public void testSetProperties() throws Exception {
+
+        // Test #4 - Set properties
         // Trigger a read
-        JsonNode result = getJSON("/testApp/mock/foo?test=setProperties");
+        result = getJSON("/testApp/mock/foo?test=setProperties");
         assertThat(result.get("id").textValue()).isEqualTo("foo");
         assertThat(result.get("self").get("href").textValue()).isEqualTo("/testApp/mock/foo");
         assertThat(result.get("testing").textValue()).isEqualTo("123");

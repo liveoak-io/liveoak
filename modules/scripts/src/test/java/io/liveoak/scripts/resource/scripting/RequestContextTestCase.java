@@ -46,43 +46,59 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
     }
 
     @Test
-    public void testRead() throws Exception {
+    public void requestContextTests() throws Exception {
+        // Test #1 - Read
         // Trigger a read
         String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
         execGet(uri);
 
         ResourceState readState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preRead");
         testState(readState, uri, "GET");
-    }
 
-    @Test
-    public void testCreate() throws Exception {
+
+        // Test #2 - Create
         // Trigger a create
-        String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
+        uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
         execPost(uri, "{'id': 'ABC', 'foo' : 'bar'}");
 
         ResourceState createState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preCreate");
         testState(createState, uri, "POST");
-    }
 
-    @Test
-    public void testUpdate() throws Exception {
+
+        // Test #3 - Update
         // Trigger an update
-        String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
+        uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
         execPut(uri, "{'id': 'ABC', 'foo' : 'bar'}");
 
         ResourceState updateState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preUpdate");
         testState(updateState, uri, "PUT");
-    }
 
-    @Test
-    public void testDelete() throws Exception {
+
+        // Test #4 - Delete
         // Trigger a delete
-        String uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
+        uri = "/testApp/mock/foo?offset=1&limit=5&fields=*(*)&foo=bar";
         execDelete(uri);
 
         ResourceState deleteState = client.read(new RequestContext.Builder().build(), "/testApp/mock/preDelete");
         testState(deleteState, uri, "DELETE");
+
+
+        // Test #5 - Set parameters
+        // Trigger a read
+        assertThat(get("/testApp/mock/foo?test=setParameters").execute()).hasStatus(406);
+        assertThat(httpResponse).isNotAcceptable().with("parameters cannot be modified");
+
+
+        // Test #6 - Set attributes
+        // Trigger a read
+        assertThat(get("/testApp/mock/foo?test=setAttributes").execute()).hasStatus(406);
+        assertThat(httpResponse).isNotAcceptable().with("attributes cannot be modified");
+
+
+        // Test #7 - Set security context
+        // Trigger a read
+        assertThat(get("/testApp/mock/foo?test=setSecurityContext").execute()).hasStatus(406);
+        assertThat(httpResponse).isNotAcceptable().with("securityContext cannot be modified");
     }
 
     public void testState(ResourceState state, String uri, String httpMethod) {
@@ -104,27 +120,6 @@ public class RequestContextTestCase extends BaseScriptingTestCase {
         assertThat(security.get("subject")).isEqualTo(null);
         assertThat(security.get("lastVerified")).isEqualTo(0L);
         assertThat(security.get("token")).isEqualTo(null);
-    }
-
-    @Test
-    public void testSetParameters() throws Exception {
-        // Trigger a read
-        assertThat(get("/testApp/mock/foo?test=setParameters").execute()).hasStatus(406);
-        assertThat(httpResponse).isNotAcceptable().with("parameters cannot be modified");
-    }
-
-    @Test
-    public void testSetAttributes() throws Exception {
-        // Trigger a read
-        assertThat(get("/testApp/mock/foo?test=setAttributes").execute()).hasStatus(406);
-        assertThat(httpResponse).isNotAcceptable().with("attributes cannot be modified");
-    }
-
-    @Test
-    public void testSetSecurityContext() throws Exception {
-        // Trigger a read
-        assertThat(get("/testApp/mock/foo?test=setSecurityContext").execute()).hasStatus(406);
-        assertThat(httpResponse).isNotAcceptable().with("securityContext cannot be modified");
     }
 
 }

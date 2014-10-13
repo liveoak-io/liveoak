@@ -44,7 +44,8 @@ public class ResponseTestCase extends BaseScriptingTestCase {
     }
 
     @Test
-    public void testRead() throws Exception {
+    public void responseTests() throws Exception {
+        // Test #1 - Read
         // Trigger a read
         execGet("/testApp/mock/foo");
 
@@ -52,10 +53,9 @@ public class ResponseTestCase extends BaseScriptingTestCase {
 
         assertThat(readState.getProperty("type")).isEqualTo("read");
         testResource(readState);
-    }
 
-    @Test
-    public void testCreate() throws Exception {
+
+        // Test #2 - Create
         // Trigger a create
         execPost("/testApp/mock", "{'id': 'ABC', 'foo' : 'bar'}");
 
@@ -67,10 +67,9 @@ public class ResponseTestCase extends BaseScriptingTestCase {
 
         Map resourceProperties = (Map) postCreate.getProperty("resource.properties");
         assertThat(resourceProperties.get("foo")).isEqualTo("bar");
-    }
 
-    @Test
-    public void testUpdate() throws Exception {
+
+        // Test #3 - Update
         // Trigger an update
         execPut("/testApp/mock/foo", "{'Hello' : 'World'}");
 
@@ -80,16 +79,18 @@ public class ResponseTestCase extends BaseScriptingTestCase {
         assertThat(updateState.getProperty("resource.id")).isEqualTo("foo");
         assertThat(updateState.getProperty("resource.uri")).isEqualTo("/testApp/mock/foo");
 
-        Map resourceProperties = (Map) updateState.getProperty("resource.properties");
+        resourceProperties = (Map) updateState.getProperty("resource.properties");
         assertThat(resourceProperties.get("Hello")).isEqualTo("World");
         assertThat(resourceProperties.get("baz")).isNull();
         assertThat(resourceProperties.get("hello")).isNull();
 
         assertThat(updateState.getProperty("resource.member.0.id")).isEqualTo("baz");
-    }
 
-    @Test
-    public void testDelete() throws Exception {
+        // Reset state
+        execPut("/testApp/mock/foo", "{'hello' : 'world', 'baz' : 123 }");
+
+
+        // Test #4 - Delete
         // Trigger a delete
         execDelete("/testApp/mock/foo");
 
@@ -97,10 +98,15 @@ public class ResponseTestCase extends BaseScriptingTestCase {
 
         assertThat(deleteState.getProperty("type")).isEqualTo("deleted");
         testResource(deleteState);
-    }
 
-    @Test
-    public void testError() throws Exception {
+        // Reset state
+        ResourceState foo = new DefaultResourceState("foo");
+        foo.putProperty("hello", "world");
+        foo.putProperty("baz", 123);
+        client.create(new RequestContext.Builder().build(), "/testApp/mock/", foo);
+
+
+        // Test #5 - Error
         // Trigger an exception to be thrown in the resource
         assertThat(execPut("/testApp/mock", "{'throwError': 'true'}")).hasStatus(406);
 
@@ -110,10 +116,28 @@ public class ResponseTestCase extends BaseScriptingTestCase {
         assertThat(onErrorState.getProperty("resource.id")).isNull();
         assertThat(onErrorState.getProperty("resource.uri")).isNull();
 
-        Map resourceProperties = (Map) onErrorState.getProperty("resource.properties");
+        resourceProperties = (Map) onErrorState.getProperty("resource.properties");
         assertThat(resourceProperties.get("error-type")).isEqualTo("NOT_ACCEPTABLE");
         assertThat(resourceProperties.get("cause")).isNotNull();
         assertThat(resourceProperties.get("message")).isNotNull();
+
+
+        // Test #6 - Set type
+        // Trigger a read
+        assertThat(execGet("/testApp/mock/foo?test=setType")).hasStatus(406);
+        assertThat(httpResponse).isNotAcceptable().with("type cannot be modified");
+
+
+        // Test #7 - Set resource
+        // Trigger a read
+        assertThat(execGet("/testApp/mock/foo?test=setResource")).hasStatus(406);
+        assertThat(httpResponse).isNotAcceptable().with("resource cannot be modified");
+
+
+        // Test #8 - Set request
+        // Trigger a read
+        assertThat(execGet("/testApp/mock/foo?test=setRequest")).hasStatus(406);
+        assertThat(httpResponse).isNotAcceptable().with("request cannot be modified");
     }
 
     protected void testResource(ResourceState resourceState) throws Exception {
@@ -125,26 +149,5 @@ public class ResponseTestCase extends BaseScriptingTestCase {
         assertThat(resourceProperties.get("baz")).isEqualTo(123);
 
         assertThat(resourceState.getProperty("resource.member.0.id")).isEqualTo("baz");
-    }
-
-    @Test
-    public void testSetType() throws Exception {
-        // Trigger a read
-        assertThat(execGet("/testApp/mock/foo?test=setType")).hasStatus(406);
-        assertThat(httpResponse).isNotAcceptable().with("type cannot be modified");
-    }
-
-    @Test
-    public void testSetResource() throws Exception {
-        // Trigger a read
-        assertThat(execGet("/testApp/mock/foo?test=setResource")).hasStatus(406);
-        assertThat(httpResponse).isNotAcceptable().with("resource cannot be modified");
-    }
-
-    @Test
-    public void testSetRequest() throws Exception {
-        // Trigger a read
-        assertThat(execGet("/testApp/mock/foo?test=setRequest")).hasStatus(406);
-        assertThat(httpResponse).isNotAcceptable().with("request cannot be modified");
     }
 }

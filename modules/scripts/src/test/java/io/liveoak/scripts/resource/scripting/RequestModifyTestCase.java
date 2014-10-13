@@ -33,28 +33,26 @@ public class RequestModifyTestCase extends BaseScriptingTestCase {
     }
 
     @Test
-    public void testSetId() throws Exception {
+    public void requestModificationTests() throws Exception {
+        // Test #1 - Set id
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setId")).hasStatus(406);
         assertThat(httpResponse).isNotAcceptable().with("id cannot be modified");
-    }
 
-    @Test
-    public void testSetPath() throws Exception {
+
+        // Test #2 - Set path
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setPath")).hasStatus(406);
         assertThat(httpResponse).isNotAcceptable().with("path cannot be modified");
-    }
 
-    @Test
-    public void testSetType() throws Exception {
+
+        // Test #3 - Set type
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setType")).hasStatus(406);
         assertThat(httpResponse).isNotAcceptable().with("type cannot be modified");
-    }
 
-    @Test
-    public void testSetResource() throws Exception {
+
+        // Test #4 - Set resource
         // Trigger a read
         assertThat(execGet("/testApp/mock/foo?test=setResource")).hasStatus(406);
         assertThat(httpResponse).isNotAcceptable().with("resource cannot be modified");

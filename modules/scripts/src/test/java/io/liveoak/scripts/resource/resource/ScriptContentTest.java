@@ -4,7 +4,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.scripts.resource.BaseResourceTriggeredTestCase;
 import io.liveoak.spi.MediaType;
@@ -123,12 +122,12 @@ public class ScriptContentTest extends BaseResourceTriggeredTestCase {
 
         ObjectNode jsonData = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/" + id);
         assertThat(jsonData.get("target-path").textValue()).isEqualTo("targetPath");
-        assertThat(((ArrayNode)jsonData.get("provides")).size()).isEqualTo(1);
-        assertThat(((ArrayNode)jsonData.get("provides")).get(0).textValue()).isEqualTo("PREREAD");
+        assertThat(jsonData.get("provides").size()).isEqualTo(1);
+        assertThat(jsonData.get("provides").get(0).textValue()).isEqualTo("PREREAD");
         assertThat(jsonData.get("enabled").booleanValue()).isEqualTo(true);
 
         // Update the metadata
-        HttpResponse updateResponse =  execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id +"', 'target-path': 'targetPath', 'enabled': false }");
+        execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id +"', 'target-path': 'targetPath', 'enabled': false }");
         assertThat(response).hasStatus(201);
 
         ObjectNode updatedData = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/" + id);

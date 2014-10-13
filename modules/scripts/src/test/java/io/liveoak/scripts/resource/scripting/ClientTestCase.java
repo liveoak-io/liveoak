@@ -52,7 +52,8 @@ public class ClientTestCase extends BaseScriptingTestCase {
     }
 
     @Test
-    public void testDefaultRead() throws Exception {
+    public void clientTests() throws Exception {
+        // Test #1 - Default read
         // Trigger a read
         get("/testApp/mock/test?test=testDefaultRead").execute();
 
@@ -76,21 +77,20 @@ public class ClientTestCase extends BaseScriptingTestCase {
         assertThat(bar.get("id")).isEqualTo("bar");
         assertThat(bar.get("uri")).isEqualTo("/testApp/mock/test/bar");
         assertThat((Map) bar.get("properties")).isEmpty();
-    }
 
-    @Test
-    public void testFields() throws Exception {
+
+        // Test #2 - Fields
         // Trigger a read
         execGet("/testApp/mock/test?test=testFields");
 
-        ResourceState data = client.read(new RequestContext.Builder().build(), "/testApp/mock/data/testFields");
+        data = client.read(new RequestContext.Builder().build(), "/testApp/mock/data/testFields");
         System.out.println("DATA : " + data);
 
         assertThat(data).isNotNull();
         assertThat(data.getProperty("id")).isEqualTo("test");
         assertThat(data.getProperty("uri")).isEqualTo("/testApp/mock/test");
 
-        Map properties = (Map) data.getProperty("properties");
+        properties = (Map) data.getProperty("properties");
         assertThat(properties.get("type")).isEqualTo("parent");
         assertThat(properties.get("hello")).isNull();
 
@@ -109,78 +109,74 @@ public class ClientTestCase extends BaseScriptingTestCase {
         assertThat(childProperties2.size()).isEqualTo(1);
         assertThat(childProperties2.get("type")).isEqualTo("child");
         assertThat(childProperties2.get("value")).isNull();
-    }
 
-    @Test
-    public void testSort() throws Exception {
+
+        // Test #3 - Sort
         // Trigger a read
         execGet("/testApp/mock/test?test=testSort");
 
-        ResourceState data = client.read(new RequestContext.Builder().build(), "/testApp/mock/data/testSort");
+        data = client.read(new RequestContext.Builder().build(), "/testApp/mock/data/testSort");
         System.out.println("DATA : " + data);
 
         assertThat(data).isNotNull();
         assertThat(data.getProperty("id")).isEqualTo("test");
         assertThat(data.getProperty("uri")).isEqualTo("/testApp/mock/test");
 
-        Map properties = (Map) data.getProperty("properties");
+        properties = (Map) data.getProperty("properties");
         assertThat(properties.get("type")).isEqualTo("parent");
         assertThat(properties.get("hello")).isEqualTo("world");
 
-        Map child1 = (Map) data.getProperty("member_0");
+        child1 = (Map) data.getProperty("member_0");
         assertThat(child1.get("id")).isEqualTo("bar");
         assertThat(child1.get("uri")).isEqualTo("/testApp/mock/test/bar");
 
-        Map child2 = (Map) data.getProperty("member_1");
+        child2 = (Map) data.getProperty("member_1");
         assertThat(child2.get("id")).isEqualTo("foo");
         assertThat(child2.get("uri")).isEqualTo("/testApp/mock/test/foo");
-    }
 
-    @Test
-    public void testOffset() throws Exception {
+
+        // Test #4 - Offset
         // Trigger a read
         execGet("/testApp/mock/test?test=testOffset");
 
-        ResourceState data = client.read(new RequestContext.Builder().build(), "/testApp/mock/data/testOffset");
+        data = client.read(new RequestContext.Builder().build(), "/testApp/mock/data/testOffset");
         System.out.println("DATA : " + data);
 
         assertThat(data).isNotNull();
         assertThat(data.getProperty("id")).isEqualTo("test");
         assertThat(data.getProperty("uri")).isEqualTo("/testApp/mock/test");
 
-        Map properties = (Map) data.getProperty("properties");
+        properties = (Map) data.getProperty("properties");
         assertThat(properties.get("type")).isEqualTo("parent");
         assertThat(properties.get("hello")).isEqualTo("world");
 
-        Map child1 = (Map) data.getProperty("member_0");
+        child1 = (Map) data.getProperty("member_0");
         assertThat(child1.get("id")).isEqualTo("bar");
         assertThat(child1.get("uri")).isEqualTo("/testApp/mock/test/bar");
 
         assertThat(data.getProperty("member_1")).isNull();
-    }
 
-    @Test
-    public void testLimit() throws Exception {
+
+        // Test #5 - Limit
         // Trigger a read
         execGet("/testApp/mock/test?test=testLimit");
 
-        ResourceState data = client.read(new RequestContext.Builder().build(), "/testApp/mock/data/testLimit");
+        data = client.read(new RequestContext.Builder().build(), "/testApp/mock/data/testLimit");
         System.out.println("DATA : " + data);
 
         assertThat(data).isNotNull();
         assertThat(data.getProperty("id")).isEqualTo("test");
         assertThat(data.getProperty("uri")).isEqualTo("/testApp/mock/test");
 
-        Map properties = (Map) data.getProperty("properties");
+        properties = (Map) data.getProperty("properties");
         assertThat(properties.get("type")).isEqualTo("parent");
         assertThat(properties.get("hello")).isEqualTo("world");
 
-        Map child1 = (Map) data.getProperty("member_0");
+        child1 = (Map) data.getProperty("member_0");
         assertThat(child1.get("id")).isEqualTo("foo");
         assertThat(child1.get("uri")).isEqualTo("/testApp/mock/test/foo");
 
         assertThat(data.getProperty("member_1")).isNull();
     }
-
 
 }

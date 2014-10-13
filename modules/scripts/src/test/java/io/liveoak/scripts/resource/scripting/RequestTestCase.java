@@ -33,7 +33,8 @@ public class RequestTestCase extends BaseScriptingTestCase {
     }
 
     @Test
-    public void testCreate() throws Exception {
+    public void requestTests() throws Exception {
+        // Test #1 - Create
         // Trigger a create
         execPost("/testApp/mock/", "{'foo' : 'BAR'}");
 
@@ -43,10 +44,9 @@ public class RequestTestCase extends BaseScriptingTestCase {
         assertThat(preCreate.getProperty("id")).isEqualTo(postCreate.getProperty("id"));
         assertThat(preCreate.getProperty("type")).isEqualTo(postCreate.getProperty("type")).isEqualTo("create");
         assertThat(preCreate.getProperty("path")).isEqualTo(postCreate.getProperty("path")).isEqualTo("/testApp/mock");
-    }
 
-    @Test
-    public void testRead() throws Exception {
+
+        // Test #2 - Read
         // Trigger a read
         execGet("/testApp/mock/foo");
 
@@ -56,10 +56,9 @@ public class RequestTestCase extends BaseScriptingTestCase {
         assertThat(preRead.getProperty("id")).isEqualTo(postRead.getProperty("id"));
         assertThat(preRead.getProperty("type")).isEqualTo(postRead.getProperty("type")).isEqualTo("read");
         assertThat(preRead.getProperty("path")).isEqualTo(postRead.getProperty("path")).isEqualTo("/testApp/mock/foo");
-    }
 
-    @Test
-    public void testUpdate() throws Exception {
+
+        // Test #3 - Update
         // Trigger an update
         execPut("/testApp/mock/foo", "{'foo' : 'BAR'}");
 
@@ -69,10 +68,9 @@ public class RequestTestCase extends BaseScriptingTestCase {
         assertThat(preUpdate.getProperty("id")).isEqualTo(postUpdate.getProperty("id"));
         assertThat(preUpdate.getProperty("type")).isEqualTo(postUpdate.getProperty("type")).isEqualTo("update");
         assertThat(preUpdate.getProperty("path")).isEqualTo(postUpdate.getProperty("path")).isEqualTo("/testApp/mock/foo");
-    }
 
-    @Test
-    public void testDelete() throws Exception {
+
+        // Test #4 - Delete
         // Trigger an update
         execDelete("/testApp/mock/foo");
 
