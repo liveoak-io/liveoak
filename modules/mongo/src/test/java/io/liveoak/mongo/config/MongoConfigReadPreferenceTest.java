@@ -141,10 +141,8 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
             Fail.fail();
         } catch (InitializationException e) {
             //expected
+            this.system.awaitStability();
         }
-
-        // Reset for next test
-        //removeResource(resource);
 
 
         // TEST #6 - Null type
