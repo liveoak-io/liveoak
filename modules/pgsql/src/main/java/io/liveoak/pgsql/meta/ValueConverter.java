@@ -6,7 +6,9 @@
 package io.liveoak.pgsql.meta;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
@@ -15,6 +17,10 @@ import java.util.Date;
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
 public class ValueConverter {
+
+    private static DateTimeFormatter ISO_MILLIS = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    private static DateTimeFormatter ISO_DATE_TIME = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private static DateTimeFormatter ISO_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
 
     public static int toInt(Object val) {
         if (val == null) {
@@ -48,21 +54,15 @@ public class ValueConverter {
 
     private static Timestamp parseIsoDateTime(String val) {
         try {
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-            LocalDateTime ldt = LocalDateTime.parse(val, dtf);
-            Timestamp.valueOf(ldt);
+            return Timestamp.valueOf(LocalDateTime.parse(val, ISO_MILLIS));
         } catch (DateTimeParseException ignored) {}
 
         try {
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-            LocalDateTime ldt = LocalDateTime.parse(val, dtf);
-            Timestamp.valueOf(ldt);
+            return Timestamp.valueOf(LocalDateTime.parse(val, ISO_DATE_TIME));
         } catch (DateTimeParseException ignored) {}
 
         try {
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDateTime ldt = LocalDateTime.parse(val, dtf);
-            Timestamp.valueOf(ldt);
+            return Timestamp.valueOf(LocalDateTime.of(LocalDate.parse(val, ISO_DATE), LocalTime.MIDNIGHT));
         } catch (DateTimeParseException ignored) {}
 
         throw new IllegalArgumentException("Value could not be parsed as ISO DateTime: " + val);
