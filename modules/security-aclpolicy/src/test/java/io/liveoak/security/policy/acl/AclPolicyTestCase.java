@@ -3,7 +3,6 @@
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package io.liveoak.security.policy.acl;
 
 import java.util.ArrayList;
@@ -16,8 +15,8 @@ import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
 import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.common.DefaultResourceResponse;
-import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.security.policy.acl.impl.AclPolicy;
 import io.liveoak.security.policy.acl.impl.AclPolicyConfig;
 import io.liveoak.security.policy.acl.impl.AclPolicyConfigurator;
@@ -96,8 +95,9 @@ public class AclPolicyTestCase extends AbstractTestCase {
     }
 
     @Test
-    public void testAutocreateACE() {
-        ResourceState createdState = aclPolicy.autocreateAce( createResourceResponse("/storage/todos", "123", "john123", "todo/user"));
+    public void aclPolicyTests() {
+        // Test #1 - Autocreate ACE
+        ResourceState createdState = aclPolicy.autocreateAce(createResourceResponse("/storage/todos", "123", "john123", "todo/user"));
         // Some testing of content of created ACEs
         Assert.assertEquals(1, createdState.members().size());
         ResourceState createdSt1 = createdState.members().get(0);
@@ -105,14 +105,13 @@ public class AclPolicyTestCase extends AbstractTestCase {
         Assert.assertEquals("/storage/todos/123", createdSt1.getProperty(AclPolicy.ACE_RESOURCE_PATH));
         Assert.assertEquals("liveoak-apps", createdSt1.getProperty(AclPolicy.ACE_REALM));
         Assert.assertEquals(true, createdSt1.getProperty(AclPolicy.ACE_PERMITTED));
-        Assert.assertEquals(3, ((String[])createdSt1.getProperty(AclPolicy.ACE_ACTIONS)).length);
-    }
+        Assert.assertEquals(3, ((String[]) createdSt1.getProperty(AclPolicy.ACE_ACTIONS)).length);
 
-    @Test
-    public void testTodomvc() {
-        aclPolicy.autocreateAce( createResourceResponse("/storage/todos", "123", "john123"));
-        aclPolicy.autocreateAce( createResourceResponse("/storage/todos", "456", "john123"));
-        aclPolicy.autocreateAce( createResourceResponse("/storage/todos", "789", "peter123", "todos/user"));
+
+        // Test #2 - Todomvc
+        aclPolicy.autocreateAce(createResourceResponse("/storage/todos", "123", "john123"));
+        aclPolicy.autocreateAce(createResourceResponse("/storage/todos", "456", "john123"));
+        aclPolicy.autocreateAce(createResourceResponse("/storage/todos", "789", "peter123", "todos/user"));
 
         RequestContext testReq = createRequestContext("/storage/todos/123", "john123", RequestType.READ);
         Assert.assertEquals(AuthzDecision.ACCEPT, aclPolicy.isAuthorized(testReq));
@@ -137,15 +136,14 @@ public class AclPolicyTestCase extends AbstractTestCase {
 
         testReq = createRequestContext("/storage/todos/789", "peter123", RequestType.READ);
         Assert.assertEquals(AuthzDecision.ACCEPT, aclPolicy.isAuthorized(testReq));
-    }
 
-    @Test
-    public void testChat() {
-        aclPolicy.autocreateAce( createResourceResponse("/storage/chat", "ObjectId(\"123\")", "john123"));
-        aclPolicy.autocreateAce( createResourceResponse("/storage/chat", "456", "john123"));
-        aclPolicy.autocreateAce( createResourceResponse("/storage/chat", "789", "peter123", "chat/user"));
 
-        RequestContext testReq = createRequestContext("/storage/chat/ObjectId(\"123\")", "john123", RequestType.READ);
+        // Test #3 - Chat
+        aclPolicy.autocreateAce(createResourceResponse("/storage/chat", "ObjectId(\"123\")", "john123"));
+        aclPolicy.autocreateAce(createResourceResponse("/storage/chat", "456", "john123"));
+        aclPolicy.autocreateAce(createResourceResponse("/storage/chat", "789", "peter123", "chat/user"));
+
+        testReq = createRequestContext("/storage/chat/ObjectId(\"123\")", "john123", RequestType.READ);
         Assert.assertEquals(AuthzDecision.ACCEPT, aclPolicy.isAuthorized(testReq));
 
         testReq = createRequestContext("/storage/chat/ObjectId(\"123\")", "john123", RequestType.UPDATE);

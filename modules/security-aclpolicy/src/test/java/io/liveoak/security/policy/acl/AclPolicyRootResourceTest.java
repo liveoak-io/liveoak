@@ -42,11 +42,11 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
     public void loadExtensions() throws Exception {
         loadExtension("interceptor", new InterceptorExtension(), createInterceptorConfig());
         loadExtension("mongo", new MongoExtension(), createMongoConfig());
-        loadExtension( "acl-policy", new SecurityACLPolicyExtension() );
-        loadExtension("mock-storage", new MockExtension( MockAclTestStorageResource.class ));
+        loadExtension("acl-policy", new SecurityACLPolicyExtension());
+        loadExtension("mock-storage", new MockExtension(MockAclTestStorageResource.class));
 
-        installResource( "acl-policy", "acl-policy", createPolicyConfig());
-        installResource( "mock-storage", "mock-storage", JsonNodeFactory.instance.objectNode() );
+        installResource("acl-policy", "acl-policy", createPolicyConfig());
+        installResource("mock-storage", "mock-storage", JsonNodeFactory.instance.objectNode());
     }
 
     private ObjectNode createInterceptorConfig() {
@@ -88,7 +88,8 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
     }
 
     @Test
-    public void testTodomvc() throws Exception {
+    public void aclPolicyTests() throws Exception {
+        // Test #1 - Todomvc
         // Create some resources. AclUpdaterInterceptor should create ACE entries for those
         sendCreateRequest("/testApp/mock-storage/todos", "123", "john123");
         sendCreateRequest("/testApp/mock-storage/todos", "456", "john123");
@@ -118,15 +119,9 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
 
         testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/789", "peter123", RequestType.READ);
         assertAuthzDecision(testReq, AuthzDecision.ACCEPT);
-    }
 
-    @Test
-    public void testTodomvcDelete() throws Exception {
-        sendCreateRequest("/testApp/mock-storage/todos", "123", "john123");
 
-        RequestContext testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/123", "john123", RequestType.READ);
-        assertAuthzDecision(testReq, AuthzDecision.ACCEPT);
-
+        // Test #2 - Todomvc delete
         // Delete resource
         RequestContext deleteReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/123", "john123", RequestType.DELETE);
         client.delete(deleteReq, "/testApp/mock-storage/todos/123");
@@ -134,10 +129,9 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
         // And assert that ACE entry was deleted as well and user doesn't have permission now
         testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/123", "john123", RequestType.READ);
         assertAuthzDecision(testReq, AuthzDecision.IGNORE);
-    }
 
-    @Test
-    public void testTodomvcUpdateConfig() throws Exception {
+
+        // Test #3 - Todomvc update config
         // First create some resource
         sendCreateRequest("/testApp/mock-storage/todos", "john-rw", "john123");
 
@@ -147,7 +141,7 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
         ResourceParams resourceParams = DefaultResourceParams.instance(params);
         RequestContext reqCtx = new RequestContext.Builder().resourceParams(resourceParams).build();
         ResourceState config = client.read(reqCtx, "/admin/applications/testApp/resources/acl-policy");
-        List<ResourceState> autoRules = (List<ResourceState>)config.getProperty(AclPolicyConfigResource.AUTO_RULES_PROPERTY);
+        List<ResourceState> autoRules = (List<ResourceState>) config.getProperty(AclPolicyConfigResource.AUTO_RULES_PROPERTY);
 
         ResourceState todomvcRule = null;
         for (ResourceState rule : autoRules) {
@@ -166,7 +160,7 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
         sendCreateRequest("/testApp/mock-storage/todos", "john-ro", "john123");
 
         // Test created resources
-        RequestContext testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/john-rw", "john123", RequestType.READ);
+        testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/john-rw", "john123", RequestType.READ);
         assertAuthzDecision(testReq, AuthzDecision.ACCEPT);
 
         testReq = AclPolicyTestCase.createRequestContext("/testApp/mock-storage/todos/john-rw", "john123", RequestType.UPDATE);
