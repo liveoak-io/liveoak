@@ -451,8 +451,20 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
       var _formCtrl = $scope.modalScope.loCollectionCreate;
       var _inputCtrl = _formCtrl.collectionName;
+      var _valString = 'collectionNameExists';
 
-      this.timeout = loRemoteCheck(this.timeout, _resMethod, _resParams, _formCtrl, _inputCtrl, 'collectionName');
+      _formCtrl.$setValidity(_valString, false);
+      var _callbacks = {
+        success: function(){
+          _inputCtrl.$setValidity(_valString, false);
+        },
+        error: function(){
+          _inputCtrl.$setValidity(_valString, true);
+          _formCtrl.$setValidity(_valString, true);
+        }
+      };
+
+      this.timeout = loRemoteCheck(this.timeout, _resMethod, _resParams, _callbacks);
     };
 
     $scope.getFile = function () {

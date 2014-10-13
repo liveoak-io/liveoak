@@ -2,7 +2,8 @@
 
 var loMod = angular.module('loApp.controllers.push', []);
 
-loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, Notifications, currentApp) {
+loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, Notifications, currentApp,
+                                      loRemoteCheck, loPushPing, $resource) {
 
   $log.debug('PushCtrl');
 
@@ -21,6 +22,57 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
   $scope.pushModel = angular.copy(loPush);
 
   $scope.pushAppName = loPush.applicationId;
+
+  // Field indicating if the pre-configured URL could be reached (successful ping)
+  $scope.connected = false;
+
+  $scope.checkPushAuth = function() {
+    // Turns on the spinner in pre-configured push panel;
+    $scope.configuredUrlPing = true;
+    $scope.connected = false;
+
+    $resource($scope.pushModel.upsURL + '/rest/ping/').get({}, function(){
+      $scope.configuredUrlPing = false;
+      $scope.connected = true;
+    }, function(error){
+      $scope.configuredUrlPing = false;
+      $scope.connected = false;
+      if( error.status === 401 ) {
+        $scope.connected = true;
+      }
+    });
+  };
+
+  if($scope.pushModel.upsURL) {
+    $scope.checkPushAuth();
+  }
+
+  $scope.checkPushUrl = function(pushUrl){
+    // Turns on the spinner in push url input message;
+    $scope.pushUrlPing = true;
+
+    var _res = loPushPing(pushUrl + '/rest/ping/');
+    var _resMethod = _res.ping;
+
+    var _callbacks = {
+      success: function(){
+        $scope.pushUrlPing = false;
+        // Hides the message about URL not reachable under the url input;
+        $scope.pushUrlInvalid = false;
+      },
+      error: function(error){
+        $scope.pushUrlPing = false;
+        if( error.status === 401 ) {
+          $scope.pushUrlInvalid = false;
+        } else {
+          $scope.pushUrlInvalid = true;
+        }
+      }
+    };
+
+    // Actual checking of URL happens 300ms after user stops typing
+    this.timeout = loRemoteCheck(this.timeout, _resMethod, {}, _callbacks);
+  };
 
   $scope.clear = function() {
     $scope.pushModel = angular.copy(pushModelBackup);
@@ -54,6 +106,7 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
           $scope.pushAppName = $scope.pushModel.applicationId;
           $scope.changed = false;
           $scope.create = false;
+          $scope.checkPushAuth();
         },
         // error
         function(httpResponse) {
