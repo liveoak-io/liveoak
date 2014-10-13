@@ -89,7 +89,9 @@ public class PgSqlTableResource implements SynchronousResource {
         // keep predictable ordering by using LinkedHashMap
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("links", links);
-        result.put("count", totalCount != -1 ? totalCount : results.count());
+        if (totalCount != -1 || results.count() < ctx.pagination().limit()) {
+            result.put("count", totalCount != -1 ? totalCount : results.count());
+        }
         result.put("type", "collection");
         return result;
     }
