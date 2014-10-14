@@ -32,7 +32,7 @@
 
         <div class="panel panel-missing" ng-repeat="s in missingSecuredStorages">
           <div class="panel-heading">
-            <h2 class="panel-title">{{s.id}} <a href="" ng-click="recycleResource();" tooltip="Restore Storage Resource"><i class="fa fa-recycle"></i></a></h2>
+            <h2 class="panel-title">{{s.id}} <a href="" ng-click="modalResourceRestore(s.id);" tooltip="Restore Storage Resource"><i class="fa fa-recycle"></i></a></h2>
             <div class="pull-right" data-tooltip-placement="top" data-tooltip="Delete Security">
               <a href="" ng-click="modalResourceSecurityDelete(s.id);"><i class="fa fa-trash-o"></i></a>
             </div>
@@ -55,7 +55,7 @@
 
         <div class="panel panel-missing" ng-repeat="c in missingSecuredCollections">
           <div class="panel-heading">
-            <h2 class="panel-title">{{c.storage}} / {{c.id}} <a href="" ng-click="recycleResource();" tooltip="Restore Collection Resource"><i class="fa fa-recycle"></i></a> </h2>
+            <h2 class="panel-title">{{c.storage}} / {{c.id}} <a href="" ng-click="modalResourceRestore(c.id, c.storage);" tooltip="Restore Collection Resource"><i class="fa fa-recycle"></i></a> </h2>
             <div class="pull-right" data-tooltip-placement="top" data-tooltip="Delete Security">
               <a href="" ng-click="modalResourceSecurityDelete(c.id, c.storage);"><i class="fa fa-trash-o"></i></a>
             </div>

@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.security', []);
 
-loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $log, $filter, $modal, Notifications, LoSecurity, LoACL, expAppResources, expApp, currentApp) {
+loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $log, $filter, $modal, Notifications, LoSecurity, LoACL, LoStorage, LoCollection, expAppResources, expApp, currentApp) {
 
   $rootScope.curApp = currentApp;
 
@@ -185,6 +185,88 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
       }
       else {
         deleteResourceSecurity(['/' + currentApp.id + '/' + parentId + '/' + resourceId, '/' + currentApp.id + '/' + parentId + '/' + resourceId + '/*'], resourceId, parentId);
+      }
+    };
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+  };
+
+  // Restore Resource
+  $scope.modalResourceRestore = function(resourceId, parentId, isStorage) {
+    $scope.isStorage = parentId ? false : true;
+    $scope.restoreResourceId = parentId ? (parentId + '/' + resourceId) : resourceId;
+
+    if (parentId && $filter('filter')($scope.storageList, {'id': parentId}).length == 0) {
+      $scope.restoreParentId = parentId;
+    }
+
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/security/resource-restore.html',
+      controller: RestoreResourceModalCtrl,
+      scope: $scope
+    });
+  };
+
+  var RestoreResourceModalCtrl = function ($scope, $route, $modalInstance) {
+
+    var restoreStorage = function(storageId) {
+      var storageData = {
+        id: storageId,
+        type: 'mongo',
+        config: {
+          db: $scope.curApp.id,
+          servers: [{host: 'localhost', port: 27017}],
+          credentials: []
+        }
+      };
+
+      return LoStorage.create({appId: $scope.curApp.id}, storageData).$promise;
+    };
+
+    var restoreCollection = function(collection) {
+      var resources = collection.split('/');
+      var collectionData = {id : resources[1]};
+      return LoCollection.create({appId: $scope.curApp.id, storageId: resources[0]}, collectionData).$promise;
+    };
+
+    var closeAndReload = function(notifFunc, message, httpResponse) {
+      notifFunc(message, httpResponse);
+      $modalInstance.close();
+      $route.reload();
+    };
+
+    $scope.resourceRestore = function (resourceId, parentId) {
+      if (parentId || $scope.isStorage) {
+        var restoredStoragePromise = restoreStorage(parentId || resourceId);
+
+        restoredStoragePromise.then(function() {
+          if ($scope.isStorage) {
+            closeAndReload(Notifications.success, 'The storage "' + resourceId + '" has been created.');
+          }
+          else {
+            var restoredCollectionPromise = restoreCollection(resourceId);
+            restoredCollectionPromise.then(function() {
+              closeAndReload(Notifications.success, 'The storage "' + parentId + '" and collection "' + resourceId + '" have been created.');
+            },
+            function(httpResponse) {
+              closeAndReload(Notifications.httpError, 'The storage "' + parentId + '" has been created but not able to create collection "' + resourceId + '".', httpResponse);
+            });
+          }
+        },
+        function(httpResponse) {
+          closeAndReload(Notifications.httpError, 'Not able to create the storage "' + resourceId + '".', httpResponse);
+        });
+      }
+      else {
+        var restoredCollectionPromise = restoreCollection(resourceId);
+        restoredCollectionPromise.then(function() {
+          closeAndReload(Notifications.success, 'The collection "' + resourceId + '" has been created.');
+        },
+        function(httpResponse) {
+          closeAndReload(Notifications.httpError, 'Not able to create the collection "' + resourceId + '".', httpResponse);
+        });
       }
     };
 
