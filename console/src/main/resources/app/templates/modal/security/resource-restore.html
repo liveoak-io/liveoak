@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <button type="button" class="close" ng-click="cancel()">
+    <span class="pficon pficon-close"></span>
+  </button>
+  <h4 class="modal-title">Restore Resource</h4>
+</div>
+<div class="modal-body">
+  <div class="form-group">
+    <p class="primary-message">Are you sure you want to create the following resources ?</p>
+    <ul>
+      <li ng-show="$parent.isStorage">Storage "<strong>{{$parent.restoreResourceId}}</strong>"</li>
+      <li ng-show="!$parent.isStorage && $parent.restoreParentId">Storage "<strong>{{$parent.restoreParentId}}</strong>"</li>
+      <li ng-show="!$parent.isStorage">Collection "<strong>{{$parent.restoreResourceId}}</strong>"</li>
+    </ul>
+    <p>These resources will be created with default settings.</p>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button type="button" class="btn btn-primary" ng-click="resourceRestore(restoreResourceId, restoreParentId);">Create</button>
+</div>
