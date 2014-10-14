@@ -59,16 +59,6 @@ loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, $ro
 
 });
 
-loMod.controller('HomeCtrl', function($log, $rootScope, $scope, $location, $filter, loAppList) {
-  var filtered = $filter('filter')(loAppList.members, {'visible': true});
-  if (filtered.length === 1) {
-    $location.url('/applications/' + filtered[0].id);
-  }
-  else {
-    $location.url('/applications');
-  }
-});
-
 loMod.controller('NavigationCtrl', function($scope, $rootScope, $filter, loLiveLoader, LoLiveAppList) {
 
   loLiveLoader(LoLiveAppList.getList).then(function(data){
