@@ -55,8 +55,8 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
       }
       else if (pathElemsUri.length + extraUri === 4) {
         // collection
-        var collStorage = $filter('filter')($scope.storageList, {'id': pathElemsUri[2]}, true);
-        if (collStorage[0] && collStorage[0].members && $filter('filter')(collStorage[0].members, {'id': pathElemsUri[3]}, true).length > 0) {
+        var uriCollStorage = $filter('filter')($scope.storageList, {'id': pathElemsUri[2]}, true);
+        if (uriCollStorage[0] && uriCollStorage[0].members && $filter('filter')(uriCollStorage[0].members, {'id': pathElemsUri[3]}, true).length > 0) {
           $scope.securedCollections.uriPolicies.push($scope.uriPolicies[i]);
         }
         else {
@@ -99,8 +99,8 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
       }
       else if (pathElemsAcl.length + extraAcl === 4) {
         // collection
-        var collStorage = $filter('filter')($scope.storageList, {'id': pathElemsAcl[2]}, true);
-        if (collStorage[0] && collStorage[0].members && $filter('filter')(collStorage[0].members, {'id': pathElemsAcl[3]}, true).length > 0) {
+        var aclCollStorage = $filter('filter')($scope.storageList, {'id': pathElemsAcl[2]}, true);
+        if (aclCollStorage[0] && aclCollStorage[0].members && $filter('filter')(aclCollStorage[0].members, {'id': pathElemsAcl[3]}, true).length > 0) {
           $scope.securedCollections.aclPolicies.push($scope.acl[i]);
         }
         else {
@@ -153,7 +153,7 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
         newUriPolicies.rules = $filter('filter')(newUriPolicies.rules, {'uriPattern': ('!' + paths[p])}, true);
       }
 
-      var deleteUriSuccess = function(value/*, responseHeaders*/) {
+      var deleteUriSuccess = function(/*value, responseHeaders*/) {
         newAclPolicies.$save({appId: currentApp.name}, deleteAclSuccess, deleteFailure);
       };
 
@@ -194,11 +194,11 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
   };
 
   // Restore Resource
-  $scope.modalResourceRestore = function(resourceId, parentId, isStorage) {
+  $scope.modalResourceRestore = function(resourceId, parentId) {
     $scope.isStorage = parentId ? false : true;
     $scope.restoreResourceId = parentId ? (parentId + '/' + resourceId) : resourceId;
 
-    if (parentId && $filter('filter')($scope.storageList, {'id': parentId}).length == 0) {
+    if (parentId && $filter('filter')($scope.storageList, {'id': parentId}).length === 0) {
       $scope.restoreParentId = parentId;
     }
 
