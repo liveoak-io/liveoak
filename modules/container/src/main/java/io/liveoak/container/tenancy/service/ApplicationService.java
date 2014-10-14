@@ -3,13 +3,13 @@ package io.liveoak.container.tenancy.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.container.extension.MediaTypeMountService;
@@ -18,13 +18,13 @@ import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
-import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.container.zero.service.ApplicationClientsInstallService;
 import io.liveoak.spi.LiveOak;
-import io.liveoak.spi.Services;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.Services;
+import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
@@ -44,10 +44,11 @@ import org.jboss.msc.value.InjectedValue;
  */
 public class ApplicationService implements Service<InternalApplication> {
 
-    public ApplicationService(String id, String name, File directory) {
+    public ApplicationService(String id, String name, File directory, Consumer<File> gitCommit) {
         this.id = id;
         this.name = name != null ? name : id;
         this.directory = directory;
+        this.gitCommit = gitCommit;
     }
 
     @Override
@@ -159,12 +160,8 @@ public class ApplicationService implements Service<InternalApplication> {
                 .addDependency(appResourceName, ApplicationResource.class, appResourceMount.resourceInjector())
                 .install());
 
-        // Only install the application-clients resource for an application if it's not currently
-        ResourceState state = new DefaultResourceState();
-        state.putProperty(LiveOak.RESOURCE_TYPE, LiveOak.APPLICATION_CLIENTS_RESOURCE_TYPE);
-
         // Startup all resources defined for the application
-        ApplicationResourcesStartupService resources = new ApplicationResourcesStartupService(resourcesTree);
+        ApplicationResourcesStartupService resources = new ApplicationResourcesStartupService(resourcesTree, this.gitCommit, this.app.directory());
 
         target.addService(Services.application(this.id).append("resources"), resources)
                 .addInjectionValue(resources.applicationInjector(), this)
@@ -196,6 +193,7 @@ public class ApplicationService implements Service<InternalApplication> {
     private String id;
     private String name;
     private File directory;
+    private Consumer<File> gitCommit;
     private InjectedValue<File> applicationsDirectoryInjector = new InjectedValue<>();
     private InternalApplication app;
 

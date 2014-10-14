@@ -69,10 +69,10 @@ public class LocalApplicationsResourceTest {
         this.httpClient.close();
     }
 
-    @AfterClass
-    public static void cleanUpInstalledApps() throws Exception {
-        new AppCleanup().accept("apps/myapp");
-    }
+//    @AfterClass
+//    public static void cleanUpInstalledApps() throws Exception {
+//        new AppCleanup().accept("apps/myapp");
+//    }
 
     protected ResourceState decode(HttpResponse response) throws Exception {
         ByteBuf buffer = Unpooled.buffer();
@@ -226,8 +226,7 @@ public class LocalApplicationsResourceTest {
         File myApp = new File(appDir, "myapp");
         assertThat(new File(myApp, ".git").exists()).isTrue();
         Git git = Git.open(myApp);
-        // Removed this check as it seems to be randomly true or false
-//        assertThat(git.status().call().hasUncommittedChanges()).isTrue();
+        assertThat(git.status().call().hasUncommittedChanges()).isFalse();
         Iterable<RevCommit> commits = git.log().call();
         int count = 0;
         for (RevCommit rev : commits) {

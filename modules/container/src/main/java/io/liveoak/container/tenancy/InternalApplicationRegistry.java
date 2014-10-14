@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import io.liveoak.container.tenancy.service.ApplicationRemovalService;
@@ -21,7 +22,6 @@ import org.vertx.java.core.Vertx;
  */
 public class InternalApplicationRegistry implements ApplicationRegistry {
 
-
     public InternalApplicationRegistry(ServiceTarget target) {
         this.target = target;
     }
@@ -31,7 +31,11 @@ public class InternalApplicationRegistry implements ApplicationRegistry {
     }
 
     public InternalApplication createApplication(String id, String name, File directory) throws InterruptedException {
-        ApplicationService app = new ApplicationService(id, name, directory);
+        return createApplication(id, name, directory, null);
+    }
+
+    public InternalApplication createApplication(String id, String name, File directory, Consumer<File> gitCommit) throws InterruptedException {
+        ApplicationService app = new ApplicationService(id, name, directory, gitCommit);
         ServiceController<InternalApplication> controller = this.target.addService(Services.application(id), app)
                 .addDependency(Services.APPLICATIONS_DIR, File.class, app.applicationsDirectoryInjector())
                 .install();
