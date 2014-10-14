@@ -5,55 +5,45 @@
  */
 package io.liveoak.git;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import io.liveoak.git.extension.GitExtension;
-import io.liveoak.testtools.AbstractHTTPResourceTestCase;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.junit.Test;
-
 import java.io.File;
 
-import static org.fest.assertions.Assertions.assertThat;
+import io.liveoak.git.extension.GitExtension;
+import io.liveoak.testtools.AbstractHTTPResourceTestCase;
+import org.junit.Test;
+
+import static io.liveoak.testtools.assertions.Assertions.assertThat;
 
 /**
  * @author Ken Finnigan
  */
 public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
-
-    @Override
-    protected File applicationDirectory() {
-        return new File( this.projectRoot, "target/test-app" );
-    }
+    private static final String ADMIN_ROOT = "/admin/applications/";
+    private static final String GIT_ADMIN_RESOURCE_PATH = "/resources/git";
+    private static final String TESTAPP_GIT_ADMIN_ROOT = ADMIN_ROOT + "testApp" + GIT_ADMIN_RESOURCE_PATH;
+    private static final String TESTAPP_GIT_PUBLIC_ROOT = "/testApp/git";
 
     @Override
     public void loadExtensions() throws Exception {
-        new File( applicationDirectory(), "git" ).mkdirs();
-        loadExtension( "git", new GitExtension() );
-        installResource( "git", "git", JsonNodeFactory.instance.objectNode() );
+        loadExtension("git", new GitExtension());
     }
 
     @Test
-    public void enumerateRoot() throws Exception {
-        HttpGet get = new HttpGet("http://localhost:8080/testApp/git");
-        get.addHeader("Accept", "application/json");
+    public void rootResource() throws Exception {
+        // Test #1 -  Git Repo already exists
+        File alreadyGitDir = new File(this.application.directory(), ".git");
 
-        try {
-            System.out.println("DO GET");
-            CloseableHttpResponse result = httpClient.execute(get);
-            System.out.println("=============>>>");
-            System.out.println(result);
+        // Verify git dir exists
+        assertThat(alreadyGitDir.exists()).isTrue();
+        assertThat(new File(alreadyGitDir, ".git").exists()).isFalse();
 
-            HttpEntity entity = result.getEntity();
-            if (entity.getContentLength() > 0) {
-                entity.writeTo(System.out);
-            }
-            System.out.println("\n<<<=============");
-            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(200);
-        } finally {
-            httpClient.close();
-        }
+        // Verify git resource is installed
+        assertThat(execGet(TESTAPP_GIT_ADMIN_ROOT)).hasStatus(200);
+        assertThat(execGet(TESTAPP_GIT_PUBLIC_ROOT)).hasStatus(404).hasNoSuchResource();
+
+        // Verify git dir still exists, and we didn't create it too low in folder hierarchy
+        assertThat(alreadyGitDir.exists()).isTrue();
+        assertThat(new File(alreadyGitDir, ".git").exists()).isFalse();
+
     }
 
 }

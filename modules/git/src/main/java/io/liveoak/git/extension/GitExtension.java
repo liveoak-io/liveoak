@@ -1,19 +1,16 @@
 package io.liveoak.git.extension;
 
-import java.io.File;
-
-import io.liveoak.git.GitRepoAdminResource;
-import io.liveoak.git.service.GitRepoResourceService;
+import io.liveoak.git.service.GitRootResourceService;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
 import io.liveoak.spi.resource.async.DefaultRootResource;
 import org.jboss.msc.service.ServiceTarget;
-import org.vertx.java.core.Vertx;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class GitExtension implements Extension {
 
@@ -24,25 +21,17 @@ public class GitExtension implements Extension {
 
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
-
         ServiceTarget target = context.target();
-        String appId = context.application().id();
 
-        File dir = new File(context.application().directory(), context.resourceId());
-        GitRepoAdminResource privateResource = new GitRepoAdminResource(context.resourceId(), dir);
-        context.mountPrivate(privateResource);
+        GitRootResourceService gitService = new GitRootResourceService(context.resourceId(), context.application().directory());
 
-        GitRepoResourceService publicResource = new GitRepoResourceService(privateResource, context.resourceId());
-
-        target.addService(Services.resource(appId, context.resourceId()), publicResource)
-                .addDependency(Services.VERTX, Vertx.class, publicResource.vertxInjector())
+        target.addService(Services.adminResource(context.application().id(), context.resourceId()), gitService)
                 .install();
 
-        context.mountPublic();
+        context.mountPrivate();
     }
 
     @Override
     public void unextend(ApplicationExtensionContext context) throws Exception {
-
     }
 }
