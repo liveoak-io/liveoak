@@ -69,10 +69,10 @@ public class LocalApplicationsResourceTest {
         this.httpClient.close();
     }
 
-//    @AfterClass
-//    public static void cleanUpInstalledApps() throws Exception {
-//        new AppCleanup().accept("apps/myapp");
-//    }
+    @AfterClass
+    public static void cleanUpInstalledApps() throws Exception {
+        new AppCleanup().accept("apps/myapp");
+    }
 
     protected ResourceState decode(HttpResponse response) throws Exception {
         ByteBuf buffer = Unpooled.buffer();
