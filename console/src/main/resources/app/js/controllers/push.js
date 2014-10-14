@@ -3,7 +3,7 @@
 var loMod = angular.module('loApp.controllers.push', []);
 
 loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, Notifications, currentApp,
-                                      loRemoteCheck, loPushPing, $resource) {
+                                      loRemoteCheck, loPushPing, $resource, $modal) {
 
   $log.debug('PushCtrl');
 
@@ -116,14 +116,15 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
     }
   };
 
-  $scope.delete = function() {
+  $scope.pushDelete = function () {
     $log.debug('Deleting push resource.');
     LoPush.delete({appId: $scope.curApp.id},
       // success
       function(/*value, responseHeaders*/) {
         Notifications.success('The push configuration has been deleted.');
         $scope.pushModel = {};
-        pushModelBackup = angular.copy($scope.pushModel);
+        pushModelBackup = {};
+        $scope.pushForm.$setPristine();
         $scope.changed = false;
         $scope.create = true;
       },
@@ -132,6 +133,14 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
         Notifications.httpError('Failed to delete the push configuration.', httpResponse);
       }
     );
+  };
+
+  $scope.modalPushDelete = function(){
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/push/push-delete.html',
+      controller: 'DefaultModalCtrl',
+      scope: $scope
+    });
   };
 
 });
