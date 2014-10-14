@@ -14,9 +14,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 
-
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -45,7 +43,7 @@ public class MongoAggregationResource extends MongoAggregationItem {
             }
         }
 
-        DBCollection dbCollection = parent().dbCollection;
+        DBCollection dbCollection = parent().getDBCollection();
 
         try {
             BasicDBList result = new BasicDBList();

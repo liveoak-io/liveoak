@@ -8,6 +8,7 @@ package io.liveoak.mongo;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import com.mongodb.BasicDBObject;
@@ -17,7 +18,9 @@ import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 
+import io.liveoak.common.util.PagingLinksBuilder;
 import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.exceptions.ResourceProcessingException;
@@ -31,8 +34,12 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class MongoCollectionResource extends MongoResource {
 
-    DBCollection dbCollection;
-    String collectionName;
+    private DBCollection dbCollection;
+    private String collectionName;
+
+    private boolean explainQuery;
+    private DBObject queryObject;
+    private DBObject returnFields;
 
     MongoCollectionResource(RootMongoResource parent, DBCollection collection) {
         super(parent);
@@ -87,15 +94,13 @@ public class MongoCollectionResource extends MongoResource {
     }
 
     @Override
-    public Collection<Resource> members(RequestContext ctx) throws Exception {
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
 
-        LinkedList<Resource> members = new LinkedList<>();
-        DBObject queryObject = new BasicDBObject();
-
+        queryObject = new BasicDBObject();
         ResourceParams resourceParams = ctx.resourceParams();
         if (resourceParams != null) {
             if (resourceParams.contains("q")) {
-                String queryString = ctx.resourceParams().value("q");
+                String queryString = resourceParams.value("q");
                 try {
                     queryObject = (DBObject) JSON.parse(queryString);
                 } catch (Exception e) {
@@ -104,17 +109,61 @@ public class MongoCollectionResource extends MongoResource {
             }
         }
 
-        DBObject returnFields = new BasicDBObject();
-        if (ctx.returnFields() != null && !ctx.returnFields().isAll()) {
-            ctx.returnFields().forEach((fieldName) -> {
-                returnFields.put(fieldName, true);
-            });
+        explainQuery = resourceParams != null
+                && resourceParams.contains("explain")
+                && resourceParams.value("explain").equalsIgnoreCase("true");
+
+        if (!explainQuery) {
+            returnFields = new BasicDBObject();
+            if (ctx.returnFields() != null && !ctx.returnFields().isAll()) {
+                ctx.returnFields().forEach((fieldName) -> {
+                    returnFields.put(fieldName, true);
+                });
+            }
         }
+
+        int totalCount = explainQuery ? 1 : (int) dbCollection.getCount(queryObject, returnFields);
+        int count = ctx.pagination().offset() >= totalCount ? 0 : totalCount - ctx.pagination().offset();
+        count = count < ctx.pagination().limit() ? count : ctx.pagination().limit();
+
+        List<Resource> links = new LinkedList<>();
+
+        PagingLinksBuilder linksBuilder = new PagingLinksBuilder(ctx)
+                .uri(uri())
+                .count(count)
+                .totalCount(totalCount);
+
+        links.addAll(linksBuilder.build());
+
+        Map<String, Object> result = new HashMap<>();
+        if (links.size() > 0) {
+            result.put("links", links);
+        }
+        result.put("type", "collection");
+        result.put("count", (long) totalCount);
+        result.put("capped", dbCollection.isCapped());
+
+        DBObject collectionDBObject = getDBCollection().getDB().getCollection( "system" ).getCollection( "namespaces" ).findOne( new BasicDBObject ( "name", this.getDBCollection().getFullName()));
+
+        if (collectionDBObject != null && collectionDBObject.get("options") != null) {
+            DBObject collectionOptions = (DBObject) collectionDBObject.get( "options" );
+            result.put("max", collectionOptions.get( "max" ));
+            result.put("size", collectionOptions.get("size"));
+        }
+
+        return result;
+    }
+
+    @Override
+    public Collection<Resource> members(RequestContext ctx) throws Exception {
+
+        LinkedList<Resource> members = new LinkedList<>();
 
         DBCursor dbCursor = dbCollection.find(queryObject, returnFields);
 
-        if (ctx.resourceParams() != null && ctx.resourceParams().contains("hint")) {
-            String hint = ctx.resourceParams().value( "hint" );
+        ResourceParams resourceParams = ctx.resourceParams();
+        if (resourceParams != null && resourceParams.contains("hint")) {
+            String hint = resourceParams.value("hint");
             if (hint.startsWith("{")) {
                 try {
                     DBObject hintObject = (DBObject) JSON.parse(hint);
@@ -127,36 +176,34 @@ public class MongoCollectionResource extends MongoResource {
             }
         }
 
-        if (resourceParams != null && ctx.resourceParams().contains("explain")) {
-            if (ctx.resourceParams().value("explain").equalsIgnoreCase("true")) {
-                members.add(new MongoEmbeddedObjectResource(this, dbCursor.explain()));
-                return members;
+        if (explainQuery) {
+            members.add(new MongoEmbeddedObjectResource(this, dbCursor.explain()));
+        } else {
+            Sorting sorting = ctx.sorting();
+            if (sorting != null) {
+                BasicDBObject sortingObject = new BasicDBObject();
+                for (Sorting.Spec spec : sorting) {
+                    sortingObject.append(spec.name(), spec.ascending() ? 1 : -1);
+                }
+                dbCursor = dbCursor.sort(sortingObject);
             }
-        }
 
-        Sorting sorting = ctx.sorting();
-        if (sorting != null) {
-            BasicDBObject sortingObject = new BasicDBObject();
-            for (Sorting.Spec spec : sorting) {
-                sortingObject.append(spec.name(), spec.ascending() ? 1 : -1);
+            Pagination pagination = ctx.pagination();
+            if (pagination != null) {
+                dbCursor.limit(pagination.limit());
+                dbCursor.skip(pagination.offset());
             }
-            dbCursor = dbCursor.sort(sortingObject);
-        }
 
-        if (ctx.pagination() != null) {
-            dbCursor.limit(ctx.pagination().limit());
-            dbCursor.skip(ctx.pagination().offset());
-        }
+            try {
+                dbCursor.hasNext();
+            } catch (Exception e) {
+                throw new ResourceProcessingException("Exception encountered trying to fetch data from the Mongo Database", e);
+            }
 
-        try {
-            dbCursor.hasNext();
-        } catch (Exception e) {
-            throw new ResourceProcessingException("Exception encountered trying to fetch data from the Mongo Database", e);
+            dbCursor.forEach((dbObject) -> {
+                members.add(new MongoBaseObjectResource(this, dbObject));
+            });
         }
-
-        dbCursor.forEach((dbObject) -> {
-            members.add(new MongoBaseObjectResource(this, dbObject));
-        });
 
         return members;
     }
@@ -184,24 +231,6 @@ public class MongoCollectionResource extends MongoResource {
 
     public String toString() {
         return "[MongoCollectionResource: id=" + this.id() + "]";
-    }
-
-    @Override
-    public Map<String, ?> properties(RequestContext ctx) throws Exception {
-        Map<String, Object> result = new HashMap<>();
-        result.put("type", "collection");
-        result.put("count", dbCollection.getCount());
-        result.put("capped", dbCollection.isCapped());
-
-        DBObject collectionDBObject = getDBCollection().getDB().getCollection( "system" ).getCollection( "namespaces" ).findOne( new BasicDBObject ( "name", this.getDBCollection().getFullName()));
-
-        if (collectionDBObject != null && collectionDBObject.get("options") != null) {
-            DBObject collectionOptions = (DBObject) collectionDBObject.get( "options" );
-            result.put("max", collectionOptions.get( "max" ));
-            result.put("size", collectionOptions.get("size"));
-        }
-
-        return result;
     }
 
     @Override

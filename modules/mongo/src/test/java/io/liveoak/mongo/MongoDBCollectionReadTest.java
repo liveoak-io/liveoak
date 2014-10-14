@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+import io.liveoak.common.DefaultPagination;
 import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.Pagination;
@@ -403,6 +404,79 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
 
         String[] expected = {"Jacqueline", "John", "Jane", "Hans", "Francois", "Helga"};
         assertThat(expected).isEqualTo(getNames(result));
+
+
+
+        // Test #13b - Test pagination - presence of links, and value of count
+        assertThat(result.getPropertyAsList("links")).isNull();
+        assertThat(result.getProperty("count")).isEqualTo(6L);
+
+        requestContext = new RequestContext.Builder()
+                .returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS))
+                .sorting(new Sorting("lastName,-name"))
+                .resourceParams(resourceParams)
+                .pagination(new DefaultPagination(0, 2)).build();
+
+        result = client.read(requestContext, "/testApp/" + BASEPATH + "/testSortCollection");
+
+        List<ResourceState> links = result.getPropertyAsList("links");
+        assertThat(links).isNotNull();
+        assertThat(links.size()).isEqualTo(2);
+        assertThat(links.get(0).getProperty("rel")).isEqualTo("next");
+        assertThat(links.get(1).getProperty("rel")).isEqualTo("last");
+        assertThat(result.getProperty("count")).isEqualTo(6L);
+
+        List<ResourceState> members = result.members();
+        assertThat(members).isNotNull();
+        assertThat(members.size()).isEqualTo(2);
+        assertThat(members.get(0).getPropertyAsString("name")).isEqualTo("Jacqueline");
+        assertThat(members.get(1).getPropertyAsString("name")).isEqualTo("John");
+
+        requestContext = new RequestContext.Builder()
+                .returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS))
+                .sorting(new Sorting("lastName,-name"))
+                .resourceParams(resourceParams)
+                .pagination(new DefaultPagination(2, 2)).build();
+
+        result = client.read(requestContext, "/testApp/" + BASEPATH + "/testSortCollection");
+
+        links = result.getPropertyAsList("links");
+        assertThat(links).isNotNull();
+        assertThat(links.size()).isEqualTo(4);
+        assertThat(links.get(0).getProperty("rel")).isEqualTo("first");
+        assertThat(links.get(1).getProperty("rel")).isEqualTo("prev");
+        assertThat(links.get(2).getProperty("rel")).isEqualTo("next");
+        assertThat(links.get(3).getProperty("rel")).isEqualTo("last");
+        assertThat(result.getProperty("count")).isEqualTo(6L);
+
+        members = result.members();
+        assertThat(members).isNotNull();
+        assertThat(members.size()).isEqualTo(2);
+        assertThat(members.get(0).getPropertyAsString("name")).isEqualTo("Jane");
+        assertThat(members.get(1).getPropertyAsString("name")).isEqualTo("Hans");
+
+
+        requestContext = new RequestContext.Builder()
+                .returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS))
+                .sorting(new Sorting("lastName,-name"))
+                .resourceParams(resourceParams)
+                .pagination(new DefaultPagination(4, 2)).build();
+
+        result = client.read(requestContext, "/testApp/" + BASEPATH + "/testSortCollection");
+
+        links = result.getPropertyAsList("links");
+        assertThat(links).isNotNull();
+        assertThat(links.size()).isEqualTo(2);
+        assertThat(links.get(0).getProperty("rel")).isEqualTo("first");
+        assertThat(links.get(1).getProperty("rel")).isEqualTo("prev");
+        assertThat(result.getProperty("count")).isEqualTo(6L);
+
+        members = result.members();
+        assertThat(members).isNotNull();
+        assertThat(members.size()).isEqualTo(2);
+        assertThat(members.get(0).getPropertyAsString("name")).isEqualTo("Francois");
+        assertThat(members.get(1).getPropertyAsString("name")).isEqualTo("Helga");
+
 
 
         // Test #14 - Get storage collections query and sort
