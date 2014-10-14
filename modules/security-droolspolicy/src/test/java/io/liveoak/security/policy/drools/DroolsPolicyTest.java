@@ -200,13 +200,18 @@ public class DroolsPolicyTest {
         req13params.put("sort", Arrays.asList(new String[]{"user,name"}));
         req13params.put("limit", Arrays.asList(new String[]{"10"}));
         RequestContext.Builder request13 = new RequestContext.Builder().requestType(RequestType.READ)
-                .resourcePath(new ResourcePath("/droolsTest/bar")).resourceParams(DefaultResourceParams.instance(req13params));
+                .resourcePath(new ResourcePath("/droolsTest/bar"))
+                .resourceParams(DefaultResourceParams.instance(req13params));
         Assert.assertEquals(AuthzDecision.ACCEPT, droolsPolicy.isAuthorized(request13.securityContext(john)));
         Assert.assertEquals(AuthzDecision.REJECT, droolsPolicy.isAuthorized(request13.securityContext(evil)));
 
         // Should pass because of limit==5
         req13params.put("sort", Arrays.asList(new String[]{"user,namee"}));
         req13params.put("limit", Arrays.asList(new String[]{"5"}));
+        request13 = new RequestContext.Builder().requestType(RequestType.READ)
+                .resourcePath(new ResourcePath("/droolsTest/bar"))
+                .resourceParams(DefaultResourceParams.instance(req13params));
+
         Assert.assertEquals(AuthzDecision.ACCEPT, droolsPolicy.isAuthorized(request13.securityContext(john)));
 
 
@@ -214,16 +219,28 @@ public class DroolsPolicyTest {
         req13params.put("sort", Arrays.asList(new String[]{"user,namee"}));
         req13params.put("limit", Arrays.asList(new String[]{"10"}));
         req13params.put("q", Arrays.asList(new String[]{"{\"completed\":false}"}));
+        request13 = new RequestContext.Builder().requestType(RequestType.READ)
+                .resourcePath(new ResourcePath("/droolsTest/bar"))
+                .resourceParams(DefaultResourceParams.instance(req13params));
+
         Assert.assertEquals(AuthzDecision.ACCEPT, droolsPolicy.isAuthorized(request13.securityContext(john)));
 
         // Shouldn't pass because anything from sort,limit or q can be applied
         req13params.put("sort", Arrays.asList(new String[]{"user,namee"}));
         req13params.put("limit", Arrays.asList(new String[]{"10"}));
         req13params.put("q", Arrays.asList(new String[]{"{\"completed\":\"kokos\"}"}));
+        request13 = new RequestContext.Builder().requestType(RequestType.READ)
+                .resourcePath(new ResourcePath("/droolsTest/bar"))
+                .resourceParams(DefaultResourceParams.instance(req13params));
+
         Assert.assertEquals(AuthzDecision.IGNORE, droolsPolicy.isAuthorized(request13.securityContext(john)));
 
         // This is passing thanks to rule9
         req13params.put("q", Arrays.asList(new String[]{"{\"completed\":true}"}));
+        request13 = new RequestContext.Builder().requestType(RequestType.READ)
+                .resourcePath(new ResourcePath("/droolsTest/bar"))
+                .resourceParams(DefaultResourceParams.instance(req13params));
+
         Assert.assertEquals(AuthzDecision.ACCEPT, droolsPolicy.isAuthorized(request13.securityContext(john)));
     }
 }

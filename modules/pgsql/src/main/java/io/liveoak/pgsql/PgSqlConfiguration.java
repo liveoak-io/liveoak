@@ -18,6 +18,8 @@ public interface PgSqlConfiguration {
 
     public boolean allowCreateSchema();
 
+    public boolean includeTotalCount();
+
     public String defaultSchema();
 
 }

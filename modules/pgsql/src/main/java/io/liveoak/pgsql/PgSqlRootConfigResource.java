@@ -114,6 +114,7 @@ public class PgSqlRootConfigResource extends DefaultRootResource implements Sync
             result.put("default-schema", configuration.defaultSchema());
         }
         result.put("allow-create-schema", configuration.allowCreateSchema());
+        result.put("include-total-count", configuration.includeTotalCount());
         return result;
     }
 
@@ -163,6 +164,11 @@ public class PgSqlRootConfigResource extends DefaultRootResource implements Sync
         Boolean bval = state.getPropertyAsBoolean("allow-create-schema");
         if (bval != null) {
             configuration.allowCreateSchema(bval);
+        }
+
+        bval = state.getPropertyAsBoolean("include-total-count");
+        if (bval != null) {
+            configuration.includeTotalCount(bval);
         }
 
         PGPoolingDataSource old = this.ds;
@@ -348,6 +354,7 @@ public class PgSqlRootConfigResource extends DefaultRootResource implements Sync
         private List<String> exposedSchemas;
         private List<String> blockedSchemas;
         private boolean allowCreateSchema;
+        private boolean totalCount;
         private String defaultSchema;
 
         public List<String> exposedSchemas() {
@@ -372,6 +379,14 @@ public class PgSqlRootConfigResource extends DefaultRootResource implements Sync
 
         public void allowCreateSchema(boolean allowCreateSchema) {
             this.allowCreateSchema = allowCreateSchema;
+        }
+
+        public boolean includeTotalCount() {
+            return totalCount;
+        }
+
+        public void includeTotalCount(boolean totalCount) {
+            this.totalCount = totalCount;
         }
 
         public String defaultSchema() {

@@ -8,6 +8,7 @@ package io.liveoak.pgsql;
 import java.net.URI;
 import java.sql.Connection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +88,7 @@ public class PgSqlRowResource implements SynchronousResource {
             return null;
         }
 
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new LinkedHashMap<>();
         Catalog cat = parent.parent().catalog();
         Table table = cat.table(new TableRef(parent.id()));
         HashMap<ForeignKey, String[]> fkMap = new HashMap<>();

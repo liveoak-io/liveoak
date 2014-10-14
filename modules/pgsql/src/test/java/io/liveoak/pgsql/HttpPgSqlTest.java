@@ -996,7 +996,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
     private void testSortLimitAndOffset() throws IOException {
         // get orders with limit 1, offset 1, sorted by total
-        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?sort=total&offset=1&limit=1&fields=*(*)");
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?fields=*(*)&sort=total&offset=1&limit=1");
         get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
         String result = getRequest(get);
@@ -1010,10 +1010,16 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'links' : [{                                                                  \n" +
                 "    'rel' : 'schema',                                                           \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders;schema'                \n" +
+                "  },{                                                                           \n" +
+                "    'rel' : 'first',                                                            \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders?fields=*%28*%29&sort=total&limit=1'            \n" +
+                "  },{                                                                           \n" +
+                "    'rel' : 'prev',                                                             \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders?fields=*%28*%29&sort=total&limit=1'            \n" +
                 "  }],                                                                           \n" +
-                "  'count' : 1,                                                                  \n" +
+                "  'count' : 2,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
-                "  'members' : [ {                                                              \n" +
+                "  'members' : [ {                                                               \n" +
                 "    'id' : '014-2004096',                                                       \n" +
                 "    'self' : {                                                                  \n" +
                 "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-2004096'         \n" +
@@ -1031,7 +1037,10 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
 
         checkResult(result, expected);
 
-        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?sort=-total&offset=1&limit=1&fields=*(*)");
+
+        // check link to previous page
+
+        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?fields=*%28*%29&sort=total&limit=1");
         get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
 
         result = getRequest(get);
@@ -1045,10 +1054,60 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  'links' : [{                                                                  \n" +
                 "    'rel' : 'schema',                                                           \n" +
                 "    'href' : '/testApp/sqldata/" + schema_two + ".orders;schema'                \n" +
+                "  },{                                                                           \n" +
+                "    'rel' : 'next',                                                             \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders?fields=*%28*%29&sort=total&offset=1&limit=1'   \n" +
+                "  },{                                                                           \n" +
+                "    'rel' : 'last',                                                             \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders?fields=*%28*%29&sort=total&offset=1&limit=1'   \n" +
                 "  }],                                                                           \n" +
-                "  'count' : 1,                                                                  \n" +
+                "  'count' : 2,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
-                "  'members' : [ {                                                              \n" +
+                "  'members' : [ {                                                               \n" +
+                "    'id' : '014-1003095',                                                       \n" +
+                "    'self' : {                                                                  \n" +
+                "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'         \n" +
+                "    },                                                                          \n" +
+                "    'order_id' : '014-1003095',                                                 \n" +
+                "    'create_date' : 1402146615000,                                              \n" +
+                "    'total' : 18990,                                                            \n" +
+                "    'address' : {                                                               \n" +
+                "      'self' : {                                                                \n" +
+                "        'href' : '/testApp/sqldata/addresses/1'                                 \n" +
+                "      }                                                                         \n" +
+                "    }                                                                           \n" +
+                "  } ]                                                                           \n" +
+                "}";
+
+        checkResult(result, expected);
+
+
+        // reverse sort condition
+
+        get = new HttpGet("http://localhost:8080/testApp/" + BASEPATH + "/" + schema_two + ".orders?fields=*(*)&sort=-total&offset=1&limit=1");
+        get.setHeader(HttpHeaders.Names.ACCEPT, APPLICATION_JSON);
+
+        result = getRequest(get);
+        System.out.println(result);
+
+        expected = "{                                                                            \n" +
+                "  'id' : '" + schema_two + ".orders',                                           \n" +
+                "  'self' : {                                                                    \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders'                       \n" +
+                "  },                                                                            \n" +
+                "  'links' : [{                                                                  \n" +
+                "    'rel' : 'schema',                                                           \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders;schema'                \n" +
+                "  },{                                                                           \n" +
+                "    'rel' : 'first',                                                            \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders?fields=*%28*%29&sort=-total&limit=1'           \n" +
+                "  },{                                                                           \n" +
+                "    'rel' : 'prev',                                                             \n" +
+                "    'href' : '/testApp/sqldata/" + schema_two + ".orders?fields=*%28*%29&sort=-total&limit=1'           \n" +
+                "  }],                                                                           \n" +
+                "  'count' : 2,                                                                  \n" +
+                "  'type' : 'collection',                                                        \n" +
+                "  'members' : [ {                                                               \n" +
                 "    'id' : '014-1003095',                                                       \n" +
                 "    'self' : {                                                                  \n" +
                 "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-1003095'         \n" +
@@ -1120,7 +1179,7 @@ public class HttpPgSqlTest extends BasePgSqlHttpTest {
                 "  }],                                                                           \n" +
                 "  'count' : 1,                                                                  \n" +
                 "  'type' : 'collection',                                                        \n" +
-                "  'members' : [ {                                                              \n" +
+                "  'members' : [ {                                                               \n" +
                 "    'id' : '014-2004096',                                                       \n" +
                 "    'self' : {                                                                  \n" +
                 "      'href' : '/testApp/sqldata/" + schema_two + ".orders/014-2004096'         \n" +

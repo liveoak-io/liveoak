@@ -10,7 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
@@ -18,7 +17,7 @@ import io.liveoak.spi.state.ResourceState;
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class MapResource implements Resource {
+public class MapResource implements SynchronousResource {
 
     private Map<String, Object> map = new LinkedHashMap<>();
 
@@ -43,11 +42,8 @@ public class MapResource implements Resource {
     }
 
     @Override
-    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        for (String key: map.keySet()) {
-            sink.accept(key, map.get(key));
-        }
-        sink.complete();
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        return map;
     }
 
     @Override
