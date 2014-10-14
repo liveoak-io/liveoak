@@ -3,6 +3,7 @@ package io.liveoak.container.tenancy.service;
 import java.io.File;
 import java.util.function.Consumer;
 
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.StartContext;
@@ -20,10 +21,14 @@ public class ApplicationGitInstallCommitService implements Service<Void> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.gitCommit.accept(this.installDir);
-
-        // remove ourselves
-        context.getController().setMode(ServiceController.Mode.REMOVE);
+        try {
+            this.gitCommit.accept(this.installDir);
+        } catch (RuntimeException re) {
+            log.error("Unable to commit to git on application install", re);
+        } finally {
+            // remove ourselves
+            context.getController().setMode(ServiceController.Mode.REMOVE);
+        }
     }
 
     @Override
@@ -37,4 +42,5 @@ public class ApplicationGitInstallCommitService implements Service<Void> {
 
     private Consumer<File> gitCommit;
     private File installDir;
+    private static final Logger log = Logger.getLogger(ApplicationGitInstallCommitService.class);
 }
