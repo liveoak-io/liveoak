@@ -12,6 +12,7 @@ import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public interface SynchronousResource extends Resource {
 
@@ -24,7 +25,7 @@ public interface SynchronousResource extends Resource {
         if (members == null) {
             return null;
         }
-        for (Resource member: members) {
+        for (Resource member : members) {
             if (id.equals(member.id())) {
                 return member;
             }
@@ -34,6 +35,10 @@ public interface SynchronousResource extends Resource {
 
     default Map<String, ?> properties(RequestContext ctx) throws Exception {
         return null;
+    }
+
+    default void initProperties(ResourceState props) throws Exception {
+        // nothing
     }
 
     default void properties(ResourceState props) throws Exception {
@@ -72,7 +77,7 @@ public interface SynchronousResource extends Resource {
         Map<String, ?> props = properties(ctx);
 
         if (props != null) {
-            for (Map.Entry<String, ?> entry : props.entrySet() ) {
+            for (Map.Entry<String, ?> entry : props.entrySet()) {
                 sink.accept(entry.getKey(), entry.getValue());
             }
         }
@@ -81,8 +86,14 @@ public interface SynchronousResource extends Resource {
     }
 
     @Override
+    default void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        initProperties(state);
+        responder.resourceUpdated(this);
+    }
+
+    @Override
     default void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        properties( state );
-        responder.resourceUpdated( this );
+        properties(state);
+        responder.resourceUpdated(this);
     }
 }
