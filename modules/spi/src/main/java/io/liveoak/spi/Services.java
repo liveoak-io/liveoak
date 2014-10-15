@@ -36,7 +36,6 @@ public final class Services {
 
     public static final ServiceName CODEC = LIVEOAK.append("codec");
 
-    private static final ServiceName RESOURCE = LIVEOAK.append("resource");
     private static final ServiceName RESOURCE_FACTORY = LIVEOAK.append("resource-extension");
     private static final ServiceName INTERCEPTOR = LIVEOAK.append("interceptor");
 
