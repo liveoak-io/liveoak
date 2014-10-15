@@ -118,4 +118,9 @@ public class ServiceUpdateResponder implements Responder {
     public void error(ResourceErrorResponse.ErrorType errorType, String message, Throwable cause) {
         this.context.failed(new StartException(cause));
     }
+
+    @Override
+    public void error(Throwable cause) {
+        this.context.failed(new StartException(cause));
+    }
 }

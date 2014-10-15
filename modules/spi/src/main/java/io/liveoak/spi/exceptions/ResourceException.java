@@ -5,6 +5,8 @@
  */
 package io.liveoak.spi.exceptions;
 
+import io.liveoak.spi.state.ResourceState;
+
 /**
  * @author Bob McWhirter
  */
@@ -29,9 +31,29 @@ public class ResourceException extends Exception {
         this.path = path;
     }
 
+    public ResourceException(String path, ResourceState state) {
+        this.path = path;
+        this.state = state;
+    }
+
+    public ResourceException(String path, String message, ResourceState state) {
+        super(message);
+        this.path = path;
+        this.state = state;
+    }
+
     public String path() {
         return this.path;
     }
 
+    public void state(ResourceState state) {
+        this.state = state;
+    }
+
+    public ResourceState state() {
+        return state;
+    }
+
     private String path;
+    private ResourceState state;
 }

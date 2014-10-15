@@ -8,11 +8,11 @@ package io.liveoak.container;
 import java.util.concurrent.Executor;
 
 import io.liveoak.client.impl.ClientResourceResponseImpl;
-import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.common.codec.driver.RootEncodingDriver;
 import io.liveoak.common.codec.state.ResourceStateEncoder;
 import io.liveoak.container.protocols.RequestCompleteEvent;
 import io.liveoak.spi.ResourceErrorResponse;
+import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.resource.BlockingResource;
@@ -78,18 +78,17 @@ public class ResourceStateHandler extends ChannelOutboundHandlerAdapter {
             ResourceState state = encoder.root();
             response.setState(state);
             ctx.writeAndFlush(response, promise).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
-        }, t -> handleError(ctx, response, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, t));
+        }, t -> handleError(ctx, response.inReplyTo(), t));
 
         try {
             driver.encode();
-        } catch (Exception e) {
-            handleError(ctx, response, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, e);
+        } catch (Throwable e) {
+            handleError(ctx, response.inReplyTo(), e);
         }
     }
 
-    private void handleError(ChannelHandlerContext ctx, ResourceResponse response, ResourceErrorResponse.ErrorType errorType, Throwable t) {
-        log.error(errorType, t);
-        ctx.writeAndFlush(new DefaultResourceErrorResponse(response.inReplyTo(), errorType, t.getMessage(), t));
-        ctx.fireUserEventTriggered(new RequestCompleteEvent(response.requestId()));
+    private void handleError(ChannelHandlerContext ctx, ResourceRequest inReplyTo, Throwable e) {
+        ErrorHandler.handleError(ctx, inReplyTo, e);
+        ctx.fireUserEventTriggered(new RequestCompleteEvent(inReplyTo.requestId()));
     }
 }

@@ -111,5 +111,10 @@ public class DelegatingResponder implements Responder {
         delegate.error(errorType, message, cause);
     }
 
+    @Override
+    public void error(Throwable cause) {
+        delegate.error(cause);
+    }
+
     private Responder delegate;
 }

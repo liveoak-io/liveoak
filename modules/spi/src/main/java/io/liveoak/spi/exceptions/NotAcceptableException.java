@@ -5,6 +5,8 @@
  */
 package io.liveoak.spi.exceptions;
 
+import io.liveoak.spi.state.ResourceState;
+
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
@@ -23,6 +25,10 @@ public class NotAcceptableException extends ResourceException {
     public NotAcceptableException(String path, String message, Throwable cause) {
         super(path, "The request to resource at '" + path + " as not acceptable:" + message, cause);
         this.message = message;
+    }
+
+    public NotAcceptableException(String path, ResourceState state) {
+        super(path, state);
     }
 
     public String message() {

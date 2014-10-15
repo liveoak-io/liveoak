@@ -114,4 +114,11 @@ public interface Responder {
     void error(ResourceErrorResponse.ErrorType errorType);
     void error(ResourceErrorResponse.ErrorType errorType, String message);
     void error(ResourceErrorResponse.ErrorType errorType, String message, Throwable cause);
+
+    /**
+     * this method determines the appropriate response based on exception type of the cause parameter
+     *
+     * @param cause
+     */
+    void error(Throwable cause);
 }
