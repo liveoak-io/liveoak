@@ -44,6 +44,11 @@ public class FileSystemAdminResource implements RootResource, SynchronousResourc
     }
 
     @Override
+    public void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        updateProperties(ctx, state, responder);
+    }
+
+    @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         String directory = (String) state.getProperty("directory");
         if (this.directory == null && (directory == null || directory.trim().equals(""))) {
