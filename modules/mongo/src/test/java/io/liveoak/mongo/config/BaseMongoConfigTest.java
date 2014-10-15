@@ -16,15 +16,12 @@ public abstract class BaseMongoConfigTest extends AbstractResourceTestCase {
     static String BASEPATH = "storage";
     static final String ADMIN_PATH = "/" + ZeroExtension.APPLICATION_ID + "/applications/testApp/resources/" + BASEPATH;
     static final String SYSTEM_CONFIG_PATH = "/" + ZeroExtension.APPLICATION_ID + "/system/mongo";
+    static final String INSTANCES_CONFIG_PATH = "/" + ZeroExtension.APPLICATION_ID + "/system-instances/mongo";
 
     @Override
     public void loadExtensions() throws Exception {
         ObjectNode json = JsonNodeFactory.instance.objectNode();
-
-        ObjectNode serverNode = JsonNodeFactory.instance.objectNode();
-        serverNode.put("db", "testDefaultDB");
-        json.put("internal-database", serverNode);
-
+        json.put("db", "testDefaultDB");
         loadExtension("mongo", new MongoExtension(), json);
     }
 

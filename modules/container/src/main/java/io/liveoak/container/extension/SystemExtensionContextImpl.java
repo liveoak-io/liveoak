@@ -65,6 +65,35 @@ public class SystemExtensionContextImpl implements SystemExtensionContext {
                 .install();
     }
 
+    public void mountInstance(RootResource resource) {
+        target.addService(Services.instanceResource(this.id), new ValueService<RootResource>(new ImmediateValue<>(resource)))
+                .install();
+
+        mountPrivate(Services.instanceResource(this.id));
+    }
+
+    public void mountInstance(ServiceName privateName) {
+        MountService<RootResource> mount = new MountService();
+
+        InitializeResourceService configApply = new InitializeResourceService();
+        target.addService(privateName.append("apply-config"), configApply)
+                .addDependency(privateName, Resource.class, configApply.resourceInjector())
+                .addInjection(configApply.configurationInjector(), this.configuration)
+                .install();
+
+        RootResourceLifecycleService lifecycle = new RootResourceLifecycleService();
+        target.addService(privateName.append("lifecycle"), lifecycle)
+                .addDependency(privateName.append("apply-config"))
+                .addDependency(privateName, RootResource.class, lifecycle.resourceInjector())
+                .install();
+
+        ServiceController<? extends Resource> controller = this.target.addService(privateName.append("mount"), mount)
+                .addDependency(privateName.append("lifecycle"))
+                .addDependency(this.systemExtensionMount, MountPointResource.class, mount.mountPointInjector())
+                .addDependency(privateName, RootResource.class, mount.resourceInjector())
+                .install();
+    }
+
     private ServiceTarget target;
     private String id;
     private ServiceName systemExtensionMount;

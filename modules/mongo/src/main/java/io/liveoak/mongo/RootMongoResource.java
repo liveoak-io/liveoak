@@ -18,7 +18,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import io.liveoak.mongo.config.RootMongoConfigResource;
-import io.liveoak.mongo.config.MongoSystemConfigResource;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.ResourceProcessingException;
@@ -37,7 +36,7 @@ public class RootMongoResource extends MongoResource implements RootResource {
     private String id;
     private RootMongoConfigResource mongoConfigResource;
 
-    public RootMongoResource(String id, MongoSystemConfigResource mongoSystemConfigResource, RootMongoConfigResource mongoConfigResource) {
+    public RootMongoResource(String id, RootMongoConfigResource mongoConfigResource) {
         super(null);
         this.id = id;
         this.mongoConfigResource = mongoConfigResource;

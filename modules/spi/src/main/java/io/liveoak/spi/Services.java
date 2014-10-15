@@ -101,6 +101,10 @@ public final class Services {
         return LIVEOAK.append("system-resource", id);
     }
 
+    public static ServiceName instanceResource(String id) {
+        return LIVEOAK.append("system-instance", id);
+    }
+
     public static ServiceName server(String name, boolean network) {
         if (network) {
             return NETWORK_SERVER.append(name);

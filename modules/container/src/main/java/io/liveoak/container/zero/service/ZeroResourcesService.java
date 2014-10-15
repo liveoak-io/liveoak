@@ -2,15 +2,16 @@ package io.liveoak.container.zero.service;
 
 import java.io.File;
 
+import io.liveoak.common.DefaultMountPointResource;
 import io.liveoak.container.extension.MediaTypeMountService;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
-import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.container.zero.SystemResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
-import io.liveoak.spi.Services;
 import io.liveoak.spi.MediaType;
+import io.liveoak.spi.Services;
+import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -46,6 +47,16 @@ public class ZeroResourcesService implements Service<Void> {
         target.addService(systemName.append("mount"), mount)
                 .addDependency(Services.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, mount.mountPointInjector())
                 .addDependency(systemName, RootResource.class, mount.resourceInjector())
+                .install();
+
+        ServiceName instanceName = Services.resource(ZeroExtension.APPLICATION_ID, "system-instances");
+        target.addService(instanceName, new ValueService<DefaultMountPointResource>(new ImmediateValue<>(new DefaultMountPointResource("system-instances"))))
+                .install();
+
+        MountService<RootResource> instanceMount = new MountService<>();
+        target.addService(instanceName.append("mount"), instanceMount)
+                .addDependency(Services.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, instanceMount.mountPointInjector())
+                .addDependency(instanceName, RootResource.class, instanceMount.resourceInjector())
                 .install();
 
         ServiceName applicationsName = Services.resource(ZeroExtension.APPLICATION_ID, "applications");

@@ -70,20 +70,15 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
         String host = System.getProperty("mongo.host", "localhost");
         log.debug("Using Mongo for ACL on " + host + ":" + port + ", database: " + database);
 
-
-        ResourceState internalDatabase = new DefaultResourceState();
-        internalDatabase.putProperty("db", database);
+        ResourceState config = new DefaultResourceState();
+        config.putProperty("db", database);
 
         List<ResourceState> servers = new ArrayList<ResourceState>();
         ResourceState server = new DefaultResourceState();
         server.putProperty("port", port);
         server.putProperty("host", host);
         servers.add(server);
-        internalDatabase.putProperty("servers", servers);
-
-        ResourceState config = new DefaultResourceState();
-        config.putProperty("internal-database", internalDatabase);
-
+        config.putProperty("servers", servers);
         return ConversionUtils.convert(config);
     }
 

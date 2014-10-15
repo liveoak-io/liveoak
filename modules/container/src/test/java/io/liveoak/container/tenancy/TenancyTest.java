@@ -198,7 +198,7 @@ public class TenancyTest {
 
         Collection<? extends Resource> appResources = appContext.getValue().members(ctx);
         assertThat(appResources).isNotNull();
-        assertThat(appResources).hasSize(2);
+        assertThat(appResources).hasSize(3); //system, system-instances, applicationsco
 
         ApplicationResource zeroApp = (ApplicationResource) appsAdminResource.member(ctx, ZeroExtension.APPLICATION_ID);
         assertThat(zeroApp).isNotNull();

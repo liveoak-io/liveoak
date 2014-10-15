@@ -14,5 +14,8 @@ public interface SystemExtensionContext {
     void mountPrivate(ServiceName adminResourceName);
     void mountPrivate(RootResource resource);
 
+    void mountInstance(ServiceName instanceName);
+    void mountInstance(RootResource resource);
+
     //void mount(ServiceName name);
 }
