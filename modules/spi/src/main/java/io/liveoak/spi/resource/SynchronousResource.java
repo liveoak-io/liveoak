@@ -38,7 +38,7 @@ public interface SynchronousResource extends Resource {
     }
 
     default void initProperties(ResourceState props) throws Exception {
-        // nothing
+        properties(props);
     }
 
     default void properties(ResourceState props) throws Exception {
