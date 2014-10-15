@@ -68,7 +68,7 @@ public class KeycloakServerApplication extends KeycloakApplication {
 
             realm.setSsoSessionMaxLifespan(36000);
             realm.setAccessTokenLifespan(300);
-            realm.setSsoSessionIdleTimeout(600);
+            realm.setSsoSessionIdleTimeout(6000);
             realm.setAccessCodeLifespan(60);
             realm.setAccessCodeLifespanUserAction(300);
             KeycloakModelUtils.generateRealmKeys(realm);
@@ -77,6 +77,7 @@ public class KeycloakServerApplication extends KeycloakApplication {
             realm.setAccountTheme(LiveOakLoginThemeProviderFactory.ID);
             adminRealm.setLoginTheme(LiveOakLoginThemeProviderFactory.ID);
             adminRealm.setAccountTheme(LiveOakLoginThemeProviderFactory.ID);
+            adminRealm.setSsoSessionIdleTimeout(6000);
         }
     }
 
