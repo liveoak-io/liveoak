@@ -10,22 +10,30 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class DataStore extends EmbeddedConfigResource{
+public class MongoDatastoreResource implements RootResource, SynchronousResource {
 
     //Property keys
     public static final String SERVERS = "servers";
 
     MongoClient mongoClient;
+    Resource parent;
+    String id;
 
-    public DataStore(Resource parent, ResourceState resourceState) throws Exception{
-        super(parent);
-        properties(resourceState);
+    public MongoDatastoreResource (String id) {
+        this.id = id;
+    }
+
+    public MongoDatastoreResource(Resource parent, ResourceState state) throws Exception {
+        this.parent = parent;
+        properties(state);
     }
 
     @Override
@@ -101,5 +109,19 @@ public class DataStore extends EmbeddedConfigResource{
 
         this.mongoClient = mongoClient;
     }
-}
 
+    @Override
+    public void parent(Resource parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public Resource parent() {
+        return this.parent;
+    }
+
+    @Override
+    public String id() {
+        return id;
+    }
+}

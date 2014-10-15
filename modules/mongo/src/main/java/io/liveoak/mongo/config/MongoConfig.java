@@ -7,6 +7,7 @@ import com.mongodb.DB;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.PropertyException;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
 /**
@@ -19,36 +20,46 @@ public class MongoConfig extends EmbeddedConfigResource {
 
     private String databaseName;
     private String datastoreName;
-    private DataStore dataStore;
+    private MongoDatastoreResource dataStore;
 
-    private MongoSystemConfigResource mongoSystemConfigResource;
+    private MongoDatastoresRegistry mongoDatastoresResource;
 
-    public MongoConfig(Resource parent, MongoSystemConfigResource mongoSystemConfigResource, ResourceState resourceState) throws Exception {
+    public MongoConfig(Resource parent, MongoDatastoresRegistry mongoSystemConfigResource, ResourceState resourceState) throws Exception {
         super(parent);
-        this.mongoSystemConfigResource = mongoSystemConfigResource;
-        properties(resourceState);
+        this.mongoDatastoresResource = mongoSystemConfigResource;
+        generateDataStore(resourceState, true);
     }
 
+    @Override
+    public void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        generateDataStore(state, true);
+    }
+
+    @Override
     public void properties(ResourceState configState) throws Exception {
-        String database = configState.getProperty(DATABASE, true, String.class);
-        String datastore = configState.getProperty(DATASTORE, false, String.class);
+        generateDataStore(configState, false);
+    }
+
+    public void generateDataStore(ResourceState resourceState, Boolean init) throws Exception {
+        String database = resourceState.getProperty(DATABASE, true, String.class);
+        String datastore = resourceState.getProperty(DATASTORE, false, String.class);
 
         this.databaseName = database;
 
-        if (configState.getPropertyNames().contains(DATASTORE) && configState.getProperty(DATASTORE) == null) {
+        if (resourceState.getPropertyNames().contains(DATASTORE) && resourceState.getProperty(DATASTORE) == null) {
             throw new PropertyException("A datastore cannot accept a null value.");
         }
 
-        if (datastore != null && mongoSystemConfigResource != null) {
-            if (mongoSystemConfigResource.getDataStore(datastore) != null) {
+        if (datastore != null && mongoDatastoresResource != null) {
+            if (mongoDatastoresResource.getDataStore(datastore) != null || init) {
                 this.datastoreName = datastore;
             } else {
                 throw new PropertyException("No datastore named '" + datastore + "' exists.");
             }
-        } else if (datastore != null && mongoSystemConfigResource == null) {
+        } else if (datastore != null && mongoDatastoresResource == null) {
             throw new PropertyException("DataStores not supported for this resource.");
         } else {
-            this.dataStore = new DataStore(this, configState);
+            this.dataStore = new MongoDatastoreResource(this, resourceState);
         }
     }
 
@@ -68,8 +79,8 @@ public class MongoConfig extends EmbeddedConfigResource {
     }
 
     public DB getDB() {
-        if (datastoreName != null && mongoSystemConfigResource != null) {
-            return mongoSystemConfigResource.getDataStore(datastoreName).mongoClient.getDB(databaseName);
+        if (datastoreName != null && mongoDatastoresResource != null) {
+            return mongoDatastoresResource.getDataStore(datastoreName).mongoClient.getDB(databaseName);
         } else if (dataStore != null){
             return dataStore.mongoClient.getDB(databaseName);
         } else {

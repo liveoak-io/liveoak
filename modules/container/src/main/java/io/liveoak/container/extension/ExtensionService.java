@@ -1,7 +1,12 @@
 package io.liveoak.container.extension;
 
+import java.util.Iterator;
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.container.tenancy.InstancesResourceRegistry;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.Extension;
@@ -47,6 +52,26 @@ public class ExtensionService implements Service<Extension> {
         } catch (Exception e) {
             throw new StartException(e);
         }
+
+        try {
+            ObjectNode extInstanceConfig = (ObjectNode) this.fullConfig.get("instances");
+            if (extInstanceConfig != null) {
+                //Create the system-instances/module resource so that we can put in there each individual instance
+                SystemExtensionContext systemInstanceExtContext = new SystemExtensionContextImpl(target, this.id, Services.resource(ZeroExtension.APPLICATION_ID, "system-instances"), JsonNodeFactory.instance.objectNode());
+                //systemInstanceExtContext.mountPrivate(new SimpleResourceRegistry(this.id));
+                systemInstanceExtContext.mountPrivate(new InstancesResourceRegistry(this.id, this.extension, target ));
+
+                Iterator<Map.Entry<String, JsonNode>> fieldIterator = extInstanceConfig.fields();
+                while (fieldIterator.hasNext()) {
+                    Map.Entry<String, JsonNode> entry = fieldIterator.next();
+                    SystemExtensionContext extInstanceContext = new SystemExtensionContextImpl(target, this.id, Services.systemResource(this.id), (ObjectNode) entry.getValue());
+                    this.extension.instance(entry.getKey(), extInstanceContext);
+                }
+            }
+        } catch (Exception e) {
+            throw new StartException("Error trying to install an instance for '" + this.id + "'.",e);
+        }
+
         log.debug("** Extension activated: " + this.id);
     }
 

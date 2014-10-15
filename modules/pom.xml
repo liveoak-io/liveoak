@@ -101,7 +101,6 @@
         <module>wildfly</module>
         <module>autosetup</module>
         <module>keycloak</module>
-
         <module>mongo</module>
         <module>mongo-gridfs</module>
         <module>mongo-launcher</module>

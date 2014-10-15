@@ -1,7 +1,6 @@
 package io.liveoak.mongo;
 
 import io.liveoak.mongo.config.RootMongoConfigResource;
-import io.liveoak.mongo.config.MongoSystemConfigResource;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -22,7 +21,7 @@ public class RootMongoResourceService implements Service<RootMongoResource> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.rootMongoResource = new RootMongoResource(id, mongoSystemConfigInjector.getValue(), mongoConfigInjector.getValue());
+        this.rootMongoResource = new RootMongoResource(id, mongoConfigInjector.getValue());
     }
 
     @Override
@@ -35,6 +34,5 @@ public class RootMongoResourceService implements Service<RootMongoResource> {
         return rootMongoResource;
     }
 
-    public InjectedValue<MongoSystemConfigResource> mongoSystemConfigInjector = new InjectedValue<>();
     public InjectedValue<RootMongoConfigResource> mongoConfigInjector = new InjectedValue<>();
 }

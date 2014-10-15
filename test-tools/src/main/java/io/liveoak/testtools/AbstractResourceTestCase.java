@@ -5,13 +5,17 @@
  */
 package io.liveoak.testtools;
 
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
-import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.Extension;
@@ -20,10 +24,6 @@ import io.liveoak.spi.state.ResourceState;
 import org.junit.After;
 import org.junit.Before;
 import org.vertx.java.core.Vertx;
-
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 
 
 /**
@@ -52,8 +52,17 @@ public abstract class AbstractResourceTestCase extends AbstractTestCase {
     }
 
     protected void loadExtension(String id, Extension ext, ObjectNode extConfig) throws Exception {
+        loadExtension(id, ext, extConfig, null);
+    }
+
+    protected void loadExtension(String id, Extension ext, ObjectNode extConfig, ObjectNode instancesConfig) throws Exception {
         ObjectNode fullConfig = JsonNodeFactory.instance.objectNode();
         fullConfig.put( "config", extConfig );
+
+        if (instancesConfig != null) {
+            fullConfig.put("instances", instancesConfig);
+        }
+
         this.system.extensionInstaller().load(id, ext, fullConfig);
         this.extensionIds.add(id);
         this.system.awaitStability();

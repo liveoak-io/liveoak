@@ -19,11 +19,11 @@ public class RootMongoConfigResource implements ConfigResource, RootResource {
     String id;
 
     MongoConfig mongoConfig;
-    MongoSystemConfigResource mongoSystemConfigResource;
+    MongoDatastoresRegistry mongoDatastoresResource;
 
-    public RootMongoConfigResource(String id, MongoSystemConfigResource mongoSystemConfigResource) {
+    public RootMongoConfigResource(String id, MongoDatastoresRegistry mongoSystemConfigResource) {
         this.id = id;
-        this.mongoSystemConfigResource = mongoSystemConfigResource;
+        this.mongoDatastoresResource = mongoSystemConfigResource;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class RootMongoConfigResource implements ConfigResource, RootResource {
     @Override
     public void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         try {
-            this.mongoConfig = new MongoConfig(this, mongoSystemConfigResource, state);
+            this.mongoConfig = new MongoConfig(this, mongoDatastoresResource, state);
             responder.resourceUpdated(this);
         } catch (Exception e) {
             throw new InitializationException("Error trying to initilize the LiveOak Mongo Module",e);
@@ -53,7 +53,7 @@ public class RootMongoConfigResource implements ConfigResource, RootResource {
 
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        this.mongoConfig = new MongoConfig(this, mongoSystemConfigResource, state);
+        this.mongoConfig = new MongoConfig(this, mongoDatastoresResource, state);
         responder.resourceUpdated(this);
     }
 
