@@ -9,6 +9,7 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import org.eclipse.jgit.api.Git;
+import org.jboss.logging.Logger;
 
 /**
  * @author Bob McWhirter
@@ -32,6 +33,7 @@ public class ApplicationsResource extends DefaultMountPointResource {
 
         InternalApplication app = this.applicationRegistry.createApplication(state.id(), (String) state.getProperty("name"), dir, installDir -> {
             try {
+                log.debug("Init git repo for: " + installDir);
                 Git gitRepo = GitHelper.initRepo(installDir);
                 GitHelper.addAllAndCommit(gitRepo, ctx.securityContext().getUser(), "Initial creation of LiveOak application");
             } catch (Exception e) {
@@ -44,4 +46,5 @@ public class ApplicationsResource extends DefaultMountPointResource {
 
     private final InternalApplicationRegistry applicationRegistry;
 
+    private static final Logger log = Logger.getLogger(ApplicationsResource.class);
 }
