@@ -17,6 +17,24 @@ var loMod = angular.module('loApp', [
   'ui.codemirror'
 ]);
 
+var liveOak = new LiveOak({
+  auth: {
+    realm: 'liveoak-admin',
+    clientId: 'console',
+    onload: 'login-required'
+  }
+});
+
+loMod.factory('LiveOak', function () {
+  return liveOak;
+});
+
+liveOak.auth.init({ onLoad: 'login-required' }).success(function () {
+  angular.bootstrap(document, ['loApp']);
+}).error(function() {
+  window.alert('Error: Unable to initialize LiveOak client.');
+});
+
 loMod.config(function($compileProvider){
   $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|mailto|blob):/);
 });
@@ -27,8 +45,23 @@ loMod.config(['$routeProvider', function($routeProvider) {
       template: '',
       controller: 'HomeCtrl',
       resolve: {
-        loAppList : function(loLiveLoader, LoLiveAppList) {
-          return loLiveLoader(LoLiveAppList.getList);
+        loAppList : function(loLiveLoader, LoLiveAppList, $filter, $location, $q) {
+          var livePromise = loLiveLoader(LoLiveAppList.getList);
+          livePromise.then(function(loAppList){
+            var filtered = $filter('filter')(loAppList.members, {'visible': true});
+            if (filtered.length === 1) {
+              $location.url('/applications/' + filtered[0].id);
+            }
+            else {
+              $location.url('/applications');
+            }
+          }, function(){
+            $location.url('/error');
+          });
+
+          // Returning a promise which would never be resolved, so that the page would not render.
+          // The page will be redirected before rendering based on the application list loaded above.
+          return $q.defer().promise;
         }
       }
     })
@@ -729,31 +762,6 @@ loMod.config(['$routeProvider', function($routeProvider) {
 loMod.config(['$logProvider', function($logProvider) {
   $logProvider.debugEnabled(false);
 }]);
-
-angular.element(document).ready(function () {
-  /* jshint ignore:start */
-  if(typeof LiveOak != "undefined") {
-    var liveOak = new LiveOak({
-      auth: {
-        realm: 'liveoak-admin',
-        clientId: 'console',
-        onload: 'login-required'
-      }
-    });
-
-    liveOak.auth.init({ onLoad: 'login-required' }).success(function () {
-        loMod.factory('LiveOak', function () {
-            return liveOak;
-        });
-        angular.bootstrap(document, ['loApp']);
-    }).error(function() {
-      window.location.reload();
-    });
-  }
-  /* jshint ignore:end */
-});
-
-// -- Loading Interceptor ----------------------------
 
 var resourceRequests = 0;
 var loadingTimer = -1;
