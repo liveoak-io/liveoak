@@ -9,7 +9,6 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 
@@ -57,25 +56,23 @@ public class KeycloakConfigRootResource implements RootResource, SynchronousReso
     }
 
     @Override
-    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        Set<String> keys = state.getPropertyNames();
+    public void properties(ResourceState props) throws Exception {
+        Set<String> keys = props.getPropertyNames();
 
         if (keys.contains(KEYCLOAK_URL)) {
-            config.setBaseUrl((String) state.getProperty(KEYCLOAK_URL));
+            config.setBaseUrl((String) props.getProperty(KEYCLOAK_URL));
         }
 
         Map<String, String> publicKeys = new Hashtable<>();
         if (keys.contains(PUBLIC_KEYS)) {
-            ResourceState k = (ResourceState) state.getProperty(PUBLIC_KEYS);
+            ResourceState k = (ResourceState) props.getProperty(PUBLIC_KEYS);
             for (String r : k.getPropertyNames()) {
                 publicKeys.put(r, (String) k.getProperty(r));
             }
         }
         config.setPublicKeyPems(publicKeys);
 
-        config.setLoadKeys(keys.contains(LOAD_PUBLIC_KEYS) ? (boolean) state.getProperty(LOAD_PUBLIC_KEYS) : false);
-
-        responder.resourceUpdated(this);
+        config.setLoadKeys(keys.contains(LOAD_PUBLIC_KEYS) ? (boolean) props.getProperty(LOAD_PUBLIC_KEYS) : false);
     }
 
     public Logger logger() {
