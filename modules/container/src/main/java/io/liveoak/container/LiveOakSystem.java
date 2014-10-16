@@ -13,11 +13,13 @@ import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceContainer;
+import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.vertx.java.core.Vertx;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -75,6 +77,14 @@ public class LiveOakSystem implements SynchronousResource {
 
     public void awaitStability() throws InterruptedException {
         this.serviceContainer.awaitStability();
+    }
+
+    public boolean awaitStability(long timeout, TimeUnit unit) throws InterruptedException {
+        return this.serviceContainer.awaitStability(timeout, unit);
+    }
+
+    public boolean awaitStability(long timeout, TimeUnit unit, Set<? super ServiceController<?>> failed, Set<? super ServiceController<?>> problem) throws InterruptedException {
+        return this.serviceContainer.awaitStability(timeout, unit, failed, problem);
     }
 
     // ----------------------------------------

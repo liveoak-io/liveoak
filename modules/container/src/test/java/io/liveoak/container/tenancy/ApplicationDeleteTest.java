@@ -1,20 +1,15 @@
 package io.liveoak.container.tenancy;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.UUID;
 
+import io.liveoak.container.AbstractContainerTest;
 import io.liveoak.container.InMemoryDBExtension;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
 import io.liveoak.spi.MediaType;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -28,39 +23,15 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author Ken Finnigan
  */
-public class ApplicationDeleteTest {
+public class ApplicationDeleteTest extends AbstractContainerTest {
 
-
-    private LiveOakSystem system;
     private CloseableHttpClient httpClient;
-    private File appDir;
+    private File appsDir;
 
     @Before
     public void setUpServer() throws Exception {
-        File appResourcesDir = new File(getClass().getClassLoader().getResource("apps").getFile());
-        appDir = new File(appResourcesDir.getParent(), UUID.randomUUID().toString().substring(0, 8));
-
-        Path appResourcesPath = appResourcesDir.toPath();
-        Path appDirPath = appDir.toPath();
-        Files.createDirectories(appDirPath);
-
-        Files.walkFileTree(appResourcesDir.toPath(), new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.copy(file, appDirPath.resolve(appResourcesPath.relativize(file)));
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                if (!dir.equals(appResourcesPath)) {
-                    Files.createDirectory(appDirPath.resolve(appResourcesPath.relativize(dir)));
-                }
-                return FileVisitResult.CONTINUE;
-            }
-        });
-
-        this.system = LiveOakFactory.create(null, appDir, null);
+        appsDir = new File(getClass().getClassLoader().getResource("apps").getFile());
+        this.system = LiveOakFactory.create(null, appsDir, null);
         this.system.extensionInstaller().load("dummy", new InMemoryDBExtension());
 
         this.system.awaitStability();
@@ -69,23 +40,6 @@ public class ApplicationDeleteTest {
     @After
     public void tearDownServer() throws Exception {
         this.system.stop();
-        Files.walkFileTree(appDir.toPath(), new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
-                if (e == null) {
-                    Files.delete(dir);
-                    return FileVisitResult.CONTINUE;
-                } else {
-                    throw e;
-                }
-            }
-        });
         System.err.flush();
     }
 
@@ -103,7 +57,7 @@ public class ApplicationDeleteTest {
     public void deleteTests() throws Throwable {
         // Test #1 - Test deleting and recreating an application with the same id
         this.system.applicationRegistry().createApplication("testApp1", "Test Application 1");
-        this.system.awaitStability();
+        awaitStability();
 
         HttpDelete deleteRequest;
         HttpPost postRequest;
@@ -116,7 +70,7 @@ public class ApplicationDeleteTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
 
-        this.system.awaitStability();
+        awaitStability();
         response.close();
 
         // Recreate app with same name
@@ -142,7 +96,7 @@ public class ApplicationDeleteTest {
         // Test #2 - Test deleting and recreating an application with the same id and resources
         InternalApplication app = this.system.applicationRegistry().createApplication("testApp2", "Test Application 2");
         app.extend("dummy");
-        this.system.awaitStability();
+        awaitStability();
 
         // Delete app
         deleteRequest = new HttpDelete("http://localhost:8080/admin/applications/testApp2");
@@ -151,6 +105,7 @@ public class ApplicationDeleteTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
         response.close();
+        awaitStability();
 
         // Recreate app with same name
         postRequest = new HttpPost("http://localhost:8080/admin/applications");
@@ -162,7 +117,7 @@ public class ApplicationDeleteTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
         response.close();
-        this.system.awaitStability();
+        awaitStability();
 
         // Add Resource to new app
         postRequest = new HttpPost("http://localhost:8080/admin/applications/testApp2/resources");
@@ -172,7 +127,7 @@ public class ApplicationDeleteTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
         response.close();
-        this.system.awaitStability();
+        awaitStability();
 
         // Delete app
         deleteRequest = new HttpDelete("http://localhost:8080/admin/applications/testApp2");
