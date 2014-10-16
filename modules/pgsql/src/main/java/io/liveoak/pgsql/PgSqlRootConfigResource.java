@@ -119,6 +119,11 @@ public class PgSqlRootConfigResource extends DefaultRootResource implements Sync
     }
 
     @Override
+    public void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        updateProperties(ctx, state, responder);
+    }
+
+    @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
 
         String dbName = state.getPropertyAsString("db");
