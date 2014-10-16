@@ -4,7 +4,7 @@
     <div class="lo-content-area col-md-12">
   
       <lo-breadcrumbs></lo-breadcrumbs>
-      <h2 class="pull-left"><span>{{ appClient.name || 'New Client' }}</span> Configuration</h2>
+      <h2 class="pull-left"><span>{{ appClient.name|clientname:curApp.id || 'New Client' }}</span> Configuration</h2>
 
       <hr>
 
@@ -13,8 +13,8 @@
           <div class="form-group clearfix">
             <label class="col-sm-2 control-label" for="clientname" required>Client Name <span class="required">*</span></label>
             <div class="col-sm-4" ng-class="{'has-error': clientsForm.clientname.$invalid && settings.name}">
-              <input class="form-control" type="text" id="clientname" name="clientname" ng-model="settings.name" required
-                     pf-focused="!settings.name" ng-change="checkClientName(settings.name)"/>
+              <input class="form-control" type="text" id="clientname" name="clientname" ng-model="settings.displayName" required
+                     pf-focused="!settings.name" ng-change="checkClientName(settings.hadPrefix ? (namePrefix + settings.name) : settings.name)"/>
               <span class="help-block" ng-show="clientsForm.clientname.$invalid && settings.name">
                 <span>Client with this name already exists.</span>
               </span>
@@ -101,8 +101,8 @@
           </div>
         </fieldset>
         <div class="pull-right form-actions">
-          <button class="btn btn-default btn-lg" ng-disabled="!changed || clientsForm.$invalid || !settings.name" type="button" ng-click="clear()">Clear changes</button>
-          <button class="btn btn-primary btn-lg" ng-disabled="!changed || clientsForm.$invalid || !settings.name" type="submit" ng-click="save()">Save</button>
+          <button class="btn btn-default btn-lg" ng-disabled="!changed || clientsForm.$invalid || !settings.displayName" type="button" ng-click="clear()">Clear changes</button>
+          <button class="btn btn-primary btn-lg" ng-disabled="!changed || clientsForm.$invalid || !settings.displayName" type="submit" ng-click="save()">Save</button>
         </div>
       </form>
     </div>

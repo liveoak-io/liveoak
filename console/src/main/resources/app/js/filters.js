@@ -121,3 +121,9 @@ loFilters.filter('conditional', function () {
     return output;
   };
 });
+
+loFilters.filter('clientname', function() {
+  return function (clientName, appName) {
+    return clientName ? clientName.replace(new RegExp('^liveoak.client.' + appName + '.'), '') : clientName;
+  }
+});
