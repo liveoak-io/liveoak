@@ -69,9 +69,8 @@ public class ApplicationDeleteTest extends AbstractContainerTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
-
-        awaitStability();
         response.close();
+        awaitStability();
 
         // Recreate app with same name
         postRequest = new HttpPost("http://localhost:8080/admin/applications");
@@ -83,6 +82,7 @@ public class ApplicationDeleteTest extends AbstractContainerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
         response.close();
+        awaitStability();
 
         // Delete app
         deleteRequest = new HttpDelete("http://localhost:8080/admin/applications/testApp1");
