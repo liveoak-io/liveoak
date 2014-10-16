@@ -30,7 +30,9 @@ loMod.factory('LiveOak', function () {
 });
 
 liveOak.auth.init({ onLoad: 'login-required' }).success(function () {
-  angular.bootstrap(document, ['loApp']);
+  angular.element(document).ready(function() {
+    angular.bootstrap(document, ['loApp']);
+  });
 }).error(function() {
   window.alert('Error: Unable to initialize LiveOak client.');
 });
