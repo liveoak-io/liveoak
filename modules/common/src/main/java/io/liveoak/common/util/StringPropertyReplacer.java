@@ -133,6 +133,9 @@ public final class StringPropertyReplacer {
 
                     String key = string.substring(start + 2, i);
 
+                    //TODO: check for other ports?
+                    boolean hasPort = containsKey("jboss.http.port", key) || containsKey("jboss.https.port", key);
+
                     // check for alias
                     if (FILE_SEPARATOR_ALIAS.equals(key)) {
                         value = FILE_SEPARATOR;
@@ -166,6 +169,19 @@ public final class StringPropertyReplacer {
                                 // No default, check for a composite key,
                                 // "key1,key2"
                                 value = resolveCompositeKey(key, props);
+                            }
+                        }
+                    }
+
+                    if (value != null && hasPort) {
+                        Object offsetObject = props.get("jboss.socket.binding.port-offset");
+                        if (offsetObject != null && offsetObject instanceof String && value instanceof String) {
+                            try {
+                                Integer offset = Integer.parseInt((String)offsetObject);
+                                Integer intValue = Integer.parseInt(value);
+                                value = new Integer(intValue + offset).toString();
+                            } catch (NumberFormatException e) {
+                                // ignore.
                             }
                         }
                     }
@@ -232,5 +248,19 @@ public final class StringPropertyReplacer {
         }
         // Return whatever we've found or null
         return value;
+    }
+
+    private static boolean containsKey(String key, String value) {
+        int colon = value.indexOf(':');
+        if (colon > 0) {
+            value = value.substring(0, colon);
+        }
+        String[] values = value.split(",");
+        for (int i = 0; i < values.length; i++) {
+            if (values[i].equals(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
