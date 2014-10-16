@@ -6,7 +6,6 @@ import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
-import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
@@ -29,7 +28,6 @@ public class ApplicationClientsInstallService implements Service<Void> {
                     log.debug("BOOTTIME INSTALL OF: application-clients");
                     this.applicationInjector.getValue().extend("application-clients", appClientState, false);
                     context.complete();
-                    context.getController().setMode(ServiceController.Mode.REMOVE);
                 } catch (Throwable e) {
                     context.failed(new StartException(e));
                 }
