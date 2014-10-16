@@ -282,6 +282,8 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
     {'label': 'Clients', 'href': '#/applications/' + currentApp.id + '/application-clients'}
   ];
 
+  $scope.namePrefix = 'liveoak.client.' + currentApp.id + '.';
+
   var idClientMap = {};
 
   for (var client in loRealmAppClients){
@@ -360,6 +362,8 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     {'label': 'Clients',       'href':'#/applications/' + currentApp.id + '/application-clients'}
   ];
 
+  $scope.namePrefix = 'liveoak.client.' + currentApp.id + '.';
+
   $scope.platformsBasic = ['html5', 'android', 'ios'];
   $scope.platformsCustom = [];
 
@@ -379,7 +383,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     }
     $scope.create = false;
     $scope.appClient = loRealmAppClient;
-    $scope.breadcrumbs.push({'label': loRealmAppClient.name, 'href':'#/applications/' + currentApp.id + '/application-clients/' + loRealmAppClient.name});
+    $scope.breadcrumbs.push({'label': $filter('clientname')(loRealmAppClient.name, currentApp.id), 'href':'#/applications/' + currentApp.id + '/application-clients/' + loRealmAppClient.name});
   }
   else {
     $scope.create = true;
@@ -397,11 +401,14 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
 
   $scope.settings = {
     name: $scope.appClient.name,
+    displayName: $filter('clientname')($scope.appClient.name, currentApp.id),
     type: loClient.type,
     scopeMappings: [],
     redirectUris: angular.copy($scope.appClient.redirectUris) || [],
     webOrigins: angular.copy($scope.appClient.webOrigins) || []
   };
+
+  $scope.settings.hadPrefix = $scope.create || $scope.settings.displayName !== $scope.settings.name;
 
   angular.forEach(scopeMappings, function(role) {$scope.settings.scopeMappings.push(role.id);});
 
@@ -463,6 +470,9 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
   };
 
   $scope.$watch('settings', function() {
+    if($scope.settings.hadPrefix) {
+      $scope.settings.name = $scope.namePrefix + $scope.settings.displayName;
+    }
     $scope.changed = !angular.equals($scope.settings, settingsBackup);
   }, true);
 
@@ -582,6 +592,15 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
         $scope.settings.webOrigins.push(uri.val);
       }
     });
+
+    if ($scope.create) {
+      if ($scope.settings.displayName.indexOf($scope.namePrefix) === -1) {
+        $scope.settings.name = $scope.namePrefix + $scope.settings.displayName;
+      }
+      else {
+        $scope.settings.name = $scope.settings.displayName;
+      }
+    }
 
     var nameChanged = $scope.appClient.name !== $scope.settings.name;
     var redirectUrisChanged = !angular.equals($scope.appClient.redirectUris, $scope.settings.redirectUris);

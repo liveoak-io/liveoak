@@ -1,13 +1,13 @@
 <div class="panel">
   <div class="panel-heading">
-    <h2 class="panel-title"><a href="#/applications/{{app.id}}/application-clients/{{ client.kcClient.name }}">{{ client.kcClient.name }}</a></h2>
+    <h2 class="panel-title"><span ng-show="!showFQDN && client.kcClient.name.indexOf($parent.$parent.namePrefix) === 0" ng-click="showFQDN = true;">(...)</span><a href="#/applications/{{app.id}}/application-clients/{{ client.kcClient.name }}"><span ng-show="showFQDN">{{$parent.$parent.namePrefix}}</span>{{ client.kcClient.name|clientname:app.id }}</a></h2>
     <div class="pull-right">
       <a href ng-click="$parent.modalClientDelete(client.kcClient.name, client.kcClient.id)"><i class="fa fa-trash-o" tooltip="Delete Client"></i></a>
     </div>
   </div>
   <div class="panel-body">
     <ul class="lo-app-opts">
-      <li><i class="fa fa-rocket" tooltip="Platform"></i>{{client.type}}</li>
+      <li><i class="fa fa-rocket" tooltip="Platform"></i>{{client.type || 'custom'}}</li>
       <li><i class="fa fa-link" tooltip="Redirect URIs"></i><span ng-class="{'text-muted': client.kcClient.redirectUris.length == 0}">{{ client.kcClient.redirectUris.length > 0 && client.kcClient.redirectUris.join(", ") || "No Redirect URIs defined" }}</span></li>
       <li><i class="fa fa-unlock" tooltip="Scope"></i><span ng-hide="client.realmRoles.length > 0" class="text-muted">No Roles specified</span><span ng-repeat="realmRole in client.realmRoles">{{ realmRole.name + ($last ? '' : ', ')}}</span></li>
     </ul>
