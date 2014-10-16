@@ -10,6 +10,8 @@ import io.liveoak.common.DefaultResourceParams;
 import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.container.tenancy.InternalApplicationExtension;
+import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
@@ -38,100 +40,115 @@ public class ErrorsTest {
 
     private LiveOakSystem system;
     private Client client;
-    protected CloseableHttpClient httpClient;
     private InternalApplication application;
+    private InternalApplicationExtension extension;
 
     @Before
-    public void setUpServer() throws Exception {
-        this.system = LiveOakFactory.create();
+    public void setUpSystem() throws Exception {
+        try {
+            this.system = LiveOakFactory.create();
+            this.client = this.system.client();
 
-        ErrorsTestResource root = new ErrorsTestResource("errors");
-        this.system.extensionInstaller().load( "errors", new ErrorsTestExtension(root) );
+            ErrorsTestResource root = new ErrorsTestResource("errors");
+            this.system.extensionInstaller().load( "errors", new ErrorsTestExtension(root) );
 
-        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
-        this.system.awaitStability();
-        this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application");
+            // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
+            this.system.awaitStability();
 
-        this.application.extend( "errors" );
-        this.system.awaitStability();
+            this.system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
+            this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application");
 
-        this.client = this.system.client();
-    }
+            extension = this.application.extend( "errors" );
 
-    @Before
-    public void setUpClient() throws Exception {
-        this.httpClient = HttpClientBuilder.create().build();
+            this.system.awaitStability();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 
     @After
-    public void tearDownClient() throws Exception {
-        this.httpClient.close();
-    }
+    public void tearDownSystem() throws Exception {
+        extension.remove();
+        this.application.configurationFile().delete();
 
-    @After
-    public void tearDownServer() throws Exception {
+        this.system.awaitStability();
         this.system.stop();
-        System.err.flush();
     }
 
     @Test
+    public void allTests() throws Exception {
+        testSetOnPropertySink();
+        testThrownFromProperties();
+        testSetOnResourceSink();
+        testThrownFromMembers();
+        testThrownFromMember();
+        testSetOnMemberResponder();
+        testThrownFromUpdate();
+        testSetOnUpdateResponder();
+        testThrownFromCreate();
+        testSetOnCreateResponder();
+        testThrownFromDelete();
+        testSetOnDeleteResponder();
+    }
+
+    //@Test
     public void testSetOnPropertySink() throws Exception {
         runTests("read-properties");
     }
 
-    @Test
+    //@Test
     public void testThrownFromProperties() throws Exception {
         runTests("properties");
     }
 
-    @Test
+    //@Test
     public void testSetOnResourceSink() throws Exception {
         runTests("read-members");
     }
 
-    @Test
+    //@Test
     public void testThrownFromMembers() throws Exception {
         runTests("members");
     }
 
-    @Test
+    //@Test
     public void testThrownFromMember() throws Exception {
         runTests("member");
     }
 
-    @Test
+    //@Test
     public void testSetOnMemberResponder() throws Exception {
         runTests("member-responder");
     }
 
-    @Test
+    //@Test
     public void testThrownFromUpdate() throws Exception {
         runTests("update");
     }
 
-    @Test
+    //@Test
     public void testSetOnUpdateResponder() throws Exception {
         runTests("update-responder");
     }
 
-    @Test
+    //@Test
     public void testThrownFromCreate() throws Exception {
         runTests("create");
     }
 
-    @Test
+    //@Test
     public void testSetOnCreateResponder() throws Exception {
         runTests("create-responder");
     }
 
-    @Test
+    //@Test
     public void testThrownFromDelete() throws Exception {
-        runTests("create");
+        runTests("delete");
     }
 
-    @Test
+    //@Test
     public void testSetOnDeleteResponder() throws Exception {
-        runTests("create-responder");
+        runTests("delete-responder");
     }
 
     protected void runTests(String where) throws Exception {
