@@ -1,6 +1,7 @@
 package io.liveoak.client;
 
 import java.net.SocketAddress;
+import java.util.concurrent.ExecutorService;
 
 import io.liveoak.client.protocol.LocalResponseHandler;
 import io.netty.bootstrap.Bootstrap;
@@ -14,12 +15,14 @@ import io.netty.channel.nio.NioEventLoopGroup;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class LocalConnection implements Connection {
 
-    public LocalConnection(DefaultClient client) {
+    public LocalConnection(DefaultClient client, ExecutorService executor) {
         this.client = client;
         this.group = new NioEventLoopGroup();
+        this.executor = executor;
     }
 
     @Override
@@ -49,7 +52,7 @@ public class LocalConnection implements Connection {
         return new ChannelInitializer<LocalChannel>() {
             protected void initChannel(LocalChannel ch) throws Exception {
                 //ch.pipeline().addLast(new DebugHandler( "local-client-head" ) );
-                ch.pipeline().addLast(new LocalResponseHandler());
+                ch.pipeline().addLast(new LocalResponseHandler(executor));
             }
         };
     }
@@ -57,4 +60,5 @@ public class LocalConnection implements Connection {
     private DefaultClient client;
     private EventLoopGroup group;
     private Channel channel;
+    private ExecutorService executor;
 }

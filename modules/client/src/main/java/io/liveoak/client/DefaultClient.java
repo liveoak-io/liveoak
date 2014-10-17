@@ -3,6 +3,8 @@ package io.liveoak.client;
 import java.net.SocketAddress;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 import io.liveoak.common.DefaultResourceRequest;
@@ -22,44 +24,44 @@ import io.liveoak.spi.exceptions.UpdateNotSupportedException;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.state.ResourceState;
-import io.netty.channel.local.LocalAddress;
 import org.jboss.logging.Logger;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class DefaultClient implements Client {
 
     public DefaultClient() {
-
-    }
-
-    //@Override
-    public void connect(SocketAddress address) throws Exception {
-        log.debug("connect local client");
-        this.connection = new LocalConnection(this);
-        this.connection.connect(address);
-    }
-
-    //@Override
-    public void close() {
-        this.connection.close();
     }
 
     /**
-     * Creates a new client to be used with synchronous calls.
+     * Connect to local channel.
+     * Utilizes a cached thread pool for processing callbacks
      *
-     * Note: A new client is required for synchronous calls since since
-     * if a synchronous call occurs within an asynchronous one it will block.
-     *
-     * @return A new client for performing synchronous calls
+     * @param address
      * @throws Exception
      */
-    private DefaultClient createSyncClient() throws Exception {
-        DefaultClient syncClient = new DefaultClient();
-        syncClient.connect(new LocalAddress("liveoak"));
+    public void connect(SocketAddress address) throws Exception {
+        connect(address, Executors.newCachedThreadPool());
+    }
 
-        return syncClient;
+    /**
+     * Connect to local channel, while specifying a particular {@link java.util.concurrent.ExecutorService} to use for
+     * handling callbacks.
+     *
+     * @param address
+     * @param executor
+     * @throws Exception
+     */
+    public void connect(SocketAddress address, ExecutorService executor) throws Exception {
+        log.debug("connect local client");
+        this.connection = new LocalConnection(this, executor);
+        this.connection.connect(address);
+    }
+
+    public void close() {
+        this.connection.close();
     }
 
     /**
@@ -94,8 +96,7 @@ public class DefaultClient implements Client {
     public ResourceState create(RequestContext context, String path, ResourceState state) throws Exception {
         CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
-        DefaultClient syncClient = createSyncClient();
-        syncClient.create(context, path, state, (response) -> {
+        create(context, path, state, (response) -> {
             if (response.responseType() == ClientResourceResponse.ResponseType.OK) {
                 future.complete(response.state());
             } else {
@@ -105,7 +106,6 @@ public class DefaultClient implements Client {
 
         try {
             ResourceState resourceState = future.get();
-            syncClient.close();
             return resourceState;
         } catch (ExecutionException e) {
             e.getCause().fillInStackTrace();
@@ -145,8 +145,7 @@ public class DefaultClient implements Client {
     public ResourceState read(RequestContext context, String path) throws Exception {
         CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
-        DefaultClient syncClient = createSyncClient();
-        syncClient.read(context, path, (response) -> {
+        read(context, path, (response) -> {
             if (response.responseType() == ClientResourceResponse.ResponseType.OK) {
                 future.complete(response.state());
             } else {
@@ -156,7 +155,6 @@ public class DefaultClient implements Client {
 
         try {
             ResourceState resourceState = future.get();
-            syncClient.close();
             return resourceState;
         } catch (ExecutionException e) {
             if (e.getCause() != null) {
@@ -211,8 +209,7 @@ public class DefaultClient implements Client {
     public ResourceState update(RequestContext context, String path, ResourceState state) throws Exception {
         CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
-        DefaultClient syncClient = createSyncClient();
-        syncClient.update(context, path, state, (response) -> {
+        update(context, path, state, (response) -> {
             if (response.responseType() == ClientResourceResponse.ResponseType.OK) {
                 future.complete(response.state());
             } else {
@@ -222,7 +219,6 @@ public class DefaultClient implements Client {
 
         try {
             ResourceState resourceState = future.get();
-            syncClient.close();
             return resourceState;
         } catch (ExecutionException e) {
             e.getCause().fillInStackTrace();
@@ -262,8 +258,7 @@ public class DefaultClient implements Client {
     public ResourceState delete(RequestContext context, String path) throws Exception {
         CompletableFuture<ResourceState> future = new CompletableFuture<>();
 
-        DefaultClient syncClient = createSyncClient();
-        syncClient.delete(context, path, (response) -> {
+        delete(context, path, (response) -> {
             if (response.responseType() == ClientResourceResponse.ResponseType.OK) {
                 future.complete(response.state());
             } else {
@@ -273,7 +268,6 @@ public class DefaultClient implements Client {
 
         try {
             ResourceState resourceState = future.get();
-            syncClient.close();
             return resourceState;
         } catch (ExecutionException e) {
             e.getCause().fillInStackTrace();

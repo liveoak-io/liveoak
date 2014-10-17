@@ -195,7 +195,7 @@ public class ClientTest {
         assertThat(response.state().id()).isEqualTo("people");
 
 
-        System.out.println("TEST #7 - Nested Async");
+        System.out.println("TEST #8 - Nested Async");
         RequestContext nestedCtx = new RequestContext.Builder().build();
         CompletableFuture<ResourceState> nestedFuture2 = new CompletableFuture<>();
 

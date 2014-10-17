@@ -3,6 +3,8 @@ package io.liveoak.client.protocol;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 import io.liveoak.client.ClientRequest;
@@ -18,7 +20,8 @@ import io.netty.channel.ChannelPromise;
  */
 public class LocalResponseHandler extends ChannelDuplexHandler {
 
-    public LocalResponseHandler() {
+    public LocalResponseHandler(ExecutorService executor) {
+        this.executor = executor;
     }
 
     @Override
@@ -39,7 +42,7 @@ public class LocalResponseHandler extends ChannelDuplexHandler {
             ResourceRequest inReplyTo = ((ClientResourceResponseImpl) msg).inReplyTo();
             Consumer<ClientResourceResponse> handler = this.handlers.remove(inReplyTo.requestId());
             if (handler != null) {
-                handler.accept((ClientResourceResponse) msg);
+                this.executor.execute(() -> handler.accept((ClientResourceResponse) msg));
             }
         } else {
             super.channelRead(ctx, msg);
@@ -47,4 +50,5 @@ public class LocalResponseHandler extends ChannelDuplexHandler {
     }
 
     private Map<UUID, Consumer<ClientResourceResponse>> handlers = new ConcurrentHashMap<>();
+    private ExecutorService executor;
 }
