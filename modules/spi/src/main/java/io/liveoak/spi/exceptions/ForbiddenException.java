@@ -10,17 +10,17 @@ import io.liveoak.spi.state.ResourceState;
 /**
  * @author Bob McWhirter
  */
-public class NotAuthorizedException extends ResourceException {
+public class ForbiddenException extends ResourceException {
 
-    public NotAuthorizedException(String path) {
-        super(path, "Authentication required for '" + path + "'");
+    public ForbiddenException(String path) {
+        super(path, "Not allowed access to '" + path + "'");
     }
 
-    public NotAuthorizedException(String path, String message) {
+    public ForbiddenException(String path, String message) {
         super(path, message);
     }
 
-    public NotAuthorizedException(String path, ResourceState state) {
+    public ForbiddenException(String path, ResourceState state) {
         super(path, state);
     }
 }

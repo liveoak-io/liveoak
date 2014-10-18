@@ -23,6 +23,7 @@ import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceParams;
+import io.liveoak.spi.exceptions.NotAcceptableException;
 import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.Sorting;
 import io.liveoak.spi.resource.async.Resource;
@@ -104,7 +105,7 @@ public class MongoCollectionResource extends MongoResource {
                 try {
                     queryObject = (DBObject) JSON.parse(queryString);
                 } catch (Exception e) {
-                    throw new ResourceProcessingException("Invalid JSON format for the 'query' parameter", e);
+                    throw new NotAcceptableException(uri().toString(), "Invalid JSON format for the 'query' parameter", e);
                 }
             }
         }
@@ -169,7 +170,7 @@ public class MongoCollectionResource extends MongoResource {
                     DBObject hintObject = (DBObject) JSON.parse(hint);
                     dbCursor.hint(hintObject) ;
                 } catch (Exception e) {
-                    throw new ResourceProcessingException("Invalid JSON format for the 'hint' parameter", e);
+                    throw new NotAcceptableException(uri().toString(), "Invalid JSON format for the 'hint' parameter", e);
                 }
             } else {
                 dbCursor.hint(hint);

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+ */
 package io.liveoak.client;
 
 import java.net.SocketAddress;
@@ -10,6 +15,7 @@ import java.util.function.Consumer;
 import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.spi.exceptions.CreateNotSupportedException;
 import io.liveoak.spi.exceptions.DeleteNotSupportedException;
+import io.liveoak.spi.exceptions.ForbiddenException;
 import io.liveoak.spi.exceptions.NotAcceptableException;
 import io.liveoak.spi.exceptions.NotAuthorizedException;
 import io.liveoak.spi.exceptions.ReadNotSupportedException;
@@ -281,10 +287,13 @@ public class DefaultClient implements Client {
     void handleError(ClientResourceResponse response, CompletableFuture<?> future) {
         switch (response.responseType()) {
             case NOT_AUTHORIZED:
-                future.completeExceptionally(new NotAuthorizedException(response.path()));
+                future.completeExceptionally(new NotAuthorizedException(response.path(), response.state()));
+                break;
+            case FORBIDDEN:
+                future.completeExceptionally(new ForbiddenException(response.path(), response.state()));
                 break;
             case NOT_ACCEPTABLE:
-                future.completeExceptionally(new NotAcceptableException(response.path()));
+                future.completeExceptionally(new NotAcceptableException(response.path(), response.state()));
                 break;
             case NO_SUCH_RESOURCE:
                 future.completeExceptionally(new ResourceNotFoundException(response.path()));
@@ -305,8 +314,10 @@ public class DefaultClient implements Client {
                 future.completeExceptionally(new DeleteNotSupportedException(response.path()));
                 break;
             case INTERNAL_ERROR:
-                future.completeExceptionally(new ResourceException("internal error"));
+                future.completeExceptionally(new ResourceException(response.path(), "Internal error", response.state()));
                 break;
+            default:
+                future.completeExceptionally(new ResourceException(response.path(), "Container error", response.state()));
         }
     }
 

@@ -7,6 +7,7 @@ package io.liveoak.container.traversal;
 
 import io.liveoak.common.DefaultResourceErrorResponse;
 import io.liveoak.common.DefaultResourceResponse;
+import io.liveoak.container.ErrorHandler;
 import io.liveoak.container.protocols.http.HttpRequestBodyHandler;
 import io.liveoak.spi.ResourceErrorResponse;
 import io.liveoak.spi.ResourceRequest;
@@ -101,42 +102,42 @@ public class BaseResponder implements Responder {
 
     @Override
     public void internalError(String message) {
-        log.error(message, new RuntimeException("Stack trace: "));
+        log.warn("[IGNORED] " + message, new RuntimeException("Stack trace: "));
         this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR, message));
         resumeRead();
     }
 
     @Override
     public void internalError(String message, Throwable cause) {
-        log.error(message, cause);
+        log.warn("[IGNORED] " + message, cause);
         this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR, message, cause));
         resumeRead();
     }
 
     @Override
     public void internalError(Throwable cause) {
-        log.error("Internal error: ", cause);
+        log.warn("[IGNORED] Internal error: ", cause);
         this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.INTERNAL_ERROR, cause));
         resumeRead();
     }
 
     @Override
     public void invalidRequest(String message) {
-        log.debug(message, new RuntimeException("Stack trace: "));
+        log.debug("[IGNORED] " + message, new RuntimeException("Stack trace: "));
         this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, message));
         resumeRead();
     }
 
     @Override
     public void invalidRequest(Throwable cause) {
-        log.debug("Invalid request: ", cause);
+        log.debug("[IGNORED] Invalid request: ", cause);
         this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, cause));
         resumeRead();
     }
 
     @Override
     public void invalidRequest(String message, Throwable cause) {
-        log.debug(message, cause);
+        log.debug("[IGNORED] " + message, cause);
         this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, ResourceErrorResponse.ErrorType.NOT_ACCEPTABLE, cause));
         resumeRead();
     }
@@ -159,6 +160,12 @@ public class BaseResponder implements Responder {
     public void error(ResourceErrorResponse.ErrorType errorType, String message, Throwable cause) {
         log.debug("[IGNORED] error(): " + errorType + ", message: " + message + ", cause: ", cause);
         this.ctx.writeAndFlush(new DefaultResourceErrorResponse(this.inReplyTo, errorType, message, cause));
+        resumeRead();
+    }
+
+    @Override
+    public void error(Throwable cause) {
+        ErrorHandler.handleError(this.ctx, this.inReplyTo(), cause);
         resumeRead();
     }
 

@@ -26,7 +26,7 @@ public class LocalResourceResponseEncoder extends ChannelOutboundHandlerAdapter 
             ResourceResponse response = (ResourceResponse) msg;
             if (msg instanceof ResourceErrorResponse) {
                 ClientResourceResponse.ResponseType responseType = decodeResponseType(((ResourceErrorResponse) msg).errorType());
-                ctx.writeAndFlush(new ClientResourceResponseImpl(response.inReplyTo(), responseType, response.inReplyTo().resourcePath().toString(), null));
+                ctx.writeAndFlush(new ClientResourceResponseImpl(response.inReplyTo(), responseType, response.inReplyTo().resourcePath().toString(), ((ResourceErrorResponse) msg).state()));
             } else {
                 encode(ctx, response);
             }
@@ -39,6 +39,8 @@ public class LocalResourceResponseEncoder extends ChannelOutboundHandlerAdapter 
         switch (errorType) {
             case NOT_AUTHORIZED:
                 return ClientResourceResponse.ResponseType.NOT_AUTHORIZED;
+            case FORBIDDEN:
+                return ClientResourceResponse.ResponseType.FORBIDDEN;
             case NOT_ACCEPTABLE:
                 return ClientResourceResponse.ResponseType.NOT_ACCEPTABLE;
             case NO_SUCH_RESOURCE:

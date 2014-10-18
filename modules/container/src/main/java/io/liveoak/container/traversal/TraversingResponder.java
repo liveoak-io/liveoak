@@ -78,14 +78,14 @@ public class TraversingResponder extends BaseResponder {
                     try {
                         step.execute(stepContext, resource);
                     } catch (Throwable t) {
-                        internalError(t);
+                        error(t);
                     }
                 });
             } else {
                 try {
                     step.execute(stepContext, resource);
                 } catch (Throwable t) {
-                    internalError(t);
+                    error(t);
                 }
             }
         };

@@ -16,7 +16,6 @@ import com.mongodb.DBRef;
 import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.exceptions.NotAcceptableException;
 import io.liveoak.spi.exceptions.ResourceException;
 import io.liveoak.spi.exceptions.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceRef;
@@ -190,7 +189,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         try {
             client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/john");
             Fail.fail();
-        } catch (NotAcceptableException e) {
+        } catch (ResourceException e) {
             // expected
         }
 

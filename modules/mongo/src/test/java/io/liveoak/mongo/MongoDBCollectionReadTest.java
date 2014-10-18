@@ -17,6 +17,7 @@ import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Sorting;
 import io.liveoak.spi.exceptions.NotAcceptableException;
+import io.liveoak.spi.exceptions.ResourceException;
 import io.liveoak.spi.exceptions.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
 import org.fest.assertions.Fail;
@@ -338,7 +339,7 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
         try {
             client.read(requestContext, "/testApp/" + BASEPATH + "/testQueryCollection");
             Fail.fail();
-        } catch (NotAcceptableException iee) {
+        } catch (ResourceException iee) {
             // TODO fix me
             //assertThat(iee.message()).isEqualTo("Exception encountered trying to fetch data from the Mongo Database");
 
