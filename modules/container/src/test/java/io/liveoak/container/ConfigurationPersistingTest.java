@@ -36,9 +36,8 @@ import static org.junit.Assert.fail;
  * @author Bob McWhirter
  * @author Ken Finnigan
  */
-public class ConfigurationPersistingTest {
+public class ConfigurationPersistingTest extends AbstractContainerTest {
 
-    private LiveOakSystem system;
     private Client client;
     private InternalApplication application;
 
@@ -55,12 +54,12 @@ public class ConfigurationPersistingTest {
         this.system.extensionInstaller().load("filter", new FilterExtension());
 
         // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
-        this.system.awaitStability();
+        awaitStability();
 
         this.system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
         this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application");
 
-        this.system.awaitStability();
+        awaitStability();
 
         this.mapper = new ObjectMapper();
         mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
@@ -93,7 +92,7 @@ public class ConfigurationPersistingTest {
         initialConfig.put("cheese", "cheddar");
         this.application.extend("mock", "one", initialConfig);
 
-        this.system.awaitStability();
+        awaitStability();
 
         ResourceState configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "one");
         assertThat(configState).isNotNull();
@@ -112,7 +111,7 @@ public class ConfigurationPersistingTest {
         initialConfig = JsonNodeFactory.instance.objectNode();
         initialConfig.put("cheese", "cheddar");
         this.application.extend("mock", "two", initialConfig);
-        this.system.awaitStability();
+        awaitStability();
 
         configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "two");
         assertThat(configState).isNotNull();
@@ -131,6 +130,7 @@ public class ConfigurationPersistingTest {
         configState.putProperty("dog", "moses");
 
         ResourceState result = this.client.update(new RequestContext.Builder().build(), ADMIN_PATH + "two", configState);
+        awaitStability();
 
         assertThat(result).isNotNull();
         assertThat(result.getProperty("cheese")).isNull();
@@ -152,7 +152,7 @@ public class ConfigurationPersistingTest {
         initialConfig = JsonNodeFactory.instance.objectNode();
         initialConfig.put("cheese", "cheddar");
         this.application.extend("mock", "three", initialConfig);
-        this.system.awaitStability();
+        awaitStability();
 
         configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "three");
         assertThat(configState).isNotNull();
@@ -164,6 +164,7 @@ public class ConfigurationPersistingTest {
         assertThat(mockTree.get("type").asText()).isEqualTo("mock");
 
         this.client.delete(new RequestContext.Builder().build(), ADMIN_PATH + "three");
+        awaitStability();
 
         try {
             this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "three");
@@ -186,8 +187,7 @@ public class ConfigurationPersistingTest {
         assertThat(tree.get("resources").get("filter")).isNull();
 
         this.application.extend("filter", ConversionUtils.convert(buildConfig(appDir, randomDir)));
-
-        this.system.awaitStability();
+        awaitStability();
 
         // Check config values to make sure we're receiving the unparsed versions
         configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "filter");
@@ -227,6 +227,7 @@ public class ConfigurationPersistingTest {
         String modifiedDir = randomDir + "/more/";
 
         this.client.update(new RequestContext.Builder().build(), ADMIN_PATH + "filter", buildConfig(appDir, modifiedDir));
+        awaitStability();
 
         // Check config values to make sure we're receiving the unparsed versions
         configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + "filter");

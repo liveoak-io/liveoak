@@ -1,15 +1,16 @@
 package io.liveoak.container.extension;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import io.liveoak.common.util.JsonFilterUtils;
+import io.liveoak.common.util.ObjectsTree;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.resource.DelegatingRootResource;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -45,27 +46,10 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
         // If runtime is not set, we replace the config values
         if (!runtimeRequested) {
             sink.replaceConfig((names, object) -> {
-                if (configValuesWithVariables.containsKey(names[0])) {
-                    ConfigValue configValue = configValuesWithVariables.get(names[0]);
-                    boolean matched = false;
-
-                    // If there's no parents to check, return the value
-                    if (names.length == 1 && configValue.parents().length == 0) {
-                        return configValue.value();
-                    }
-
-                    // Ensure the parent hierarchy has same depth before comparing
-                    if (names.length == configValue.parents().length + 1) {
-                        int index = 1;
-                        for (String parent : configValue.parents()) {
-                            if (names[index++] != parent) {
-                                break;
-                            }
-                        }
-                        matched = true;
-                    }
-
-                    return matched ? configValue.value() : object;
+                ResourcePath path = new ResourcePath(names);
+                List<Object> values = this.configValuesTree.objects(path).collect(Collectors.toList());
+                if (values != null && values.size() == 1) {
+                    return values.get(0);
                 }
                 return object;
             });
@@ -79,6 +63,8 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
     public void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         cleanup(state);
         delegate().initializeProperties(ctx, filter(state), responder);
+
+        this.configValuesTree = new ObjectsTree<>();
         updateConfigEnvVars(state);
     }
 
@@ -86,7 +72,8 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         cleanup(state);
         delegate().updateProperties(ctx, filter(state), new ResourceConfigPersistingResponder(this, state, responder));
-        configValuesWithVariables = new HashMap<>();
+
+        this.configValuesTree = new ObjectsTree<>();
         updateConfigEnvVars(state);
     }
 
@@ -110,55 +97,40 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
         return JsonFilterUtils.filter(state, this.environmentProperties);
     }
 
-    private void updateConfigEnvVars(ResourceState state, String... parents) {
-        state.getPropertyNames().forEach(name -> handleConfigObject(name, state.getProperty(name), parents));
+    private void updateConfigEnvVars(ResourceState state, String... path) {
+        state.getPropertyNames().forEach(name -> handleConfigObject(name, state.getProperty(name), path));
     }
 
-    private void handleConfigObject(String name, Object value, String... parents) {
+    private void handleConfigObject(String name, Object value, String... path) {
         if (value != null) {
             if (value instanceof ResourceState) {
-                updateConfigEnvVars((ResourceState) value, append(name, parents));
+                updateConfigEnvVars((ResourceState) value, append(name, path));
             } else if (value instanceof List) {
-                ((List) value).forEach(obj->handleConfigObject(name, obj, parents));
+                ((List) value).forEach(obj->handleConfigObject(name, obj, path));
             } else {
                 String val = value.toString();
                 int start = val.indexOf("${");
                 int end = val.indexOf("}", start);
                 if (end > start) {
-                    configValuesWithVariables.put(name, new ConfigValue(value, parents));
+                    this.configValuesTree.addObject(value, new ResourcePath(append(name, path)));
                 }
             }
         }
     }
 
-    private String[] append(String newParent, String... parents) {
-        String[] newArray = new String[parents.length + 1];
-        System.arraycopy(parents, 0, newArray, 0, parents.length);
-        newArray[parents.length] = newParent;
+    private String[] append(String first, String... path) {
+        int newLength = path != null ? path.length + 1 : 1;
+        String[] newArray = new String[newLength];
+        newArray[0] = first;
+        if (newLength != 1) {
+            System.arraycopy(path, 0, newArray, 1, newLength - 1);
+        }
         return newArray;
-    }
-
-    private class ConfigValue {
-        private Object configValue;
-        private String[] parents;
-
-        ConfigValue(Object configValue, String... parents) {
-            this.configValue = configValue;
-            this.parents = parents;
-        }
-
-        public Object value() {
-            return this.configValue;
-        }
-
-        public String[] parents() {
-            return this.parents;
-        }
     }
 
     private final InternalApplicationExtension extension;
     private final ApplicationConfigurationManager configManager;
     private Properties environmentProperties;
-    private Map<String, ConfigValue> configValuesWithVariables = new HashMap<>();
+    private ObjectsTree<Object> configValuesTree;
 
 }
