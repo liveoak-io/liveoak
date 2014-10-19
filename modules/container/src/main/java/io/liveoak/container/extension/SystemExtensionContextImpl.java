@@ -48,7 +48,7 @@ public class SystemExtensionContextImpl implements SystemExtensionContext {
 
         InitializeResourceService configApply = new InitializeResourceService();
         target.addService(privateName.append("apply-config"), configApply)
-                .addDependency(privateName, Resource.class, configApply.resourceInjector())
+                .addDependency(privateName, RootResource.class, configApply.resourceInjector())
                 .addInjection(configApply.configurationInjector(), this.configuration)
                 .install();
 
@@ -77,7 +77,7 @@ public class SystemExtensionContextImpl implements SystemExtensionContext {
 
         InitializeResourceService configApply = new InitializeResourceService();
         target.addService(privateName.append("apply-config"), configApply)
-                .addDependency(privateName, Resource.class, configApply.resourceInjector())
+                .addDependency(privateName, RootResource.class, configApply.resourceInjector())
                 .addInjection(configApply.configurationInjector(), this.configuration)
                 .install();
 

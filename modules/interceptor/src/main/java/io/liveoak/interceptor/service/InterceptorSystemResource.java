@@ -59,12 +59,6 @@ public class InterceptorSystemResource implements RootResource, SynchronousResou
     }
 
     @Override
-    public void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        this.interceptorManager.setInterceptorsConfig(state);
-        responder.resourceUpdated(this);
-    }
-
-    @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         this.interceptorManager.setInterceptorsConfig(state);
         responder.resourceUpdated(this);

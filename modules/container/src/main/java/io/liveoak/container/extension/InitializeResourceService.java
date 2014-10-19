@@ -3,6 +3,7 @@ package io.liveoak.container.extension;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -56,12 +57,12 @@ public class InitializeResourceService implements Service<Void> {
         return this.configurationInjector;
     }
 
-    public Injector<Resource> resourceInjector() {
+    public Injector<RootResource> resourceInjector() {
         return this.resourceInjector;
     }
 
     private InjectedValue<ObjectNode> configurationInjector = new InjectedValue<>();
-    private InjectedValue<Resource> resourceInjector = new InjectedValue<>();
+    private InjectedValue<RootResource> resourceInjector = new InjectedValue<>();
     private Consumer<Exception> exceptionConsumer;
 
 }

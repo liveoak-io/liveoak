@@ -132,16 +132,6 @@ public interface Resource {
     }
 
     /**
-     * Initialize this object's state. Only called on container startup.
-     *
-     * @param state     The inbound representation of the state.
-     * @param responder To respond to the action.
-     */
-    default void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        updateProperties(ctx, state, responder);
-    }
-
-    /**
      * Create a new child resource of this collection.
      *
      * If we assume this resource's uri is /app/service then this method is invoked if

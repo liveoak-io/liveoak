@@ -37,10 +37,6 @@ public interface SynchronousResource extends Resource {
         return null;
     }
 
-    default void initProperties(ResourceState props) throws Exception {
-        properties(props);
-    }
-
     default void properties(ResourceState props) throws Exception {
         // nothing
     }
@@ -83,12 +79,6 @@ public interface SynchronousResource extends Resource {
         }
 
         sink.complete();
-    }
-
-    @Override
-    default void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        initProperties(state);
-        responder.resourceUpdated(this);
     }
 
     @Override

@@ -31,11 +31,6 @@ public class MongoConfig extends EmbeddedConfigResource {
     }
 
     @Override
-    public void initializeProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        generateDataStore(state, true);
-    }
-
-    @Override
     public void properties(ResourceState configState) throws Exception {
         generateDataStore(configState, false);
     }
