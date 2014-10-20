@@ -12,7 +12,9 @@ import com.mongodb.ServerAddress;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
+import io.liveoak.spi.resource.async.DelegatingResponder;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
 /**
@@ -123,5 +125,23 @@ public class MongoDatastoreResource implements RootResource, SynchronousResource
     @Override
     public String id() {
         return id;
+    }
+
+    @Override
+    public void delete(RequestContext ctx, Responder responder) throws Exception {
+        parent.deleteMember(ctx, this.id(), new deleteDelegatingResponse(responder));
+    }
+
+    private class deleteDelegatingResponse extends DelegatingResponder {
+
+        public deleteDelegatingResponse(Responder delegate) {
+            super(delegate);
+        }
+
+        @Override
+        public void resourceDeleted(Resource resource) {
+            super.resourceDeleted(resource);
+            mongoClient.close();
+        }
     }
 }

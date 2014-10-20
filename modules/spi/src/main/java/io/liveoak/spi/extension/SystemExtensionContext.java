@@ -10,6 +10,7 @@ import org.jboss.msc.service.ServiceTarget;
 public interface SystemExtensionContext {
 
     String id();
+    String moduleId();
     ServiceTarget target();
     void mountPrivate(ServiceName adminResourceName);
     void mountPrivate(RootResource resource);

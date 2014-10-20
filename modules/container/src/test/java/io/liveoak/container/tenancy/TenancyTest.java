@@ -1,5 +1,8 @@
 package io.liveoak.container.tenancy;
 
+import java.io.File;
+import java.util.Collection;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultMountPointResource;
 import io.liveoak.container.extension.ExtensionInstaller;
@@ -17,20 +20,25 @@ import io.liveoak.spi.Services;
 import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
-import org.fest.assertions.Assertions;
-import org.jboss.msc.service.*;
+import org.jboss.msc.service.ServiceContainer;
+import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceController.State;
+import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.util.Collection;
-
-import static io.liveoak.spi.Services.*;
+import static io.liveoak.spi.Services.APPLICATIONS_DEPLOYER;
+import static io.liveoak.spi.Services.APPLICATIONS_DIR;
+import static io.liveoak.spi.Services.APPLICATION_REGISTRY;
+import static io.liveoak.spi.Services.GLOBAL_CONTEXT;
+import static io.liveoak.spi.Services.application;
+import static io.liveoak.spi.Services.applicationAdminResource;
+import static io.liveoak.spi.Services.applicationContext;
+import static io.liveoak.spi.Services.defaultMount;
+import static io.liveoak.spi.Services.resource;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
@@ -201,7 +209,7 @@ public class TenancyTest {
 
         Collection<? extends Resource> appResources = appContext.getValue().members(ctx);
         assertThat(appResources).isNotNull();
-        assertThat(appResources).hasSize(3); //system, system-instances, applicationsco
+        assertThat(appResources).hasSize(2); //system, applications
 
         ApplicationResource zeroApp = (ApplicationResource) appsAdminResource.member(ctx, ZeroExtension.APPLICATION_ID);
         assertThat(zeroApp).isNotNull();

@@ -135,7 +135,7 @@ public class ScheduledScriptResource extends ScriptResource {
     }
 
     @Override
-    protected void deleteMember(RequestContext ctx, String id, Responder responder) {
+    public void deleteMember(RequestContext ctx, String id, Responder responder) {
         if (id == ScriptFileResource.ID && script.getScriptBuffer() != null) {
             Resource resource = new ScriptFileResource(this);
             this.script.setScriptBuffer(null);

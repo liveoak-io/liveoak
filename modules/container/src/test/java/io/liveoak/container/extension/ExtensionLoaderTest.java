@@ -1,10 +1,13 @@
 package io.liveoak.container.extension;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.common.DefaultMountPointResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Services;
+import io.liveoak.spi.resource.MountPointResource;
+import io.liveoak.spi.resource.SynchronousResource;
+import io.liveoak.spi.resource.async.Resource;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
@@ -27,10 +30,10 @@ public class ExtensionLoaderTest {
     @Before
     public void setUpServiceContainer() {
         this.serviceContainer = ServiceContainer.Factory.create();
-        this.systemAdminMount = new DefaultMountPointResource("admin" );
-        this.serviceContainer.addService( Services.resource(ZeroExtension.APPLICATION_ID, "system"), new ValueService<MountPointResource>( new ImmediateValue<>( this.systemAdminMount )))
+        this.systemAdminMount = new DefaultMountPointResource("admin");
+        this.serviceContainer.addService(Services.resource(ZeroExtension.APPLICATION_ID, "system"), new ValueService<MountPointResource>(new ImmediateValue<>(this.systemAdminMount)))
                 .install();
-        this.serviceContainer.addService( Services.SERVICE_CONTAINER, new ValueService<ServiceContainer>( new ImmediateValue<>( this.serviceContainer ) ) )
+        this.serviceContainer.addService(Services.SERVICE_CONTAINER, new ValueService<ServiceContainer>(new ImmediateValue<>(this.serviceContainer)))
                 .install();
     }
 
@@ -41,19 +44,21 @@ public class ExtensionLoaderTest {
 
     @Test
     public void testLoadExtensionByInstance() throws Exception {
-        ExtensionInstaller loader = new ExtensionInstaller( this.serviceContainer, ServiceName.of( "admin-mount" ) );
-        loader.load( "mock", new MockExtension(), JsonNodeFactory.instance.objectNode() );
+        ExtensionInstaller loader = new ExtensionInstaller(this.serviceContainer, ServiceName.of("admin-mount"));
+        loader.load("mock", new MockExtension(), JsonNodeFactory.instance.objectNode());
 
         this.serviceContainer.awaitStability();
 
-        ServiceController<?> adminResource = this.serviceContainer.getService(MockExtension.adminResource( "mock" ) );
+        ServiceController<?> adminResource = this.serviceContainer.getService(MockExtension.adminResource("module"));
 
-        assertThat( adminResource ).isNotNull();
-        assertThat( adminResource.getValue() ).isNotNull();
-        assertThat( adminResource.getValue() ).isInstanceOf( MockAdminResource.class );
-        assertThat( ((MockAdminResource)adminResource.getValue()).flavor() ).isEqualTo( "system" );
+        assertThat(adminResource).isNotNull();
+        assertThat(adminResource.getValue()).isNotNull();
+        assertThat(adminResource.getValue()).isInstanceOf(MockAdminResource.class);
+        assertThat(((MockAdminResource) adminResource.getValue()).flavor()).isEqualTo("system");
 
-        assertThat( this.systemAdminMount.member(new RequestContext.Builder().build(), "mock" ) ).isSameAs( adminResource.getValue() );
+        Resource adminMountResource = this.systemAdminMount.member(new RequestContext.Builder().build(), "mock");
+
+        assertThat(((SynchronousResource) adminMountResource).member(new RequestContext.Builder().build(), "module")).isSameAs(adminResource.getValue());
     }
 }
 

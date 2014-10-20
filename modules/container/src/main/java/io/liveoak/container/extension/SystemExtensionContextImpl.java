@@ -17,9 +17,10 @@ import org.jboss.msc.value.ImmediateValue;
  */
 public class SystemExtensionContextImpl implements SystemExtensionContext {
 
-    public SystemExtensionContextImpl(ServiceTarget target, String id, ServiceName systemExtensionMount, ObjectNode configuration) {
+    public SystemExtensionContextImpl(ServiceTarget target, String moduleId, String id, ServiceName systemExtensionMount, ObjectNode configuration) {
         this.target = target;
         this.id = id;
+        this.moduleId = moduleId;
         this.systemExtensionMount = systemExtensionMount;
         this.configuration = configuration;
     }
@@ -30,16 +31,21 @@ public class SystemExtensionContextImpl implements SystemExtensionContext {
     }
 
     @Override
+    public String moduleId() {
+        return this.moduleId;
+    }
+
+    @Override
     public ServiceTarget target() {
         return this.target;
     }
 
     @Override
     public void mountPrivate(RootResource resource) {
-        target.addService(Services.systemResource(this.id), new ValueService<RootResource>(new ImmediateValue<>(resource)))
+        target.addService(Services.systemResource(moduleId, this.id), new ValueService<RootResource>(new ImmediateValue<>(resource)))
                 .install();
 
-        mountPrivate(Services.systemResource(this.id));
+        mountPrivate(Services.systemResource(moduleId, this.id));
     }
 
     @Override
@@ -95,6 +101,7 @@ public class SystemExtensionContextImpl implements SystemExtensionContext {
     }
 
     private ServiceTarget target;
+    private String moduleId;
     private String id;
     private ServiceName systemExtensionMount;
     private ObjectNode configuration;
