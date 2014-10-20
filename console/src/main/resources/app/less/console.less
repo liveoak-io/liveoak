@@ -477,7 +477,8 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
         color: @c_green;
       }
       
-      + .label {
+      + .label,
+      + a {
         margin-left: 15px;
       }
       
@@ -619,8 +620,23 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
 }
 
 .panel-missing {
-  .panel-heading, .panel-body {
-    background-color : #888888;
+  background-color: #fff;
+  background-image: url("https://dl.dropboxusercontent.com/u/2730435/panel-disabled-bg.png");
+  background-repeat: repeat;
+  background-position: left top;
+  border: 3px solid #fff;
+  border-left: 3px solid #eb7720;
+  
+  .panel-heading {
+    background-color: transparent;
+    
+    + a {
+      color: @c_green;
+    }
+  }
+  
+  .panel-body .lo-app-opts li {
+    color: #aaa;
   }
 }
 
