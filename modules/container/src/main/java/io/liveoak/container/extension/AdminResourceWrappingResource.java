@@ -44,7 +44,7 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
         boolean runtimeRequested = runtimeValuePresent ? Boolean.parseBoolean(ctx.resourceParams().value("runtime")) : ctx.resourceParams().names().contains("runtime");
 
         // If runtime is not set, we replace the config values
-        if (!runtimeRequested) {
+        if (!runtimeRequested && this.configValuesTree != null) {
             sink.replaceConfig((names, object) -> {
                 ResourcePath path = new ResourcePath(names);
                 List<Object> values = this.configValuesTree.objects(path).collect(Collectors.toList());

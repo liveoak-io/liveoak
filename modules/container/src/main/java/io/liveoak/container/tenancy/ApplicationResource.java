@@ -7,6 +7,8 @@ import java.util.Map;
 
 import io.liveoak.container.zero.ApplicationExtensionsResource;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.client.Client;
+import io.liveoak.spi.exceptions.PropertyException;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -18,10 +20,11 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class ApplicationResource implements RootResource, SynchronousResource {
 
-    public ApplicationResource(InternalApplication app, ApplicationConfigurationManager configManager, InternalApplicationRegistry appRegistry) {
+    public ApplicationResource(InternalApplication app, ApplicationConfigurationManager configManager, InternalApplicationRegistry appRegistry, Client client) {
         this.app = app;
         this.configManager = configManager;
         this.appRegistry = appRegistry;
+        this.client = client;
         this.extensions = new ApplicationExtensionsResource(this, "resources");
     }
 
@@ -67,6 +70,7 @@ public class ApplicationResource implements RootResource, SynchronousResource {
         result.put("name", this.app.name());
         result.put("html-app", this.app.htmlApplicationResourcePath());
         result.put("visible", this.app.visible());
+        result.put("version-resource-id", this.app.versionResourceId());
         result.put("directory", this.app.directory().getAbsolutePath());
         return result;
     }
@@ -88,7 +92,28 @@ public class ApplicationResource implements RootResource, SynchronousResource {
             this.app.setHtmlApplicationPath(htmlPath);
         }
 
+        String versionResourceId = (String) state.getProperty("version-resource-id");
+        if (versionResourceId != null) {
+            boolean resourceFound = false;
+            for (Resource resource : this.extensions.members(ctx)) {
+                if (resource.id().equals(versionResourceId)) {
+                    resourceFound = true;
+                    break;
+                }
+            }
+            if (!resourceFound) {
+                throw new PropertyException("No versioning resource found with id: " + versionResourceId);
+            }
+            this.app.setVersionResourceId(versionResourceId);
+        }
+
         this.configManager.updateApplication(this.app);
+
+        Boolean partOfGitInstallProcess = (Boolean) state.getProperty("git-install-process");
+        if (this.app.versioned() && partOfGitInstallProcess == null || !partOfGitInstallProcess) {
+            // Commit configuration changes
+            //TODO
+        }
 
         responder.resourceUpdated(this);
     }
@@ -104,4 +129,5 @@ public class ApplicationResource implements RootResource, SynchronousResource {
     private final ApplicationExtensionsResource extensions;
     private ApplicationConfigurationManager configManager;
     private InternalApplicationRegistry appRegistry;
+    private Client client;
 }

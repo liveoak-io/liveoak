@@ -64,14 +64,13 @@ public class LocalApplicationsResource implements RootResource, SynchronousResou
         String id = state.id();
         File installDir = new File(this.applicationsDirectory, id);
         final String copyFromPath = localPath;
-        GitHelper.initRepo(installDir);
+        final Git gitRepo = GitHelper.initRepo(installDir);
 
         this.vertx.fileSystem().copy(localDir.getAbsolutePath(), installDir.getAbsolutePath(), true, event -> {
             if (event.succeeded()) {
                 try {
                     InternalApplication app = this.applicationRegistry.createApplication(id, (String) state.getProperty("name"), installDir, d -> {
                         try {
-                            Git gitRepo = Git.open(installDir);
                             GitHelper.addAllAndCommit(gitRepo, ctx.securityContext().getUser(), "Import LiveOak application from: " + copyFromPath);
                         } catch (Exception e) {
                             throw new RuntimeException(e);

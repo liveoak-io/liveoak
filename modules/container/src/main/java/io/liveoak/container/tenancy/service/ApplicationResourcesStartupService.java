@@ -52,9 +52,7 @@ public class ApplicationResourcesStartupService implements Service<Void> {
                         this.applicationInjector.getValue().extend(resourceId, resourceState, true);
                     }
                     createGitCommitService(context, dependencies);
-
                     context.complete();
-
                 } catch (Throwable e) {
                     context.failed(new StartException(e));
                 }

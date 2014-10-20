@@ -15,6 +15,7 @@
         <module name="io.netty" slot="liveoak"/>
         <module name="io.vertx" services="import"/>
         <module name="com.fasterxml.jackson.core"/>
+        <module name="io.liveoak.git"/>
         <module name="io.liveoak.stomp"/>
         <module name="io.liveoak.spi"/>
         <module name="io.liveoak.common"/>

@@ -3,6 +3,7 @@ package io.liveoak.git.service;
 import java.io.File;
 
 import io.liveoak.git.GitRootResource;
+import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -11,7 +12,7 @@ import org.jboss.msc.service.StopContext;
 /**
  * @author Ken Finnigan
  */
-public class GitRootResourceService implements Service<GitRootResource> {
+public class GitRootResourceService implements Service<RootResource> {
     public GitRootResourceService(String id, File applicationDir) {
         this.id = id;
         this.applicationDir = applicationDir;
@@ -28,11 +29,11 @@ public class GitRootResourceService implements Service<GitRootResource> {
     }
 
     @Override
-    public GitRootResource getValue() throws IllegalStateException, IllegalArgumentException {
+    public RootResource getValue() throws IllegalStateException, IllegalArgumentException {
         return gitRoot;
     }
 
-    private GitRootResource gitRoot;
+    private RootResource gitRoot;
     private String id;
     private File applicationDir;
 }

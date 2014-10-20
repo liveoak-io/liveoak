@@ -4,6 +4,7 @@ import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
+import io.liveoak.spi.client.Client;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
@@ -27,7 +28,7 @@ public class ApplicationResourceService implements Service<ApplicationResource> 
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.resource = new ApplicationResource(this.app, this.configManager.getValue(), this.applicationRegistry.getValue());
+        this.resource = new ApplicationResource(this.app, this.configManager.getValue(), this.applicationRegistry.getValue(), this.client.getValue());
 
         ServiceTarget target = context.getChildTarget();
         ServiceName name = context.getController().getName();
@@ -54,8 +55,13 @@ public class ApplicationResourceService implements Service<ApplicationResource> 
         return this.applicationRegistry;
     }
 
+    public Injector<Client> clientInjector() {
+        return this.client;
+    }
+
     private final InternalApplication app;
     private ApplicationResource resource;
     private InjectedValue<ApplicationConfigurationManager> configManager = new InjectedValue<>();
     private InjectedValue<InternalApplicationRegistry> applicationRegistry = new InjectedValue<>();
+    private InjectedValue<Client> client = new InjectedValue<>();
 }

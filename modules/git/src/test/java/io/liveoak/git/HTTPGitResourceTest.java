@@ -19,8 +19,8 @@ import static io.liveoak.testtools.assertions.Assertions.assertThat;
 public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
     private static final String ADMIN_ROOT = "/admin/applications/";
     private static final String GIT_ADMIN_RESOURCE_PATH = "/resources/git";
-    private static final String TESTAPP_GIT_ADMIN_ROOT = ADMIN_ROOT + "testApp" + GIT_ADMIN_RESOURCE_PATH;
-    private static final String TESTAPP_GIT_PUBLIC_ROOT = "/testApp/git";
+    private static final String GIT_ADMIN_ROOT = ADMIN_ROOT + "newApp" + GIT_ADMIN_RESOURCE_PATH;
+    private static final String GIT_PUBLIC_ROOT = "/newApp/git";
 
     @Override
     public void loadExtensions() throws Exception {
@@ -29,20 +29,27 @@ public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
 
     @Test
     public void rootResource() throws Exception {
-        // Test #1 -  Git Repo already exists
-        File alreadyGitDir = new File(this.application.directory(), ".git");
+        // Test #1 -  Git Repo present after install
 
-        // Verify git dir exists
-        assertThat(alreadyGitDir.exists()).isTrue();
-        assertThat(new File(alreadyGitDir, ".git").exists()).isFalse();
+        File appDir = new File(this.application.directory().getParentFile(), "newApp");
+        File appGitDir = new File(appDir, ".git");
 
-        // Verify git resource is installed
-        assertThat(execGet(TESTAPP_GIT_ADMIN_ROOT)).hasStatus(200);
-        assertThat(execGet(TESTAPP_GIT_PUBLIC_ROOT)).hasStatus(404).hasNoSuchResource();
+        // Verify app and git dir do not exist
+        assertThat(appDir.exists()).isFalse();
+        assertThat(appGitDir.exists()).isFalse();
 
-        // Verify git dir still exists, and we didn't create it too low in folder hierarchy
-        assertThat(alreadyGitDir.exists()).isTrue();
-        assertThat(new File(alreadyGitDir, ".git").exists()).isFalse();
+        // Create new app
+        assertThat(execPost(ADMIN_ROOT, "{ \"id\": \"newApp\" }")).hasStatus(201);
+        this.system.awaitStability();
+
+        // Verify app and git dirs exist
+        assertThat(appDir.exists()).isTrue();
+        assertThat(appGitDir.exists()).isTrue();
+        assertThat(new File(appGitDir, ".git").exists()).isFalse();
+
+        // Verify REST endpoints
+        assertThat(execGet(GIT_ADMIN_ROOT)).hasStatus(200);
+        assertThat(execGet(GIT_PUBLIC_ROOT)).hasStatus(404).hasNoSuchResource();
 
     }
 

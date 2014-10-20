@@ -5,6 +5,7 @@ import io.liveoak.common.DefaultMountPointResource;
 import io.liveoak.container.extension.ExtensionInstaller;
 import io.liveoak.container.extension.ExtensionService;
 import io.liveoak.container.extension.MountService;
+import io.liveoak.container.service.ClientService;
 import io.liveoak.container.tenancy.service.ApplicationsDeployerService;
 import io.liveoak.container.tenancy.service.ApplicationsDirectoryService;
 import io.liveoak.container.zero.ApplicationExtensionsResource;
@@ -51,6 +52,8 @@ public class TenancyTest {
 
         ExtensionInstaller installer = new ExtensionInstaller(this.serviceContainer.subTarget(), Services.resource(ZeroExtension.APPLICATION_ID, "system"));
         installer.load("application-clients", new ApplicationClientsExtension());
+
+        this.serviceContainer.addService(Services.CLIENT, new ClientService()).install();
 
         this.serviceContainer.awaitStability();
     }

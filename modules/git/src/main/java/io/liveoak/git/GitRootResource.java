@@ -6,7 +6,6 @@ import java.util.Map;
 
 import io.liveoak.common.DefaultMountPointResource;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
@@ -72,6 +71,6 @@ public class GitRootResource extends DefaultMountPointResource {
     }
 
     private File appDir;
-    private Boolean create;
+    private Boolean create = Boolean.TRUE;
     private Git git;
 }

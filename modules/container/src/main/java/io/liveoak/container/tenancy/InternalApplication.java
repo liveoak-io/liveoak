@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.container.tenancy.service.ApplicationExtensionService;
 import io.liveoak.spi.Application;
-import io.liveoak.spi.Services;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
@@ -24,13 +24,14 @@ import org.jboss.msc.service.StabilityMonitor;
  */
 public class InternalApplication implements Application {
 
-    public InternalApplication(ServiceTarget target, String id, String name, File directory, ResourcePath htmlAppPath, Boolean visible) {
+    public InternalApplication(ServiceTarget target, String id, String name, File directory, ResourcePath htmlAppPath, Boolean visible, String versionResourceId) {
         this.target = target;
         this.id = id;
         this.name = name;
         this.directory = directory;
         this.htmlAppPath = htmlAppPath;
         this.visible = visible;
+        this.versionResourceId = versionResourceId;
     }
 
     @Override
@@ -59,6 +60,19 @@ public class InternalApplication implements Application {
 
     public void setVisible(Boolean visible) {
         this.visible = visible;
+    }
+
+    @Override
+    public Boolean versioned() {
+        return this.versionResourceId != null && this.versionResourceId.length() > 0;
+    }
+
+    public String versionResourceId() {
+        return this.versionResourceId;
+    }
+
+    public void setVersionResourceId(String versionResourceId) {
+        this.versionResourceId = versionResourceId;
     }
 
     public File configurationFile() {
@@ -160,6 +174,7 @@ public class InternalApplication implements Application {
     private File directory;
     private ResourcePath htmlAppPath;
     private Boolean visible;
+    private String versionResourceId;
 
     private static final Logger log = Logger.getLogger(InternalApplication.class);
 }

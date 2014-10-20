@@ -20,15 +20,18 @@ import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.container.zero.service.ApplicationClientsInstallService;
+import io.liveoak.container.zero.service.GitResourceInstallService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.Services;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StartContext;
@@ -75,6 +78,7 @@ public class ApplicationService implements Service<InternalApplication> {
 
         String appName = this.name;
         Boolean appVisible = Boolean.TRUE;
+        String versionResourceId = null;
         ResourcePath htmlApp = null;
         ResourceState resourcesTree = null;
 
@@ -92,6 +96,9 @@ public class ApplicationService implements Service<InternalApplication> {
                 }
                 if ((value = state.getProperty("visible")) != null) {
                     appVisible = (Boolean) value;
+                }
+                if ((value = state.getProperty("version-resource-id")) != null) {
+                    versionResourceId = (String) value;
                 }
                 if ((value = state.getProperty(LiveOak.RESOURCES)) != null) {
                     resourcesTree = (ResourceState) value;
@@ -114,7 +121,7 @@ public class ApplicationService implements Service<InternalApplication> {
             }
         }
 
-        this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp, appVisible);
+        this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp, appVisible, versionResourceId);
 
         ServiceName configManagerName = Services.applicationConfigurationManager(this.id);
         ApplicationConfigurationService configManager = new ApplicationConfigurationService(applicationJson);
@@ -127,16 +134,29 @@ public class ApplicationService implements Service<InternalApplication> {
         ServiceName appContextName = Services.applicationContext(this.id);
 
         // Configure application-clients resource if it's not present
+        boolean appClientInstalled = false;
         if (resourcesTree == null || !resourcesTree.getPropertyNames().contains(LiveOak.APPLICATION_CLIENTS_RESOURCE_TYPE)) {
             ApplicationClientsInstallService appClientInstaller = new ApplicationClientsInstallService();
-            target.addService(appContextName.append("app-client-install"), appClientInstaller)
+            target.addService(Services.application(this.app.id()).append("app-client-install"), appClientInstaller)
                     .addDependency(configManagerName)
                     .addInjectionValue(appClientInstaller.applicationInjector(), this)
                     .install();
+            appClientInstalled = true;
+        }
+
+        // Configure git resource if it's not present and git extension is installed
+        boolean gitInstalled = false;
+        if (!this.app.versioned() && null != context.getController().getServiceContainer().getService(Services.extension("git"))) {
+            GitResourceInstallService gitInstaller = new GitResourceInstallService();
+            target.addService(Services.application(this.app.id()).append("git-install"), gitInstaller)
+                    .addDependency(configManagerName)
+                    .addInjectionValue(gitInstaller.applicationInjector(), this)
+                    .addDependency(Services.CLIENT, Client.class, gitInstaller.clientInjector())
+                    .install();
+            gitInstalled = true;
         }
 
         // context resource
-
         ApplicationContextService appContext = new ApplicationContextService(this.app);
         target.addService(appContextName, appContext)
                 .install();
@@ -147,12 +167,12 @@ public class ApplicationService implements Service<InternalApplication> {
                 .install());
 
         // admin resource
-
         ServiceName appResourceName = Services.applicationAdminResource(this.id);
         ApplicationResourceService appResource = new ApplicationResourceService(this.app);
         target.addService(appResourceName, appResource)
                 .addDependency(configManagerName, ApplicationConfigurationManager.class, appResource.configInjector())
                 .addDependency(Services.APPLICATION_REGISTRY, InternalApplicationRegistry.class, appResource.registryInjector())
+                .addDependency(Services.CLIENT, Client.class, appResource.clientInjector())
                 .install();
         MediaTypeMountService<ApplicationResource> appResourceMount = new MediaTypeMountService<>(null, MediaType.JSON, true);
         this.app.resourceController(target.addService(Services.defaultMount(appResourceName), appResourceMount)
@@ -163,9 +183,16 @@ public class ApplicationService implements Service<InternalApplication> {
         // Startup all resources defined for the application
         ApplicationResourcesStartupService resources = new ApplicationResourcesStartupService(resourcesTree, this.gitCommit, this.app.directory());
 
-        target.addService(Services.application(this.id).append("resources"), resources)
-                .addInjectionValue(resources.applicationInjector(), this)
-                .install();
+        ServiceBuilder<Void> resourceStartup = target.addService(Services.application(this.id).append("resources"), resources)
+                .addInjectionValue(resources.applicationInjector(), this);
+
+        if (appClientInstalled) {
+            resourceStartup.addDependency(Services.application(this.app.id()).append("app-client-install"));
+        }
+        if (gitInstalled) {
+            resourceStartup.addDependency(Services.application(this.app.id()).append("git-install"));
+        }
+        resourceStartup.install();
     }
 
     private Properties envProperties() {
