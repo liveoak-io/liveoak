@@ -21,11 +21,11 @@ public class InterceptorExtension implements Extension {
 
         InterceptorSystemResourceService interceptorSystemResourceService = new InterceptorSystemResourceService(context.id());
 
-        target.addService(Services.systemResource(context.id()), interceptorSystemResourceService)
+        target.addService(Services.systemResource(context.moduleId(), context.id()), interceptorSystemResourceService)
                 .addDependency(Services.INTERCEPTOR_MANAGER, InterceptorManager.class, interceptorSystemResourceService.interceptorManagerInjector())
                 .install();
 
-        context.mountPrivate(Services.systemResource(context.id()));
+        context.mountPrivate(Services.systemResource(context.moduleId(), context.id()));
 
         InterceptorRegistrationHelper.installInterceptor(target, "timing-http", new TimingInterceptor("HTTP"));
         InterceptorRegistrationHelper.installInterceptor(target, "timing-local", new TimingInterceptor("Local"));

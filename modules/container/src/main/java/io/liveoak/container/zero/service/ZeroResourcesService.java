@@ -2,7 +2,6 @@ package io.liveoak.container.zero.service;
 
 import java.io.File;
 
-import io.liveoak.common.DefaultMountPointResource;
 import io.liveoak.container.extension.MediaTypeMountService;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.InternalApplication;
@@ -47,16 +46,6 @@ public class ZeroResourcesService implements Service<Void> {
         target.addService(systemName.append("mount"), mount)
                 .addDependency(Services.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, mount.mountPointInjector())
                 .addDependency(systemName, RootResource.class, mount.resourceInjector())
-                .install();
-
-        ServiceName instanceName = Services.resource(ZeroExtension.APPLICATION_ID, "system-instances");
-        target.addService(instanceName, new ValueService<DefaultMountPointResource>(new ImmediateValue<>(new DefaultMountPointResource("system-instances"))))
-                .install();
-
-        MountService<RootResource> instanceMount = new MountService<>();
-        target.addService(instanceName.append("mount"), instanceMount)
-                .addDependency(Services.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, instanceMount.mountPointInjector())
-                .addDependency(instanceName, RootResource.class, instanceMount.resourceInjector())
                 .install();
 
         ServiceName applicationsName = Services.resource(ZeroExtension.APPLICATION_ID, "applications");

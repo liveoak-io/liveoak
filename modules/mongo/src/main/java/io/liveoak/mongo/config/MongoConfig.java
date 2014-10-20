@@ -24,10 +24,10 @@ public class MongoConfig extends EmbeddedConfigResource {
 
     private MongoDatastoresRegistry mongoDatastoresResource;
 
-    public MongoConfig(Resource parent, MongoDatastoresRegistry mongoSystemConfigResource, ResourceState resourceState) throws Exception {
+    public MongoConfig(Resource parent, MongoDatastoresRegistry mongoSystemConfigResource, ResourceState resourceState, boolean init) throws Exception {
         super(parent);
         this.mongoDatastoresResource = mongoSystemConfigResource;
-        generateDataStore(resourceState, true);
+        generateDataStore(resourceState, init);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class MongoConfig extends EmbeddedConfigResource {
 
         this.databaseName = database;
 
-        if (resourceState.getPropertyNames().contains(DATASTORE) && resourceState.getProperty(DATASTORE) == null) {
+        if (resourceState.getPropertyNames().contains(DATASTORE) && (datastore == null || datastore.isEmpty() )) {
             throw new PropertyException("A datastore cannot accept a null value.");
         }
 

@@ -15,8 +15,8 @@ public abstract class BaseMongoConfigTest extends AbstractResourceTestCase {
 
     static String BASEPATH = "storage";
     static final String ADMIN_PATH = "/" + ZeroExtension.APPLICATION_ID + "/applications/testApp/resources/" + BASEPATH;
-    static final String SYSTEM_CONFIG_PATH = "/" + ZeroExtension.APPLICATION_ID + "/system/mongo";
-    static final String INSTANCES_CONFIG_PATH = "/" + ZeroExtension.APPLICATION_ID + "/system-instances/mongo";
+    static final String SYSTEM_CONFIG_PATH = "/" + ZeroExtension.APPLICATION_ID + "/system/mongo/module";
+    static final String INSTANCES_CONFIG_PATH = "/" + ZeroExtension.APPLICATION_ID + "/system/mongo";
 
     @Override
     public void loadExtensions() throws Exception {

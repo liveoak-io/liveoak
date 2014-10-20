@@ -60,7 +60,7 @@ public class DefaultMountPointResource implements MountPointResource, RootResour
         return "[" + getClass().getSimpleName() + ": parent=" + this.parent + "; id=" + this.id + "; registry=" + this.registry.keySet() + "]";
     }
 
-    private Resource parent;
-    private String id;
-    private Map<String, Resource> registry = new ConcurrentHashMap<>();
+    protected Resource parent;
+    protected String id;
+    protected Map<String, Resource> registry = new ConcurrentHashMap<>();
 }

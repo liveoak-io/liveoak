@@ -37,7 +37,7 @@ public class InterceptorRootResourceTest extends AbstractResourceTestCase {
         RequestContext requestContext = new RequestContext.Builder().build();
         client.read(requestContext, "/testApp");
         client.read(requestContext, "/testApp/subscriptions");
-        ResourceState adminState = client.read(requestContext, "/admin/system/interceptor");
+        ResourceState adminState = client.read(requestContext, "/admin/system/interceptor/module");
         assertCounter(2);
 
         // Assert configuration is expected
@@ -48,14 +48,14 @@ public class InterceptorRootResourceTest extends AbstractResourceTestCase {
 
         // Disable mapping for mockInterceptor
         interceptorsConfig.get(0).putProperty("resource-path-prefix", "/testApp/something-which-does-not-exist");
-        client.update(requestContext, "/admin/system/interceptor", adminState);
+        client.update(requestContext, "/admin/system/interceptor/module", adminState);
 
         // This request won't reach mockInterceptor and so won't increase counter
         client.read(requestContext, "/testApp");
 
         // Re-enable mapping for mockInterceptor again
         interceptorsConfig.get(0).putProperty("resource-path-prefix", "/testApp");
-        client.update(requestContext, "/admin/system/interceptor", adminState);
+        client.update(requestContext, "/admin/system/interceptor/module", adminState);
 
         // Counter still 2
         assertCounter(2);

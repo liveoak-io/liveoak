@@ -207,18 +207,23 @@ public class ResourceScripts extends ScriptsResource {
         }
     }
 
-    public void deleteMember(RequestContext ctx, String id, Responder responder) throws Exception {
-        ResourceTriggeredScript script = scripts.get(id);
-        if (script != null) {
-            if (script.getScriptBuffer() != null) {
-                deleteSourceFile(id);
+    @Override
+    public void deleteMember(RequestContext ctx, String id, Responder responder) {
+        try {
+            ResourceTriggeredScript script = scripts.get(id);
+            if (script != null) {
+                if (script.getScriptBuffer() != null) {
+                    deleteSourceFile(id);
+                }
+                deleteMetadataFile(id);
+                deleteScriptDirectory(id);
+                scripts.remove(id);
+                responder.resourceDeleted(new ResourceScript(this, script));
+            } else {
+                responder.noSuchResource(id);
             }
-            deleteMetadataFile(id);
-            deleteScriptDirectory(id);
-            scripts.remove(id);
-            responder.resourceDeleted(new ResourceScript(this, script));
-        } else {
-            responder.noSuchResource(id);
+        } catch (Exception e) {
+            responder.internalError("Error trying to delete Script", e);
         }
     }
 

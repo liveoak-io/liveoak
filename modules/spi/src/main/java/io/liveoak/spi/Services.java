@@ -96,8 +96,8 @@ public final class Services {
         return LIVEOAK.append("application-extension", extensionId, appId);
     }
 
-    public static ServiceName systemResource(String id) {
-        return LIVEOAK.append("system-resource", id);
+    public static ServiceName systemResource(String moduleId, String id) {
+        return LIVEOAK.append("system-resource", moduleId).append(id);
     }
 
     public static ServiceName instanceResource(String id) {

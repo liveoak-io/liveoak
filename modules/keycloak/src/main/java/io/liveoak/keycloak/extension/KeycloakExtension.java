@@ -29,7 +29,7 @@ public class KeycloakExtension implements Extension {
         target.addService(KeycloakServices.address(), new KeycloakConfigService())
                 .install();
 
-        ServiceName serviceName = Services.systemResource(context.id());
+        ServiceName serviceName = Services.systemResource(context.moduleId(), context.id());
 
         KeycloakConfigResourceService resource = new KeycloakConfigResourceService(context.id());
         target.addService(serviceName, resource)

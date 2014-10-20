@@ -32,9 +32,6 @@ public abstract class ScriptResource implements Resource {
         return getScript().getScriptBuffer();
     }
 
-    protected abstract void deleteMember(RequestContext ctx, String id, Responder responder);
-
-
     @Override
     public void readMember(RequestContext ctx, String id, Responder responder) throws Exception {
         if (id.equals(ScriptFileResource.ID) && getScriptBuffer()!= null) {

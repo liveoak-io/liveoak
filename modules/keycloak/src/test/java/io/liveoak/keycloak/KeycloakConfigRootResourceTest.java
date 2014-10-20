@@ -24,7 +24,7 @@ public class KeycloakConfigRootResourceTest extends AbstractKeycloakTest {
     public void configTests() throws Exception {
         // Test #1 - Read properties
         RequestContext requestContext = new RequestContext.Builder().requestAttributes(new DefaultRequestAttributes()).build();
-        ResourceState returnedState = client.read(requestContext, "/admin/system/keycloak");
+        ResourceState returnedState = client.read(requestContext, "/admin/system/keycloak/module");
 
         Assert.assertEquals("http://localhost:8383/auth", returnedState.getProperty(KeycloakConfigRootResource.KEYCLOAK_URL));
 
@@ -47,7 +47,7 @@ public class KeycloakConfigRootResourceTest extends AbstractKeycloakTest {
         state.putProperty(KeycloakConfigRootResource.LOAD_PUBLIC_KEYS, true);
 
         requestContext = new RequestContext.Builder().requestAttributes(new DefaultRequestAttributes()).build();
-        returnedState = client.update(requestContext, "/admin/system/keycloak", state);
+        returnedState = client.update(requestContext, "/admin/system/keycloak/module", state);
 
         Assert.assertEquals(3, returnedState.getPropertyNames().size());
         Assert.assertEquals("http://test", returnedState.getProperty(KeycloakConfigRootResource.KEYCLOAK_URL));

@@ -5,15 +5,15 @@
  */
 package io.liveoak.spi.resource.async;
 
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.state.ResourceState;
-import org.jboss.logging.Logger;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
 
 /**
  * Basic server-side representation of a resource.
@@ -194,6 +194,10 @@ public interface Resource {
      * @param responder To respond to the action.
      */
     default void delete(RequestContext ctx, Responder responder) throws Exception {
+        responder.deleteNotSupported(this);
+    }
+
+    default void deleteMember(RequestContext ctx, String id, Responder responder) {
         responder.deleteNotSupported(this);
     }
 }
