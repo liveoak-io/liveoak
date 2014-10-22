@@ -108,10 +108,10 @@ public class CollectionSubscriptionsTest {
 
         response.close();
 
-        // Give it time to propagate
-        Thread.sleep(500);
-
         this.system.awaitStability();
+
+        // Give it time to propagate
+        Thread.sleep(1000);
 
         assertThat(appCreateCount.get()).isEqualTo(1);
         assertThat(wildcardCount.get()).isEqualTo(1);
