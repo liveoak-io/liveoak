@@ -14,6 +14,7 @@ public class HttpResponseAssert extends GenericAssert<HttpResponseAssert, HttpRe
     private static final String NOT_ACCEPTABLE = "NOT_ACCEPTABLE";
     private static final String RESOURCE_ALREADY_EXISTS = "RESOURCE_ALREADY_EXISTS";
     private static final String NO_SUCH_RESOURCE = "NO_SUCH_RESOURCE";
+    private static final String INTERNAL_ERROR = "INTERNAL_ERROR";
 
     private JsonNode json;
 
@@ -43,6 +44,10 @@ public class HttpResponseAssert extends GenericAssert<HttpResponseAssert, HttpRe
 
     public HttpResponseAssert isNotAcceptable() throws Exception {
         return validateErrorType(NOT_ACCEPTABLE);
+    }
+
+    public HttpResponseAssert isInternalError() throws Exception {
+        return validateErrorType(INTERNAL_ERROR);
     }
 
     public HttpResponseAssert with(String message) throws Exception {

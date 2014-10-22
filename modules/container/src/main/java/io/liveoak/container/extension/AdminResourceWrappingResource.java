@@ -11,6 +11,7 @@ import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.DelegatingRootResource;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
@@ -23,11 +24,12 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class AdminResourceWrappingResource extends DelegatingRootResource {
 
-    public AdminResourceWrappingResource(InternalApplicationExtension extension, ApplicationConfigurationManager configManager, RootResource delegate, Properties envProps) {
+    public AdminResourceWrappingResource(InternalApplicationExtension extension, ApplicationConfigurationManager configManager, RootResource delegate, Properties envProps, Client client) {
         super(delegate);
         this.extension = extension;
         this.configManager = configManager;
         this.environmentProperties = envProps;
+        this.client = client;
     }
 
     public String type() {
@@ -71,10 +73,16 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         cleanup(state);
-        delegate().updateProperties(ctx, filter(state), new ResourceConfigPersistingResponder(this, state, responder));
+        delegate().updateProperties(ctx, filter(state),
+                new ResourceConfigPersistingResponder(this, state, new VersioningResponder(responder, this.extension.application(), this.client, ctx.securityContext())));
 
         this.configValuesTree = new ObjectsTree<>();
         updateConfigEnvVars(state);
+    }
+
+    @Override
+    public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        delegate().createMember(ctx, filter(state), new VersioningResponder(responder, this.extension.application(), this.client, ctx.securityContext()));
     }
 
     @Override
@@ -83,7 +91,7 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
         // TODO should we call delete() on this resource?  I think yes.
         //this.delegate.delete(ctx, responder);
         this.configManager.removeResource(this.id());
-        responder.resourceDeleted(this.delegate());
+        new VersioningResponder(responder, this.extension.application(), this.client, ctx.securityContext()).resourceDeleted(this.delegate());
     }
 
     private void cleanup(ResourceState state) {
@@ -130,6 +138,7 @@ public class AdminResourceWrappingResource extends DelegatingRootResource {
 
     private final InternalApplicationExtension extension;
     private final ApplicationConfigurationManager configManager;
+    private Client client;
     private Properties environmentProperties;
     private ObjectsTree<Object> configValuesTree;
 

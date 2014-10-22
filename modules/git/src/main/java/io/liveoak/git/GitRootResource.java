@@ -13,7 +13,7 @@ import org.eclipse.jgit.errors.RepositoryNotFoundException;
 /**
  * @author Ken Finnigan
  */
-public class GitRootResource extends DefaultMountPointResource {
+public class GitRootResource extends DefaultMountPointResource implements GitResource {
     public GitRootResource(String id, File appDir) {
         super(id);
         this.appDir = appDir;
@@ -50,17 +50,8 @@ public class GitRootResource extends DefaultMountPointResource {
             }
         }
 
-        // Commit current configuration state, if changes
-        if (this.git.status().call().hasUncommittedChanges()) {
-            this.git.add()
-                    .addFilepattern(".")
-                    .call();
-            this.git.commit()
-                    .setMessage("'git' Resource started on " + parent().id())
-                    .call();
-        }
-
         // Install sub resources here
+        registerResource(new CommitsResource(this));
     }
 
     @Override
@@ -68,6 +59,11 @@ public class GitRootResource extends DefaultMountPointResource {
         this.git.close();
         this.git = null;
         this.appDir = null;
+    }
+
+    @Override
+    public Git git() {
+        return this.git;
     }
 
     private File appDir;

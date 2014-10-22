@@ -5,6 +5,7 @@ import java.util.Properties;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
+import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.MediaType;
@@ -125,6 +126,7 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
                 .addDependency(privateName, RootResource.class, wrapper.resourceInjector())
                 .addDependency(Services.applicationConfigurationManager(appExtension.application().id()), ApplicationConfigurationManager.class, wrapper.configurationManagerInjector())
                 .addDependency(Services.applicationEnvironmentProperties(appExtension.application().id()), Properties.class, wrapper.environmentPropertiesInjector())
+                .addDependency(Services.CLIENT, Client.class, wrapper.clientInjector())
                 .install();
 
         InitializeResourceService configApply = new InitializeResourceService(this.appExtension);
