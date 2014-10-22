@@ -50,16 +50,6 @@ public class GitRootResource extends DefaultMountPointResource implements GitRes
             }
         }
 
-        // Commit current configuration state, if changes
-        if (this.git.status().call().hasUncommittedChanges()) {
-            this.git.add()
-                    .addFilepattern(".")
-                    .call();
-            this.git.commit()
-                    .setMessage("'git' Resource started on " + parent().id())
-                    .call();
-        }
-
         // Install sub resources here
         registerResource(new CommitsResource(this));
     }

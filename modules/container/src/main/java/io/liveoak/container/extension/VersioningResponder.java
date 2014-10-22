@@ -74,7 +74,7 @@ public class VersioningResponder extends DelegatingResponder {
     }
 
     private String commitMsg(Resource resource, RequestType type) {
-        return "Configuration modified for " + type + " on " + resource.id();
+        return "Configuration modified for " + type + " request on resource with id " + resource.id();
     }
 
     private InternalApplication application;

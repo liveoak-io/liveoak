@@ -119,6 +119,7 @@ public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
         treeWalk.addTree(latestCommit.getTree());
         treeWalk.setFilter(PathFilter.create("another.txt"));
         assertThat(treeWalk.next()).isFalse();
+        treeWalk.release();
 
         treeWalk = new TreeWalk(gitRepo.getRepository());
         treeWalk.addTree(latestCommit.getTree());
