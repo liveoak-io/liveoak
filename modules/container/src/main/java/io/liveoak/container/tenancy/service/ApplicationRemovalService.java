@@ -1,9 +1,14 @@
 package io.liveoak.container.tenancy.service;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import io.liveoak.container.tenancy.InternalApplication;
-import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceController;
@@ -36,13 +41,16 @@ public class ApplicationRemovalService implements Service<Void> {
             context.asynchronous();
             this.appServiceController.setMode(ServiceController.Mode.REMOVE);
 
-            this.vertx.getValue().fileSystem().delete(appDir.getAbsolutePath(), true, result -> {
-                if (result.succeeded()) {
-                    context.complete();
-                } else {
-                    context.failed(new StartException("Unable to remove application directory: " + appDir.getAbsolutePath()));
+            new Thread("ApplicationRemovalService worker thread") {
+                public void run() {
+                    try {
+                        deleteNonEmptyDir(appDir.getAbsoluteFile());
+                        context.complete();
+                    } catch (Throwable e) {
+                        context.failed(new StartException("Unable to remove application directory: " + appDir.getAbsolutePath(), e));
+                    }
                 }
-            });
+            }.start();
 
             monitor.awaitStability();
             target.removeMonitor(monitor);
@@ -52,6 +60,25 @@ public class ApplicationRemovalService implements Service<Void> {
 
         // remove ourselves
         context.getController().setMode(ServiceController.Mode.REMOVE);
+    }
+
+    void deleteNonEmptyDir(File dir) throws IOException {
+        Path directory = dir.toPath();
+        Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                if (!file.toFile().delete()) {
+                    throw new IOException("Failed to delete file: " + file);
+                }
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
     @Override

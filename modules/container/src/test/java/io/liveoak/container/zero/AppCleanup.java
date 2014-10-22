@@ -20,7 +20,9 @@ public class AppCleanup implements Consumer<String> {
         Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
+                if (!file.toFile().delete()) {
+                    throw new IOException("Failed to delete file: " + file);
+                }
                 return FileVisitResult.CONTINUE;
             }
 
