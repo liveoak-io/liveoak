@@ -10,11 +10,11 @@
     <div class="bs-sidebar">
       <ul>
         <li ng-class="{active: current === 'dashboard'}" class="dashboard"><a href="#/applications/{{curApp.id}}/dashboard"><i class="fa fa-tachometer"></i>Dashboard</a></li>
-        <li ng-class="{active: current === 'storage'}" class="storage"><a href="#/applications/{{curApp.id}}/storage"><i class="fa fa-cloud"></i>Storage</a></li>
+        <li ng-class="{active: (current === 'storage' || current === 'create-storage')}" class="storage"><a href="#/applications/{{curApp.id}}/storage"><i class="fa fa-cloud"></i>Storage</a></li>
         <li ng-class="{active: current === 'security'}" class="security"><a href="#/applications/{{curApp.id}}/security/policies"><i class="fa fa-lock"></i>Security</a></li>
         <li ng-class="{active: current === 'push'}" class="push"><a href="#/applications/{{curApp.id}}/push"><i class="fa fa-mobile"></i>Push</a></li>
-        <li ng-class="{active: current === 'application-clients'}" class="clients"><a href="#/applications/{{curApp.id}}/application-clients"><i class="fa fa-globe"></i>Clients</a></li>
-        <li ng-class="{active: current === 'business-logic'}" class="logic"><a href="#/applications/{{curApp.id}}/business-logic"><i class="fa fa-code"></i>Logic</a></li>
+        <li ng-class="{active: (current === 'application-clients' || current === 'create-client')}" class="clients"><a href="#/applications/{{curApp.id}}/application-clients"><i class="fa fa-globe"></i>Clients</a></li>
+        <li ng-class="{active: (current === 'business-logic' || current === 'create-logic')}" class="logic"><a href="#/applications/{{curApp.id}}/business-logic"><i class="fa fa-code"></i>Logic</a></li>
       </ul>
     </div>
   </nav>
