@@ -409,6 +409,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
   };
 
   $scope.settings.hadPrefix = $scope.create || $scope.settings.displayName !== $scope.settings.name;
+  var originalName = $scope.settings.name;
 
   angular.forEach(scopeMappings, function(role) {$scope.settings.scopeMappings.push(role.id);});
 
@@ -446,10 +447,14 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     if (!clientName || clientName === ''){
       $scope.clientsForm.clientname.$setValidity('clientName', true);
     }
-    if (appClients.indexOf(clientName) > -1) {
-      $scope.clientsForm.clientname.$setValidity('clientName', false);
-    } else {
-      $scope.clientsForm.clientname.$setValidity('clientName', true);
+    else {
+      $scope.settings.name = $scope.settings.hadPrefix ? $scope.namePrefix + $scope.settings.displayName : $scope.settings.displayName;
+
+      if ($scope.settings.name !== originalName && appClients.indexOf($scope.settings.name) > -1) {
+        $scope.clientsForm.clientname.$setValidity('clientName', false);
+      } else {
+        $scope.clientsForm.clientname.$setValidity('clientName', true);
+      }
     }
   };
 
@@ -470,9 +475,6 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
   };
 
   $scope.$watch('settings', function() {
-    if($scope.settings.hadPrefix) {
-      $scope.settings.name = $scope.namePrefix + $scope.settings.displayName;
-    }
     $scope.changed = !angular.equals($scope.settings, settingsBackup);
   }, true);
 
@@ -645,7 +647,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
           $scope.loClient.type = $scope.settings.type;
           $scope.loClient['security-key'] = $scope.appClient.name;
 
-          return $scope.create ? $scope.loClient.$create({appId: currentApp.id}) : $scope.loClient.$update({appId: currentApp.id, clientId: originalName});
+          return $scope.create ? $scope.loClient.$create({appId: currentApp.id}) : $scope.loClient.$update({appId: currentApp.id, clientId: $scope.appClient.id});
         }, function(){
           return $q.reject();
         }

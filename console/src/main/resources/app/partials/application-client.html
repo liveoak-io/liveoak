@@ -14,8 +14,8 @@
             <label class="col-sm-2 control-label" for="clientname" required>Client Name <span class="required">*</span></label>
             <div class="col-sm-4" ng-class="{'has-error': clientsForm.clientname.$invalid && settings.name}">
               <input class="form-control" type="text" id="clientname" name="clientname" ng-model="settings.displayName" required
-                     pf-focused="!settings.name" ng-change="checkClientName(settings.hadPrefix ? (namePrefix + settings.name) : settings.name)"/>
-              <span class="help-block" ng-show="clientsForm.clientname.$invalid && settings.name">
+                     pf-focused="!settings.name" ng-change="checkClientName(settings.displayName)"/>
+              <span class="help-block" ng-show="clientsForm.clientname.$invalid && settings.displayName">
                 <span>Client with this name already exists.</span>
               </span>
             </div>
