@@ -23,6 +23,8 @@
         <jboss.releases.repo.url>dav:https://repository-projectodd.forge.cloudbees.com/release</jboss.releases.repo.url>
         <jboss.snapshots.repo.url>dav:https://repository-projectodd.forge.cloudbees.com/release</jboss.snapshots.repo.url>
 
+        <liveoak.examples.zip.url>https://github.com/liveoak-io/liveoak-examples/archive/master.zip</liveoak.examples.zip.url>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <vertx.version>2.1.2</vertx.version>
         <vertx.testtools.version>2.1.2</vertx.testtools.version>
