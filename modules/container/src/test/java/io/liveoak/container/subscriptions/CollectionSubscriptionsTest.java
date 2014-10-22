@@ -111,7 +111,7 @@ public class CollectionSubscriptionsTest {
         this.system.awaitStability();
 
         // Give it time to propagate
-        Thread.sleep(1000);
+        Thread.sleep(1500);
 
         assertThat(appCreateCount.get()).isEqualTo(1);
         assertThat(wildcardCount.get()).isEqualTo(1);
