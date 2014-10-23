@@ -127,7 +127,7 @@ public class ScriptInterceptor extends DefaultInterceptor {
         // TODO: This is proper way to check, but application is currently not set
         Application application = request.requestContext().application();
         if (application != null) {
-            applicationName = application.name();
+            applicationName = application.id();
         }
 
         return applicationName;

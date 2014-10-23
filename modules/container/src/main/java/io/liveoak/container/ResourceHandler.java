@@ -22,7 +22,8 @@ public class ResourceHandler extends SimpleChannelInboundHandler<ResourceRequest
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResourceRequest msg) throws Exception {
-        new TraversingResponder(this.workerPool, this.globalContext, msg, ctx).resourceRead(globalContext);
+        ResourceRequest requestWrapper = globalContext.generateResourceRequest(msg);
+        new TraversingResponder(this.workerPool, this.globalContext, requestWrapper, ctx).resourceRead(globalContext);
     }
 
     private GlobalContext globalContext;
