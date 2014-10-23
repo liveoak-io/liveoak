@@ -59,12 +59,8 @@
     border-left: none;
 }
 
-.login-pf .container .form-horizontal .control-label {
-	font-size: 13px;
-}
-
 .login-pf .container .form-horizontal .form-control {
-  font-size: 12px;
+  line-height: 1;
 }
 
 .login-pf .btn-primary {

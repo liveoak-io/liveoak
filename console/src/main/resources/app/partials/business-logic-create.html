@@ -10,12 +10,6 @@
         <fieldset>
           <legend lo-collapse class="collapsible"><span class="text">Settings</span></legend>
           <div class="form-group clearfix">
-            <label class="col-sm-3 control-label" for="name">Script Name</label>
-            <div class="col-sm-4">
-              <input class="form-control" type="text" id="name" ng-model="script.name">
-            </div>
-          </div>
-          <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="id">Script ID</label>
             <div class="col-sm-4">
               <input class="form-control" type="text" id="id" ng-model="script.id" ng-readonly="!create">
@@ -23,9 +17,22 @@
             </div>
           </div>
           <div class="form-group clearfix">
-            <label class="col-sm-3 control-label" for="description">Description</label>
+            <label class="col-sm-3 control-label" for="path">Resource Path <span class="required">*</span></label>
+            <span data-toggle="modal" data-target="#path-help" class="input-help">
+              <button class="btn btn-link btn-icon">
+                <i class="fa fa-question-circle" data-tooltip-placement="top" data-tooltip="Click for Help"></i>
+                <span>Click for Help</span>
+              </button>
+            </span>
             <div class="col-sm-4">
-              <textarea class="form-control" rows="3" id="description" ng-model="script.description"></textarea>
+              <input class="form-control" type="text" id="path" value="/<app-name>/" ng-model="script['target-path']" required>
+            </div>
+            
+          </div>
+          <div class="form-group clearfix">
+            <label class="col-sm-3 control-label" for="priority">Priority</label>
+            <div class="col-sm-2">
+              <input class="form-control" id="priority" type="number" min="0" max="10" value="5" ng-model="script.priority">
             </div>
           </div>
           <div class="form-group clearfix">
@@ -44,28 +51,22 @@
             </div>
           </div>
           <div class="form-group clearfix">
-            <label class="col-sm-3 control-label" for="priority">Priority</label>
-            <div class="col-sm-2">
-              <input class="form-control" id="priority" type="number" min="0" max="10" value="5" ng-model="script.priority">
+            <label class="col-sm-3 control-label" for="name">Script Name</label>
+            <div class="col-sm-4">
+              <input class="form-control" type="text" id="name" ng-model="script.name">
             </div>
           </div>
           <div class="form-group clearfix">
-            <label class="col-sm-3 control-label" for="path">Resource Path <span class="required">*</span></label>
+            <label class="col-sm-3 control-label" for="description">Description</label>
             <div class="col-sm-4">
-              <input class="form-control" type="text" id="path" value="/<app-name>/" ng-model="script['target-path']" required>
+              <textarea class="form-control" rows="3" id="description" ng-model="script.description"></textarea>
             </div>
-            <span data-toggle="modal" data-target="#path-help" class="input-help">
-              <button class="btn btn-link btn-icon">
-                <i class="fa fa-question-circle" data-tooltip-placement="top" data-tooltip="Click for Help"></i>
-                <span>Click for Help</span>
-              </button>
-            </span>
           </div>
         </fieldset>
         <fieldset>
           <legend lo-collapse class="collapsible"><span class="text">Script</span> <span class="required">*</span></legend>
           <div class="form-group clearfix">
-            <div style="width: 100%; text-align: right;"><small>Use Ctrl+Space for auto-completion where available</small> </div>
+            <p class="ta-right"><small>Use Ctrl+Space for auto-completion where available</small></p>
             <ui-codemirror ui-codemirror-opts="editorOptions" ng-model="script.code" required></ui-codemirror>
           </div>
         </fieldset>

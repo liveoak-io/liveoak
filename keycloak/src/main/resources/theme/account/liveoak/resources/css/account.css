@@ -76,7 +76,7 @@ body > .container {
 }
 
 .navbar-pf .navbar-utility {
-    padding-right: 20px;
+  top: -36px;
 }
 
 .navbar-pf .navbar-utility > li > a {
@@ -105,7 +105,7 @@ body > .container {
 }
 
 .bs-sidebar ul li {
-  margin: 18px 0 0;
+  margin: 28px 0 0;
   text-align: center;
 }
 
@@ -132,11 +132,14 @@ body > .container {
 .bs-sidebar ul li a:focus {
   text-decoration: none;
   opacity: 1;
+  border: none;
+  color: #fff;
 }
 
 .bs-sidebar ul li.active a {
   background-color: transparent;
   opacity: 1;
+  background-image: none;
 }
 
 .bs-sidebar ul li a:before {
@@ -145,9 +148,9 @@ body > .container {
   font-style: normal;
   font-weight: normal;
   line-height: 1;
-  font-size: 42px;
+  font-size: 36px;
   opacity: 1;
-  -webkit-opacity: inherit;
+  margin-bottom: 3px;
 }
 
 .bs-sidebar ul li:nth-child(1) a:before {
@@ -389,6 +392,10 @@ ol li span {
     padding-top: 20px;
   }
   
+  .bs-sidebar ul li.active {
+    background: url(img/sidebar-active-horizontal.svg) no-repeat center bottom;
+  }
+  
   .content-area {
     width: 100%;
     clear: both;
@@ -400,6 +407,10 @@ ol li span {
   
   .content-area > .row > .col-md-2 {
     float: right;
+  }
+  
+  .control-label + .required {
+    position: initial;
   }
 }
 
@@ -423,6 +434,11 @@ ol li span {
   
   .navbar-pf .navbar-utility {
     float: right;
+    margin-right: 20px;
+  }
+  
+  .navbar-pf .navbar-utility > li + li {
+    border-top: none;
   }
   
   .navbar-collapse ul li {

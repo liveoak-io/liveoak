@@ -1,4 +1,4 @@
-<div class="col-md-10 lo-main-pane">
+<div class="col-md-10 lo-main-pane storage-collections">
   <div class="row">
   <ul class="nav nav-tabs nav-tabs-pf">
     <li class="active"><a href="">Collections</a></li>
@@ -64,7 +64,7 @@
           <thead>
           <tr>
             <th colspan="{{ columns.length + 1 }}" class="table-actions">
-              <div class="search-comp clearfix">
+              <div class="input-with-button search-comp clearfix">
                 <input type="text" class="form-control search ng-pristine ng-valid" placeholder="Search..."
                        ng-model="searchQuery">
                 <button class="btn btn-link btn-icon" tooltip="Search" type="submit" disabled>
@@ -135,7 +135,7 @@
                   </button>
                   <ul class="dropdown-menu dropdown-menu-right" role="menu">
                     <li role="presentation">
-                      <a role="menuitem" tabindex="-1" ng-click="modalCollectionImport()">Import Data...</a>
+                      <a href="" role="menuitem" tabindex="-1" ng-click="modalCollectionImport()">Import Data...</a>
                     </li>
                     <li role="presentation">
                       <a role="menuitem" tabindex="-1" ng-href="{{urlExport}}" download="{{jsonName}}"
@@ -147,11 +147,11 @@
                     <li class="separator"
                         ng-show="(columnsHidden.length > 0) || (collectionId && (collectionData.length > 0))"></li>
                     <li role="presentation">
-                      <a role="menuitem" tabindex="-1" ng-click="columnsHidden = []"
+                      <a href="" role="menuitem" tabindex="-1" ng-click="columnsHidden = []"
                          ng-show="columnsHidden.length > 0">Show All Columns</a>
                     </li>
                     <li role="presentation">
-                      <a role="menuitem" tabindex="-1" ng-click="modalDataDeleteAll()"
+                      <a href="" role="menuitem" tabindex="-1" ng-click="modalDataDeleteAll()"
                          ng-show="(collectionId && (collectionData.length > 0))">Delete All Data</a>
                     </li>
                   </ul>
@@ -162,7 +162,7 @@
           <tr ng-show="columns.length > 1">
             <th ng-repeat="column in columns | filter:notHidden" class="hasDropdown caption row-{{column}}" ng-class="{'before-actions':$last}">
               <button class="btn btn-link btn-icon btn-unhide btn-unhide-left" type="button"
-                      ng-show="isNextHidden(column, true) && $first" ng-click="unhideNext(column, true)">
+                      ng-show="isNextHidden(column, true) && $first" ng-click="unhideNext(column, true)" data-tooltip="Show Hidden Column" data-tooltip-placement="right">
                 <i class="lo-unhide-right"></i>
               </button>
               {{ column }}

@@ -10,15 +10,13 @@
 
       <lo-breadcrumbs></lo-breadcrumbs>
 
-      <h3 style="margin-bottom: 0;">
-        <ul class="nav nav-tabs">
-          <li><a href="#/applications/{{curApp.id}}/security/secure-storage" role="tab">Storage</a></li>
-          <li><a href="#/applications/{{curApp.id}}/security/secure-collections">Collections</a></li>
-          <li><a href="#/applications/{{curApp.id}}/security/secure-push" role="tab">Push</a></li>
-          <li><a href="#/applications/{{curApp.id}}/security/secure-clients" role="tab">Clients</a></li>
-          <li class="active"><a href="" role="tab">Business Logic</a></li>
-        </ul>
-      </h3>
+      <ul class="nav nav-tabs">
+        <li><a href="#/applications/{{curApp.id}}/security/secure-storage" role="tab">Storage</a></li>
+        <li><a href="#/applications/{{curApp.id}}/security/secure-collections">Collections</a></li>
+        <li><a href="#/applications/{{curApp.id}}/security/secure-push" role="tab">Push</a></li>
+        <li><a href="#/applications/{{curApp.id}}/security/secure-clients" role="tab">Clients</a></li>
+        <li class="active"><a href="" role="tab">Business Logic</a></li>
+      </ul>
 
       <h2 class="pull-left"><span>Business Logic</span> Security</h2>
       <p class="subtitle"><span class="required">*</span> Required fields</p>
@@ -33,7 +31,7 @@
           <legend lo-collapse class="collapsible"><span class="text">Storage Settings</span></legend>
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="access">Can access the scripts <span class="required">*</span></label>
-            <div class="dropdown btn-group bootstrap-select col-sm-9" style="z-index: 998;">
+            <div class="dropdown btn-group bootstrap-select col-sm-9">
               <button class="btn btn-default dropdown-toggle col-sm-12" id ="access" type="button">
                 <span class="pull-left" ng-show="appRoles.length === 0">The application has no roles</span>
                 <span class="pull-left" ng-show="appRoles.length > 0 && settings.accessRoles.length === 0">Nothing selected</span>

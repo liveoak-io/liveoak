@@ -74,10 +74,10 @@
           <div class="form-group clearfix">
             <label class="col-sm-3 control-label" for="password">Password</label>
             <div class="col-sm-4" ng-show="!create && !resetPassword">
-              <span><a style="vertical-align: sub;" href="" ng-click="resetPassword = true">Reset Password</a></span>
+              <a href="" ng-click="resetPassword = true">Reset Password</a>
             </div>
             <div class="col-sm-4" ng-show="create || resetPassword">
-              <div class="search-comp clearfix" style="width: 100%;">
+              <div class="input-with-button clearfix">
               <input class="form-control" type="{{inputType}}" id="password" name="password" autocomplete="off" ng-model="userModel.password" pf-focused="resetPassword">
               <button class="btn btn-link btn-icon ng-scope" ng-click="changeInputType()" type="button" tooltip="Show/Hide Password" >
                 <i class="fa fa-eye-slash" ng-show="inputType === 'password'"></i>
