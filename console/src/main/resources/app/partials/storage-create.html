@@ -78,7 +78,7 @@
             <label class="col-sm-3  control-label" for="passwd">Password</label>
 
             <div class="col-sm-4">
-              <div class="search-comp clearfix" style="width: 100%;">
+              <div class="input-with-button clearfix">
                 <input class="form-control" type="{{passwordInputType}}" id="passwd" name="password" autocomplete="off" ng-model="storageModel.credentials[0].password">
                 <button class="btn btn-link btn-icon" ng-click="changePasswordInputType()" type="button" tooltip="Show/Hide Password" >
                   <i class="fa fa-eye-slash" ng-show="passwordInputType === 'password'"></i>

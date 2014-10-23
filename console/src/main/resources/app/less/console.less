@@ -77,6 +77,7 @@
   src: local('Exo 2 Semi Bold Italic'), local('Exo2-SemiBoldItalic'), url('../css/exo2/exo2_600i.woff') format('woff');
 }
 
+
 /*
 ***********************************
           Basic elements
@@ -205,6 +206,11 @@ hr {
   white-space: nowrap;
 }
 
+.ta-right {
+  text-align: right;
+}
+
+
 /* Apply to make color slightly lighter */
 .lo-emph {
   color: @c_graylight;
@@ -220,6 +226,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
 
 /*
 ***********************************
@@ -242,6 +249,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
     }
   }
 }
+
 
 /* Top Menu */
 
@@ -313,7 +321,9 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   }
 }
 
+
 /* Side menu (1st column) */
+
 .lo-sidebar {
   background-color: @c_snav;
   padding: 0;
@@ -384,7 +394,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
           font-size: 36px;
           
           &.fa-mobile {
-            font-size: 48px;
+            font-size: 42px;
           }
         }
       }
@@ -406,7 +416,9 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   }
 }
 
+
 /* The main area (2rd column) */
+
 .lo-main-pane {
   padding: 0;
 
@@ -422,6 +434,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
     }
   }
 }
+
 
 /* Nav menu (tabs) */
 
@@ -456,10 +469,12 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
 
 
 /* Panel */
+
 .panel {
 
-  .panel-heading, .panel-body {
-    padding : 1em;
+  .panel-heading, 
+  .panel-body {
+    padding: 1em;
   }
 
   .panel-heading {
@@ -477,7 +492,6 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
         color: @c_green;
       }
       
-      + .label,
       + a {
         margin-left: 15px;
       }
@@ -498,11 +512,20 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
       }
     }
     
-    .pull-right a {
-      color: @c_gray;
+    .pull-right {
+      margin-left: 10px;
+    
+       a {
+        color: @c_gray;
+        
+        &:hover {
+          color: @c_greendark;
+        }
+      }
       
-      &:hover {
-        color: @c_greendark;
+      span {
+        margin-top: 4px;
+        display: inline-block;
       }
     }
     
@@ -512,11 +535,6 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
     
     h3 {
       margin: 2px 0 0 0;
-    }
-    
-    .pull-right span {
-      margin-top: 4px;
-      display: inline-block;
     }
     
     .dropdown,
@@ -592,10 +610,6 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
         i {
           margin-right: 6px;
         }
-        
-        span {
-          color: @c_graylight;
-        }
       }
       
       & + pre {
@@ -621,7 +635,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
 
 .panel-missing {
   background-color: #fff;
-  background-image: url("https://dl.dropboxusercontent.com/u/2730435/panel-disabled-bg.png");
+  background-image: url("https://dl.dropboxusercontent.com/u/2730435/panel-disabled-bg.png"); /* FIXME: place this image locally */
   background-repeat: repeat;
   background-position: left top;
   border: 3px solid #fff;
@@ -650,188 +664,6 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
 
 .error-page .panel {
   margin-top: 40px;
-}
-
-
-/* Example-applications */
-
-.transition {
-  transition: all .25s ease;
-}
-
-.example-apps {
-
-  margin-top: 20px;
-
-  &.hover .panel {
-    .transition;
-    opacity: 0.75;
-    
-    &.clicked {
-      opacity: 1;
-    }
-  }
-
-  .panel {
-  
-    margin: 0 10px 20px 10px;
-    .transition;
-    position: relative;
-    
-    .label-success {
-      position: absolute;
-      right: -1px;
-      top: -1px;
-      
-      i {
-        font-size: inherit;
-      }
-    }
-    
-    .panel-body {
-      padding: 20px 0;
-      
-      .pull-left {
-        width: 107px;
-        height: 107px;
-        margin-top: 10px;
-        overflow: hidden;
-      }
-      
-      img {
-        width: 107px;
-        height: 107px;
-      }
-      
-      .btn {
-        margin: 10px 0 0 0;
-        width: 100%;
-        opacity: 0;
-        .transition;
-        outline: 0 none;
-        
-        .spinner.spinner-inline {
-          display: none;
-          vertical-align: baseline;
-        }
-      }
-      
-      .pull-right {
-        width: calc(~"100% - 127px");
-      }
-        
-      h3 {
-        margin-top: 0;
-        margin-bottom: 5px;
-      }
-      
-      p {
-        font-size: 12px;
-        height: 99px;
-        overflow: hidden;
-        .transition;
-      }
-    }
-    
-    &:hover {
-      cursor: pointer;
-      opacity: 1;
-      
-      .panel-body p {
-        margin-right: 10px;
-        .transition;
-      }
-    }
-    
-    &:hover, 
-    &.clicked {
-      margin: -5px 5px 15px 5px;
-      padding: 5px 20px;
-      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.20);
-    }
-    
-    &.clicked {
-      .panel-body {
-        padding-bottom: 12px;
-        .transition;
-      
-        .pull-left {
-          height: 195px;
-          .transition;
-        }
-        
-        .btn {
-          opacity: 1;
-          
-          &.installing {
-            .spinner.spinner-inline {
-              display: inline-block;
-            }
-          }
-        }
-        
-        p {
-          height: 296px;
-          font-size: 13px;
-          -webkit-transition: all .25s ease;
-        }  
-      }
-      
-      &:hover {
-        cursor: pointer;
-      
-        .panel-body p {
-          height: 296px;
-        }   
-      }
-    }
-    
-    @media (max-width: 640px) {
-    
-      margin-left: 0;
-      margin-right: 0;
-      
-      &:hover,
-      &.clicked {
-        margin-left: -5px;
-        margin-right: -5px;
-      }
-    }
-    
-    @media (max-width: 767px) {
-    
-      .panel-body p {
-        .transition;
-      }
-    
-      &.clicked .panel-body p,
-      &.clicked:hover .panel-body p {
-        height: auto;
-        padding-bottom: 10px;
-      }
-    }
-    
-    @media (min-width: 768px) {
-      &.col-sm-6 {
-        width: calc(~"50% - 20px");
-        
-        &:hover, &.clicked {
-          width: calc(~"50% - 10px");
-        }
-      }
-    }
-    
-    @media (min-width: 1200px) {
-    
-      &.col-lg-4 {
-        width: calc(~"33.3% - 20px");
-        
-        &:hover, &.clicked {
-          width: calc(~"33.3% - 10px");
-        }
-      }
-    }
-  }
 }
 
 
@@ -926,11 +758,13 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   }
 }
 
+
 /* Panel Push */
 
 .app-push .panel .panel-heading {
   padding-bottom: 15px;
 }
+
 
 /* Panel Security-list */
 
@@ -977,6 +811,7 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
 
 
 /* The info area (3rd column) */
+
 .lo-info-pane {
   font-size: @fsize;
   background-color: rgba(255,255,255,0.75);
@@ -1071,23 +906,11 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   }
 }
 
-.security-list .lo-info-pane .fa-chevron-right {
+.security-list .lo-info-pane .fa {
   font-size: 11px;
   color: @c_graylight;
   margin-top: 3px;
-}
-
-/* FIXME: Mixing with above rule did not worked */
-.security-list .lo-info-pane .fa-check {
-  font-size: 11px;
-  color: @c_graylight;
-  margin-top: 3px;
-}
-
-.security-list .lo-info-pane .fa-info {
-  font-size: 11px;
-  color: @c_graylight;
-  margin-top: 3px;
+  width: 5px;
 }
 
 .lo-tutorials .unsecured-list span {
@@ -1162,6 +985,7 @@ button.lo-icon-button {
   }
 }
 
+
 /* LO form specific */
 
 p.subtitle {
@@ -1203,6 +1027,11 @@ p.form-info {
       position: absolute;
       right: 5px;
       top: 3px;
+    }
+    
+    + div > a {
+      margin-top: 3px;
+      display: inline-block;
     }
   }
   
@@ -1286,6 +1115,7 @@ p.form-info {
 .col-sm-9.bootstrap-select.btn-group > .dropdown-menu {
   min-width: calc(~"100% - 25px");
   margin-left: .5em;
+  z-index: 1000;
 }
 
 .form-actions {
@@ -1606,23 +1436,24 @@ legend {
   font-size: 11.5px;
 }
 
-.search-comp {
-  display: inline-block;
+.input-with-button {
   position: relative;
   font-weight: normal;
-
+  
   input {
     padding-right: 25px;
   }
-
+  
   .btn-icon {
     font-size: 14px;
     line-height: 16px;
     padding-right: 2px;
     position: absolute;
     right: 0;
-    top: 4px;  }
+    top: 4px;  
   }
+}
+
 
 /* Table */
 
@@ -1669,6 +1500,10 @@ legend {
     th {
       &.caption{
         text-align: center;
+        
+        .dropdown-menu {
+          text-align: left;
+        }
       }
 
       &.row-id {
@@ -2025,7 +1860,7 @@ legend {
 /* Forms */
 .form-control {
 
-  font-size: 12px;
+  line-height: 1;
   
   &:focus, &:hover {
     border-color: @c_green;
@@ -2059,6 +1894,10 @@ legend {
 }
 
 /* Notifications/Alerts */
+
+.button-close {
+  margin-left: 10px;
+}
 
 .alert {
   line-height: 1.5em;
@@ -2135,10 +1974,6 @@ legend {
   		font-weight: normal;
   	}
   	
-  	.bootstrap-select:not([class*="span"]):not([class*="col-"]):not([class*="form-control"]) {
-/*    	width: 100%;*/
-  	}
-  	
   	+ .modal-footer {
     	margin-top: 0;
   	}
@@ -2158,14 +1993,24 @@ legend {
 
 .modal-body ul {
   margin-top: 16px;
-  margin-left: 16px;
+  margin-left: 10px;
   
   li {
     margin-bottom: 4px;
-  }
-  
-  li .lo-emph {
-    margin-left: 5px;
+    
+    .lo-emph {
+      margin-left: 5px;
+    }
+    
+    &:before {
+    	content: "";
+    	font-family: FontAwesome;
+    	font-size: 4px;
+      vertical-align: middle;
+      display: inline-block;
+      margin-right: 6px;
+      color: @c_graylight;
+  	}
   }
 }
 
@@ -2180,103 +2025,188 @@ legend {
 ***********************************
 */
 
-/* Dashboard Page */
-.lo-main-pane.app-dashboard .panel {
+
+/* Example-applications */
+
+.transition {
+  transition: all .25s ease;
+}
+
+.example-apps {
+
   margin-top: 20px;
-  
-  .panel-heading {
-    padding: 10px 15px;
-    border-bottom: 1px solid @c_mainpane;
+
+  &.hover .panel {
+    .transition;
+    opacity: 0.75;
     
-    .btn-group {
-      margin-top: 2px;
+    &.clicked {
+      opacity: 1;
     }
   }
+
+  .panel {
   
-  .panel-body {
-    padding: 36px 15px 32px;
-  }
-}
-
-
-/* Edit Storage Page */
-
-.lo-db-instances {
-/*   text-align: center; */ /* for 1 resource */
-  text-align: left;
-  padding-left: 0;
-
-  [class*="lo-db-"] {
-    text-indent: -9999em;
-    background: @c_white;
-    background-position: center top;
-    background-repeat: no-repeat;
-    border: 1px solid @c_mainpane - 30;
-    display: inline-block;
-    width: 160px;
-    height: 105px;
-    border-radius: 6px;
-    margin: 1em;
-    margin-left: 0; /* for 1 resource */
-    cursor: pointer;
-    margin-top: 0;
-    margin-bottom: 15px;
-
+    margin: 0 10px 20px 10px;
+    .transition;
+    position: relative;
+    
+    .label-success {
+      position: absolute;
+      right: -1px;
+      top: -1px;
+      
+      i {
+        font-size: inherit;
+      }
+    }
+    
+    .panel-body {
+      padding: 20px 0;
+      
+      .pull-left {
+        width: 107px;
+        height: 107px;
+        margin-top: 10px;
+        overflow: hidden;
+      }
+      
+      img {
+        width: 107px;
+        height: 107px;
+      }
+      
+      .btn {
+        margin: 10px 0 0 0;
+        width: 100%;
+        opacity: 0;
+        .transition;
+        outline: 0 none;
+        
+        .spinner.spinner-inline {
+          display: none;
+          vertical-align: baseline;
+        }
+      }
+      
+      .pull-right {
+        width: calc(~"100% - 127px");
+      }
+        
+      h3 {
+        margin-top: 0;
+        margin-bottom: 5px;
+      }
+      
+      p {
+        font-size: 12px;
+        height: 99px;
+        overflow: hidden;
+        .transition;
+      }
+    }
+    
     &:hover {
-      border-width: 1px;
-      border-color: @c_green;
+      cursor: pointer;
+      opacity: 1;
+      
+      .panel-body p {
+        margin-right: 10px;
+        .transition;
+      }
     }
-
-    &.active{
-      border-width: 3px;
-      border-color: @c_green;
-      background-position: center -105px;
-    }
-  }
-
-  .lo-db-mongo {
-    background-image: url("img/db/mongo.png");
-
-    &.active {
-    }
-  }
-
-  .lo-db-mysql {
-    background-image: url("img/db/mysql.png");
-  }
-
-  .lo-db-plsql {
-    background-image: url("img/db/plsql.png");
-  }
-  
-  p,a {
-    font-size: 13px;
-  }
-}
-
-
-/* Storage Collections Page */
-
-.storage-collections {
-
-  .lo-page-info {
     
-    .btn-icon {
-      margin-left: 12px;
+    &:hover, 
+    &.clicked {
+      margin: -5px 5px 15px 5px;
+      padding: 5px 20px;
+      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.20);
     }
-
-    span .btn-icon {
-      margin-left: 5px;
+    
+    &.clicked {
+      .panel-body {
+        padding-bottom: 12px;
+        .transition;
+      
+        .pull-left {
+          height: 195px;
+          .transition;
+        }
+        
+        .btn {
+          opacity: 1;
+          
+          &.installing {
+            .spinner.spinner-inline {
+              display: inline-block;
+            }
+          }
+        }
+        
+        p {
+          height: 296px;
+          font-size: 13px;
+          -webkit-transition: all .25s ease;
+        }  
+      }
+      
+      &:hover {
+        cursor: pointer;
+      
+        .panel-body p {
+          height: 296px;
+        }   
+      }
     }
-  }
-
-  hr {
-    float: left;
-    width: 100%;
-    margin-top: 0;
-    margin-bottom: 20px;
+    
+    @media (max-width: 640px) {
+    
+      margin-left: 0;
+      margin-right: 0;
+      
+      &:hover,
+      &.clicked {
+        margin-left: -5px;
+        margin-right: -5px;
+      }
+    }
+    
+    @media (max-width: 767px) {
+    
+      .panel-body p {
+        .transition;
+      }
+    
+      &.clicked .panel-body p,
+      &.clicked:hover .panel-body p {
+        height: auto;
+        padding-bottom: 10px;
+      }
+    }
+    
+    @media (min-width: 768px) {
+      &.col-sm-6 {
+        width: calc(~"50% - 20px");
+        
+        &:hover, &.clicked {
+          width: calc(~"50% - 10px");
+        }
+      }
+    }
+    
+    @media (min-width: 1200px) {
+    
+      &.col-lg-4 {
+        width: calc(~"33.3% - 20px");
+        
+        &:hover, &.clicked {
+          width: calc(~"33.3% - 10px");
+        }
+      }
+    }
   }
 }
+
 
 /* Next Steps Page */
 
@@ -2415,6 +2345,140 @@ legend {
   }
 }
 
+
+/* Dashboard Page */
+
+.lo-main-pane.app-dashboard .panel {
+  margin-top: 20px;
+  
+  .panel-heading {
+    padding: 10px 15px;
+    border-bottom: 1px solid @c_mainpane;
+    
+    .btn-group {
+      margin-top: 2px;
+    }
+  }
+  
+  .panel-body {
+    padding: 36px 15px 32px;
+  }
+}
+
+
+/* Storage Collections Page */
+
+.storage-collections {
+
+  .lo-page-info {
+    
+    .btn-icon {
+      margin-left: 12px;
+    }
+
+    span .btn-icon {
+      margin-left: 5px;
+    }
+  }
+
+  hr {
+    float: left;
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+}
+
+
+/* Storage Settings Page */
+
+.lo-db-instances {
+  text-align: left;
+  padding-left: 0;
+
+  [class*="lo-db-"] {
+    text-indent: -9999em;
+    background: @c_white;
+    background-position: center top;
+    background-repeat: no-repeat;
+    border: 1px solid @c_mainpane - 30;
+    display: inline-block;
+    width: 160px;
+    height: 105px;
+    border-radius: 6px;
+    margin: 1em;
+    margin-left: 0; /* for 1 resource */
+    cursor: pointer;
+    margin-top: 0;
+    margin-bottom: 15px;
+
+    &:hover {
+      border-width: 1px;
+      border-color: @c_green;
+    }
+
+    &.active{
+      border-width: 3px;
+      border-color: @c_green;
+      background-position: center -105px;
+    }
+  }
+
+  .lo-db-mongo {
+    background-image: url("img/db/mongo.png");
+
+    &.active {
+    }
+  }
+
+  .lo-db-mysql {
+    background-image: url("img/db/mysql.png");
+  }
+
+  .lo-db-plsql {
+    background-image: url("img/db/plsql.png");
+  }
+  
+  p,a {
+    font-size: 13px;
+  }
+}
+
+
+/* Security Policies pages */
+
+.security-policies {
+  
+  .breadcrumb + .nav-tabs {
+    margin-top: 25px;
+    
+    + span + .panel {
+      margin-top: 30px;
+    }
+  }
+}
+
+.lo-content-area .nav-tabs > li:first-child {
+  margin-left: 0;
+}
+
+.nav-tabs > li.active > a, 
+.nav-tabs > li.active > a:hover, 
+.nav-tabs > li.active > a:focus {
+  color: @c_green;
+  background-color: #f5f5f5;
+}
+
+
+/* Script list page */
+
+.business-logic-list .panel-title {
+  margin-right: 15px;
+}
+
+
+/* */
+
 .lo-checkbox {
   opacity: 0.2;
   
@@ -2442,37 +2506,9 @@ tr.deleted {
   }
 }
 
-/* Security Policies pages */
-
-.security-policies {
-  
-  .breadcrumb + .nav-tabs {
-    margin-top: 25px;
-    
-    + span + .panel {
-      margin-top: 30px;
-    }
-  }
-}
-
-.lo-content-area .nav-tabs > li:first-child {
-  margin-left: 0;
-}
-
-.nav-tabs > li.active > a, 
-.nav-tabs > li.active > a:hover, 
-.nav-tabs > li.active > a:focus {
-  color: @c_green;
-  background-color: #f5f5f5;
-}
-
-
-/* */
-
 .form-group.hover-menu {
 
   .input-group-client {
-
     display: none;
     position: absolute;
     top: 0;
@@ -2505,8 +2541,6 @@ tr.deleted {
 }
 
 
-
-
 /* Media queries */
 
 @media only screen and (min-width: 1201px) {
@@ -2532,6 +2566,7 @@ tr.deleted {
       width: 33%;
       margin-bottom: 20px;
       padding: 0 10px;
+      min-height: 65px;
     }
   } 
 }
@@ -2733,10 +2768,6 @@ tr.deleted {
 
 @media only screen and (max-width: 640px) {
 
-  .nav-tabs > li:first-child {
-    margin-left: 15px;
-  }
-  
   .lo-sidebar {
     
     .dropdown {
@@ -2772,15 +2803,36 @@ tr.deleted {
       &:last-child {
         margin-bottom: 10px;
       }
+      
+      a {
+        font-size: 13px;
+        
+        .fa {
+          font-size: 33px;
+          
+          &.fa-mobile {
+            font-size: 38px;
+          }
+        }
+      }
     }
   }
   
   .app-dashboard .lo-info-pane {
     padding: 0 20px;
+    
+    .details section {
+      width: 50%;
+      min-height: 80px;
+    }
   }
   
   .lo-main-pane .lo-content-area {
     padding: 0 15px 30px;
+  }
+  
+  .nav-tabs > li:first-child {
+    margin-left: 15px;
   }
   
   .panel.lo-dashboard .panel-heading .panel-title {
@@ -2794,11 +2846,7 @@ tr.deleted {
   .panel.lo-dashboard .panel-body .lo-measure-box {
     width: 100%;
   }
-  
-  .app-dashboard .lo-info-pane .details section {
-    width: 50%;
-  }
-  
+    
   .lo-page-info p {
     display: block;
     margin-bottom: 10px;
@@ -2813,7 +2861,7 @@ tr.deleted {
     }
   }
     
-  .feedback-aligner .alert {
+  #feedback-aligner > div > div {
     min-width: 0;
     width: calc(~"100% - 30px");
   }
@@ -2841,7 +2889,7 @@ tr.deleted {
     width: 150px;
   }
   
-  .storage-collections .lo-page-info .pull-left {
+  .storage-collections .lo-page-info > .pull-left {
     margin-bottom: 10px;
   }
   
@@ -2852,6 +2900,8 @@ tr.deleted {
   }
   
 }
+
+/* */
 
 .CodeMirror {
   border: 1px solid #63b474;
