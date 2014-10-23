@@ -12,34 +12,42 @@ import org.jboss.msc.value.ImmediateValue;
  */
 public class MockExtension implements Extension {
 
+    public MockExtension() {
+    }
+
+    public MockExtension(String id) {
+        this.id = id;
+    }
+
     public static ServiceName resource(String id) {
-        return ServiceName.of( "mock", "resource", id );
+        return ServiceName.of("mock", "resource", id);
     }
 
     public static ServiceName adminResource(String id) {
-        return ServiceName.of( "mock", "admin-resource", id );
+        return ServiceName.of("mock", "admin-resource", id);
     }
 
     public static ServiceName adminResource(String appId, String id) {
-        return ServiceName.of( "mock", "app-admin-resource", appId, id );
+        return ServiceName.of("mock", "app-admin-resource", appId, id);
     }
 
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
-        MockAdminResource admin = new MockAdminResource( context.id(), "system" );
-        context.target().addService(adminResource( context.id() ), new ValueService<MockAdminResource>(new ImmediateValue<>(admin)))
+        MockAdminResource admin = new MockAdminResource(context.id(), "system");
+        ServiceName serviceName = this.id != null ? adminResource(context.id()).append(this.id) : adminResource(context.id());
+        context.target().addService(serviceName, new ValueService<>(new ImmediateValue<>(admin)))
                 .install();
 
-        context.mountPrivate( adminResource( context.id() ));
+        context.mountPrivate(serviceName);
     }
 
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
-        MockAdminResource admin = new MockAdminResource( context.resourceId(), "application" );
-        context.mountPrivate( admin );
+        MockAdminResource admin = new MockAdminResource(context.resourceId(), "application");
+        context.mountPrivate(admin);
 
-        MockResource resource = new MockResource( context.resourceId() );
-        context.mountPublic( resource );
+        MockResource resource = new MockResource(context.resourceId());
+        context.mountPublic(resource);
     }
 
     @Override
@@ -50,9 +58,11 @@ public class MockExtension implements Extension {
     @Override
     public void instance(String id, SystemExtensionContext context) throws Exception {
         MockAdminResource instance = new MockAdminResource(context.id(), "instance");
-        context.target().addService(adminResource( context.id() ), new ValueService<MockAdminResource>(new ImmediateValue<>(instance)))
+        context.target().addService(adminResource(context.id()), new ValueService<>(new ImmediateValue<>(instance)))
                 .install();
 
-        context.mountInstance( adminResource( context.id() ));
+        context.mountInstance(adminResource(context.id()));
     }
+
+    private String id = null;
 }

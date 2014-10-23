@@ -27,6 +27,7 @@ public class MediaType {
 
     // Custom JSON media types
     public static final MediaType LOCAL_APP_JSON = new MediaType("application/vnd.liveoak.local-app+json");
+    public static final MediaType GIT_APP_JSON = new MediaType("application/vnd.liveoak.git-app+json");
 
     public static final MediaType HTML = new MediaType("text/html");
     public static final MediaType FORM_URLENCODED = new MediaType("application/x-www-form-urlencoded");

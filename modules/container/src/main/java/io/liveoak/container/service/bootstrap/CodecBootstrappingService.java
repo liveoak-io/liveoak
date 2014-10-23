@@ -50,6 +50,7 @@ public class CodecBootstrappingService implements Service<Void> {
 
         // Custom Media Types
         codecCompletionDependencies.add(installCodec(target, MediaType.LOCAL_APP_JSON, JSONEncoder.class, new JSONDecoder()));
+        codecCompletionDependencies.add(installCodec(target, MediaType.GIT_APP_JSON, JSONEncoder.class, new JSONDecoder()));
 
         // Install completion service
         ServiceBuilder<Void> builder = target.addService(CODEC_MANAGER_COMPLETE, new CodecInstallationCompleteService());

@@ -39,7 +39,7 @@ public class ZeroResourcesService implements Service<Void> {
         ServiceTarget target = context.getChildTarget();
 
         ServiceName systemName = Services.resource(ZeroExtension.APPLICATION_ID, "system");
-        target.addService(systemName, new ValueService<SystemResource>(new ImmediateValue<>(new SystemResource())))
+        target.addService(systemName, new ValueService<>(new ImmediateValue<>(new SystemResource())))
                 .install();
 
         MountService<RootResource> mount = new MountService<>();
@@ -73,6 +73,20 @@ public class ZeroResourcesService implements Service<Void> {
         target.addService(Services.defaultMount(localApplicationsName), localAppMediaTypeMount)
                 .addDependency(Services.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, localAppMediaTypeMount.mountPointInjector())
                 .addDependency(localApplicationsName, RootResource.class, localAppMediaTypeMount.resourceInjector())
+                .install();
+
+        // Install Git Applications Resource
+        ServiceName gitApplicationsName = Services.resource(ZeroExtension.APPLICATION_ID, "git-applications");
+        GitApplicationsResourceService gitAppsResourceService = new GitApplicationsResourceService();
+        target.addService(gitApplicationsName, gitAppsResourceService)
+                .addDependency(APPLICATION_REGISTRY, InternalApplicationRegistry.class, gitAppsResourceService.applicationRegistryInjector())
+                .addDependency(APPLICATIONS_DIR, File.class, gitAppsResourceService.applicationDirectoryInjector())
+                .install();
+
+        MediaTypeMountService<RootResource> gitAppMediaTypeMount = new MediaTypeMountService<>(null, MediaType.GIT_APP_JSON, false);
+        target.addService(Services.defaultMount(gitApplicationsName), gitAppMediaTypeMount)
+                .addDependency(Services.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, gitAppMediaTypeMount.mountPointInjector())
+                .addDependency(gitApplicationsName, RootResource.class, gitAppMediaTypeMount.resourceInjector())
                 .install();
     }
 
