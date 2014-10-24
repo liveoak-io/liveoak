@@ -25,6 +25,11 @@ var LiveOak = function( options ) {
         options.appId = server.appId;
     }
 
+    // Pull application id from url, if needed
+    if (!options.appId) {
+        options.appId = parseApplicationId();
+    }
+
     var http = new Http(options);
     var auth;
     var stomp_client = new Stomp.Client( options.host, options.port, options.secure, options.appId );
@@ -111,6 +116,16 @@ var LiveOak = function( options ) {
                 }
                 server.appId = parts[3];
                 return server;
+            }
+        }
+    }
+
+    function parseApplicationId() {
+        var scripts = document.getElementsByTagName('script');
+        for (var i = 0; i < scripts.length; i++)  {
+            if (scripts[i].src.match(/.*liveoak\.js/)) {
+                var parts = scripts[i].src.split('/');
+                return parts[3];
             }
         }
     }
