@@ -465,6 +465,13 @@ loMod.factory('LoAppExamples', function($resource) {
         headers: {
           'Content-Type':'application/vnd.liveoak.local-app+json'
         }
+      },
+      importGit: {
+        method : 'POST',
+        url: '/admin/applications/',
+        headers: {
+          'Content-Type':'application/vnd.liveoak.git-app+json'
+        }
       }
     });
 });

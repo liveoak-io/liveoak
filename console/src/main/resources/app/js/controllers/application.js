@@ -269,6 +269,48 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
   $scope.appModel = {
   };
 
+  // Import Application
+  $scope.modalApplicationImport = function() {
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/application/application-import.html',
+      controller: ImportApplicationModalCtrl,
+      scope: $scope
+    });
+  };
+
+  var ImportApplicationModalCtrl = function ($scope, $modalInstance, $log, LoAppExamples) {
+    $scope.sources = [{'id': 'git', 'name': 'Git'}, {'id': 'local', 'name': 'Local Filesystem'}];
+    $scope.source = 'git';
+
+    $scope.app = {};
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+
+    $scope.import = function () {
+      importApp($scope.app, LoAppExamples, Notifications, $modalInstance, $route);
+    };
+
+    var idAuto = true;
+
+    $scope.updateAppId = function() {
+      if (idAuto) {
+        console.log($scope.$parent.source);
+        if ($scope.source === 'local') {
+          $scope.app.id = $scope.app.path.replace(/\/$/, '').split('/').pop();
+        }
+        else {
+          $scope.app.id = $scope.app.url.replace(/\/$/, '').replace(/\.git$/, '').split('/').pop();
+        }
+      }
+    };
+
+    $scope.manualChange = function() {
+      idAuto = false;
+    };
+  }
+
 });
 
 loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal, Notifications, LoRealmApp, loClients,
@@ -760,20 +802,35 @@ loMod.controller('ExampleListCtrl', function($scope, $rootScope, $location, $fil
   };
 
   $scope.install = function(example) {
-    example.installing = true;
-
-    new LoAppExamples({ id: example.id, localPath: example.path }).$install({},
-      function(/*value, responseHeaders*/) {
-        Notifications.success('The example application "' + example.id + '" has been installed.');
-        example.installing = false;
-        example.installed = true;
-      },
-      function(httpResponse) {
-        Notifications.httpError('Failed to install the example application "' + example.id + '".', httpResponse);
-        example.installing = false;
-      }
-    );
+    importApp(example, LoAppExamples, Notifications);
   };
 
 });
 
+var importApp = function(app, LoAppExamples, Notifications, $modalInstance, $route) {
+  app.installing = true;
+
+  var installSuccess = function(value/*, responseHeaders*/) {
+    Notifications.success('The application "' + value.name + '" has been installed.');
+    app.installing = false;
+    app.installed = true;
+    if ($modalInstance) {
+      $modalInstance.close();
+    }
+    if ($route) {
+      $route.reload();
+    }
+  };
+
+  var installFailure = function(httpResponse) {
+    Notifications.httpError('Failed to install the application "' + app.id + '".', httpResponse);
+    app.installing = false;
+  };
+
+  if (app.hasOwnProperty('url')) {
+    new LoAppExamples({ id: app.id, url: app.url }).$importGit({}, installSuccess, installFailure);
+  }
+  else if (app.hasOwnProperty('path')) {
+    new LoAppExamples({ id: app.id, localPath: app.path }).$install({}, installSuccess, installFailure);
+  }
+}
