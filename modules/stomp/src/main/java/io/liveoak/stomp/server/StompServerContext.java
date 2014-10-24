@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -13,7 +13,7 @@ import io.liveoak.stomp.StompMessage;
  */
 public interface StompServerContext {
 
-    void handleConnect(StompConnection connection) throws StompServerException;
+    void handleConnect(StompConnection connection, String applicationId) throws StompServerException;
 
     void handleDisconnect(StompConnection connection) throws StompServerException;
 

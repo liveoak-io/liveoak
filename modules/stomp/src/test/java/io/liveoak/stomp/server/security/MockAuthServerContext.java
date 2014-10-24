@@ -24,7 +24,7 @@ public class MockAuthServerContext implements StompServerContext {
     private String lastSubscribedLogin;
 
     @Override
-    public void handleConnect(StompConnection connection) throws StompServerException {
+    public void handleConnect(StompConnection connection, String applicationId) throws StompServerException {
         String login = connection.getLogin();
         String passcode = connection.getPasscode();
 

@@ -15,7 +15,8 @@ var Stomp = {
         CONTENT_LENGTH: 'content-length',
         CONTENT_TYPE: 'content-type',
         ACCEPT_VERSION: 'accept-version',
-        VERSION: 'version'
+        VERSION: 'version',
+        APPLICATION_ID: 'application-id'
     },
 
     Transport: {
@@ -110,10 +111,11 @@ var Stomp = {
 
 };
 
-Stomp.Client = function (host, port, secure) {
+Stomp.Client = function (host, port, secure, appId) {
     this._host = host || Stomp.DEFAULT_HOST;
     this._port = port || Stomp.DEFAULT_PORT || 8080;
     this._secure = secure || Stomp.DEFAULT_SECURE_FLAG || false;
+    this._appId = appId || "";
 }
 
 Stomp.Client.prototype = {
@@ -162,6 +164,9 @@ Stomp.Client.prototype = {
             t.client = this;
             if (this._login && this._passcode) {
               t.setAuth(this._login, this._passcode);
+            }
+            if (this._appId) {
+              t.setApplication(this._appId);
             }
             transports.push(t);
         }

@@ -1,9 +1,4 @@
 <?xml version="1.0"?>
-<!--
-  ~ Copyright 2013 Red Hat, Inc. and/or its affiliates.
-  ~
-  ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
-  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0           http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
@@ -29,6 +24,10 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-spi</artifactId>
         </dependency>
     </dependencies>
     <build>
