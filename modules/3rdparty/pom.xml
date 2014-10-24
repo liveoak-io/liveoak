@@ -243,6 +243,16 @@
             <artifactId>org.eclipse.jgit</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.javaewah</groupId>
+            <artifactId>JavaEWAH</artifactId>
+            <scope>compile</scope>
+        </dependency>
 
         <!-- DynJS -->
         <dependency>

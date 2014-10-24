@@ -54,6 +54,8 @@
         <mvel.version>2.1.8.Final</mvel.version>
         <janino.version>2.5.16</janino.version>
         <jgit.version>3.5.0.201409260305-r</jgit.version>
+        <jcraft.version>0.1.50</jcraft.version>
+        <googlecode.javaewah.version>0.7.9</googlecode.javaewah.version>
         <javamail.version>1.4.7</javamail.version>
         <hibernate.version>4.2.7.SP1</hibernate.version>
         <hibernate.annotations.version>4.0.2.Final</hibernate.annotations.version>
@@ -267,6 +269,16 @@
                 <groupId>org.eclipse.jgit</groupId>
                 <artifactId>org.eclipse.jgit</artifactId>
                 <version>${jgit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jcraft</groupId>
+                <artifactId>jsch</artifactId>
+                <version>${jcraft.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.googlecode.javaewah</groupId>
+                <artifactId>JavaEWAH</artifactId>
+                <version>${googlecode.javaewah.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.mail</groupId>

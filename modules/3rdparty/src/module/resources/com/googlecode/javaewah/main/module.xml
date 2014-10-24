@@ -5,16 +5,14 @@
   ~
   ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
   -->
-<module xmlns="urn:jboss:module:1.3" name="org.eclipse.jgit">
+<module xmlns="urn:jboss:module:1.3" name="com.googlecode.javaewah">
 
     <resources>
-        <artifact name="org.eclipse.jgit:org.eclipse.jgit:${jgit.version}"/>
+        <artifact name="com.googlecode.javaewah:JavaEWAH:${googlecode.javaewah.version}"/>
     </resources>
 
     <dependencies>
-        <module name="javax.api"/>
-        <module name="com.jcraft.jsch"/>
-        <module name="com.googlecode.javaewah"/>
     </dependencies>
 
 </module>
+
