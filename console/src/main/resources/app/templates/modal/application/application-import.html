@@ -5,7 +5,7 @@
   <h4 class="modal-title">Import Application</h4>
 </div>
 
-<div class="modal-body clearfix">
+<div class="modal-body clearfix import-applications">
 
   <div class="alert alert-danger hide"> <!-- Error (invalid folder) -->
     <span class="pficon-layered">
@@ -28,7 +28,7 @@
     <div class="form-group clearfix" ng-if="source === 'local' && !app.installing">
       <label for="path" class="col-sm-4 control-label">Root Directory</label>
       <div class="col-sm-6">
-        <input type="text" class="form-control" id="path" ng-model="app.path" ng-change="updateAppId()" placeholder="eg: /home/liveoak/apps/sample-app">
+        <input type="text" class="form-control" id="path" ng-model="app.path" ng-change="updateAppId()" placeholder="e.g.: /home/liveoak/apps/sample-app">
       </div>
     </div>
 
@@ -36,14 +36,14 @@
     <div class="form-group clearfix" ng-if="source === 'git' && !app.installing">
       <label for="url" class="col-sm-4 control-label">HTTP(S) GIT URL</label>
       <div class="col-sm-6">
-        <input type="text" class="form-control" id="url" ng-model="app.url" ng-change="updateAppId()" placeholder="eg: https://github.com/liveoak-io/liveoak-chat-html.git">
+        <input type="text" class="form-control" id="url" ng-model="app.url" ng-change="updateAppId()" placeholder="e.g.: https://github.com/liveoak-io/liveoak-chat-html.git">
       </div>
     </div>
 
     <div class="form-group clearfix" ng-show="!app.installing">
       <label for="url" class="col-sm-4 control-label">Application ID</label>
       <div class="col-sm-6">
-        <input type="text" class="form-control" id="id" ng-model="app.id" ng-change="manualChange()" placeholder="eg: MyChatHTML">
+        <input type="text" class="form-control" id="id" ng-model="app.id" ng-change="manualChange()" placeholder="e.g.: MyChatHTML">
       </div>
     </div>
   </form>
