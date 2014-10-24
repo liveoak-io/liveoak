@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.ResourcePath;
 import org.jboss.logging.Logger;
 
 /**
@@ -30,8 +31,12 @@ public class ApplicationConfigurationManager {
     public synchronized void updateApplication(InternalApplication application) throws IOException {
         ObjectNode tree = read();
         tree.put("name", application.name());
-        if (application.htmlApplicationResourcePath() != null) {
-            tree.put("html-app", application.htmlApplicationResourcePath().toString());
+        ResourcePath htmlAppPath = application.htmlApplicationResourcePath();
+        if (htmlAppPath != null) {
+            if (htmlAppPath.head().name().equals(application.id())) {
+                htmlAppPath = htmlAppPath.subPath();
+            }
+            tree.put("html-app", htmlAppPath.toString());
         }
         tree.put("visible", application.visible());
 

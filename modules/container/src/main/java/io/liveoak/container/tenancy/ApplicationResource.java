@@ -90,6 +90,9 @@ public class ApplicationResource implements RootResource, SynchronousResource {
 
         String htmlPath = (String) state.getProperty("html-app");
         if (htmlPath != null) {
+            if (!htmlPath.startsWith("/" + this.app.id())) {
+                htmlPath = "/" + this.app.id() + htmlPath;
+            }
             this.app.setHtmlApplicationPath(htmlPath);
         }
 

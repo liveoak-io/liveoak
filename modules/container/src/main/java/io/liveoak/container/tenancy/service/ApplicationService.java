@@ -92,7 +92,9 @@ public class ApplicationService implements Service<InternalApplication> {
                 }
                 if ((value = state.getProperty("html-app")) != null) {
                     htmlApp = new ResourcePath((String) value);
-                    htmlApp.prependSegment(this.id);
+                    if (!htmlApp.head().name().equals(this.id)) {
+                        htmlApp.prependSegment(this.id);
+                    }
                 }
                 if ((value = state.getProperty("visible")) != null) {
                     appVisible = (Boolean) value;
