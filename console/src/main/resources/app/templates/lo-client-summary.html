@@ -1,6 +1,6 @@
 <div class="panel">
   <div class="panel-heading">
-    <h2 class="panel-title"><span ng-show="!showFQDN && client.kcClient.name.indexOf($parent.$parent.namePrefix) === 0" ng-click="showFQDN = true;">(...)</span><a href="#/applications/{{app.id}}/application-clients/{{ client.kcClient.name }}"><span ng-show="showFQDN">{{$parent.$parent.namePrefix}}</span>{{ client.kcClient.name|clientname:app.id }}</a></h2>
+    <h2 class="panel-title"><span ng-show="!showFQDN && client.kcClient.name.indexOf($parent.$parent.namePrefix) === 0" ng-click="showFQDN = true;"><span data-tooltip="Click to expand">(...)</span></span><a href="#/applications/{{app.id}}/application-clients/{{ client.kcClient.name }}"><span ng-show="showFQDN">{{$parent.$parent.namePrefix}}</span>{{ client.kcClient.name|clientname:app.id }}</a></h2>
     <div class="pull-right">
       <a href ng-click="$parent.modalClientDelete(client.kcClient.name, client.kcClient.id)"><i class="fa fa-trash-o" tooltip="Delete Client"></i></a>
     </div>
