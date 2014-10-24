@@ -42,13 +42,14 @@ public class ConnectHandler extends AbstractControlFrameHandler {
 
         String login = headers.get(Headers.LOGIN);
         String passcode = headers.get(Headers.PASSCODE);
+        String applicationId = headers.get(Headers.APPLICATION_ID);
 
         StompConnection stompConnection = new StompConnection(ctx.channel(), login, passcode);
         StompFrame connected = StompFrame.newConnectedFrame(stompConnection.getConnectionId(), version);
         if (hb != null) {
             connected.headers().put(Headers.HEARTBEAT, hb.getServerSend() + "," + hb.getServerReceive());
         }
-        this.serverContext.handleConnect(stompConnection);
+        this.serverContext.handleConnect(stompConnection, applicationId);
         ctx.channel().attr(CONNECTION).set(stompConnection);
         ctx.writeAndFlush(connected);
     }

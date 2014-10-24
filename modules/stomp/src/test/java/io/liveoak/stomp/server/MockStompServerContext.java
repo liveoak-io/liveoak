@@ -17,7 +17,7 @@ import java.util.List;
 public class MockStompServerContext implements StompServerContext {
 
     @Override
-    public void handleConnect(StompConnection connection) {
+    public void handleConnect(StompConnection connection, String applicationId) {
     }
 
     @Override

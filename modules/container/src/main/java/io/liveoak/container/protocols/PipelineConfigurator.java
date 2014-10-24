@@ -10,7 +10,7 @@ import io.liveoak.container.ErrorHandler;
 import io.liveoak.container.RequestContextDisposerHandler;
 import io.liveoak.container.ResourceHandler;
 import io.liveoak.container.ResourceStateHandler;
-import io.liveoak.container.auth.SecuredStompServerContext;
+import io.liveoak.container.subscriptions.SecuredStompServerContext;
 import io.liveoak.container.interceptor.InterceptorHandler;
 import io.liveoak.container.interceptor.InterceptorManagerImpl;
 import io.liveoak.container.protocols.http.CORSHandler;

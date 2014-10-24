@@ -1,9 +1,8 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package io.liveoak.stomp;
 
 import java.util.Set;
@@ -35,6 +34,7 @@ public interface Headers {
     String TRANSACTION = "transaction";
     String SUBSCRIPTION = "subscription";
     String MESSAGE_ID = "message-id";
+    String APPLICATION_ID = "application-id";
     String HOST = "host";
     String ACCEPT_VERSION = "accept-version";
     String VERSION = "version";

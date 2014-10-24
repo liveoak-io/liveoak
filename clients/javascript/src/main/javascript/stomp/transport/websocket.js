@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -48,6 +48,10 @@ Stomp.Transport.WebSocket.prototype = {
       this._passcode = passcode;
     },
 
+    setApplication: function(appId) {
+        this._appId = appId;
+    },
+
     _issueConnect: function () {
         console.log("issuing connect");
         var headers = {};
@@ -56,6 +60,9 @@ Stomp.Transport.WebSocket.prototype = {
         }
         if (this._passcode) {
             headers['passcode'] = this._passcode;
+        }
+        if (this._appId) {
+            headers[Stomp.Headers.APPLICATION_ID] = this._appId;
         }
         Stomp.logger.debug(this.client);
         headers[Stomp.Headers.ACCEPT_VERSION] = this.client.supportedVersions();

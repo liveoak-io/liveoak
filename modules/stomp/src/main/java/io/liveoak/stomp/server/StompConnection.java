@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -7,6 +7,7 @@ package io.liveoak.stomp.server;
 
 import java.util.UUID;
 
+import io.liveoak.spi.security.SecurityContext;
 import io.liveoak.stomp.StompMessage;
 import io.netty.channel.Channel;
 
@@ -34,13 +35,21 @@ public class StompConnection {
         return passcode;
     }
 
+    public void setSecurityContext(SecurityContext securityContext) {
+        this.securityContext = securityContext;
+    }
+
+    public SecurityContext getSecurityContext() {
+        return this.securityContext;
+    }
+
     public void send(StompMessage message) {
         this.channel.writeAndFlush(message);
     }
 
-    private String connectionId;
+    private final String connectionId;
     private final Channel channel;
     private final String login;
     private final String passcode;
-
+    private SecurityContext securityContext;
 }

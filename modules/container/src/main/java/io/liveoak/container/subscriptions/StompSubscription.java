@@ -24,14 +24,13 @@ import io.liveoak.stomp.server.StompConnection;
  */
 public class StompSubscription implements Subscription {
 
-    public StompSubscription(StompConnection connection, String destination, String subscriptionId, MediaType mediaType, ResourceCodec codec, SecurityContext securityContext) {
+    public StompSubscription(StompConnection connection, String destination, String subscriptionId, MediaType mediaType, ResourceCodec codec) {
         this.connection = connection;
         this.destination = destination;
         this.subscriptionId = subscriptionId;
         this.mediaType = mediaType;
         this.codec = codec;
         this.resourcePath = new ResourcePath(destination);
-        this.securityContext = securityContext;
     }
 
     public static String generateId(StompConnection connection, String subscriptionId) {
@@ -58,7 +57,7 @@ public class StompSubscription implements Subscription {
 
     @Override
     public SecurityContext securityContext() {
-        return this.securityContext;
+        return this.connection.getSecurityContext();
     }
 
     @Override
@@ -111,6 +110,5 @@ public class StompSubscription implements Subscription {
     private ResourceCodec codec;
 
     private final ResourcePath resourcePath;
-    private final SecurityContext securityContext;
 
 }
