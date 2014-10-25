@@ -85,6 +85,12 @@
                     <named-formatter name="COLOR-PATTERN"/>
                 </formatter>
             </console-handler>
+            <console-handler name="CONSOLE-LOG">
+                <level name="INFO"/>
+                <formatter>
+                    <named-formatter name="PATTERN-LOG"/>
+                </formatter>
+            </console-handler>
             <periodic-rotating-file-handler name="FILE" autoflush="true">
                 <formatter>
                     <named-formatter name="PATTERN"/>
@@ -111,6 +117,12 @@
             <logger category="jacorb.config">
                 <level name="ERROR"/>
             </logger>
+            <logger category="io.liveoak.container.analytics.Analytics.log" use-parent-handlers="false">
+                <level name="INFO"/>
+                <handlers>
+                    <handler name="CONSOLE-LOG"></handler>
+                </handlers>
+            </logger>
             <root-logger>
                 <level name="INFO"/>
                 <handlers>
@@ -123,6 +135,9 @@
             </formatter>
             <formatter name="COLOR-PATTERN">
                 <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
+            </formatter>
+            <formatter name="PATTERN-LOG">
+                <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %s%E%n"/>
             </formatter>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:batch:1.0">

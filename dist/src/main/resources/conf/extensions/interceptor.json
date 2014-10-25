@@ -1,15 +1,15 @@
 {
     module-id:  'io.liveoak.interceptor',
     config: {
-            local: [
-                {
-                    interceptor-name: 'timing-local'
-                }
-            ],
+            //local: [
+            //    {
+            //        interceptor-name: 'timing-local'
+            //    }
+            //],
             http: [
-                {
-                    interceptor-name: 'timing-http'
-                },
+                //{
+                //    interceptor-name: 'timing-http'
+                //},
                 {
                     interceptor-name: 'https-redirect'
                 },

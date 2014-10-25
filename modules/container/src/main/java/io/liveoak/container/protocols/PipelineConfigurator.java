@@ -10,7 +10,10 @@ import io.liveoak.container.ErrorHandler;
 import io.liveoak.container.RequestContextDisposerHandler;
 import io.liveoak.container.ResourceHandler;
 import io.liveoak.container.ResourceStateHandler;
-import io.liveoak.container.subscriptions.SecuredStompServerContext;
+import io.liveoak.container.analytics.AnalyticsBandwidthHandler;
+import io.liveoak.container.analytics.AnalyticsNotificationHandler;
+import io.liveoak.container.analytics.AnalyticsResponseHandler;
+import io.liveoak.container.analytics.AnalyticsService;
 import io.liveoak.container.interceptor.InterceptorHandler;
 import io.liveoak.container.interceptor.InterceptorManagerImpl;
 import io.liveoak.container.protocols.http.CORSHandler;
@@ -22,6 +25,7 @@ import io.liveoak.container.protocols.local.LocalResourceResponseEncoder;
 import io.liveoak.container.protocols.websocket.WebSocketHandshakerHandler;
 import io.liveoak.container.protocols.websocket.WebSocketStompFrameDecoder;
 import io.liveoak.container.protocols.websocket.WebSocketStompFrameEncoder;
+import io.liveoak.container.subscriptions.SecuredStompServerContext;
 import io.liveoak.container.subscriptions.SubscriptionWatcher;
 import io.liveoak.container.tenancy.GlobalContext;
 import io.liveoak.spi.client.Client;
@@ -38,6 +42,7 @@ import io.liveoak.stomp.server.protocol.SendHandler;
 import io.liveoak.stomp.server.protocol.StompErrorHandler;
 import io.liveoak.stomp.server.protocol.SubscribeHandler;
 import io.liveoak.stomp.server.protocol.UnsubscribeHandler;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
@@ -113,6 +118,13 @@ public class PipelineConfigurator {
 
         StompServerContext serverContext = new SecuredStompServerContext(this.codecManager, this.subscriptionManager, this.client);
 
+        AnalyticsService analyticsService = AnalyticsService.instance();
+        AnalyticsBandwidthHandler analyticsHandler = null;
+        if (analyticsService != null && analyticsService.enabled()) {
+            analyticsHandler = new AnalyticsBandwidthHandler(analyticsService);
+            pipeline.addLast("analytics-handler", analyticsHandler);
+        }
+
         pipeline.addLast(new StompFrameDecoder());
         pipeline.addLast(new StompFrameEncoder());
         // handle frames
@@ -124,6 +136,11 @@ public class PipelineConfigurator {
         pipeline.addLast(new ReceiptHandler());
         pipeline.addLast(new StompMessageDecoder());
         pipeline.addLast(new StompMessageEncoder(true));
+
+        if (analyticsHandler != null) {
+            pipeline.addLast(new AnalyticsNotificationHandler(analyticsHandler));
+        }
+
         // handle messages
         pipeline.addLast(new SendHandler(serverContext));
         // catch errors, return an ERROR message.
@@ -136,8 +153,21 @@ public class PipelineConfigurator {
             pipeline.remove("protocol-detector");
         }
         //pipeline.addLast(new DebugHandler("server-pre-http"));
+
+        AnalyticsBandwidthHandler analyticsHandler = null;
+        AnalyticsService analyticsService = AnalyticsService.instance();
+        if (analyticsService != null && analyticsService.enabled()) {
+            analyticsHandler = new AnalyticsBandwidthHandler(analyticsService);
+            pipeline.addLast("analytics-handler", analyticsHandler);
+        }
+
         pipeline.addLast(new HttpRequestDecoder());
         pipeline.addLast(new HttpResponseEncoder());
+
+        if (analyticsHandler != null) {
+            pipeline.addLast(new AnalyticsResponseHandler(analyticsHandler));
+        }
+
         //pipeline.addLast( new DebugHandler( "server-post-http" ) );
         //pipeline.addLast(new HttpObjectAggregator(1024 * 1024)); //TODO: Remove this to support chunked http
         pipeline.addLast("ws-handshake", new WebSocketHandshakerHandler(this));
@@ -164,6 +194,13 @@ public class PipelineConfigurator {
         pipeline.addLast(new ReceiptHandler());
         pipeline.addLast(new StompMessageDecoder());
         pipeline.addLast(new StompMessageEncoder(true));
+
+        // place analytics handler in stomp pipeline to another position - it's now twice in the pipeline
+        AnalyticsBandwidthHandler handler = (AnalyticsBandwidthHandler) pipeline.get("analytics-handler");
+        if (handler != null) {
+            pipeline.addLast(new AnalyticsNotificationHandler(handler));
+        }
+
         // handle messages
         pipeline.addLast(new SendHandler(serverContext));
         // catch errors, return an ERROR message.

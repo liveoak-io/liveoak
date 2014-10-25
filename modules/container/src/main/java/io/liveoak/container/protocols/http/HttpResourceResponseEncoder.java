@@ -226,7 +226,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
                         @Override
                         public void close() {
                             ctx.writeAndFlush(new DefaultLastHttpContent(Unpooled.EMPTY_BUFFER));
-                            ctx.fireUserEventTriggered(new RequestCompleteEvent(msg.requestId()));
+                            ctx.pipeline().fireUserEventTriggered(new RequestCompleteEvent(msg.requestId()));
                         }
 
                         @Override

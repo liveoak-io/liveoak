@@ -1,0 +1,8 @@
+{
+  module-id: 'io.liveoak.analytics',
+  config: {
+    enabled: true,
+    rhq-metrics-url: 'http://${jboss.bind.address:localhost}:${jboss.http.port:8080}/rhq-metrics/event-log',
+    apps-enabled-by-default: true
+  }
+}

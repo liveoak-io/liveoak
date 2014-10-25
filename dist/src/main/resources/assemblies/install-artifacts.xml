@@ -34,6 +34,10 @@
             <source>${project.build.directory}/dependency/keycloak-js/keycloak.js</source>
             <outputDirectory>/client/auth/</outputDirectory>
         </file>
+        <file>
+            <source>./src/main/resources/deployments/rhq-metrics-rest-0.2.4.Alpha01-liveoak.war</source>
+            <outputDirectory>/standalone/deployments</outputDirectory>
+        </file>
     </files>
     <fileSets>
         <fileSet>

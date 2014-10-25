@@ -32,7 +32,7 @@ public class InternalStorage {
      * @return A collection for the resource to use
      */
     public DBCollection getCollection(String collectionName) {
-         // Note: this method is more of a helper method than anything.
+         // Note: this setMethod is more of a helper setMethod than anything.
          // The resource could call getCollection().getCollection('foo') to
          // do the same thing.
          collectionName = InternalStorageManager.replaceCollectionName(collectionName);

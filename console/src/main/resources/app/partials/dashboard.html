@@ -8,7 +8,7 @@
           <h2 class="panel-title"><span>{{ curApp.name }}</span> Dashboard</h2>
 
           <div class="btn-group">
-            <button ng-repeat="period in dataPeriods" class="btn btn-default" type="button" ng-model="$parent.range" btn-radio="period">{{period}}</button>
+            <button ng-repeat="period in dataPeriods" class="btn btn-default" type="button" ng-click="rangeSelected(period)" ng-model="$parent.range" btn-radio="period">{{period}}</button>
           </div>
         </div>
 
@@ -16,32 +16,89 @@
           <div class="col-xs-12 lo-measure-box api highlight">
             <i class="fa fa-spinner"></i>
             <div>
-              <em>{{data[curApp.name].metrics[range].requests || "0"}}</em>
-              <span class="text">API requests / second</span>
+              <em>{{displayData[range].requests.value}}</em>
+              <span class="text">{{displayData[range].requests.unit}} / {{displayData[range].requests.per}}</span>
             </div>
           </div>
           <div class="col-xs-4 lo-measure-box users">
             <i class="fa fa-users"></i>
             <div>
-              <em>{{data[curApp.name].metrics[range].users || "0"}}</em>
-              <span class="text">active users / second</span>
+              <em>{{displayData[range].users.value}}</em>
+              <span class="text">{{displayData[range].users.unit}} / {{displayData[range].users.per}}</span>
             </div>
           </div>
           <div class="col-xs-4 lo-measure-box push">
             <i class="fa fa-mobile"></i>
             <div>
-              <em>{{data[curApp.name].metrics[range].notifications || "0"}}</em>
-              <span class="text">notifications / second</span>
+              <em>{{displayData[range].notifications.value}}</em>
+              <span class="text">{{displayData[range].notifications.unit}} / {{displayData[range].notifications.per}}</span>
             </div>
           </div>
           <div class="col-xs-4 lo-measure-box storage">
             <i class="fa fa-cloud"></i>
             <div>
-              <em>{{data[curApp.name].metrics[range].storage || "0.0"}}</em>
-              <span class="measure">GB</span>
-              <span class="text">gigabytes / second</span>
+              <em>{{displayData[range].storage.value}}</em>
+              <span class="text">{{displayData[range].storage.unit}} / {{displayData[range].storage.per}}</span>
             </div>
           </div>
+        </div>
+
+        <div class="panel">
+          <div  class="panel-heading">
+            <h3>Errors</h3>
+          </div>
+          <ul class="panel-body">
+            <li ng-repeat="event in logData.errors">[{{formatDate(event.timestamp)}}] {{event.status}} - {{event.method}} {{event.uri}}</li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <div class="panel-heading">
+            <h3>Most popular resources</h3>
+          </div>
+          <ul class="panel-body">
+            <li ng-repeat="(key, value) in logData.topPathsRequested">{{key}} - ({{value[0].count}} requests)</li>
+          </ul>
+        </div>
+
+
+        <div class="panel panel-chart1">
+          <div class="panel-heading">
+            <h3>Requests</h3>
+          </div>
+          <div id="stackedBarChart_requests" style="height:255px">
+            <!-- HINT: colors for the chart can be changed in the d3-chart.css -->
+            <rhqm-chart
+                    data="{{chartData[range].requests.chartData}}"
+                    chart-type="{{chartData[range].requests.chartType}}"
+                    chart-height="250"></rhqm-chart>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-chart1">
+        <div class="panel-heading">
+          <h3>Traffic in bytes</h3>
+        </div>
+        <div id="stackedBarChart_traffic" style="height:255px">
+          <!-- HINT: colors for the chart can be changed in the d3-chart.css -->
+          <rhqm-chart
+                  data="{{chartData[range].bandwidth.chartData}}"
+                  chart-type="{{chartData[range].bandwidth.chartType}}"
+                  chart-height="250"></rhqm-chart>
+        </div>
+      </div>
+
+      <div class="panel panel-chart1">
+        <div class="panel-heading">
+          <h3>Notifications</h3>
+        </div>
+        <div id="stackedBarChart_notifications" style="height:255px">
+          <!-- HINT: colors for the chart can be changed in the d3-chart.css -->
+          <rhqm-chart
+                  data="{{chartData[range].notifications.chartData}}"
+                  chart-type="{{chartData[range].notifications.chartType}}"
+                  chart-height="250"></rhqm-chart>
         </div>
       </div>
 

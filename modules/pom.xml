@@ -121,5 +121,6 @@
         <module>ups</module>
         <module>https-redirect</module>
         <module>application-clients</module>
+        <module>analytics</module>
     </modules>
 </project>
