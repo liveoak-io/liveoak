@@ -1,13 +1,8 @@
 package io.liveoak.container.tenancy.service;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 
+import io.liveoak.common.util.FileHelper;
 import io.liveoak.container.tenancy.InternalApplication;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -44,7 +39,7 @@ public class ApplicationRemovalService implements Service<Void> {
             new Thread("ApplicationRemovalService worker thread") {
                 public void run() {
                     try {
-                        deleteNonEmptyDir(appDir.getAbsoluteFile());
+                        FileHelper.deleteNonEmpty(appDir.getAbsoluteFile());
                         context.complete();
                     } catch (Throwable e) {
                         context.failed(new StartException("Unable to remove application directory: " + appDir.getAbsolutePath(), e));
@@ -60,25 +55,6 @@ public class ApplicationRemovalService implements Service<Void> {
 
         // remove ourselves
         context.getController().setMode(ServiceController.Mode.REMOVE);
-    }
-
-    void deleteNonEmptyDir(File dir) throws IOException {
-        Path directory = dir.toPath();
-        Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                if (!file.toFile().delete()) {
-                    throw new IOException("Failed to delete file: " + file);
-                }
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
-        });
     }
 
     @Override

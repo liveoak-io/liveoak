@@ -2,6 +2,7 @@ package io.liveoak.container.zero;
 
 import java.io.File;
 
+import io.liveoak.common.util.FileHelper;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.spi.RequestContext;
@@ -55,18 +56,25 @@ public class GitApplicationsResource implements RootResource, SynchronousResourc
         }
 
         File installDir = new File(this.appsDir, id);
+        boolean cloneSucceeded = false;
 
         try {
             Git.cloneRepository()
                     .setURI(gitUrl)
                     .setDirectory(installDir)
                     .call();
+            cloneSucceeded = true;
         } catch (InvalidRemoteException ire) {
             responder.invalidRequest(String.format(INVALID_REQUEST_MESSAGE, gitUrl));
             return;
         } catch (TransportException te) {
             responder.invalidRequest("Unable to connect to git repo due to: " + te.getMessage());
             return;
+        } finally {
+            if (!cloneSucceeded) {
+                // Remove application directory
+                FileHelper.deleteNonEmpty(installDir);
+            }
         }
 
         InternalApplication app = this.registry.createApplication(id, (String) state.getProperty("name"), installDir, dir -> {
