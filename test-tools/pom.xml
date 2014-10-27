@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.liveoak</groupId>
         <artifactId>liveoak</artifactId>
-        <version>1.0.0.Beta01</version>
+        <version>1.0.0.Beta02-SNAPSHOT-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
