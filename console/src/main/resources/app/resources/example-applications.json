@@ -66,7 +66,7 @@
     "icon-alt": "Illustration: An XML empty tag element"
   },
   {
-    "id": "useragentsscript",
+    "id": "useragentscript",
     "url": "https://github.com/liveoak-io/liveoak-useragentscript.git",
     "name": "Request Headers",
     "description": "Utilize Business Logic to read/query/write/update LiveOak resources. In this case it uses the headers from the request to track how many times the same User Agent has accessed the resource.",
