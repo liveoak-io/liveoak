@@ -31,7 +31,6 @@ public class GitResourceInstallService implements Service<Void> {
                     ResourceState state = new DefaultResourceState();
                     state.putProperty("version-resource-id", "git");
                     state.putProperty("git-install-process", true);
-                    //TODO When this call is made, git resource doesn't exist in ApplicationResource.members()
                     this.client.getValue().update(new RequestContext.Builder().build(), "/admin/applications/" + this.applicationInjector.getValue().id(), state);
                     context.complete();
                 } catch (Throwable e) {

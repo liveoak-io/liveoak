@@ -31,6 +31,7 @@ public class ApplicationConfigurationManager {
     public synchronized void updateApplication(InternalApplication application) throws IOException {
         ObjectNode tree = read();
         tree.put("name", application.name());
+
         ResourcePath htmlAppPath = application.htmlApplicationResourcePath();
         if (htmlAppPath != null) {
             if (htmlAppPath.head().name().equals(application.id())) {
@@ -38,7 +39,13 @@ public class ApplicationConfigurationManager {
             }
             tree.put("html-app", htmlAppPath.toString());
         }
+
         tree.put("visible", application.visible());
+
+        String versioningResourceId = application.versionResourceId();
+        if (versioningResourceId != null) {
+            tree.put("version-resource-id", versioningResourceId);
+        }
 
         write(tree);
     }
