@@ -78,6 +78,7 @@ public class ApplicationService implements Service<InternalApplication> {
 
         String appName = this.name;
         Boolean appVisible = Boolean.TRUE;
+        Boolean appExample = Boolean.FALSE;
         String versionResourceId = null;
         ResourcePath htmlApp = null;
         ResourceState resourcesTree = null;
@@ -98,6 +99,9 @@ public class ApplicationService implements Service<InternalApplication> {
                 }
                 if ((value = state.getProperty("visible")) != null) {
                     appVisible = (Boolean) value;
+                }
+                if ((value = state.getProperty("example")) != null) {
+                    appExample = (Boolean) value;
                 }
                 if ((value = state.getProperty("version-resource-id")) != null) {
                     versionResourceId = (String) value;
@@ -123,7 +127,7 @@ public class ApplicationService implements Service<InternalApplication> {
             }
         }
 
-        this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp, appVisible, versionResourceId);
+        this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp, appVisible, appExample, versionResourceId);
 
         ServiceName configManagerName = Services.applicationConfigurationManager(this.id);
         ApplicationConfigurationService configManager = new ApplicationConfigurationService(applicationJson);
