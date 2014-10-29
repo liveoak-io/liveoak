@@ -2,8 +2,8 @@ package io.liveoak.container.codec;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultReturnFields;
+import io.liveoak.container.AbstractContainerTest;
 import io.liveoak.container.LiveOakFactory;
-import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
@@ -17,7 +17,8 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -26,130 +27,137 @@ import static org.fest.assertions.Assertions.assertThat;
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  * @author Ken Finnigan
  */
-public class MemberEncodingDriverTest {
+public class MemberEncodingDriverTest extends AbstractContainerTest {
 
-    private LiveOakSystem system;
-    private Client client;
-    private InternalApplication application;
+    private static Client client;
 
     private static final String PATH = "/testApp/";
     private static final String RESOURCE_ID = "readMembers";
 
-    TestReadingMembersResource resource;
+    static TestReadingMembersResource resource;
 
-    @Before
-    public void setUp() throws Exception {
-        this.system = LiveOakFactory.create();
-        this.client = this.system.client();
-        this.system.extensionInstaller().load(RESOURCE_ID, new TestReadingMembersExtension());
+    @BeforeClass
+    public static void setUp() throws Exception {
+        system = LiveOakFactory.create();
+        client = system.client();
+        system.extensionInstaller().load(RESOURCE_ID, new TestReadingMembersExtension());
+        awaitStability();
 
-        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
-        this.system.awaitStability();
+        InternalApplication application = system.applicationRegistry().createApplication("testApp", "Test Application");
+        application.extend(RESOURCE_ID, RESOURCE_ID, JsonNodeFactory.instance.objectNode());
+        awaitStability();
+    }
 
-        this.application = this.system.applicationRegistry().createApplication( "testApp", "Test Application" );
-        this.application.extend(RESOURCE_ID, RESOURCE_ID, JsonNodeFactory.instance.objectNode());
-        this.system.awaitStability();
+    @AfterClass
+    public static void shutdown() {
+        system.stop();
     }
 
     @After
-    public void shutdown() {
-        this.system.stop();
+    public void resetResourceFlag() {
+        resource.resetFlag();
     }
 
     @Test
-    public void testReadNoReturnFields() throws Exception {
-        // Test #1 - Test Read with no ReturnFields
+    public void testReadWithNoReturnFields() throws Exception {
         // by default the members are returned
-        ResourceState configState = this.client.read(new RequestContext.Builder().build(), PATH + RESOURCE_ID);
+        ResourceState configState = client.read(new RequestContext.Builder().build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
         assertThat(resource.getReadMembers()).isTrue();
+    }
 
-        // Test #2 - Test Read with All ReturnFields
+    @Test
+    public void testReadWithAllReturnFields() throws Exception {
         // when all is specified, the members should be returned
-        resource.resetFlag();
-        configState = this.client.read(new RequestContext.Builder().returnFields( ReturnFields.ALL).build(), PATH + RESOURCE_ID);
+        ResourceState configState = client.read(new RequestContext.Builder().returnFields(ReturnFields.ALL).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
         assertThat(resource.getReadMembers()).isTrue();
+    }
 
-        // Test #3 - Test Read with Asterisk ReturnFields
+    @Test
+    public void testReadWithAsteriskReturnFields() throws Exception {
         // when all is specified, the members should be returned
-        resource.resetFlag();
-        configState = this.client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*")).build(), PATH + RESOURCE_ID);
+        ResourceState configState = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*")).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
         assertThat(resource.getReadMembers()).isTrue();
+    }
 
-        // Test #4 - Test Read with None ReturnFields
+    @Test
+    public void testReadWithNoneReturnFields() throws Exception {
         // when requesting no return fields, we should not get the members
-        resource.resetFlag();
-        configState = this.client.read(new RequestContext.Builder().returnFields( ReturnFields.NONE).build(), PATH + RESOURCE_ID);
-
-        assertThat(configState).isNotNull();
-        assertThat(configState.id()).isEqualTo(RESOURCE_ID);
-        assertThat(resource.getReadMembers()).isFalse();
-
-        // Test #5 - Test Read with other ReturnFields
-        // when requesting return fields and not members, should not be reading the members
-        resource.resetFlag();
-        configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("foo")).build(), PATH + RESOURCE_ID);
-
-        assertThat(configState).isNotNull();
-        assertThat(configState.id()).isEqualTo(RESOURCE_ID);
-        assertThat(resource.getReadMembers()).isFalse();
-
-        // Test #6 - Test Read with members ReturnFields
-        // when requesting 'members' as part of the return fields, should be reading the members
-        resource.resetFlag();
-        configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields(LiveOak.MEMBERS)).build(), PATH + RESOURCE_ID);
-
-        assertThat(configState).isNotNull();
-        assertThat(configState.id()).isEqualTo(RESOURCE_ID);
-        assertThat(resource.getReadMembers()).isTrue();
-
-        // Test #7 - Test Read with members and other ReturnFields
-        // when requesting 'members' as part of the return fields, should be reading the members
-        resource.resetFlag();
-        configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("foo,members")).build(), PATH + RESOURCE_ID);
-
-        assertThat(configState).isNotNull();
-        assertThat(configState.id()).isEqualTo(RESOURCE_ID);
-        assertThat(resource.getReadMembers()).isTrue();
-
-        // Test #8 - Test Read with multiple ReturnFields
-        // when requesting 'members' as part of the return fields, should be reading the members
-        resource.resetFlag();
-        configState = this.client.read(new RequestContext.Builder().returnFields( new DefaultReturnFields("bar,foo, members")).build(), PATH + RESOURCE_ID);
+        ResourceState configState = client.read(new RequestContext.Builder().returnFields(ReturnFields.NONE).build(), PATH + RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(RESOURCE_ID);
         assertThat(resource.getReadMembers()).isFalse();
     }
 
-    private class TestReadingMembersExtension implements Extension {
+    @Test
+    public void testReadWithOtherReturnFields() throws Exception {
+        // when requesting return fields and not members, should not be reading the members
+        ResourceState configState = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("foo")).build(), PATH + RESOURCE_ID);
+
+        assertThat(configState).isNotNull();
+        assertThat(configState.id()).isEqualTo(RESOURCE_ID);
+        assertThat(resource.getReadMembers()).isFalse();
+    }
+
+    @Test
+    public void testReadWithMembersReturnFields() throws Exception {
+        // when requesting 'members' as part of the return fields, should be reading the members
+        ResourceState configState = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields(LiveOak.MEMBERS)).build(), PATH + RESOURCE_ID);
+
+        assertThat(configState).isNotNull();
+        assertThat(configState.id()).isEqualTo(RESOURCE_ID);
+        assertThat(resource.getReadMembers()).isTrue();
+    }
+
+    @Test
+    public void testReadWithMembersAndOtherReturnFields() throws Exception {
+        // when requesting 'members' as part of the return fields, should be reading the members
+        ResourceState configState = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("foo,members")).build(), PATH + RESOURCE_ID);
+
+        assertThat(configState).isNotNull();
+        assertThat(configState.id()).isEqualTo(RESOURCE_ID);
+        assertThat(resource.getReadMembers()).isTrue();
+    }
+
+    @Test
+    public void testReadWithMultipleReturnFields() throws Exception {
+        // when requesting 'members' as part of the return fields, should be reading the members
+        ResourceState configState = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("bar,foo, members")).build(), PATH + RESOURCE_ID);
+
+        assertThat(configState).isNotNull();
+        assertThat(configState.id()).isEqualTo(RESOURCE_ID);
+        assertThat(resource.getReadMembers()).isFalse();
+    }
+
+    private static class TestReadingMembersExtension implements Extension {
 
         @Override
-        public void extend( SystemExtensionContext context ) throws Exception {
+        public void extend(SystemExtensionContext context) throws Exception {
             // do nothing
         }
 
         @Override
-        public void extend( ApplicationExtensionContext context ) throws Exception {
-            resource = new TestReadingMembersResource( context.resourceId() );
+        public void extend(ApplicationExtensionContext context) throws Exception {
+            resource = new TestReadingMembersResource(context.resourceId());
             context.mountPublic(resource);
         }
 
         @Override
-        public void unextend( ApplicationExtensionContext context ) throws Exception {
+        public void unextend(ApplicationExtensionContext context) throws Exception {
             //do nothing
         }
     }
 
-    private class TestReadingMembersResource implements RootResource {
+    private static class TestReadingMembersResource implements RootResource {
 
         Resource parent;
         String id;
@@ -168,7 +176,7 @@ public class MemberEncodingDriverTest {
         }
 
         @Override
-        public void parent( Resource parent ) {
+        public void parent(Resource parent) {
             this.parent = parent;
         }
 
@@ -183,7 +191,7 @@ public class MemberEncodingDriverTest {
         }
 
         @Override
-        public void readMembers( RequestContext ctx, ResourceSink sink ) throws Exception {
+        public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
             readMembers = true;
             sink.complete();
         }

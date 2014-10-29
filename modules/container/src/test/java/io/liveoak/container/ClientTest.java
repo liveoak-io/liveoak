@@ -18,8 +18,8 @@ import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.client.ClientResourceResponse;
 import io.liveoak.spi.state.ResourceState;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -28,43 +28,49 @@ import static org.fest.assertions.Fail.fail;
 /**
  * @author Bob McWhirter
  */
-public class ClientTest {
+public class ClientTest extends AbstractContainerTest {
 
-    private LiveOakSystem system;
-    private Client client;
-    private InternalApplication application;
+    private static Client client;
+    private static InternalApplication application;
 
+    @BeforeClass
+    public static void setUp() throws Exception {
+        system = LiveOakFactory.create();
+        client = system.client();
 
-    @Before
-    public void setUp() throws Exception {
-        this.system = LiveOakFactory.create();
-        this.client = this.system.client();
+        awaitStability();
 
-        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
-        this.system.awaitStability();
+        application = system.applicationRegistry().createApplication("testApp", "Test Application");
+        system.extensionInstaller().load("db", new InMemoryDBExtension());
+        application.extend("db");
 
-        this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application");
-        this.system.extensionInstaller().load("db", new InMemoryDBExtension());
-        this.application.extend("db");
-
-        InMemoryDBResource db = (InMemoryDBResource) this.system.service(InMemoryDBExtension.resource("testApp", "db"));
+        InMemoryDBResource db = (InMemoryDBResource) system.service(InMemoryDBExtension.resource("testApp", "db"));
         db.addMember(new InMemoryCollectionResource(db, "people"));
         db.addMember(new InMemoryCollectionResource(db, "dogs"));
-
     }
 
-    @After
-    public void shutdown() throws Exception {
-        this.system.stop();
+    @AfterClass
+    public static void shutdown() throws Exception {
+        system.stop();
     }
 
     @Test
-    public void tests() throws Throwable {
-        System.out.println("TEST #1 - Read");
+    public void all() throws Throwable {
+        read();
+        create();
+        update();
+        readFromResource();
+        readFromBlockingResource();
+        simpleAsync();
+        nestedAsync();
+        nestedAsyncWithFinalSync();
+    }
+
+    private void read() throws Throwable {
         ReturnFields fields = new DefaultReturnFields("*,members(*,members(*))");
 
         RequestContext requestContext = new RequestContext.Builder().returnFields(fields).build();
-        ResourceState result = this.client.read(requestContext, "/testApp");
+        ResourceState result = client.read(requestContext, "/testApp");
         assertThat(result).isNotNull();
 
         List<ResourceState> members = result.members();
@@ -78,20 +84,19 @@ public class ClientTest {
 
         ResourceState dogs = db.members().stream().filter((e) -> e.id().equals("dogs")).findFirst().get();
         assertThat(dogs).isNotNull();
+    }
 
-
-        System.out.println("TEST #2 - Create");
-        fields = new DefaultReturnFields("*");
-
-        requestContext = new RequestContext.Builder().returnFields(fields).build();
+    private void create() throws Throwable {
+        ReturnFields fields = new DefaultReturnFields("*");
+        RequestContext requestContext = new RequestContext.Builder().returnFields(fields).build();
         ResourceState bob = new DefaultResourceState("bob");
         bob.putProperty("name", "Bob McWhirter");
 
-        result = this.client.create(requestContext, "/testApp/db/people", bob);
+        ResourceState result = client.create(requestContext, "/testApp/db/people", bob);
         assertThat(result).isNotNull();
         assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");
 
-        people = this.client.read(requestContext, "/testApp/db/people");
+        ResourceState people = client.read(requestContext, "/testApp/db/people");
         assertThat(people).isNotNull();
 
         ResourceState foundBob = people.members().stream().filter((e) -> e.id().equals("bob")).findFirst().get();
@@ -99,117 +104,118 @@ public class ClientTest {
         assertThat(foundBob.id()).isEqualTo("bob");
         assertThat(foundBob.getPropertyNames()).hasSize(0);
 
-        foundBob = this.client.read(requestContext, "/testApp/db/people/bob");
+        foundBob = client.read(requestContext, "/testApp/db/people/bob");
+        assertThat(foundBob).isNotNull();
+        assertThat(foundBob.getProperty("name")).isEqualTo("Bob McWhirter");
+    }
+
+    private void update() throws Throwable {
+        ReturnFields fields = new DefaultReturnFields("*");
+        RequestContext requestContext = new RequestContext.Builder().returnFields(fields).build();
+
+        ResourceState foundBob = client.read(requestContext, "/testApp/db/people/bob");
         assertThat(foundBob).isNotNull();
         assertThat(foundBob.getProperty("name")).isEqualTo("Bob McWhirter");
 
-
-        System.out.println("TEST #3 - Update");
-        foundBob = this.client.read(requestContext, "/testApp/db/people/bob");
-        assertThat(foundBob).isNotNull();
-        assertThat(foundBob.getProperty("name")).isEqualTo("Bob McWhirter");
-
-        bob = new DefaultResourceState("bob");
+        ResourceState bob = new DefaultResourceState("bob");
         bob.putProperty("name", "Robert McWhirter");
 
-        result = this.client.update(requestContext, "/testApp/db/people/bob", bob);
+        ResourceState result = client.update(requestContext, "/testApp/db/people/bob", bob);
         assertThat(result).isNotNull();
         assertThat(result.getProperty("name")).isEqualTo("Robert McWhirter");
 
-        foundBob = this.client.read(requestContext, "/testApp/db/people/bob");
+        foundBob = client.read(requestContext, "/testApp/db/people/bob");
         assertThat(foundBob).isNotNull();
         assertThat(foundBob.getProperty("name")).isEqualTo("Robert McWhirter");
+    }
 
-
-        System.out.println("TEST #4 - Read from Resource");
-        requestContext = new RequestContext.Builder().build();
-        bob = new DefaultResourceState("proxybob");
+    private void readFromResource() throws Throwable {
+        RequestContext requestContext = new RequestContext.Builder().build();
+        ResourceState bob = new DefaultResourceState("proxybob");
         bob.putProperty("name", "Bob McWhirter");
-        ResourceState createdBob = this.client.create(requestContext, "/testApp/db/people", bob);
+        ResourceState createdBob = client.create(requestContext, "/testApp/db/people", bob);
         assertThat(createdBob).isNotNull();
 
-        this.system.extensionInstaller().load("proxy", new ProxyExtension());
-        InternalApplicationExtension ext = this.application.extend("proxy", JsonNodeFactory.instance.objectNode().put("blocking", false));
-        this.system.awaitStability();
+        system.extensionInstaller().load("proxy", new ProxyExtension());
+        InternalApplicationExtension ext = application.extend("proxy", JsonNodeFactory.instance.objectNode().put("blocking", false));
+        awaitStability();
 
-        result = this.client.read(requestContext, "/testApp/proxy");
+        ResourceState result = client.read(requestContext, "/testApp/proxy");
         assertThat(result.getPropertyNames()).contains("name");
         assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");
 
         ext.remove();
-        this.system.awaitStability();
+        awaitStability();
+    }
 
-
-        System.out.println("TEST #5 - Read from BlockingResource");
-        requestContext = new RequestContext.Builder().build();
-        bob = new DefaultResourceState("blockingproxybob");
+    private void readFromBlockingResource() throws Throwable {
+        RequestContext requestContext = new RequestContext.Builder().build();
+        ResourceState bob = new DefaultResourceState("blockingproxybob");
         bob.putProperty("name", "Bob McWhirter");
-        createdBob = this.client.create(requestContext, "/testApp/db/people", bob);
+        ResourceState createdBob = client.create(requestContext, "/testApp/db/people", bob);
         assertThat(createdBob).isNotNull();
-        ext = this.application.extend("proxy", JsonNodeFactory.instance.objectNode().put("blocking", true));
-        this.system.awaitStability();
+        InternalApplicationExtension ext = application.extend("proxy", JsonNodeFactory.instance.objectNode().put("blocking", true));
+        awaitStability();
 
-        result = this.client.read(requestContext, "/testApp/proxy");
+        ResourceState result = client.read(requestContext, "/testApp/proxy");
         assertThat(result.getPropertyNames()).contains("name");
         assertThat(result.getProperty("name")).isEqualTo("Bob McWhirter");
 
         ext.remove();
-        this.system.awaitStability();
+        awaitStability();
+    }
 
-
-        System.out.println("TEST #6 - Simple Async");
-        requestContext = new RequestContext.Builder().build();
+    private void simpleAsync() throws Throwable {
+        RequestContext requestContext = new RequestContext.Builder().build();
         CompletableFuture<ClientResourceResponse> future = new CompletableFuture<>();
 
-        this.client.read(requestContext, "/testApp/db/dogs", clientResourceResponse -> future.complete(clientResourceResponse));
+        client.read(requestContext, "/testApp/db/dogs", future::complete);
 
         ClientResourceResponse response = future.get();
         assertThat(response).isNotNull();
         assertThat(response.state().id()).isEqualTo("dogs");
+    }
 
-
-        System.out.println("TEST #7 - Nested Async");
+    private void nestedAsync() throws Throwable {
         RequestContext reqCtxt = new RequestContext.Builder().build();
         CompletableFuture<ClientResourceResponse> nestedFuture = new CompletableFuture<>();
 
-        this.client.read(reqCtxt, "/testApp/db/dogs", clientResourceResponse1 -> {
+        client.read(reqCtxt, "/testApp/db/dogs", clientResourceResponse1 -> {
             assertThat(clientResourceResponse1.state().id()).isEqualTo("dogs");
 
-            this.client.read(reqCtxt, "/testApp/db/people", clientResourceResponse2 -> {
+            client.read(reqCtxt, "/testApp/db/people", clientResourceResponse2 -> {
                 assertThat(clientResourceResponse2.state().id()).isEqualTo("people");
 
-                this.client.read(reqCtxt, "/testApp/db/dogs", clientResourceResponse3 -> {
+                client.read(reqCtxt, "/testApp/db/dogs", clientResourceResponse3 -> {
                     assertThat(clientResourceResponse3.state().id()).isEqualTo("dogs");
 
-                    this.client.read(reqCtxt, "/testApp/db/people", clientResourceResponse4 -> {
-                        nestedFuture.complete(clientResourceResponse4);
-                    });
+                    client.read(reqCtxt, "/testApp/db/people", nestedFuture::complete);
                 });
             });
 
 
         });
 
-        response = nestedFuture.get();
+        ClientResourceResponse response = nestedFuture.get();
         assertThat(response).isNotNull();
         assertThat(response.state().id()).isEqualTo("people");
+    }
 
-
-        System.out.println("TEST #8 - Nested Async");
+    private void nestedAsyncWithFinalSync() throws Throwable {
         RequestContext nestedCtx = new RequestContext.Builder().build();
-        CompletableFuture<ResourceState> nestedFuture2 = new CompletableFuture<>();
+        CompletableFuture<ResourceState> nestedFuture = new CompletableFuture<>();
 
-        this.client.read(nestedCtx, "/testApp/db/dogs", clientResourceResponse1 -> {
+        client.read(nestedCtx, "/testApp/db/dogs", clientResourceResponse1 -> {
             assertThat(clientResourceResponse1.state().id()).isEqualTo("dogs");
 
-            this.client.read(nestedCtx, "/testApp/db/people", clientResourceResponse2 -> {
+            client.read(nestedCtx, "/testApp/db/people", clientResourceResponse2 -> {
                 assertThat(clientResourceResponse2.state().id()).isEqualTo("people");
 
-                this.client.read(nestedCtx, "/testApp/db/dogs", clientResourceResponse3 -> {
+                client.read(nestedCtx, "/testApp/db/dogs", clientResourceResponse3 -> {
                     assertThat(clientResourceResponse3.state().id()).isEqualTo("dogs");
 
                     try {
-                        nestedFuture2.complete(this.client.read(nestedCtx, "/testApp/db/people"));
+                        nestedFuture.complete(client.read(nestedCtx, "/testApp/db/people"));
                     } catch (Exception e) {
                         e.printStackTrace();
                         fail();
@@ -218,8 +224,7 @@ public class ClientTest {
             });
         });
 
-
-        ResourceState state = nestedFuture2.get();
+        ResourceState state = nestedFuture.get();
 
         assertThat(state).isNotNull();
         assertThat(state.id()).isEqualTo("people");

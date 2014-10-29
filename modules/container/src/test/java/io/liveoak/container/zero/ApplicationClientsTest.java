@@ -4,9 +4,8 @@ import java.io.File;
 import java.util.List;
 
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.container.AbstractContainerTest;
 import io.liveoak.container.LiveOakFactory;
-import io.liveoak.container.LiveOakSystem;
-import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
@@ -21,28 +20,25 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author Ken Finnigan
  */
-public class ApplicationClientsTest {
+public class ApplicationClientsTest extends AbstractContainerTest {
 
-    private LiveOakSystem system;
     private Client client;
-    private InternalApplication application;
 
     @Before
     public void setUp() throws Exception {
-        this.system = LiveOakFactory.create(null, new File(getClass().getClassLoader().getResource("apps").getFile()), null);
-        this.client = this.system.client();
+        system = LiveOakFactory.create(null, new File(getClass().getClassLoader().getResource("apps").getFile()), null);
+        this.client = system.client();
 
-        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
-        this.system.awaitStability();
+        awaitStability();
 
-        this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application");
+        system.applicationRegistry().createApplication("testApp", "Test Application");
 
-        this.system.awaitStability();
+        awaitStability();
     }
 
     @After
     public void shutdown() {
-        this.system.stop();
+        system.stop();
     }
 
     @AfterClass
@@ -72,6 +68,7 @@ public class ApplicationClientsTest {
         assertThat(testAppConfig.id()).isEqualTo("my-html-client");
         assertThat(testAppConfig.getProperty("type")).isEqualTo("HTML");
         assertThat(testAppConfig.getProperty("security-key")).isEqualTo("html-client");
+        awaitStability();
 
         requestContext = new RequestContext.Builder().build();
         testAppConfig = this.client.read(requestContext, "admin/applications/testApp/resources/application-clients");
