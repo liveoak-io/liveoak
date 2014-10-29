@@ -68,7 +68,7 @@ public class GitApplicationsResourceTest extends AbstractContainerTest {
 
     @AfterClass
     public static void cleanUpInstalledApps() throws Exception {
-        new AppCleanup().accept("apps/liveoak-chat-html");
+        new AppCleanup().accept("apps/liveoak-example-chat-html");
         new AppCleanup().accept("apps/chat-html");
         new AppCleanup().accept("apps/gitapp");
     }
