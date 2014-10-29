@@ -910,22 +910,25 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
   }
 }
 
-.security-list .lo-info-pane .fa {
-  font-size: 11px;
-  color: @c_graylight;
-  margin-top: 3px;
-  width: 5px;
-}
+.lo-info-pane .chevron-list {
+  
+  .fa {
+    font-size: 11px;
+    color: @c_graylight;
+    margin-top: 3px;
+    width: 5px;
+  }
 
-.lo-tutorials .unsecured-list span {
-  padding-left: 10px;
-  font-size: 13px;
-}
-
-.lo-tutorials .unsecured-list a {
-  padding-left: 10px;
-  font-size: 13px;
-}
+  span {
+    padding-left: 10px;
+    font-size: 13px;
+  }
+  
+  a {
+    padding-left: 10px;
+    font-size: 13px;
+  }
+} 
 
 .lo-tutorials {
 
@@ -2298,18 +2301,36 @@ legend {
         margin-left: 5px;
       }
       
-      a {
-        font-size: 14px;
-        margin-top: 20px;
-        margin-bottom: 30px;
-        float: right;
-      }
-      
       p {
         font-size: 16px;
       }
-
       
+      ul.actions {
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 30px;
+        
+        li {
+          display: inline-block;
+          
+          + li {
+            margin-left: 8px;
+            
+            &:before {
+              content: ".";
+              margin-right: 10px;
+              color: @c_graylight;
+              margin-top: -5px;
+              float: left;
+              margin-top: -4px;
+            }
+          }
+        }
+        
+        a {
+          font-size: 14px;
+        }
+      }
     }
   }
 
@@ -2480,7 +2501,17 @@ legend {
 }
 
 
-/* Security Policies pages */
+/* Security pages */
+
+.fa-info-circle {
+  font-size: 16px;
+  opacity: 1;
+  margin-left: 5px;
+}
+
+.security-list .panel .panel-body.empty-instance .fa-info-circle {
+  .fa-info-circle;
+}
 
 .security-policies {
   

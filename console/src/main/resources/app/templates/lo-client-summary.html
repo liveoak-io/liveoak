@@ -9,6 +9,7 @@
     <ul class="lo-app-opts">
       <li><i class="fa fa-rocket" tooltip="Platform"></i>{{client.type || 'custom'}}</li>
       <li><i class="fa fa-link" tooltip="Redirect URIs"></i><span ng-class="{'text-muted': client.kcClient.redirectUris.length == 0}">{{ client.kcClient.redirectUris.length > 0 && client.kcClient.redirectUris.join(", ") || "No Redirect URIs defined" }}</span></li>
+      <li><i class="fa fa-globe" tooltip="Web Origins"></i>http://localhost:8080</li><!-- FIXME: Make it dynamic, show as empty when "No Web Origins set up" -->
       <li><i class="fa fa-unlock" tooltip="Scope"></i><span ng-hide="client.realmRoles.length > 0" class="text-muted">No Roles specified</span><span ng-repeat="realmRole in client.realmRoles">{{ realmRole.name + ($last ? '' : ', ')}}</span></li>
     </ul>
   </div>

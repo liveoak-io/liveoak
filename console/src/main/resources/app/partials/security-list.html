@@ -137,7 +137,7 @@
                                   securedBusinessLogic.uriPolicies.length > 0 || securedBusinessLogic.aclPolicies.length > 0 ||
                                   missingSecuredStorages || missingSecuredCollections">
         <div class="panel-body text-center empty-instance">
-          <p>None of your resources are secured. <span class="nowrap">Which one would you like to secure first?</span></p>
+          <p>None of your resources are secured. <span class="nowrap">Which one would you like to secure first?</span> <i class="fa fa-info-circle" data-tooltip-placement="right" data-tooltip="Resources are secured individually only in storage and collections."></i></p>
 
           <ul class="resources-list">
             <li class="btn btn-link" ng-class="{'disabled': (unsecuredStorages.length === 0)}">
@@ -193,14 +193,14 @@
       <h3><span>{{curApp.name}}</span> Unsecured Resources</h3>
       
       <h4>Storage</h4>
-      <ul class="unsecured-list">
+      <ul class="chevron-list">
         <li ng-repeat="s in unsecuredStorages"><i class="fa fa-chevron-right"></i><a href="#/applications/{{curApp.id}}/security/policies/storage/{{s.id}}">{{s.id}}</a></li>
         <li ng-show="unsecuredStorages.length === 0 && securedStorages.uriPolicies.length === 0 && securedStorages.aclPolicies.length === 0"><i class="fa fa-info"></i><span>No Storage Resources</span></li>
         <li ng-show="unsecuredStorages.length === 0 && (securedStorages.uriPolicies.length > 0 || securedStorages.aclPolicies.length > 0)"><i class="fa fa-check"></i><span>All Secured!</span></li>
       </ul>
       
       <h4>Collections</h4>
-      <ul class="unsecured-list">
+      <ul class="chevron-list">
         <li ng-repeat="c in unsecuredCollections">
           <i class="fa fa-chevron-right"></i>
           <a href="#/applications/{{curApp.id}}/security/policies/storage/{{c.storage}}/{{c.collection}}">{{c.storage}} / {{c.collection}}</a>
@@ -216,21 +216,21 @@
       </ul>
       
       <h4>Push</h4>
-      <ul class="unsecured-list">
+      <ul class="chevron-list">
         <li ng-show="hasPushRes && securedPush.uriPolicies.length === 0 && securedPush.aclPolicies.length === 0"><i class="fa fa-chevron-right"></i><a href="#/applications/{{curApp.id}}/security/secure-push">Secure Push</a></li>
         <li ng-show="hasPushRes && (securedPush.uriPolicies.length > 0 || securedPush.aclPolicies.length > 0)"><i class="fa fa-check"></i><span>All Secured!</span></li>
         <li ng-hide="hasPushRes"><i class="fa fa-info"></i><span>Resource not installed</span></li>
       </ul>
 
       <h4>Clients</h4>
-      <ul class="unsecured-list">
+      <ul class="chevron-list">
         <li ng-show="hasClientsRes && securedClients.uriPolicies.length === 0 && securedClients.aclPolicies.length === 0"><i class="fa fa-chevron-right"></i><a href="#/applications/{{curApp.id}}/security/secure-clients">Secure Clients</a></li>
         <li ng-show="hasClientsRes &&securedClients.uriPolicies.length > 0 || securedClients.aclPolicies.length > 0"><i class="fa fa-check"></i><span>All Secured!</span></li>
         <li ng-hide="hasClientsRes"><i class="fa fa-info"></i><span>Resource not installed</span></li>
       </ul>
 
       <h4>Business Logic</h4>
-      <ul class="unsecured-list">
+      <ul class="chevron-list">
         <li ng-show="hasBusinessLogicRes && securedBusinessLogic.uriPolicies.length === 0 && securedBusinessLogic.aclPolicies.length === 0"><i class="fa fa-chevron-right"></i><a href="#/applications/{{curApp.id}}/security/secure-logic">Secure Business Logic</a></li>
         <li ng-show="hasBusinessLogicRes && securedBusinessLogic.uriPolicies.length > 0 || securedBusinessLogic.aclPolicies.length > 0"><i class="fa fa-check"></i><span>All Secured!</span></li>
         <li ng-hide="hasBusinessLogicRes"><i class="fa fa-info"></i><span>Resource not installed</span></li>

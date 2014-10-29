@@ -37,7 +37,7 @@
             <label class="col-sm-3  control-label" for="dbhost">Host <span class="required">*</span></label>
 
             <div class="col-sm-4" ng-class="{'has-error': storageForm.dbhost.$error.pattern}">
-              <input class="form-control" ng-model="storageModel.servers[0].host" type="text" id="dbhost" name="dbhost" ng-pattern="reIPv4Host" required placeholder="e.g. localhost">
+              <input class="form-control" ng-model="storageModel.servers[0].host" type="text" id="dbhost" name="dbhost" ng-pattern="reIPv4Host" required placeholder="e.g.: localhost">
               <span class="help-block" ng-show="storageForm.dbhost.$error.pattern">Not a valid address.</span>
             </div>
           </div>
@@ -45,7 +45,7 @@
             <label class="col-sm-3  control-label" for="dbport">Port <span class="required">*</span></label>
 
             <div class="col-sm-4" ng-class="{'has-error': storageForm.dbport.$dirty && !storageForm.dbport.$valid}">
-              <input class="form-control no-spinner" type="number" ng-model="storageModel.servers[0].port" ng-pattern="rePort" id="dbport" name="dbport" required placeholder="e.g. 27017">
+              <input class="form-control no-spinner" type="number" ng-model="storageModel.servers[0].port" ng-pattern="rePort" id="dbport" name="dbport" required placeholder="e.g.: 27017">
               <span class="help-block" ng-show="storageForm.dbport.$dirty && !storageForm.dbport.$valid">Not a valid port number (1-65535).</span>
             </div>
           </div>
@@ -60,7 +60,7 @@
             <label class="col-sm-3  control-label" for="dburl">URL Path <span class="required">*</span></label>
 
             <div class="col-sm-4">
-              <input class="form-control" ng-model="storageModel.id" id="dburl" ng-disabled="!create" required placeholder="e.g. storage">
+              <input class="form-control" ng-model="storageModel.id" id="dburl" ng-disabled="!create" required placeholder="e.g.: storage">
             </div>
           </div>
         </fieldset>

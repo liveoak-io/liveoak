@@ -2,7 +2,7 @@
   <div class="lo-content-area col-md-12 next-steps">
     <lo-breadcrumbs></lo-breadcrumbs>
 
-    <h2>What you got and can do next:</h2>
+    <h2>What you can do next with <a href="#/applications/{{curApp.id}}/">{{curApp.name}}</a></h2>
 
     <hr>
     
@@ -18,13 +18,22 @@
               <span class="lo-field">{{storage.provider}}</span>
             </div>
             <div>
-              <span class="lo-label">URL Path</span>
+              <span class="lo-label">URL Path:</span>
               <span class="lo-field">/{{storage.id}}</span>
             </div>
+            <div>
+              <span class="lo-label">Port:</span>
+              <span class="lo-field">27017</span><!-- FIXME: make the port appear dinamically -->
+            </div>
           </div>
-          <p class="content-area" ng-hide="storageList.length > 0">Store your application's data in the cloud</p>          
-          <a href="#/applications/{{curApp.id}}/storage/{{storageList[0].id}}/browse" ng-show="storageList.length > 0">View <strong>Storage</strong> »</a>
-          <a href="#/applications/{{curApp.id}}/storage" ng-hide="storageList.length > 0">Configure <strong>Storage</strong> »</a>
+          <p class="content-area" ng-hide="storageList.length > 0">Store your application's data in the cloud</p>
+          <ul class="actions" ng-show="storageList.length > 0">
+            <li><a href="#/applications/{{curApp.id}}/storage/{{storageList[0].id}}/browse" ><strong>Collections</strong></a></li>
+            <li><a href="#/applications/{{curApp.id}}/storage/{{storageList[0].id}}"><strong>Settings</strong></a></li>
+          </ul>
+          <ul class="actions" ng-hide="storageList.length > 0">
+            <li><a href="#/applications/{{curApp.id}}/storage">Configure <strong>Storage</strong></a></li>
+          </ul>
         </div>
       </div>
       
@@ -39,11 +48,29 @@
             </div>
           </div>
           <p class="content-area" ng-hide="auth.realm">Manage login, SSO, users and more with Keycloak</p>
-          <a href="#/applications/{{curApp.id}}/security" ng-show="auth.realm">View <strong>Security</strong> »</a>
-          <a href="#/applications/{{curApp.id}}/security" ng-hide="auth.realm">Configure <strong>Security</strong> »</a>
+          <ul class="actions" ng-show="auth.realm">
+            <li><a href="#/applications/{{curApp.id}}/security"><strong>Resources</strong></a></li>
+            <li><a href="#/applications/{{curApp.id}}/security/roles"><strong>Roles</strong></a></li>
+            <li><a href="#/applications/{{curApp.id}}/security/users"><strong>Users</strong></a></li>
+          </ul>
+          <ul class="actions" ng-hide="auth.realm">
+            <li><a href="#/applications/{{curApp.id}}/security">Configure <strong>Security</strong></a></li>
+          </ul>
         </div>
       </div>
       
+      <div class="col-xs-6 col-md-4 panel">
+        <div class="panel-body text-center">
+          <i class="fa fa-globe"></i>
+          <h3>Clients</h3>
+          <p class="content-area">Choose the platform you need for your clients</p><!-- FIXME: improve this text -->
+          <ul class="actions">
+            <li><a href="#/applications/{{curApp.id}}/application-clients">Configure <strong>Clients</strong></a></li>
+          </ul>
+        </div>
+      </div>
+      
+<!--
       <div class="col-xs-6 col-md-4 panel">
         <div class="panel-body text-center">
           <i class="fa fa-mobile"></i>
@@ -67,6 +94,8 @@
           <a href="#/applications/{{curApp.id}}/push" ng-hide="pushConfig && pushConfig.upsURL">Configure <strong>Push</strong> »</a>
         </div>
       </div>
+-->
+
     </section>
 
     <section class="lo-tutorials">
