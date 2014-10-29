@@ -31,6 +31,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -41,19 +42,19 @@ import static org.fest.assertions.Assertions.assertThat;
 public class LocalApplicationsResourceTest extends AbstractContainerTest {
 
     private CloseableHttpClient httpClient;
-    private File appDir;
+    private static File appDir;
 
-    @Before
-    public void setUpServer() throws Exception {
-        appDir = new File(getClass().getClassLoader().getResource("apps").getFile());
+    @BeforeClass
+    public static void setUpServer() throws Exception {
+        appDir = new File(LocalApplicationsResourceTest.class.getClassLoader().getResource("apps").getFile());
         system = LiveOakFactory.create(null, appDir, null);
         system.extensionInstaller().load("dummy", new InMemoryDBExtension());
 
         awaitStability();
     }
 
-    @After
-    public void tearDownServer() throws Exception {
+    @AfterClass
+    public static void tearDownServer() throws Exception {
         system.stop();
         System.err.flush();
     }
