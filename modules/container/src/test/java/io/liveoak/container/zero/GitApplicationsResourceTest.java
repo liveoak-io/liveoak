@@ -133,7 +133,7 @@ public class GitApplicationsResourceTest extends AbstractContainerTest {
             stompClient.subscribe("/admin/applications/*", (subscription) -> {
                 subscription.onMessage((msg) -> {
                     System.err.println( "******* MESSAGE: "+ msg );
-                    if (msg.headers().get("location").equals("/admin/applications/liveoak-chat-html")) {
+                    if (msg.headers().get("location").equals("/admin/applications/liveoak-example-chat-html")) {
                         appCreationNotification.complete(msg);
                     }
                 });
@@ -145,7 +145,7 @@ public class GitApplicationsResourceTest extends AbstractContainerTest {
 
         subscriptionLatch.await();
         postRequest = new HttpPost("http://localhost:8080/admin/applications");
-        postRequest.setEntity(new StringEntity("{ \"url\": \"https://github.com/liveoak-io/liveoak-chat-html.git\" }"));
+        postRequest.setEntity(new StringEntity("{ \"url\": \"https://github.com/liveoak-io/liveoak-example-chat-html.git\" }"));
         postRequest.setHeader("Content-Type", MediaType.GIT_APP_JSON.toString());
 
         response = httpClient.execute(postRequest);
@@ -159,8 +159,8 @@ public class GitApplicationsResourceTest extends AbstractContainerTest {
         assertThat(state).isInstanceOf(ResourceState.class);
 
         assertThat(state.id()).isNotNull();
-        assertThat(state.getProperty(LiveOak.ID)).isEqualTo("liveoak-chat-html");
-        assertThat(state.getProperty(LiveOak.NAME)).isEqualTo("liveoak-chat-html");
+        assertThat(state.getProperty(LiveOak.ID)).isEqualTo("liveoak-example-chat-html");
+        assertThat(state.getProperty(LiveOak.NAME)).isEqualTo("liveoak-example-chat-html");
         assertThat(state.getProperty("visible")).isEqualTo(true);
 
         // check STOMP
@@ -168,19 +168,19 @@ public class GitApplicationsResourceTest extends AbstractContainerTest {
         assertThat(obj).isNotNull();
 
         ResourceState appObjState = decode(obj.content());
-        assertThat(appObjState.getProperty(LiveOak.NAME)).isEqualTo("liveoak-chat-html");
+        assertThat(appObjState.getProperty(LiveOak.NAME)).isEqualTo("liveoak-example-chat-html");
 
         assertThat(state.getProperty(LiveOak.ID)).isEqualTo(appObjState.getProperty(LiveOak.ID));
         response.close();
 
         // Check git present
-        File myApp = new File(appsDir, "liveoak-chat-html");
+        File myApp = new File(appsDir, "liveoak-example-chat-html");
         assertThat(new File(myApp, ".git").exists()).isTrue();
 
 
         // Test #5 - App Creation with SSH url and setting id
         postRequest = new HttpPost("http://localhost:8080/admin/applications");
-        postRequest.setEntity(new StringEntity("{ \"id\": \"chat-html\", \"url\": \"https://github.com/liveoak-io/liveoak-chat-html.git\" }"));
+        postRequest.setEntity(new StringEntity("{ \"id\": \"chat-html\", \"url\": \"https://github.com/liveoak-io/liveoak-example-chat-html.git\" }"));
         postRequest.setHeader("Content-Type", MediaType.GIT_APP_JSON.toString());
 
         response = httpClient.execute(postRequest);
