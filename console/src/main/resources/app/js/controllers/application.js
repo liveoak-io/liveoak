@@ -6,6 +6,8 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
 
   $rootScope.hideSidebar = true;
 
+  delete $rootScope.curApp;
+
   $scope.applications = [];
   $scope.exampleApplications = [];
 
