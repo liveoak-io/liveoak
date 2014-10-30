@@ -20,8 +20,11 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
           if (resources.members[j].hasOwnProperty('MongoClientOptions')) {
             app.mongoStorages++;
           }
-          else if(resources.members[j].hasOwnProperty('upsURL')) {
+          else if (resources.members[j].hasOwnProperty('upsURL')) {
             app.push = resources.members[j];
+          }
+          else if (resources.members[j].hasOwnProperty('script-directory')) {
+            LoBusinessLogicScripts.get({appId: app.id}).$promise.then(getScriptsInfo(app));
           }
         }
       }
@@ -52,8 +55,6 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
 
     app.mongoStorages = 0;
     app.storage.$promise.then(increaseStorages(app));
-
-    LoBusinessLogicScripts.get({appId: app.id}).$promise.then(getScriptsInfo(app));
 
     if ($filter('filter')(examplesList, {'id': app.id}, true).length > 0) {
       app.example = true;
@@ -750,6 +751,8 @@ loMod.controller('NextStepsCtrl', function($scope, $rootScope, $routeParams, cur
 loMod.controller('ExampleListCtrl', function($scope, $rootScope, $location, $filter, Notifications, LoAppExamples, LoApp, examplesList, loAppList) {
 
   $rootScope.hideSidebar = true;
+
+  delete $rootScope.curApp;
 
   $scope.breadcrumbs = [
     {'label': 'Applications', 'href': '#/applications'},
