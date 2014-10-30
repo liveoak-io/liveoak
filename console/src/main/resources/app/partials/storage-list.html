@@ -6,15 +6,15 @@
       <h2><span>{{curApp.name}}</span> Storage</h2>
 
       <div class="lo-page-info clearfix">
-        <p ng-show="resources">
+        <p ng-show="resources.length > 0">
           <span class="lo-emph">You have</span> <strong>{{resources.length}}</strong> storage resource{{resources.length > 1 ? 's' : ''}}.
         </p>
-        <div class="pull-right" ng-show="resources">
+        <div class="pull-right" ng-show="resources.length > 0">
           <a href="#/applications/{{curApp.id}}/create-storage" class="btn btn-primary btn-lg" type="button">New Storage</a>
         </div>
       </div>
 
-      <div class="panel" ng-hide="resources">
+      <div class="panel" ng-hide="resources.length > 0">
         <div class="panel-body text-center empty-instance">
           <i class="fa fa-cloud"></i>
           <p>This application currently has no storage resources.</p>
