@@ -23,29 +23,30 @@ import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.testtools.AbstractResourceTestCase;
+import io.liveoak.testtools.AbstractTestCaseWithTestApp;
 import io.liveoak.testtools.MockExtension;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class AuthzServiceRootResourceTest extends AbstractResourceTestCase {
+public class AuthzServiceRootResourceTest extends AbstractTestCaseWithTestApp {
 
     private MockAuthzRootPolicyResource mockPolicy;
     private AuthzServiceRootResource authzService;
 
-    @Override
-    public void loadExtensions() throws Exception {
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
         loadExtension("authz", new SecurityExtension());
         loadExtension("mock-policy", new MockExtension(MockAuthzRootPolicyResource.class));
-        installResource("authz", "authz", getSecurityConfig());
-        installResource("mock-policy", "mock-policy", JsonNodeFactory.instance.objectNode());
+        installTestAppResource("authz", "authz", getSecurityConfig());
+        installTestAppResource("mock-policy", "mock-policy", JsonNodeFactory.instance.objectNode());
     }
 
-    private ObjectNode getSecurityConfig() throws Exception {
+    private static ObjectNode getSecurityConfig() throws Exception {
         ObjectNode config = JsonNodeFactory.instance.objectNode();
         ObjectNode policyConfig = JsonNodeFactory.instance.objectNode();
         policyConfig.put("policyName", "Mock Policy");
@@ -56,8 +57,8 @@ public class AuthzServiceRootResourceTest extends AbstractResourceTestCase {
 
     @Before
     public void before() throws Exception {
-        this.authzService = (AuthzServiceRootResource) this.system.service(Services.resource("testApp", "authz"));
-        this.mockPolicy = (MockAuthzRootPolicyResource) this.system.service(Services.resource("testApp", "mock-policy"));
+        this.authzService = (AuthzServiceRootResource) system.service(Services.resource("testApp", "authz"));
+        this.mockPolicy = (MockAuthzRootPolicyResource) system.service(Services.resource("testApp", "mock-policy"));
     }
 
     @Test

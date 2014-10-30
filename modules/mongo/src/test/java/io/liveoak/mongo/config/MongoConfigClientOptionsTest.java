@@ -1,7 +1,6 @@
 package io.liveoak.mongo.config;
 
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
@@ -14,11 +13,10 @@ import static org.fest.assertions.Assertions.assertThat;
 public class MongoConfigClientOptionsTest extends BaseMongoConfigTest {
 
     @Test
-    public void testDefault() throws Exception {
-        // Test #1 - Default
+    public void defaultTest() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testDefaultDB");
-        InternalApplicationExtension resource = setUpSystem(config);
+        setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
 
@@ -38,13 +36,11 @@ public class MongoConfigClientOptionsTest extends BaseMongoConfigTest {
         assertThat(mongoClientOptionResource.getProperty(MongoClientOptionsState.MAX_AUTOCONNECT_RETRY_TIME)).isEqualTo(new Long(0));
         assertThat(mongoClientOptionResource.getProperty(MongoClientOptionsState.CURSOR_FINALIZER_ENABLED)).isEqualTo(true);
         assertThat(mongoClientOptionResource.getProperty(MongoClientOptionsState.ALWAYS_USE_MBEANS)).isEqualTo(false);
+    }
 
-        // Reset for next test
-        removeResource(resource);
-
-
-        // Test #2 - Configure
-        config = new DefaultResourceState();
+    @Test
+    public void configure() throws Exception {
+        ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testConfigureDB");
 
         ResourceState mongoClientConfigResourceState = new DefaultResourceState();
@@ -54,15 +50,15 @@ public class MongoConfigClientOptionsTest extends BaseMongoConfigTest {
 
         config.putProperty(MongoClientOptionsState.ID, mongoClientConfigResourceState);
 
-        resource = setUpSystem(config);
+        setUpSystem(config);
 
-        result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
+        ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
 
         assertThat(result.getProperty("db")).isEqualTo("testConfigureDB");
         assertThat(result.getProperty("servers")).isNotNull();
 
         assertThat(result.getProperty(MongoClientOptionsState.ID)).isNotNull();
-        mongoClientOptionResource = (ResourceState) result.getProperty(MongoClientOptionsState.ID);
+        ResourceState mongoClientOptionResource = (ResourceState) result.getProperty(MongoClientOptionsState.ID);
         // the default values
         assertThat(mongoClientOptionResource.getProperty(MongoClientOptionsState.CONNECTIONS_PER_HOST)).isEqualTo(100);
         assertThat(mongoClientOptionResource.getProperty(MongoClientOptionsState.THREADS_ALLOWED_TO_BLOCK_FOR_CONNECTION_MULTIPLIER)).isEqualTo(5);
@@ -76,16 +72,14 @@ public class MongoConfigClientOptionsTest extends BaseMongoConfigTest {
         assertThat(mongoClientOptionResource.getProperty(MongoClientOptionsState.DESCRIPTION)).isEqualTo("my cool mbaas");
         assertThat(mongoClientOptionResource.getProperty(MongoClientOptionsState.MAX_AUTOCONNECT_RETRY_TIME)).isEqualTo(new Long(50));
         assertThat(mongoClientOptionResource.getProperty(MongoClientOptionsState.SOCKET_KEEP_ALIVE)).isEqualTo(true);
+    }
 
-        // Reset for next test
-        removeResource(resource);
-
-
-        // Test #3 - Update configure
-        config = new DefaultResourceState();
+    @Test
+    public void updateConfigure() throws Exception {
+        ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testUpdateConfigureDB");
 
-        mongoClientConfigResourceState = new DefaultResourceState();
+        ResourceState mongoClientConfigResourceState = new DefaultResourceState();
         mongoClientConfigResourceState.putProperty(MongoClientOptionsState.DESCRIPTION, "my cool mbaas");
         mongoClientConfigResourceState.putProperty(MongoClientOptionsState.MAX_AUTOCONNECT_RETRY_TIME, 50); //test that specifying an int here works
         mongoClientConfigResourceState.putProperty(MongoClientOptionsState.SOCKET_KEEP_ALIVE, true);
@@ -103,13 +97,13 @@ public class MongoConfigClientOptionsTest extends BaseMongoConfigTest {
         updatedConfig.putProperty("db", "testUpdateConfigureDB");
         updatedConfig.putProperty(MongoClientOptionsState.ID, updatedClientConfigResourceState);
 
-        result = client.update(new RequestContext.Builder().build(), ADMIN_PATH, updatedConfig);
+        ResourceState result = client.update(new RequestContext.Builder().build(), ADMIN_PATH, updatedConfig);
 
         assertThat(result.getProperty("db")).isEqualTo("testUpdateConfigureDB");
         assertThat(result.getProperty("servers")).isNotNull();
 
         assertThat(result.getProperty(MongoClientOptionsState.ID)).isNotNull();
-        mongoClientOptionResource = (ResourceState) result.getProperty(MongoClientOptionsState.ID);
+        ResourceState mongoClientOptionResource = (ResourceState) result.getProperty(MongoClientOptionsState.ID);
 
         // the default values
         assertThat(mongoClientOptionResource.getProperty(MongoClientOptionsState.CONNECTIONS_PER_HOST)).isEqualTo(100);

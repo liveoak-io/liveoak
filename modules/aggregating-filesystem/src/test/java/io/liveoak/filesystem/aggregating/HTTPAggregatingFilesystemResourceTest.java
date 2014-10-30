@@ -11,17 +11,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.filesystem.aggregating.extension.AggregatingFilesystemExtension;
-import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -31,21 +28,25 @@ import static org.fest.assertions.Assertions.assertThat;
  */
 public class HTTPAggregatingFilesystemResourceTest extends AbstractHTTPResourceTestCase {
 
-
-    @Override
-    public void loadExtensions() throws Exception {
-        loadExtension( "aggr-fs", new AggregatingFilesystemExtension() );
-        installResource( "aggr-fs", "aggr", JsonNodeFactory.instance.objectNode() );
+    static {
+        setProjectRoot(HTTPAggregatingFilesystemResourceTest.class);
+        applicationDirectory = projectRoot;
+        try {
+            installTestApp();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    protected File applicationDirectory() {
-        return this.projectRoot;
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
+        loadExtension("aggr-fs", new AggregatingFilesystemExtension());
+        installTestAppResource("aggr-fs", "aggr", JsonNodeFactory.instance.objectNode());
     }
 
     @Before
     public void before() {
-        File dataDir = new File( this.projectRoot, "aggr" );
+        File dataDir = new File(projectRoot, "aggr");
 
         dataDir.mkdirs();
 
@@ -70,7 +71,7 @@ public class HTTPAggregatingFilesystemResourceTest extends AbstractHTTPResourceT
 
     @After
     public void after() {
-        File dataDir = new File( this.projectRoot, "aggr" );
+        File dataDir = new File(projectRoot, "aggr");
         new File(dataDir, "aggregate.js.aggr").delete();
         new File(dataDir, "first.js").delete();
         new File(dataDir, "second.js").delete();

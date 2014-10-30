@@ -25,31 +25,32 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourceParams;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.testtools.AbstractResourceTestCase;
+import io.liveoak.testtools.AbstractTestCaseWithTestApp;
 import io.liveoak.testtools.MockExtension;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
+public class AclPolicyRootResourceTest extends AbstractTestCaseWithTestApp {
 
-    private final Logger log = Logger.getLogger(AclPolicyRootResourceTest.class);
+    private static final Logger log = Logger.getLogger(AclPolicyRootResourceTest.class);
 
-    @Override
-    public void loadExtensions() throws Exception {
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
         loadExtension("interceptor", new InterceptorExtension(), createInterceptorConfig());
         loadExtension("mongo", new MongoExtension(), createMongoConfig());
         loadExtension("acl-policy", new SecurityACLPolicyExtension());
         loadExtension("mock-storage", new MockExtension(MockAclTestStorageResource.class));
 
-        installResource("acl-policy", "acl-policy", createPolicyConfig());
-        installResource("mock-storage", "mock-storage", JsonNodeFactory.instance.objectNode());
+        installTestAppResource("acl-policy", "acl-policy", createPolicyConfig());
+        installTestAppResource("mock-storage", "mock-storage", JsonNodeFactory.instance.objectNode());
     }
 
-    private ObjectNode createInterceptorConfig() {
+    private static ObjectNode createInterceptorConfig() {
         ObjectNode config = JsonNodeFactory.instance.objectNode();
         ObjectNode aclUpdater = JsonNodeFactory.instance.objectNode()
                 .put("interceptor-name", "acl-updater")
@@ -58,13 +59,13 @@ public class AclPolicyRootResourceTest extends AbstractResourceTestCase {
         return config;
     }
 
-    private ObjectNode createPolicyConfig() throws Exception {
+    private static ObjectNode createPolicyConfig() throws Exception {
         ObjectMapper om = ObjectMapperFactory.create();
-        ObjectNode objectNode = om.readValue(getClass().getClassLoader().getResourceAsStream("policy-config/acl-policy-config.json"), ObjectNode.class);
+        ObjectNode objectNode = om.readValue(AclPolicyRootResourceTest.class.getClassLoader().getResourceAsStream("policy-config/acl-policy-config.json"), ObjectNode.class);
         return objectNode;
     }
 
-    private ObjectNode createMongoConfig() {
+    private static ObjectNode createMongoConfig() {
         String database = System.getProperty("mongo.db", "liveoak-acl");
         Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");

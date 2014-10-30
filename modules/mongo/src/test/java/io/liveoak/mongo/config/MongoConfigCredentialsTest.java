@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
@@ -18,19 +17,10 @@ import static org.fest.assertions.Assertions.assertThat;
 public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
 
     @Test
-    public void allTests() throws Exception {
-        testDefault();
-        testConfigureCredentialCR();
-        testConfigureCredentialGSS();
-        testConfigureMultipleCredentials();
-        testUpdateCredentials();
-        testClearCredentials();
-    }
-
     public void testDefault() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testDefaultDB");
-        InternalApplicationExtension resource = setUpSystem(config);
+        setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
         assertThat(result.getProperty("db")).isEqualTo("testDefaultDB");
@@ -38,11 +28,9 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         // by default it should exist but be empty
         assertThat(result.getProperty("credentials")).isNotNull();
         assertThat((List) result.getProperty("credentials")).isEmpty();
-
-        // Reset for next test
-        removeResource(resource);
     }
 
+    @Test
     public void testConfigureCredentialCR() throws Exception {
         ResourceState config = new DefaultResourceState();
         config = new DefaultResourceState();
@@ -58,7 +46,7 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         credentials.add(credential);
         config.putProperty("credentials", credentials);
 
-        InternalApplicationExtension resource = setUpSystem(config);
+        setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
         assertThat(result.getProperty("db")).isEqualTo("testConfigureCRDB");
@@ -71,11 +59,9 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         assertThat(credentialResult.getProperty("password")).isEqualTo("bar");
         assertThat(credentialResult.getProperty("database")).isEqualTo("testConfigureCRDB");
         assertThat(credentialResult.getProperty("mechanism")).isEqualTo("MONGODB-CR");
-
-        // Reset for next test
-        removeResource(resource);
     }
 
+    @Test
     public void testConfigureCredentialGSS() throws Exception {
         ResourceState config = new DefaultResourceState();
         config = new DefaultResourceState();
@@ -89,7 +75,7 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         credentials.add(credential);
         config.putProperty("credentials", credentials);
 
-        InternalApplicationExtension resource = setUpSystem(config);
+        setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
         assertThat(result.getProperty("db")).isEqualTo("testConfigureGSSDB");
@@ -101,11 +87,9 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         assertThat(credentialResult.getPropertyNames().size()).isEqualTo(2);
         assertThat(credentialResult.getProperty("username")).isEqualTo("foobar");
         assertThat(credentialResult.getProperty("mechanism")).isEqualTo("GSSAPI");
-
-        // Reset for next test
-        removeResource(resource);
     }
 
+    @Test
     public void testConfigureMultipleCredentials () throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "ConfigureMultipleCredentialsDB");
@@ -131,7 +115,7 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         credentials.add(credentialC);
 
         config.putProperty("credentials", credentials);
-        InternalApplicationExtension resource = setUpSystem(config);
+        setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
         assertThat(result.getProperty("db")).isEqualTo("ConfigureMultipleCredentialsDB");
@@ -157,12 +141,9 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         assertThat(credentialResultC.getProperty("password")).isEqualTo("pwC");
         assertThat(credentialResultC.getProperty("database")).isEqualTo("databaseC");
         assertThat(credentialResultC.getProperty("mechanism")).isEqualTo("MONGODB-CR");
-
-        // Reset for next test
-        removeResource(resource);
     }
 
-    //@Test
+    @Test
     public void testUpdateCredentials() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "UpdateCredentialsDB");
@@ -188,7 +169,7 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         credentials.add(credentialC);
 
         config.putProperty("credentials", credentials);
-        InternalApplicationExtension resource = setUpSystem(config);
+        setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
         assertThat(result.getProperty("db")).isEqualTo("UpdateCredentialsDB");
@@ -213,12 +194,9 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         assertThat(credentialResultA.getPropertyNames().size()).isEqualTo(2);
         assertThat(credentialResultA.getProperty("username")).isEqualTo("userX");
         assertThat(credentialResultA.getProperty("mechanism")).isEqualTo("GSSAPI");
-
-        // Reset for next test
-        removeResource(resource);
     }
 
-
+    @Test
     public void testClearCredentials() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testClearCredentials");
@@ -233,7 +211,7 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         credentials.add(credential);
         config.putProperty("credentials", credentials);
 
-        InternalApplicationExtension resource = setUpSystem(config);
+        setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
         assertThat(result.getProperty("db")).isEqualTo("testClearCredentials");
@@ -252,9 +230,6 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
 
         assertThat(updatedResult.getProperty("db")).isEqualTo("testClearCredentials");
         assertThat((List) updatedResult.getProperty("credentials")).isEmpty();
-
-        // Reset for next test
-        removeResource(resource);
     }
 
 }

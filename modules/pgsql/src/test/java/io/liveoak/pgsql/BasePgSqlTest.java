@@ -31,7 +31,7 @@ import io.liveoak.pgsql.extension.PgSqlExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.testtools.AbstractResourceTestCase;
+import io.liveoak.testtools.AbstractTestCaseWithTestApp;
 import org.jboss.logging.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -51,7 +51,7 @@ import static org.fest.assertions.Assertions.assertThat;
  * GRANT CREATE ON DATABASE test TO test;
  * \q
  */
-public class BasePgSqlTest extends AbstractResourceTestCase {
+public class BasePgSqlTest extends AbstractTestCaseWithTestApp {
 
     protected static final Logger log = Logger.getLogger(BasePgSqlTest.class);
 
@@ -115,6 +115,9 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
 
         createTables();
         insertData();
+
+        loadExtension("pgsql", new PgSqlExtension(), JsonNodeFactory.instance.objectNode());
+        installTestAppResource("pgsql", BASEPATH, createConfig());
     }
 
     @AfterClass
@@ -138,13 +141,7 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
         return skipTests;
     }
 
-    @Override
-    public void loadExtensions() throws Exception {
-        loadExtension( "pgsql", new PgSqlExtension(), JsonNodeFactory.instance.objectNode() );
-        installResource( "pgsql", BASEPATH, createConfig() );
-    }
-
-    public ResourceState createConfig() {
+    public static ResourceState createConfig() {
         String server = datasource.getServerName();
         int port = datasource.getPortNumber();
         String db = datasource.getDatabaseName();
@@ -163,7 +160,7 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
         config.putProperty("password", password);
         config.putProperty("max-connections", maxConnections);
         config.putProperty("initial-connections", initialConnections);
-        config.putProperty("schemas", Arrays.asList( new String[] { schema, schema_two } ));
+        config.putProperty("schemas", Arrays.asList(new String[]{schema, schema_two}));
         config.putProperty("default-schema", schema);
 
         return config;
@@ -274,7 +271,7 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
         assertThat(actual.id()).isEqualTo(expected.id());
         assertThat(actual.uri()).isEqualTo(expected.uri());
         assertThat(actual.getPropertyNames()).isEqualTo(expected.getPropertyNames());
-        for (String key: actual.getPropertyNames()) {
+        for (String key : actual.getPropertyNames()) {
             Object exval = expected.getProperty(key);
             Object val = actual.getProperty(key);
             if (exval instanceof ResourceState) {
@@ -294,7 +291,7 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
         assertThat(members.size()).isEqualTo(exmembers.size());
 
         int i = 0;
-        for (ResourceState member: members) {
+        for (ResourceState member : members) {
             checkResource(member, exmembers.get(i));
             i++;
         }
@@ -303,7 +300,7 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
     private void checkList(List actual, List expected) {
         assertThat(actual.size()).isEqualTo(expected.size());
         int i = 0;
-        for (Object val: actual) {
+        for (Object val : actual) {
             Object exval = expected.get(i);
             if (val instanceof ResourceState) {
                 assertThat(exval).isInstanceOf(ResourceState.class);
@@ -330,11 +327,11 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
         assertThat(properties.length % 2).isEqualTo(0);
         int count = properties.length / 2;
         for (int i = 0; i < count; i++) {
-            String key = (String) properties[2*i];
-            Object val = properties[2*i + 1];
+            String key = (String) properties[2 * i];
+            Object val = properties[2 * i + 1];
             state.putProperty(key, val);
         }
-        for (ResourceState resource: members) {
+        for (ResourceState resource : members) {
             state.members().add(resource);
         }
         return state;
@@ -354,13 +351,13 @@ public class BasePgSqlTest extends AbstractResourceTestCase {
         return ls;
     }
 
-    protected ResourceState obj(Object ... properties) {
+    protected ResourceState obj(Object... properties) {
         DefaultResourceState state = new DefaultResourceState();
         assertThat(properties.length % 2).isEqualTo(0);
         int count = properties.length / 2;
         for (int i = 0; i < count; i++) {
-            String key = (String) properties[2*i];
-            Object val = properties[2*i + 1];
+            String key = (String) properties[2 * i];
+            Object val = properties[2 * i + 1];
             state.putProperty(key, val);
         }
         return state;

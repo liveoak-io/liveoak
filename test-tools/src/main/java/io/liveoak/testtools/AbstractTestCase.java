@@ -1,17 +1,4 @@
-/*
- * Copyright 2014 Red Hat, Inc. and/or its affiliates.
- *
- * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
- */
 package io.liveoak.testtools;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import io.liveoak.common.util.ObjectMapperFactory;
-import io.liveoak.mongo.launcher.MongoInstaller;
-import io.liveoak.mongo.launcher.MongoLauncher;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,72 +9,320 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.util.ConversionUtils;
+import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.container.LiveOakFactory;
+import io.liveoak.container.LiveOakSystem;
+import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.container.tenancy.InternalApplicationExtension;
+import io.liveoak.container.zero.extension.ZeroExtension;
+import io.liveoak.mongo.launcher.MongoInstaller;
+import io.liveoak.mongo.launcher.MongoLauncher;
+import io.liveoak.spi.client.Client;
+import io.liveoak.spi.extension.Extension;
+import io.liveoak.spi.state.ResourceState;
+import org.jboss.logging.Logger;
+import org.jboss.msc.service.ServiceController;
+import org.junit.After;
+import org.junit.ClassRule;
+import org.junit.rules.ExternalResource;
+import org.vertx.java.core.Vertx;
 
 /**
- * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
+ * @author Ken Finnigan
  */
 public class AbstractTestCase {
-    protected File projectRoot;
+    protected static File projectRoot;
+    protected static File applicationDirectory;
+    protected static LiveOakSystem system;
+    protected static Client client;
+    protected static Vertx vertx;
 
-    protected static MongoLauncher mongoLauncher;
-    protected static int mongoPort = 27017;
-    protected static String mongoHost = "localhost";
+    protected static InternalApplication testApplication;
+    protected static Set<InternalApplicationExtension> testAppExtensions = new HashSet<>();
 
-    @BeforeClass
-    public static void setupMongo() throws IOException {
-        if (mongoLauncher != null) {
-            throw new IllegalStateException("Assertion failed: static mongoLauncher is not null");
+    static {
+        applicationDirectory = null;
+    }
+
+    protected static void setProjectRoot(Class<? extends AbstractTestCase> clazz) {
+        String name = clazz.getName().replace(".", "/") + ".class";
+        URL resource = clazz.getClassLoader().getResource(name);
+
+        if (resource != null) {
+            File current = new File(resource.getFile());
+
+            while (current.exists()) {
+                if (current.isDirectory()) {
+                    if (new File(current, "pom.xml").exists()) {
+                        projectRoot = current;
+                        break;
+                    }
+                }
+
+                current = current.getParentFile();
+            }
         }
-        String host = System.getProperty("mongo.host");
-        String port = System.getProperty("mongo.port");
-        String moduleDir = System.getProperty("user.dir");
 
-        if (host != null && ("localhost".equals(host) || "127.0.0.1".equals(host))) {
+        if (projectRoot != null) {
+            System.setProperty("user.dir", projectRoot.getAbsolutePath());
+        }
+    }
 
-            // make sure mongod is installed
-            String mongodPath = MongoInstaller.autoInstall();
+    @ClassRule
+    public static ExternalResource mongoLauncher = new LiveOakSetup();
 
-            if (mongodPath == null) {
-                throw new RuntimeException("Failed to install MongoDB!");
-            }
+    @After
+    public void postTestWait() throws InterruptedException {
+        awaitStability();
+    }
 
-            // launch mongod
-            mongoLauncher = new MongoLauncher();
-            mongoLauncher.setMongodPath(mongodPath);
-            mongoLauncher.setUseSmallFiles(true);
+    protected JsonNode toJSON(String value) throws IOException {
+        return ObjectMapperFactory.create().readTree(value);
+    }
 
-            if (port != null) {
-                mongoPort = Integer.parseInt(port);
-            }
-            mongoLauncher.setPort( mongoPort );
+    public static void installTestApp() throws Exception {
+        testApplication = system.applicationRegistry().createApplication("testApp", "Test Application", applicationDirectory);
+        awaitStability();
+    }
 
-            if (host != null) {
-                mongoHost = host;
-            }
-            mongoLauncher.setHost( mongoHost );
+    protected static boolean awaitStability() throws InterruptedException {
+        // Default all calls to a 5 second timeout if not specified
+        return awaitStability(5, TimeUnit.SECONDS);
+    }
 
-            String dataDir = new File(moduleDir, "target/data_" + randomName()).getAbsolutePath();
-            File ddFile = new File(dataDir);
-            if (!ddFile.isDirectory()) {
-                if (!ddFile.mkdirs()) {
-                    throw new RuntimeException("Failed to create a data directory: " + dataDir);
+    protected static boolean awaitStability(int timeout, TimeUnit unit) throws InterruptedException {
+        return awaitStability(timeout, unit, null, null);
+    }
+
+    protected static boolean awaitStability(long timeout, TimeUnit unit, Set<? super ServiceController<?>> failed, Set<? super ServiceController<?>> problem) throws InterruptedException {
+        boolean stable = system.awaitStability(timeout, unit, failed, problem);
+        if (!stable) {
+            log.warn("awaitStability() may require an increased timeout duration.");
+        }
+
+        if (failed != null && !failed.isEmpty()) {
+            Iterator<? super ServiceController<?>> failedIterator = failed.iterator();
+            while (failedIterator.hasNext()) {
+                ServiceController controller = (ServiceController) failedIterator.next();
+                log.errorf(CONTROLLER_MESSAGE, controller.getName(), controller.getState(), controller.getSubstate(), controller.getMode());
+                if (controller.getStartException() != null) {
+                    controller.getStartException().printStackTrace();
                 }
             }
-            String logFile = new File(dataDir, "mongod.log").getAbsolutePath();
-            mongoLauncher.setDbPath(dataDir);
-            mongoLauncher.setLogPath(logFile);
-            mongoLauncher.setPidFilePath(new File(ddFile, "mongod.pid").getAbsolutePath());
-            mongoLauncher.startMongo();
+        }
 
-            // wait for it to start
-            long start = System.currentTimeMillis();
-            while(!mongoLauncher.serverRunning(mongoHost, mongoPort, (e) -> {
+        if (problem != null && !problem.isEmpty()) {
+            Iterator<? super ServiceController<?>> problemIterator = problem.iterator();
+            while (problemIterator.hasNext()) {
+                ServiceController controller = (ServiceController) problemIterator.next();
+                log.errorf(CONTROLLER_MESSAGE, controller.getName(), controller.getState(), controller.getSubstate(), controller.getMode());
+                if (controller.getStartException() != null) {
+                    controller.getStartException().printStackTrace();
+                }
+            }
+        }
+
+        return stable;
+    }
+
+    protected static void loadExtension(String id, Extension ext) throws Exception {
+        system.extensionInstaller().load(id, ext);
+        awaitStability();
+    }
+
+    protected static void loadExtension(String id, Extension ext, ObjectNode extConfig) throws Exception {
+        loadExtension(id, ext, extConfig, null);
+    }
+
+    protected static void loadExtension(String id, Extension ext, ObjectNode extConfig, ObjectNode instancesConfig) throws Exception {
+        ObjectNode fullConfig = JsonNodeFactory.instance.objectNode();
+        fullConfig.put("config", extConfig);
+
+        if (instancesConfig != null) {
+            fullConfig.put("instances", instancesConfig);
+        }
+
+        system.extensionInstaller().load(id, ext, fullConfig);
+        awaitStability();
+    }
+
+    protected static InternalApplicationExtension installTestAppResource(String extId, String resourceId, ObjectNode resourceConfig) throws Exception {
+        InternalApplicationExtension appExt = testApplication.extend(extId, resourceId, resourceConfig);
+        testAppExtensions.add(appExt);
+        awaitStability();
+        return appExt;
+    }
+
+    protected static InternalApplicationExtension installTestAppResource(String extId, String resourceId, ResourceState resourceConfig) throws Exception {
+        return installTestAppResource(extId, resourceId, ConversionUtils.convert(resourceConfig));
+    }
+
+    public static void removeTestAppResource(InternalApplicationExtension resource) throws InterruptedException {
+        testAppExtensions.remove(resource);
+        resource.remove();
+
+        awaitStability();
+    }
+
+    public static void removeAllResources() throws InterruptedException {
+        if (testAppExtensions != null && testAppExtensions.size() > 0) {
+            for (InternalApplicationExtension extension : testAppExtensions) {
+                extension.remove();
+            }
+
+            testAppExtensions.clear();
+        }
+        awaitStability();
+    }
+
+    static class LiveOakSetup extends ExternalResource {
+        MongoLauncher mongoLauncher;
+        int mongoPort = 27017;
+        String mongoHost = "localhost";
+
+        @Override
+        protected void before() throws Throwable {
+            startupMongo();
+            startupLiveOak();
+        }
+
+        @Override
+        protected void after() {
+            shutdownMongo();
+            shutdownLiveOak();
+        }
+
+        void startupMongo() throws Throwable {
+            if (mongoLauncher != null) {
+                throw new IllegalStateException("Assertion failed: static mongoLauncher is not null");
+            }
+            String host = System.getProperty("mongo.host");
+            String port = System.getProperty("mongo.port");
+            String moduleDir = System.getProperty("user.dir");
+
+            if (host != null && ("localhost".equals(host) || "127.0.0.1".equals(host))) {
+                // make sure mongod is installed
+                String mongodPath = MongoInstaller.autoInstall();
+
+                if (mongodPath == null) {
+                    throw new RuntimeException("Failed to install MongoDB!");
+                }
+
+                // launch mongod
+                mongoLauncher = new MongoLauncher();
+                mongoLauncher.setMongodPath(mongodPath);
+                mongoLauncher.setUseSmallFiles(true);
+
+                if (port != null) {
+                    mongoPort = Integer.parseInt(port);
+                }
+                mongoLauncher.setPort(mongoPort);
+
+                if (host != null) {
+                    mongoHost = host;
+                }
+                mongoLauncher.setHost(mongoHost);
+
+                String dataDir = new File(moduleDir, "target/data_" + randomName()).getAbsolutePath();
+                File ddFile = new File(dataDir);
+                if (!ddFile.isDirectory()) {
+                    if (!ddFile.mkdirs()) {
+                        throw new RuntimeException("Failed to create a data directory: " + dataDir);
+                    }
+                }
+                String logFile = new File(dataDir, "mongod.log").getAbsolutePath();
+                mongoLauncher.setDbPath(dataDir);
+                mongoLauncher.setLogPath(logFile);
+                mongoLauncher.setPidFilePath(new File(ddFile, "mongod.pid").getAbsolutePath());
+                mongoLauncher.startMongo();
+
+                // wait for it to start
+                long start = System.currentTimeMillis();
+                while (!mongoLauncher.serverRunning(mongoHost, mongoPort, (e) -> {
                     if (System.currentTimeMillis() - start > 120000) throw new RuntimeException(e);
                 })) {
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException("Interrupted!");
+                    }
+                }
+            }
+        }
+
+        void startupLiveOak() throws Throwable {
+            system = LiveOakFactory.create();
+            client = system.client();
+            vertx = system.vertx();
+
+            awaitStability();
+
+            system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
+
+            system.awaitStability();
+            log.debug("stable");
+        }
+
+        void shutdownLiveOak() {
+            system.stop();
+            if (testApplication != null) {
+                testApplication.configurationFile().delete();
+            }
+        }
+
+        void shutdownMongo() {
+            if (mongoLauncher != null) {
                 try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException("Interrupted!");
+                    mongoLauncher.stopMongo();
+
+                    // wait for it to stop
+                    long start = System.currentTimeMillis();
+                    while (MongoLauncher.serverRunning(mongoHost, mongoPort, (e) -> {
+                        if (System.currentTimeMillis() - start > 120000) throw new RuntimeException(e);
+                    })) {
+
+                        if (System.currentTimeMillis() - start > 120000) {
+                            throw new RuntimeException("mongod process still seems to be running (2m timeout)");
+                        }
+                        try {
+                            Thread.sleep(300);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException("Interrupted!");
+                        }
+                    }
+
+                    // now delete the data dir except log file
+                    Files.walkFileTree(new File(mongoLauncher.getDbPath()).toPath(), new SimpleFileVisitor<Path>() {
+                        @Override
+                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                            if (!file.startsWith(mongoLauncher.getLogPath())) {
+                                Files.delete(file);
+                            }
+                            return FileVisitResult.CONTINUE;
+                        }
+
+                        @Override
+                        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                            try {
+                                Files.delete(dir);
+                            } catch (DirectoryNotEmptyException ignored) {
+                            }
+                            return FileVisitResult.CONTINUE;
+                        }
+                    });
+                } catch (Throwable t) {
+                    log.error("MongoLauncherResource.after() error.", t);
+                } finally {
+                    mongoLauncher = null;
                 }
             }
         }
@@ -106,77 +341,7 @@ public class AbstractTestCase {
         return sb.toString();
     }
 
-    @Before
-    public void setupUserDir() {
-        String name = getClass().getName().replace(".", "/") + ".class";
-        URL resource = getClass().getClassLoader().getResource(name);
+    private static String CONTROLLER_MESSAGE = "Controller %s is in State: %s, Substate: %s and Mode: %s";
 
-        if (resource != null) {
-            File current = new File(resource.getFile());
-
-            while (current.exists()) {
-                if (current.isDirectory()) {
-                    if (new File(current, "pom.xml").exists()) {
-                        this.projectRoot = current;
-                        break;
-                    }
-                }
-
-                current = current.getParentFile();
-            }
-        }
-
-        if (this.projectRoot != null) {
-            System.setProperty("user.dir", this.projectRoot.getAbsolutePath());
-        }
-    }
-
-    @AfterClass
-    public static void tearDownMongo() throws IOException {
-        if (mongoLauncher != null) {
-            mongoLauncher.stopMongo();
-
-            // wait for it to stop
-            long start = System.currentTimeMillis();
-            while(mongoLauncher.serverRunning(mongoHost, mongoPort, (e) -> {
-                    if (System.currentTimeMillis() - start > 120000) throw new RuntimeException(e);
-                })) {
-
-                if (System.currentTimeMillis() - start > 120000) {
-                    throw new RuntimeException("mongod process still seems to be running (2m timeout)");
-                }
-                try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException("Interrupted!");
-                }
-            }
-
-            // now delete the data dir except log file
-            Files.walkFileTree(new File(mongoLauncher.getDbPath()).toPath(), new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    if (!file.startsWith(mongoLauncher.getLogPath())) {
-                        Files.delete(file);
-                    }
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    try {
-                        Files.delete(dir);
-                    } catch (DirectoryNotEmptyException ignored) {
-                    }
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-
-            mongoLauncher = null;
-        }
-    }
-
-    protected JsonNode toJSON(String value) throws IOException {
-        return ObjectMapperFactory.create().readTree(value);
-    }
+    private static final Logger log = Logger.getLogger(AbstractTestCase.class);
 }

@@ -23,8 +23,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
 
     @Test
-    public void resourceDeleteTests() throws Exception {
-        // Test #1 - Simple delete
+    public void simpleDelete() throws Exception {
         String methodName = "testSimpleDelete";
         assertThat(db.getCollectionNames().contains(methodName)).isFalse();
 
@@ -45,17 +44,18 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
 
         // check that it got deleted in the db
         assertThat(db.getCollection(methodName).getCount()).isEqualTo(0);
+    }
 
-
-        // Test #2 - Direct delete property
-        methodName = "testDirectDeleteProperty";
+    @Test
+    public void directDeleteProperty() throws Exception {
+        String methodName = "testDirectDeleteProperty";
         assertThat(db.getCollectionNames().contains(methodName)).isFalse();
 
         // create the object using the mongo driver directly
-        object = new BasicDBObject();
+        BasicDBObject object = new BasicDBObject();
         object.append("foo", new BasicDBObject("bar", "123"));
         db.getCollection(methodName).insert(object);
-        id = object.getObjectId("_id").toString();
+        String id = object.getObjectId("_id").toString();
         assertThat(db.getCollection(methodName).findOne(new BasicDBObject("_id", new ObjectId(id)))).isNotNull();
 
         // we should not be able to directly delete a child property
@@ -67,17 +67,18 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         }
 
         assertThat((DBObject) object).isEqualTo(db.getCollection(methodName).findOne());
+    }
 
-
-        // Test #3 - Delete child object
-        methodName = "testDeleteChildObject";
+    @Test
+    public void deleteChildObject() throws Exception {
+        String methodName = "testDeleteChildObject";
         assertThat(db.getCollectionNames().contains(methodName)).isFalse();
 
         // create the object using the mongo driver directly
-        object = new BasicDBObject();
+        BasicDBObject object = new BasicDBObject();
         object.append("foo", new BasicDBObject("bar", new BasicDBObject("ABC", 123)));
         db.getCollection(methodName).insert(object);
-        id = object.getObjectId("_id").toString();
+        String id = object.getObjectId("_id").toString();
         assertThat(db.getCollection(methodName).findOne(new BasicDBObject("_id", new ObjectId(id)))).isNotNull();
 
         // we should not be able to directly delete a child object
@@ -90,17 +91,18 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         }
 
         assertThat((DBObject) object).isEqualTo(db.getCollection(methodName).findOne());
+    }
 
-
-        // Test #4 - Delete child property
-        methodName = "testDeleteChildProperty";
+    @Test
+    public void deleteChildProperty() throws Exception {
+        String methodName = "testDeleteChildProperty";
         assertThat(db.getCollectionNames().contains(methodName)).isFalse();
 
         // create the object using the mongo driver directly
-        object = new BasicDBObject();
+        BasicDBObject object = new BasicDBObject();
         object.append("foo", new BasicDBObject("bar", new BasicDBObject("ABC", 123)));
         db.getCollection(methodName).insert(object);
-        id = object.getObjectId("_id").toString();
+        String id = object.getObjectId("_id").toString();
         assertThat(db.getCollection(methodName).findOne(new BasicDBObject("_id", new ObjectId(id)))).isNotNull();
 
         // we should not be able to directly delete a child property
@@ -112,17 +114,18 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         }
 
         assertThat((DBObject) object).isEqualTo(db.getCollection(methodName).findOne());
+    }
 
-
-        // Test #5 - Delete grandchild object
-        methodName = "testDeleteGrandchildObject";
+    @Test
+    public void deleteGrandchildObject() throws Exception {
+        String methodName = "testDeleteGrandchildObject";
         assertThat(db.getCollectionNames().contains(methodName)).isFalse();
 
         // create the object using the mongo driver directly
-        object = new BasicDBObject();
+        BasicDBObject object = new BasicDBObject();
         object.append("foo", new BasicDBObject("bar", new BasicDBObject("ABC", new BasicDBObject("123", "XYZ"))));
         db.getCollection(methodName).insert(object);
-        id = object.getObjectId("_id").toString();
+        String id = object.getObjectId("_id").toString();
         assertThat(db.getCollection(methodName).findOne(new BasicDBObject("_id", new ObjectId(id)))).isNotNull();
 
         // we should not be able to directly delete a child object
@@ -135,10 +138,11 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         }
 
         assertThat((DBObject) object).isEqualTo(db.getCollection(methodName).findOne());
+    }
 
-
-        // Test #6 - Delete non existent collection
-        methodName = "testDeleteNonExistantCollection";
+    @Test
+    public void deleteNonExistentCollection() throws Exception {
+        String methodName = "testDeleteNonExistantCollection";
         assertThat(db.getCollectionNames().contains(methodName)).isFalse();
 
         try {
@@ -147,10 +151,11 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         } catch (ResourceNotFoundException rnfe) {
             // expected
         }
+    }
 
-
-        // Test #7 - Delete collection
-        methodName = "testDeleteCollection";
+    @Test
+    public void deleteCollection() throws Exception {
+        String methodName = "testDeleteCollection";
         assertThat(db.getCollectionNames().contains(methodName)).isFalse();
 
         // create the collection
@@ -161,10 +166,11 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
 
         // check that it was actually deleted
         assertThat(db.getCollectionNames().contains(methodName)).isFalse();
+    }
 
-
-        // Test #8 - Delete invalid id
-        methodName = "testDeleteInvalidId";
+    @Test
+    public void deleteInvalidId() throws Exception {
+        String methodName = "testDeleteInvalidId";
         assertThat(db.getCollectionNames().contains(methodName)).isFalse();
 
         try {
@@ -173,10 +179,11 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         } catch (ResourceNotFoundException e) {
             // expected
         }
+    }
 
-
-        // Test #9 - Delete non existent id
-        methodName = "testDeleteNonExistantId";
+    @Test
+    public void deleteNonExistentId() throws Exception {
+        String methodName = "testDeleteNonExistantId";
         assertThat(db.getCollectionNames().contains(methodName)).isFalse();
 
         ObjectId objectId = new ObjectId();
@@ -187,7 +194,6 @@ public class MongoDBResourceDeleteTest extends BaseMongoDBTest {
         } catch (ResourceNotFoundException e) {
             // expected
         }
-
     }
 
 }

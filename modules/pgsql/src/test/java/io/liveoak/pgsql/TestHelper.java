@@ -27,16 +27,6 @@ public class TestHelper extends BasePgSqlHttpTest {
     private final static String BOB = "00000000002";
     private final static String WONDERLAND = "00000000001";
 
-    @Override
-    public void setUpSystem() {
-        // don't setup an embedded server - this helper is to be used against standalone LiveOak setup
-    }
-
-    @Override
-    public void tearDownSystem() {
-        // no setup - no teardown
-    }
-
     @Test
     public void createUsersTable() throws IOException {
         HttpPost post = new HttpPost(ENDPOINT);

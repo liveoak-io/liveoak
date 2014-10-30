@@ -7,7 +7,8 @@ import io.liveoak.scheduler.extension.SchedulerExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.testtools.AbstractResourceTestCase;
+import io.liveoak.testtools.AbstractTestCaseWithTestApp;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -15,13 +16,12 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author Bob McWhirter
  */
-public class SchedulerResourceTest extends AbstractResourceTestCase {
+public class SchedulerResourceTest extends AbstractTestCaseWithTestApp {
 
-
-    @Override
-    public void loadExtensions() throws Exception {
-        loadExtension( "scheduler", new SchedulerExtension() );
-        installResource( "scheduler", "scheduler", JsonNodeFactory.instance.objectNode() );
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
+        loadExtension("scheduler", new SchedulerExtension());
+        installTestAppResource("scheduler", "scheduler", JsonNodeFactory.instance.objectNode());
     }
 
     @Test
@@ -30,21 +30,21 @@ public class SchedulerResourceTest extends AbstractResourceTestCase {
 
         ResourceState triggerState = new DefaultResourceState();
         triggerState.putProperty("cron", "* * * * * ?");
-        System.err.println( "creating a trigger" );
+        System.err.println("creating a trigger");
         ResourceState returnedState = client.create(requestContext, "/testApp/scheduler", triggerState);
-        System.err.println( "created a trigger: " + returnedState );
+        System.err.println("created a trigger: " + returnedState);
 
         String id = returnedState.id();
 
-        System.err.println( "Sleeping 2 seconds" );
+        System.err.println("Sleeping 2 seconds");
         // intentional, to allow the job to fire some
         Thread.sleep(2000);
 
-        System.err.println( "Fetching firings" );
+        System.err.println("Fetching firings");
 
         ResourceState fromCollection = client.read(requestContext, "/testApp/scheduler/" + id);
 
-        System.err.println( "Fetched: " + fromCollection );
+        System.err.println("Fetched: " + fromCollection);
 
         assertThat(fromCollection).isNotNull();
         assertThat(fromCollection.getPropertyNames()).hasSize(2);

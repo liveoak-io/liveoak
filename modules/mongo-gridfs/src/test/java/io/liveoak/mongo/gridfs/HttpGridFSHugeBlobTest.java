@@ -28,7 +28,7 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class HttpGridFSHugeBlobTest extends AbstractGridFSTest {
+public class HttpGridFSHugeBlobTest extends AbstractGridFSTestCase {
 
     private static final String USER_ROOT_URL = "http://localhost:8080/testApp/gridfs/john";
     private static final String ROOT_URL = "http://localhost:8080";

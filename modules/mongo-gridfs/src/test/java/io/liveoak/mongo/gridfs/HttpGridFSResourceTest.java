@@ -25,7 +25,7 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class HttpGridFSResourceTest extends AbstractGridFSTest {
+public class HttpGridFSResourceTest extends AbstractGridFSTestCase {
 
     private static final String BLOB_CONTENT_TYPE = "application/octet-stream";
 

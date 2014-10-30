@@ -15,8 +15,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class MongoDBCappedCollectionTest extends BaseMongoDBTest {
 
     @Test
-    public void cappedCollectionTests() throws Exception {
-        // Test #1 - Create capped collection
+    public void createCappedCollection() throws Exception {
         // check that we can create the resource
         ResourceState state = new DefaultResourceState("lastFive");
         state.putProperty("capped", "true");
@@ -34,16 +33,17 @@ public class MongoDBCappedCollectionTest extends BaseMongoDBTest {
         assertThat(lastFive.getProperty("capped")).isEqualTo(true);
         assertThat(lastFive.getProperty("max")).isEqualTo(5);
         assertThat(lastFive.members().size()).isEqualTo(0);
+    }
 
-
-        // Test #2 - Write capped collection
+    @Test
+    public void writeCappedCollection() throws Exception {
         // check that we can create the resource
-        state = new DefaultResourceState("lastTwo");
+        ResourceState state = new DefaultResourceState("lastTwo");
         state.putProperty("capped", "true");
         state.putProperty("size", 1024);
         state.putProperty("max", 2);
 
-        createdResource = client.create(new RequestContext.Builder().build(), "/testApp/storage", state);
+        ResourceState createdResource = client.create(new RequestContext.Builder().build(), "/testApp/storage", state);
         assertThat(createdResource).isNotNull();
         assertThat(createdResource.id()).isEqualTo("lastTwo");
 
@@ -61,16 +61,17 @@ public class MongoDBCappedCollectionTest extends BaseMongoDBTest {
         assertThat(lastTwo.members().size()).isEqualTo(2);
         assertThat(lastTwo.members().get(0).id()).isEqualTo("second");
         assertThat(lastTwo.members().get(1).id()).isEqualTo("third");
+    }
 
-
-        // Test #3 - Delete element capped collection
+    @Test
+    public void deleteElementCappedCollection() throws Exception {
         // check that we can create the resource
-        state = new DefaultResourceState("onlyThree");
+        ResourceState state = new DefaultResourceState("onlyThree");
         state.putProperty("capped", "true");
         state.putProperty("size", 1024);
         state.putProperty("max", 3);
 
-        createdResource = client.create(new RequestContext.Builder().build(), "/testApp/storage", state);
+        ResourceState createdResource = client.create(new RequestContext.Builder().build(), "/testApp/storage", state);
         assertThat(createdResource).isNotNull();
         assertThat(createdResource.id()).isEqualTo("onlyThree");
 
@@ -83,16 +84,17 @@ public class MongoDBCappedCollectionTest extends BaseMongoDBTest {
         } catch (DeleteNotSupportedException dnse) {
             //expected
         }
+    }
 
-
-        // Test #4 - Delete capped collection
+    @Test
+    public void deleteCappedCollection() throws Exception {
         // check that we can create the resource
-        state = new DefaultResourceState("testDelete");
+        ResourceState state = new DefaultResourceState("testDelete");
         state.putProperty("capped", "true");
         state.putProperty("size", 1024);
         state.putProperty("max", 3);
 
-        createdResource = client.create(new RequestContext.Builder().build(), "/testApp/storage", state);
+        ResourceState createdResource = client.create(new RequestContext.Builder().build(), "/testApp/storage", state);
         assertThat(createdResource).isNotNull();
         assertThat(createdResource.id()).isEqualTo("testDelete");
 

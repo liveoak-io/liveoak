@@ -5,7 +5,7 @@ import io.liveoak.scripts.JavaScriptResourceState;
 import io.liveoak.scripts.resource.BaseResourceTriggeredTestCase;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -21,8 +21,8 @@ public class PropertyTestCase extends BasePropertyTestCase {
     // NOTE: not meant to check things like CRUD on the properties but to test the properties behaviour.
     // Please see the io.liveoak.scripts.resource for CRUD testing
 
-    @Before
-    public void setupTests() throws Exception {
+    @BeforeClass
+    public static void setupTests() throws Exception {
         //check that there are no other scripts configured
         ResourceState initialState = client.read(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH);
         assertThat(initialState.members()).isEmpty();
@@ -33,14 +33,13 @@ public class PropertyTestCase extends BasePropertyTestCase {
         assertThat(resourceState.id()).isEqualTo("propertyTest");
 
         //upload the javascript file
-        ResourceState binaryResourceState = new JavaScriptResourceState(readFile("testMetadata.js"));
+        ResourceState binaryResourceState = new JavaScriptResourceState(readFile(PropertyTestCase.class, "testMetadata.js"));
         ResourceState javascriptState = client.create(new RequestContext.Builder().build(), resourceState.uri().toString(), binaryResourceState);
         assertThat(javascriptState).isNotNull();
     }
 
-    @Test (timeout = 18000)
-    public void timeoutTests() throws Exception {
-        // Test #1 - Default timeout
+    @Test (timeout = 11000)
+    public void defaultTimeout() throws Exception {
         Long startTime = System.currentTimeMillis();
         // Trigger a read
         JsonNode result = getJSON("/testApp/mock?test=testTimeout");
@@ -51,36 +50,44 @@ public class PropertyTestCase extends BasePropertyTestCase {
 
         Long executionTime = endTime - startTime;
         assertThat(executionTime).isGreaterThan(5000); //5000 is the timeout value
+    }
 
-
-        // Tests #2 - Timeout with force
-        startTime = System.currentTimeMillis();
+    @Test (timeout = 11000)
+    public void timeoutWithForce() throws Exception {
+        Long startTime = System.currentTimeMillis();
         // Trigger a read
-        result = getJSON("/testApp/mock?test=testTimeoutWithForce");
-        endTime = System.currentTimeMillis();
+        JsonNode result = getJSON("/testApp/mock?test=testTimeoutWithForce");
+        Long endTime = System.currentTimeMillis();
 
         assertThat(result.get("error-type").textValue()).isEqualTo("INTERNAL_ERROR");
         assertThat(result.get("message").textValue()).isEqualTo("A timeout occurred when running the script.");
 
-        executionTime = endTime - startTime;
+        Long executionTime = endTime - startTime;
         assertThat(executionTime).isGreaterThan(10000); //5000 is the timeout value for the script + 5000 to wait until we kill the thread
+    }
 
-
-        // Test #3 - Custom timeout
+    @Test (timeout = 1000)
+    public void customTimeout() throws Exception {
         int timeout = 500;
         client.update(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/propertyTest",
                 new BaseResourceTriggeredTestCase.MetadataState("propertyTest", "/testApp/*")
                         .libraries("client").timeout(timeout).build());
 
-        startTime = System.currentTimeMillis();
+        Long startTime = System.currentTimeMillis();
         // Trigger a read
-        result = getJSON("/testApp/mock?test=testTimeout");
-        endTime = System.currentTimeMillis();
+        JsonNode result = getJSON("/testApp/mock?test=testTimeout");
+        Long endTime = System.currentTimeMillis();
 
         assertThat(result.get("error-type").textValue()).isEqualTo("INTERNAL_ERROR");
         assertThat(result.get("message").textValue()).isEqualTo("A timeout occurred when running the script.");
 
-        executionTime = endTime - startTime;
+        Long executionTime = endTime - startTime;
         assertThat(executionTime).isGreaterThan(timeout);
+
+        // Reset
+        timeout = 5000;
+        client.update(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/propertyTest",
+                new BaseResourceTriggeredTestCase.MetadataState("propertyTest", "/testApp/*")
+                        .libraries("client").timeout(timeout).build());
     }
 }

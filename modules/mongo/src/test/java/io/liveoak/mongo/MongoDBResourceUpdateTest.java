@@ -25,8 +25,7 @@ import static org.junit.Assert.assertEquals;
 public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
 
     @Test
-    public void resourceUpdateTests() throws Exception {
-        // Test #1 - Simple update
+    public void simpleUpdate() throws Exception {
         String methodName = "testSimpleUpdate";
         assertThat(db.getCollection(methodName).getCount()).isEqualTo(0);
 
@@ -53,21 +52,22 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         DBObject dbObject = db.getCollection(methodName).findOne();
         assertEquals("baz", dbObject.get("foo"));
         assertEquals(new ObjectId(id.substring("ObjectId(\"".length(), id.length() - "\")".length())), dbObject.get("_id"));
+    }
 
-
-        // Test #2 - Child direct update
-        methodName = "testChildDirectUpdate";
+    @Test
+    public void childDirectUpdate() throws Exception {
+        String methodName = "testChildDirectUpdate";
         assertThat(db.getCollection(methodName).getCount()).isEqualTo(0);
 
         // create the object using the mongo driver directly
-        object = new BasicDBObject();
+        BasicDBObject object = new BasicDBObject();
         object.append("foo", new BasicDBObject("bar", "baz"));
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
+        String id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
 
         // update the resource using the client.update method
-        resourceState = new DefaultResourceState();
+        ResourceState resourceState = new DefaultResourceState();
         resourceState.putProperty("bar", 123);
 
         // should not be able to directly update a child object
@@ -79,21 +79,22 @@ public class MongoDBResourceUpdateTest extends BaseMongoDBTest {
         }
 
         assertThat((DBObject) object).isEqualTo(db.getCollection(methodName).findOne());
+    }
 
-
-        // Test #3 - Grandchild direct update
-        methodName = "testGrandChildDirectUpdate";
+    @Test
+    public void grandchildDirectUpdate() throws Exception {
+        String methodName = "testGrandChildDirectUpdate";
         assertThat(db.getCollection(methodName).getCount()).isEqualTo(0);
 
         // create the object using the mongo driver directly
-        object = new BasicDBObject();
+        BasicDBObject object = new BasicDBObject();
         object.append("foo", new BasicDBObject("bar", new BasicDBObject("baz", "ABC")));
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
-        id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
+        String id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
 
         // update the resource using the client.update method
-        resourceState = new DefaultResourceState();
+        ResourceState resourceState = new DefaultResourceState();
         resourceState.putProperty("baz", "XYZ");
 
         try {

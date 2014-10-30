@@ -5,38 +5,39 @@
  */
 package io.liveoak.mongo.gridfs;
 
-import com.mongodb.DB;
-import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
-import io.liveoak.common.codec.DefaultResourceState;
-import com.mongodb.WriteConcern;
-import io.liveoak.mongo.gridfs.extension.GridFSExtension;
-import io.liveoak.spi.state.ResourceState;
-import io.liveoak.testtools.AbstractResourceTestCase;
-import org.jboss.logging.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.mongodb.DB;
+import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
+import com.mongodb.WriteConcern;
+import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.mongo.gridfs.extension.GridFSExtension;
+import io.liveoak.spi.state.ResourceState;
+import io.liveoak.testtools.AbstractTestCaseWithTestApp;
+import org.jboss.logging.Logger;
+import org.junit.BeforeClass;
+
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class BaseGridFSTest extends AbstractResourceTestCase {
+public class BaseGridFSTest extends AbstractTestCaseWithTestApp {
 
     protected String BASEPATH = "gridfs";
-    protected final Logger log = Logger.getLogger(getClass());
+    protected static final Logger log = Logger.getLogger(BaseGridFSTest.class);
 
     protected static Mongo mongoClient;
     protected static DB db;
 
-    @Override
-    public void loadExtensions() throws Exception {
-        loadExtension("gridfs", new GridFSExtension() );
-        installResource( "gridfs", "gridfs", createConfig() );
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
+        loadExtension("gridfs", new GridFSExtension());
+        installTestAppResource("gridfs", "gridfs", createConfig());
     }
 
-    public ResourceState createConfig() {
+    public static ResourceState createConfig() {
         String database = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
         Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");

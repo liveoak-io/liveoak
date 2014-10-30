@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
@@ -9,27 +9,32 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.filesystem.extension.FilesystemExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.testtools.AbstractResourceTestCase;
+import io.liveoak.testtools.AbstractTestCase;
+import io.liveoak.testtools.AbstractTestCaseWithTestApp;
+import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Bob McWhirter
  */
-public class FilesystemResourceTest extends AbstractResourceTestCase {
+public class FilesystemResourceTest extends AbstractTestCase {
 
-    @Override
-    protected File applicationDirectory() {
-        return this.projectRoot;
+    static {
+        setProjectRoot(FilesystemResourceTest.class);
+        applicationDirectory = projectRoot;
+        try {
+            installTestApp();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    public void loadExtensions() throws Exception {
+    @BeforeClass
+    public static void setup() throws Exception {
         loadExtension("fs", new FilesystemExtension());
-        installResource( "fs", "files", JsonNodeFactory.instance.objectNode() );
+        installTestAppResource("fs", "files", JsonNodeFactory.instance.objectNode());
     }
 
     @Test

@@ -21,8 +21,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class MongoDBCollectionCreateTest extends BaseMongoDBTest {
 
     @Test
-    public void collectionCreateTests() throws Exception {
-        // Test #1 - Create collection
+    public void createCollection() throws Exception {
         // check that we can create the resource
         ResourceState state = new DefaultResourceState("movies");
         ResourceState createdResource = client.create(new RequestContext.Builder().build(), "/testApp/storage", state);
@@ -33,15 +32,16 @@ public class MongoDBCollectionCreateTest extends BaseMongoDBTest {
         ResourceState movies = client.read(new RequestContext.Builder().build(), "/testApp/storage/movies");
         assertThat(movies).isNotNull();
         assertThat(movies.id()).isEqualTo("movies");
+    }
 
-
-        // Test #2 - Create empty collection
+    @Test
+    public void createEmptyCollection() throws Exception {
         // DB db = mongoClient.getDB("testGetStorageEmpty");
         db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one ?
 
         assertThat(db.getCollectionNames()).hasSize(0);
 
-        state = new DefaultResourceState("testCollection");
+        ResourceState state = new DefaultResourceState("testCollection");
 
         ResourceState response = client.create(new RequestContext.Builder().build(), "/testApp/" + BASEPATH, state);
 
@@ -54,14 +54,15 @@ public class MongoDBCollectionCreateTest extends BaseMongoDBTest {
         // verify whats in mongodb
         assertThat(db.collectionExists("testCollection")).isTrue();
         assertThat(db.getCollection("testCollection").count()).isEqualTo(0);
+    }
 
-
-        // Test #3 - Create collection no id
+    @Test
+    public void createCollectionNoId() throws Exception {
         // DB db = mongoClient.getDB("testGetStorageEmpty");
         db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one ?
         assertThat(db.getCollectionNames()).hasSize(0);
 
-        response = client.create(new RequestContext.Builder().build(), "/testApp/" + BASEPATH, new DefaultResourceState());
+        ResourceState response = client.create(new RequestContext.Builder().build(), "/testApp/" + BASEPATH, new DefaultResourceState());
 
         // verfiy response
         assertThat(response).isNotNull();
@@ -73,9 +74,10 @@ public class MongoDBCollectionCreateTest extends BaseMongoDBTest {
         // verify whats in mongodb
         assertThat(db.collectionExists(id)).isTrue();
         assertThat(db.getCollection(id).count()).isEqualTo(0);
+    }
 
-
-        // Test #4 - Create already existing
+    @Test
+    public void createAlreadyExisting() throws Exception {
         db.dropDatabase(); // TODO: create a new DB here instead of dropping the old one ?
         assertThat(db.collectionExists("foobar")).isFalse();
         // create a collection
@@ -88,6 +90,5 @@ public class MongoDBCollectionCreateTest extends BaseMongoDBTest {
         } catch (ResourceAlreadyExistsException e) {
             // expected
         }
-
     }
 }

@@ -13,9 +13,9 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.DefaultRequestAttributes;
-import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.security.policy.uri.extension.URIPolicyExtension;
 import io.liveoak.spi.RequestAttributes;
@@ -24,30 +24,31 @@ import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.security.SecurityContext;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.testtools.AbstractResourceTestCase;
+import io.liveoak.testtools.AbstractTestCaseWithTestApp;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class BasicURIPolicyRootResourceTest extends AbstractResourceTestCase {
+public class BasicURIPolicyRootResourceTest extends AbstractTestCaseWithTestApp {
 
     private SecurityContext anonymous;
     private SecurityContext mary;
     private SecurityContext john;
     private SecurityContext bob;
 
-    @Override
-    public void loadExtensions() throws Exception {
-        loadExtension( "uri-policy", new URIPolicyExtension() );
-        installResource( "uri-policy", "uri-policy", getPolicyConfig() );
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
+        loadExtension("uri-policy", new URIPolicyExtension());
+        installTestAppResource("uri-policy", "uri-policy", getPolicyConfig());
     }
 
-    private ObjectNode getPolicyConfig() throws Exception {
+    private static ObjectNode getPolicyConfig() throws Exception {
         ObjectMapper om = ObjectMapperFactory.create();
-        ObjectNode objectNode = om.readValue(getClass().getClassLoader().getResourceAsStream("policy-config/basic-uri-policy-config.json"), ObjectNode.class);
+        ObjectNode objectNode = om.readValue(BasicURIPolicyRootResourceTest.class.getClassLoader().getResourceAsStream("policy-config/basic-uri-policy-config.json"), ObjectNode.class);
         return objectNode;
     }
 
@@ -124,7 +125,8 @@ public class BasicURIPolicyRootResourceTest extends AbstractResourceTestCase {
         assertAuthzDecision(storageReq.securityContext(bob), AuthzDecision.ACCEPT);
 
         // UPDATE request to /storage/todos/something
-        storageReq.requestType(RequestType.UPDATE).resourcePath(new ResourcePath("/testApp/storage/todos/something"));;
+        storageReq.requestType(RequestType.UPDATE).resourcePath(new ResourcePath("/testApp/storage/todos/something"));
+        ;
         assertAuthzDecision(storageReq.securityContext(anonymous), AuthzDecision.IGNORE);
         assertAuthzDecision(storageReq.securityContext(mary), AuthzDecision.IGNORE);
         assertAuthzDecision(storageReq.securityContext(john), AuthzDecision.IGNORE);
