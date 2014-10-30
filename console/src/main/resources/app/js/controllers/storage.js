@@ -28,7 +28,10 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $routePa
     if (loStorage.credentials.length === 0 ){
       loStorage.credentials = [{'mechanism':'MONGODB-CR'}];
     }
-    $scope.breadcrumbs.push({'label': loStorage.id, 'href':'#/applications/' + currentApp.id + '/storage/' + loStorage.id});
+    $scope.breadcrumbs.push(
+      {'label': loStorage.id, 'href':'#/applications/' + currentApp.id + '/storage/' + loStorage.id},
+      {'label': 'Settings', 'href':'#/applications/' + currentApp.id + '/storage/' + loStorage.id}
+    );
   }
   else {
     $scope.breadcrumbs.push({'label': 'New Storage', 'href':'#/applications/' + currentApp.id + '/storage/create-storage'});
