@@ -2,7 +2,7 @@
 <html lang="en" data-framework="angularjs" ng-controller="GlobalCtrl">
 <head>
   <meta charset="utf-8">
-  <title ng-bind-template="LiveOak - {{curApp.name}}">LiveOak Loading...</title>
+  <title ng-bind-template="LiveOak {{curApp ? ('- ' + curApp.name) : 'Admin Console' }}">LiveOak Loading...</title>
   <link rel="icon" href="/admin/console/img/favicon.ico">
 
   <script src="/admin/console/lib/jquery/jquery.js" type="text/javascript"></script>
