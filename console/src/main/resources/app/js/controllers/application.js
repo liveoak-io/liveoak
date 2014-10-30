@@ -567,7 +567,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
         // smRes.$save({appId: $route.current.params.appId, clientId: $route.current.params.clientId});
         $http.post(scopeMappingsUrl, smData).then(
           function() {
-            onSaveSuccessful();
+            //onSaveSuccessful();
           },
           function(httpResponse) {
             Notifications.httpError('Failed to update the scope roles.', httpResponse);
