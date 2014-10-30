@@ -26,6 +26,10 @@ loMod.controller('SecurityListCtrl', function($scope, $rootScope, $location, $lo
   $scope.securedClients = {uriPolicies: [], aclPolicies: []};
   $scope.securedBusinessLogic = {uriPolicies: [], aclPolicies: []};
 
+  $scope.hasPushRes = $filter('filter')(expAppResources.members, {'id': 'push' }).length > 0;
+  $scope.hasClientsRes = $filter('filter')(expAppResources.members, {'id': 'application-clients' }).length > 0;
+  $scope.hasBusinessLogicRes = $filter('filter')(expAppResources.members, {'id': 'scripts' }).length > 0;
+
   // Iterate through URI policies and distribute them per resource type
   for (var i = 0; i < $scope.uriPolicies.length; i++) {
     if ($scope.uriPolicies[i].uriPattern === '/' + currentApp.id + '/push') {
@@ -327,8 +331,9 @@ loMod.controller('SecurityCollectionsCtrl', function($scope, $rootScope, $locati
   $scope.breadcrumbs = [
     {'label': 'Applications', 'href': '#/applications'},
     {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
-    {'label': 'Security', 'href': '#/applications/' + currentApp.id + '/security'},
-    {'label': 'Secure ' + $scope.currentCollectionDisplay, 'href': '#/applications/' + currentApp.id + '/security/' + $scope.currentCollection}
+    {'label': 'Security Policies', 'href': '#/applications/' + currentApp.id + '/security'},
+    {'label': 'Secure Collection', 'href': '#/applications/' + currentApp.id + '/security/secure-collections/'},
+    {'label': $scope.currentCollectionDisplay, 'href': '#/applications/' + currentApp.id + '/security/' + $scope.currentCollection}
   ];
 
   $scope.storageList = $filter('filter')(loStorageList.members, {'type': 'database'});
@@ -509,8 +514,9 @@ loMod.controller('SecurityStorageCtrl', function($scope, $rootScope, $location, 
   $scope.breadcrumbs = [
     {'label': 'Applications', 'href': '#/applications'},
     {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
-    {'label': 'Security', 'href': '#/applications/' + currentApp.id + '/security'},
-    {'label': 'Secure ' + $scope.currentStorage, 'href': '#/applications/' + currentApp.id + '/security/policies/storage/' + $scope.currentStorage}
+    {'label': 'Security Policies', 'href': '#/applications/' + currentApp.id + '/security'},
+    {'label': 'Secure Collection', 'href': '#/applications/' + currentApp.id + '/security/secure-storage/'},
+    {'label': $scope.currentStorage, 'href': '#/applications/' + currentApp.id + '/security/policies/storage/' + $scope.currentStorage}
   ];
 
   // watch for currentStorage dropdown changes, so we switch the route accordingly
@@ -644,7 +650,7 @@ loMod.controller('SecurityPushCtrl', function($scope, $rootScope, $location, $ro
   $scope.breadcrumbs = [
     {'label': 'Applications', 'href': '#/applications'},
     {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
-    {'label': 'Security', 'href': '#/applications/' + currentApp.id + '/security'},
+    {'label': 'Security Policies', 'href': '#/applications/' + currentApp.id + '/security'},
     {'label': 'Secure Push', 'href': '#/applications/' + currentApp.id + '/security/secure-push'}
   ];
 
@@ -770,7 +776,7 @@ loMod.controller('SecurityClientsCtrl', function($scope, $rootScope, $location, 
   $scope.breadcrumbs = [
     {'label': 'Applications', 'href': '#/applications'},
     {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
-    {'label': 'Security', 'href': '#/applications/' + currentApp.id + '/security'},
+    {'label': 'Security Policies', 'href': '#/applications/' + currentApp.id + '/security'},
     {'label': 'Secure Clients', 'href': '#/applications/' + currentApp.id + '/security/secure-clients'}
   ];
 
@@ -897,7 +903,7 @@ loMod.controller('SecurityBusinessLogicCtrl', function($scope, $rootScope, $loca
   $scope.breadcrumbs = [
     {'label': 'Applications', 'href': '#/applications'},
     {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
-    {'label': 'Security', 'href': '#/applications/' + currentApp.id + '/security'},
+    {'label': 'Security Policies', 'href': '#/applications/' + currentApp.id + '/security'},
     {'label': 'Secure Business Logic', 'href': '#/applications/' + currentApp.id + '/security/secure-logic'}
   ];
 
