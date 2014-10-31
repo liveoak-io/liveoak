@@ -6,6 +6,7 @@ import java.util.Map;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
 /**
@@ -45,5 +46,10 @@ public class MockAdminResource extends MockResource {
                 this.props.putProperty(name, ResourceConversionUtils.convertList((List<ResourceState>)value, this));
             }
         }
+    }
+
+    @Override
+    public void delete(RequestContext ctx, Responder responder) throws Exception {
+        responder.resourceDeleted(this);
     }
 }

@@ -100,8 +100,16 @@ public final class Services {
         return LIVEOAK.append("system-resource", moduleId).append(id);
     }
 
-    public static ServiceName instanceResource(String id) {
-        return LIVEOAK.append("system-instance", id);
+    public static ServiceName instanceResource(String moduleId, String id) {
+        return LIVEOAK.append("system-instance", moduleId, id);
+    }
+
+    public static ServiceName systemConfigurationManager(String appId) {
+        return LIVEOAK.append("system-config-managers", appId);
+    }
+
+    public static ServiceName systemEnvironmentProperties(String id) {
+        return LIVEOAK.append("system-resource").append("env-props").append(id);
     }
 
     public static ServiceName server(String name, boolean network) {

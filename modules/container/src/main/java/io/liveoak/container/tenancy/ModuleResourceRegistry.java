@@ -15,6 +15,7 @@ import io.liveoak.spi.extension.SystemExtensionContext;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 
@@ -25,15 +26,13 @@ public class ModuleResourceRegistry extends DefaultMountPointResource {
 
     Extension extension;
     ServiceTarget target;
+    ExtensionConfigurationManager configurationManager;
 
-    public ModuleResourceRegistry(Resource parent, String id) {
-        super(parent, id);
-    }
-
-    public ModuleResourceRegistry(String id, Extension extension, ServiceTarget target) {
+    public ModuleResourceRegistry(String id, Extension extension, ServiceTarget target, ExtensionConfigurationManager configurationManager) {
         super(id);
         this.extension = extension;
         this.target = target;
+        this.configurationManager = configurationManager;
     }
 
     @Override
@@ -77,8 +76,12 @@ public class ModuleResourceRegistry extends DefaultMountPointResource {
             });
 
             ServiceName moduleName = Services.resource(ZeroExtension.APPLICATION_ID, "system").append("module").append(id());
-            SystemExtensionContext extInstanceContext = new SystemExtensionContextImpl(target, id(), state.id(), moduleName, ConversionUtils.convert(state));
+            SystemExtensionContext extInstanceContext = new SystemExtensionContextImpl(target, id(), state.id(), moduleName, ConversionUtils.convert(state), this);
             extension.instance(state.id(), extInstanceContext);
+
+            if (configurationManager != null) {
+                configurationManager.createResource(state.id(), id(), ConversionUtils.convert(state));
+            }
 
         } catch (Exception e) {
             responder.internalError(e.getMessage(), e);
@@ -98,11 +101,38 @@ public class ModuleResourceRegistry extends DefaultMountPointResource {
             responder.noSuchResource(id);
         } else {
             registry.remove(id);
+
+            if (configurationManager != null) {
+                try {
+                    configurationManager.removeResource(id, id());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            ServiceController serviceController = serviceControllers.get(id);
+            if (serviceController != null) {
+
+                //TODO: figure out a better way to handle this......
+                serviceController.getServiceContainer().getService(Services.instanceResource(id(), id)).setMode(ServiceController.Mode.REMOVE);
+                serviceController.getServiceContainer().getService(Services.instanceResource(id(), id).append("wrapper")).setMode(ServiceController.Mode.REMOVE);
+                serviceController.getServiceContainer().getService(Services.instanceResource(id(), id).append("apply-config")).setMode(ServiceController.Mode.REMOVE);
+                serviceController.getServiceContainer().getService(Services.instanceResource(id(), id).append("lifecycle")).setMode(ServiceController.Mode.REMOVE);
+
+                serviceController.setMode(ServiceController.Mode.REMOVE);
+                serviceControllers.remove(id);
+            }
+
             responder.resourceDeleted(resource);
         }
     }
 
+    public void addServiceController(String id, ServiceController serviceController) {
+        serviceControllers.put(id, serviceController);
+    }
+
     private Map<String, ResourceListener> resourceListeners = new ConcurrentHashMap<>();
+    private Map<String, ServiceController> serviceControllers = new ConcurrentHashMap<>();
 
     private interface ResourceListener {
         default void ResourceRegistered(Resource resource) {}

@@ -70,14 +70,13 @@ public class MongoExtension implements Extension {
     }
 
     public void instance(String id, SystemExtensionContext context) throws Exception {
-
+        ServiceName instanceName = Services.instanceResource(context.moduleId(), id);
         MongoDatastoreService mongoDatastoreService = new MongoDatastoreService();
-        context.target().addService(SYSTEM_MONGO_DATASTORE.append(id), mongoDatastoreService)
+        context.target().addService(instanceName, mongoDatastoreService)
                 .addDependency(SYSTEM_MONGO_DATASTORE_CONFIG_SERVICE, MongoDatastoresRegistry.class, mongoDatastoreService.mongoDatastoreInjector)
                 .addInjection(mongoDatastoreService.idInjector, id)
                 .install();
-
-        context.mountInstance(SYSTEM_MONGO_DATASTORE.append(id));
+        context.mountInstance(instanceName);
     }
 
 }

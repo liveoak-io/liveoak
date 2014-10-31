@@ -12,4 +12,5 @@ public interface Application {
     File directory();
     Boolean visible();
     Boolean versioned();
+    String versionResourceId();
 }
