@@ -100,7 +100,7 @@ public class AbstractTestCase {
     }
 
     protected static boolean awaitStability(int timeout, TimeUnit unit) throws InterruptedException {
-        return awaitStability(timeout, unit, null, null);
+        return awaitStability(timeout, unit, new HashSet<>(), new HashSet<>());
     }
 
     protected static boolean awaitStability(long timeout, TimeUnit unit, Set<? super ServiceController<?>> failed, Set<? super ServiceController<?>> problem) throws InterruptedException {
