@@ -8,22 +8,23 @@ import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.interceptor.extension.InterceptorExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.testtools.AbstractResourceTestCase;
+import io.liveoak.testtools.AbstractTestCaseWithTestApp;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class InterceptorRootResourceTest extends AbstractResourceTestCase {
+public class InterceptorRootResourceTest extends AbstractTestCaseWithTestApp {
 
-    @Override
-    public void loadExtensions() throws Exception {
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
         loadExtension("interceptor", new InterceptorExtension(), createConfig());
         loadExtension("mock-interceptor", new MockInterceptorExtension());
     }
 
-    protected ObjectNode createConfig() {
+    protected static ObjectNode createConfig() {
         ObjectNode config = JsonNodeFactory.instance.objectNode();
         ObjectNode localChainConfig = JsonNodeFactory.instance.objectNode()
                 .put("interceptor-name", "mock-interceptor")
@@ -41,7 +42,7 @@ public class InterceptorRootResourceTest extends AbstractResourceTestCase {
         assertCounter(2);
 
         // Assert configuration is expected
-        List<ResourceState> interceptorsConfig = (List<ResourceState>)adminState.getProperty("local");
+        List<ResourceState> interceptorsConfig = (List<ResourceState>) adminState.getProperty("local");
         Assert.assertEquals(1, interceptorsConfig.size());
         Assert.assertEquals("mock-interceptor", interceptorsConfig.get(0).getProperty("interceptor-name"));
         Assert.assertEquals("/testApp", interceptorsConfig.get(0).getProperty("resource-path-prefix"));

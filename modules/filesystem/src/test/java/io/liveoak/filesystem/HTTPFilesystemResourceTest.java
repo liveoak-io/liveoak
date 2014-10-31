@@ -1,25 +1,18 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
 package io.liveoak.filesystem;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.filesystem.extension.FilesystemExtension;
-import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -28,16 +21,20 @@ import static org.fest.assertions.Assertions.assertThat;
  */
 public class HTTPFilesystemResourceTest extends AbstractHTTPResourceTestCase {
 
-
-    @Override
-    protected File applicationDirectory() {
-        return this.projectRoot;
+    static {
+        setProjectRoot(HTTPFilesystemResourceTest.class);
+        applicationDirectory = projectRoot;
+        try {
+            installTestApp();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    public void loadExtensions() throws Exception {
-        loadExtension( "fs", new FilesystemExtension());
-        installResource( "fs", "files", JsonNodeFactory.instance.objectNode() );
+    @BeforeClass
+    public static void setup() throws Exception {
+        loadExtension("fs", new FilesystemExtension());
+        installTestAppResource("fs", "files", JsonNodeFactory.instance.objectNode());
     }
 
     @Test

@@ -1,10 +1,13 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package io.liveoak.mongo;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -18,36 +21,32 @@ import com.mongodb.util.JSON;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.testtools.AbstractResourceTestCase;
+import io.liveoak.testtools.AbstractTestCaseWithTestApp;
 import org.jboss.logging.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import org.junit.BeforeClass;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class BaseMongoDBTest extends AbstractResourceTestCase {
+public class BaseMongoDBTest extends AbstractTestCaseWithTestApp {
 
-    protected String BASEPATH = "storage";
+    protected static String BASEPATH = "storage";
 
-    protected DB db;
-    protected Mongo mongoClient;
+    protected static DB db;
+    protected static Mongo mongoClient;
 
-    protected final Logger log = Logger.getLogger(getClass());
+    protected static final Logger log = Logger.getLogger(BaseMongoDBTest.class);
 
-    @Override
-    public void loadExtensions() throws Exception {
-
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
         ObjectNode config = JsonNodeFactory.instance.objectNode();
-        config.put( "db", "MongoInteralTest_" + UUID.randomUUID());
+        config.put("db", "MongoInteralTest_" + UUID.randomUUID());
 
-        loadExtension( "mongo", new MongoExtension(), config );
-        installResource( "mongo", BASEPATH, createConfig() );
+        loadExtension("mongo", new MongoExtension(), config);
+        installTestAppResource("mongo", BASEPATH, createConfig());
     }
 
-    public ResourceState createConfig() {
+    public static ResourceState createConfig() {
         String database = System.getProperty("mongo.db", "MongoControllerTest_" + UUID.randomUUID());
         Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");

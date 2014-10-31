@@ -1,12 +1,8 @@
 package io.liveoak.scripts.resource;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.liveoak.spi.MediaType;
-import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
 
 import static io.liveoak.testtools.assertions.Assertions.assertThat;

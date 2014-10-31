@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.pgsql.extension.PgSqlExtension;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.testtools.AbstractHTTPResourceTestCase;
+import io.liveoak.testtools.AbstractHTTPResourceTestCaseWithTestApp;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -32,6 +32,7 @@ import org.apache.http.entity.StringEntity;
 import org.fest.assertions.Assertions;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.postgresql.jdbc2.optional.PoolingDataSource;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -49,7 +50,7 @@ import static org.fest.assertions.Assertions.assertThat;
  *
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
+public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCaseWithTestApp {
 
     private static final Logger log = Logger.getLogger(BasePgSqlHttpTest.class);
 
@@ -57,10 +58,10 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
     protected static final String BASEPATH = "sqldata";
     protected static final JsonFactory JSON_FACTORY = new JsonFactory();
 
-    protected String schema;
-    protected String schema_two;
-    protected PoolingDataSource datasource;
-    private boolean skipTests;
+    protected static String schema;
+    protected static String schema_two;
+    protected static PoolingDataSource datasource;
+    private static boolean skipTests;
 
     static {
         JSON_FACTORY.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
@@ -177,8 +178,8 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
         return resultStr;
     }
 
-    @Override
-    public void loadExtensions() throws Exception {
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
 
         schema = "xlo_test_" + UUID.randomUUID().toString().substring(0, 8);
         schema_two = "xlo_test_" + UUID.randomUUID().toString().substring(0, 8);
@@ -187,11 +188,16 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
             schema = schema_two;
             schema_two = tmp;
         }
-        loadExtension( "pgsql", new PgSqlExtension(), JsonNodeFactory.instance.objectNode() );
-        installResource( "pgsql", BASEPATH, createConfig() );
+        loadExtension("pgsql", new PgSqlExtension(), JsonNodeFactory.instance.objectNode());
+        try {
+            installTestAppResource("pgsql", BASEPATH, createConfig());
+        } catch (Exception e) {
+            // Happens when datasource can not be configured
+            e.printStackTrace();
+        }
     }
 
-    public ResourceState createConfig() throws SQLException, ClassNotFoundException {
+    public static ResourceState createConfig() throws SQLException, ClassNotFoundException {
 
         String server = System.getProperty("pgsql.server", "localhost");
         int port = Integer.parseInt(System.getProperty("pgsql.port", "5432"));
@@ -223,7 +229,7 @@ public class BasePgSqlHttpTest extends AbstractHTTPResourceTestCase {
         return config;
     }
 
-    private void setupDataSource(String server, int port, String db, String user, String password, int maxConnections, int initialConnections) throws ClassNotFoundException, SQLException {
+    private static void setupDataSource(String server, int port, String db, String user, String password, int maxConnections, int initialConnections) throws ClassNotFoundException, SQLException {
         Class.forName("org.postgresql.Driver");
 
         PoolingDataSource ds = new PoolingDataSource();

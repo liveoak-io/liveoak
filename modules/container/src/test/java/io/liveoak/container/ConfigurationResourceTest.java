@@ -10,23 +10,21 @@ import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.state.ResourceState;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * @author Bob McWhirter
  * @author Ken Finnigan
  */
-public class ConfigurationResourceTest {
+public class ConfigurationResourceTest extends AbstractContainerTest {
 
-    private LiveOakSystem system;
-    private Client client;
-    private InternalApplication application;
+    private static Client client;
+    private static InternalApplication application;
 
     private static final String ADMIN_PATH = "/" + ZeroExtension.APPLICATION_ID + "/applications/testApp/resources/";
     private static final String CONFIG_RESOURCE_ID = "config";
@@ -38,12 +36,12 @@ public class ConfigurationResourceTest {
     private static final String SECOND_KEY = "other";
     private static final String SECOND_VALUE = "secondPath";
 
-    private File projectRoot;
+    private static File projectRoot;
 
-    @Before
-    public void setupUserDir() {
-        String name = getClass().getName().replace(".", "/") + ".class";
-        URL resource = getClass().getClassLoader().getResource(name);
+    @BeforeClass
+    public static void setupUserDir() {
+        String name = ConfigurationResourceTest.class.getName().replace(".", "/") + ".class";
+        URL resource = ConfigurationResourceTest.class.getClassLoader().getResource(name);
 
         if (resource != null) {
             File current = new File(resource.getFile());
@@ -51,7 +49,7 @@ public class ConfigurationResourceTest {
             while (current.exists()) {
                 if (current.isDirectory()) {
                     if (new File(current, "pom.xml").exists()) {
-                        this.projectRoot = current;
+                        projectRoot = current;
                         break;
                     }
                 }
@@ -61,43 +59,43 @@ public class ConfigurationResourceTest {
         }
     }
 
-    @Before
-    public void setUp() throws Exception {
-        this.system = LiveOakFactory.create();
-        this.client = this.system.client();
-        this.system.extensionInstaller().load("config", new InMemoryConfigExtension());
+    @BeforeClass
+    public static void setUp() throws Exception {
+        system = LiveOakFactory.create();
+        client = system.client();
+        system.extensionInstaller().load("config", new InMemoryConfigExtension());
 
-        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
-        this.system.awaitStability();
+        awaitStability();
 
-        this.system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
-        this.application = this.system.applicationRegistry().createApplication( "testApp", "Test Application" );
+        system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
+        application = system.applicationRegistry().createApplication("testApp", "Test Application");
 
-        this.system.awaitStability();
+        awaitStability();
 
         ObjectNode configNode = JsonNodeFactory.instance.objectNode();
         configNode.put(FIRST_KEY, FIRST_VALUE);
         configNode.put(SECOND_KEY, SECOND_VALUE);
-        this.application.extend("config", CONFIG_RESOURCE_ID, configNode);
-        this.system.awaitStability();
+        application.extend("config", CONFIG_RESOURCE_ID, configNode);
+        awaitStability();
     }
 
-    @After
-    public void shutdown() {
-        this.system.stop();
+    @AfterClass
+    public static void shutdown() {
+        system.stop();
     }
 
     @Test
-    public void configTests() throws Exception {
-        System.out.println("TEST #1 - Read configuration");
-        ResourceState configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_RESOURCE_ID);
+    public void readConfiguration() throws Exception {
+        ResourceState configState = client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(CONFIG_RESOURCE_ID);
         assertThat(configState.uri().toString()).isEqualTo(ADMIN_PATH + CONFIG_RESOURCE_ID);
+    }
 
-        System.out.println("TEST #2 - Config property string");
-        configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_RESOURCE_ID);
+    @Test
+    public void configPropertyString() throws Exception {
+        ResourceState configState = client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_RESOURCE_ID);
 
         assertThat(configState).isNotNull();
         assertThat(configState.id()).isEqualTo(CONFIG_RESOURCE_ID);
@@ -106,83 +104,91 @@ public class ConfigurationResourceTest {
         Object value = configState.getProperty(FIRST_KEY);
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
-        assertThat(value).toString().equals(FIRST_VALUE);
+        assertThat(value.toString()).isEqualTo(FIRST_VALUE);
 
         value = configState.getProperty(SECOND_KEY);
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
-        assertThat(value).toString().equals(SECOND_VALUE);
+        assertThat(value.toString()).isEqualTo(SECOND_VALUE);
+    }
 
-        System.out.println("TEST #3 - Config property not found");
+    @Test
+    public void configPropertyNotFound() throws Exception {
         try {
             ObjectNode configNode = JsonNodeFactory.instance.objectNode();
             configNode.put(SECOND_KEY, SECOND_VALUE);
-            this.application.extend("config", "config3", configNode);
+            application.extend("config", "config3", configNode);
             fail("Should throw due to missing config for 'path1'");
         } catch (Exception e) {
             // expected and correct
         }
+    }
 
-        System.out.println("TEST #4 - Config property converter");
-        this.system.extensionInstaller().load("config-converter", new InMemoryConfigConverterExtension());
+    @Test
+    public void configPropertyConverter() throws Exception {
+        system.extensionInstaller().load("config-converter", new InMemoryConfigConverterExtension());
 
         ObjectNode configNode = JsonNodeFactory.instance.objectNode();
-        configNode.put("file", this.projectRoot.getAbsolutePath());
-        this.application.extend("config-converter", CONFIG_CONVERTER_RESOURCE_ID, configNode);
-        this.system.awaitStability();
+        configNode.put("file", projectRoot.getAbsolutePath());
+        application.extend("config-converter", CONFIG_CONVERTER_RESOURCE_ID, configNode);
+        awaitStability();
 
-        configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_CONVERTER_RESOURCE_ID);
+        ResourceState configState = client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_CONVERTER_RESOURCE_ID);
 
         assertThat(configState).isNotNull();
 
-        value = configState.getProperty("file");
+        Object value = configState.getProperty("file");
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
-        assertThat(value).toString().equals(this.projectRoot.getAbsolutePath());
+        assertThat(value.toString()).isEqualTo(projectRoot.getAbsolutePath());
+    }
 
-        System.out.println("TEST #5 - Config multi property conversion");
-        this.system.extensionInstaller().load("config-multi", new InMemoryConfigMultiValueExtension());
+    @Test
+    public void configMultiPropertyConversion() throws Exception {
+        system.extensionInstaller().load("config-multi", new InMemoryConfigMultiValueExtension());
 
-        configNode = JsonNodeFactory.instance.objectNode();
+        ObjectNode configNode = JsonNodeFactory.instance.objectNode();
         configNode.put("firstValue", "firstValue");
         configNode.put("secondValue", "another");
-        this.application.extend("config-multi", CONFIG_MULTI_RESOURCE_ID, configNode);
-        this.system.awaitStability();
+        application.extend("config-multi", CONFIG_MULTI_RESOURCE_ID, configNode);
+        awaitStability();
 
-        configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_MULTI_RESOURCE_ID);
+        ResourceState configState = client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_MULTI_RESOURCE_ID);
 
         assertThat(configState).isNotNull();
 
-        value = configState.getProperty("firstValue");
+        Object value = configState.getProperty("firstValue");
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
-        assertThat(value).toString().equals("firstValue");
+        assertThat(value.toString()).isEqualTo("firstValue");
 
         value = configState.getProperty("secondValue");
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
-        assertThat(value).toString().equals("another");
+        assertThat(value.toString()).isEqualTo("another");
+    }
 
-        System.out.println("TEST #6 - Config property type conversion");
-        this.system.extensionInstaller().load("config-types", new InMemoryConfigTypesExtension());
+    @Test
+    public void configPropertyTypeConversion() throws Exception {
+        system.extensionInstaller().load("config-types", new InMemoryConfigTypesExtension());
 
-        configNode = JsonNodeFactory.instance.objectNode();
-        configNode.put("file", this.projectRoot.getAbsolutePath());
+        ObjectNode configNode = JsonNodeFactory.instance.objectNode();
+        configNode.put("file", projectRoot.getAbsolutePath());
         configNode.put("flag", true);
         configNode.put("url", "http://liveoak.io");
         configNode.put("uri", "urn:isbn:0451450523");
         configNode.put("dbl", new Double("4.6"));
         configNode.put("integer", new Integer("35"));
-        this.application.extend("config-types", CONFIG_TYPE_RESOURCE_ID, configNode);
-        this.system.awaitStability();
+        application.extend("config-types", CONFIG_TYPE_RESOURCE_ID, configNode);
+        awaitStability();
 
-        configState = this.client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_TYPE_RESOURCE_ID);
+        ResourceState configState = client.read(new RequestContext.Builder().build(), ADMIN_PATH + CONFIG_TYPE_RESOURCE_ID);
         assertThat(configState).isNotNull();
 
-        value = configState.getProperty("file");
+        Object value = configState.getProperty("file");
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
-        assertThat(value).toString().equals(this.projectRoot.getAbsolutePath());
+        assertThat(value.toString()).isEqualTo(projectRoot.getAbsolutePath());
 
         value = configState.getProperty("flag");
         assertThat(value).isNotNull();
@@ -192,21 +198,21 @@ public class ConfigurationResourceTest {
         value = configState.getProperty("url");
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
-        assertThat(value).toString().equals("http://liveoak.io");
+        assertThat(value.toString()).isEqualTo("http://liveoak.io");
 
         value = configState.getProperty("uri");
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(String.class);
-        assertThat(value).toString().equals("urn:isbn:0451450523");
+        assertThat(value.toString()).isEqualTo("urn:isbn:0451450523");
 
         value = configState.getProperty("dbl");
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(Double.class);
-        assertThat(value).toString().equals("4.6");
+        assertThat((double) value).isEqualTo(4.6);
 
         value = configState.getProperty("integer");
         assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(Integer.class);
-        assertThat(value).toString().equals("35");
+        assertThat((int) value).isEqualTo(35);
     }
 }

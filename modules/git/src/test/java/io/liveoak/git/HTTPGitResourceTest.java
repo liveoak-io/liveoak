@@ -10,11 +10,12 @@ import java.nio.file.Files;
 import java.util.Iterator;
 
 import io.liveoak.git.extension.GitExtension;
-import io.liveoak.testtools.AbstractHTTPResourceTestCase;
+import io.liveoak.testtools.AbstractHTTPResourceTestCaseWithTestApp;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static io.liveoak.testtools.assertions.Assertions.assertThat;
@@ -22,21 +23,21 @@ import static io.liveoak.testtools.assertions.Assertions.assertThat;
 /**
  * @author Ken Finnigan
  */
-public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
+public class HTTPGitResourceTest extends AbstractHTTPResourceTestCaseWithTestApp {
     private static final String ADMIN_ROOT = "/admin/applications/";
     private static final String GIT_ADMIN_RESOURCE_PATH = "/resources/git";
     private static final String GIT_ADMIN_ROOT = ADMIN_ROOT + "newApp" + GIT_ADMIN_RESOURCE_PATH;
     private static final String GIT_PUBLIC_ROOT = "/newApp/git";
 
-    @Override
-    public void loadExtensions() throws Exception {
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
         loadExtension("git", new GitExtension());
     }
 
     @Test
     public void rootResource() throws Exception {
         // Test #1 -  Git Repo present after install
-        File appDir = new File(this.application.directory().getParentFile(), "newApp");
+        File appDir = new File(testApplication.directory().getParentFile(), "newApp");
         File appGitDir = new File(appDir, ".git");
 
         // Verify app and git dir do not exist
@@ -45,7 +46,7 @@ public class HTTPGitResourceTest extends AbstractHTTPResourceTestCase {
 
         // Create new app
         assertThat(execPost(ADMIN_ROOT, "{ \"id\": \"newApp\" }")).hasStatus(201);
-        this.system.awaitStability();
+        awaitStability();
 
         // Verify app and git dirs exist
         assertThat(appDir.exists()).isTrue();

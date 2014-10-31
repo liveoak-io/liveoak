@@ -1,44 +1,52 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package io.liveoak.security.policy.drools.integration;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.DefaultRequestAttributes;
 import io.liveoak.common.DefaultResourceParams;
-import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
+import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.security.policy.drools.extension.DroolsPolicyExtension;
-import io.liveoak.spi.*;
+import io.liveoak.spi.RequestAttributes;
+import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.RequestType;
+import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.security.SecurityContext;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.testtools.AbstractResourceTestCase;
+import io.liveoak.testtools.AbstractTestCaseWithTestApp;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.*;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class DroolsPolicyRootResourceTest extends AbstractResourceTestCase {
+public class DroolsPolicyRootResourceTest extends AbstractTestCaseWithTestApp {
 
-    @Override
-    public void loadExtensions() throws Exception {
-        loadExtension( "drools-policy", new DroolsPolicyExtension() );
-        installResource( "drools-policy", "drools-policy", getPolicyConfig() );
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
+        loadExtension("drools-policy", new DroolsPolicyExtension());
+        installTestAppResource("drools-policy", "drools-policy", getPolicyConfig());
     }
 
-    private ObjectNode getPolicyConfig() throws Exception {
+    private static ObjectNode getPolicyConfig() throws Exception {
         ObjectMapper om = ObjectMapperFactory.create();
-        ObjectNode objectNode = om.readValue(getClass().getClassLoader().getResourceAsStream("policy-config/drools-policy-config.json"), ObjectNode.class);
+        ObjectNode objectNode = om.readValue(DroolsPolicyRootResourceTest.class.getClassLoader().getResourceAsStream("policy-config/drools-policy-config.json"), ObjectNode.class);
         return objectNode;
     }
 

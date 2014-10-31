@@ -8,48 +8,49 @@ package io.liveoak.security.impl.interceptor;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.common.security.DefaultSecurityContext;
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
-import io.liveoak.common.DefaultReturnFields;
+import io.liveoak.common.security.DefaultSecurityContext;
 import io.liveoak.interceptor.extension.InterceptorExtension;
 import io.liveoak.security.extension.SecurityExtension;
 import io.liveoak.security.integration.AuthzServiceConfigResource;
 import io.liveoak.security.integration.AuthzServiceRootResource;
-import io.liveoak.spi.Services;
-import io.liveoak.spi.exceptions.NotAuthorizedException;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourcePath;
+import io.liveoak.spi.Services;
+import io.liveoak.spi.exceptions.NotAuthorizedException;
 import io.liveoak.spi.state.ResourceState;
-import io.liveoak.testtools.AbstractResourceTestCase;
+import io.liveoak.testtools.AbstractTestCaseWithTestApp;
 import io.liveoak.testtools.MockExtension;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class AuthzInterceptorTest extends AbstractResourceTestCase {
+public class AuthzInterceptorTest extends AbstractTestCaseWithTestApp {
 
     private InterceptorTestAuthzResource mockPolicy;
-    private MockAuthInterceptor mockAuthInterceptor = new MockAuthInterceptor();
+    private static MockAuthInterceptor mockAuthInterceptor = new MockAuthInterceptor();
 
-    @Override
-    public void loadExtensions() throws Exception {
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
         loadExtension("interceptor", new InterceptorExtension(), getInterceptorConfig());
         loadExtension("authz", new SecurityExtension());
-        loadExtension("mock-resource", new MockExtension( MockInMemoryRootResource.class ));
-        loadExtension("mock-policy", new MockExtension( InterceptorTestAuthzResource.class ));
+        loadExtension("mock-resource", new MockExtension(MockInMemoryRootResource.class));
+        loadExtension("mock-policy", new MockExtension(InterceptorTestAuthzResource.class));
         loadExtension("mock-auth-interceptor", new InterceptorTestExtension(mockAuthInterceptor), JsonNodeFactory.instance.objectNode());
 
-        installResource("authz", "authz", getSecurityConfig());
-        installResource("mock-resource", "mock-resource", JsonNodeFactory.instance.objectNode() );
-        installResource("mock-policy", "mock-policy", JsonNodeFactory.instance.objectNode() );
+        installTestAppResource("authz", "authz", getSecurityConfig());
+        installTestAppResource("mock-resource", "mock-resource", JsonNodeFactory.instance.objectNode());
+        installTestAppResource("mock-policy", "mock-policy", JsonNodeFactory.instance.objectNode());
     }
 
-    private ObjectNode getInterceptorConfig() {
+    private static ObjectNode getInterceptorConfig() {
         ObjectNode config = JsonNodeFactory.instance.objectNode();
         ObjectNode mockAuth = JsonNodeFactory.instance.objectNode()
                 .put("interceptor-name", "mock-auth")
@@ -61,7 +62,7 @@ public class AuthzInterceptorTest extends AbstractResourceTestCase {
         return config;
     }
 
-    private ObjectNode getSecurityConfig() throws Exception {
+    private static ObjectNode getSecurityConfig() throws Exception {
         ObjectNode config = JsonNodeFactory.instance.objectNode();
         ObjectNode policyConfig = JsonNodeFactory.instance.objectNode();
         policyConfig.put("policyName", "Mock Policy");
@@ -72,8 +73,8 @@ public class AuthzInterceptorTest extends AbstractResourceTestCase {
 
     @Before
     public void before() throws Exception {
-        AuthzServiceRootResource authzRootResource = (AuthzServiceRootResource) this.system.service(Services.resource("testApp", "authz"));
-        this.mockPolicy = (InterceptorTestAuthzResource) this.system.service(Services.resource("testApp", "mock-policy") );
+        AuthzServiceRootResource authzRootResource = (AuthzServiceRootResource) system.service(Services.resource("testApp", "authz"));
+        this.mockPolicy = (InterceptorTestAuthzResource) system.service(Services.resource("testApp", "mock-policy"));
     }
 
     @Test
@@ -114,7 +115,7 @@ public class AuthzInterceptorTest extends AbstractResourceTestCase {
             client.read(reqContext, "/testApp/mock-resource");
             Assert.fail("Not expected to reach this");
         } catch (NotAuthorizedException e) {
-        };
+        }
     }
 
 

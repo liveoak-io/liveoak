@@ -1,16 +1,16 @@
 package io.liveoak.keycloak;
 
+import java.util.Date;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.keycloak.extension.KeycloakExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.keycloak.representations.AccessToken;
-
-import java.io.File;
-import java.util.Date;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -22,15 +22,10 @@ public class KeycloakRootResourceTest extends AbstractKeycloakTest {
 
     private TokenUtil tokenUtil;
 
-    @Override
-    public void loadExtensions() throws Exception {
-        loadExtension( "auth", new KeycloakExtension(), createTestConfig());
-        installResource( "auth", "auth", JsonNodeFactory.instance.objectNode() );
-    }
-
-    @Override
-    protected File applicationDirectory() {
-        return new File( this.projectRoot, "/src/test/resources" );
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
+        loadExtension("auth", new KeycloakExtension(), createTestConfig());
+        installTestAppResource("auth", "auth", JsonNodeFactory.instance.objectNode());
     }
 
     @Before

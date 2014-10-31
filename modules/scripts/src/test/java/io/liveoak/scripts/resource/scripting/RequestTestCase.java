@@ -27,7 +27,7 @@ public class RequestTestCase extends BaseScriptingTestCase {
         assertThat(resourceState.id()).isEqualTo("requestTest");
 
         //upload the javascript file
-        ResourceState binaryResourceState = new JavaScriptResourceState(readFile("testRequest.js"));
+        ResourceState binaryResourceState = new JavaScriptResourceState(readFile(RequestTestCase.class, "testRequest.js"));
         ResourceState javascriptState = client.create(new RequestContext.Builder().build(), resourceState.uri().toString(), binaryResourceState);
         assertThat(javascriptState).isNotNull();
     }

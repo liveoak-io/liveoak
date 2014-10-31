@@ -1,50 +1,51 @@
 package io.liveoak.container.subscriptions;
 
-import io.liveoak.container.*;
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.container.AbstractContainerTest;
+import io.liveoak.container.InMemoryCollectionResource;
+import io.liveoak.container.InMemoryDBExtension;
+import io.liveoak.container.InMemoryDBResource;
+import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.exceptions.ResourceNotFoundException;
 import io.liveoak.spi.client.Client;
+import io.liveoak.spi.exceptions.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 /**
  * @author Bob McWhirter
  */
-public class HttpSubscriptionTest {
+public class HttpSubscriptionTest extends AbstractContainerTest {
 
-    protected LiveOakSystem system;
     protected Client client;
-    private InternalApplication application;
 
     @Before
     public void setUp() throws Exception {
-        this.system = LiveOakFactory.create();
-        this.system.extensionInstaller().load("memory", new InMemoryDBExtension());
+        system = LiveOakFactory.create();
+        system.extensionInstaller().load("memory", new InMemoryDBExtension());
 
-        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
-        this.system.awaitStability();
-        this.application = this.system.applicationRegistry().createApplication( "testApp", "Test Application" );
-        this.application.extend("memory");
+        awaitStability();
+        InternalApplication application = system.applicationRegistry().createApplication("testApp", "Test Application");
+        application.extend("memory");
 
-        this.system.awaitStability();
+        awaitStability();
 
-        InMemoryDBResource resource = (InMemoryDBResource) this.system.service( InMemoryDBExtension.resource("testApp", "memory") );
+        InMemoryDBResource resource = (InMemoryDBResource) system.service(InMemoryDBExtension.resource("testApp", "memory"));
         resource.addMember(new InMemoryCollectionResource(resource, "data"));
         resource.addMember(new InMemoryCollectionResource(resource, "notifications"));
 
-        this.client = this.system.client();
+        this.client = system.client();
     }
 
     @After
     public void tearDown() throws Exception {
-        this.system.stop();
+        system.stop();
     }
 
     @Test
@@ -89,7 +90,7 @@ public class HttpSubscriptionTest {
 
         // Delete a subscribed thing
 
-        ResourceState deletedBob = this.client.delete(requestContext, createdBob.uri().toString());
+        this.client.delete(requestContext, createdBob.uri().toString());
 
         // Give it time to propagate
 

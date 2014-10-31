@@ -5,12 +5,15 @@
  */
 package io.liveoak.keycloak;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.interceptor.extension.InterceptorExtension;
 import io.liveoak.keycloak.extension.KeycloakExtension;
-import io.liveoak.spi.Services;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.security.SecurityContext;
 import io.liveoak.testtools.MockExtension;
 import org.apache.http.HttpStatus;
@@ -25,12 +28,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.keycloak.representations.AccessToken;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -41,18 +41,13 @@ public class AuthInterceptorTest extends AbstractKeycloakTest {
 
     private MockRootResource mock;
 
-    @Override
-    public void loadExtensions() throws Exception {
+    @BeforeClass
+    public static void loadExtensions() throws Exception {
         loadExtension("auth", new KeycloakExtension(), createTestConfig());
         loadExtension("auth-test", new MockExtension(MockRootResource.class));
         setupAuthInterceptor();
-        installResource("auth", "auth", JsonNodeFactory.instance.objectNode());
-        installResource("auth-test", "auth-test", JsonNodeFactory.instance.objectNode());
-    }
-
-    @Override
-    protected File applicationDirectory() {
-        return new File(this.projectRoot, "/src/test/resources");
+        installTestAppResource("auth", "auth", JsonNodeFactory.instance.objectNode());
+        installTestAppResource("auth-test", "auth-test", JsonNodeFactory.instance.objectNode());
     }
 
     @Before
@@ -63,7 +58,7 @@ public class AuthInterceptorTest extends AbstractKeycloakTest {
         httpClient = HttpClientBuilder.create().build();
         System.err.println("** C");
 
-        mock = (MockRootResource) this.system.service(Services.resource("testApp", "auth-test"));
+        mock = (MockRootResource) system.service(Services.resource("testApp", "auth-test"));
     }
 
     @After
@@ -145,7 +140,7 @@ public class AuthInterceptorTest extends AbstractKeycloakTest {
         resp.close();
     }
 
-    private void setupAuthInterceptor() throws Exception {
+    private static void setupAuthInterceptor() throws Exception {
         ObjectNode interceptorConfig = JsonNodeFactory.instance.objectNode();
         ObjectNode httpChainConfig = JsonNodeFactory.instance.objectNode()
                 .put("interceptor-name", "auth");

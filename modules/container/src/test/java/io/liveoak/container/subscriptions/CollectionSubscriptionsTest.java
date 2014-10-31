@@ -6,8 +6,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.liveoak.container.AbstractContainerTest;
 import io.liveoak.container.LiveOakFactory;
-import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.zero.AppCleanup;
 import io.liveoak.spi.MediaType;
 import io.liveoak.stomp.StompMessage;
@@ -27,17 +27,14 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author Ken Finnigan
  */
-public class CollectionSubscriptionsTest {
-
-    private LiveOakSystem system;
-    private File appDir;
+public class CollectionSubscriptionsTest extends AbstractContainerTest {
 
     protected CloseableHttpClient httpClient;
 
     @Before
     public void setUpServer() throws Exception {
-        appDir = new File(getClass().getClassLoader().getResource("apps").getFile());
-        this.system = LiveOakFactory.create(null, appDir, null);
+        File appDir = new File(getClass().getClassLoader().getResource("apps").getFile());
+        system = LiveOakFactory.create(null, appDir, null);
     }
 
     @Before
@@ -52,7 +49,7 @@ public class CollectionSubscriptionsTest {
 
     @After
     public void tearDownServer() throws Exception {
-        this.system.stop();
+        system.stop();
         System.err.flush();
     }
 
@@ -108,7 +105,7 @@ public class CollectionSubscriptionsTest {
 
         response.close();
 
-        this.system.awaitStability();
+        awaitStability();
 
         // Give it time to propagate
         Thread.sleep(1500);

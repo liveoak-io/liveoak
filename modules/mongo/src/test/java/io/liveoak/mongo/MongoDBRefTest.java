@@ -34,7 +34,6 @@ public class MongoDBRefTest extends BaseMongoDBTest {
 
     @Test
     public void testReadDBRefSameCollection() throws Exception {
-        // Test #1 - Read DBRef same collection
         String methodName = "testReadDBRefSameCollection";
         assertThat(db.collectionExists(methodName)).isFalse();
 
@@ -94,9 +93,10 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(expandedSpouse2.getProperty("name")).isEqualTo("Jane Smith");
         assertThat(expandedSpouse2.getProperty("spouse")).isInstanceOf(ResourceRef.class);
         assertThat(expandedSpouse2.getPropertyAsResourceState("spouse").uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/john"));
+    }
 
-
-        // Test #2 - Read DBRef in another collection
+    @Test
+    public void readDBRefInAnotherCollection() throws Exception {
         assertThat(db.collectionExists("employees")).isFalse();
         DBCollection employeesCollection = db.createCollection("employees", new BasicDBObject());
 
@@ -104,10 +104,10 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         DBCollection departmentsCollection = db.createCollection("departments", new BasicDBObject());
 
         // create the object using the mongo driver directly
-        johnObject = new BasicDBObject("_id", "john");
+        BasicDBObject johnObject = new BasicDBObject("_id", "john");
         johnObject.append("firstName", "John");
         johnObject.append("lastName", "Smith");
-        johnDBRef = new DBRef(db, employeesCollection.getName(), johnObject.get("_id"));
+        DBRef johnDBRef = new DBRef(db, employeesCollection.getName(), johnObject.get("_id"));
 
         BasicDBObject financingObject = new BasicDBObject("_id", "financing");
         financingObject.append("name", "Financing");
@@ -122,7 +122,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertEquals(1, employeesCollection.getCount());
         assertEquals(1, departmentsCollection.getCount());
 
-        result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/employees" + "/john");
+        ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/employees" + "/john");
         // verify the non-expanded results
         assertThat(result.id()).isEqualTo("john");
         assertThat(result.uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/employees" + "/john"));
@@ -131,7 +131,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(result.getProperty("department")).isInstanceOf(ResourceRef.class);
         assertThat(result.getPropertyAsResourceState("department").uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/departments/financing"));
 
-        expandedResult = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/employees" + "/john");
+        ResourceState expandedResult = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/employees" + "/john");
         // verify the expanded results
         assertThat(expandedResult.id()).isEqualTo("john");
         assertThat(expandedResult.uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/employees" + "/john"));
@@ -143,19 +143,20 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(departmentState.uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/departments/financing"));
         assertThat(departmentState.getProperty("head")).isInstanceOf(ResourceRef.class);
         assertThat(departmentState.getPropertyAsResourceState("head").uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/employees" + "/john"));
+    }
 
-
-        // Test #3 - Read non existent DBRef
-        methodName = "testReadNonExistentDBRef";
+    @Test
+    public void readNonExistentDBRef() throws Exception {
+        String methodName = "testReadNonExistentDBRef";
         assertThat(db.collectionExists(methodName)).isFalse();
 
-        collection = db.createCollection(methodName, new BasicDBObject());
+        DBCollection collection = db.createCollection(methodName, new BasicDBObject());
 
         // create the object using the mongo driver directly
-        johnObject = new BasicDBObject("_id", "john");
+        BasicDBObject johnObject = new BasicDBObject("_id", "john");
         johnObject.append("name", "John Smith");
 
-        janeDBRef = new DBRef(db, collection.getName(), "jane");
+        DBRef janeDBRef = new DBRef(db, collection.getName(), "jane");
 
         johnObject.append("spouse", janeDBRef);
 
@@ -167,7 +168,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         // But we should still be able to retrieve the 'john' document which contains a link which would result in a 404
         // If we try and expand this object, then we should receive an exception
 
-        result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/john");
+        ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/john");
 
         // verify the result
         assertThat(result).isNotNull();
@@ -192,19 +193,20 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         } catch (ResourceException e) {
             // expected
         }
+    }
 
-
-        // Test #4 - Read DBRef array
-        methodName = "testReadDBRefArray";
+    @Test
+    public void readDBRefArray() throws Exception {
+        String methodName = "testReadDBRefArray";
         assertThat(db.collectionExists(methodName)).isFalse();
 
-        collection = db.createCollection(methodName, new BasicDBObject());
+        DBCollection collection = db.createCollection(methodName, new BasicDBObject());
 
         // create the object using the mongo driver directly
-        johnObject = new BasicDBObject("_id", "john");
+        BasicDBObject johnObject = new BasicDBObject("_id", "john");
         johnObject.append("firstName", "John");
         johnObject.append("lastName", "Smith");
-        johnDBRef = new DBRef(db, collection.getName(), johnObject.get("_id"));
+        DBRef johnDBRef = new DBRef(db, collection.getName(), johnObject.get("_id"));
 
         BasicDBObject jackObject = new BasicDBObject("_id", "jack");
         jackObject.append("firstName", "Jack");
@@ -220,10 +222,10 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         list.add(jackDBRef);
         list.add(judyDBRef);
 
-        janeObject = new BasicDBObject("_id", "jane");
+        BasicDBObject janeObject = new BasicDBObject("_id", "jane");
         janeObject.append("firstName", "Jane");
         janeObject.append("lastName", "Smith");
-        janeDBRef = new DBRef(db, collection.getName(), janeObject.get("_id"));
+        DBRef janeDBRef = new DBRef(db, collection.getName(), janeObject.get("_id"));
 
         johnObject.append("spouse", janeDBRef);
         johnObject.append("children", list);
@@ -236,7 +238,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertEquals(4, collection.getCount());
 
         // get the non-expanded result
-        result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/john");
+        ResourceState result = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/john");
         // verify the non-expanded result
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo("john");
@@ -249,7 +251,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(childrenResult.get(1).uri()).isEqualTo(new URI("/testApp/storage/testReadDBRefArray/judy"));
 
         // get the expanded result
-        expandedResult = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
+        ResourceState expandedResult = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
                 + "/john");
         // verify the expanded result
         assertThat(expandedResult).isNotNull();
@@ -267,14 +269,15 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         assertThat(judyResourceState.uri()).isEqualTo(new URI("/testApp/storage/testReadDBRefArray/judy"));
         assertThat(judyResourceState.getProperty("firstName")).isEqualTo("Judy");
         assertThat(judyResourceState.getProperty("lastName")).isEqualTo("Smith");
+    }
 
-
-        // Test #5 - Create with DBRef
-        methodName = "testCreateWithDBRef";
+    @Test
+    public void createWithDBRef() throws Exception {
+        String methodName = "testCreateWithDBRef";
         assertThat(db.collectionExists(methodName)).isFalse();
 
         // Create the reference resource in mongo
-        collection = db.createCollection(methodName, new BasicDBObject());
+        DBCollection collection = db.createCollection(methodName, new BasicDBObject());
         BasicDBObject parentObject = new BasicDBObject("_id", "johnSmith");
         parentObject.append("name", "John Smith");
         collection.insert(parentObject);
@@ -314,19 +317,20 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         getResource = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName + "/judySmith");
         ResourceState fatherResourceState = (ResourceState) getResource.getProperty("father");
         assertThat(fatherResourceState.getProperty("name")).isEqualTo("John Smith");
+    }
 
-
-        // Test #6 - Create with invalid DBRef
-        methodName = "testCreateWithInvalidDBRef";
+    @Test
+    public void createWithInvalidDBRef() throws Exception {
+        String methodName = "testCreateWithInvalidDBRef";
         assertThat(db.collectionExists(methodName)).isFalse();
 
         // Create the reference resource in mongo
-        collection = db.createCollection(methodName, new BasicDBObject());
-        johnObject = new BasicDBObject("_id", "johnSmith");
+        DBCollection collection = db.createCollection(methodName, new BasicDBObject());
+        BasicDBObject johnObject = new BasicDBObject("_id", "johnSmith");
         johnObject.append("name", "John Smith");
         collection.insert(johnObject);
 
-        getResource = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/johnSmith");
+        ResourceState getResource = client.read(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/johnSmith");
 
         ResourceState invalidRef = new DefaultResourceState();
         invalidRef.putProperty("$dbref", "not a path to a url.");
@@ -381,10 +385,11 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         } catch (ResourceException e) {
             // expected
         }
+    }
 
-
-        // Test #7 - Update with DBRef
-        methodName = "testUpdateWithDBRef";
+    @Test
+    public void updateWithDBRef() throws Exception {
+        String methodName = "testUpdateWithDBRef";
         assertThat(db.collectionExists(methodName)).isFalse();
 
         DBCollection people = db.createCollection(methodName, new BasicDBObject());
@@ -430,61 +435,63 @@ public class MongoDBRefTest extends BaseMongoDBTest {
         // verify the result, with Steve now being Sue's best friend
         bestFriend = (ResourceState) sueResource.getProperty("bestFriend");
         assertThat(bestFriend.getProperty("name")).isEqualTo("Steve");
+    }
 
-
-        // Test #8 - Removing DBRef
-        methodName = "testRemovingDBRef";
+    @Test
+    public void removingDBRef() throws Exception {
+        String methodName = "testRemovingDBRef";
         assertThat(db.collectionExists(methodName)).isFalse();
 
-        people = db.createCollection(methodName, new BasicDBObject());
+        DBCollection people = db.createCollection(methodName, new BasicDBObject());
 
         // create some objects using the mongo driver directly
-        sallyObject = new BasicDBObject("_id", "Sally");
+        BasicDBObject sallyObject = new BasicDBObject("_id", "Sally");
         sallyObject.append("name", "Sally");
-        sallyDBRef = new DBRef(db, people.getName(), sallyObject.get("_id"));
+        DBRef sallyDBRef = new DBRef(db, people.getName(), sallyObject.get("_id"));
 
-        sueObject = new BasicDBObject("_id", "Sue");
+        BasicDBObject sueObject = new BasicDBObject("_id", "Sue");
         sueObject.append("name", "Sue");
         sueObject.append("bestFriend", sallyDBRef);
 
         people.insert(sallyObject);
         people.insert(sueObject);
 
-        sueResource = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
+        ResourceState sueResource = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
                 + "/Sue");
         // verify the result, with Sally being Sue's best friend
-        bestFriend = (ResourceState) sueResource.getProperty("bestFriend");
+        ResourceState bestFriend = (ResourceState) sueResource.getProperty("bestFriend");
         assertThat(bestFriend.getProperty("name")).isEqualTo("Sally");
 
         // now try and remove the bestFriend value
         sueResource.putProperty("bestFriend", null);
 
-        updatedState = client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/Sue", sueResource);
+        ResourceState updatedState = client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/Sue", sueResource);
         assertThat(updatedState.getProperty("bestFriend")).isNull();
+    }
 
-
-        // Test #9 - Overwrite with DBRef
-        methodName = "testOverwriteWithDBRef";
+    @Test
+    public void overwriteWithDBRef() throws Exception {
+        String methodName = "testOverwriteWithDBRef";
         assertThat(db.collectionExists(methodName)).isFalse();
 
-        people = db.createCollection(methodName, new BasicDBObject());
+        DBCollection people = db.createCollection(methodName, new BasicDBObject());
 
         // create some objects using the mongo driver directly
-        sallyObject = new BasicDBObject("_id", "sally");
+        BasicDBObject sallyObject = new BasicDBObject("_id", "sally");
         sallyObject.append("name", "Sally");
-        sallyDBRef = new DBRef(db, people.getName(), sallyObject.get("_id"));
+        DBRef sallyDBRef = new DBRef(db, people.getName(), sallyObject.get("_id"));
 
-        sueObject = new BasicDBObject("_id", "sue");
+        BasicDBObject sueObject = new BasicDBObject("_id", "sue");
         sueObject.append("name", "Sue");
         sueObject.append("bestFriend", sallyDBRef);
 
         people.insert(sallyObject);
         people.insert(sueObject);
 
-        sueResource = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
+        ResourceState sueResource = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), "/testApp/" + BASEPATH + "/" + methodName
                 + "/sue");
         // verify the result, with Sally being Sue's best friend
-        bestFriend = (ResourceState) sueResource.getProperty("bestFriend");
+        ResourceState bestFriend = (ResourceState) sueResource.getProperty("bestFriend");
         assertThat(bestFriend.uri()).isEqualTo(new URI("/testApp/" + BASEPATH + "/" + methodName + "/sally"));
         assertThat(bestFriend.id()).isEqualTo("sally");
         assertThat(bestFriend.getProperty("name")).isEqualTo("Sally");
@@ -503,7 +510,7 @@ public class MongoDBRefTest extends BaseMongoDBTest {
 
         // remove the ID from the bestFriend object, this should now make it an embedded object, which is legal for an update
         bestFriend.id(null);
-        updatedState = client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/sue", sueResource);
+        ResourceState updatedState = client.update(new RequestContext.Builder().build(), "/testApp/" + BASEPATH + "/" + methodName + "/sue", sueResource);
 
         assertThat(updatedState).isNotNull();
         bestFriend = (ResourceState) updatedState.getProperty("bestFriend");

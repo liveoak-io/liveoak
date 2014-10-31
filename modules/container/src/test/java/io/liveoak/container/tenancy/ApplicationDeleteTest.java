@@ -5,11 +5,9 @@ import java.io.File;
 import io.liveoak.container.AbstractContainerTest;
 import io.liveoak.container.InMemoryDBExtension;
 import io.liveoak.container.LiveOakFactory;
-import io.liveoak.container.LiveOakSystem;
 import io.liveoak.spi.MediaType;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -26,20 +24,19 @@ import static org.fest.assertions.Assertions.assertThat;
 public class ApplicationDeleteTest extends AbstractContainerTest {
 
     private CloseableHttpClient httpClient;
-    private File appsDir;
 
     @Before
     public void setUpServer() throws Exception {
-        appsDir = new File(getClass().getClassLoader().getResource("apps").getFile());
-        this.system = LiveOakFactory.create(null, appsDir, null);
-        this.system.extensionInstaller().load("dummy", new InMemoryDBExtension());
+        File appsDir = new File(getClass().getClassLoader().getResource("apps").getFile());
+        system = LiveOakFactory.create(null, appsDir, null);
+        system.extensionInstaller().load("dummy", new InMemoryDBExtension());
 
-        this.system.awaitStability();
+        awaitStability();
     }
 
     @After
     public void tearDownServer() throws Exception {
-        this.system.stop();
+        system.stop();
         System.err.flush();
     }
 
@@ -56,7 +53,7 @@ public class ApplicationDeleteTest extends AbstractContainerTest {
     @Test
     public void deleteTests() throws Throwable {
         // Test #1 - Test deleting and recreating an application with the same id
-        this.system.applicationRegistry().createApplication("testApp1", "Test Application 1");
+        system.applicationRegistry().createApplication("testApp1", "Test Application 1");
         awaitStability();
 
         HttpDelete deleteRequest;
@@ -94,7 +91,7 @@ public class ApplicationDeleteTest extends AbstractContainerTest {
 
 
         // Test #2 - Test deleting and recreating an application with the same id and resources
-        InternalApplication app = this.system.applicationRegistry().createApplication("testApp2", "Test Application 2");
+        InternalApplication app = system.applicationRegistry().createApplication("testApp2", "Test Application 2");
         app.extend("dummy");
         awaitStability();
 

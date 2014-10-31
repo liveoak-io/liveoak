@@ -52,34 +52,36 @@ public class InternalApplicationExtension implements Consumer<Exception> {
         String appId = this.app.id();
         ServiceController<InternalApplicationExtension> extController = (ServiceController<InternalApplicationExtension>) this.registry.getService(Services.applicationExtension(appId, this.resourceId));
 
-        ApplicationExtensionRemovalService removal = new ApplicationExtensionRemovalService(extController);
+        if (extController != null) {
+            ApplicationExtensionRemovalService removal = new ApplicationExtensionRemovalService(extController);
 
-        ServiceTarget target = extController.getServiceContainer().subTarget();
-        ServiceController<InternalApplicationExtension> extensionController = (ServiceController<InternalApplicationExtension>) extController.getServiceContainer().getService(Services.applicationExtension(appId, this.resourceId));
+            ServiceTarget target = extController.getServiceContainer().subTarget();
+            ServiceController<InternalApplicationExtension> extensionController = (ServiceController<InternalApplicationExtension>) extController.getServiceContainer().getService(Services.applicationExtension(appId, this.resourceId));
 
-        CountDownLatch latch = new CountDownLatch(1);
+            CountDownLatch latch = new CountDownLatch(1);
 
-        target.addListener(new AbstractServiceListener<Object>() {
-            @Override
-            public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
-                if (transition.getAfter().equals(ServiceController.Substate.REMOVED)) {
-                    latch.countDown();
+            target.addListener(new AbstractServiceListener<Object>() {
+                @Override
+                public void transition(ServiceController<?> controller, ServiceController.Transition transition) {
+                    if (transition.getAfter().equals(ServiceController.Substate.REMOVED)) {
+                        latch.countDown();
+                    }
                 }
+            });
+
+            target.addService(extController.getName().append("remove"), removal)
+                    .addDependency(Services.extension(this.extensionId), Extension.class, removal.extensionInjector())
+                    .install();
+
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                log.error("Unable to remove extension: " + this.extensionId, e);
             }
-        });
 
-        target.addService(extController.getName().append("remove"), removal)
-                .addDependency(Services.extension(this.extensionId), Extension.class, removal.extensionInjector())
-                .install();
-
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            log.error("Unable to remove extension: " + this.extensionId, e);
+            // Remove extension controller, and any remaining dependent services
+            extensionController.setMode(ServiceController.Mode.REMOVE);
         }
-
-        // Remove extension controller, and any remaining dependent services
-        extensionController.setMode(ServiceController.Mode.REMOVE);
     }
 
     public void adminResourceController(ServiceController<? extends Resource> controller) {

@@ -1,7 +1,7 @@
 package io.liveoak.container.resource;
 
+import io.liveoak.container.AbstractContainerTest;
 import io.liveoak.container.LiveOakFactory;
-import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
@@ -15,30 +15,27 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class ExtensionTest {
-    private LiveOakSystem system;
+public class ExtensionTest extends AbstractContainerTest {
     private Client client;
-    private InternalApplication application;
 
 
     @Before
     public void setUp() throws Exception {
-        this.system = LiveOakFactory.create();
-        this.client = this.system.client();
+        system = LiveOakFactory.create();
+        this.client = system.client();
+        awaitStability();
 
-        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
-        this.system.awaitStability();
+        InternalApplication application = system.applicationRegistry().createApplication("testApp", "Test Application");
+        system.extensionInstaller().load("mock", new MockExtension());
+        awaitStability();
+        application.extend("mock");
 
-        this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application");
-        this.system.extensionInstaller().load("mock", new MockExtension());
-        this.application.extend("mock");
-
-        this.system.service(MockExtension.resource("testApp", "mock"));
+        system.service(MockExtension.resource("testApp", "mock"));
     }
 
     @After
     public void shutdown() throws Exception {
-        this.system.stop();
+        system.stop();
     }
 
     @Test

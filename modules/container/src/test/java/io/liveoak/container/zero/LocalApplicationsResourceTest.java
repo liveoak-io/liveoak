@@ -6,9 +6,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import io.liveoak.container.AbstractContainerTest;
 import io.liveoak.container.InMemoryDBExtension;
 import io.liveoak.container.LiveOakFactory;
-import io.liveoak.container.LiveOakSystem;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.state.ResourceState;
@@ -31,6 +31,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -38,24 +39,23 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author Ken Finnigan
  */
-public class LocalApplicationsResourceTest {
+public class LocalApplicationsResourceTest extends AbstractContainerTest {
 
-    private LiveOakSystem system;
     private CloseableHttpClient httpClient;
-    private File appDir;
+    private static File appDir;
 
-    @Before
-    public void setUpServer() throws Exception {
-        appDir = new File(getClass().getClassLoader().getResource("apps").getFile());
-        this.system = LiveOakFactory.create(null, appDir, null);
-        this.system.extensionInstaller().load("dummy", new InMemoryDBExtension());
+    @BeforeClass
+    public static void setUpServer() throws Exception {
+        appDir = new File(LocalApplicationsResourceTest.class.getClassLoader().getResource("apps").getFile());
+        system = LiveOakFactory.create(null, appDir, null);
+        system.extensionInstaller().load("dummy", new InMemoryDBExtension());
 
-        this.system.awaitStability();
+        awaitStability();
     }
 
-    @After
-    public void tearDownServer() throws Exception {
-        this.system.stop();
+    @AfterClass
+    public static void tearDownServer() throws Exception {
+        system.stop();
         System.err.flush();
     }
 
@@ -83,14 +83,14 @@ public class LocalApplicationsResourceTest {
         System.err.println("========= HttpResponse ==========");
         System.err.println(buffer.toString(Charset.defaultCharset()));
         System.err.println("===================");
-        return this.system.codecManager().decode(MediaType.LOCAL_APP_JSON, buffer);
+        return system.codecManager().decode(MediaType.LOCAL_APP_JSON, buffer);
     }
 
     protected ResourceState decode(ByteBuf buffer) throws Exception {
         System.err.println("========= ByteBuf ==========");
         System.err.println(buffer.toString(Charset.defaultCharset()));
         System.err.println("===================");
-        return this.system.codecManager().decode(MediaType.LOCAL_APP_JSON, buffer);
+        return system.codecManager().decode(MediaType.LOCAL_APP_JSON, buffer);
     }
 
     @Test
@@ -155,7 +155,7 @@ public class LocalApplicationsResourceTest {
         stompClient.connect("localhost", 8080, (client) -> {
             stompClient.subscribe("/admin/applications/*", (subscription) -> {
                 subscription.onMessage((msg) -> {
-                    System.err.println( "******* MESSAGE: "+ msg );
+                    System.err.println("******* MESSAGE: " + msg);
                     if (msg.headers().get("location").equals("/admin/applications/myapp")) {
                         appCreationNotification.complete(msg);
                     }
@@ -181,7 +181,7 @@ public class LocalApplicationsResourceTest {
 
         response = httpClient.execute(postRequest);
 
-        this.system.awaitStability();
+        awaitStability();
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
@@ -220,7 +220,7 @@ public class LocalApplicationsResourceTest {
         response.close();
 
         // Check files were copied across
-        assertThat(this.system.vertx().fileSystem().existsSync(appDir.getPath() + "/myapp/app/index.html")).isTrue();
+        assertThat(system.vertx().fileSystem().existsSync(appDir.getPath() + "/myapp/app/index.html")).isTrue();
 
         // Check git present
         File myApp = new File(appDir, "myapp");

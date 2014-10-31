@@ -1,9 +1,14 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2014 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
  */
 package io.liveoak.container;
+
+import java.nio.charset.Charset;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.spi.LiveOak;
@@ -25,34 +30,26 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.nio.charset.Charset;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import static org.fest.assertions.Assertions.assertThat;
 
-public class BasicServerTest {
-
-    private LiveOakSystem system;
+public class BasicServerTest extends AbstractContainerTest {
 
     protected CloseableHttpClient httpClient;
-    private InternalApplication application;
 
     @Before
     public void setUpServer() throws Exception {
-        this.system = LiveOakFactory.create();
-        this.system.extensionInstaller().load( "memory", new InMemoryDBExtension() );
+        system = LiveOakFactory.create();
+        system.extensionInstaller().load("memory", new InMemoryDBExtension());
 
-        // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
-        this.system.awaitStability();
-        this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application");
+        awaitStability();
+        InternalApplication application = system.applicationRegistry().createApplication("testApp", "Test Application");
 
-        this.application.extend( "memory" );
-        this.system.awaitStability();
+        application.extend("memory");
+        awaitStability();
     }
 
     @Before
@@ -65,9 +62,9 @@ public class BasicServerTest {
         this.httpClient.close();
     }
 
-    @After
-    public void tearDownServer() throws Exception {
-        this.system.stop();
+    @AfterClass
+    public static void tearDownServer() throws Exception {
+        system.stop();
         System.err.flush();
     }
 
@@ -80,14 +77,14 @@ public class BasicServerTest {
         System.err.println("===================");
         System.err.println(buffer.toString(Charset.defaultCharset()));
         System.err.println("===================");
-        return this.system.codecManager().decode(MediaType.JSON, buffer);
+        return system.codecManager().decode(MediaType.JSON, buffer);
     }
 
     protected ResourceState decode(ByteBuf buffer) throws Exception {
         System.err.println("===================");
         System.err.println(buffer.toString(Charset.defaultCharset()));
         System.err.println("===================");
-        return this.system.codecManager().decode(MediaType.JSON, buffer);
+        return system.codecManager().decode(MediaType.JSON, buffer);
     }
 
     @Test
@@ -103,7 +100,7 @@ public class BasicServerTest {
         stompClient.connect("localhost", 8080, (client) -> {
             stompClient.subscribe("/testApp/memory/people/*", (subscription) -> {
                 subscription.onMessage((msg) -> {
-                    System.err.println( "******* MESSAGE: "+ msg );
+                    System.err.println("******* MESSAGE: " + msg);
                     if (msg.headers().get("location").equals("/testApp/memory/people")) {
                         peopleCreationNotification.complete(msg);
                     } else {
@@ -246,10 +243,10 @@ public class BasicServerTest {
         StompMessage obj = bobCreationNotification.get(30000, TimeUnit.SECONDS);
         assertThat(obj).isNotNull();
 
-        ResourceState bobObjState = (ResourceState) decode(obj.content());
+        ResourceState bobObjState = decode(obj.content());
         assertThat(bobObjState.getProperty("name")).isEqualTo("bob");
 
-        assertThat(((ResourceState) state).getProperty(LiveOak.ID)).isEqualTo(bobObjState.getProperty(LiveOak.ID));
+        assertThat(state.getProperty(LiveOak.ID)).isEqualTo(bobObjState.getProperty(LiveOak.ID));
         response.close();
     }
 

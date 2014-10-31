@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceController;
 
 /**
@@ -11,45 +12,49 @@ import org.jboss.msc.service.ServiceController;
  */
 public class AbstractContainerTest {
 
-    protected LiveOakSystem system;
+    protected static LiveOakSystem system;
 
-    protected boolean awaitStability() throws InterruptedException {
+    protected static boolean awaitStability() throws InterruptedException {
         // Default all calls to a 7 second timeout if not specified
         return awaitStability(7, TimeUnit.SECONDS);
     }
 
-    protected boolean awaitStability(int timeout, TimeUnit unit) throws InterruptedException {
+    protected static boolean awaitStability(int timeout, TimeUnit unit) throws InterruptedException {
         return awaitStability(timeout, unit, null, null);
     }
 
-    protected boolean awaitStability(long timeout, TimeUnit unit, Set<? super ServiceController<?>> failed, Set<? super ServiceController<?>> problem) throws InterruptedException {
-        boolean stable = this.system.awaitStability(timeout, unit, failed, problem);
+    protected static boolean awaitStability(long timeout, TimeUnit unit, Set<? super ServiceController<?>> failed, Set<? super ServiceController<?>> problem) throws InterruptedException {
+        boolean stable = system.awaitStability(timeout, unit, failed, problem);
         if (!stable) {
-            System.out.println("awaitStability() may require an increased timeout duration.");
-        } else {
-            if (failed != null && !failed.isEmpty()) {
-                Iterator<? super ServiceController<?>> failedIterator = failed.iterator();
-                while (failedIterator.hasNext()) {
-                    ServiceController controller = (ServiceController) failedIterator.next();
-                    System.err.printf("Controller %s is in State: %s, Substate: %s and Mode: %s", controller.getName(), controller.getState(), controller.getSubstate(), controller.getMode());
-                    if (controller.getStartException() != null) {
-                        System.err.println(controller.getStartException());
-                        controller.getStartException().printStackTrace();
-                    }
-                }
-            }
-            if (problem != null) {
-                Iterator<? super ServiceController<?>> problemIterator = problem.iterator();
-                while (problemIterator.hasNext()) {
-                    ServiceController controller = (ServiceController) problemIterator.next();
-                    System.err.printf("Controller %s is in State: %s, Substate: %s and Mode: %s", controller.getName(), controller.getState(), controller.getSubstate(), controller.getMode());
-                    if (controller.getStartException() != null) {
-                        System.err.println(controller.getStartException());
-                        controller.getStartException().printStackTrace();
-                    }
+            log.warn("awaitStability() may require an increased timeout duration.");
+        }
+
+        if (failed != null && !failed.isEmpty()) {
+            Iterator<? super ServiceController<?>> failedIterator = failed.iterator();
+            while (failedIterator.hasNext()) {
+                ServiceController controller = (ServiceController) failedIterator.next();
+                log.errorf(CONTROLLER_MESSAGE, controller.getName(), controller.getState(), controller.getSubstate(), controller.getMode());
+                if (controller.getStartException() != null) {
+                    controller.getStartException().printStackTrace();
                 }
             }
         }
+
+        if (problem != null && !problem.isEmpty()) {
+            Iterator<? super ServiceController<?>> problemIterator = problem.iterator();
+            while (problemIterator.hasNext()) {
+                ServiceController controller = (ServiceController) problemIterator.next();
+                log.errorf(CONTROLLER_MESSAGE, controller.getName(), controller.getState(), controller.getSubstate(), controller.getMode());
+                if (controller.getStartException() != null) {
+                    controller.getStartException().printStackTrace();
+                }
+            }
+        }
+
         return stable;
     }
+
+    private static String CONTROLLER_MESSAGE = "Controller %s is in State: %s, Substate: %s and Mode: %s";
+
+    private static final Logger log = Logger.getLogger(AbstractContainerTest.class);
 }

@@ -32,7 +32,7 @@ import io.liveoak.testtools.AbstractTestCase;
 import org.jboss.logging.Logger;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -40,15 +40,15 @@ import org.junit.Test;
  */
 public class AclPolicyTestCase extends AbstractTestCase {
 
-    private final Logger log = Logger.getLogger(AclPolicyTestCase.class);
+    private static final Logger log = Logger.getLogger(AclPolicyTestCase.class);
 
-    private AclPolicy aclPolicy;
+    private static AclPolicy aclPolicy;
     private MockAclTestStorageResource mockResource = new MockAclTestStorageResource("storage");
-    private MongoClient mongoClient;
-    private DB db;
+    private static MongoClient mongoClient;
+    private static DB db;
 
-    @Before
-    public void before() {
+    @BeforeClass
+    public static void before() {
         initMongo();
 
         List<AutoRuleConfig> autoRules = new ArrayList<>();
@@ -61,18 +61,18 @@ public class AclPolicyTestCase extends AbstractTestCase {
 
         AclPolicyConfig config = new AclPolicyConfig();
         config.setAutoRules(autoRules);
-        this.aclPolicy = new AclPolicy(db.getCollection("acl"));
+        aclPolicy = new AclPolicy(db.getCollection("acl"));
         new AclPolicyConfigurator().configure(aclPolicy, config);
     }
 
-    private AutoRuleConfig createRule(String collectionPath, String... autoAddedOwnerPermissions) {
+    private static AutoRuleConfig createRule(String collectionPath, String... autoAddedOwnerPermissions) {
         AutoRuleConfig autoRule = new AutoRuleConfig();
         autoRule.setResourcePath(collectionPath);
         autoRule.setAutoAddedOwnerPermissions(Arrays.asList(autoAddedOwnerPermissions));
         return autoRule;
     }
 
-    private void initMongo() {
+    private static void initMongo() {
         String database = System.getProperty("mongo.db", "liveoak-acl");
         Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");

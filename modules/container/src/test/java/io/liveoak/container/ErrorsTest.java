@@ -10,7 +10,6 @@ import io.liveoak.common.DefaultResourceParams;
 import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
@@ -24,10 +23,8 @@ import io.liveoak.spi.exceptions.ResourceAlreadyExistsException;
 import io.liveoak.spi.exceptions.ResourceException;
 import io.liveoak.spi.exceptions.ResourceNotFoundException;
 import io.liveoak.spi.state.ResourceState;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -36,46 +33,43 @@ import static org.junit.Assert.fail;
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class ErrorsTest {
+public class ErrorsTest extends AbstractContainerTest {
 
-    private LiveOakSystem system;
-    private Client client;
-    private InternalApplication application;
-    private InternalApplicationExtension extension;
+    private static Client client;
+    private static InternalApplication application;
 
-    @Before
-    public void setUpSystem() throws Exception {
+    @BeforeClass
+    public static void setUpSystem() throws Exception {
         try {
-            this.system = LiveOakFactory.create();
-            this.client = this.system.client();
+            system = LiveOakFactory.create();
+            client = system.client();
 
             ErrorsTestResource root = new ErrorsTestResource("errors");
-            this.system.extensionInstaller().load( "errors", new ErrorsTestExtension(root) );
+            system.extensionInstaller().load("errors", new ErrorsTestExtension(root));
 
             // LIVEOAK-295 ... make sure system services have all started before performing programmatic application deployment
-            this.system.awaitStability();
+            awaitStability();
 
-            this.system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
-            this.application = this.system.applicationRegistry().createApplication("testApp", "Test Application");
+            system.applicationRegistry().createApplication(ZeroExtension.APPLICATION_ID, ZeroExtension.APPLICATION_NAME);
+            application = system.applicationRegistry().createApplication("testApp", "Test Application");
 
-            extension = this.application.extend( "errors" );
+            application.extend("errors");
 
-            this.system.awaitStability();
+            awaitStability();
         } catch (Throwable t) {
             t.printStackTrace();
         }
     }
 
-    @After
-    public void tearDownSystem() throws Exception {
-        extension.remove();
-        this.application.configurationFile().delete();
+    @AfterClass
+    public static void tearDownSystem() throws Exception {
+        application.configurationFile().delete();
 
-        this.system.awaitStability();
-        this.system.stop();
+        awaitStability();
+        system.stop();
     }
 
-    @Test
+    //    @Test
     public void allTests() throws Exception {
         testSetOnPropertySink();
         testThrownFromProperties();
@@ -91,62 +85,62 @@ public class ErrorsTest {
         testSetOnDeleteResponder();
     }
 
-    //@Test
+    @Test
     public void testSetOnPropertySink() throws Exception {
         runTests("read-properties");
     }
 
-    //@Test
+    @Test
     public void testThrownFromProperties() throws Exception {
         runTests("properties");
     }
 
-    //@Test
+    @Test
     public void testSetOnResourceSink() throws Exception {
         runTests("read-members");
     }
 
-    //@Test
+    @Test
     public void testThrownFromMembers() throws Exception {
         runTests("members");
     }
 
-    //@Test
+    @Test
     public void testThrownFromMember() throws Exception {
         runTests("member");
     }
 
-    //@Test
+    @Test
     public void testSetOnMemberResponder() throws Exception {
         runTests("member-responder");
     }
 
-    //@Test
+    @Test
     public void testThrownFromUpdate() throws Exception {
         runTests("update");
     }
 
-    //@Test
+    @Test
     public void testSetOnUpdateResponder() throws Exception {
         runTests("update-responder");
     }
 
-    //@Test
+    @Test
     public void testThrownFromCreate() throws Exception {
         runTests("create");
     }
 
-    //@Test
+    @Test
     public void testSetOnCreateResponder() throws Exception {
         runTests("create-responder");
     }
 
-    //@Test
+    @Test
     public void testThrownFromDelete() throws Exception {
         runTests("delete");
     }
 
-    //@Test
+    @Test
     public void testSetOnDeleteResponder() throws Exception {
         runTests("delete-responder");
     }
@@ -169,7 +163,7 @@ public class ErrorsTest {
                 .add("where", where)
                 .build();
         try {
-            result = execute(endpoint, params, where);
+            execute(endpoint, params, where);
             fail("Expected an exception!");
         } catch (ResourceException e) {
             assertThat(e.state().getPropertyAsString("message").startsWith("where: " + where));
@@ -180,7 +174,7 @@ public class ErrorsTest {
                 .add("where", where)
                 .build();
         try {
-            result = execute(endpoint, params, where);
+            execute(endpoint, params, where);
             fail("Expected an exception!");
         } catch (NotAcceptableException e) {
             assertThat(e.state().getPropertyAsString("message").startsWith("where: " + where));
@@ -191,7 +185,7 @@ public class ErrorsTest {
                 .add("where", where)
                 .build();
         try {
-            result = execute(endpoint, params, where);
+            execute(endpoint, params, where);
             fail("Expected an exception!");
         } catch (ResourceException e) {
             assertThat(e.state().getPropertyAsString("message").startsWith("where: " + where));
@@ -202,7 +196,7 @@ public class ErrorsTest {
                 .add("where", where)
                 .build();
         try {
-            result = execute(endpoint, params, where);
+            execute(endpoint, params, where);
             fail("Expected an exception!");
         } catch (NotAcceptableException e) {
             assertThat(e.state().getPropertyAsString("message").startsWith("where: " + where));
@@ -213,7 +207,7 @@ public class ErrorsTest {
                 .add("where", where)
                 .build();
         try {
-            result = execute(endpoint, params, where);
+            execute(endpoint, params, where);
             fail("Expected an exception!");
         } catch (NotAuthorizedException e) {
             assertThat(e.state().getPropertyAsString("message").startsWith("where: " + where));
@@ -224,7 +218,7 @@ public class ErrorsTest {
                 .add("where", where)
                 .build();
         try {
-            result = execute(endpoint, params, where);
+            execute(endpoint, params, where);
             fail("Expected an exception!");
         } catch (ForbiddenException e) {
             assertThat(e.state().getPropertyAsString("message").startsWith("where: " + where));
@@ -235,7 +229,7 @@ public class ErrorsTest {
                 .add("where", where)
                 .build();
         try {
-            result = execute(endpoint, params, where);
+            execute(endpoint, params, where);
             fail("Expected an exception!");
         } catch (ResourceNotFoundException e) {
             // noop
@@ -246,7 +240,7 @@ public class ErrorsTest {
                 .add("where", where)
                 .build();
         try {
-            result = execute(endpoint, params, where);
+            execute(endpoint, params, where);
             fail("Expected an exception!");
         } catch (ResourceAlreadyExistsException e) {
             // noop
