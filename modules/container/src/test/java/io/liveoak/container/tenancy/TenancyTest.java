@@ -166,7 +166,7 @@ public class TenancyTest {
                 .addDependency(APPLICATION_REGISTRY, InternalApplicationRegistry.class, deployerService.applicationRegistryInjector())
                 .install();
 
-        ExtensionService ext = new ExtensionService(ZeroExtension.APPLICATION_ID, new ZeroExtension(), JsonNodeFactory.instance.objectNode());
+        ExtensionService ext = new ExtensionService(ZeroExtension.APPLICATION_ID, new ZeroExtension(), JsonNodeFactory.instance.objectNode(), null);
         this.serviceContainer.addService(Services.extension(ZeroExtension.EXTENSION_ID), ext)
                 .install();
 

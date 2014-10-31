@@ -3,6 +3,7 @@ package io.liveoak.container.extension;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Properties;
 import java.util.ServiceLoader;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.json.JSONEncoder;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.common.util.StringPropertyReplacer;
+import io.liveoak.container.tenancy.ExtensionConfigurationManager;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.modules.Module;
@@ -21,6 +23,8 @@ import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StabilityMonitor;
+import org.jboss.msc.service.ValueService;
+import org.jboss.msc.value.ImmediateValue;
 
 /**
  * @author Bob McWhirter
@@ -42,6 +46,13 @@ public class ExtensionInstaller {
         if (id.endsWith(".json")) {
             id = id.substring(0, id.length() - 5);
         }
+
+        //ServiceName configManagerName = Services.systemConfigurationManager(id);
+        this.extensionConfigurationManager =  new ExtensionConfigurationManager(id, extensionDesc);
+        //target.addService(configManagerName, new ValueService<>(new ImmediateValue<>(extensionConfigurationManager))).install();
+
+        //target.addService(Services.systemEnvironmentProperties(id), new ValueService<>(new ImmediateValue<>(envProperties()))).install();
+
         load(id, fullConfig);
     }
 
@@ -76,10 +87,21 @@ public class ExtensionInstaller {
     }
 
     public void load(String id, Extension extension, ObjectNode config) throws Exception {
+
+        ServiceName configManagerName = Services.systemConfigurationManager(id);
+
+        if (extensionConfigurationManager == null) {
+            extensionConfigurationManager = new ExtensionConfigurationManager(id, null);
+        }
+
+        target.addService(configManagerName, new ValueService<>(new ImmediateValue<>(extensionConfigurationManager))).install();
+        target.addService(Services.systemEnvironmentProperties(id), new ValueService<>(new ImmediateValue<>(envProperties()))).install();
+
         StabilityMonitor monitor = new StabilityMonitor();
         ServiceTarget target = this.target.subTarget();
         target.addMonitor(monitor);
-        ServiceBuilder builder = target.addService(Services.extension(id), new ExtensionService(id, extension, config));
+        ExtensionService extensionService = new ExtensionService(id, extension, config, extensionConfigurationManager);
+        ServiceBuilder builder = target.addService(Services.extension(id), extensionService);
 
         JsonNode deps = config.get("dependencies");
         if (deps != null) {
@@ -96,7 +118,12 @@ public class ExtensionInstaller {
         return StringPropertyReplacer.replaceProperties(original, System.getProperties(), (v) -> { return JSONEncoder.jsonStringEscape(v); });
     }
 
+    private Properties envProperties() {
+        Properties props = new Properties(System.getProperties());
+        return props;
+    }
+
     private ServiceTarget target;
     private final ServiceName systemConfigMount;
-
+    private ExtensionConfigurationManager extensionConfigurationManager = null;
 }

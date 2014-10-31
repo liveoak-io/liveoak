@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.container.tenancy.service.ApplicationExtensionService;
+import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.Services;
@@ -68,6 +69,11 @@ public class InternalApplication implements Application {
         return this.versionResourceId != null && this.versionResourceId.length() > 0;
     }
 
+    public String versionedResourcePath() {
+        return "/" + ZeroExtension.APPLICATION_ID + "/applications/" + this.id() + "/resources/" + this.versionResourceId() + "/commits";
+    }
+
+    @Override
     public String versionResourceId() {
         return this.versionResourceId;
     }

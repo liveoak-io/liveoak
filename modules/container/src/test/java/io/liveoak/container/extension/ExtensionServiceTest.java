@@ -1,12 +1,18 @@
 package io.liveoak.container.extension;
 
+import java.util.Properties;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.container.service.ClientService;
+import io.liveoak.container.tenancy.ExtensionConfigurationManager;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Services;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ValueService;
+import org.jboss.msc.value.ImmediateValue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,9 +30,11 @@ public class ExtensionServiceTest {
     public void setUpServiceContainer() throws Exception {
         this.serviceContainer = ServiceContainer.Factory.create();
 
-        ExtensionService mockExt = new ExtensionService("mock", new MockExtension(), getConfig());
+        ExtensionService mockExt = new ExtensionService("mock", new MockExtension(), getConfig(), null);
         this.serviceContainer.addService(Services.extension("mock"), mockExt).install();
-
+        this.serviceContainer.addService(Services.CLIENT, new ClientService()).install();
+        this.serviceContainer.addService(Services.systemConfigurationManager("mock"), new ValueService<>(new ImmediateValue<>(new ExtensionConfigurationManager("mock", null)))).install();
+        this.serviceContainer.addService(Services.systemEnvironmentProperties("mock"), new ValueService<>(new ImmediateValue<>(new Properties(System.getProperties())))).install();
         serviceContainer.awaitStability();
     }
 

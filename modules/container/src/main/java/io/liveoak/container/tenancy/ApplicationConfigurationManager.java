@@ -17,10 +17,11 @@ import org.jboss.logging.Logger;
  * @author Bob McWhirter
  * @author Ken Finnigan
  */
-public class ApplicationConfigurationManager {
+public class ApplicationConfigurationManager implements ConfigurationManager {
 
-    public ApplicationConfigurationManager(File file) {
+    public ApplicationConfigurationManager(File file, InternalApplication internalApplication) {
         this.file = file;
+        this.internalApplication = internalApplication;
     }
 
     public synchronized ObjectNode read() throws IOException {
@@ -50,7 +51,8 @@ public class ApplicationConfigurationManager {
         write(tree);
     }
 
-    public ObjectNode readResource(String id) throws IOException {
+    @Override
+    public ObjectNode readResource(String id, String type) throws IOException {
         ObjectNode tree = read();
         ObjectNode resourcesTree = (ObjectNode) tree.get("resources");
         if (resourcesTree == null) {
@@ -61,6 +63,7 @@ public class ApplicationConfigurationManager {
         return (ObjectNode) resourcesTree.get(id);
     }
 
+    @Override
     public synchronized void updateResource(String id, String type, JsonNode config) throws IOException {
         ObjectNode tree = read();
         ObjectNode resourcesTree = (ObjectNode) tree.get("resources");
@@ -80,7 +83,23 @@ public class ApplicationConfigurationManager {
         write(tree);
     }
 
-    public synchronized void removeResource(String id) throws IOException {
+    @Override
+    public String type() {
+        return null;
+    }
+
+    @Override
+    public String versionedResourcePath() {
+        return internalApplication.versionedResourcePath();
+    }
+
+    @Override
+    public boolean versioned() {
+        return internalApplication.versioned();
+    }
+
+    @Override
+    public synchronized void removeResource(String id, String type) throws IOException {
         ObjectNode tree = read();
         ObjectNode resourcesTree = (ObjectNode) tree.get("resources");
         if (resourcesTree == null) {
@@ -101,6 +120,7 @@ public class ApplicationConfigurationManager {
     }
 
     private final File file;
+    private final InternalApplication internalApplication;
 
     private static final Logger log = Logger.getLogger(ApplicationConfigurationManager.class);
 }

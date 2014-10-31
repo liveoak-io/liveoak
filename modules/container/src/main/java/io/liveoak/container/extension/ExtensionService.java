@@ -6,6 +6,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.container.tenancy.ExtensionConfigurationManager;
 import io.liveoak.container.tenancy.ModuleResourceRegistry;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.Services;
@@ -28,7 +29,7 @@ import org.jboss.msc.value.ImmediateValue;
  */
 public class ExtensionService implements Service<Extension> {
 
-    public ExtensionService(String id, Extension extension, ObjectNode fullConfig) {
+    public ExtensionService(String id, Extension extension, ObjectNode fullConfig, ExtensionConfigurationManager manager) {
         this.id = id;
         this.extension = extension;
         this.fullConfig = fullConfig;
@@ -36,6 +37,7 @@ public class ExtensionService implements Service<Extension> {
         if (fullConfig.has("common")) {
             this.common = fullConfig.get("common").asBoolean();
         }
+        this.configurationManager = manager;
     }
 
     @Override
@@ -51,9 +53,9 @@ public class ExtensionService implements Service<Extension> {
 
 
         ServiceName moduleName = Services.resource(ZeroExtension.APPLICATION_ID, "system").append("module").append(id);
-        target.addService(moduleName, new ValueService<>(new ImmediateValue<>(new ModuleResourceRegistry(this.id, this.extension, target))))
-                .install();
 
+        ModuleResourceRegistry moduleResourceRegistry =  new ModuleResourceRegistry(this.id, this.extension, target, configurationManager);
+        target.addService(moduleName, new ValueService<>(new ImmediateValue<>(moduleResourceRegistry))).install();
 
         MountService<RootResource> instanceMount = new MountService<>();
         target.addService(moduleName.append("mount"), instanceMount)
@@ -61,7 +63,7 @@ public class ExtensionService implements Service<Extension> {
                 .addDependency(moduleName, RootResource.class, instanceMount.resourceInjector())
                 .install();
 
-        SystemExtensionContext moduleContext = new SystemExtensionContextImpl(target, this.id, "module", moduleName, extConfig);
+        SystemExtensionContext moduleContext = new SystemExtensionContextImpl(target, this.id, "module", moduleName, extConfig, moduleResourceRegistry);
 
         try {
             this.extension.extend(moduleContext);
@@ -73,11 +75,10 @@ public class ExtensionService implements Service<Extension> {
             ObjectNode extInstanceConfig = (ObjectNode) this.fullConfig.get("instances");
             if (extInstanceConfig != null) {
                 //Create the system-instances/module resource so that we can put in there each individual instance
-
                 Iterator<Map.Entry<String, JsonNode>> fieldIterator = extInstanceConfig.fields();
                 while (fieldIterator.hasNext()) {
                     Map.Entry<String, JsonNode> entry = fieldIterator.next();
-                    SystemExtensionContext extInstanceContext = new SystemExtensionContextImpl(target, this.id, entry.getKey(), moduleName, (ObjectNode) entry.getValue());
+                    SystemExtensionContext extInstanceContext = new SystemExtensionContextImpl(target, this.id, entry.getKey(), moduleName, (ObjectNode) entry.getValue(), moduleResourceRegistry);
                     this.extension.instance(entry.getKey(), extInstanceContext);
                 }
             }
@@ -119,7 +120,7 @@ public class ExtensionService implements Service<Extension> {
     private final Extension extension;
     private final ObjectNode fullConfig;
     private boolean common;
+    private ExtensionConfigurationManager configurationManager;
 
     private static final Logger log = Logger.getLogger(ExtensionService.class);
-
 }

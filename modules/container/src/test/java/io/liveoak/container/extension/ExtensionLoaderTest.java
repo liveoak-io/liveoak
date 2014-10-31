@@ -2,9 +2,11 @@ package io.liveoak.container.extension;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultMountPointResource;
+import io.liveoak.container.service.ClientService;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Services;
+import io.liveoak.spi.resource.DelegatingRootResource;
 import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -28,13 +30,15 @@ public class ExtensionLoaderTest {
     private DefaultMountPointResource systemAdminMount;
 
     @Before
-    public void setUpServiceContainer() {
+    public void setUpServiceContainer() throws Exception {
         this.serviceContainer = ServiceContainer.Factory.create();
         this.systemAdminMount = new DefaultMountPointResource("admin");
         this.serviceContainer.addService(Services.resource(ZeroExtension.APPLICATION_ID, "system"), new ValueService<MountPointResource>(new ImmediateValue<>(this.systemAdminMount)))
                 .install();
         this.serviceContainer.addService(Services.SERVICE_CONTAINER, new ValueService<ServiceContainer>(new ImmediateValue<>(this.serviceContainer)))
                 .install();
+        this.serviceContainer.addService(Services.CLIENT, new ClientService()).install();
+        serviceContainer.awaitStability();
     }
 
     @After
@@ -58,7 +62,9 @@ public class ExtensionLoaderTest {
 
         Resource adminMountResource = this.systemAdminMount.member(new RequestContext.Builder().build(), "mock");
 
-        assertThat(((SynchronousResource) adminMountResource).member(new RequestContext.Builder().build(), "module")).isSameAs(adminResource.getValue());
+        DelegatingRootResource delegatingResource = (DelegatingRootResource)((SynchronousResource) adminMountResource).member(new RequestContext.Builder().build(), "module");
+
+        assertThat(delegatingResource.delegate()).isSameAs(adminResource.getValue());
     }
 }
 

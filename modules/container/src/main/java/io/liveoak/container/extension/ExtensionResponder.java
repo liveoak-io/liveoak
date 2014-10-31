@@ -1,8 +1,6 @@
 package io.liveoak.container.extension;
 
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourceErrorResponse;
@@ -12,23 +10,31 @@ import io.liveoak.spi.resource.async.DelegatingResponder;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.security.SecurityContext;
-import io.liveoak.spi.security.UserProfile;
 import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Ken Finnigan
  */
-public class VersioningResponder extends DelegatingResponder {
-    public VersioningResponder(Responder delegate, InternalApplication application, Client client, SecurityContext securityContext) {
+public class ExtensionResponder extends DelegatingResponder {
+    public ExtensionResponder(Responder delegate, boolean versioned, String path, Client client, SecurityContext securityContext) {
         super(delegate);
-        this.application = application;
+        this.path = path;
+        this.versioned = versioned;
         this.client = client;
         this.securityContext = securityContext;
     }
 
+    public static Responder VersioningResponder(Responder delegate, String path, Client client, SecurityContext securityContext) {
+        return new ExtensionResponder(delegate, true, path, client, securityContext);
+    }
+
+    public static Responder Responder(Responder delegate, Client client, SecurityContext securityContext) {
+        return new ExtensionResponder(delegate, false, null, client, securityContext);
+    }
+
     @Override
     public void resourceCreated(Resource resource) {
-        if (this.application.versioned()) {
+        if (versioned) {
             // Versioning is installed
             performCommit(resource, RequestType.CREATE, () -> super.resourceCreated(resource));
         } else {
@@ -38,7 +44,7 @@ public class VersioningResponder extends DelegatingResponder {
 
     @Override
     public void resourceUpdated(Resource resource) {
-        if (this.application.versioned()) {
+        if (versioned) {
             // Versioning is installed
             performCommit(resource, RequestType.UPDATE, () -> super.resourceUpdated(resource));
         } else {
@@ -48,7 +54,7 @@ public class VersioningResponder extends DelegatingResponder {
 
     @Override
     public void resourceDeleted(Resource resource) {
-        if (this.application.versioned()) {
+        if (versioned) {
             // Versioning is installed
             performCommit(resource, RequestType.DELETE, () -> super.resourceDeleted(resource));
         } else {
@@ -70,14 +76,15 @@ public class VersioningResponder extends DelegatingResponder {
     }
 
     private String path() {
-        return "/" + ZeroExtension.APPLICATION_ID + "/applications/" + this.application.id() + "/resources/" + this.application.versionResourceId() + "/commits";
+        return this.path;
     }
 
     private String commitMsg(Resource resource, RequestType type) {
         return "Configuration modified for " + type + " request on resource with id " + resource.id();
     }
 
-    private InternalApplication application;
+    private boolean versioned;
+    private String path;
     private Client client;
     private SecurityContext securityContext;
 }
