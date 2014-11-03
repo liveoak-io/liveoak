@@ -66,7 +66,7 @@ public class PropertyTestCase extends BasePropertyTestCase {
         assertThat(executionTime).isGreaterThan(10000); //5000 is the timeout value for the script + 5000 to wait until we kill the thread
     }
 
-    @Test (timeout = 1000)
+    @Test (timeout = 2000)
     public void customTimeout() throws Exception {
         int timeout = 500;
         client.update(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/propertyTest",
@@ -86,8 +86,11 @@ public class PropertyTestCase extends BasePropertyTestCase {
 
         // Reset
         timeout = 5000;
-        client.update(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/propertyTest",
+        ResourceState updateState = client.update(new RequestContext.Builder().build(), RESOURCE_SCRIPT_PATH + "/propertyTest",
                 new BaseResourceTriggeredTestCase.MetadataState("propertyTest", "/testApp/*")
                         .libraries("client").timeout(timeout).build());
+
+        assertThat(updateState).isNotNull();
+        assertThat(updateState.getProperty("timeout")).isEqualTo(5000);
     }
 }
