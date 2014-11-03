@@ -1,5 +1,6 @@
 package io.liveoak.container;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +21,7 @@ public class AbstractContainerTest {
     }
 
     protected static boolean awaitStability(int timeout, TimeUnit unit) throws InterruptedException {
-        return awaitStability(timeout, unit, null, null);
+        return awaitStability(timeout, unit, new HashSet<>(), new HashSet<>());
     }
 
     protected static boolean awaitStability(long timeout, TimeUnit unit, Set<? super ServiceController<?>> failed, Set<? super ServiceController<?>> problem) throws InterruptedException {

@@ -48,8 +48,13 @@ public class BaseResponder implements Responder {
 
     @Override
     public void resourceCreated(Resource resource) {
-        this.ctx.writeAndFlush(new DefaultResourceResponse(this.inReplyTo, ResourceResponse.ResponseType.CREATED, resource));
-        resumeRead();
+        if (resource.id() == null || resource.id().length() == 0) {
+            // Resource created without an id is invalid
+            this.internalError("Resource created with a null or empty id, which is not valid.");
+        } else {
+            this.ctx.writeAndFlush(new DefaultResourceResponse(this.inReplyTo, ResourceResponse.ResponseType.CREATED, resource));
+            resumeRead();
+        }
     }
 
     @Override
