@@ -1,0 +1,16 @@
+{
+    module-id:  'io.liveoak.mock',
+    config: {
+      hello: "mock",
+      foo: "bar"
+    },
+    instances: {
+      "foo" : {
+        hello: "foo"
+      },
+      "bar" : {
+        hello: "bar"
+      }
+    }
+}
+
