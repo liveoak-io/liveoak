@@ -1,7 +1,7 @@
 package io.liveoak.container.zero;
 
 import io.liveoak.common.MediaTypeMountPointResource;
-import io.liveoak.container.extension.ExtensionResponder;
+import io.liveoak.container.extension.ConfigVersioningResponder;
 import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
@@ -27,7 +27,7 @@ public class ApplicationExtensionsResource extends MediaTypeMountPointResource i
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         InternalApplication internalApp = this.application.application();
         InternalApplicationExtension ext = internalApp.extend(state.id(), state);
-        new ExtensionResponder(responder, internalApp.versioned(), internalApp.versionedResourcePath(), this.client, ctx.securityContext()).resourceCreated(ext.adminResource());
+        new ConfigVersioningResponder(responder, internalApp.versioned(), internalApp.versionedResourcePath(), this.client, ctx.securityContext()).resourceCreated(ext.adminResource());
     }
 
     private final ApplicationResource application;

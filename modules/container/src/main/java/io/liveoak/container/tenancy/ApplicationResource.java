@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.liveoak.container.extension.ExtensionResponder;
+import io.liveoak.container.extension.ConfigVersioningResponder;
 import io.liveoak.container.zero.ApplicationExtensionsResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
@@ -117,7 +117,7 @@ public class ApplicationResource implements RootResource, SynchronousResource {
         Boolean partOfGitInstallProcess = (Boolean) state.getProperty("git-install-process");
         if (this.app.versioned() && partOfGitInstallProcess == null || !partOfGitInstallProcess) {
             // Wrap current responder with one that will perform commit of version changes
-            responder = new ExtensionResponder(responder, app.versioned(), app.versionedResourcePath(), this.client, ctx.securityContext());
+            responder = new ConfigVersioningResponder(responder, app.versioned(), app.versionedResourcePath(), this.client, ctx.securityContext());
         }
 
         responder.resourceUpdated(this);

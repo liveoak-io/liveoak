@@ -73,7 +73,7 @@ public class ConfigResourceWrappingResource extends DelegatingRootResource {
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         cleanup(state);
         delegate().updateProperties(ctx, filter(state),
-                new ResourceConfigPersistingResponder(this, state, new ExtensionResponder(responder, configManager.versioned(), configManager.versionedResourcePath(), this.client, ctx.securityContext())));
+                new ResourceConfigPersistingResponder(this, state, new ConfigVersioningResponder(responder, configManager.versioned(), configManager.versionedResourcePath(), this.client, ctx.securityContext())));
 
         this.configValuesTree = new ObjectsTree<>();
         updateConfigEnvVars(state);
@@ -81,16 +81,16 @@ public class ConfigResourceWrappingResource extends DelegatingRootResource {
 
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        delegate().createMember(ctx, filter(state), new ExtensionResponder(responder, configManager.versioned(), configManager.versionedResourcePath(), this.client, ctx.securityContext()));
+        delegate().createMember(ctx, filter(state), new ConfigVersioningResponder(responder, configManager.versioned(), configManager.versionedResourcePath(), this.client, ctx.securityContext()));
     }
 
     @Override
     public void delete(RequestContext ctx, Responder responder) throws Exception {
-        ExtensionResponder extensionResponder = new ExtensionResponder(responder, configManager.versioned(), configManager.versionedResourcePath(), this.client, ctx.securityContext());//.resourceDeleted(this.delegate());
-        delegate().delete(ctx, new DeleteResponder(extensionResponder));
+        configManager.removeResource(id(), type());
+        new ConfigVersioningResponder(responder, configManager.versioned(), configManager.versionedResourcePath(), this.client, ctx.securityContext()).resourceDeleted(this.delegate());
     }
 
-    private class DeleteResponder extends DelegatingResponder {
+    protected class DeleteResponder extends DelegatingResponder {
 
         public DeleteResponder(Responder delegate) {
             super(delegate);
@@ -149,9 +149,8 @@ public class ConfigResourceWrappingResource extends DelegatingRootResource {
         return newArray;
     }
 
-    //private final InternalApplicationExtension extension;
-    private final ConfigurationManager configManager;
-    private Client client;
+    protected final ConfigurationManager configManager;
+    protected Client client;
     private Properties environmentProperties;
     private ObjectsTree<Object> configValuesTree;
 

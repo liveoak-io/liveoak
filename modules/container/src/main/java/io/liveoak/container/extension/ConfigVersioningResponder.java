@@ -15,21 +15,13 @@ import io.liveoak.spi.state.ResourceState;
 /**
  * @author Ken Finnigan
  */
-public class ExtensionResponder extends DelegatingResponder {
-    public ExtensionResponder(Responder delegate, boolean versioned, String path, Client client, SecurityContext securityContext) {
+public class ConfigVersioningResponder extends DelegatingResponder {
+    public ConfigVersioningResponder(Responder delegate, boolean versioned, String path, Client client, SecurityContext securityContext) {
         super(delegate);
         this.path = path;
         this.versioned = versioned;
         this.client = client;
         this.securityContext = securityContext;
-    }
-
-    public static Responder VersioningResponder(Responder delegate, String path, Client client, SecurityContext securityContext) {
-        return new ExtensionResponder(delegate, true, path, client, securityContext);
-    }
-
-    public static Responder Responder(Responder delegate, Client client, SecurityContext securityContext) {
-        return new ExtensionResponder(delegate, false, null, client, securityContext);
     }
 
     @Override
