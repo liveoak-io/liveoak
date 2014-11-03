@@ -38,6 +38,10 @@ public class ExtensionInstaller {
     }
 
     public void load(File extensionDesc) throws Exception {
+        loadFile(extensionDesc, null);
+    }
+
+    public void loadFile(File extensionDesc, Extension extension) throws Exception {
         ObjectMapper mapper = ObjectMapperFactory.create();
         // replace the properties before trying to read it as a json document
         // eg "number: $someValue" is not a valid json object.
@@ -46,44 +50,45 @@ public class ExtensionInstaller {
         if (id.endsWith(".json")) {
             id = id.substring(0, id.length() - 5);
         }
-
-        //ServiceName configManagerName = Services.systemConfigurationManager(id);
         this.extensionConfigurationManager =  new ExtensionConfigurationManager(id, extensionDesc);
-        //target.addService(configManagerName, new ValueService<>(new ImmediateValue<>(extensionConfigurationManager))).install();
 
-        //target.addService(Services.systemEnvironmentProperties(id), new ValueService<>(new ImmediateValue<>(envProperties()))).install();
+        if (extension == null) {
+            extension = getExtension(fullConfig);
+        }
 
-        load(id, fullConfig);
+        load(id, extension, fullConfig);
     }
 
-    public void load(String id, ObjectNode fullConfig) throws Exception {
-        String moduleId = fullConfig.get("module-id").asText();
-        load(id, ModuleIdentifier.create(moduleId), fullConfig);
-    }
-
-    public void load(String id, ModuleIdentifier moduleId, ObjectNode fullConfig) throws Exception {
+    private Extension getExtension(ObjectNode config) throws Exception {
+        String moduleId = config.get("module-id").asText();
+        ModuleIdentifier moduleIdentifier = ModuleIdentifier.create(moduleId);
         ModuleLoader loader = ModuleLoader.forClass(this.getClass());
-        Module module = loader.loadModule(moduleId);
+
+        Module module = loader.loadModule(moduleIdentifier);
 
         ServiceLoader<Extension> extensions = module.loadService(Extension.class);
 
-        boolean found = false;
-
         for (Extension extension : extensions) {
-            if (found) {
-                throw new Exception("Only one extension allowed per module: " + moduleId);
-            }
-            load(id, extension, fullConfig);
-            found = true;
+            return extension;
         }
 
-        if (!found) {
-            throw new Exception("No extension found in module: " + moduleId);
-        }
+        throw new Exception("No extension found in module: " + moduleId);
     }
 
     public void load(String id, Extension extension) throws Exception {
         load(id, extension, JsonNodeFactory.instance.objectNode());
+    }
+
+    public void load(Extension extension, File file) throws Exception {
+        ObjectMapper mapper = ObjectMapperFactory.create();
+        ObjectNode fullConfig = (ObjectNode) mapper.readTree(replaceProperties(file));
+        String id = file.getName();
+        if (id.endsWith(".json")) {
+            id = id.substring(0, id.length() - 5);
+        }
+        this.extensionConfigurationManager =  new ExtensionConfigurationManager(id, file);
+
+        load(id, extension, fullConfig);
     }
 
     public void load(String id, Extension extension, ObjectNode config) throws Exception {

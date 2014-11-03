@@ -50,6 +50,10 @@ public class MockAdminResource extends MockResource {
 
     @Override
     public void delete(RequestContext ctx, Responder responder) throws Exception {
-        responder.resourceDeleted(this);
+        if (parent() != null) {
+            parent().deleteMember(ctx, this.id(), responder);
+        } else {
+            responder.resourceDeleted(this);
+        }
     }
 }

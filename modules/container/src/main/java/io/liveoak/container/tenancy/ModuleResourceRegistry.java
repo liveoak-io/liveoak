@@ -15,6 +15,7 @@ import io.liveoak.spi.extension.SystemExtensionContext;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
@@ -111,13 +112,19 @@ public class ModuleResourceRegistry extends DefaultMountPointResource {
             }
 
             ServiceController serviceController = serviceControllers.get(id);
-            if (serviceController != null) {
+            if (serviceController != null && serviceController.getServiceContainer() != null) {
 
                 //TODO: figure out a better way to handle this......
-                serviceController.getServiceContainer().getService(Services.instanceResource(id(), id)).setMode(ServiceController.Mode.REMOVE);
-                serviceController.getServiceContainer().getService(Services.instanceResource(id(), id).append("wrapper")).setMode(ServiceController.Mode.REMOVE);
-                serviceController.getServiceContainer().getService(Services.instanceResource(id(), id).append("apply-config")).setMode(ServiceController.Mode.REMOVE);
-                serviceController.getServiceContainer().getService(Services.instanceResource(id(), id).append("lifecycle")).setMode(ServiceController.Mode.REMOVE);
+                ServiceContainer serviceContainer = serviceController.getServiceContainer();
+
+                ServiceName service = Services.instanceResource(id(), id);
+
+                if (serviceContainer.getService(service) != null) {
+                    serviceContainer.getService(Services.instanceResource(id(), id)).setMode(ServiceController.Mode.REMOVE);
+                    serviceContainer.getService(Services.instanceResource(id(), id).append("wrapper")).setMode(ServiceController.Mode.REMOVE);
+                    serviceContainer.getService(Services.instanceResource(id(), id).append("apply-config")).setMode(ServiceController.Mode.REMOVE);
+                    serviceContainer.getService(Services.instanceResource(id(), id).append("lifecycle")).setMode(ServiceController.Mode.REMOVE);
+                }
 
                 serviceController.setMode(ServiceController.Mode.REMOVE);
                 serviceControllers.remove(id);
