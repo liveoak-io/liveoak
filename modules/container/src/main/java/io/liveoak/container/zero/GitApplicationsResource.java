@@ -61,6 +61,7 @@ public class GitApplicationsResource implements RootResource, SynchronousResourc
         try {
             Git.cloneRepository()
                     .setURI(gitUrl)
+                    .setRemote("upstream")
                     .setDirectory(installDir)
                     .call();
             cloneSucceeded = true;
