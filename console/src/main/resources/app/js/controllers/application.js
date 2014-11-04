@@ -312,7 +312,7 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
     $scope.manualChange = function() {
       idAuto = false;
     };
-  }
+  };
 
 });
 
@@ -838,4 +838,4 @@ var importApp = function(app, LoAppExamples, Notifications, $modalInstance, $rou
   else if (app.hasOwnProperty('path')) {
     new LoAppExamples({ id: app.id, localPath: app.path }).$install({}, installSuccess, installFailure);
   }
-}
+};

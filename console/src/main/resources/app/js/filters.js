@@ -125,7 +125,7 @@ loFilters.filter('conditional', function () {
 loFilters.filter('clientname', function() {
   return function (clientName, appName) {
     return clientName ? clientName.replace(new RegExp('^liveoak.client.' + appName + '.'), '') : clientName;
-  }
+  };
 });
 
 loFilters.filter('ures', function () {
@@ -141,7 +141,7 @@ loFilters.filter('ures', function () {
       }
       return uris;
     }
-  }
+  };
 });
 
 
