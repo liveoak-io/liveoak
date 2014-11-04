@@ -26,6 +26,16 @@
     "instructions": "https://github.com/liveoak-io/liveoak-example-chat-android#readme"
   },
   {
+    "id": "chat-ios",
+    "url": "https://github.com/liveoak-io/liveoak-example-chat-ios.git",
+    "name": "iOS Chat",
+    "description": "Get native iOS integration with resources stored in a LiveOak instance; Native notifications of resource subscription from Apple Push Notification Service (APNS) via integration with the Aerogear Unified Push Server (UPS); System notifications when the application is in the background (using the 'content-available' flag for immediate fetch of new chat messages).",
+    "icon": "chat-ios.svg",
+    "icon-alt": "Illustration: Ballons with the iOS logo",
+    "depends": [["chat-html"],["chat-html-secured"]],
+    "instructions": "https://github.com/liveoak-io/liveoak-example-chat-ios#readme"
+  },
+  {
     "id": "gallery",
     "url": "https://github.com/liveoak-io/liveoak-example-gallery.git",
     "name": "Gallery",
