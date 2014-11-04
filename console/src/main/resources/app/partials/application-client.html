@@ -32,12 +32,9 @@
               <label class="checkbox-inline ios" ng-class="{'active': settings.type == 'ios'}">
                 <input type="radio" name="platform" ng-model="settings.type" value="ios"> iOS
               </label>
-              <label class="checkbox-inline custom">
-                <input type="radio" name="platform" value="Custom"> Custom
-              </label><!-- FIXME: make it work ;) -->
               <label ng-repeat="platform in platformsCustom" class="checkbox-inline custom"
                      ng-class="{'active': settings.type == platform}">
-                <input type="radio" name="platform" ng-model="settings.type" value="{{platform}}">{{platform}}
+                <input type="radio" name="platform" ng-model="settings.type" value="{{platform||'Custom'}}">{{platform||'Custom'}}
               </label>
               <span data-tooltip-placement="top" data-tooltip="Add Platform">
                 <button type="button" class="btn btn-link btn-icon inline add-condition" ng-click="modalPlatformAdd()">

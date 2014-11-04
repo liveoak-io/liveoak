@@ -23,7 +23,7 @@
             </div>
             <div>
               <span class="lo-label">Port:</span>
-              <span class="lo-field">27017</span><!-- FIXME: make the port appear dinamically -->
+              <span class="lo-field">{{storage.port}}</span>
             </div>
           </div>
           <p class="content-area" ng-hide="storageList.length > 0">Store your application's data in the cloud</p>
@@ -63,7 +63,7 @@
         <div class="panel-body text-center">
           <i class="fa fa-globe"></i>
           <h3>Clients</h3>
-          <p class="content-area">Choose the platform you need for your clients</p><!-- FIXME: improve this text -->
+          <p class="content-area">Configure the clients for different platforms</p>
           <ul class="actions">
             <li><a href="#/applications/{{curApp.id}}/application-clients">Configure <strong>Clients</strong></a></li>
           </ul>

@@ -137,7 +137,7 @@
                                   securedBusinessLogic.uriPolicies.length > 0 || securedBusinessLogic.aclPolicies.length > 0 ||
                                   missingSecuredStorages || missingSecuredCollections">
         <div class="panel-body text-center empty-instance">
-          <p>None of your resources are secured. <span class="nowrap">Which one would you like to secure first?</span> <i class="fa fa-info-circle" data-tooltip-placement="right" data-tooltip="Resources are secured individually only in storage and collections."></i></p>
+          <p>None of your resources are secured. <span class="nowrap">Which one would you like to secure first?</span> <i class="fa fa-info-circle" data-tooltip-placement="top" data-tooltip="Resources are secured individually only in storage and collections."></i></p>
 
           <ul class="resources-list">
             <li class="btn btn-link" ng-class="{'disabled': (unsecuredStorages.length === 0)}">
@@ -152,19 +152,19 @@
                 <span class="icon-label">Collections</span>
               </a>
             </li>
-            <li class="btn btn-link">
+            <li class="btn btn-link" ng-class="{'disabled': (!hasPushRes)}">
               <a href="#/applications/{{curApp.id}}/security/secure-push">
                 <i class="fa fa-mobile"></i>
                 <span class="icon-label">Push</span>
               </a>
             </li>
-            <li class="btn btn-link">
+            <li class="btn btn-link" ng-class="{'disabled': (!hasClientsRes)}">
               <a href="#/applications/{{curApp.id}}/security/secure-clients">
                 <i class="fa fa-globe"></i>
                 <span class="icon-label">Clients</span>
               </a>
             </li>
-            <li class="btn btn-link">
+            <li class="btn btn-link" ng-class="{'disabled': (!hasBusinessLogicRes)}">
               <a href="#/applications/{{curApp.id}}/security/secure-logic">
                 <i class="fa fa-code"></i>
                 <span class="icon-label">Logic</span>

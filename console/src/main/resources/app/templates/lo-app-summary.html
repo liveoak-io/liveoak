@@ -13,12 +13,13 @@
   <div class="panel-body">
     <ul class="lo-app-opts">
       <!--<li ng-repeat="s in app.storage.members" ng-show="s.MongoClientOptions"><a href="#/applications/{{app.id}}/storage/{{s.id}}/browse"><i class="fa fa-briefcase"></i>{{app.mongo_storages}} Mongo DB</a></li>-->
-      <li ng-show="app.mongoStorages > 0"><a href="#/applications/{{app.id}}/storage/"><i class="fa fa-cloud" tooltip="Storage databases"></i>{{app.mongoStorages}} mongoDB<span>, n collections</span></a></li><!-- FIXME: make the n dynamic, don't show the collections if no collections -->
+      <li ng-show="app.mongoStorages > 0"><a href="#/applications/{{app.id}}/storage/"><i class="fa fa-cloud" tooltip="Storage databases"></i>{{app.mongoStorages}} mongoDB</a></li>
       <li ng-show="app.mongoStorages <= 0" class="empty"><a href="#/applications/{{app.id}}/storage/"><i class="fa fa-cloud" tooltip="Storage databases"></i>No Storage</a></li>
-      <li ng-show="true"><a href="#/applications/{{app.id}}/security"><i class="fa fa-lock" tooltip="Security"></i><!-- {{$parent.auth.realm}} -->n resources secured</a></li><!-- FIXME: make the n dynamic, show "liveoak-admin" when no resources secured -->
+      <li><a href="#/applications/{{app.id}}/security"><i class="fa fa-lock" tooltip="Security"></i>{{(app.storage.members|filter: { id: 'uri-policy'}|ures|unique).length || 'No'}} resources secured</a></li>
       <li ng-show="app.push.upsURL"><a href="#/applications/{{app.id}}/push"><i class="fa fa-mobile" tooltip="Push"></i>Push set up</a></li>
       <li ng-hide="app.push.upsURL" class="empty"><a href="#/applications/{{app.id}}/push"><i class="fa fa-mobile" tooltip="Push"></i>No Push set up</a></li>
-      <li class="empty"><a href="#/applications/{{app.id}}/application-clients"><i class="fa fa-globe" tooltip="Clients"></i>No Clients set up</a></li>
+      <li ng-show="(app.storage.members|filter: { id: 'application-clients'})[0].members.length > 0"><a href="#/applications/{{app.id}}/application-clients"><i class="fa fa-globe" tooltip="Clients"></i>{{(app.storage.members|filter: { id: 'application-clients'})[0].members.length}} Client(s) configured</a></li>
+      <li ng-hide="(app.storage.members|filter: { id: 'application-clients'})[0].members.length > 0" class="empty"><a href="#/applications/{{app.id}}/application-clients"><i class="fa fa-globe" tooltip="Clients"></i>No Clients set up</a></li>
       <li ng-show="!app.scriptsCount || app.scriptsCount <= 0" class="empty"><a href="#/applications/{{app.id}}/business-logic"><i class="fa fa-code" tooltip="Business Logic"></i> No Logic set up</a></li>
       <li ng-show="app.scriptsCount > 0"><a href="#/applications/{{app.id}}/business-logic"><i class="fa fa-code" tooltip="Business Logic"></i>{{(app.scripts|filter:'resource-triggered-scripts')[0].count}} Script(s) installed</a></li>
     </ul>

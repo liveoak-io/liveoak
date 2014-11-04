@@ -127,3 +127,57 @@ loFilters.filter('clientname', function() {
     return clientName ? clientName.replace(new RegExp('^liveoak.client.' + appName + '.'), '') : clientName;
   }
 });
+
+loFilters.filter('ures', function () {
+  return function(item) {
+    if (item) {
+      var uris = [];
+      for (var i = 0; i < item.length; i++) {
+        for (var j = 0; j < item[i].rules.length; j++) {
+          if(item[i].rules[j].uriPattern !== '*') {
+            uris.push(item[i].rules[j].uriPattern.replace(/\/\*$/,''));
+          }
+        }
+      }
+      return uris;
+    }
+  }
+});
+
+
+/* taken from http://angular-ui.github.io/ui-utils/dist/ui-utils.js */
+loFilters.filter('unique', ['$parse', function ($parse) {
+
+  return function (items, filterOn) {
+
+    if (filterOn === false) {
+      return items;
+    }
+
+    if ((filterOn || angular.isUndefined(filterOn)) && angular.isArray(items)) {
+      var newItems = [],
+        get = angular.isString(filterOn) ? $parse(filterOn) : function (item) { return item; };
+
+      var extractValueToCompare = function (item) {
+        return angular.isObject(item) ? get(item) : item;
+      };
+
+      angular.forEach(items, function (item) {
+        var isDuplicate = false;
+
+        for (var i = 0; i < newItems.length; i++) {
+          if (angular.equals(extractValueToCompare(newItems[i]), extractValueToCompare(item))) {
+            isDuplicate = true;
+            break;
+          }
+        }
+        if (!isDuplicate) {
+          newItems.push(item);
+        }
+
+      });
+      items = newItems;
+    }
+    return items;
+  };
+}]);
