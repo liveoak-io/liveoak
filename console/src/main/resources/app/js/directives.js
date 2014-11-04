@@ -78,8 +78,9 @@ loDirectives.directive('loStorageSummary', function (LoCollection) {
     replace: true,
     templateUrl: '/admin/console/templates/lo-storage-summary.html',
     link: function(scope){
-      LoCollection.getList({appId: scope.loApp.id, storageId: scope.storage.path}, function(){
-        scope.storage.hasCollections = true;
+      LoCollection.getList({appId: scope.loApp.id, storageId: scope.storage.path}, function(storage){
+        scope.storage.collections = storage.members;
+        scope.storage.hasCollections = true; // FIXME: wrong attribute name ?
       });
     }
   };

@@ -732,7 +732,7 @@ loMod.controller('NextStepsCtrl', function($scope, $rootScope, $routeParams, cur
   /* jshint unused: false */
   angular.forEach(loStorageList.members, function (value, key) {
     if (value.hasOwnProperty('db')) {
-      this.push({id: value.id, provider: value.hasOwnProperty('MongoClientOptions') ? 'mongoDB' : 'unknown'});
+      this.push({id: value.id, provider: value.hasOwnProperty('MongoClientOptions') ? 'mongoDB' : 'unknown', port: value.servers[0].port || '?'});
     }
     else if(value.hasOwnProperty('upsURL')) {
       $scope.pushConfig = value;

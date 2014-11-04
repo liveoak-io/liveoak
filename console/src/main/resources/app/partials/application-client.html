@@ -1,4 +1,4 @@
-<div class="col-md-9 lo-main-pane application-client">
+<div class="col-md-10 lo-main-pane application-client">
 
   <div class="row">
     <div class="lo-content-area col-md-12">
@@ -34,7 +34,7 @@
               </label>
               <label ng-repeat="platform in platformsCustom" class="checkbox-inline custom"
                      ng-class="{'active': settings.type == platform}">
-                <input type="radio" name="platform" ng-model="settings.type" value="{{platform}}">{{platform}}
+                <input type="radio" name="platform" ng-model="settings.type" value="{{platform||'Custom'}}">{{platform||'Custom'}}
               </label>
               <span data-tooltip-placement="top" data-tooltip="Add Platform">
                 <button type="button" class="btn btn-link btn-icon inline add-condition" ng-click="modalPlatformAdd()">
