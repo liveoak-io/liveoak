@@ -138,14 +138,23 @@ loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $route
     var scriptMeta = angular.copy($scope.script);
     var scriptCode = angular.copy($scope.script.code);
     delete(scriptMeta.code);
-    scriptMeta.$create({'appId': currentApp.id, 'type':'resource-triggered-scripts'},
+    var params = {'appId': currentApp.id, 'type':'resource-triggered-scripts'};
+    if ($scope.create) {
+      var method = '$create';
+    }
+    else {
+      var method =  '$update';
+      params['scriptId'] = scriptMeta.id;
+    }
+
+    scriptMeta[method](params,
       function(data) {
         $scope.script = angular.copy(data);
         //Notifications.success('The script "' + $scope.script.id + '" has been created.');
         //$scope.script.$setSource({'appId': currentApp.id, 'type':'resource-triggered-scripts'});
         $http({
-          method: 'POST',
-          url: '/admin/applications/' + currentApp.id + '/resources/scripts/resource-triggered-scripts/' + $scope.script.id,
+          method: ($scope.create ? 'POST' : 'PUT'),
+          url: '/admin/applications/' + currentApp.id + '/resources/scripts/resource-triggered-scripts/' + $scope.script.id + ($scope.create ? '' : '/script'),
           headers: { 'Content-Type':'application/javascript' },
           data: scriptCode
         }).

@@ -522,6 +522,9 @@ loMod.factory('LoBusinessLogicScripts', function($resource) {
     create: {
       method: 'POST'
     },
+    update: {
+      method: 'PUT'
+    },
     getResource : {
       method : 'GET',
       url: '/admin/applications/:appId/resources/scripts/'
