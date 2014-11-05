@@ -21,15 +21,15 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.fest.assertions.Fail.fail;
 
 /**
- * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
- * @author Ken Finnigan
- */
+* @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+* @author Ken Finnigan
+*/
 public class MongoDatastoreTest extends BaseMongoConfigTest {
 
     @BeforeClass
     public static void loadExtensions() throws Exception {
         JsonNode configNode = ObjectMapperFactory.create().readTree(
-                "{ db: 'testDataStoresDB', datastore: 'foo'}");
+                "{}");
 
         JsonNode instancesNode = ObjectMapperFactory.create().readTree(
                 "{" +
@@ -45,8 +45,10 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
     public void testReadDataStoreInstances() throws Exception {
         ResourceState systemConfigState = client.read(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH);
 
-        assertThat(systemConfigState.getProperty("db")).isEqualTo("testDataStoresDB");
-        assertThat(systemConfigState.getProperty("datastore")).isEqualTo("foo");
+        assertThat(systemConfigState.getProperty("servers")).isNotNull();
+        ResourceState server = (ResourceState)systemConfigState.getProperty("servers", true, List.class).get(0);
+        assertThat(server.getProperty("host")).isEqualTo("127.0.0.1");
+        assertThat(server.getProperty("port")).isEqualTo(27017);
 
         ResourceState instancesConfig = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), INSTANCES_CONFIG_PATH);
 
@@ -125,8 +127,7 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
         client.delete(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), INSTANCES_CONFIG_PATH + "/bort");
     }
 
-    //TODO Breaks because delete a system instance does not remove the service
-//    @Test
+    @Test
     public void testDeleteDataStore() throws Exception {
         ResourceState deleteState = client.delete(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), INSTANCES_CONFIG_PATH + "/foo");
         assertThat(deleteState.id()).isEqualTo("foo");
@@ -221,11 +222,16 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
 
     @Test
     public void testInvalidDatastore() throws Exception {
-        ResourceState updateState = client.read(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH);
+        ResourceState config = new DefaultResourceState();
+        config.putProperty("db", "testInvalidDatastore");
+        config.putProperty("datastore", "foo");
+        setUpSystem(config);
+
+        ResourceState updateState = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
         updateState.putProperty("datastore", "bat"); //bat doesn't exist as a datastore
 
         try {
-            client.update(new RequestContext.Builder().build(), SYSTEM_CONFIG_PATH, updateState);
+            client.update(new RequestContext.Builder().build(), ADMIN_PATH, updateState);
             fail();
         } catch (ResourceException e) {
             //expected

@@ -18,6 +18,7 @@ import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.interceptor.extension.InterceptorExtension;
 import io.liveoak.mongo.extension.MongoExtension;
+import io.liveoak.mongo.internal.extension.MongoInternalExtension;
 import io.liveoak.security.policy.acl.extension.SecurityACLPolicyExtension;
 import io.liveoak.security.policy.acl.integration.AclPolicyConfigResource;
 import io.liveoak.spi.RequestAttributes;
@@ -42,7 +43,8 @@ public class AclPolicyRootResourceTest extends AbstractTestCaseWithTestApp {
     @BeforeClass
     public static void loadExtensions() throws Exception {
         loadExtension("interceptor", new InterceptorExtension(), createInterceptorConfig());
-        loadExtension("mongo", new MongoExtension(), createMongoConfig());
+        loadExtension("mongo", new MongoExtension(), JsonNodeFactory.instance.objectNode());
+        loadExtension("mongo-internal", new MongoInternalExtension(), createMongoInternalConfig());
         loadExtension("acl-policy", new SecurityACLPolicyExtension());
         loadExtension("mock-storage", new MockExtension(MockAclTestStorageResource.class));
 
@@ -65,7 +67,7 @@ public class AclPolicyRootResourceTest extends AbstractTestCaseWithTestApp {
         return objectNode;
     }
 
-    private static ObjectNode createMongoConfig() {
+    private static ObjectNode createMongoInternalConfig() {
         String database = System.getProperty("mongo.db", "liveoak-acl");
         Integer port = new Integer(System.getProperty("mongo.port", "27017"));
         String host = System.getProperty("mongo.host", "localhost");
