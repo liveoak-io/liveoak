@@ -5,7 +5,6 @@ import io.liveoak.mongo.RootMongoResourceService;
 import io.liveoak.mongo.config.MongoDatastoreService;
 import io.liveoak.mongo.config.MongoDatastoresRegistry;
 import io.liveoak.mongo.config.RootMongoConfigResource;
-import io.liveoak.mongo.internal.InternalMongoService;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
@@ -20,7 +19,6 @@ import org.jboss.msc.value.ImmediateValue;
  */
 public class MongoExtension implements Extension {
 
-    public static final ServiceName INTERNAL_MONGO_SERVICE_NAME = Services.LIVEOAK.append("internal").append("mongo");
     public static final ServiceName SYSTEM_MONGO_CONFIG_SERVICE = Services.LIVEOAK.append("system").append("mongo");
     public static final ServiceName SYSTEM_MONGO_ROOT_RESOURCE = Services.LIVEOAK.append("system").append("mongo").append("root");
     public static final ServiceName SYSTEM_MONGO_DATASTORE_CONFIG_SERVICE = Services.LIVEOAK.append("system").append("mongo").append("datastores");
@@ -30,17 +28,14 @@ public class MongoExtension implements Extension {
 
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
-        //Create a rootMongoConfigResource here which configures the internal root mongo resource
-        MongoConfigResourceService mongoConfigResourceService = new MongoConfigResourceService(context.id());
-        context.target().addService(SYSTEM_MONGO_CONFIG_SERVICE, mongoConfigResourceService)
-                .addDependency(SYSTEM_MONGO_DATASTORE_CONFIG_SERVICE, MongoDatastoresRegistry.class, mongoConfigResourceService.mongoDatastoreInjector)
+        ServiceName serviceName = Services.systemResource(context.moduleId(), context.id());
+        MongoDatastoreService mongoDatastoreService = new MongoDatastoreService();
+        context.target().addService(serviceName, mongoDatastoreService)
+                .addDependency(SYSTEM_MONGO_DATASTORE_CONFIG_SERVICE, MongoDatastoresRegistry.class, mongoDatastoreService.mongoDatastoreInjector)
+                .addInjection(mongoDatastoreService.idInjector, context.id())
                 .install();
-        context.mountPrivate(SYSTEM_MONGO_CONFIG_SERVICE);
+        context.mountPrivate(serviceName);
 
-        InternalMongoService internalMongoService = new InternalMongoService();
-        context.target().addService(INTERNAL_MONGO_SERVICE_NAME, internalMongoService)
-                .addDependency(SYSTEM_MONGO_CONFIG_SERVICE, RootMongoConfigResource.class, internalMongoService.configResourceInjector)
-                .install();
 
         MongoDatastoresRegistry mongoDatastoresResource = new MongoDatastoresRegistry();
         ValueService<RootResource> instanceConfigService = new ValueService(new ImmediateValue(mongoDatastoresResource));

@@ -9,6 +9,7 @@ import com.mongodb.WriteConcern;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.mongo.extension.MongoExtension;
+import io.liveoak.mongo.internal.extension.MongoInternalExtension;
 import io.liveoak.spi.state.ResourceState;
 import io.liveoak.testtools.AbstractTestCaseWithTestApp;
 import org.jboss.logging.Logger;
@@ -46,7 +47,8 @@ public class BaseUPSTestCase extends AbstractTestCaseWithTestApp {
         server.put("port", port);
 
         config.putArray("servers").add(server);
-        loadExtension("mongo", new MongoExtension(), config);
+        loadExtension("mongo", new MongoExtension(), JsonNodeFactory.instance.objectNode());
+        loadExtension("mongo-internal", new MongoInternalExtension(), config);
 
         try {
             mongoClient = new MongoClient(host, port);

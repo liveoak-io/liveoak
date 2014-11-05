@@ -421,6 +421,11 @@
             </dependency>
             <dependency>
                 <groupId>io.liveoak</groupId>
+                <artifactId>liveoak-mongo-internal</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.liveoak</groupId>
                 <artifactId>liveoak-filesystem</artifactId>
                 <version>${project.version}</version>
             </dependency>

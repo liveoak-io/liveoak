@@ -1,6 +1,6 @@
 package io.liveoak.mongo.internal;
 
-import io.liveoak.mongo.extension.MongoExtension;
+import io.liveoak.mongo.internal.extension.MongoInternalExtension;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
@@ -21,11 +21,11 @@ public class InternalStorageFactory {
      */
     public static ServiceName createService(ServiceTarget serviceContainer, String appName, String resourceId) {
 
-        ServiceName serviceName = MongoExtension.INTERNAL_MONGO_SERVICE_NAME.append(appName).append(resourceId);
+        ServiceName serviceName = MongoInternalExtension.INTERNAL_MONGO_SERVICE_NAME.append(appName).append(resourceId);
 
         InternalStorageService internalStorageService = new InternalStorageService();
         serviceContainer.addService(serviceName, internalStorageService)
-                .addDependency(MongoExtension.INTERNAL_MONGO_SERVICE_NAME, InternalStorageManager.class, internalStorageService.internalStorageManagerInjector)
+                .addDependency(MongoInternalExtension.INTERNAL_MONGO_SERVICE_NAME, InternalStorageManager.class, internalStorageService.internalStorageManagerInjector)
                 .addInjection(internalStorageService.appNameInjector, appName)
                 .addInjection(internalStorageService.resourceIdInjector, resourceId)
                 .install();
