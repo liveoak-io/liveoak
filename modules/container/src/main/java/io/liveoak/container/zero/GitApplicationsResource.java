@@ -59,11 +59,12 @@ public class GitApplicationsResource implements RootResource, SynchronousResourc
         boolean cloneSucceeded = false;
 
         try {
-            Git.cloneRepository()
+            Git repo = Git.cloneRepository()
                     .setURI(gitUrl)
                     .setRemote("upstream")
                     .setDirectory(installDir)
                     .call();
+            repo.close();
             cloneSucceeded = true;
         } catch (InvalidRemoteException ire) {
             responder.invalidRequest(String.format(INVALID_REQUEST_MESSAGE, gitUrl));
@@ -82,6 +83,7 @@ public class GitApplicationsResource implements RootResource, SynchronousResourc
             try {
                 Git gitRepo = GitHelper.initRepo(dir);
                 GitHelper.addAllAndCommit(gitRepo, ctx.securityContext().getUser(), "Import LiveOak application from git: " + gitUrl);
+                gitRepo.close();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

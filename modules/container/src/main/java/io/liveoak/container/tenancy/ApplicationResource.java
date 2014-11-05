@@ -115,7 +115,7 @@ public class ApplicationResource implements RootResource, SynchronousResource {
         this.configManager.updateApplication(this.app);
 
         Boolean partOfGitInstallProcess = (Boolean) state.getProperty("git-install-process");
-        if (this.app.versioned() && partOfGitInstallProcess == null || !partOfGitInstallProcess) {
+        if (this.app.versioned() && (partOfGitInstallProcess == null || !partOfGitInstallProcess)) {
             // Wrap current responder with one that will perform commit of version changes
             responder = new ConfigVersioningResponder(responder, app.versioned(), app.versionedResourcePath(), this.client, ctx.securityContext());
         }

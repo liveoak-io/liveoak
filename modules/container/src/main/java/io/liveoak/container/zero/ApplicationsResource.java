@@ -36,6 +36,7 @@ public class ApplicationsResource extends DefaultMountPointResource {
                 log.debug("Init git repo for: " + installDir);
                 Git gitRepo = GitHelper.initRepo(installDir);
                 GitHelper.addAllAndCommit(gitRepo, ctx.securityContext().getUser(), "Initial creation of LiveOak application");
+                gitRepo.close();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

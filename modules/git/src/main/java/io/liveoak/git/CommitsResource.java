@@ -61,21 +61,26 @@ public class CommitsResource implements SynchronousResource {
             addCmd.setUpdate(true);
         }
 
-        addCmd.call();
-
         // Commit staged changes
+        RevCommit commit;
         CommitCommand commitCmd = parent.git().commit();
 
-        UserProfile user = ctx.securityContext().getUser();
-        if (user != null && user.name() != null && user.email() != null) {
-            commitCmd.setCommitter(user.name(), user.email());
+        if (ctx.securityContext() != null) {
+            UserProfile user = ctx.securityContext().getUser();
+            if (user != null && user.name() != null && user.email() != null) {
+                commitCmd.setCommitter(user.name(), user.email());
+            }
         }
 
         if (commitMsg != null) {
             commitCmd.setMessage(commitMsg);
         }
 
-        RevCommit commit = commitCmd.call();
+        synchronized (this) {
+            // Execute add and commit
+            addCmd.call();
+            commit = commitCmd.call();
+        }
 
         responder.resourceCreated(new GitCommitResource(this, commit));
     }

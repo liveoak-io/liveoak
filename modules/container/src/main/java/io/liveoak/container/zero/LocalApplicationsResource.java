@@ -72,6 +72,7 @@ public class LocalApplicationsResource implements RootResource, SynchronousResou
                     InternalApplication app = this.applicationRegistry.createApplication(id, (String) state.getProperty("name"), installDir, d -> {
                         try {
                             GitHelper.addAllAndCommit(gitRepo, ctx.securityContext().getUser(), "Import LiveOak application from: " + copyFromPath);
+                            gitRepo.close();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
