@@ -11,6 +11,7 @@ import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
+import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
@@ -43,6 +44,7 @@ public class GitApplicationsResource implements RootResource, SynchronousResourc
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         String gitUrl = state.getPropertyAsString("url");
         String id = state.id();
+        String branch = state.getPropertyAsString("branch");
 
         if (gitUrl == null || gitUrl.length() == 0) {
             responder.invalidRequest(String.format(INVALID_REQUEST_MESSAGE, gitUrl));
@@ -59,11 +61,16 @@ public class GitApplicationsResource implements RootResource, SynchronousResourc
         boolean cloneSucceeded = false;
 
         try {
-            Git repo = Git.cloneRepository()
+            CloneCommand cloneCommand = Git.cloneRepository()
                     .setURI(gitUrl)
                     .setRemote("upstream")
-                    .setDirectory(installDir)
-                    .call();
+                    .setDirectory(installDir);
+
+            if (branch != null && branch.length() > 0) {
+                cloneCommand.setBranch(branch);
+            }
+
+            Git repo = cloneCommand.call();
             repo.close();
             cloneSucceeded = true;
         } catch (InvalidRemoteException ire) {
