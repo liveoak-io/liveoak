@@ -9,6 +9,7 @@ import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -21,7 +22,7 @@ public class MongoInternalExtension implements Extension {
 
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
-        System.err.println("MONGOINTERNALEXTENSION");
+        log.info("Startup internal Mongo instance");
 
         InternalMongoService internalMongoService = new InternalMongoService();
         context.target().addService(INTERNAL_MONGO_SERVICE_NAME, internalMongoService)
@@ -46,4 +47,5 @@ public class MongoInternalExtension implements Extension {
         //do nothing
     }
 
+    private static final Logger log = Logger.getLogger(MongoInternalExtension.class);
 }
