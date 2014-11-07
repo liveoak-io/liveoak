@@ -48,7 +48,7 @@ public class KeycloakServerApplication extends KeycloakApplication {
             consoleApp = new ApplicationManager(manager).createApplication(adminRealm, "console");
             consoleApp.setPublicClient(true);
 
-            consoleApp.setAllowedClaimsMask(ClaimMask.USERNAME);
+            consoleApp.setAllowedClaimsMask(ClaimMask.ALL);
             consoleApp.addRedirectUri("/admin");
             consoleApp.addRedirectUri("/admin/");
             consoleApp.setBaseUrl("/admin/");
