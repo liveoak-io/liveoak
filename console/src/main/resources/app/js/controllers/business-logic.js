@@ -139,12 +139,13 @@ loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $route
     var scriptCode = angular.copy($scope.script.code);
     delete(scriptMeta.code);
     var params = {'appId': currentApp.id, 'type':'resource-triggered-scripts'};
+    var method;
     if ($scope.create) {
-      var method = '$create';
+      method = '$create';
     }
     else {
-      var method =  '$update';
-      params['scriptId'] = scriptMeta.id;
+      method =  '$update';
+      params.scriptId = scriptMeta.id;
     }
 
     scriptMeta[method](params,
