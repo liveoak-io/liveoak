@@ -5,6 +5,7 @@ import java.io.File;
 import io.liveoak.common.util.StringPropertyReplacer;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
+import io.liveoak.container.zero.git.GitHelper;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;

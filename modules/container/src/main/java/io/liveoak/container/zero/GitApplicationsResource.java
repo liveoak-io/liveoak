@@ -5,6 +5,8 @@ import java.io.File;
 import io.liveoak.common.util.FileHelper;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
+import io.liveoak.container.zero.git.GitHelper;
+import io.liveoak.container.zero.git.LiveOakSshSessionFactory;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
@@ -15,6 +17,10 @@ import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.transport.SshSessionFactory;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+
+import static io.liveoak.common.util.StringUtils.hasValue;
 
 /**
  * @author Ken Finnigan
@@ -45,13 +51,23 @@ public class GitApplicationsResource implements RootResource, SynchronousResourc
         String gitUrl = state.getPropertyAsString("url");
         String id = state.id();
         String branch = state.getPropertyAsString("branch");
+        String user = state.getPropertyAsString("user");
+        String password = state.getPropertyAsString("pwd");
+        String passphrase = state.getPropertyAsString("passphrase");
 
-        if (gitUrl == null || gitUrl.length() == 0) {
+        if (!hasValue(gitUrl)) {
             responder.invalidRequest(String.format(INVALID_REQUEST_MESSAGE, gitUrl));
             return;
         }
 
-        if (id == null || id.length() == 0) {
+        if (!gitUrl.startsWith("http://")) {
+            if (!hasValue(passphrase) && !hasValue(user)) {
+                responder.invalidRequest("SSH passphrase or user/pwd need to be set when cloning secure repositories.");
+                return;
+            }
+        }
+
+        if (!hasValue(id)) {
             int start = gitUrl.lastIndexOf('/');
             int end = gitUrl.indexOf(".git", start);
             id = gitUrl.substring(start + 1, end);
@@ -66,8 +82,19 @@ public class GitApplicationsResource implements RootResource, SynchronousResourc
                     .setRemote("upstream")
                     .setDirectory(installDir);
 
-            if (branch != null && branch.length() > 0) {
+            if (hasValue(branch)) {
+                // Set branch to checkout
                 cloneCommand.setBranch(branch);
+            }
+
+            if (hasValue(user) && hasValue(password)) {
+                // Set credentials for cloning
+                cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(user, password));
+            }
+
+            if (hasValue(passphrase)) {
+                // Set SSH factory
+                SshSessionFactory.setInstance(new LiveOakSshSessionFactory(passphrase));
             }
 
             Git repo = cloneCommand.call();
@@ -80,7 +107,7 @@ public class GitApplicationsResource implements RootResource, SynchronousResourc
             responder.invalidRequest("Unable to connect to git repo due to: " + te.getMessage());
             return;
         } finally {
-            if (!cloneSucceeded) {
+            if (!cloneSucceeded && installDir.exists()) {
                 // Remove application directory
                 FileHelper.deleteNonEmpty(installDir);
             }

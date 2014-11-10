@@ -13,7 +13,7 @@
 
     <dependencies>
         <module name="javax.api"/>
-        <module name="com.jcraft.jsch"/>
+        <module name="com.jcraft.jsch" export="true"/>
         <module name="com.googlecode.javaewah"/>
     </dependencies>
 
