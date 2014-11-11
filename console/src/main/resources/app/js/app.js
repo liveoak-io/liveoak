@@ -538,8 +538,8 @@ loMod.config(['$routeProvider', function($routeProvider) {
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
         },
-        currentCollectionList: function(LoCollectionListLoader){
-          return new LoCollectionListLoader();
+        currentCollectionList: function(loLiveLoader, LoLiveCollectionList, $route){
+          return loLiveLoader(LoLiveCollectionList.get, {appId : $route.current.params.appId,storageId : $route.current.params.storageId});
         }
       },
       templateUrl: '/admin/console/partials/storage-collection.html'
