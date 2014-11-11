@@ -549,11 +549,17 @@ loMod.factory('LoBusinessLogicScripts', function($resource) {
 
 // Loader service using the subscriptions to maintain live data. The service name starts with lowercase character,
 // because it's supposed to be used as a function.
-loMod.service('loLiveLoader', function($q, loSuperSubscribe) {
+loMod.service('loLiveLoader', function($q, loLiveSubscribe) {
   return function(resourceMethod, resourceParameters, forceReload){
     // function for actual loading of the data
     function restGet(method, parameters){
-      var i = parameters && parameters();
+      var i;
+
+      if(angular.isFunction(parameters)) {
+        i = parameters();
+      } else {
+        i = parameters;
+      }
 
       // The live data are stored as a function "field" (in JS, even function is an object and can have fields)
       // It's important to understand, that we're storing the data in a promise.
@@ -579,7 +585,7 @@ loMod.service('loLiveLoader', function($q, loSuperSubscribe) {
         resourceMethod.$live = restGet(resourceMethod, resourceParameters);
 
         // Subscribe callbacks
-        loSuperSubscribe(resourceMethod);
+        loLiveSubscribe(resourceMethod);
 
         // And return
         return resourceMethod.$live;
@@ -598,7 +604,7 @@ loMod.service('loLiveLoader', function($q, loSuperSubscribe) {
 
 // No magic here, just a service used for subscribing callback on particular URL. Have a look on resource definition
 // for better understanding.
-loMod.factory('loSuperSubscribe', function($resource, LiveOak, $rootScope, $q) {
+loMod.factory('loLiveSubscribe', function($resource, LiveOak, $rootScope, $q) {
   return function(method){
 
     var delay = $q.defer();
@@ -662,6 +668,62 @@ loMod.factory('LoLiveAppList', function($resource) {
       },
       delete: function (data) {
         res.getList.$live.then(function(promise){
+          if(!promise.members) {
+            return promise;
+          }
+
+          for(var i = 0; i < promise.members.length; i++){
+            if (data.id === promise.members[i].id) {
+              promise.members.splice(i, 1);
+              break;
+            }
+          }
+
+          return promise;
+        });
+      }
+    }
+  };
+
+  return res;
+});
+
+loMod.factory('LoLiveCollectionList', function($resource, $route) {
+
+  // Url of the original resource
+  var url = '/' + $route.current.params.appId + '/' + $route.current.params.storageId + '/',
+    res = $resource('/:appId/:storageId', {
+      appId : '@appId',
+      storageId : '@storageId'
+    }, {
+      get : {
+        method : 'GET'
+      }
+    });
+
+  console.log(url);
+
+  // For each $resource functions we can register subscription callbacks. The subscription URL can be different to
+  // the $resource URL.
+  res.get.loSubscription = {
+    url: url,
+    // Callbacks are maintaining the data structure based on subscription calls. The property is the subscription "action"
+    // and the value is a function(data), where data are data returned by subscription call. The only tricky part here
+    // is to have in mind, that we're working with promises, so the body would be often in the "then" method and we
+    // need to return the result in a form of promise, too.
+    callbacks: {
+      create: function (data) {
+        res.get.$live.then(function(promise){
+          if(!promise.members) {
+            promise.members = [];
+          }
+
+          promise.members.push(data);
+          return promise;
+        });
+      },
+      delete: function (data) {
+        res.get.$live.then(function(promise){
           if(!promise.members) {
             return promise;
           }
