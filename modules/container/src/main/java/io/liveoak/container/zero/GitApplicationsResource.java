@@ -60,13 +60,6 @@ public class GitApplicationsResource implements RootResource, SynchronousResourc
             return;
         }
 
-        if (!gitUrl.startsWith("http://")) {
-            if (!hasValue(passphrase) && !hasValue(user)) {
-                responder.invalidRequest("SSH passphrase or user/pwd need to be set when cloning secure repositories.");
-                return;
-            }
-        }
-
         if (!hasValue(id)) {
             int start = gitUrl.lastIndexOf('/');
             int end = gitUrl.indexOf(".git", start);
