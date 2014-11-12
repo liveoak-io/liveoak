@@ -6,6 +6,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
 
 import io.liveoak.keycloak.theme.LiveOakLoginThemeProviderFactory;
+import org.jboss.logging.Logger;
 import org.jboss.resteasy.core.Dispatcher;
 import org.keycloak.Config;
 import org.keycloak.enums.SslRequired;
@@ -13,6 +14,7 @@ import org.keycloak.models.ApplicationModel;
 import org.keycloak.models.ClaimMask;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.services.managers.ApplicationManager;
@@ -20,6 +22,10 @@ import org.keycloak.services.managers.RealmManager;
 import org.keycloak.services.resources.KeycloakApplication;
 
 public class KeycloakServerApplication extends KeycloakApplication {
+
+    private static final String LIVEOAK_INITIAL_PASSWORD_PARAMETER = "liveoak.initial.password";
+
+    private static final Logger log = Logger.getLogger(KeycloakServerApplication.class);
 
     public KeycloakServerApplication(@Context ServletContext context, @Context Dispatcher dispatcher) throws FileNotFoundException {
         super(context, dispatcher);
@@ -52,6 +58,21 @@ public class KeycloakServerApplication extends KeycloakApplication {
             consoleApp.addRedirectUri("/admin");
             consoleApp.addRedirectUri("/admin/");
             consoleApp.setBaseUrl("/admin/");
+
+            //check if we should create a customized default password for LiveOak's KeyCloak instance
+            String initialPassword = System.getProperty(LIVEOAK_INITIAL_PASSWORD_PARAMETER);
+            if (initialPassword != null) {
+                //Create a new, initial password for the admin user
+                UserCredentialModel password = new UserCredentialModel();
+                password.setType(UserCredentialModel.PASSWORD);
+                password.setValue(initialPassword);
+
+                session.users().getUserByUsername("admin", adminRealm).updateCredential(password);
+
+                log.info("############################################################");
+                log.info("INITIAL LIVEOAK PASSWORD IS : " + initialPassword);
+                log.info("############################################################");
+            }
 
             consoleApp.addScopeMapping(adminRealm.getRole("admin"));
         }
