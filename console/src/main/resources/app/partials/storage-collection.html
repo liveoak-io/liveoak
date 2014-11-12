@@ -76,40 +76,31 @@
               <div class="advanced-search">
                 <a href class="dropdown-toggle-button advanced" ng-click="showAdvanced = !showAdvanced">Advanced Search</a>
                 <a class="dropdown-toggle-button search-clear" href
-                   ng-show="searchQuery !== '' || filterColumns.length !== 0"
+                   ng-show="searchQuery !== '' || filterConditions.length > 0"
                    ng-click="searchClear()">Clear Search</a>
                 <div class="asearch popover bottom" ng-show="showAdvanced" lo-autoclose>
                   <div class="arrow"></div>
-                  <div class="form-group">
-                    <label for="columns-select">Search in Columns</label>
-                    <select pf-select class="select selectpicker" multiple id="columns-select"
-                            ng-model="searchColumns" ng-options="o as o for o in columns">
-                    </select>
-                  </div>
                   <div class="form-group">
                     <label for="condition-input">Condition</label>
 
                     <div class="inline-items" ng-repeat="condition in searchConditions">
 
-                      <select pf-select="false" class="select selectpicker inline"
-                              ng-model="condition.type" id="condition-input">
+                      <select pf-select="false" class="select selectpicker inline" id="columns-select"
+                              ng-model="condition.column" ng-options="o as o for o in columns" ng-change="conditionWatcher()">
+                      </select>
+
+                      <select pf-select="false" class="select selectpicker inline" id="condition-input"
+                              ng-model="condition.type" ng-change="conditionWatcher()">
                         <option value="E">Equals</option>
                         <option value="N">Not equal</option>
                       </select>
 
                       <input class="inline form-control" type="text" placeholder="Contains text"
-                             ng-model="condition.text">
+                             ng-model="condition.text" ng-change="conditionWatcher()">
 
                       <button type="button" ng-click="searchConditionRemove($index)" ng-show="$index > 0"
                               class="btn btn-link btn-icon inline add-condition">
                         <i class="fa fa-minus-circle" data-tooltip-placement="top" data-tooltip="Remove Condition"></i><span>Remove Condition</span></button>
-
-                      <!--
-                      <button ng-show="$last"
-                              data-placement="top" data-toggle="tooltip" type="button" ng-click="searchConditionAdd()"
-                              class="btn btn-link btn-icon inline add-condition" data-original-title="Add Condition">
-                        <i class="fa fa-plus-circle"></i><span>Add Condition</span></button>
-                        -->
                     </div>
                   </div>
 
@@ -117,8 +108,8 @@
                      tooltip-placement="right" tooltip="On the Right!" tooltip-trigger="{{myFoo}}">Add Condition</a>
 
                   <div class="pull-right form-actions" tooltip-placement="top"
-                       tooltip="{{ (searchConditionsEmpty || (searchColumns.length === 0)) ? 'No columns set or conditions missing.' : '' }}">
-                    <button type="submit" class="btn btn-primary btn-lg" ng-disabled="searchConditionsEmpty || (searchColumns.length === 0)"
+                       tooltip="{{ searchConditionsEmpty ? 'No columns set or conditions missing.' : '' }}">
+                    <button type="submit" class="btn btn-primary btn-lg" ng-disabled="searchConditionsEmpty"
                             ng-click="advancedSearch()">Search</button>
                   </div>
                 </div>
@@ -217,7 +208,7 @@
           </tr>
 
           <!-- Original rows, editing happens here -->
-          <tr ng-repeat="item in collectionData | orderBy:predicate:reverse | conditional:searchQuery:filterColumns:filterConditions"
+          <tr ng-repeat="item in collectionData | orderBy:predicate:reverse | condition:filterConditions | dataContains: searchQuery"
               ng-class="{deleted: rowsToDelete.indexOf(item['id']) > -1}">
 
             <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}"
