@@ -5,13 +5,10 @@
  */
 package io.liveoak.stomp.client;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import io.liveoak.stomp.Headers;
@@ -322,8 +319,6 @@ public class StompClient {
     private Stomp.Version version = Stomp.Version.VERSION_1_2;
     private Channel channel;
     private final Consumer<StompMessage> errorCallback;
-    private AtomicInteger subscriptionCounter = new AtomicInteger();
-    private Map<String, Consumer<StompMessage>> subscriptions = new HashMap<>();
 
     private static final Logger log = Logger.getLogger(StompClient.class);
 

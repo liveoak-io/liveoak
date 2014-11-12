@@ -5,6 +5,11 @@
  */
 package io.liveoak.container.subscriptions;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import io.liveoak.common.codec.ResourceCodec;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.spi.MediaType;
@@ -27,10 +32,15 @@ public class ContainerStompServerContext implements StompServerContext {
 
     @Override
     public void handleConnect(StompConnection connection, String applicationId) {
+        this.subscriptionIdsByConnection.put(connection.getConnectionId(), new ArrayList<>());
     }
 
     @Override
     public void handleDisconnect(StompConnection connection) {
+        List<String> subscriptionIds = this.subscriptionIdsByConnection.remove(connection.getConnectionId());
+        if (subscriptionIds != null && subscriptionIds.size() > 0) {
+            subscriptionIds.forEach(id -> this.subscriptionManager.removeSubscriptionById(StompSubscription.generateId(connection, id)));
+        }
     }
 
     @Override
@@ -47,11 +57,13 @@ public class ContainerStompServerContext implements StompServerContext {
         ResourceCodec codec = this.codecManager.getResourceCodec(mediaType);
         StompSubscription subscription = new StompSubscription(connection, destination, subscriptionId, mediaType, codec);
         this.subscriptionManager.addSubscription(subscription);
+        this.subscriptionIdsByConnection.get(connection.getConnectionId()).add(subscriptionId);
     }
 
     @Override
     public void handleUnsubscribe(StompConnection connection, String subscriptionId) {
-        this.subscriptionManager.removeSubscription(this.subscriptionManager.getSubscription(StompSubscription.generateId(connection, subscriptionId)));
+        this.subscriptionManager.removeSubscriptionById(StompSubscription.generateId(connection, subscriptionId));
+        this.subscriptionIdsByConnection.get(connection.getConnectionId()).remove(subscriptionId);
     }
 
     @Override
@@ -60,5 +72,5 @@ public class ContainerStompServerContext implements StompServerContext {
 
     private ResourceCodecManager codecManager;
     protected SubscriptionManager subscriptionManager;
-
+    protected Map<String, List<String>> subscriptionIdsByConnection = new ConcurrentHashMap<>();
 }

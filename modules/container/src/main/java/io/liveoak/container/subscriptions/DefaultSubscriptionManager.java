@@ -1,6 +1,7 @@
 package io.liveoak.container.subscriptions;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.liveoak.common.util.ObjectsTree;
@@ -24,6 +25,12 @@ public class DefaultSubscriptionManager implements SubscriptionManager {
     public void addSubscription(Subscription subscription) {
         this.subscriptionsTree.addObject(subscription, subscription.resourcePath());
         this.subscriptionsMap.put(subscription.id(), subscription);
+    }
+
+    @Override
+    public void removeSubscriptionById(String subscriptionId) {
+        Subscription subscription = this.subscriptionsMap.remove(subscriptionId);
+        this.subscriptionsTree.removeObject(subscription, subscription.resourcePath());
     }
 
     @Override
@@ -98,6 +105,10 @@ public class DefaultSubscriptionManager implements SubscriptionManager {
 
     public ObjectsTree<Subscription> treeFor(ResourcePath path) {
         return this.subscriptionsTree.findLeaf(path);
+    }
+
+    public Set<String> subscriptionIds() {
+        return subscriptionsMap.keySet();
     }
 
     private ObjectsTree<Subscription> subscriptionsTree = new ObjectsTree<>();

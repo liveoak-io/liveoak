@@ -1,6 +1,7 @@
 package io.liveoak.container.subscriptions;
 
 import java.io.File;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +23,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
+import static io.liveoak.spi.Services.SUBSCRIPTION_MANAGER;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
@@ -71,7 +73,7 @@ public class CollectionSubscriptionsTest extends AbstractContainerTest {
         stompClient.connect("localhost", 8080, (client) -> {
             stompClient.subscribe("/admin/applications", (subscription) -> {
                 subscription.onMessage((msg) -> {
-                    System.err.println( "******* /admin/applications MESSAGE: " + msg);
+                    System.err.println("******* /admin/applications MESSAGE: " + msg);
                     appCreateCount.getAndIncrement();
                     appCreationNotification.complete(msg);
                 });
@@ -79,7 +81,7 @@ public class CollectionSubscriptionsTest extends AbstractContainerTest {
             });
             stompClient.subscribe("/admin/applications/*", (subscription) -> {
                 subscription.onMessage((msg) -> {
-                    System.err.println( "******* /admin/applications/* MESSAGE: " + msg);
+                    System.err.println("******* /admin/applications/* MESSAGE: " + msg);
                     wildcardCount.getAndIncrement();
                     wildcardNotification.complete(msg);
                 });
@@ -122,5 +124,18 @@ public class CollectionSubscriptionsTest extends AbstractContainerTest {
         assertThat(msg).isNotNull();
         assertThat(msg.headers().get("action")).isEqualTo("create");
         assertThat(msg.headers().get("location")).isEqualTo("/admin/applications/myapp");
+
+
+        // Verify disconnect causes unsubscription
+        stompClient.disconnectSync();
+
+        // Give it time to propagate
+        Thread.sleep(500);
+
+        // Get subscription manager to verify we were unsubscribed on disconnect
+        DefaultSubscriptionManager mgr = (DefaultSubscriptionManager) system.service(SUBSCRIPTION_MANAGER);
+        Set<String> keys = mgr.subscriptionIds();
+        assertThat(keys).isNotNull();
+        assertThat(keys.size()).isEqualTo(0);
     }
 }

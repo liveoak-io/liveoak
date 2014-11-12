@@ -12,6 +12,8 @@ public interface SubscriptionManager {
 
     void removeSubscription(Subscription subscription);
 
+    void removeSubscriptionById(String subscriptionId);
+
     Subscription getSubscription(String subscriptionId);
 
     void resourceCreated(ResourceResponse resourceResponse);

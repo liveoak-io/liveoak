@@ -49,6 +49,7 @@ public class SecuredStompServerContext extends ContainerStompServerContext {
 
         // For anonymous request, just set empty SecurityContext
         if (token == null) {
+            super.handleConnect(connection, applicationId);
             connection.setSecurityContext(securityContext);
             return;
         }
@@ -59,7 +60,10 @@ public class SecuredStompServerContext extends ContainerStompServerContext {
 
         SecurityHelper.auth(client, securityContext, applicationId, token,
                 // Success function
-                () -> connection.setSecurityContext(securityContext),
+                () -> {
+                    super.handleConnect(connection, applicationId);
+                    connection.setSecurityContext(securityContext);
+                },
                 // No Such Resource function
                 () -> connection.setSecurityContext(securityContext),
                 // Not Authorized function
