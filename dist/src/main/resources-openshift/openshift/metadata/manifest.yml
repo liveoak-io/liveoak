@@ -1,6 +1,6 @@
 Name: liveoak
 Cartridge-Short-Name: LIVEOAK
-Display-Name: LiveOak BaaS 1.0.0.Alpha01
+Display-Name: LiveOak BaaS 1.0.0.Beta02-SNAPSHOT
 Description: "The opensource RESTful backend-as-a-service stack"
 Version: '1.0.0'
 License: EPL
@@ -15,7 +15,6 @@ Categories:
   - liveoak
 Website: http://www.liveoak.io
 Help-Topics:
-  "Developer Center": https://www.openshift.com/developers
 Cart-Data:
   - Key: OPENSHIFT_LIVEOAK_LOG_DIR
     Type: environment
@@ -31,7 +30,12 @@ Cart-Data:
     Description: "Internal port to which the web-framework binds to."
   - Key: OPENSHIFT_LIVEOAK_IP
     Type: environment
-    Description: "Internal IP to which the web-framework binds to."
+  - Key: password
+    Type: cart_data
+    Description: The default admin password
+  - Key: username
+    Type: cart_data
+    Description: The admin's username
   - Key: OPENSHIFT_APP_DNS
     Type: environment
     Description: "Fully qualified domain name for the application."
@@ -54,6 +58,8 @@ Provides:
 # Requires not supported for non-official cartridges
 #Requires:
 #  - java-1.8.0
+Requires:
+  - mongodb-2.4
 Publishes:
   publish-http-url:
     Type: "NET_TCP:httpd-proxy-info"

@@ -1,0 +1,7 @@
+#!/bin/bash
+source $OPENSHIFT_CARTRIDGE_SDK_BASH
+
+password=$OPENSHIFT_LIVEOAK_INITIAL_PASSWORD
+
+cart_props "username=admin"
+cart_props "password=${password}"
