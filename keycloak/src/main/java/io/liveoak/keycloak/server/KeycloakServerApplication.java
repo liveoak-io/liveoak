@@ -6,7 +6,6 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
 
 import io.liveoak.keycloak.theme.LiveOakLoginThemeProviderFactory;
-import org.jboss.logging.Logger;
 import org.jboss.resteasy.core.Dispatcher;
 import org.keycloak.Config;
 import org.keycloak.enums.SslRequired;
@@ -24,8 +23,6 @@ import org.keycloak.services.resources.KeycloakApplication;
 public class KeycloakServerApplication extends KeycloakApplication {
 
     private static final String LIVEOAK_INITIAL_PASSWORD_PARAMETER = "liveoak.initial.password";
-
-    private static final Logger log = Logger.getLogger(KeycloakServerApplication.class);
 
     public KeycloakServerApplication(@Context ServletContext context, @Context Dispatcher dispatcher) throws FileNotFoundException {
         super(context, dispatcher);
@@ -68,10 +65,6 @@ public class KeycloakServerApplication extends KeycloakApplication {
                 password.setValue(initialPassword);
 
                 session.users().getUserByUsername("admin", adminRealm).updateCredential(password);
-
-                log.info("############################################################");
-                log.info("INITIAL LIVEOAK PASSWORD IS : " + initialPassword);
-                log.info("############################################################");
             }
 
             consoleApp.addScopeMapping(adminRealm.getRole("admin"));
