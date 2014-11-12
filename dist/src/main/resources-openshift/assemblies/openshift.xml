@@ -16,9 +16,6 @@
             <outputDirectory>versions/1.0.0</outputDirectory>
             <excludes>
               <exclude>**/standalone.xml</exclude>
-              <exclude>apps/admin/console/js/app.js</exclude>
-              <exclude>apps/admin/console/js/controllers/application.js</exclude>
-              <exclude>apps/admin/console/partials/storage-create.html</exclude>
               <exclude>conf/extensions/keycloak.json</exclude>
             </excludes>
         </fileSet>
