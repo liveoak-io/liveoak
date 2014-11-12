@@ -690,7 +690,6 @@ loMod.factory('LoLiveAppList', function($resource) {
 
 loMod.factory('LoLiveCollectionList', function($resource, $route) {
 
-  // Url of the original resource
   var url = '/' + $route.current.params.appId + '/' + $route.current.params.storageId + '/',
     res = $resource('/:appId/:storageId', {
       appId : '@appId',
@@ -703,14 +702,8 @@ loMod.factory('LoLiveCollectionList', function($resource, $route) {
 
   console.log(url);
 
-  // For each $resource functions we can register subscription callbacks. The subscription URL can be different to
-  // the $resource URL.
   res.get.loSubscription = {
     url: url,
-    // Callbacks are maintaining the data structure based on subscription calls. The property is the subscription "action"
-    // and the value is a function(data), where data are data returned by subscription call. The only tricky part here
-    // is to have in mind, that we're working with promises, so the body would be often in the "then" method and we
-    // need to return the result in a form of promise, too.
     callbacks: {
       create: function (data) {
         res.get.$live.then(function(promise){

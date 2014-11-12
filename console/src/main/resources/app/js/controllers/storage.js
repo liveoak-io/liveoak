@@ -269,7 +269,9 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   $scope.isDataChange = false;
 
   $scope.searchColumns = [];
-  $scope.searchConditions = [{type:'E', text:''}];
+  var defaultSearchCondition = {column: 'id', type:'E', text:''};
+  $scope.searchConditions = [angular.copy(defaultSearchCondition)];
+  $scope.filterLastConditions = [];
   $scope.showAdvanced = false;
 
   $scope.searchQuery = '';
@@ -693,26 +695,25 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $scope.filterConditions = [];
 
     $scope.searchColumns = [];
-    $scope.searchConditions = [{type:'E', text:''}];
+    $scope.searchConditions = [angular.copy(defaultSearchCondition)];
   };
 
   $scope.searchConditionAdd = function(){
-    $scope.searchConditions.push({type:'E', text:''});
+    $scope.searchConditions.push(angular.copy(defaultSearchCondition));
   };
 
   $scope.searchConditionsEmpty = true;
 
-  $scope.$watch('searchConditions', function(){
+  $scope.conditionWatcher = function() {
     for (var index in $scope.searchConditions){
       var condition = $scope.searchConditions[index];
-
-      if (!condition.text || condition.text === ''){
+      if (!condition.text || !condition.column || !condition.type  || condition.text === ''){
         $scope.searchConditionsEmpty = true;
         return;
       }
     }
     $scope.searchConditionsEmpty = false;
-  }, true);
+  };
 
   $scope.searchConditionRemove = function(index){
     $log.debug('Going to remove '+index);
@@ -722,15 +723,18 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   $scope.advancedSearch = function(){
     $scope.filterColumns = angular.copy($scope.searchColumns);
 
-    $scope.filterConditions = [];
+    var filterConditions = [];
 
     angular.forEach($scope.searchConditions, function(condition){
       if (condition.text !== '') {
-        $scope.filterConditions.push(condition);
+        filterConditions.push(condition);
       }
     });
 
+    $scope.filterConditions = angular.copy(filterConditions);
+
     $scope.showAdvanced = false;
+    $scope.filterActive = true;
   };
 
   $scope.collectionImport = function(removeAll, data) {
@@ -949,6 +953,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $scope.filterColumns = [];
     $scope.filterConditions = [];
     $scope.searchColumns = [];
-    $scope.searchConditions = [{type:'E', text:''}];
+    $scope.searchConditions = [angular.copy(defaultSearchCondition)];
   }
 });
