@@ -515,7 +515,7 @@ loMod.controller('SecurityStorageCtrl', function($scope, $rootScope, $location, 
     {'label': 'Applications', 'href': '#/applications'},
     {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
     {'label': 'Security Policies', 'href': '#/applications/' + currentApp.id + '/security'},
-    {'label': 'Secure Collection', 'href': '#/applications/' + currentApp.id + '/security/secure-storage/'},
+    {'label': 'Secure Storage', 'href': '#/applications/' + currentApp.id + '/security/secure-storage/'},
     {'label': $scope.currentStorage, 'href': '#/applications/' + currentApp.id + '/security/policies/storage/' + $scope.currentStorage}
   ];
 

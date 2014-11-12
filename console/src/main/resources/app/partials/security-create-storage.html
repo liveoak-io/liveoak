@@ -20,7 +20,7 @@
 
       <span ng-show="currentStorage">
         <h2 class="pull-left"><span>{{currentStorage}}</span> Security</h2>
-        <p class="subtitle"><span class="required">*</span> Required fields</p>
+        <!--<p class="subtitle"><span class="required">*</span> Required fields</p>-->
 
         <div class="alert alert-info" ng-show="appRoles.length === 0">
           <span class="pficon pficon-info"></span>
@@ -31,7 +31,7 @@
           <fieldset>
             <legend lo-collapse class="collapsible"><span class="text">Storage Settings</span></legend>
             <div class="form-group clearfix">
-              <label class="col-sm-3 control-label" for="collection">Storage <span class="required">*</span></label>
+              <label class="col-sm-3 control-label" for="collection">Storage</label>
               <div class="dropdown btn-group bootstrap-select col-sm-9">
                 <button class="btn btn-default col-sm-12" id ="collection" type="button" data-toggle="dropdown">
                   <span class="pull-left">{{currentStorage}}</span>
@@ -53,7 +53,7 @@
               </div>
             </div>
             <div class="form-group clearfix">
-              <label class="col-sm-3 control-label" for="access">Can access the storage <span class="required">*</span></label>
+              <label class="col-sm-3 control-label" for="access">Can access the storage</label>
               <div class="dropdown btn-group bootstrap-select col-sm-9">
                 <button class="btn btn-default dropdown-toggle col-sm-12" id ="access" type="button">
                   <span class="pull-left" ng-show="appRoles.length === 0">The application has no roles</span>
@@ -79,7 +79,7 @@
           <fieldset>
             <legend lo-collapse class="collapsible"><span class="text">Entry Settings</span></legend>
             <div class="form-group clearfix">
-              <label class="col-sm-3 control-label" for="create">Can create a collection <span class="required">*</span></label>
+              <label class="col-sm-3 control-label" for="create">Can create a collection</label>
               <div class="dropdown btn-group bootstrap-select col-sm-9">
                 <button class="btn btn-default dropdown-toggle col-sm-12" id="create" type="button" ng-disabled="settings.accessRoles.length === 0">
                   <span class="pull-left" ng-show="settings.accessRoles.length === 0">No Roles can access the collection</span>
@@ -98,7 +98,7 @@
               </div>
             </div>
             <div class="form-group clearfix">
-              <label class="col-sm-3 control-label" for="creator">Collection creator can <span class="required">*</span></label>
+              <label class="col-sm-3 control-label" for="creator">Collection creator can</label>
               <select pf-select class="col-sm-9" multiple id="creator" ng-options="permission for permission in availablePermissions" ng-model="settings.ownerPermissions">
               </select>
             </div>

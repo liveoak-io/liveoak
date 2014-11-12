@@ -19,7 +19,7 @@
       </ul>
 
       <h2 class="pull-left"><span>Business Logic</span> Security</h2>
-      <p class="subtitle"><span class="required">*</span> Required fields</p>
+      <!--<p class="subtitle"><span class="required">*</span> Required fields</p>-->
 
       <div class="alert alert-info" ng-show="appRoles.length === 0">
         <span class="pficon pficon-info"></span>
@@ -30,7 +30,7 @@
         <fieldset>
           <legend lo-collapse class="collapsible"><span class="text">Storage Settings</span></legend>
           <div class="form-group clearfix">
-            <label class="col-sm-3 control-label" for="access">Can access the scripts <span class="required">*</span></label>
+            <label class="col-sm-3 control-label" for="access">Can access the scripts</label>
             <div class="dropdown btn-group bootstrap-select col-sm-9">
               <button class="btn btn-default dropdown-toggle col-sm-12" id ="access" type="button">
                 <span class="pull-left" ng-show="appRoles.length === 0">The application has no roles</span>
@@ -56,7 +56,7 @@
         <fieldset>
           <legend lo-collapse class="collapsible"><span class="text">Entry Settings</span></legend>
           <div class="form-group clearfix">
-            <label class="col-sm-3 control-label" for="create">Can create a script <span class="required">*</span></label>
+            <label class="col-sm-3 control-label" for="create">Can create a script</label>
             <div class="dropdown btn-group bootstrap-select col-sm-9">
               <button class="btn btn-default dropdown-toggle col-sm-12" id="create" type="button" ng-disabled="settings.accessRoles.length === 0">
                 <span class="pull-left" ng-show="settings.accessRoles.length === 0">No Roles can access the scripts</span>
@@ -75,7 +75,7 @@
             </div>
           </div>
           <div class="form-group clearfix">
-            <label class="col-sm-3 control-label" for="creator">Script creator can <span class="required">*</span></label>
+            <label class="col-sm-3 control-label" for="creator">Script creator can</label>
             <select pf-select class="col-sm-9" multiple id="creator" ng-options="permission for permission in availablePermissions" ng-model="settings.ownerPermissions">
             </select>
           </div>
