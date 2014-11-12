@@ -5,6 +5,12 @@
  */
 package io.liveoak.filesystem.aggregating;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.LinkedList;
+import java.util.List;
+
 import io.liveoak.filesystem.FileResource;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.RequestContext;
@@ -14,12 +20,6 @@ import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import org.jboss.logging.Logger;
 import org.vertx.java.core.buffer.Buffer;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author Bob McWhirter
@@ -68,6 +68,12 @@ public class AggregatingResource implements BinaryResource {
                             String rest = line.substring("require".length()).trim();
                             File sub = new File(file.getParent(), rest);
                             list.add(sub);
+                        } else if (line.startsWith("optional")) {
+                            String rest = line.substring("optional".length()).trim();
+                            File sub = new File(file.getParent(), rest);
+                            if (sub.exists()) {
+                                list.add(sub);
+                            }
                         }
                     }
                 } finally {

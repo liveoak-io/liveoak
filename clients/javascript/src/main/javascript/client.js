@@ -16,23 +16,40 @@ var LiveOak = function( options ) {
         return new LiveOak( options );
     }
 
-    // Use address of liveoak.js if server address not specified
+    // grab values from the script URL and use those if not specified in the options directly
+    var server = parseScriptUrl();
     if (!options.host) {
-        var server = parseScriptUrl();
-        options.host = server.host;
-        options.port = server.port;
-        options.secure = server.secure;
-        options.appId = server.appId;
+      options.host = server.host;
     }
-
-    // Pull application id from url, if needed
+    if (!options.port) {
+      options.port = server.port;
+    }
+    if (!options.secure) {
+      options.secure = server.secure;
+    }
     if (!options.appId) {
-        options.appId = parseApplicationId();
-    }
+      options.appId = server.appId;
+    }    
 
     var http = new Http(options);
     var auth;
-    var stomp_client = new Stomp.Client( options.host, options.port, options.secure, options.appId );
+
+    var stompPort = options.port;
+    if (options.stomp && (options.stomp.port || options.stomp.portSecure)) {
+      if (options.secure && options.stomp.portSecure) {
+        stompPort = options.stomp.portSecure;
+      } else if (options.stomp.port) {
+        stompPort = options.stomp.port;
+      }
+    } else {  
+      if (options.secure && typeof LIVEOAK_STOMP_PORT_SECURE != 'undefined') {
+        stompPort = LIVEOAK_STOMP_PORT_SECURE;
+      } else if (typeof LIVEOAK_STOMP_PORT != 'undefined') {
+        stompPort = LIVEOAK_STOMP_PORT;
+      }
+    }
+
+    var stomp_client = new Stomp.Client( options.host, stompPort, options.secure, options.appId );
 
     this.connect = function( callback ) {
       // TODO: Better way to do this...
@@ -111,7 +128,7 @@ var LiveOak = function( options ) {
                     server.host = parts[2].substring(0, parts[2].indexOf(':'));
                     server.port = parseInt(parts[2].substring(parts[2].indexOf(':') + 1));
                 }
-                if (parts[0] == 'https') {
+                if (parts[0] == 'https:') {
                     server.secure = true;
                 }
                 server.appId = parts[3];

@@ -17,7 +17,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -44,8 +43,8 @@ public class HTTPAggregatingFilesystemResourceTest extends AbstractHTTPResourceT
         installTestAppResource("aggr-fs", "aggr", JsonNodeFactory.instance.objectNode());
     }
 
-    @Before
-    public void before() {
+
+    public void setupNoOptional() {
         File dataDir = new File(projectRoot, "aggr");
 
         dataDir.mkdirs();
@@ -55,6 +54,7 @@ public class HTTPAggregatingFilesystemResourceTest extends AbstractHTTPResourceT
             FileWriter out = new FileWriter(new File(dataDir, "aggregate.js.aggr"));
             out.write("require first.js\n");
             out.write("require second.js\n");
+            out.write("optional third.js\n");
             out.close();
 
             out = new FileWriter(new File(dataDir, "first.js"));
@@ -69,17 +69,47 @@ public class HTTPAggregatingFilesystemResourceTest extends AbstractHTTPResourceT
         }
     }
 
+    public void setupWithOptional() {
+        File dataDir = new File(projectRoot, "aggr");
+
+        dataDir.mkdirs();
+
+        // create some files in there
+        try {
+            FileWriter out = new FileWriter(new File(dataDir, "aggregate.js.aggr"));
+            out.write("require first.js\n");
+            out.write("require second.js\n");
+            out.write("optional third.js\n");
+            out.close();
+
+            out = new FileWriter(new File(dataDir, "first.js"));
+            out.write("// first.js\n");
+            out.close();
+
+            out = new FileWriter(new File(dataDir, "second.js"));
+            out.write("// second.js\n");
+            out.close();
+
+            out = new FileWriter(new File(dataDir, "third.js"));
+            out.write("// third.js\n");
+            out.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create a test file: ", e);
+        }
+    }
+
     @After
     public void after() {
         File dataDir = new File(projectRoot, "aggr");
         new File(dataDir, "aggregate.js.aggr").delete();
         new File(dataDir, "first.js").delete();
         new File(dataDir, "second.js").delete();
+        new File(dataDir, "third.js").delete();
     }
 
     @Test
-    public void testReadAggregate() throws Exception {
-
+    public void testReadAggregateWithoutOptional() throws Exception {
+        setupNoOptional();
         HttpGet get = new HttpGet("http://localhost:8080/testApp/aggr/aggregate.js");
         get.addHeader("Accept", "*/*");
 
@@ -100,6 +130,35 @@ public class HTTPAggregatingFilesystemResourceTest extends AbstractHTTPResourceT
 
             assertThat(result.getStatusLine().getStatusCode()).isEqualTo(200);
             assertThat(content).isEqualTo("// first.js\n// second.js\n");
+
+        } finally {
+            httpClient.close();
+        }
+    }
+
+    @Test
+    public void testReadAggregateWithOptional() throws Exception {
+        setupWithOptional();
+        HttpGet get = new HttpGet("http://localhost:8080/testApp/aggr/aggregate.js");
+        get.addHeader("Accept", "*/*");
+
+        try {
+            System.err.println("DO GET");
+            CloseableHttpResponse result = httpClient.execute(get);
+            System.err.println("=============>>>");
+            System.err.println(result);
+
+            HttpEntity entity = result.getEntity();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            if (entity.getContentLength() > 0) {
+                entity.writeTo(out);
+            }
+            String content = new String(out.toByteArray());
+            System.err.println(content);
+            System.err.println("\n<<<=============");
+
+            assertThat(result.getStatusLine().getStatusCode()).isEqualTo(200);
+            assertThat(content).isEqualTo("// first.js\n// second.js\n// third.js\n");
 
         } finally {
             httpClient.close();
