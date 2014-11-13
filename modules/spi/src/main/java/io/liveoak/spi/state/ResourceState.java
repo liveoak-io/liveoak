@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import io.liveoak.spi.LiveOak;
@@ -201,5 +202,14 @@ public interface ResourceState {
 
     List<ResourceState> members();
 
-
+    default ResourceState member(String id) {
+        ResourceState state = null;
+        if (id != null && id.length() > 0) {
+            Optional<ResourceState> optional = members().stream().filter(member -> member.id().equals(id)).findFirst();
+            if (optional.isPresent()) {
+                state = optional.get();
+            }
+        }
+        return state;
+    }
 }
