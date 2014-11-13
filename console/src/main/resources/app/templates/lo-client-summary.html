@@ -1,4 +1,4 @@
-<div class="panel">
+<div class="panel" ng-class="{'animated rollIn': created == client.kcClient.name}">
   <div class="panel-heading">
     <h2 class="panel-title"><span ng-show="!showFQDN && client.kcClient.name.indexOf($parent.$parent.namePrefix) === 0" ng-click="showFQDN = true;"><span data-tooltip="Click to expand">(...)</span></span><a href="#/applications/{{app.id}}/application-clients/{{ client.kcClient.name }}"><span ng-show="showFQDN">{{$parent.$parent.namePrefix}}</span>{{ client.kcClient.name|clientname:app.id }}</a></h2>
     <div class="pull-right">

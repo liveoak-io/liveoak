@@ -316,8 +316,8 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
 
 });
 
-loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal, Notifications, LoRealmApp, loClients,
-                                            LoRealmAppClientScopeMapping, currentApp, loRealmAppClients) {
+loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal, $routeParams, Notifications, LoRealmApp,
+                                            loClients, LoRealmAppClientScopeMapping, currentApp, loRealmAppClients) {
 
   $rootScope.curApp = currentApp;
 
@@ -326,6 +326,8 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
     {'label': currentApp.name, 'href': '#/applications/' + currentApp.id},
     {'label': 'Clients', 'href': '#/applications/' + currentApp.id + '/application-clients'}
   ];
+
+  $scope.createdId = $routeParams.created;
 
   $scope.namePrefix = 'liveoak.client.' + currentApp.id + '.';
 
@@ -717,7 +719,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
       $route.reload();
     }
     else {
-      $location.path('applications/' + currentApp.name + '/application-clients/' + $scope.appClient.name);
+      $location.search('created', $scope.appClient.name).path('applications/' + currentApp.name + '/application-clients');
     }
   };
 });

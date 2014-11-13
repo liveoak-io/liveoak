@@ -11,6 +11,8 @@ loMod.controller('BusinessLogicListCtrl', function($scope, $rootScope, $routePar
     {'label': 'Business Logic', 'href': '#/applications/' + currentApp.id + '/business-logic'}
   ];
 
+  $scope.createdId = $routeParams.created;
+
   $scope.scripts = triggeredScripts;
 
   $scope.showScript = function (script) {
@@ -170,7 +172,7 @@ loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $route
         finally(function() {
           $scope.create = false;
         });
-        $location.path('/applications/' + currentApp.id + '/business-logic');
+        $location.search('created', $scope.script.id).path('/applications/' + currentApp.id + '/business-logic');
       },
       function(httpResponse) {
         Notifications.httpError('Failed to ' + ($scope.create ? 'create' : 'update') + ' the script "' + $scope.script.id + '".', httpResponse);
