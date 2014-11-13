@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <div class="panel" ng-show="scripts.members" ng-repeat="script in scripts.members">
+      <div class="panel" ng-show="scripts.members" ng-repeat="script in scripts.members" ng-class="{'animated rollIn': createdId == script.id}">
         <div class="panel-heading">
           <h2 class="panel-title" ng-show="script.name"><a href="#/applications/{{curApp.id}}/business-logic/{{script.id}}"> {{script.name}} </a><span>({{script.id}})</span></h2>
           <h2 class="panel-title" ng-hide="script.name"><a href="#/applications/{{curApp.id}}/business-logic/{{script.id}}"> {{script.id}} </a></h2>
