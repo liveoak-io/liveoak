@@ -13,7 +13,7 @@
   <div class="panel-body">
     <ul class="lo-app-opts">
       <li ng-show="storage.collections.length > 0"><i class="fa fa-table" tooltip="Collections"></i>{{storage.collections.length}} Collections</li>
-      <li ng-hide="storage.collections.length > 0" class="text-muted"><i class="fa fa-table" tooltip="Collections"></i>No Collections</li>
+      <li ng-hide="storage.collections.length > 0" class="empty"><i class="fa fa-table" tooltip="Collections"></i>No Collections</li>
       <li><i class="fa fa-briefcase" tooltip="Storage resource"></i>{{storage.provider}}</li>
       <li><i class="fa fa-desktop" tooltip="Host"></i>{{storage.host}}</li>
       <li><i class="fa fa-thumb-tack" tooltip="Port"></i>{{storage.port}}</li>

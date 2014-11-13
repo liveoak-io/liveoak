@@ -51,3 +51,36 @@
   </div>
   
 </div>
+
+
+<!-- FIXME: put modal code anywhere else. Work with the same feedback as Import Data in Collection -->
+
+<div class="modal fade" id="upload-page-app" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+          <span class="pficon pficon-close"></span>
+        </button>
+        <h4 class="modal-title">Upload Single Page Application</h4>
+      </div>
+      <div class="modal-body">
+        
+        <form lo-autofocus="">
+          <div class="form-group clearfix">
+            <label for="data-file" class="col-sm-4 control-label">Upload File</label>
+            <div class="button-input-file">
+              <a href="#" class="btn btn-default"><i class="fa fa-upload"></i> Choose a ZIP file...</a>
+              <input type="file" class="input-file" id="data-file">
+          </div>
+          </div>
+        </form>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
