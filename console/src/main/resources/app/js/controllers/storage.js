@@ -168,6 +168,7 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
   $scope.storageId = '';
 
   $scope.resources = [];
+  $scope.hasCollections = false;
 
   if (loStorageList.members) {
     for (var i = 0; i < loStorageList.members.length; i++) {
@@ -185,6 +186,18 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
       }
     }
   }
+
+  $scope.$watch('resources', function(){
+    for (var i in $scope.resources) {
+      var res = $scope.resources[i];
+      console.log(res);
+      if (res.collections && res.collections.length > 0) {
+        $scope.hasCollections = true;
+        return;
+      }
+    }
+    $scope.hasCollections = false;
+  }, true);
 
   var ModalInstanceCtrl = function ($scope, $modalInstance) {
 
@@ -584,7 +597,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
   $scope.rowAdd = function(){
     $log.debug('Creating new row ' + $scope.newRow);
-    $scope.newRows.push({});
+    $scope.newRows.unshift({});
   };
 
   $scope.rowRemoveNew = function (index) {
@@ -847,15 +860,29 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
       Notifications.error('Error: "' + errorType + '" during saving "' + JSON.stringify(object) + '" to the collection \"' + $scope.collectionId + '\".');
     }
 
+    function isEmpty(obj) {
+      for(var i in obj){
+        if(obj.hasOwnProperty(i)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
     for (var l in $scope.newRows){
       var newRowToSave = $scope.newRows[l];
       $log.debug('Creating: ' + newRowToSave);
       var decodedNewRowToSave = loJSON.parseJSON(newRowToSave);
 
-      var promiseCreate = LoCollectionItem.create({appId: currentApp.id, storageId: $routeParams.storageId,
-        collectionId: $scope.collectionId}, decodedNewRowToSave, angular.noop, errorCreate).$promise;
+      if (!isEmpty(decodedNewRowToSave)) {
+        var promiseCreate = LoCollectionItem.create({
+          appId: currentApp.id,
+          storageId: $routeParams.storageId,
+          collectionId: $scope.collectionId
+        }, decodedNewRowToSave, angular.noop, errorCreate).$promise;
 
-      promises.push(promiseCreate);
+        promises.push(promiseCreate);
+      }
     }
 
     $q.all(promises).then(function() {
