@@ -168,6 +168,7 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
   $scope.storageId = '';
 
   $scope.resources = [];
+  $scope.hasCollections = false;
 
   if (loStorageList.members) {
     for (var i = 0; i < loStorageList.members.length; i++) {
@@ -185,6 +186,18 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
       }
     }
   }
+
+  $scope.$watch('resources', function(){
+    for (var i in $scope.resources) {
+      var res = $scope.resources[i];
+      console.log(res);
+      if (res.collections && res.collections.length > 0) {
+        $scope.hasCollections = true;
+        return;
+      }
+    }
+    $scope.hasCollections = false;
+  }, true);
 
   var ModalInstanceCtrl = function ($scope, $modalInstance) {
 
