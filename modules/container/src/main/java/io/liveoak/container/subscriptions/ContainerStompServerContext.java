@@ -32,7 +32,6 @@ public class ContainerStompServerContext implements StompServerContext {
 
     @Override
     public void handleConnect(StompConnection connection, String applicationId) {
-        this.subscriptionIdsByConnection.put(connection.getConnectionId(), new ArrayList<>());
     }
 
     @Override
@@ -57,17 +56,21 @@ public class ContainerStompServerContext implements StompServerContext {
         ResourceCodec codec = this.codecManager.getResourceCodec(mediaType);
         StompSubscription subscription = new StompSubscription(connection, destination, subscriptionId, mediaType, codec);
         this.subscriptionManager.addSubscription(subscription);
-        this.subscriptionIdsByConnection.get(connection.getConnectionId()).add(subscriptionId);
+        subscriptionIdsForConnection(connection.getConnectionId()).add(subscriptionId);
     }
 
     @Override
     public void handleUnsubscribe(StompConnection connection, String subscriptionId) {
         this.subscriptionManager.removeSubscriptionById(StompSubscription.generateId(connection, subscriptionId));
-        this.subscriptionIdsByConnection.get(connection.getConnectionId()).remove(subscriptionId);
+        subscriptionIdsForConnection(connection.getConnectionId()).remove(subscriptionId);
     }
 
     @Override
     public void handleSend(StompConnection connection, StompMessage message) {
+    }
+
+    private List<String> subscriptionIdsForConnection(String connectionId) {
+        return this.subscriptionIdsByConnection.computeIfAbsent(connectionId, (key) -> new ArrayList<>());
     }
 
     private ResourceCodecManager codecManager;
