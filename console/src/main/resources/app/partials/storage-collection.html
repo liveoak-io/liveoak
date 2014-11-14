@@ -197,7 +197,7 @@
           <tr ng-repeat="item in newRows">
             <td ng-repeat="column in columns | filter:notHidden" ng-class="{'before-actions':$last}"
                 ng-click="isEdit = (true && column !== 'id')">
-              <input class="form-control" type="text" ng-model="item[column]" pf-validation="isValidJSON(input)"/>
+              <input class="form-control" type="text" ng-model="item[column]" pf-validation="isValidJSON(input)" pf-focused="$parent.$first && $first"/>
             </td>
             <td class="actions">
               <button class="btn btn-link btn-icon" tooltip="Delete Row" ng-click="rowRemoveNew($index)">

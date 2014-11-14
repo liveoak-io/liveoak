@@ -584,7 +584,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
   $scope.rowAdd = function(){
     $log.debug('Creating new row ' + $scope.newRow);
-    $scope.newRows.push({});
+    $scope.newRows.unshift({});
   };
 
   $scope.rowRemoveNew = function (index) {
