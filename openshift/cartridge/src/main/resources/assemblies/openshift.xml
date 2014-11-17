@@ -4,32 +4,41 @@
   ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
 -->
 <assembly>
-    <id>openshift</id>
+    <id>openshift-liveoak-cartridge</id>
     <formats>
         <format>dir</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>${project.build.directory}/liveoak</directory>
-            <!--Note can't use ${project.version} since openshift requires a strict version format, and wont even allow letter, so no 'alpha' or 'beta' tags allowed here -->
+            <directory>${project.build.directory}/dependency/liveoak</directory>
             <outputDirectory>versions/1.0.0</outputDirectory>
             <excludes>
+              <exclude>modules/system/layers/base/io/undertow/core/main/undertow-core-1.0.15.Final.jar</exclude>
               <exclude>**/standalone.xml</exclude>
               <exclude>conf/extensions/keycloak.json</exclude>
             </excludes>
         </fileSet>
         <fileSet>
-            <directory>./src/main/resources-openshift/openshift</directory>
+            <directory>./src/main/resources/openshift</directory>
             <outputDirectory></outputDirectory>
             <excludes>
               <exclude>versions/**</exclude>
             </excludes>
         </fileSet>
         <fileSet>
-            <directory>./src/main/resources-openshift/openshift/versions</directory>
+            <directory>./src/main/resources/openshift/versions</directory>
             <outputDirectory>versions/1.0.0</outputDirectory>
         </fileSet>
     </fileSets>
+    <dependencySets>
+      <dependencySet>
+        <includes>
+          <include>io.liveoak:liveoak-openshift-undertow:jar:${project.version}</include>
+        </includes>
+        <outputDirectory>versions/1.0.0/modules/system/layers/base/io/undertow/core/main</outputDirectory>      
+        <outputFileNameMapping>undertow-core-1.0.15.Final.jar</outputFileNameMapping> 
+      </dependencySet>
+    </dependencySets>
 </assembly>
 
