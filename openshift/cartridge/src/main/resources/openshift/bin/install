@@ -1,0 +1,37 @@
+#!/bin/bash
+source $OPENSHIFT_CARTRIDGE_SDK_BASH
+
+# generate the password
+echo "Generating the initial admin password for LiveOak"
+
+password=$(generate_password)
+
+echo "$password" > $OPENSHIFT_LIVEOAK_DIR/env/OPENSHIFT_LIVEOAK_INITIAL_PASSWORD
+
+client_result ""
+client_result "LiveOak Cartridge installed. Please make note of the credentials:"
+client_result ""
+client_result "  Username:         admin"
+client_result "  Initial Password: $password"
+client_result ""
+client_result "IMPORTANT: PLEASE MAKE NOTE OF THIS PASSWORD. YOU WILL NEED IT TO LOG INTO LIVEOAK"
+client_result ""
+
+# install the OpenJDK binary from the rpms.
+# NOTE: we want this from the rpms since they are headless and take up less space
+mkdir $OPENSHIFT_LIVEOAK_DIR/openjdk
+pushd $OPENSHIFT_LIVEOAK_DIR/openjdk > /dev/null
+  wget https://kojipkgs.fedoraproject.org//packages/java-1.8.0-openjdk/1.8.0.25/0.b18.fc19/i686/java-1.8.0-openjdk-devel-1.8.0.25-0.b18.fc19.i686.rpm -o /dev/null > /dev/null
+  rpm2cpio java-1.8.0-openjdk-devel-1.8.0.25-0.b18.fc19.i686.rpm  | cpio -id --quiet > /dev/null
+  rm java-1.8.0-openjdk-devel-1.8.0.25-0.b18.fc19.i686.rpm > /dev/null
+
+  wget https://kojipkgs.fedoraproject.org//packages/java-1.8.0-openjdk/1.8.0.25/0.b18.fc19/i686/java-1.8.0-openjdk-headless-1.8.0.25-0.b18.fc19.i686.rpm -o /dev/null > /dev/null
+  rpm2cpio java-1.8.0-openjdk-headless-1.8.0.25-0.b18.fc19.i686.rpm | cpio -id --quiet > /dev/null
+  rm java-1.8.0-openjdk-headless-1.8.0.25-0.b18.fc19.i686.rpm > /dev/null
+
+  //fix the broken symlink
+  unlink usr/lib/jvm/java-1.8.0-openjdk-1.8.0.25/jre/lib/security/cacerts
+  ln -s /etc/pki/java/cacerts ./usr/lib/jvm/java-1.8.0-openjdk-1.8.0.25/jre/lib/security/cacerts
+
+  echo '$OPENSHIFT_LIVEOAK_DIR/openjdk/usr/lib/jvm/java-1.8.0-openjdk' > $OPENSHIFT_LIVEOAK_DIR/env/JAVA_HOME 
+popd > /dev/null
