@@ -1,15 +1,14 @@
-package io.liveoak.container;
+package io.liveoak.container.resource.mapping;
 
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
 import io.liveoak.spi.resource.async.DefaultRootResource;
-import io.liveoak.spi.resource.config.WrappingConfigResource;
 
 /**
- * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
+ * @author Ken Finnigan
  */
-public class InMemoryConfigMultiValueExtension implements Extension {
+public class InMemoryConfigConverterExtension implements Extension {
 
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
@@ -18,9 +17,9 @@ public class InMemoryConfigMultiValueExtension implements Extension {
 
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
-        InMemoryConfigResourceMultiConvert configResource = new InMemoryConfigResourceMultiConvert(context.resourceId());
+        InMemoryConfigResourceWithConverter configResource = new InMemoryConfigResourceWithConverter(context.resourceId());
 
-        context.mountPrivate(new WrappingConfigResource(context.resourceId(), configResource));
+        context.mountPrivate(configResource);
     }
 
     @Override

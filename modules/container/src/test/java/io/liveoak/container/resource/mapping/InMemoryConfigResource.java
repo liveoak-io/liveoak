@@ -1,13 +1,14 @@
-package io.liveoak.container;
+package io.liveoak.container.resource.mapping;
 
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.config.ConfigProperty;
+import io.liveoak.spi.resource.mapper.MappingResource;
+import io.liveoak.spi.resource.mapper.Property;
 import io.liveoak.spi.resource.RootResource;
 
 /**
- * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
+ * @author Ken Finnigan
  */
-public class InMemoryConfigResource implements RootResource {
+public class InMemoryConfigResource implements RootResource, MappingResource {
 
     private Resource parent;
     String id;
@@ -16,10 +17,10 @@ public class InMemoryConfigResource implements RootResource {
         this.id = id;
     }
 
-    @ConfigProperty
+    @Property
     private String path1;
 
-    @ConfigProperty(value = "other")
+    @Property(value = "other")
     private String path2;
 
     @Override

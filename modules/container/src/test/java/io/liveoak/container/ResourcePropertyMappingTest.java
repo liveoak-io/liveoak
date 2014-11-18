@@ -5,6 +5,10 @@ import java.net.URL;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.container.resource.mapping.InMemoryConfigConverterExtension;
+import io.liveoak.container.resource.mapping.InMemoryConfigExtension;
+import io.liveoak.container.resource.mapping.InMemoryConfigMultiValueExtension;
+import io.liveoak.container.resource.mapping.InMemoryConfigTypesExtension;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;
@@ -21,7 +25,7 @@ import static org.junit.Assert.fail;
  * @author Bob McWhirter
  * @author Ken Finnigan
  */
-public class ConfigurationResourceTest extends AbstractContainerTest {
+public class ResourcePropertyMappingTest extends AbstractContainerTest {
 
     private static Client client;
     private static InternalApplication application;
@@ -40,8 +44,8 @@ public class ConfigurationResourceTest extends AbstractContainerTest {
 
     @BeforeClass
     public static void setupUserDir() {
-        String name = ConfigurationResourceTest.class.getName().replace(".", "/") + ".class";
-        URL resource = ConfigurationResourceTest.class.getClassLoader().getResource(name);
+        String name = ResourcePropertyMappingTest.class.getName().replace(".", "/") + ".class";
+        URL resource = ResourcePropertyMappingTest.class.getClassLoader().getResource(name);
 
         if (resource != null) {
             File current = new File(resource.getFile());

@@ -5,13 +5,12 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
-import io.liveoak.spi.resource.config.ConfigResource;
 import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class UPSRootConfigResource implements ConfigResource, RootResource {
+public class UPSRootConfigResource implements RootResource {
 
     Resource parent;
     String id;
@@ -44,14 +43,15 @@ public class UPSRootConfigResource implements ConfigResource, RootResource {
     }
 
     @Override
-    public void readConfigProperties(RequestContext ctx, PropertySink sink, Resource resource) throws Exception {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept(UPS_SERVER_URL, upsServerURL);
         sink.accept(APPLICATION_ID, applicationId);
         sink.accept(MASTER_SECRET, masterSecret);
+        sink.complete();
     }
 
     @Override
-    public void updateConfigProperties(RequestContext ctx, ResourceState state, Responder responder, Resource resource) throws Exception {
+    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         Object upsServerURLProperty = state.getProperty(UPS_SERVER_URL);
         Object applicationIdProperty = state.getProperty(APPLICATION_ID);
         Object masterKeyProperty = state.getProperty(MASTER_SECRET);
@@ -73,6 +73,7 @@ public class UPSRootConfigResource implements ConfigResource, RootResource {
         } else if (masterKeyProperty != null) { // if it is null, it wasn't specified in the json, so keep old value
             responder.invalidRequest("The " + MASTER_SECRET + " property must be a String.");
         }
+        responder.resourceUpdated(this);
     }
 
 

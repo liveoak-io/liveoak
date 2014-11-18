@@ -1,4 +1,4 @@
-package io.liveoak.container;
+package io.liveoak.container.resource.mapping;
 
 import java.io.File;
 import java.net.URI;
@@ -6,12 +6,13 @@ import java.net.URL;
 
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.config.ConfigProperty;
+import io.liveoak.spi.resource.mapper.MappingResource;
+import io.liveoak.spi.resource.mapper.Property;
 
 /**
- * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
+ * @author Ken Finnigan
  */
-public class InMemoryConfigResourceTypes implements RootResource {
+public class InMemoryConfigResourceTypes implements RootResource, MappingResource {
 
     String id;
 
@@ -36,22 +37,22 @@ public class InMemoryConfigResourceTypes implements RootResource {
 
     private Resource parent;
 
-    @ConfigProperty
+    @Property
     private File file;
 
-    @ConfigProperty
+    @Property
     private Boolean flag;
 
-    @ConfigProperty
+    @Property
     private URL url;
 
-    @ConfigProperty
+    @Property
     private URI uri;
 
-    @ConfigProperty
+    @Property
     private Double dbl;
 
-    @ConfigProperty
+    @Property
     private Integer integer;
 
 

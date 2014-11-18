@@ -1,16 +1,17 @@
-package io.liveoak.container;
+package io.liveoak.container.resource.mapping;
 
 import java.util.HashMap;
 
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.config.ConfigMappingExporter;
-import io.liveoak.spi.resource.config.ConfigProperty;
+import io.liveoak.spi.resource.mapper.MappingExporter;
+import io.liveoak.spi.resource.mapper.MappingResource;
+import io.liveoak.spi.resource.mapper.Property;
 
 /**
- * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
+ * @author Ken Finnigan
  */
-public class InMemoryConfigResourceMultiConvert implements RootResource {
+public class InMemoryConfigResourceMultiConvert implements RootResource, MappingResource {
 
     private Resource parent;
     String id;
@@ -31,11 +32,11 @@ public class InMemoryConfigResourceMultiConvert implements RootResource {
 
     private Thing thing;
 
-    private void importConfig(@ConfigProperty("firstValue") String firstValue, @ConfigProperty("secondValue") String otherValue) throws Exception {
+    private void importConfig(@Property("firstValue") String firstValue, @Property("secondValue") String otherValue) throws Exception {
         thing = new Thing(firstValue, otherValue);
     }
 
-    @ConfigMappingExporter
+    @MappingExporter
     public void exportConfig(HashMap<String, Object> config) throws Exception {
         config.put("firstValue", thing.getVal1());
         config.put("secondValue", thing.getVal2());

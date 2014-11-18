@@ -7,13 +7,12 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
-import io.liveoak.spi.resource.config.ConfigResource;
 import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class RootMongoConfigResource implements ConfigResource, RootResource {
+public class RootMongoConfigResource implements RootResource {
 
     Resource parent;
     String id;

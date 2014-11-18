@@ -1,21 +1,22 @@
-package io.liveoak.container;
+package io.liveoak.container.resource.mapping;
 
 import java.io.File;
 
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.config.ConfigProperty;
-import io.liveoak.spi.resource.config.ConfigPropertyConverter;
+import io.liveoak.spi.resource.mapper.MappingResource;
+import io.liveoak.spi.resource.mapper.Property;
+import io.liveoak.spi.resource.mapper.PropertyConverter;
 import io.liveoak.spi.resource.RootResource;
 
 /**
- * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
+ * @author Ken Finnigan
  */
-public class InMemoryConfigResourceWithConverter implements RootResource {
+public class InMemoryConfigResourceWithConverter implements RootResource, MappingResource {
 
     private Resource parent;
     String id;
 
-    @ConfigProperty(converter = FileConverter.class)
+    @Property(converter = FileConverter.class)
     private File file;
 
     public InMemoryConfigResourceWithConverter(String id) {
@@ -39,14 +40,14 @@ public class InMemoryConfigResourceWithConverter implements RootResource {
     }
 
 
-    public static class FileConverter implements ConfigPropertyConverter<File> {
+    public static class FileConverter implements PropertyConverter<File> {
         @Override
         public File createFrom(Object value) throws Exception {
             return new File(value.toString());
         }
 
         @Override
-        public Object toConfigValue(File value) throws Exception {
+        public Object toValue(File value) throws Exception {
             return value.getAbsolutePath();
         }
     }

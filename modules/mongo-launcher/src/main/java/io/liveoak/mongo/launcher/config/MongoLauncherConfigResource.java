@@ -10,7 +10,6 @@ import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
-import io.liveoak.spi.resource.config.ConfigResource;
 import io.liveoak.spi.state.ResourceState;
 
 import static io.liveoak.mongo.launcher.config.Constants.DB_PATH;
@@ -27,7 +26,7 @@ import static io.liveoak.mongo.launcher.config.Constants.USE_SMALL_FILES;
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
  */
-public class MongoLauncherConfigResource implements ConfigResource, RootResource {
+public class MongoLauncherConfigResource implements RootResource {
 
     private String id;
     private Resource parent;
@@ -103,7 +102,7 @@ public class MongoLauncherConfigResource implements ConfigResource, RootResource
     }
 
     @Override
-    public void readConfigProperties(RequestContext ctx, PropertySink sink, Resource resource) throws Exception {
+    public void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
         sink.accept(MONGOD_PATH, mongodPath);
         sink.accept(HOST, host);
         sink.accept(PORT, port);
@@ -114,10 +113,11 @@ public class MongoLauncherConfigResource implements ConfigResource, RootResource
         sink.accept(USE_SMALL_FILES, useSmallFiles);
         sink.accept(ENABLED, enabled);
         sink.accept(EXTRA_ARGS, extraArgs);
+        sink.complete();
     }
 
     @Override
-    public void updateConfigProperties(RequestContext ctx, ResourceState state, Responder responder, Resource resource) throws Exception {
+    public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         mongodPath = getStringProperty(MONGOD_PATH, state);
         dbPath = getStringProperty(DB_PATH, state);
         logPath = getStringProperty(LOG_PATH, state);
@@ -138,6 +138,7 @@ public class MongoLauncherConfigResource implements ConfigResource, RootResource
 
         String enabled = getStringProperty(ENABLED, state);
         this.enabled = enabled == null ? "auto" : enabled;
+        responder.resourceUpdated(this);
     }
 
     // TODO: this should be part of ResourceState probably

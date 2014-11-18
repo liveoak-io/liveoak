@@ -1,4 +1,4 @@
-package io.liveoak.spi.resource.config;
+package io.liveoak.spi.resource.mapper;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
@@ -21,23 +21,28 @@ import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 
 /**
- * @author <a href="http://community.jboss.org/people/kenfinni">Ken Finnigan</a>
+ * Provides automatic mapping between String values on {@link io.liveoak.spi.state.ResourceState} and
+ * the fields, or method parameters, that represent the properties of the resource.
+ *
+ * Typically useful on {@link io.liveoak.spi.resource.RootResource} that contains properties.
+ *
+ * @author Ken Finnigan
  */
-public interface ConfigResource extends Resource {
+public interface MappingResource extends Resource {
 
     @Override
     default void readProperties(RequestContext ctx, PropertySink sink) throws Exception {
-        readConfigProperties(ctx, sink, this.parent());
+        mapPropertiesForRead(ctx, sink, this);
         sink.complete();
     }
 
-    default void readConfigProperties(RequestContext ctx, PropertySink sink, Resource resource) throws Exception {
+    default void mapPropertiesForRead(RequestContext ctx, PropertySink sink, Resource resource) throws Exception {
         // Check fields
-        for (Field field : getFields(resource.getClass(), ConfigProperty.class)) {
-            ConfigProperty configProperty = field.getAnnotation(ConfigProperty.class);
+        for (Field field : getFields(resource.getClass(), Property.class)) {
+            Property property = field.getAnnotation(Property.class);
             String key = field.getName();
-            if (!"".equals(configProperty.value())) {
-                key = configProperty.value();
+            if (!"".equals(property.value())) {
+                key = property.value();
             }
 
             // Retrieve the value of the field
@@ -46,10 +51,10 @@ public interface ConfigResource extends Resource {
 
             if (value != null) {
                 // Check for converter
-                if (!configProperty.converter().isInterface()) {
-                    Class<? extends ConfigPropertyConverter> converterClass = configProperty.converter();
-                    ConfigPropertyConverter converter = converterClass.getConstructor().newInstance();
-                    value = converter.toConfigValue(value);
+                if (!property.converter().isInterface()) {
+                    Class<? extends PropertyConverter> converterClass = property.converter();
+                    PropertyConverter converter = converterClass.getConstructor().newInstance();
+                    value = converter.toValue(value);
                 } else {
                     // Convert some known types
                     if (field.getType().equals(File.class)) {
@@ -75,10 +80,10 @@ public interface ConfigResource extends Resource {
         }
 
         // Check methods
-        for (Method method : getMethods(resource.getClass(), ConfigMappingExporter.class)) {
-            ConfigMappingExporter configExporter = method.getAnnotation(ConfigMappingExporter.class);
+        for (Method method : getMethods(resource.getClass(), MappingExporter.class)) {
+            MappingExporter exporter = method.getAnnotation(MappingExporter.class);
 
-            if (configExporter != null) {
+            if (exporter != null) {
                 HashMap<String, Object> values = new HashMap<>();
                 method.invoke(resource, values);
 
@@ -98,34 +103,34 @@ public interface ConfigResource extends Resource {
 
     @Override
     default void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        updateConfigProperties(ctx, state, responder, this.parent());
+        mapPropertiesForUpdate(ctx, state, responder, this);
         responder.resourceUpdated(this);
     }
 
-    default void updateConfigProperties(RequestContext ctx, ResourceState state, Responder responder, Resource resource) throws Exception {
-        for (Field field : getFields(resource.getClass(), ConfigProperty.class)) {
-            ConfigProperty configProperty = field.getAnnotation(ConfigProperty.class);
+    default void mapPropertiesForUpdate(RequestContext ctx, ResourceState state, Responder responder, Resource resource) throws Exception {
+        for (Field field : getFields(resource.getClass(), Property.class)) {
+            Property property = field.getAnnotation(Property.class);
 
             // Retrieve the key for the property.
             // Defaults to field name if annotation does not specify name.
             String key = field.getName();
-            if (!"".equals(configProperty.value())) {
-                key = configProperty.value();
+            if (!"".equals(property.value())) {
+                key = property.value();
             }
 
             Object value = state.getProperty(key);
 
             if (value == null) {
-                String msg = !"".equals(configProperty.msg())
-                        ? configProperty.msg()
-                        : "No configuration value specified for: " + key + " on Resource with id: " + resource.id();
+                String msg = !"".equals(property.msg())
+                        ? property.msg()
+                        : "No value specified for: " + key + " on Resource with id: " + resource.id();
                 throw new InitializationException(msg);
             }
 
             // Check for converter
-            if (!configProperty.converter().isInterface()) {
-                Class<? extends ConfigPropertyConverter> converterClass = configProperty.converter();
-                ConfigPropertyConverter converter = converterClass.getConstructor().newInstance();
+            if (!property.converter().isInterface()) {
+                Class<? extends PropertyConverter> converterClass = property.converter();
+                PropertyConverter converter = converterClass.getConstructor().newInstance();
                 value = converter.createFrom(value);
             } else {
                 // Convert some known types
@@ -158,26 +163,26 @@ public interface ConfigResource extends Resource {
         }
 
         // Check methods
-        for (Method method : getMethodsWithParamAnnotation(resource.getClass(), ConfigProperty.class)) {
+        for (Method method : getMethodsWithParamAnnotation(resource.getClass(), Property.class)) {
             Parameter[] params = method.getParameters();
 
-            Object[] configValues = new Object[params.length];
+            Object[] values = new Object[params.length];
             int count = 0;
 
             // Retrieve config values from state
             for (Parameter methodParam : params) {
-                ConfigProperty methodParamProp = methodParam.getAnnotation(ConfigProperty.class);
+                Property methodParamProp = methodParam.getAnnotation(Property.class);
                 String key = methodParamProp.value();
                 if (key == null || "".equals(key)) {
-                    throw new InitializationException("No value defined on @ConfigProperty of " + methodParam.getName()
+                    throw new InitializationException("No value defined on @Property of " + methodParam.getName()
                             + " parameter on method " + method.getName() + "() in " + resource.getClass());
                 }
-                configValues[count++] = methodParam.getType().cast(state.getProperty(key));
+                values[count++] = methodParam.getType().cast(state.getProperty(key));
             }
 
             // Create object from config state
             method.setAccessible(Boolean.TRUE);
-            method.invoke(resource, configValues);
+            method.invoke(resource, values);
         }
     }
 
@@ -266,5 +271,5 @@ public interface ConfigResource extends Resource {
         return fields;
     }
 
-    static final Logger log = Logger.getLogger(ConfigResource.class);
+    static final Logger log = Logger.getLogger(MappingResource.class);
 }
