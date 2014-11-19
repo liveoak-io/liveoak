@@ -641,14 +641,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     if ($scope.columnNew !== '') {
       $scope.columns.push(columnName);
     }
-/*
-    // Commenting because the empty string is not the same as no value.
-    for (var k in $scope.collectionData){
-      var item = $scope.collectionData[k];
-      item[columnName] = '';
-    }
-*/
-    $scope.isDataChange = true;
+
     $scope.isColumnChange = true;
   };
 
@@ -661,12 +654,12 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
       for (var k in $scope.collectionData) {
         var item = $scope.collectionData[k];
-        if (item.hasOwnProperty(columnName)) {
-          item[columnName] = null;
+        if (item.hasOwnProperty(columnName) && item[columnName] !== '') {
+          item[columnName] = '';
+          $scope.isDataChange = true;
         }
       }
 
-      $scope.isDataChange = true;
       $scope.isColumnChange = true;
     }
   };
