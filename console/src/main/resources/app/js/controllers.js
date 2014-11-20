@@ -5,6 +5,7 @@
 // Only defining controllers module, each module is defined at it's own file at app/js/controllers/*.js
 var loMod = angular.module('loApp.controllers', [
   'loApp.controllers.application',
+  'loApp.controllers.appclient',
   'loApp.controllers.businesslogic',
   'loApp.controllers.storage',
   'loApp.controllers.security',
