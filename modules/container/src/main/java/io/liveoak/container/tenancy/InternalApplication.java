@@ -25,7 +25,7 @@ import org.jboss.msc.service.StabilityMonitor;
  */
 public class InternalApplication implements Application {
 
-    public InternalApplication(ServiceTarget target, String id, String name, File directory, ResourcePath htmlAppPath, Boolean visible, Boolean example, String versionResourceId) {
+    public InternalApplication(ServiceTarget target, String id, String name, File directory, ResourcePath htmlAppPath, Boolean visible, String example, String versionResourceId) {
         this.target = target;
         this.id = id;
         this.name = name;
@@ -82,7 +82,7 @@ public class InternalApplication implements Application {
         this.versionResourceId = versionResourceId;
     }
 
-    public Boolean example() {
+    public String example() {
         return this.example;
     }
 
@@ -185,7 +185,7 @@ public class InternalApplication implements Application {
     private File directory;
     private ResourcePath htmlAppPath;
     private Boolean visible;
-    private Boolean example;
+    private String example;
     private String versionResourceId;
 
     private static final Logger log = Logger.getLogger(InternalApplication.class);

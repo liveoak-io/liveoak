@@ -71,7 +71,9 @@ public class ApplicationResource implements RootResource, SynchronousResource {
         result.put("name", this.app.name());
         result.put("html-app", this.app.htmlApplicationResourcePath());
         result.put("visible", this.app.visible());
-        result.put("example", this.app.example());
+        if (this.app.example() != null) {
+            result.put("example", this.app.example());
+        }
         result.put("version-resource-id", this.app.versionResourceId());
         result.put("directory", this.app.directory().getAbsolutePath());
         return result;

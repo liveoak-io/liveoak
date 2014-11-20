@@ -78,7 +78,7 @@ public class ApplicationService implements Service<InternalApplication> {
 
         String appName = this.name;
         Boolean appVisible = Boolean.TRUE;
-        Boolean appExample = Boolean.FALSE;
+        String appExample = null;
         String versionResourceId = null;
         ResourcePath htmlApp = null;
         ResourceState resourcesTree = null;
@@ -101,7 +101,7 @@ public class ApplicationService implements Service<InternalApplication> {
                     appVisible = (Boolean) value;
                 }
                 if ((value = state.getProperty("example")) != null) {
-                    appExample = (Boolean) value;
+                    appExample = (String) value;
                 }
                 if ((value = state.getProperty("version-resource-id")) != null) {
                     versionResourceId = (String) value;
