@@ -130,7 +130,7 @@ public class ApplicationService implements Service<InternalApplication> {
         this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp, appVisible, appExample, versionResourceId);
 
         ServiceName configManagerName = Services.applicationConfigurationManager(this.id);
-        ApplicationConfigurationService configManager = new ApplicationConfigurationService(applicationJson, app);
+        ApplicationConfigurationService configManager = new ApplicationConfigurationService(applicationJson);
         target.addService(configManagerName, configManager)
                 .install();
 

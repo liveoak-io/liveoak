@@ -106,7 +106,7 @@ public class ModuleResourceRegistry extends DefaultMountPointResource {
 
             if (configurationManager != null) {
                 try {
-                    configurationManager.removeResource(id, id());
+                    configurationManager.removeResource(id);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

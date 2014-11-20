@@ -19,9 +19,8 @@ import org.jboss.logging.Logger;
  */
 public class ApplicationConfigurationManager implements ConfigurationManager {
 
-    public ApplicationConfigurationManager(File file, InternalApplication internalApplication) {
+    public ApplicationConfigurationManager(File file) {
         this.file = file;
-        this.internalApplication = internalApplication;
     }
 
     public synchronized ObjectNode read() throws IOException {
@@ -52,7 +51,7 @@ public class ApplicationConfigurationManager implements ConfigurationManager {
     }
 
     @Override
-    public ObjectNode readResource(String id, String type) throws IOException {
+    public ObjectNode readResource(String id) throws IOException {
         ObjectNode tree = read();
         ObjectNode resourcesTree = (ObjectNode) tree.get("resources");
         if (resourcesTree == null) {
@@ -84,22 +83,7 @@ public class ApplicationConfigurationManager implements ConfigurationManager {
     }
 
     @Override
-    public String type() {
-        return null;
-    }
-
-    @Override
-    public String versionedResourcePath() {
-        return internalApplication.versionedResourcePath();
-    }
-
-    @Override
-    public boolean versioned() {
-        return internalApplication.versioned();
-    }
-
-    @Override
-    public synchronized void removeResource(String id, String type) throws IOException {
+    public synchronized void removeResource(String id) throws IOException {
         ObjectNode tree = read();
         ObjectNode resourcesTree = (ObjectNode) tree.get("resources");
         if (resourcesTree == null) {
@@ -120,7 +104,6 @@ public class ApplicationConfigurationManager implements ConfigurationManager {
     }
 
     private final File file;
-    private final InternalApplication internalApplication;
 
     private static final Logger log = Logger.getLogger(ApplicationConfigurationManager.class);
 }

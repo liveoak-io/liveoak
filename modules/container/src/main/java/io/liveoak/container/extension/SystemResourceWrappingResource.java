@@ -10,6 +10,7 @@ import io.liveoak.spi.resource.async.Responder;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+ * @author Ken Finnigan
  */
 public class SystemResourceWrappingResource extends ConfigResourceWrappingResource {
 
@@ -18,8 +19,23 @@ public class SystemResourceWrappingResource extends ConfigResourceWrappingResour
     }
 
     @Override
+    public String extensionId() {
+        return ((ExtensionConfigurationManager)configManager).extensionId();
+    }
+
+    @Override
+    public boolean resourceVersioned() {
+        return false;
+    }
+
+    @Override
+    public String versionedResourcePath() {
+        return null;
+    }
+
+    @Override
     public void delete(RequestContext ctx, Responder responder) throws Exception {
-        ConfigVersioningResponder configVersioningResponder = new ConfigVersioningResponder(responder, configManager.versioned(), configManager.versionedResourcePath(), this.client, ctx.securityContext());
+        ConfigVersioningResponder configVersioningResponder = new ConfigVersioningResponder(responder, resourceVersioned(), versionedResourcePath(), this.client, ctx.securityContext());
         delegate().delete(ctx, new DeleteResponder(configVersioningResponder));
     }
 }

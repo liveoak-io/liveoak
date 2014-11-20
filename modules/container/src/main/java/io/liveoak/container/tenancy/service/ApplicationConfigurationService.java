@@ -14,14 +14,13 @@ import org.jboss.msc.service.StopContext;
  */
 public class ApplicationConfigurationService implements Service<ApplicationConfigurationManager> {
 
-    public ApplicationConfigurationService(File configFile, InternalApplication internalApplication) {
+    public ApplicationConfigurationService(File configFile) {
         this.configFile = configFile;
-        this.internalApplication = internalApplication;
     }
 
     @Override
     public void start(StartContext context) throws StartException {
-        this.manager = new ApplicationConfigurationManager(this.configFile, internalApplication);
+        this.manager = new ApplicationConfigurationManager(this.configFile);
     }
 
     @Override
@@ -36,6 +35,5 @@ public class ApplicationConfigurationService implements Service<ApplicationConfi
 
     private final File configFile;
     private ApplicationConfigurationManager manager;
-    private InternalApplication internalApplication;
 
 }

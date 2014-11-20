@@ -21,6 +21,21 @@ public class AdminResourceWrappingResource extends ConfigResourceWrappingResourc
     }
 
     @Override
+    public String extensionId() {
+        return this.extension.extensionId();
+    }
+
+    @Override
+    public boolean resourceVersioned() {
+        return extension.application().versioned();
+    }
+
+    @Override
+    public String versionedResourcePath() {
+        return extension.application().versionedResourcePath();
+    }
+
+    @Override
     public void delete(RequestContext ctx, Responder responder) throws Exception {
         this.extension.remove();
         super.delete(ctx, responder);

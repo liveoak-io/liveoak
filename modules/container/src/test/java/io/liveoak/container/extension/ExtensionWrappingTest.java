@@ -61,7 +61,7 @@ public class ExtensionWrappingTest extends AbstractContainerTest {
         new AppCleanup().accept("apps/testApp");
     }
 
-//    @Test
+    @Test
     public void appExtensionIdReturned() throws Exception {
         HttpPost post = new HttpPost("http://localhost:8080/admin/applications/testApp/resources");
         post.setEntity(new StringEntity("{ \"id\": \"mymock\", \"type\": \"mock\" }"));

@@ -23,7 +23,7 @@ public class ResourceConfigPersistingResponder extends DelegatingResponder {
     @Override
     public void resourceUpdated(Resource resource) {
         try {
-            this.resource.configurationManager().updateResource(this.resource.id(), this.resource.type(), ConversionUtils.convert(this.state));
+            this.resource.configurationManager().updateResource(this.resource.id(), this.resource.extensionId(), ConversionUtils.convert(this.state));
             super.resourceUpdated(resource);
         } catch (Exception e) {
             log.error("Unable to update resource config for resource id " + this.resource.id(), e);

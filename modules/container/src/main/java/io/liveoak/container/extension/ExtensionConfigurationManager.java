@@ -15,40 +15,26 @@ import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+ * @author Ken Finnigan
  */
 public class ExtensionConfigurationManager implements ConfigurationManager {
 
-    private String type;
+    private String extensionId;
     private File file;
-    private boolean versioned;
-    private String versionedResourcePath;
 
     private static final Logger log = Logger.getLogger(ExtensionConfigurationManager.class);
 
-    public ExtensionConfigurationManager(String type, File file) {
-        this.type = type;
+    public ExtensionConfigurationManager(String extensionId, File file) {
+        this.extensionId = extensionId;
         this.file = file;
-        this.versioned = false;
-        this.versionedResourcePath = null;
+    }
+
+    public String extensionId() {
+        return extensionId;
     }
 
     @Override
-    public String type() {
-        return type;
-    }
-
-    @Override
-    public String versionedResourcePath() {
-        return versionedResourcePath;
-    }
-
-    @Override
-    public boolean versioned() {
-        return versioned;
-    }
-
-    @Override
-    public void removeResource(String id, String type) throws Exception {
+    public void removeResource(String id) throws Exception {
         if (file != null) {
             ObjectNode tree = read();
 
@@ -90,7 +76,7 @@ public class ExtensionConfigurationManager implements ConfigurationManager {
     }
 
     @Override
-    public ObjectNode readResource(String id, String type) throws Exception {
+    public ObjectNode readResource(String id) throws Exception {
         if (file != null) {
             ObjectNode tree = read();
 

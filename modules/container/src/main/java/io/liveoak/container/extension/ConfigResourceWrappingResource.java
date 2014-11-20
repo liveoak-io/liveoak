@@ -20,9 +20,11 @@ import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
 /**
+ * @author Bob McWhirter
+ * @author Ken Finnigan
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class ConfigResourceWrappingResource extends DelegatingRootResource {
+public abstract class ConfigResourceWrappingResource extends DelegatingRootResource {
 
     public ConfigResourceWrappingResource(ConfigurationManager configManager, RootResource delegate, Properties envProps, Client client) {
         super(delegate);
@@ -31,9 +33,11 @@ public class ConfigResourceWrappingResource extends DelegatingRootResource {
         this.client = client;
     }
 
-    public String type() {
-        return configManager.type();
-    }
+    public abstract String extensionId();
+
+    public abstract boolean resourceVersioned();
+
+    public abstract String versionedResourcePath();
 
     public ConfigurationManager configurationManager() {
         return this.configManager;
@@ -56,7 +60,7 @@ public class ConfigResourceWrappingResource extends DelegatingRootResource {
             });
         }
 
-        sink.accept(LiveOak.RESOURCE_TYPE, type());
+        sink.accept(LiveOak.RESOURCE_TYPE, extensionId());
         super.readProperties(ctx, sink);
     }
 
@@ -73,7 +77,7 @@ public class ConfigResourceWrappingResource extends DelegatingRootResource {
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         cleanup(state);
         delegate().updateProperties(ctx, filter(state),
-                new ResourceConfigPersistingResponder(this, state, new ConfigVersioningResponder(responder, configManager.versioned(), configManager.versionedResourcePath(), this.client, ctx.securityContext())));
+                new ResourceConfigPersistingResponder(this, state, new ConfigVersioningResponder(responder, resourceVersioned(), versionedResourcePath(), this.client, ctx.securityContext())));
 
         this.configValuesTree = new ObjectsTree<>();
         updateConfigEnvVars(state);
@@ -81,13 +85,13 @@ public class ConfigResourceWrappingResource extends DelegatingRootResource {
 
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        delegate().createMember(ctx, filter(state), new ConfigVersioningResponder(responder, configManager.versioned(), configManager.versionedResourcePath(), this.client, ctx.securityContext()));
+        delegate().createMember(ctx, filter(state), new ConfigVersioningResponder(responder, resourceVersioned(), versionedResourcePath(), this.client, ctx.securityContext()));
     }
 
     @Override
     public void delete(RequestContext ctx, Responder responder) throws Exception {
-        configManager.removeResource(id(), type());
-        new ConfigVersioningResponder(responder, configManager.versioned(), configManager.versionedResourcePath(), this.client, ctx.securityContext()).resourceDeleted(this.delegate());
+        configManager.removeResource(id());
+        new ConfigVersioningResponder(responder, resourceVersioned(), versionedResourcePath(), this.client, ctx.securityContext()).resourceDeleted(this.delegate());
     }
 
     protected class DeleteResponder extends DelegatingResponder {
@@ -99,7 +103,7 @@ public class ConfigResourceWrappingResource extends DelegatingRootResource {
         @Override
         public void resourceDeleted(Resource resource) {
             try {
-                configManager.removeResource(id(), type());
+                configManager.removeResource(id());
             } catch (Exception e) {
                 e.printStackTrace();
             }
