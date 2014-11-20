@@ -162,7 +162,7 @@ loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $route
           data: scriptCode
         }).
         success(function (data/*, status*/) {
-          Notifications.success('The script "' + $scope.script.id + '" has been created.');
+          Notifications.success('The script "' + $scope.script.id + '" has been ' + ($scope.create ? 'created.' : 'updated.'));
           $scope.script.code = data;
           settingsBackup = angular.copy($scope.script);
         }).
@@ -172,7 +172,7 @@ loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $route
         finally(function() {
           $scope.create = false;
         });
-        $location.search('created', $scope.script.id).path('/applications/' + currentApp.id + '/business-logic');
+        $location.search(($scope.create ? 'created' : 'updated'), $scope.script.id).path('/applications/' + currentApp.id + '/business-logic');
       },
       function(httpResponse) {
         Notifications.httpError('Failed to ' + ($scope.create ? 'create' : 'update') + ' the script "' + $scope.script.id + '".', httpResponse);
