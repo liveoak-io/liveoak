@@ -3,8 +3,6 @@ package io.liveoak.container.extension;
 import java.util.Properties;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.container.tenancy.ExtensionConfigurationManager;
-import io.liveoak.container.tenancy.ModuleResourceRegistry;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.SystemExtensionContext;

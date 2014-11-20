@@ -48,7 +48,7 @@ public class ExtensionLoaderTest {
 
     @Test
     public void testLoadExtensionByInstance() throws Exception {
-        ExtensionInstaller loader = new ExtensionInstaller(this.serviceContainer, ServiceName.of("admin-mount"));
+        ExtensionInstaller loader = new ExtensionInstaller(this.serviceContainer);
         loader.load("mock", new MockExtension(), JsonNodeFactory.instance.objectNode());
 
         this.serviceContainer.awaitStability();

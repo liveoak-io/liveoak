@@ -6,8 +6,6 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.container.tenancy.ExtensionConfigurationManager;
-import io.liveoak.container.tenancy.ModuleResourceRegistry;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.Extension;

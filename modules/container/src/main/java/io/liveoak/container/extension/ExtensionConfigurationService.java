@@ -1,8 +1,8 @@
-package io.liveoak.container.tenancy.service;
+package io.liveoak.container.extension;
 
 import java.io.File;
 
-import io.liveoak.container.tenancy.ExtensionConfigurationManager;
+import io.liveoak.container.extension.ExtensionConfigurationManager;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;

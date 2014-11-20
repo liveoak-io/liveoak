@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.json.JSONEncoder;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.common.util.StringPropertyReplacer;
-import io.liveoak.container.tenancy.ExtensionConfigurationManager;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.modules.Module;
@@ -31,10 +30,8 @@ import org.jboss.msc.value.ImmediateValue;
  */
 public class ExtensionInstaller {
 
-
-    public ExtensionInstaller(ServiceTarget target, ServiceName systemConfigMount) {
+    public ExtensionInstaller(ServiceTarget target) {
         this.target = target.subTarget();
-        this.systemConfigMount = systemConfigMount;
     }
 
     public void load(File extensionDesc) throws Exception {
@@ -50,13 +47,12 @@ public class ExtensionInstaller {
         if (id.endsWith(".json")) {
             id = id.substring(0, id.length() - 5);
         }
-        this.extensionConfigurationManager =  new ExtensionConfigurationManager(id, extensionDesc);
 
         if (extension == null) {
             extension = getExtension(fullConfig);
         }
 
-        load(id, extension, fullConfig);
+        load(id, extension, fullConfig, new ExtensionConfigurationManager(id, extensionDesc));
     }
 
     private Extension getExtension(ObjectNode config) throws Exception {
@@ -86,26 +82,24 @@ public class ExtensionInstaller {
         if (id.endsWith(".json")) {
             id = id.substring(0, id.length() - 5);
         }
-        this.extensionConfigurationManager =  new ExtensionConfigurationManager(id, file);
 
-        load(id, extension, fullConfig);
+        load(id, extension, fullConfig, new ExtensionConfigurationManager(id, file));
     }
 
     public void load(String id, Extension extension, ObjectNode config) throws Exception {
+        load(id, extension, config, new ExtensionConfigurationManager(id, null));
+    }
 
+    public void load(String id, Extension extension, ObjectNode config, ExtensionConfigurationManager extensionConfigManager) throws Exception {
         ServiceName configManagerName = Services.systemConfigurationManager(id);
 
-        if (extensionConfigurationManager == null) {
-            extensionConfigurationManager = new ExtensionConfigurationManager(id, null);
-        }
-
-        target.addService(configManagerName, new ValueService<>(new ImmediateValue<>(extensionConfigurationManager))).install();
+        target.addService(configManagerName, new ValueService<>(new ImmediateValue<>(extensionConfigManager))).install();
         target.addService(Services.systemEnvironmentProperties(id), new ValueService<>(new ImmediateValue<>(envProperties()))).install();
 
         StabilityMonitor monitor = new StabilityMonitor();
         ServiceTarget target = this.target.subTarget();
         target.addMonitor(monitor);
-        ExtensionService extensionService = new ExtensionService(id, extension, config, extensionConfigurationManager);
+        ExtensionService extensionService = new ExtensionService(id, extension, config, extensionConfigManager);
         ServiceBuilder builder = target.addService(Services.extension(id), extensionService);
 
         JsonNode deps = config.get("dependencies");
@@ -120,7 +114,7 @@ public class ExtensionInstaller {
 
     private String replaceProperties(File file) throws IOException {
         String original = new String(Files.readAllBytes(file.toPath()));
-        return StringPropertyReplacer.replaceProperties(original, System.getProperties(), (v) -> { return JSONEncoder.jsonStringEscape(v); });
+        return StringPropertyReplacer.replaceProperties(original, System.getProperties(), (v) -> JSONEncoder.jsonStringEscape(v));
     }
 
     private Properties envProperties() {
@@ -129,6 +123,4 @@ public class ExtensionInstaller {
     }
 
     private ServiceTarget target;
-    private final ServiceName systemConfigMount;
-    private ExtensionConfigurationManager extensionConfigurationManager = null;
 }

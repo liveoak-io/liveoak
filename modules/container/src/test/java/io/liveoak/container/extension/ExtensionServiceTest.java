@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.container.service.ClientService;
-import io.liveoak.container.tenancy.ExtensionConfigurationManager;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Services;
 import org.jboss.msc.service.ServiceContainer;

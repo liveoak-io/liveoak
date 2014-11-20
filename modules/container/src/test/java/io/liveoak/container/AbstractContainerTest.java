@@ -1,10 +1,17 @@
 package io.liveoak.container;
 
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import io.liveoak.spi.MediaType;
+import io.liveoak.spi.state.ResourceState;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufOutputStream;
+import io.netty.buffer.Unpooled;
+import org.apache.http.HttpResponse;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceController;
 
@@ -53,6 +60,18 @@ public class AbstractContainerTest {
         }
 
         return stable;
+    }
+
+    protected ResourceState decode(HttpResponse response) throws Exception {
+        ByteBuf buffer = Unpooled.buffer();
+        ByteBufOutputStream out = new ByteBufOutputStream(buffer);
+        response.getEntity().writeTo(out);
+        out.flush();
+        out.close();
+        System.err.println("========= HttpResponse ==========");
+        System.err.println(buffer.toString(Charset.defaultCharset()));
+        System.err.println("===================");
+        return system.codecManager().decode(MediaType.JSON, buffer);
     }
 
     private static String CONTROLLER_MESSAGE = "Controller %s is in State: %s, Substate: %s and Mode: %s";

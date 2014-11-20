@@ -58,7 +58,7 @@ public class TenancyTest {
 
         this.serviceContainer.addService(Services.SERVICE_REGISTRY, new ValueService<>(new ImmediateValue<>(this.serviceContainer))).install();
 
-        ExtensionInstaller installer = new ExtensionInstaller(this.serviceContainer.subTarget(), Services.resource(ZeroExtension.APPLICATION_ID, "system"));
+        ExtensionInstaller installer = new ExtensionInstaller(this.serviceContainer.subTarget());
         installer.load("application-clients", new ApplicationClientsExtension());
 
         this.serviceContainer.addService(Services.CLIENT, new ClientService()).install();
