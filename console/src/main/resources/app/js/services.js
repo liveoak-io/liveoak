@@ -513,7 +513,7 @@ loMod.factory('loPushPing', function($resource) {
 
 loMod.factory('LoBusinessLogicScripts', function($resource) {
   return $resource('/admin/applications/:appId/resources/scripts/:type/:scriptId', {
-    appId : '@appId',
+    appId : '@appId'
   }, {
     get : {
       method : 'GET',
