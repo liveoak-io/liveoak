@@ -259,7 +259,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
         $http.post(scopeMappingsUrl, smData).then(
           function() {
             if (showNotification) {
-              onSaveSuccessful()
+              onSaveSuccessful();
             }
           },
           function(httpResponse) {

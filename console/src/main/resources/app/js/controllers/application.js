@@ -357,8 +357,14 @@ loMod.controller('ExampleListCtrl', function($scope, $rootScope, $location, $fil
 
   for (var i = 0; i < examplesList.length; i++) {
     var example = examplesList[i];
-    if ($filter('filter')(loAppList.members, {'id': example.id}, true).length > 0) {
-      example.installed = true;
+
+    for(var appIndex in loAppList.members){
+      var app = loAppList.members[appIndex];
+      if (app.example === example.id){
+        example.installed = true;
+        example.path = app.id;
+        break;
+      }
     }
   }
 
