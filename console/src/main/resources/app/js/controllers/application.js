@@ -548,7 +548,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     return -1;
   };
 
-  var saveScopeMappings = function() {
+  var saveScopeMappings = function(showNotification) {
     var smData = [];
     for(var i = 0; i < $scope.availableRoles.length; i++) {
       if($scope.settings.scopeMappings.indexOf($scope.availableRoles[i].id) > -1) {
@@ -572,7 +572,9 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
         // smRes.$save({appId: $route.current.params.appId, clientId: $route.current.params.clientId});
         $http.post(scopeMappingsUrl, smData).then(
           function() {
-            //onSaveSuccessful()
+            if (showNotification) {
+              onSaveSuccessful()
+            }
         },
           function(httpResponse) {
             Notifications.httpError('Failed to update the scope roles.', httpResponse);
@@ -708,18 +710,23 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
         });
     }
     else if (!angular.equals($scope.settings.scopeMappings, settingsBackup.scopeMappings)) {
-      saveScopeMappings();
+      saveScopeMappings(true);
     }
   };
 
   var onSaveSuccessful = function() {
     Notifications.success('The client "' + $scope.appClient.name + '" has been ' + ($scope.create ? 'created': 'updated') + '.');
+    /*
     var nxtLoc = 'applications/' + currentApp.name + '/application-clients/' + $scope.appClient.name;
     if ($location.path().replace(/\/+/g, '') === nxtLoc.replace(/\/+/g, '')) {
       $route.reload();
     }
-    else {
+    */
+    if ($scope.create) {
       $location.search('created', $scope.appClient.name).path('applications/' + currentApp.name + '/application-clients');
+    }
+    else {
+      $location.path('applications/' + currentApp.name + '/application-clients');
     }
   };
 });
