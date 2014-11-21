@@ -1,4 +1,4 @@
-package io.liveoak.container.extension;
+package io.liveoak.container.extension.service;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -6,6 +6,10 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.container.extension.ExtensionConfigurationManager;
+import io.liveoak.container.extension.ModuleResourceRegistry;
+import io.liveoak.container.extension.MountService;
+import io.liveoak.container.extension.SystemExtensionContextImpl;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.Extension;

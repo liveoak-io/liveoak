@@ -3,6 +3,11 @@ package io.liveoak.container.extension;
 import java.util.Properties;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.container.extension.service.AdminResourceWrappingResourceService;
+import io.liveoak.container.extension.service.InitializeResourceService;
+import io.liveoak.container.extension.service.MediaTypeMountService;
+import io.liveoak.container.extension.service.RootResourceLifecycleService;
+import io.liveoak.container.extension.service.SaveResourceConfigService;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.spi.client.Client;

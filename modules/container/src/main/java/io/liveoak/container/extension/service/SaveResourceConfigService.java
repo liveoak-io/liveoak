@@ -1,4 +1,4 @@
-package io.liveoak.container.extension;
+package io.liveoak.container.extension.service;
 
 import java.io.IOException;
 

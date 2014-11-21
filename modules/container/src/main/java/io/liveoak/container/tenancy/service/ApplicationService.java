@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.common.util.ObjectMapperFactory;
-import io.liveoak.container.extension.MediaTypeMountService;
+import io.liveoak.container.extension.service.MediaTypeMountService;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.tenancy.ApplicationResource;

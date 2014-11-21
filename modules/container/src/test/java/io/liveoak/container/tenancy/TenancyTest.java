@@ -6,7 +6,7 @@ import java.util.Collection;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultMountPointResource;
 import io.liveoak.container.extension.ExtensionInstaller;
-import io.liveoak.container.extension.ExtensionService;
+import io.liveoak.container.extension.service.ExtensionService;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.service.ClientService;
 import io.liveoak.container.tenancy.service.ApplicationsDeployerService;

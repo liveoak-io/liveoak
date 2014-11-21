@@ -1,7 +1,8 @@
-package io.liveoak.container.extension;
+package io.liveoak.container.extension.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
+import io.liveoak.container.extension.ServiceUpdateResponder;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;

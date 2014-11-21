@@ -2,7 +2,7 @@ package io.liveoak.container.zero.service;
 
 import java.io.File;
 
-import io.liveoak.container.extension.MediaTypeMountService;
+import io.liveoak.container.extension.service.MediaTypeMountService;
 import io.liveoak.container.extension.MountService;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;

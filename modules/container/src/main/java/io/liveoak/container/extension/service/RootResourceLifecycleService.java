@@ -1,4 +1,4 @@
-package io.liveoak.container.extension;
+package io.liveoak.container.extension.service;
 
 import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.inject.Injector;

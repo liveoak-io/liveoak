@@ -1,7 +1,9 @@
-package io.liveoak.container.extension;
+package io.liveoak.container.extension.service;
 
 import java.util.Properties;
 
+import io.liveoak.container.extension.ExtensionConfigurationManager;
+import io.liveoak.container.extension.SystemResourceWrappingResource;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.service.Service;
