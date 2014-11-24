@@ -89,7 +89,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $routePa
           { mechanism:'MONGODB-CR',
             username: $scope.storageModel.credentials[0].username,
             password: $scope.storageModel.credentials[0].password,
-            database: $scope.storageModel.db
+            database: $scope.storageModel.credentials[0].database || $scope.storageModel.db
           }
         );
       }
