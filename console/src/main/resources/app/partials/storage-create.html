@@ -68,6 +68,13 @@
         <fieldset>
           <legend lo-collapse class="collapsible"><span class="text">Login</span></legend>
           <div class="form-group clearfix">
+            <label class="col-sm-3  control-label" for="authdb">Auth Database</label>
+
+            <div class="col-sm-4">
+              <input class="form-control" ng-model="storageModel.credentials[0].database" type="text" id="authdb" autocomplete="off" placeholder="{{storageModel.db}}">
+            </div>
+          </div>
+          <div class="form-group clearfix">
             <label class="col-sm-3  control-label" for="stuname">Username</label>
 
             <div class="col-sm-4">
