@@ -1,0 +1,19 @@
+{
+    "rules": [
+        {
+            "uriPattern": "*",
+            "requestTypes": [ "*" ],
+            "allowedUsers": [ "*" ]
+        },
+        {
+            "uriPattern": "/testApp*",
+            "requestTypes": [ "READ" ],
+            "allowedRoles": [ "*" ]
+        },
+        {
+            "uriPattern": "/testApp/mock/bar",
+            "requestTypes": [ "READ" ],
+            "allowedRoles": [ "admin" ]
+        }
+    ]
+}

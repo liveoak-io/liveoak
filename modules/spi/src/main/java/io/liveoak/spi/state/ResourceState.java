@@ -176,7 +176,7 @@ public interface ResourceState {
         return getProperty(name, required, requestedType, false);
     }
 
-    default <P> P getProperty(String name, boolean required, Class<P> requestedType, boolean ignoreType) throws PropertyException {
+    default <T extends Enum<T>,P> P getProperty(String name, boolean required, Class<P> requestedType, boolean ignoreType) throws PropertyException {
         Object propertyObject = getProperty(name);
         if (required && (propertyObject == null || (propertyObject instanceof String && ((String) propertyObject).isEmpty()))) {
                 throw new RequiredPropertyException(name, requestedType);
@@ -186,7 +186,9 @@ public interface ResourceState {
             return requestedType.cast(propertyObject);
         } else if (requestedType == Long.class && propertyObject.getClass() == Integer.class) {
             //special check for numbers
-            return (P) new Long((Integer)propertyObject);
+            return (P) new Long((Integer) propertyObject);
+        } else if (requestedType.isEnum() && propertyObject instanceof String) {
+            return (P) Enum.valueOf((Class<T>)requestedType, (String)propertyObject);
         } else if (ignoreType == false) {
             throw new InvalidPropertyTypeException(name, requestedType);
         } else {

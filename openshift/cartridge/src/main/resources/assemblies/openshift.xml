@@ -17,6 +17,8 @@
               <exclude>modules/system/layers/base/io/undertow/core/main/undertow-core-1.0.15.Final.jar</exclude>
               <exclude>**/standalone.xml</exclude>
               <exclude>conf/extensions/keycloak.json</exclude>
+              <exclude>apps/admin/application.json</exclude>
+              <exclude>conf/extensions/mongo-launcher.json</exclude>
             </excludes>
         </fileSet>
         <fileSet>

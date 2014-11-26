@@ -11,6 +11,9 @@
                     interceptor-name: 'timing-http'
                 },
                 {
+                    interceptor-name: 'https-redirect'
+                },
+                {
                     interceptor-name: 'auth'
                 },
                 {

@@ -16,6 +16,7 @@ public interface ResourceResponse {
         UPDATED,
         DELETED,
         ERROR,
+        MOVED
     }
 
     ResponseType responseType();

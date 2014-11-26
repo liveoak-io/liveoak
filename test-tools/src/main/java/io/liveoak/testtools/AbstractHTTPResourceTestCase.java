@@ -54,7 +54,7 @@ public class AbstractHTTPResourceTestCase extends AbstractTestCase {
         return toResourceState(buffer, MediaType.JSON);
     }
 
-    protected JsonNode toJSON(HttpEntity entity) throws IOException {
+    public JsonNode toJSON(HttpEntity entity) throws IOException {
         return ObjectMapperFactory.create().readTree(entity.getContent());
     }
 
@@ -147,6 +147,13 @@ public class AbstractHTTPResourceTestCase extends AbstractTestCase {
             return this;
         }
 
+        public HttpRequest addHeader(String name, String value) {
+            if (builder != null) {
+                builder.addHeader(name, value);
+            }
+            return this;
+        }
+
         public HttpResponse execute() throws Exception {
             try (CloseableHttpResponse response = httpClient.execute(builder.build())) {
                 assertThat(response).isNotNull();
@@ -159,7 +166,11 @@ public class AbstractHTTPResourceTestCase extends AbstractTestCase {
     @Before
     public void setUpClient() throws Exception {
         RequestConfig cconfig = RequestConfig.custom().setSocketTimeout(500000).build();
-        this.httpClient = HttpClients.custom().disableContentCompression().setDefaultRequestConfig(cconfig).build();
+        this.httpClient = HttpClients.custom()
+                .disableContentCompression()
+                .setDefaultRequestConfig(cconfig)
+                .disableRedirectHandling()
+                .build();
     }
 
     @After

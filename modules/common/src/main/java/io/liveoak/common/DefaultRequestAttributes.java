@@ -5,11 +5,12 @@
  */
 package io.liveoak.common;
 
-import io.liveoak.spi.RequestAttributes;
-
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import io.liveoak.spi.RequestAttributes;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -25,7 +26,7 @@ public class DefaultRequestAttributes implements RequestAttributes {
     @Override
     public Collection<String> getAttributeNames() {
         if (attributesMap == null) {
-            return null;
+            return Collections.EMPTY_LIST;
         } else {
             return attributesMap.keySet();
         }
