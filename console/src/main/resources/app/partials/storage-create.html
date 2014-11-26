@@ -34,10 +34,33 @@
         <fieldset>
           <legend lo-collapse class="collapsible"><span class="text">Settings</span></legend>
           <div class="form-group clearfix">
+            <label class="col-sm-3  control-label" for="datastore">Datastore <span class="required">*</span></label>
+            <div class="dropdown btn-group bootstrap-select col-sm-4">
+              <button class="btn btn-default col-sm-12" id ="datastore" type="button" data-toggle="dropdown">
+                <span class="pull-left">{{storageModel.datastore || "Custom..."}}</span>
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                <li ng-repeat="ds in datastores" ng-class="{'active' : ds.id === storageModel.datastore}" >
+                  <a role="menuitem" tabindex="-1" ng-click="selectDatastore(ds)">
+                    <span class="text">{{ds.id}}</span>
+                  </a>
+                </li>
+                <li role="presentation" class="divider"></li>
+                <li role="presentation" ng-class="{'active' : !storageModel.datastore}">
+                  <a role="menuitem" tabindex="-1" ng-click="storageModel.datastore = undefined">Custom...</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <hr>
+
+          <div class="form-group clearfix">
             <label class="col-sm-3  control-label" for="dbhost">Host <span class="required">*</span></label>
 
             <div class="col-sm-4" ng-class="{'has-error': storageForm.dbhost.$error.pattern}">
-              <input class="form-control" ng-model="storageModel.servers[0].host" type="text" id="dbhost" name="dbhost" ng-pattern="reIPv4Host" required placeholder="e.g.: localhost">
+              <input class="form-control" ng-model="storageModel.servers[0].host" type="text" id="dbhost" name="dbhost" ng-pattern="reIPv4Host" required placeholder="e.g.: localhost" ng-disabled="storageModel.datastore">
               <span class="help-block" ng-show="storageForm.dbhost.$error.pattern">Not a valid address.</span>
             </div>
           </div>
@@ -45,7 +68,7 @@
             <label class="col-sm-3  control-label" for="dbport">Port <span class="required">*</span></label>
 
             <div class="col-sm-4" ng-class="{'has-error': storageForm.dbport.$dirty && !storageForm.dbport.$valid}">
-              <input class="form-control no-spinner" type="number" ng-model="storageModel.servers[0].port" ng-pattern="rePort" id="dbport" name="dbport" required placeholder="e.g.: 27017">
+              <input class="form-control no-spinner" type="number" ng-model="storageModel.servers[0].port" ng-pattern="rePort" id="dbport" name="dbport" required placeholder="e.g.: 27017" ng-disabled="storageModel.datastore">
               <span class="help-block" ng-show="storageForm.dbport.$dirty && !storageForm.dbport.$valid">Not a valid port number (1-65535).</span>
             </div>
           </div>
@@ -71,14 +94,14 @@
             <label class="col-sm-3  control-label" for="authdb">Auth Database</label>
 
             <div class="col-sm-4">
-              <input class="form-control" ng-model="storageModel.credentials[0].database" type="text" id="authdb" autocomplete="off" placeholder="{{storageModel.db}}">
+              <input class="form-control" ng-model="storageModel.credentials[0].database" type="text" id="authdb" autocomplete="off" placeholder="{{storageModel.db}}" ng-disabled="storageModel.datastore">
             </div>
           </div>
           <div class="form-group clearfix">
             <label class="col-sm-3  control-label" for="stuname">Username</label>
 
             <div class="col-sm-4">
-              <input class="form-control" ng-model="storageModel.credentials[0].username" type="text" id="stuname" autocomplete="off">
+              <input class="form-control" ng-model="storageModel.credentials[0].username" type="text" id="stuname" autocomplete="off" ng-disabled="storageModel.datastore">
             </div>
           </div>
           <div class="form-group clearfix">
@@ -86,7 +109,7 @@
 
             <div class="col-sm-4">
               <div class="input-with-button clearfix">
-                <input class="form-control" type="{{passwordInputType}}" id="passwd" name="password" autocomplete="off" ng-model="storageModel.credentials[0].password">
+                <input class="form-control" type="{{passwordInputType}}" id="passwd" name="password" autocomplete="off" ng-model="storageModel.credentials[0].password" ng-disabled="storageModel.datastore">
                 <button class="btn btn-link btn-icon" ng-click="changePasswordInputType()" type="button" tooltip="Show/Hide Password" >
                   <i class="fa fa-eye-slash" ng-show="passwordInputType === 'password'"></i>
                   <i class="fa fa-eye" ng-show="passwordInputType === 'text'"></i>

@@ -78,6 +78,11 @@ loMod.factory('LoStorage', function($resource) {
     delete : {
       method : 'DELETE',
       params : { appId : '@appId', storageId : '@storageId'}
+    },
+    getDatastores : {
+      method : 'GET',
+      url: '/admin/system/mongo',
+      params: { fields : '*(*)' }
     }
   });
 });
