@@ -61,8 +61,8 @@ loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, $ro
 
 loMod.controller('NavigationCtrl', function($scope, $rootScope, $filter, loLiveLoader, LoLiveAppList) {
 
-  loLiveLoader(LoLiveAppList.getList).then(function(data){
-    $scope.applications = data.members;
+  loLiveLoader(LoLiveAppList.getList, '/admin/applications/').then(function(data){
+    $scope.applications = data.live.members;
   });
 
   $scope.$watch('oPath', function() {
