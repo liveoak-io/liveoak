@@ -21,6 +21,7 @@ import io.liveoak.spi.MediaTypeMatcher;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.RequestType;
 import io.liveoak.spi.ResourceErrorResponse;
+import io.liveoak.spi.ResourceMovedResponse;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.ResourceRequest;
 import io.liveoak.spi.ResourceResponse;
@@ -32,6 +33,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpContent;
+import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -54,6 +56,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
 
         int responseStatusCode = 0;
         String responseMessage = null;
+        HttpHeaders responseHeaders = new DefaultHttpHeaders();
 
         boolean shouldEncodeState = false;
         switch (msg.responseType()) {
@@ -129,6 +132,29 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
 
                 }
                 break;
+            case MOVED:
+                if (msg instanceof ResourceMovedResponse) {
+                    ResourceMovedResponse resourceMovedResponse = (ResourceMovedResponse)msg;
+
+                    switch (resourceMovedResponse.movedType()) {
+                        case MOVED_PERMANENTLY:
+                            responseStatusCode = HttpResponseStatus.MOVED_PERMANENTLY.code();
+                            responseMessage = HttpResponseStatus.MOVED_PERMANENTLY.reasonPhrase();
+                            break;
+                        case MOVED_TEMPORARILY:
+                            responseStatusCode = HttpResponseStatus.FOUND.code();
+                            responseMessage = HttpResponseStatus.FOUND.reasonPhrase();
+                            break;
+                    }
+
+                    Integer maxAge = resourceMovedResponse.maxAge();
+                    if (maxAge != null) {
+                        responseHeaders.add(HttpHeaders.Names.CACHE_CONTROL, "max-age=" + maxAge);
+                    }
+
+                    responseHeaders.add(HttpHeaders.Names.LOCATION, ((ResourceMovedResponse) msg).redirectURL());
+                }
+                break;
         }
 
         DefaultHttpResponse response = null;
@@ -145,7 +171,8 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
                     MediaType bestMatch = matcher.findBestMatch(this.codecManager.mediaTypes());
                     if (bestMatch == MediaType.HTML) {
                         // HTML was requested and we have an HTML app
-                        ResourceRequest htmlAppRequest = new DefaultResourceRequest.Builder(RequestType.READ, htmlAppPath).mediaTypeMatcher(msg.inReplyTo().mediaTypeMatcher()).build();
+                        ResourceRequest htmlAppRequest = new DefaultResourceRequest.Builder(RequestType.READ, htmlAppPath).mediaTypeMatcher(msg.inReplyTo().mediaTypeMatcher())
+                                .requestAttributes(msg.inReplyTo().requestContext().requestAttributes()).build();
                         ctx.channel().pipeline().fireChannelRead(htmlAppRequest);
                         return;
                     }
@@ -221,6 +248,8 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
             response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, responseStatus);
             response.headers().add(HttpHeaders.Names.CONTENT_LENGTH, 0);
         }
+
+        response.headers().add(responseHeaders);
 
         out.add(response);
         ctx.fireUserEventTriggered(new RequestCompleteEvent(msg.requestId()));

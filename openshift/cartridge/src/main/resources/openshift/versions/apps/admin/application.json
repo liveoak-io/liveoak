@@ -1,0 +1,65 @@
+{
+  "name" : "LiveOak Admin Console",
+  "visible" : false,
+  "html-app" : "/console/index.html",
+  "resources" : {
+    "console" : {
+      "type" : "filesystem",
+      "config" : {
+        "directory" : "${application.dir}/console"
+      }
+    },
+
+    "client" : {
+      "type" : "aggregating-filesystem",
+      "config" : {
+        "directory" : "${io.liveoak.js.dir}"
+      }
+    },
+
+    "auth" : {
+      "type" : "keycloak"
+    },
+
+    "authz" : {
+      "type" : "security",
+      "config" : {
+        "policies" : [
+          {
+            "policyName" : "URIPolicy",
+            "policyResourceEndpoint" : "/admin/uri-policy/authzCheck"
+          }
+        ]
+      }
+    },
+
+    "uri-policy" : {
+      "type" : "uri-policy",
+      "config" : {
+        "rules" : [{
+          "uriPattern" : "/admin",
+          "requestTypes" : [ "READ" ],
+          "allowedUsers" : [ "*" ]
+        }, {
+          "uriPattern" : "/admin/console*",
+          "requestTypes" : [ "READ" ],
+          "allowedUsers" : [ "*" ]
+        }, {
+          "uriPattern" : "/admin/css*",
+          "requestTypes" : [ "READ" ],
+          "allowedUsers" : [ "*" ]
+        }, {
+          "uriPattern" : "/admin/client*",
+          "requestTypes" : [ "READ" ],
+          "allowedUsers" : [ "*" ]
+        }]
+      }
+    },
+    "https-redirect" : {
+      "type" : "https-redirect",
+      "config" : {
+        "redirects" : "ALL"
+      }
+    }
+  }
+}

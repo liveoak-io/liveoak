@@ -118,5 +118,6 @@
         <module>scripts</module>
         <module>scripts-scheduled</module>
         <module>ups</module>
+        <module>https-redirect</module>
     </modules>
 </project>
