@@ -484,6 +484,9 @@ loMod.config(['$routeProvider', function($routeProvider) {
         loStorageList : function(LoStorageListLoader) {
           return new LoStorageListLoader();
         },
+        loDatastores : function(LoStorage) {
+          return LoStorage.getDatastores().$promise;
+        },
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
         }
@@ -496,6 +499,9 @@ loMod.config(['$routeProvider', function($routeProvider) {
         loStorage : function() {
           return {'type':'mongo','servers':[{}],'credentials':[{'mechanism':'MONGODB-CR'}]};
         },
+        loDatastores : function(LoStorage) {
+          return LoStorage.getDatastores().$promise;
+        },
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
         }
@@ -507,6 +513,9 @@ loMod.config(['$routeProvider', function($routeProvider) {
       resolve : {
         loStorage: function(LoStorageLoader) {
           return new LoStorageLoader();
+        },
+        loDatastores : function(LoStorage) {
+          return LoStorage.getDatastores().$promise;
         },
         currentApp: function(LoAppLoader){
           return new LoAppLoader();
