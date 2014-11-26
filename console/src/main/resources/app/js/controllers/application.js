@@ -42,28 +42,34 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
     };
   };
 
-  var filtered = $filter('orderBy')($filter('filter')(loAppList.members, {'visible': true}), 'name');
-  for (var i = 0; i < filtered.length; i++) {
-    var app = {
-      id: filtered[i].id,
-      name: filtered[i].name,
-      visible: filtered[i].visible,
-      htmlapp: filtered[i]['html-app'],
-      example: filtered[i].example
-    };
-    app.url = $location.protocol() + '://' + $location.host() + ':' + $location.port() + '/' + app.id;
-    app.storage = LoStorage.getList({appId: app.id});
+  $scope.liveMembers = loAppList.live.members;
 
-    app.mongoStorages = 0;
-    app.storage.$promise.then(increaseStorages(app));
+  $scope.$watchCollection('liveMembers', function(){
+    loAppList.live.then(function(){
+      $scope.applications = [];
+      var filtered = $filter('orderBy')($filter('filter')(loAppList.live.members, {'visible': true}), 'name');
+      for (var i = 0; i < filtered.length; i++) {
+        var app = {
+          id: filtered[i].id,
+          name: filtered[i].name,
+          visible: filtered[i].visible,
+          htmlapp: filtered[i]['html-app'],
+          example: filtered[i].example
+        };
+        app.url = $location.protocol() + '://' + $location.host() + ':' + $location.port() + '/' + app.id;
+        app.storage = LoStorage.getList({appId: app.id});
+        app.mongoStorages = 0;
+        app.storage.$promise.then(increaseStorages(app));
 
-    if (app.example) {
-      $scope.exampleApplications.push(app);
-    }
-    else {
-      $scope.applications.push(app);
-    }
-  }
+        if (app.example) {
+          $scope.exampleApplications.push(app);
+        }
+        else {
+          $scope.applications.push(app);
+        }
+      }
+    });
+  });
 
   // Delete Application
   $scope.modalApplicationDelete = function(appId) {

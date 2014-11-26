@@ -263,8 +263,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   } else {
     $scope.breadcrumbs.push({'label': 'Collections',    'href':''});
   }
-
-  $scope.collectionList = currentCollectionList.members;
+  $scope.collectionList = currentCollectionList.live.members;
 
   $scope.collectionData = [];
   $scope.collectionDataBackup = [];
@@ -564,7 +563,7 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
 
     deletePromise.then(function(){
       Notifications.success('The collection "' + $scope.collectionId + '" has been deleted.');
-      loadCollectionList(selectFirst);
+      selectFirst();
     }, function() {
       Notifications.error('Failed to delete the collection "' + $scope.collectionId + '".');
     });
@@ -951,17 +950,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
   }
 
   $scope.isValidJSON = loJSON.isValidJSON;
-
-  function loadCollectionList(callback) {
-    $log.debug('Loading collection list');
-    var promise = LoCollection.getList({appId: currentApp.id, storageId: $routeParams.storageId});
-    promise.$promise.then(function (data) {
-      $scope.collectionList = data.members;
-      if (callback) {
-        callback();
-      }
-    });
-  }
 
   function resetEnv(){
     $scope.isColumnChange = false;
