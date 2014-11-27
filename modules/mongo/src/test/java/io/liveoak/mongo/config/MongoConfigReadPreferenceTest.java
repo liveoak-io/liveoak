@@ -1,5 +1,6 @@
 package io.liveoak.mongo.config;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.liveoak.common.codec.DefaultResourceState;
@@ -21,6 +22,7 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
     public void readPreference() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testDefaultDB");
+        config.putProperty("servers", new ArrayList());
         setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
@@ -38,6 +40,7 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
     public void configureType() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testConfigureTypeDB");
+        config.putProperty("servers", new ArrayList());
 
         ResourceState configReadPref = new DefaultResourceState();
         configReadPref.putProperty(ReadPreferenceState.TYPE, "secondary"); // use new string value here, if using ReadPreferenceResource.Types.SECONDARY.toString() then '==' will incorrectly work when we should be using equals()
@@ -61,6 +64,7 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
     public void updateType() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testUpdateTypeDB");
+        config.putProperty("servers", new ArrayList());
         setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
@@ -77,6 +81,7 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
 
         config = new DefaultResourceState();
         config.putProperty("db", "testUpdateTypeDB");
+        config.putProperty("servers", new ArrayList());
         config.putProperty(ReadPreferenceState.ID, updatedResourceState);
 
         result = client.update(new RequestContext.Builder().build(), ADMIN_PATH, config);
@@ -88,6 +93,7 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
     public void setWithTags() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testConfigureWithTagsDB");
+        config.putProperty("servers", new ArrayList());
 
         ResourceState configReadPref = new DefaultResourceState();
         configReadPref.putProperty(ReadPreferenceState.TYPE, ReadPreferenceState.SECONDARY);
@@ -121,6 +127,7 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
     public void invalidType() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testInvalidTypeDB");
+        config.putProperty("servers", new ArrayList());
 
         ResourceState configReadPref = new DefaultResourceState();
         configReadPref.putProperty(ReadPreferenceState.TYPE, "foobar");
@@ -138,6 +145,7 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
     public void nullType() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testNullTypeDB");
+        config.putProperty("servers", new ArrayList());
 
         ResourceState configReadPref = new DefaultResourceState();
         configReadPref.putProperty(ReadPreferenceState.TYPE, null);
@@ -161,6 +169,7 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
     public void updateTags() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testUpdateTagsDB");
+        config.putProperty("servers", new ArrayList());
 
         ResourceState configReadPref = new DefaultResourceState();
         configReadPref.putProperty(ReadPreferenceState.TYPE, ReadPreferenceState.SECONDARY);
@@ -176,6 +185,7 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
 
         ResourceState updatedConfig = new DefaultResourceState();
         updatedConfig.putProperty("db", "testUpdateTagsDB");
+        updatedConfig.putProperty("servers", new ArrayList());
         ResourceState updatedConfigReadPref = new DefaultResourceState();
         updatedConfigReadPref.putProperty(ReadPreferenceState.TYPE, ReadPreferenceState.SECONDARY_PREFERRED);
         ResourceState updatedTagConfig = new DefaultResourceState();

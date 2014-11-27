@@ -2,8 +2,16 @@
     module-id:  'io.liveoak.mongo',
     dependencies: ['mongo-launcher'],
     config: {
-    },
-    instances: {
-      "liveoak" : {}
+       "name" : "Default Datastore",
+       "servers" : [ {
+          "host" : "${liveoak.mongo.host:127.0.0.1}",
+          "port" : "${liveoak.mongo.port:27017}"
+       } ],
+       "credentials" : [ {
+          "username" : "${liveoak.mongo.username:}",
+          "password" : "${liveoak.mongo.password:}",
+          "database" : "${liveoak.mongo.authDb:}",
+          "mechanism" : "MONGODB-CR"
+       } ]    
     }
 }

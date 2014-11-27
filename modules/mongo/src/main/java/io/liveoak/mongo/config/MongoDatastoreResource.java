@@ -82,7 +82,9 @@ public class MongoDatastoreResource implements RootResource, SynchronousResource
         if (credentials != null) {
             for (ResourceState credential : credentials) {
                 CredentialState cred = new CredentialState(this, credential);
-                mongoCredentials.add(cred.getMongoCredential());
+                if (cred.getMongoCredential() != null) {
+                    mongoCredentials.add(cred.getMongoCredential());
+                }
             }
         }
 

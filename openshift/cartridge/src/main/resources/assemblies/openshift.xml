@@ -19,6 +19,7 @@
               <exclude>conf/extensions/keycloak.json</exclude>
               <exclude>apps/admin/application.json</exclude>
               <exclude>conf/extensions/mongo-launcher.json</exclude>
+              <exclude>conf/extensions/https-redirect.json</exclude>
             </excludes>
         </fileSet>
         <fileSet>

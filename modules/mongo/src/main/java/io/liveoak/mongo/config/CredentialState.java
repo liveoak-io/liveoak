@@ -30,14 +30,19 @@ public class CredentialState extends EmbeddedConfigResource {
         String mechanism = resourceState.getProperty(MECHANISM, false, String.class);
         String database = resourceState.getProperty(DB, false, String.class);
 
-        MongoCredential credential;
-        if (mechanism.equals(MongoCredential.MONGODB_CR_MECHANISM)) {
-            credential = MongoCredential.createMongoCRCredential(username, database, password.toCharArray());
-        } else {
-            credential = MongoCredential.createGSSAPICredential(username);
-        }
+        if (username != null && !username.isEmpty()) {
 
-        this.mongoCredential = credential;
+            MongoCredential credential;
+            if (mechanism.equals(MongoCredential.MONGODB_CR_MECHANISM)) {
+                credential = MongoCredential.createMongoCRCredential(username, database, password.toCharArray());
+            } else {
+                credential = MongoCredential.createGSSAPICredential(username);
+            }
+
+            this.mongoCredential = credential;
+        } else {
+            this.mongoCredential = null;
+        }
     }
 
     public CredentialState(Resource parent, MongoCredential credential) {

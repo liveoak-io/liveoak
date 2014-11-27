@@ -8,13 +8,13 @@ import java.util.Map;
  */
 public class MongoDatastoresRegistry {
 
-    Map<String, MongoDatastoreResource> datastores = new HashMap<>();
+    Map<String, MongoSystemDatastoreResource> datastores = new HashMap<>();
 
-    public MongoDatastoreResource getDataStore(String name) {
+    public MongoSystemDatastoreResource getDataStore(String name) {
         return datastores.get(name);
     }
 
-    public void addDataStore(String id, MongoDatastoreResource dataStore) {
+    public void addDataStore(String id, MongoSystemDatastoreResource dataStore) {
         datastores.put(id, dataStore);
     }
 }
