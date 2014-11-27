@@ -29,13 +29,13 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
     @BeforeClass
     public static void loadExtensions() throws Exception {
         JsonNode configNode = ObjectMapperFactory.create().readTree(
-                "{}");
+                "{ name: 'System'}");
 
         JsonNode instancesNode = ObjectMapperFactory.create().readTree(
                 "{" +
-                        "    foo: {servers: [{ host: 'localhost', port: 27018}]}," +
-                        "    bar: {servers: [{ port: 27017}]}," +
-                        "    baz: {}" +
+                        "    foo: {name: 'Foo', servers: [{ host: 'localhost', port: 27018}]}," +
+                        "    bar: {name: 'Bar', servers: [{ port: 27017}]}," +
+                        "    baz: {name: 'Baz'}" +
                         "}");
 
         loadExtension("mongo", new MongoExtension(), (ObjectNode) configNode, (ObjectNode) instancesNode);
@@ -91,8 +91,10 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
     @Test
     public void testCreateDataStore() throws Exception {
         ResourceState bortResourceState = new DefaultResourceState("bort");
+        bortResourceState.putProperty("name", "Bort");
         ResourceState createResponse = client.create(new RequestContext.Builder().build(), INSTANCES_CONFIG_PATH, bortResourceState);
         assertThat(createResponse.id()).isEqualTo("bort");
+        assertThat(createResponse.getProperty("name")).isEqualTo("Bort");
 
         ResourceState readState = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), INSTANCES_CONFIG_PATH);
         assertThat(readState.members().size()).isEqualTo(5);
@@ -155,6 +157,7 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
         assertThat(foo).isNull();
 
         ResourceState fooResourceState = new DefaultResourceState("foo");
+        fooResourceState.putProperty("name", "Foo");
         ResourceState server = new DefaultResourceState();
         server.putProperty("host", "localhost");
         server.putProperty("port", 27018);
@@ -167,6 +170,7 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
     @Test
     public void testUpdateDataStore() throws Exception {
         ResourceState barResourceState = client.read(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), INSTANCES_CONFIG_PATH + "/bar");
+        barResourceState.putProperty("name", "BARBARBAR");
 
         List servers = barResourceState.getProperty("servers", false, List.class);
         ((ResourceState) servers.get(0)).putProperty("port", 27019);
@@ -177,6 +181,7 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
 
         assertThat(readState).isNotNull();
         assertThat(readState.id()).isEqualTo("bar");
+        assertThat(readState.getProperty("name")).isEqualTo("BARBARBAR");
         ResourceState barServer = (ResourceState) readState.getProperty("servers", true, List.class).get(0);
         assertThat(barServer.getProperty("host")).isEqualTo("127.0.0.1");
         assertThat(barServer.getProperty("port")).isEqualTo(27019);
@@ -264,6 +269,7 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
 
         ResourceState updateState1 = new DefaultResourceState();
         updateState1.putProperty("db", "testDataStore");
+        updateState1.putProperty("servers", new ArrayList());
 
         ResourceState update1 = client.update(new RequestContext.Builder().build(), ADMIN_PATH, updateState1);
 

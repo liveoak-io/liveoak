@@ -20,6 +20,7 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
     public void testDefault() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testDefaultDB");
+        config.putProperty("servers", new ArrayList());
         setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
@@ -35,6 +36,7 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         ResourceState config = new DefaultResourceState();
         config = new DefaultResourceState();
         config.putProperty("db", "testConfigureCRDB");
+        config.putProperty("servers", new ArrayList());
 
         List<ResourceState> credentials = new ArrayList<>();
         ResourceState credential = new DefaultResourceState();
@@ -66,6 +68,7 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
         ResourceState config = new DefaultResourceState();
         config = new DefaultResourceState();
         config.putProperty("db", "testConfigureGSSDB");
+        config.putProperty("servers", new ArrayList());
 
         List<ResourceState> credentials = new ArrayList<>();
         ResourceState credential = new DefaultResourceState();
@@ -93,6 +96,7 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
     public void testConfigureMultipleCredentials () throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "ConfigureMultipleCredentialsDB");
+        config.putProperty("servers", new ArrayList());
 
         List<ResourceState> credentials = new ArrayList<>();
         ResourceState credentialA = new DefaultResourceState();
@@ -147,6 +151,7 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
     public void testUpdateCredentials() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "UpdateCredentialsDB");
+        config.putProperty("servers", new ArrayList());
 
         List<ResourceState> credentials = new ArrayList<>();
         ResourceState credentialA = new DefaultResourceState();
@@ -176,6 +181,7 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
 
         ResourceState updatedConfig = new DefaultResourceState();
         updatedConfig.putProperty("db", "UpdateCredentialsDB");
+        updatedConfig.putProperty("servers", new ArrayList());
 
         List<ResourceState> updatedCredentials = new ArrayList<ResourceState>();
 
@@ -200,6 +206,7 @@ public class MongoConfigCredentialsTest extends BaseMongoConfigTest {
     public void testClearCredentials() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testClearCredentials");
+        config.putProperty("servers", new ArrayList());
 
         List<ResourceState> credentials = new ArrayList<>();
         ResourceState credential = new DefaultResourceState();

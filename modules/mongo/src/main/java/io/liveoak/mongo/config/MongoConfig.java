@@ -7,7 +7,6 @@ import com.mongodb.DB;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.PropertyException;
 import io.liveoak.spi.resource.async.Resource;
-import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
 /**
@@ -22,11 +21,11 @@ public class MongoConfig extends EmbeddedConfigResource {
     private String datastoreName;
     private MongoDatastoreResource dataStore;
 
-    private MongoDatastoresRegistry mongoDatastoresResource;
+    private MongoDatastoresRegistry mongoDatastoresRegistry;
 
     public MongoConfig(Resource parent, MongoDatastoresRegistry mongoSystemConfigResource, ResourceState resourceState, boolean init) throws Exception {
         super(parent);
-        this.mongoDatastoresResource = mongoSystemConfigResource;
+        this.mongoDatastoresRegistry = mongoSystemConfigResource;
         generateDataStore(resourceState, init);
     }
 
@@ -45,13 +44,18 @@ public class MongoConfig extends EmbeddedConfigResource {
             throw new PropertyException("A datastore cannot accept a null value.");
         }
 
-        if (datastore != null && mongoDatastoresResource != null) {
-            if (mongoDatastoresResource.getDataStore(datastore) != null || init) {
+        // if we don't have a datastore specified, but no servers is specified, then use the default 'module' datastore
+        if (datastore == null && !resourceState.getPropertyNames().contains(MongoDatastoreResource.SERVERS)) {
+            datastore = "module";
+        }
+
+        if (datastore != null && mongoDatastoresRegistry != null) {
+            if (mongoDatastoresRegistry.getDataStore(datastore) != null || init) {
                 this.datastoreName = datastore;
             } else {
                 throw new PropertyException("No datastore named '" + datastore + "' exists.");
             }
-        } else if (datastore != null && mongoDatastoresResource == null) {
+        } else if (datastore != null && mongoDatastoresRegistry == null) {
             throw new PropertyException("DataStores not supported for this resource.");
         } else {
             this.dataStore = new MongoDatastoreResource(this, resourceState);
@@ -74,8 +78,8 @@ public class MongoConfig extends EmbeddedConfigResource {
     }
 
     public DB getDB() {
-        if (datastoreName != null && mongoDatastoresResource != null) {
-            return mongoDatastoresResource.getDataStore(datastoreName).mongoClient.getDB(databaseName);
+        if (datastoreName != null && mongoDatastoresRegistry != null) {
+            return mongoDatastoresRegistry.getDataStore(datastoreName).mongoClient.getDB(databaseName);
         } else if (dataStore != null){
             return dataStore.mongoClient.getDB(databaseName);
         } else {

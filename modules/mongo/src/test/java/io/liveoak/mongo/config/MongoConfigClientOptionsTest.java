@@ -1,5 +1,7 @@
 package io.liveoak.mongo.config;
 
+import java.util.ArrayList;
+
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
@@ -16,6 +18,7 @@ public class MongoConfigClientOptionsTest extends BaseMongoConfigTest {
     public void defaultTest() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testDefaultDB");
+        config.putProperty("servers", new ArrayList());
         setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
@@ -42,6 +45,7 @@ public class MongoConfigClientOptionsTest extends BaseMongoConfigTest {
     public void configure() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testConfigureDB");
+        config.putProperty("servers", new ArrayList());
 
         ResourceState mongoClientConfigResourceState = new DefaultResourceState();
         mongoClientConfigResourceState.putProperty(MongoClientOptionsState.DESCRIPTION, "my cool mbaas");
@@ -78,6 +82,7 @@ public class MongoConfigClientOptionsTest extends BaseMongoConfigTest {
     public void updateConfigure() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testUpdateConfigureDB");
+        config.putProperty("servers", new ArrayList());
 
         ResourceState mongoClientConfigResourceState = new DefaultResourceState();
         mongoClientConfigResourceState.putProperty(MongoClientOptionsState.DESCRIPTION, "my cool mbaas");
@@ -95,6 +100,7 @@ public class MongoConfigClientOptionsTest extends BaseMongoConfigTest {
 
         ResourceState updatedConfig = new DefaultResourceState();
         updatedConfig.putProperty("db", "testUpdateConfigureDB");
+        updatedConfig.putProperty("servers", new ArrayList());
         updatedConfig.putProperty(MongoClientOptionsState.ID, updatedClientConfigResourceState);
 
         ResourceState result = client.update(new RequestContext.Builder().build(), ADMIN_PATH, updatedConfig);

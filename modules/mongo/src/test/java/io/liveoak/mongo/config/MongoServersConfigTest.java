@@ -77,6 +77,7 @@ public class MongoServersConfigTest extends BaseMongoConfigTest {
     public void embeddedResources() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testOnlyDBDatabase");
+        config.putProperty("servers", new ArrayList());
         setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
@@ -93,6 +94,7 @@ public class MongoServersConfigTest extends BaseMongoConfigTest {
     public void onlyDb() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testOnlyDBDatabase");
+        config.putProperty("servers", new ArrayList());
         setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);

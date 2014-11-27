@@ -11,11 +11,11 @@ import org.jboss.msc.value.InjectedValue;
  */
 public class MongoDatastoreService implements Service<MongoDatastoreResource> {
 
-    MongoDatastoreResource resource;
+    MongoSystemDatastoreResource resource;
 
     @Override
     public void start(StartContext context) throws StartException {
-        resource = new MongoDatastoreResource(idInjector.getValue());
+        resource = new MongoSystemDatastoreResource(idInjector.getValue());
 
         mongoDatastoreInjector.getValue().addDataStore(idInjector.getValue(), resource);
     }

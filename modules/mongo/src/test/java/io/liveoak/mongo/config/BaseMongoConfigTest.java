@@ -1,7 +1,8 @@
 package io.liveoak.mongo.config;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.mongo.extension.MongoExtension;
@@ -22,9 +23,11 @@ public abstract class BaseMongoConfigTest extends AbstractTestCaseWithTestApp {
 
     @BeforeClass
     public static void loadExtensions() throws Exception {
-        ObjectNode json = JsonNodeFactory.instance.objectNode();
-        json.put("db", "testDefaultDB");
-        loadExtension("mongo", new MongoExtension(), json);
+        JsonNode configNode = ObjectMapperFactory.create().readTree(
+                "{ name: 'testDefaultDB'," +
+                " servers: []}");
+
+        loadExtension("mongo", new MongoExtension(), (ObjectNode) configNode);
     }
 
     @After

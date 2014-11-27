@@ -1,5 +1,7 @@
 package io.liveoak.mongo.config;
 
+import java.util.ArrayList;
+
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
@@ -17,6 +19,7 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
     public void testDefault() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testDefaultDB");
+        config.putProperty("servers", new ArrayList());
         setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
@@ -38,6 +41,7 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
     public void settingValues() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testDefaultDB");
+        config.putProperty("servers", new ArrayList());
 
         ResourceState configWriteConcernState = new DefaultResourceState();
         configWriteConcernState.putProperty(WriteConcernState.W, 2);
@@ -69,6 +73,7 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
     public void taggedWriteConcern() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testTaggedDB");
+        config.putProperty("servers", new ArrayList());
 
         ResourceState configWriteConcernState = new DefaultResourceState();
         configWriteConcernState.putProperty(WriteConcernState.W, "majority");
@@ -100,6 +105,7 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
     public void updateWriteConcern() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testUpdateWriteConcernDB");
+        config.putProperty("servers", new ArrayList());
 
         ResourceState configWriteConcernState = new DefaultResourceState();
         configWriteConcernState.putProperty(WriteConcernState.W, 2);
@@ -131,6 +137,7 @@ public class MongoConfigWriteConcernTest extends BaseMongoConfigTest {
     public void nullWriteConcern() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testTaggedDB");
+        config.putProperty("servers", new ArrayList());
 
         config.putProperty(WriteConcernState.ID, null);
 

@@ -20,7 +20,14 @@ public class ServerAddressState extends EmbeddedConfigResource {
     public ServerAddressState(Resource parent, ResourceState resourceState) throws Exception {
         super(parent);
         String host = resourceState.getProperty(HOST, false, String.class);
-        Integer port = resourceState.getProperty(PORT, false, Integer.class);
+
+        Integer port = resourceState.getProperty(PORT, false, Integer.class, true);
+        if (port == null) {
+            String portString = resourceState.getProperty(PORT, false, String.class, true);
+            if (portString != null) {
+                port = Integer.parseInt(portString);
+            }
+        }
 
         if (port == null) {
             serverAddress = new ServerAddress(host);
