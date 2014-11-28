@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.mongo.gridfs.extension.GridFSExtension;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.state.ResourceState;
@@ -41,6 +44,11 @@ public class AbstractGridFSTestCase extends AbstractHTTPResourceTestCaseWithTest
     @BeforeClass
     public static void loadExtensions() throws Exception {
         loadExtension("gridfs", new GridFSExtension());
+
+        ObjectNode mongoConfig = JsonNodeFactory.instance.objectNode();
+        mongoConfig.put("name", "Default");
+        loadExtension("mongo", new MongoExtension(), mongoConfig);
+
         installTestAppResource("gridfs", "gridfs", createConfig());
     }
 
