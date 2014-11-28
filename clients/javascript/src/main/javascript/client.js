@@ -101,7 +101,11 @@ var LiveOak = function( options ) {
         }
 
         if (!options.auth.url) {
-            options.auth.url = (options.secure ? 'https://' : 'http://') + options.host + (options.port ? ':' + options.port : '') + '/auth';
+            var scheme = options.secure ? 'https://' : 'http://';
+            if (typeof LIVEOAK_DEFAULT_SECURE_AUTH_CONNECTION != 'undefined' && LIVEOAK_DEFAULT_SECURE_AUTH_CONNECTION) {
+              scheme = 'https://';
+            }
+            options.auth.url = scheme + options.host + (options.port ? ':' + options.port : '') + '/auth';
         }
 
         auth = new Keycloak(options.auth);
