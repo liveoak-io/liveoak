@@ -200,9 +200,7 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
                   id: $scope.storagePath,
                   type: 'mongo',
                   config: {
-                    db: $scope.appModel.id,
-                    servers: [{host: 'localhost', port: 27017}],
-                    credentials: []
+                    db: $scope.appModel.id
                   }
                 };
 
@@ -332,7 +330,7 @@ loMod.controller('NextStepsCtrl', function($scope, $rootScope, $routeParams, cur
   /* jshint unused: false */
   angular.forEach(loStorageList.members, function (value, key) {
     if (value.hasOwnProperty('db')) {
-      this.push({id: value.id, provider: value.hasOwnProperty('MongoClientOptions') ? 'mongoDB' : 'unknown', port: value.servers[0].port || '?'});
+      this.push({id: value.id, provider: value.hasOwnProperty('MongoClientOptions') ? 'mongoDB' : 'unknown'});
     }
     else if(value.hasOwnProperty('upsURL')) {
       $scope.pushConfig = value;
