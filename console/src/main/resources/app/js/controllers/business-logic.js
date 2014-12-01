@@ -95,6 +95,14 @@ loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $route
 
   $scope.changed = false;
 
+  var doWatch = function() {
+    settingsBackup = angular.copy($scope.script);
+    $scope.$watch('script', function() {
+      $scope.changed = !angular.equals($scope.script, settingsBackup);
+      $scope.codeChanged = !angular.equals($scope.script.code, settingsBackup.code);
+    }, true);
+  };
+
   // Get the script itself
   if(!$scope.create) {
     $http({method: 'GET', url: '/admin/applications/' + currentApp.id + '/resources/scripts/resource-triggered-scripts/' + currentScript.id + '/script'}).
@@ -105,19 +113,11 @@ loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $route
         $scope.script.code = '';
       }).
       finally(function() {
-        settingsBackup = angular.copy($scope.script);
-
-        $scope.$watch('script', function() {
-          $scope.changed = !angular.equals($scope.script, settingsBackup);
-        }, true);
+        doWatch();
       });
   }
   else {
-    settingsBackup = angular.copy($scope.script);
-
-    $scope.$watch('script', function() {
-      $scope.changed = !angular.equals($scope.script, settingsBackup);
-    }, true);
+    doWatch();
   }
 
   $scope.editorOptions = {
@@ -132,11 +132,16 @@ loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $route
     mode: {name: 'javascript', globalVars: true}
   };
 
-  $scope.clear = function() {
-    $scope.script = angular.copy(settingsBackup);
+  $scope.clear = function(codeOnly) {
+    if (codeOnly) {
+      $scope.script.code = angular.copy(settingsBackup.code);
+    }
+    else {
+      $scope.script = angular.copy(settingsBackup);
+    }
   };
 
-  $scope.save = function() {
+  $scope.save = function(codeOnly) {
     var scriptMeta = angular.copy($scope.script);
     var scriptCode = angular.copy($scope.script.code);
     delete(scriptMeta.code);
@@ -155,29 +160,35 @@ loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $route
         $scope.script = angular.copy(data);
         //Notifications.success('The script "' + $scope.script.id + '" has been created.');
         //$scope.script.$setSource({'appId': currentApp.id, 'type':'resource-triggered-scripts'});
-        $http({
-          method: ($scope.create ? 'POST' : 'PUT'),
-          url: '/admin/applications/' + currentApp.id + '/resources/scripts/resource-triggered-scripts/' + $scope.script.id + ($scope.create ? '' : '/script'),
-          headers: { 'Content-Type':'application/javascript' },
-          data: scriptCode
-        }).
-        success(function (data/*, status*/) {
-          Notifications.success('The script "' + $scope.script.id + '" has been ' + ($scope.create ? 'created.' : 'updated.'));
-          $scope.script.code = data;
-          settingsBackup = angular.copy($scope.script);
-        }).
-        error(function (/*httpResponse, status*/) {
-          Notifications.error('Failed to set script source for "' + $scope.script.id + '".');
-        }).
-        finally(function() {
-          $scope.create = false;
-        });
-        $location.search(($scope.create ? 'created' : 'updated'), $scope.script.id).path('/applications/' + currentApp.id + '/business-logic');
+        saveCode(scriptCode);
+        if(!codeOnly) {
+          $location.search(($scope.create ? 'created' : 'updated'), $scope.script.id).path('/applications/' + currentApp.id + '/business-logic');
+        }
       },
       function(httpResponse) {
         Notifications.httpError('Failed to ' + ($scope.create ? 'create' : 'update') + ' the script "' + $scope.script.id + '".', httpResponse);
       }
     );
+  };
+
+  var saveCode = function(scriptCode) {
+    $http({
+      method: ($scope.create ? 'POST' : 'PUT'),
+      url: '/admin/applications/' + currentApp.id + '/resources/scripts/resource-triggered-scripts/' + $scope.script.id + ($scope.create ? '' : '/script'),
+      headers: { 'Content-Type':'application/javascript' },
+      data: scriptCode
+    }).
+    success(function (data/*, status*/) {
+      Notifications.success('The script "' + $scope.script.id + '" has been ' + ($scope.create ? 'created.' : 'updated.'));
+      $scope.script.code = data;
+      settingsBackup = angular.copy($scope.script);
+    }).
+    error(function (/*httpResponse, status*/) {
+      Notifications.error('Failed to set script source for "' + $scope.script.id + '".');
+    }).
+    finally(function() {
+      $scope.create = false;
+    });
   };
 
 });
