@@ -37,13 +37,13 @@
             <label class="col-sm-3  control-label" for="datastore">Datastore <span class="required">*</span></label>
             <div class="dropdown btn-group bootstrap-select col-sm-4">
               <button class="btn btn-default col-sm-12" id ="datastore" type="button" data-toggle="dropdown">
-                <span class="pull-left">{{storageModel.datastore || "Custom..."}}</span>
+                <span class="pull-left">{{ storageModel.datastore ? ((datastores|filter:{id:storageModel.datastore}:true)[0].name) : "Custom..." }}</span>
                 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu" role="menu">
                 <li ng-repeat="ds in datastores" ng-class="{'active' : ds.id === storageModel.datastore}" >
                   <a role="menuitem" tabindex="-1" ng-click="selectDatastore(ds)">
-                    <span class="text">{{ds.id}}</span>
+                    <span class="text">{{ds.name}}</span>
                   </a>
                 </li>
                 <li role="presentation" class="divider"></li>
