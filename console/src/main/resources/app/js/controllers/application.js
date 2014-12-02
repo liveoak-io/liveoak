@@ -17,7 +17,7 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
     return function (resources) {
       if (resources.members) {
         for (var j = 0; j < resources.members.length; j++) {
-          if (resources.members[j].hasOwnProperty('MongoClientOptions')) {
+          if (resources.members[j].hasOwnProperty('type') && resources.members[j].type === 'mongo') {
             app.mongoStorages++;
           }
           else if (resources.members[j].hasOwnProperty('upsURL')) {
