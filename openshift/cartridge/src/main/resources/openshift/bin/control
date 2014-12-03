@@ -40,7 +40,7 @@ function start() {
     if [ -a $OPENSHIFT_LIVEOAK_DIR/versions/1.0.0/bin/.liveoak_pid ]; then
         echo "LiveOak already started"
     else
-        $OPENSHIFT_LIVEOAK_DIR/versions/1.0.0/bin/standalone.sh -b $OPENSHIFT_LIVEOAK_IP -Djboss.bind.address=$OPENSHIFT_LIVEOAK_IP -Djboss.bind.address.management=$OPENSHIFT_LIVEOAK_IP -Djboss.bind.address.unsecure=$OPENSHIFT_LIVEOAK_IP -Djboss.liveoak.port=18383 -Dopenshift.gear.dns=$OPENSHIFT_GEAR_DNS -Dliveoak.mongo.host=$OPENSHIFT_MONGODB_DB_HOST -Dliveoak.mongo.port=$OPENSHIFT_MONGODB_DB_PORT -Dliveoak.mongo.username=$OPENSHIFT_MONGODB_DB_USERNAME -Dliveoak.mongo.password=$OPENSHIFT_MONGODB_DB_PASSWORD -Dliveoak.mongo.authDb=admin -Dliveoak.initial.password=$OPENSHIFT_LIVEOAK_INITIAL_PASSWORD &> /dev/null &
+        $OPENSHIFT_LIVEOAK_DIR/versions/1.0.0/bin/standalone.sh -b $OPENSHIFT_LIVEOAK_IP -Djboss.bind.address=$OPENSHIFT_LIVEOAK_IP -Djboss.bind.address.management=$OPENSHIFT_LIVEOAK_IP -Djboss.bind.address.unsecure=$OPENSHIFT_LIVEOAK_IP -Djboss.liveoak.port=18383 -Dopenshift.gear.dns=$OPENSHIFT_GEAR_DNS -Dliveoak.mongo.host=$OPENSHIFT_MONGODB_DB_HOST -Dliveoak.mongo.port=$OPENSHIFT_MONGODB_DB_PORT -Dliveoak.mongo.username=$OPENSHIFT_MONGODB_DB_USERNAME -Dliveoak.mongo.password=$OPENSHIFT_MONGODB_DB_PASSWORD -Dliveoak.mongo.authDb=admin -Dliveoak.initial.password=$OPENSHIFT_MONGODB_DB_PASSWORD &> /dev/null &
         echo $! > $OPENSHIFT_LIVEOAK_DIR/versions/1.0.0/bin/.liveoak_pid 
     fi
 
@@ -70,13 +70,30 @@ function reload() {
 }
 
 function tidy() {
-    echo "Tidy"
+    echo "Tidying"
+    echo "  Removing the logs"
+    rm -rf $OPENSHIFT_LIVEOAK_LOG_DIR/*
 }
 
 function deploy() {
-echo "Deploying and managing applications via the openshift git is not currently supported"
+    echo "Deploying and managing applications via the openshift git is not currently supported"
 }
 
+function pre-snapshot() {
+    echo "Preparing apps directory for snapshot"
+    mkdir $OPENSHIFT_DATA_DIR/liveoak/
+    cp -r $OPENSHIFT_LIVEOAK_DIR/versions/1.0.0/apps  $OPENSHIFT_DATA_DIR/liveoak/
+}
+
+function post-restore() {
+    echo "Preparing to copy apps directory back to LiveOak install"
+    if [ -e $OPENSHIFT_LIVEOAK_DIR/versions/1.0.0/apps ]; then
+      rm -rf $OPENSHIFT_LIVEOAK_DIR/versions/1.0.0/apps
+    fi
+
+    mv $OPENSHIFT_DATA_DIR/liveoak/apps $OPENSHIFT_LIVEOAK_DIR/versions/1.0.0
+    rmdir $OPENSHIFT_DATA_DIR/liveoak
+}
 
 case "$1" in
   start)     start ;;
@@ -86,5 +103,7 @@ case "$1" in
   reload)    reload ;;
   tidy)      tidy ;;
   deploy)    deploy ;;
+  pre-snapshot)    pre-snapshot ;;
+  post-restore)    post-restore ;;
   *)         exit 0
 esac
