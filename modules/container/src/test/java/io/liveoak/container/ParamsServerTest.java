@@ -5,6 +5,9 @@
  */
 package io.liveoak.container;
 
+import java.util.HashSet;
+import java.util.List;
+
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.state.ResourceState;
 import org.apache.http.Header;
@@ -15,9 +18,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.junit.Test;
-
-import java.util.HashSet;
-import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -139,6 +139,23 @@ public class ParamsServerTest extends BasicServerTest {
         assertThat(member.id()).isEqualTo(krustyState.id());
 
         response.close();
+
+        // Retrieve the people resource with a limit of 0 (eg do not return any members)
+        getRequest = new HttpGet("http://localhost:8080/testApp/memory/people?limit=0");
+        getRequest.addHeader(header);
+        response = httpClient.execute(getRequest);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+
+        state = decode(response);
+        assertThat(state).isNotNull();
+
+        members = state.members();
+        assertThat(members.size()).isEqualTo(0);
+
+        response.close();
+
 
 
         System.err.println("TEST #2");

@@ -169,6 +169,16 @@ public class MongoDBCollectionReadTest extends BaseMongoDBTest {
             assertThat(member.getProperty("type")).isEqualTo("collection");
             assertThat(member.members()).isEmpty();
         }
+
+        // This should return 0 members as the limit is 0
+        requestContext = new RequestContext.Builder().returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS)).pagination(new SimplePagination(23, 0)).build();
+        result = client.read(requestContext, "/testApp/" + BASEPATH);
+
+        // verify the result
+        assertThat(result.id()).isEqualTo(BASEPATH);
+        assertThat(result.getPropertyNames().size()).isEqualTo(2);
+        assertThat(result.getProperty("type")).isEqualTo("database");
+        assertThat(result.members().size()).isEqualTo(0);
     }
 
     @Test

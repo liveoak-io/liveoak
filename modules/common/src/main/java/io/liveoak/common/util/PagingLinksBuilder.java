@@ -66,7 +66,7 @@ public class PagingLinksBuilder {
         int limit = ctx.pagination().limit();
 
         int lastPageOffset = 0;
-        if (totalCount > 0) {
+        if (totalCount > 0 & limit != 0) {
             int mod = totalCount % limit;
             lastPageOffset = totalCount - (mod == 0 ? limit : mod);
         }
