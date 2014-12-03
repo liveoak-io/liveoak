@@ -27,7 +27,8 @@ public class MembersEncodingDriver extends ResourceEncodingDriver {
     public void encode() throws Exception {
         //we should only read the members if they are going to be returned in the response
         //otherwise it could be an expensive operation when all we are requesting is metadata (ie count)
-        if (requestContext().returnFields().included(LiveOak.MEMBERS)) {
+        //or if the count > 0 (eg no member should be returned).
+        if (requestContext().returnFields().included(LiveOak.MEMBERS) && requestContext().pagination().limit() > 0) {
             resource().readMembers(requestContext(), new MyResourceSink());
         } else {
             encodeNext();
