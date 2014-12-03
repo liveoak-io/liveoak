@@ -1,50 +1,35 @@
 Name: liveoak
 Cartridge-Short-Name: LIVEOAK
 Display-Name: LiveOak BaaS 1.0.0.Beta02-SNAPSHOT
-Description: "The opensource RESTful backend-as-a-service stack"
+Description: "The opensource mobile services platform."
 Version: '1.0.0'
 License: EPL
 License-Url: http://www.eclipse.org/legal/epl-v10.html
-Vendor: LiveOak
-Cartridge-Version: '0.0.1'
-Cartridge-Vendor: liveoak
+Vendor: Red Hat
+Cartridge-Version: '0.0.0.2'
+Cartridge-Vendor: jboss
 Categories:
   - web_framework
   - service
   - java
   - liveoak
 Website: http://www.liveoak.io
-Help-Topics:
+Hselp-Topics:
 Cart-Data:
   - Key: OPENSHIFT_LIVEOAK_LOG_DIR
     Type: environment
     Description: "Directory to store application log files."
-  - Key: OPENSHIFT_TMP_DIR
-    Type: environment
-    Description: "Directory to store application temporary files."
-  - Key: OPENSHIFT_REPO_DIR
-    Type: environment
-    Description: "Application root directory where application files reside. This directory is reset every time you do a git-push"
   - Key: OPENSHIFT_LIVEOAK_HTTP_PORT
     Type: environment
     Description: "Internal port to which the web-framework binds to."
   - Key: OPENSHIFT_LIVEOAK_IP
     Type: environment
-  - Key: password
-    Type: cart_data
-    Description: The default admin password
-  - Key: username
-    Type: cart_data
-    Description: The admin's username
   - Key: OPENSHIFT_APP_DNS
     Type: environment
     Description: "Fully qualified domain name for the application."
   - Key: OPENSHIFT_APP_NAME
     Type: environment
     Description: "Application name"
-  - Key: OPENSHIFT_DATA_DIR
-    Type: environment
-    Description: "Directory to store application data files. Preserved across git-pushes. Not shared across gears."
   - Key: OPENSHIFT_APP_UUID
     Type: environment
     Description: "Unique ID which identified the application. Does not change between gears."
@@ -53,35 +38,8 @@ Cart-Data:
     Description: "Unique ID which identified the gear. This value changes between gears."
 Provides:
   - liveoak
-# Providing the openjdk binary with the liveoak binary for now
-# Remove when an official openjdk binary is available on OpenShift and we can use 'Requires' to fetch it
-# Requires not supported for non-official cartridges
-#Requires:
-#  - java-1.8.0
 Requires:
   - mongodb-2.4
-Publishes:
-  publish-http-url:
-    Type: "NET_TCP:httpd-proxy-info"
-  publish-liveoak-cluster:
-    Type: NET_TCP:liveoak-cluster-info
-Subscribes:
-  set-env:
-    Type: "ENV:*"
-    Required: false
-  set-mysql-connection-info:
-    Type: "NET_TCP:db:mysql"
-    Required : false
-  set-postgres-connection-info:
-    Type: "NET_TCP:db:postgres"
-    Required : false
-  set-doc-url:
-    Type: "STRING:urlpath"
-    Required : false
-  set-generic-java:
-    Type: "ENV:NET_TCP:generic-java"
-  set-liveoak-cluster:
-    Type: NET_TCP:liveoak-cluster-info
 Scaling:
   Min: 1
   Max: 1
@@ -102,12 +60,3 @@ Endpoints:
       Backend: ''
       Options:
         health: true
-  - Private-IP-Name:     IP
-    Private-Port-Name: CLUSTER_PORT
-    Private-Port: 7600
-    Public-Port-Name: CLUSTER_PROXY_PORT
-  - Private-IP-Name: IP
-    Private-Port-Name: MANAGEMENT_HTTP_PORT
-    Private-Port: 9990
-Additional-Control-Actions:
-    - threaddump

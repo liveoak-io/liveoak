@@ -1,20 +1,12 @@
 ---
 snapshot_exclusions:
-- ~/liveoak/versions/**/**/*
+- ~/liveoak
 locked_files:
-#- bin/
-#- bin/*
-#- tools/
-#- tools/*
-#- metadata/
-#- metadata/*
-#- hooks/
-#- hooks/*
-#- env/
-#- env/OPENSHIFT_LIVEOAK_DIR
-#- env/OPENSHIFT_LIVEOAK_LOG_DIR
-#- env/OPENSHIFT_LIVEOAK_JDK*
-#- env/OPENSHIFT_LIVEOAK_VERSION
-#- env/M2_HOME
+- bin/
+- bin/*
+- metadata/
+- metadata/*
+- env/
+- env/*
 processed_templates:
 - '**/*.erb'
