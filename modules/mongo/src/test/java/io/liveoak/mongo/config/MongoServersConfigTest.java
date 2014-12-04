@@ -431,8 +431,8 @@ public class MongoServersConfigTest extends BaseMongoConfigTest {
         updatedConfig.putProperty("db", "testUpdateServersDB");
 
         ResourceState updatedServerB = new DefaultResourceState();
-        updatedServerB.putProperty("host", "127.0.0.3");
-        updatedServerB.putProperty("port", 12345); // max port number that is valid
+        updatedServerB.putProperty("host", RUNNING_MONGO_HOST);
+        updatedServerB.putProperty("port", RUNNING_MONGO_PORT); // the port the test mongo instance is running on
         updatedServers.add(updatedServerB);
 
         updatedConfig.putProperty("servers", updatedServers);
@@ -441,8 +441,8 @@ public class MongoServersConfigTest extends BaseMongoConfigTest {
 
         List<ResourceState> serversResourceState = (List) result.getProperty("servers");
         assertThat(serversResourceState.size()).isEqualTo(1);
-        assertThat(serversResourceState.get(0).getProperty("host")).isEqualTo("127.0.0.3");
-        assertThat(serversResourceState.get(0).getProperty("port")).isEqualTo(12345);
+        assertThat(serversResourceState.get(0).getProperty("host")).isEqualTo(RUNNING_MONGO_HOST);
+        assertThat(serversResourceState.get(0).getProperty("port")).isEqualTo(RUNNING_MONGO_PORT);
     }
 
     @Test

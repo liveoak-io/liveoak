@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.ObjectMapperFactory;
-import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.InitializationException;
@@ -34,7 +33,7 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
         JsonNode instancesNode = ObjectMapperFactory.create().readTree(
                 "{" +
                         "    foo: {name: 'Foo', servers: [{ host: 'localhost', port: 27018}]}," +
-                        "    bar: {name: 'Bar', servers: [{ port: 27017}]}," +
+                        "    bar: {name: 'Bar', servers: [{ port: 27018}]}," +
                         "    baz: {name: 'Baz'}" +
                         "}");
 
@@ -79,7 +78,7 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
         assertThat(bar.id()).isEqualTo("bar");
         ResourceState barServer = (ResourceState) bar.getProperty("servers", true, List.class).get(0);
         assertThat(barServer.getProperty("host")).isEqualTo("127.0.0.1");
-        assertThat(barServer.getProperty("port")).isEqualTo(27017);
+        assertThat(barServer.getProperty("port")).isEqualTo(27018);
 
         //ResourceState baz = instancesConfig.members().get(2);
         assertThat(baz.id()).isEqualTo("baz");
@@ -173,7 +172,8 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
         barResourceState.putProperty("name", "BARBARBAR");
 
         List servers = barResourceState.getProperty("servers", false, List.class);
-        ((ResourceState) servers.get(0)).putProperty("port", 27019);
+        ((ResourceState) servers.get(0)).putProperty("port", RUNNING_MONGO_PORT);
+        ((ResourceState) servers.get(0)).putProperty("host", RUNNING_MONGO_HOST);
 
         client.update(new RequestContext.Builder().returnFields(new DefaultReturnFields("*(*)")).build(), INSTANCES_CONFIG_PATH + "/bar", barResourceState);
 
@@ -183,8 +183,8 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
         assertThat(readState.id()).isEqualTo("bar");
         assertThat(readState.getProperty("name")).isEqualTo("BARBARBAR");
         ResourceState barServer = (ResourceState) readState.getProperty("servers", true, List.class).get(0);
-        assertThat(barServer.getProperty("host")).isEqualTo("127.0.0.1");
-        assertThat(barServer.getProperty("port")).isEqualTo(27019);
+        assertThat(barServer.getProperty("host")).isEqualTo(RUNNING_MONGO_HOST);
+        assertThat(barServer.getProperty("port")).isEqualTo(RUNNING_MONGO_PORT);
     }
 
     @Test
@@ -247,7 +247,7 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
     public void testChangeDataStore() throws Exception {
         JsonNode configNode = ObjectMapperFactory.create().readTree("{ db: 'testDataStore', datastore: 'foo'}");
 
-        InternalApplicationExtension resource = setUpSystem((ObjectNode) configNode);
+        setUpSystem((ObjectNode) configNode);
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
 
         result.putProperty("datastore", "bar");
@@ -267,9 +267,7 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
 
         setUpSystem((ObjectNode) configNode);
 
-        ResourceState updateState1 = new DefaultResourceState();
-        updateState1.putProperty("db", "testDataStore");
-        updateState1.putProperty("servers", new ArrayList());
+        ResourceState updateState1 = createConfig("testDataStore", RUNNING_MONGO_HOST, RUNNING_MONGO_PORT);
 
         ResourceState update1 = client.update(new RequestContext.Builder().build(), ADMIN_PATH, updateState1);
 
@@ -280,8 +278,8 @@ public class MongoDatastoreTest extends BaseMongoConfigTest {
         assertThat(update1.getProperty("datastore")).isNull();
 
         ResourceState server = (ResourceState) update1.getProperty("servers", true, List.class).get(0);
-        assertThat(server.getProperty("host")).isEqualTo("127.0.0.1");
-        assertThat(server.getProperty("port")).isEqualTo(27017);
+        assertThat(server.getProperty("host")).isEqualTo(RUNNING_MONGO_HOST);
+        assertThat(server.getProperty("port")).isEqualTo(RUNNING_MONGO_PORT);
 
         ResourceState updateState2 = new DefaultResourceState();
         updateState2.putProperty("db", "testDataStore");

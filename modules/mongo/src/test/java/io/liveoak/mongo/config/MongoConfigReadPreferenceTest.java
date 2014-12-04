@@ -62,9 +62,7 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
 
     @Test
     public void updateType() throws Exception {
-        ResourceState config = new DefaultResourceState();
-        config.putProperty("db", "testUpdateTypeDB");
-        config.putProperty("servers", new ArrayList());
+        ResourceState config = createConfig("testUpdateTypeDB", RUNNING_MONGO_HOST, RUNNING_MONGO_PORT);
         setUpSystem(config);
 
         ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
@@ -79,9 +77,8 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
         ResourceState updatedResourceState = new DefaultResourceState();
         updatedResourceState.putProperty(ReadPreferenceState.TYPE, ReadPreferenceState.NEAREST);
 
-        config = new DefaultResourceState();
-        config.putProperty("db", "testUpdateTypeDB");
-        config.putProperty("servers", new ArrayList());
+        config = createConfig("testUpdateTypeDB", RUNNING_MONGO_HOST, RUNNING_MONGO_PORT);
+
         config.putProperty(ReadPreferenceState.ID, updatedResourceState);
 
         result = client.update(new RequestContext.Builder().build(), ADMIN_PATH, config);
@@ -183,9 +180,8 @@ public class MongoConfigReadPreferenceTest extends BaseMongoConfigTest {
 
         setUpSystem(config);
 
-        ResourceState updatedConfig = new DefaultResourceState();
-        updatedConfig.putProperty("db", "testUpdateTagsDB");
-        updatedConfig.putProperty("servers", new ArrayList());
+        ResourceState updatedConfig = createConfig("testUpdateTagsDB", RUNNING_MONGO_HOST, RUNNING_MONGO_PORT);
+
         ResourceState updatedConfigReadPref = new DefaultResourceState();
         updatedConfigReadPref.putProperty(ReadPreferenceState.TYPE, ReadPreferenceState.SECONDARY_PREFERRED);
         ResourceState updatedTagConfig = new DefaultResourceState();

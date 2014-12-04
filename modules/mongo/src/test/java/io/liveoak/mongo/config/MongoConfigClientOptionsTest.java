@@ -98,9 +98,7 @@ public class MongoConfigClientOptionsTest extends BaseMongoConfigTest {
         updatedClientConfigResourceState.putProperty(MongoClientOptionsState.SOCKET_KEEP_ALIVE, false);
         updatedClientConfigResourceState.putProperty(MongoClientOptionsState.MAX_WAIT_TIME, 1000);
 
-        ResourceState updatedConfig = new DefaultResourceState();
-        updatedConfig.putProperty("db", "testUpdateConfigureDB");
-        updatedConfig.putProperty("servers", new ArrayList());
+        ResourceState updatedConfig = createConfig("testUpdateConfigureDB", RUNNING_MONGO_HOST, RUNNING_MONGO_PORT);
         updatedConfig.putProperty(MongoClientOptionsState.ID, updatedClientConfigResourceState);
 
         ResourceState result = client.update(new RequestContext.Builder().build(), ADMIN_PATH, updatedConfig);

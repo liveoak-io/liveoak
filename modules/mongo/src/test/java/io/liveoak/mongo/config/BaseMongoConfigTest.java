@@ -1,7 +1,11 @@
 package io.liveoak.mongo.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.ObjectMapperFactory;
 import io.liveoak.container.tenancy.InternalApplicationExtension;
 import io.liveoak.container.zero.extension.ZeroExtension;
@@ -21,11 +25,18 @@ public abstract class BaseMongoConfigTest extends AbstractTestCaseWithTestApp {
     static final String SYSTEM_CONFIG_PATH = "/" + ZeroExtension.APPLICATION_ID + "/system/mongo/module";
     static final String INSTANCES_CONFIG_PATH = "/" + ZeroExtension.APPLICATION_ID + "/system/mongo";
 
+    static final String RUNNING_MONGO_HOST = System.getProperty("mongo.host", "localhost");
+    static final Integer RUNNING_MONGO_PORT = new Integer(System.getProperty("mongo.port", "27017"));
+
+
     @BeforeClass
     public static void loadExtensions() throws Exception {
         JsonNode configNode = ObjectMapperFactory.create().readTree(
                 "{ name: 'testDefaultDB'," +
-                " servers: []}");
+                " servers: [{" +
+                        "host:'" + RUNNING_MONGO_HOST + "'," +
+                        "port:" + RUNNING_MONGO_PORT +
+                        "}]}");
 
         loadExtension("mongo", new MongoExtension(), (ObjectNode) configNode);
     }
@@ -42,5 +53,33 @@ public abstract class BaseMongoConfigTest extends AbstractTestCaseWithTestApp {
 
     protected InternalApplicationExtension setUpSystem(ObjectNode objectNode) throws Exception {
         return installTestAppResource("mongo", BASEPATH, objectNode);
+    }
+
+    protected InternalApplicationExtension setUpSystem(String databaseName, String host, Integer port) throws Exception {
+        JsonNode configNode =  ObjectMapperFactory.create().readTree(
+                "{ db: '" + databaseName + "'," +
+                 " servers: [{" +
+                        "host:'" + RUNNING_MONGO_HOST + "'," +
+                        "port:" + RUNNING_MONGO_PORT +
+                        "}]}");
+
+        return installTestAppResource("mongo", BASEPATH, (ObjectNode)configNode);
+    }
+
+    protected ResourceState createConfig(String databaseName, String host, Integer port) throws Exception {
+        ResourceState config = new DefaultResourceState();
+        config = new DefaultResourceState();
+        config.putProperty("db", databaseName);
+
+        ResourceState server = new DefaultResourceState();
+        server.putProperty("host", host);
+        server.putProperty("port", port);
+
+        List<ResourceState> resourceStates = new ArrayList<ResourceState>();
+        resourceStates.add(server);
+
+        config.putProperty("servers", resourceStates);
+
+        return config;
     }
 }

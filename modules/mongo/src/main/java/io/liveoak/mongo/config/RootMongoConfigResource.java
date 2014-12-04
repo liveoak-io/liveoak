@@ -52,8 +52,16 @@ public class RootMongoConfigResource implements RootResource {
 
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        this.mongoConfig = new MongoConfig(this, mongoDatastoresResource, state, false);
-        responder.resourceUpdated(this);
+        MongoConfig updatedConfig = new MongoConfig(this, mongoDatastoresResource, state, false);
+
+        DB db = updatedConfig.getDB();
+        try {
+            this.mongoConfig = updatedConfig;
+            responder.resourceUpdated(this);
+        } catch (Exception e) {
+            log.error("Error trying to update the MongoConfiguration. Could not connect to the server",e);
+            responder.invalidRequest("The Mongo configuration is invalid. Cannot connect to a running server", e);
+        }
     }
 
     @Override
