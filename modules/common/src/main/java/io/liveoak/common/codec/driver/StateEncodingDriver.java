@@ -7,7 +7,9 @@ import java.util.Map;
 
 import io.liveoak.common.codec.NonEncodableValueException;
 import io.liveoak.common.codec.StateEncoder;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.state.ResourceState;
 
 /**
@@ -33,8 +35,16 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
 
     @Override
     public void encode() throws Exception {
+        if (returnFields().excluded("id")) {
+            state().id(null);
+        }
+
+        if (returnFields().excluded("self")) {
+            state().uri(null);
+        }
+
         encoder().startResource(state());
-        encodeProperties(state());
+        encodeProperties(state(), returnFields());
         encodeMembers(state());
         encoder().endResource(state());
     }
@@ -43,31 +53,33 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
         if (resourceState.members() != null && !resourceState.members().isEmpty()) {
             encoder().startMembers();
             for (ResourceState memberState : resourceState.members()) {
-                encodeValue(memberState);
+                encodeValue(memberState, returnFields().child(LiveOak.MEMBERS));
             }
             encoder().endMembers();
         }
     }
 
-    protected void encodeProperties(ResourceState resourceState) throws Exception {
+    protected void encodeProperties(ResourceState resourceState, ReturnFields returnFields) throws Exception {
         if (!resourceState.getPropertyNames().isEmpty()) {
             encoder().startProperties();
             for (String propertyName : resourceState.getPropertyNames()) {
-                encodeProperty(propertyName, resourceState.getProperty(propertyName));
+                if (returnFields.included(propertyName)) {
+                    encodeProperty(propertyName, resourceState.getProperty(propertyName), returnFields);
+                }
             }
             encoder().endProperties();
         }
     }
 
-    protected void encodeProperty(String propertyName, Object property) throws Exception {
+    protected void encodeProperty(String propertyName, Object property, ReturnFields returnFields) throws Exception {
         encoder().startProperty(propertyName);
-        encodeValue(property);
+        encodeValue(property, returnFields);
         encoder().endProperty(propertyName);
     }
 
-    protected void encodeValue(Object value) throws Exception {
+    protected void encodeValue(Object value, ReturnFields returnFields) throws Exception {
         if (value instanceof ResourceState) {
-            encodeState((ResourceState) value);
+            encodeState((ResourceState) value, returnFields);
         } else if (value instanceof String) {
             encoder().writeValue((String) value);
         } else if (value instanceof Integer) {
@@ -90,7 +102,7 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
         } else if (value instanceof Map) {
             encoder().writeValue((Map) value);
         } else if (value instanceof Collection) {
-            encodeList((Collection) value);
+            encodeList((Collection) value, returnFields);
         } else if (value == null) {
             encoder().writeNullValue();
         } else {
@@ -98,21 +110,30 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
         }
     }
 
-    protected void encodeState(ResourceState resourceState) throws Exception {
+    protected void encodeState(ResourceState resourceState, ReturnFields returnFields) throws Exception {
+
+        if (returnFields.excluded("id")) {
+            resourceState.id(null);
+        }
+
+        if (returnFields.excluded("self")) {
+            resourceState.uri(null);
+        }
+
         encoder().startResource(resourceState);
-        encodeProperties(resourceState);
+        encodeProperties(resourceState, returnFields);
         encodeMembers(resourceState);
         encoder().endResource(resourceState);
 
     }
 
-    protected void encodeList(Collection list) throws Exception {
+    protected void encodeList(Collection list, ReturnFields returnFields) throws Exception {
         encoder().startList();
         for (Object element : list) {
             if (element instanceof ResourceState) {
 
             }
-            encodeValue(element);
+            encodeValue(element, returnFields);
         }
         encoder().endList();
     }

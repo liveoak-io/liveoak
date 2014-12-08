@@ -5,24 +5,25 @@
  */
 package io.liveoak.container.codec.json;
 
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.common.DefaultReturnFields;
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.codec.driver.StateEncodingDriver;
 import io.liveoak.common.codec.json.JSONEncoder;
-import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.common.codec.driver.EncodingDriver;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.junit.Test;
-
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -37,6 +38,18 @@ public class JSONEncoderTest {
         ByteBuf buffer = Unpooled.buffer();
         encoder.initialize(buffer);
         StateEncodingDriver driver = new StateEncodingDriver(new RequestContext.Builder().build(), encoder, resourceState);
+        driver.encode();
+        driver.close();
+        return buffer;
+    }
+
+    //TODO: use a builder for these encode methods
+    protected ByteBuf encode(ResourceState resourceState, String fields) throws Exception {
+
+        JSONEncoder encoder = new JSONEncoder();
+        ByteBuf buffer = Unpooled.buffer();
+        encoder.initialize(buffer);
+        StateEncodingDriver driver = new StateEncodingDriver(new RequestContext.Builder().returnFields(new DefaultReturnFields(fields)).build(), encoder, resourceState);
         driver.encode();
         driver.close();
         return buffer;
@@ -242,4 +255,156 @@ public class JSONEncoderTest {
         assertThat( feet.get( "left" ).asText() ).isEqualTo( "brown" );
         assertThat( feet.get( "right" ).asText() ).isEqualTo( "missing" );
     }
+
+    @Test
+    public void testResourceWithFields() throws Exception {
+        DefaultResourceState mosesState = new DefaultResourceState("moses");
+        mosesState.putProperty("name", "Moses");
+        mosesState.putProperty("breed", "German Shepherd");
+
+        mosesState.uri(new URI("/moses"));
+
+        ByteBuf buffer = encode( mosesState, "name" );
+        String encoded = buffer.toString(Charset.defaultCharset());
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(encoded);
+
+        assertThat(root.get(LiveOak.ID).asText()).isEqualTo("moses");
+        assertThat(root.get("self")).isNotNull();
+        assertThat(root.get("self").get("href").asText()).isEqualTo("/moses");
+        assertThat(root.get("name").asText()).isEqualTo("Moses");
+        assertThat(root.get("breed")).isNull();
+    }
+
+    @Test
+    public void testResourceWithExcludeIdFields() throws Exception {
+        DefaultResourceState mosesState = new DefaultResourceState("moses");
+        mosesState.putProperty("name", "Moses");
+        mosesState.putProperty("breed", "German Shepherd");
+
+        mosesState.uri(new URI("/moses"));
+
+        ByteBuf buffer = encode( mosesState, "*,-name,-id" );
+        String encoded = buffer.toString(Charset.defaultCharset());
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(encoded);
+
+        assertThat(root.get(LiveOak.ID)).isNull();
+        assertThat(root.get("self")).isNotNull();
+        assertThat(root.get("self").get("href").asText()).isEqualTo("/moses");
+        assertThat(root.get("breed").asText()).isEqualTo("German Shepherd");
+        assertThat(root.get("name")).isNull();
+    }
+
+    @Test
+    public void testResourceWithExcludeSelfFields() throws Exception {
+        DefaultResourceState mosesState = new DefaultResourceState("moses");
+        mosesState.putProperty("name", "Moses");
+        mosesState.putProperty("breed", "German Shepherd");
+
+        mosesState.uri(new URI("/moses"));
+
+        ByteBuf buffer = encode( mosesState, "*,-breed,-self" );
+        String encoded = buffer.toString(Charset.defaultCharset());
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(encoded);
+
+        assertThat(root.get(LiveOak.ID).asText()).isEqualTo("moses");
+        assertThat(root.get(LiveOak.SELF)).isNull();
+        assertThat(root.get("name").asText()).isEqualTo("Moses");
+        assertThat(root.get("breed")).isNull();
+    }
+
+    @Test
+    public void testResourceMembersWithFields() throws Exception {
+        DefaultResourceState parentState = new DefaultResourceState("parent");
+        parentState.uri(new URI("/parent"));
+        parentState.putProperty("A", 1);
+        parentState.putProperty("B", 2);
+
+        DefaultResourceState child1State = new DefaultResourceState("child1");
+        child1State.uri(new URI("/parent/child1"));
+        child1State.putProperty("foo", "bar");
+        child1State.putProperty("hello", "world");
+
+        DefaultResourceState child2State = new DefaultResourceState("child2");
+        child2State.uri(new URI("/parent/child2"));
+        child2State.putProperty("foo", "baz");
+        child2State.putProperty("goodbye", "world");
+
+        parentState.addMember(child1State);
+        parentState.addMember(child2State);
+
+        ByteBuf buffer = encode( parentState, "B,members(hello,goodbye)");
+        String encoded = buffer.toString(Charset.defaultCharset());
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(encoded);
+
+        assertThat(root.get(LiveOak.ID).asText()).isEqualTo("parent");
+        assertThat(root.get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/parent");
+        assertThat(root.size()).isEqualTo(4);
+        assertThat(root.get("B").asInt()).isEqualTo(2);
+
+        ObjectNode child1Node = (ObjectNode)root.get(LiveOak.MEMBERS).get(0);
+        assertThat(child1Node.get(LiveOak.ID).asText()).isEqualTo("child1");
+        assertThat(child1Node.get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/parent/child1");
+        assertThat(child1Node.size()).isEqualTo(3);
+        assertThat(child1Node.get("hello").asText()).isEqualTo("world");
+
+        ObjectNode child2Node = (ObjectNode)root.get(LiveOak.MEMBERS).get(1);
+        assertThat(child2Node.get(LiveOak.ID).asText()).isEqualTo("child2");
+        assertThat(child2Node.get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/parent/child2");
+        assertThat(child2Node.size()).isEqualTo(3);
+        assertThat(child2Node.get("goodbye").asText()).isEqualTo("world");
+    }
+
+    @Test
+    public void testResourceMembersWithExcludeFields() throws Exception {
+        DefaultResourceState parentState = new DefaultResourceState("parent");
+        parentState.uri(new URI("/parent"));
+        parentState.putProperty("A", 1);
+        parentState.putProperty("B", 2);
+
+        DefaultResourceState child1State = new DefaultResourceState("child1");
+        child1State.uri(new URI("/parent/child1"));
+        child1State.putProperty("foo", "bar");
+        child1State.putProperty("hello", "world");
+
+        DefaultResourceState child2State = new DefaultResourceState("child2");
+        child2State.uri(new URI("/parent/child2"));
+        child2State.putProperty("foo", "baz");
+        child2State.putProperty("goodbye", "world");
+
+        parentState.addMember(child1State);
+        parentState.addMember(child2State);
+
+        ByteBuf buffer = encode( parentState, "*,-A,members(*,-foo,-self)");
+        String encoded = buffer.toString(Charset.defaultCharset());
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(encoded);
+
+        assertThat(root.get(LiveOak.ID).asText()).isEqualTo("parent");
+        assertThat(root.get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/parent");
+        assertThat(root.size()).isEqualTo(4);
+        assertThat(root.get("B").asInt()).isEqualTo(2);
+
+        ObjectNode child1Node = (ObjectNode)root.get(LiveOak.MEMBERS).get(0);
+        assertThat(child1Node.get(LiveOak.ID).asText()).isEqualTo("child1");
+        assertThat(child1Node.get(LiveOak.SELF)).isNull();
+        assertThat(child1Node.size()).isEqualTo(2);
+        assertThat(child1Node.get("hello").asText()).isEqualTo("world");
+
+        ObjectNode child2Node = (ObjectNode)root.get(LiveOak.MEMBERS).get(1);
+        assertThat(child2Node.get(LiveOak.ID).asText()).isEqualTo("child2");
+        assertThat(child2Node.get(LiveOak.SELF)).isNull();
+        assertThat(child2Node.size()).isEqualTo(2);
+        assertThat(child2Node.get("goodbye").asText()).isEqualTo("world");
+    }
+
+
 }

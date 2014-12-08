@@ -5,6 +5,14 @@
  */
 package io.liveoak.container;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
@@ -12,13 +20,6 @@ import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Bob McWhirter
@@ -30,6 +31,11 @@ public class InMemoryCollectionResource implements SynchronousResource {
         this.id = id;
     }
 
+    public InMemoryCollectionResource(Resource parent, String id, ResourceState properties) {
+        this(parent, id);
+        this.state = properties;
+    }
+
     public Resource parent() {
         return this.parent;
     }
@@ -37,6 +43,15 @@ public class InMemoryCollectionResource implements SynchronousResource {
     @Override
     public String id() {
         return this.id;
+    }
+
+    @Override
+    public Map<String, ?> properties(RequestContext ctx) throws Exception {
+        if (state != null) {
+            return new DefaultResourceState(state).propertyMap();
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -104,4 +119,5 @@ public class InMemoryCollectionResource implements SynchronousResource {
     protected Resource parent;
     private String id;
     private Map<String, Resource> collection = new LinkedHashMap<>();
+    private ResourceState state;
 }

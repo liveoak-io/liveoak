@@ -26,6 +26,11 @@ public interface ReturnFields extends Iterable<String> {
         }
 
         @Override
+        public boolean excluded(String field) {
+            return false;
+        }
+
+        @Override
         public Iterator<String> iterator() {
             return Collections.singletonList("*").iterator();
         }
@@ -53,6 +58,11 @@ public interface ReturnFields extends Iterable<String> {
 
         @Override
         public boolean included(String... pathSegments) {
+            return false;
+        }
+
+        @Override
+        public boolean excluded(String field) {
             return false;
         }
 
@@ -87,6 +97,11 @@ public interface ReturnFields extends Iterable<String> {
         @Override
         public boolean included(String... pathSegments) {
             return true;
+        }
+
+        @Override
+        public boolean excluded(String field) {
+            return false;
         }
 
         @Override
@@ -126,6 +141,13 @@ public interface ReturnFields extends Iterable<String> {
      * @return true if the specified path should be part of JSON response or not
      */
     boolean included(String... pathSegments);
+
+    /**
+     * Check to see if the field specified is set to be explicitly excluded.
+     * @param field The field name to check
+     * @return If the field was explicitly set to be excluded
+     */
+    boolean excluded(String field);
 
     /**
      * Iterate over child fields to be included in response.
