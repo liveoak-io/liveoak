@@ -4,6 +4,7 @@ var loMod = angular.module('loApp.controllers.businesslogic', []);
 
 loMod.controller('BusinessLogicListCtrl', function($scope, $rootScope, $routeParams, $location, $http, $modal, $filter, Notifications, currentApp, triggeredScripts) {
   $rootScope.curApp = currentApp;
+  $rootScope.loClass = 'business-logic';
 
   $scope.breadcrumbs = [
     {'label': 'Applications', 'href': '#/applications'},
@@ -78,6 +79,7 @@ loMod.controller('BusinessLogicListCtrl', function($scope, $rootScope, $routePar
 loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $routeParams, $location, $http, $modal, $filter, Notifications, currentApp, currentScript) {
 
   $rootScope.curApp = currentApp;
+  $rootScope.loClass = 'business-logic';
 
   $scope.breadcrumbs = [
     {'label': 'Applications', 'href': '#/applications'},
