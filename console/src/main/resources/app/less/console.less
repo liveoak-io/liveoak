@@ -111,6 +111,28 @@ html, body {
   }
 }
 
+/* Fix the background for Business Logic pages */
+
+.business-logic-create {
+  
+  #lo-content-row {
+    display: flex;
+    
+    > div {
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    
+    @media only screen and (min-width: 992px) {
+      
+      > aside {
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+    }
+  }
+} 
+
 
 /* Basic elements */
 h1, h2, h3, h4, h5, h6 {
@@ -208,6 +230,10 @@ hr {
 
 .ta-right {
   text-align: right;
+}
+
+.btn .fa {
+  margin-right: 5px;
 }
 
 
@@ -2570,6 +2596,21 @@ legend {
 
 .business-logic-list .panel-title {
   margin-right: 15px;
+}
+
+
+/* Script edit page */
+
+.lo-form-horizontal .form-group > div.codemirror-top {
+  padding-left: 0;
+}
+
+.codemirror-top p {
+  margin-bottom: 10px;
+}
+
+.CodeMirror {
+  margin-top: 0!important;
 }
 
 
