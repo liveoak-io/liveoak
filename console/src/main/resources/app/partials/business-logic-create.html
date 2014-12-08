@@ -66,11 +66,13 @@
         <fieldset>
           <legend lo-collapse class="collapsible"><span class="text">Script</span> <span class="required">*</span></legend>
           <div class="form-group clearfix">
-            <p class="pull-left">
-              <button class="btn btn-default btn-sm" ng-disabled="create || !codeChanged" ng-click="save(true)"><span class="fa fa-save"></span> &nbsp;Save</button>
-              <button class="btn btn-default btn-sm" ng-disabled="create || !codeChanged" ng-click="clear(true)"><span class="fa fa-undo"></span> &nbsp;Revert</button>
-            </p>
-            <p class="ta-right"><small>Use Ctrl+Space for auto-completion where available</small></p>
+            <div class="codemirror-top clearfix">
+              <p class="pull-left"><small>Use Ctrl+Space for auto-completion where available</small></p>
+              <div class="pull-right">
+                <button class="btn btn-default btn-sm" ng-disabled="create || !codeChanged" ng-click="clear(true)"><span class="fa fa-undo"></span>Revert</button>
+                <button class="btn btn-default btn-sm" ng-disabled="create || !codeChanged" ng-click="save(true)"><span class="fa fa-save"></span>Save</button>
+              </div>
+            </div>
             <ui-codemirror ui-codemirror-opts="editorOptions" ng-model="script.code" required></ui-codemirror>
           </div>
         </fieldset>

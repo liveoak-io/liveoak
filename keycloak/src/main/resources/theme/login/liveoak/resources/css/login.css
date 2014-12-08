@@ -96,6 +96,13 @@
 }
 
 .login-pf #kc-logo-wrapper {
+  background-image: url(../img/liveoak_logo_hori_fordark_updated.svg);
+  height: 60px;
+  background-size: auto 60px;
+}
+
+/*
+.login-pf #kc-logo-wrapper {
     background-image: none;
     text-align: right;
 }
@@ -105,6 +112,7 @@
     font-family: "Exo 2";
     font-size: 30px;
 }
+*/
 
 
 /* Media queries */
