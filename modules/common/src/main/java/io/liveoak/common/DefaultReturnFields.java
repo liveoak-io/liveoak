@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.StringTokenizer;
 
 import io.liveoak.spi.ReturnFields;
 
@@ -139,6 +138,7 @@ public class DefaultReturnFields implements ReturnFields {
             if (current == null) {
                 return false;
             }
+
             if (current.fields.containsKey("-" + path)) {
                 return false;
             }
@@ -151,6 +151,15 @@ public class DefaultReturnFields implements ReturnFields {
             current = current.fields.get(path);
         }
         return true;
+    }
+
+    @Override
+    public boolean excluded(String field) {
+        if (fields.containsKey("-" + field)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -171,19 +180,5 @@ public class DefaultReturnFields implements ReturnFields {
     @Override
     public String toString() {
         return "[ReturnFieldsImpl: fields=" + this.fields + "]";
-    }
-
-    public DefaultReturnFields withExpand(String spec) {
-        StringTokenizer expandFields = new StringTokenizer(spec);
-
-        DefaultReturnFields merged = new DefaultReturnFields();
-        merged.fields.putAll(this.fields);
-
-        while (expandFields.hasMoreTokens()) {
-            String expandField = expandFields.nextToken();
-            merged.fields.put(expandField, new DefaultReturnFields("*"));
-        }
-
-        return merged;
     }
 }

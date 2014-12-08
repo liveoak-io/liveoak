@@ -151,12 +151,6 @@ public class HttpResourceRequestDecoder extends MessageToMessageDecoder<DefaultH
             returnFields = new DefaultReturnFields("*");
         }
 
-        String expandValue = params.value("expand");
-
-        if (expandValue != null && !"".equals(expandValue)) {
-            returnFields = returnFields.withExpand(expandValue);
-        }
-
         return returnFields;
     }
 

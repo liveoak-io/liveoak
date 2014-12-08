@@ -5,22 +5,19 @@
  */
 package io.liveoak.mongo;
 
-import static org.fest.assertions.Assertions.assertThat;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.liveoak.common.DefaultReturnFields;
-import io.liveoak.spi.LiveOak;
-import org.junit.Test;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-
+import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.state.ResourceState;
+import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>
@@ -44,7 +41,7 @@ public class MongoDBAggregateCollectionReadTest extends BaseMongoDBTest {
         SimpleResourceParams resourceParams = new SimpleResourceParams();
         resourceParams.put("q", "[{$group:{_id:{country:'$country'},numPeople:{$sum:1}}}]");
         RequestContext requestContext = new RequestContext.Builder()
-                .returnFields(new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS))
+                .returnFields(new DefaultReturnFields("*(*)"))
                 .resourceParams(resourceParams)
                 .build();
 

@@ -6,7 +6,6 @@ import java.util.List;
 import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.DefaultSecurityContext;
-import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.NotAcceptableException;
 import io.liveoak.spi.exceptions.ResourceNotFoundException;
@@ -133,7 +132,7 @@ public class AliasSubscriptionTestCase extends BaseUPSTestCase {
         // check that the resources path matches what we specified
         assertThat(subscriptionResponse.getProperty("resource-path")).isEqualTo("/testApp/storage/*");
 
-        ResourceState readResponse = client.read(new RequestContext.Builder().returnFields((new DefaultReturnFields("*").withExpand(LiveOak.MEMBERS))).build(), "/testApp/" + BASEPATH + "/aliases/" + alias);
+        ResourceState readResponse = client.read(new RequestContext.Builder().returnFields((new DefaultReturnFields("*(*)"))).build(), "/testApp/" + BASEPATH + "/aliases/" + alias);
         assertThat(readResponse.id()).isEqualTo(aliasResult.id());
         assertThat(readResponse.members().size()).isEqualTo(1);
         assertThat(readResponse.members().get(0).toString()).isEqualTo(subscriptionResponse.toString());

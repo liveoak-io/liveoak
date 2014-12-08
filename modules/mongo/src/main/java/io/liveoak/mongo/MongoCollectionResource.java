@@ -17,15 +17,15 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
-
 import io.liveoak.common.util.PagingLinksBuilder;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.Pagination;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ResourceParams;
+import io.liveoak.spi.ReturnFields;
+import io.liveoak.spi.Sorting;
 import io.liveoak.spi.exceptions.NotAcceptableException;
 import io.liveoak.spi.exceptions.ResourceProcessingException;
-import io.liveoak.spi.Sorting;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
@@ -40,7 +40,6 @@ public class MongoCollectionResource extends MongoResource {
 
     private boolean explainQuery;
     private DBObject queryObject;
-    private DBObject returnFields;
 
     MongoCollectionResource(RootMongoResource parent, DBCollection collection) {
         super(parent);
@@ -114,13 +113,11 @@ public class MongoCollectionResource extends MongoResource {
                 && resourceParams.contains("explain")
                 && resourceParams.value("explain").equalsIgnoreCase("true");
 
-        if (!explainQuery) {
-            returnFields = new BasicDBObject();
-            if (ctx.returnFields() != null && !ctx.returnFields().isAll()) {
-                ctx.returnFields().forEach((fieldName) -> {
-                    returnFields.put(fieldName, true);
-                });
-            }
+        DBObject returnFields = new BasicDBObject();
+        if (ctx.returnFields() != null && !ctx.returnFields().isAll()) {
+            ctx.returnFields().forEach((fieldName) -> {
+                returnFields.put(fieldName, true);
+            });
         }
 
         int totalCount = explainQuery ? 1 : (int) dbCollection.getCount(queryObject, returnFields);
@@ -159,6 +156,16 @@ public class MongoCollectionResource extends MongoResource {
     public Collection<Resource> members(RequestContext ctx) throws Exception {
 
         LinkedList<Resource> members = new LinkedList<>();
+
+        DBObject returnFields = new BasicDBObject();
+        if (ctx.returnFields() != null && !ctx.returnFields().child(LiveOak.MEMBERS).isEmpty()) {
+            ReturnFields membersReturnFields = ctx.returnFields().child(LiveOak.MEMBERS);
+            if (!membersReturnFields.isAll()) {
+                membersReturnFields.forEach((fieldName) -> {
+                    returnFields.put(fieldName, true);
+                });
+            }
+        }
 
         DBCursor dbCursor = dbCollection.find(queryObject, returnFields);
 

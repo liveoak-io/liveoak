@@ -6,7 +6,6 @@
 package io.liveoak.container;
 
 import io.liveoak.common.DefaultReturnFields;
-import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.ReturnFields;
 import org.junit.Assert;
 import org.junit.Test;
@@ -52,6 +51,24 @@ public class ReturnFieldsTest {
     }
 
     @Test
+    public void testExclude() {
+        DefaultReturnFields spec = new DefaultReturnFields("*,-name,dog(*,-color)");
+
+        assertThat(spec.included("foo")).isTrue();
+        assertThat(spec.included("bar")).isTrue();
+        assertThat(spec.included("name")).isFalse();
+        assertThat(spec.included("dog")).isTrue();
+        assertThat(spec.child("dog").included("breed")).isTrue();
+        assertThat(spec.child("dog").included("color")).isFalse();
+
+        assertThat(spec.excluded("name")).isTrue();
+        assertThat(spec.excluded("foo")).isFalse();
+        assertThat(spec.excluded("bar")).isFalse();
+        assertThat(spec.child("dog").excluded("color")).isTrue();
+        assertThat(spec.child("dog").excluded("breed")).isFalse();
+    }
+
+    @Test
     public void testNestedWithGlob() {
         DefaultReturnFields spec = new DefaultReturnFields("name,dog(*)");
 
@@ -64,27 +81,6 @@ public class ReturnFieldsTest {
         assertThat(spec.child("cat")).isNotNull();
         assertThat(spec.child("cat").included("name")).isFalse();
     }
-
-    @Test
-    public void testMergeWithExpand() {
-        DefaultReturnFields fields = new DefaultReturnFields("*");
-        fields = fields.withExpand(LiveOak.MEMBERS);
-
-        assertThat(fields.included("name")).isTrue();
-        assertThat(fields.included(LiveOak.MEMBERS)).isTrue();
-        assertThat(fields.child(LiveOak.MEMBERS).included("name")).isTrue();
-
-        fields = new DefaultReturnFields("wife").withExpand("dogs");
-
-        assertThat(fields.included("wife")).isTrue();
-        assertThat(fields.included("name")).isFalse();
-
-        assertThat(fields.child("dogs")).isNotNull();
-        assertThat(fields.child("dogs").included("name")).isTrue();
-        assertThat(fields.child("dogs").included("breed")).isTrue();
-        assertThat(fields.child("dogs").included("breed")).isTrue();
-    }
-
 
     @Test
     public void testNested() {

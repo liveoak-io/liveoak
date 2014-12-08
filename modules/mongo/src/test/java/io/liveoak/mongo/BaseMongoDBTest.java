@@ -41,6 +41,7 @@ public class BaseMongoDBTest extends AbstractTestCaseWithTestApp {
     public static void loadExtensions() throws Exception {
         ObjectNode config = JsonNodeFactory.instance.objectNode();
         config.put("db", "MongoInteralTest_" + UUID.randomUUID());
+        config.put("name", "Default Datastore");
 
         loadExtension("mongo", new MongoExtension(), config);
         installTestAppResource("mongo", BASEPATH, createConfig());
