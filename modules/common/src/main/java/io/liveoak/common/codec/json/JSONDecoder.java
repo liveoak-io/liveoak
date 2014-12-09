@@ -5,22 +5,23 @@
  */
 package io.liveoak.common.codec.json;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.Callable;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import io.liveoak.common.codec.ResourceDecoder;
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.common.codec.ResourceDecoder;
 import io.liveoak.common.util.StringPropertyReplacer;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.concurrent.Callable;
 
 /**
  * @author Bob McWhirter
@@ -177,14 +178,27 @@ public class JSONDecoder implements ResourceDecoder {
         parser.nextToken();
         Object value = decodeValue(parser);
 
-        if (name.equals(LiveOak.MEMBERS) && value instanceof Collection) {
-            ((Collection) value).stream().forEach((e) -> state.addMember((ResourceState) e));
+        if (name.equals(LiveOak.MEMBERS)) {
+            if (value instanceof Collection) {
+                ((Collection) value).stream().forEach((e) -> state.addMember((ResourceState) e));
+            } else {
+                throw new IOException("a members value must be a collection");
+            }
+        } else if (name.equals(LiveOak.ID)) {
+            state.id(value.toString());
+        } else if (name.equals(LiveOak.SELF)) {
+            if (value instanceof ResourceState && ((ResourceState) value).getProperty(LiveOak.HREF) instanceof String) {
+                String href = (String)((ResourceState) value).getProperty(LiveOak.HREF);
+                try {
+                    state.uri(new URI(href));
+                } catch (Exception e) {
+                    throw new IOException(e);
+                }
+            } else {
+                state.putProperty(name, value);
+            }
         } else {
             state.putProperty(name, value);
-        }
-
-        if (name.equals(LiveOak.ID)) {
-            state.id(value.toString());
         }
     }
 

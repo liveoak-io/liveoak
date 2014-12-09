@@ -35,18 +35,7 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
 
     @Override
     public void encode() throws Exception {
-        if (returnFields().excluded("id")) {
-            state().id(null);
-        }
-
-        if (returnFields().excluded("self")) {
-            state().uri(null);
-        }
-
-        encoder().startResource(state());
-        encodeProperties(state(), returnFields());
-        encodeMembers(state());
-        encoder().endResource(state());
+        encodeState(state(), returnFields());
     }
 
     protected void encodeMembers(ResourceState resourceState) throws Exception {
@@ -73,7 +62,17 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
 
     protected void encodeProperty(String propertyName, Object property, ReturnFields returnFields) throws Exception {
         encoder().startProperty(propertyName);
-        encodeValue(property, returnFields);
+        if (property instanceof ResourceState) {
+            ResourceState resourceState = (ResourceState) property;
+            // If the resource id is null, then its an 'embedded resource' and should be expanded
+            if (resourceState.id() != null) {
+                encodeValue(resourceState, returnFields.child(resourceState.id()));
+            } else {
+                encodeValue(resourceState, returnFields.ALL);
+            }
+        } else {
+            encodeValue(property, returnFields);
+        }
         encoder().endProperty(propertyName);
     }
 
@@ -90,11 +89,6 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
             encoder().writeValue((Long) value);
         } else if (value instanceof Date) {
             encoder().writeValue((Date) value);
-            //TODO: figure out when writing a link should be used....
-//        } else if (value instanceof URI ) {
-////        } else if (property instanceof ResourceState) {
-//            encoder().writeLink((URI) property);
-//        }
         } else if (value instanceof URI) {
             encoder().writeValue(((URI) value).getPath());
         } else if (value instanceof Boolean) {
