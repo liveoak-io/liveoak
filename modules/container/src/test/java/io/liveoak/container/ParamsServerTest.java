@@ -8,7 +8,6 @@ package io.liveoak.container;
 import java.util.HashSet;
 import java.util.List;
 
-import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.state.ResourceState;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -65,8 +64,6 @@ public class ParamsServerTest extends BasicServerTest {
         assertThat(bobState).isNotNull();
 
         assertThat(bobState.id()).isNotNull();
-        assertThat(bobState.getProperty(LiveOak.ID)).isNotNull();
-        assertThat(bobState.id()).isEqualTo((String) bobState.getProperty(LiveOak.ID));
         assertThat(bobState.getProperty("name")).isEqualTo("bob");
 
         response.close();
@@ -83,7 +80,8 @@ public class ParamsServerTest extends BasicServerTest {
         ResourceState krustyState = (ResourceState) decode(response);
         assertThat(krustyState).isNotNull();
 
-        assertThat(krustyState.getProperty(LiveOak.ID)).isNotNull();
+        //assertThat(krustyState.getProperty(LiveOak.ID)).isNotNull();
+        assertThat(krustyState.id()).isNotNull();
         assertThat(krustyState.getProperty("name")).isEqualTo("krusty");
 
         response.close();
@@ -161,7 +159,7 @@ public class ParamsServerTest extends BasicServerTest {
         System.err.println("TEST #2");
         // test specifying fields to return
 
-        getRequest = new HttpGet("http://localhost:8080/testApp/memory/people/" + krustyState.getProperty(LiveOak.ID) + "?fields=id");
+        getRequest = new HttpGet("http://localhost:8080/testApp/memory/people/" + krustyState.id() + "?fields=id");
         getRequest.addHeader(header);
         response = httpClient.execute(getRequest);
 

@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 import io.liveoak.container.AbstractContainerTest;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.extension.MockExtension;
-import io.liveoak.container.tenancy.service.ApplicationsDirectoryService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.state.ResourceState;
@@ -23,13 +22,11 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.eclipse.jgit.api.Git;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
-import static io.liveoak.spi.Services.APPLICATIONS_DIR;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
@@ -159,7 +156,7 @@ public class GitApplicationsResourceTest extends AbstractContainerTest {
         assertThat(state).isInstanceOf(ResourceState.class);
 
         assertThat(state.id()).isNotNull();
-        assertThat(state.getProperty(LiveOak.ID)).isEqualTo("liveoak-example-chat-html");
+        assertThat(state.id()).isEqualTo("liveoak-example-chat-html");
         assertThat(state.getProperty(LiveOak.NAME)).isEqualTo("liveoak-example-chat-html");
         assertThat(state.getProperty("visible")).isEqualTo(true);
 
@@ -194,7 +191,7 @@ public class GitApplicationsResourceTest extends AbstractContainerTest {
         assertThat(state).isInstanceOf(ResourceState.class);
 
         assertThat(state.id()).isNotNull();
-        assertThat(state.getProperty(LiveOak.ID)).isEqualTo("chat-html");
+        assertThat(state.id()).isEqualTo("chat-html");
         assertThat(state.getProperty(LiveOak.NAME)).isEqualTo("chat-html");
         assertThat(state.getProperty("visible")).isEqualTo(true);
 

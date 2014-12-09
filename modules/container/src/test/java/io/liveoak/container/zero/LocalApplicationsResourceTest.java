@@ -191,7 +191,6 @@ public class LocalApplicationsResourceTest extends AbstractContainerTest {
         assertThat(state).isInstanceOf(ResourceState.class);
 
         assertThat(state.id()).isNotNull();
-        assertThat(state.getProperty(LiveOak.ID)).isEqualTo("myapp");
         assertThat(state.getProperty(LiveOak.NAME)).isEqualTo("app1");
         assertThat(state.getProperty("visible")).isEqualTo(true);
 

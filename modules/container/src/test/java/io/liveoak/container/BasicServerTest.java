@@ -216,8 +216,7 @@ public class BasicServerTest extends AbstractContainerTest {
         ResourceState memoryCollection = state.members().get(0);
         assertThat(memoryCollection.id()).isEqualTo("people");
 
-        ResourceState selfObj = (ResourceState) memoryCollection.getProperty(LiveOak.SELF);
-        assertThat(selfObj.getProperty(LiveOak.HREF)).isEqualTo("/testApp/memory/people");
+        assertThat(memoryCollection.uri().toString()).isEqualTo("/testApp/memory/people");
 
         System.err.println("TEST #6");
         // Post a person

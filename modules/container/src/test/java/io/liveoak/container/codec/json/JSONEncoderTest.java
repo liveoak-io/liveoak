@@ -150,7 +150,7 @@ public class JSONEncoderTest {
         //TODO: figure out how resourceStates of resourceStates should behave with regards to link encoding or resource encoding
         DefaultResourceState mosesState = new DefaultResourceState("moses");
         //mosesState.uri( new URI("/moses") );
-        mosesState.putProperty( LiveOak.HREF, "/moses" );
+        mosesState.uri(new URI("/moses"));
         //mosesState.putProperty("name", "Moses");
         //mosesState.putProperty("breed", "German Shepherd");
 
@@ -174,7 +174,7 @@ public class JSONEncoderTest {
         assertThat(root.get("name").asText()).isEqualTo("Bob McWhirter");
 
         assertThat(root.get("dog")).isNotNull();
-        assertThat(root.get("dog").get(LiveOak.HREF).asText()).isEqualTo("/moses");
+        assertThat(root.get("dog").get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/moses");
     }
 
     @Test
@@ -400,6 +400,137 @@ public class JSONEncoderTest {
         assertThat(child1Node.get("hello").asText()).isEqualTo("world");
 
         ObjectNode child2Node = (ObjectNode)root.get(LiveOak.MEMBERS).get(1);
+        assertThat(child2Node.get(LiveOak.ID).asText()).isEqualTo("child2");
+        assertThat(child2Node.get(LiveOak.SELF)).isNull();
+        assertThat(child2Node.size()).isEqualTo(2);
+        assertThat(child2Node.get("goodbye").asText()).isEqualTo("world");
+    }
+
+    @Test
+    public void testResourceWithReferenceResource() throws Exception {
+        DefaultResourceState parentState = new DefaultResourceState("parent");
+        parentState.uri(new URI("/parent"));
+        parentState.putProperty("A", 1);
+        parentState.putProperty("B", 2);
+
+        DefaultResourceState child1State = new DefaultResourceState("child1");
+        child1State.uri(new URI("/parent/child1"));
+        child1State.putProperty("foo", "bar");
+        child1State.putProperty("hello", "world");
+
+        DefaultResourceState child2State = new DefaultResourceState("child2");
+        child2State.uri(new URI("/parent/child2"));
+        child2State.putProperty("foo", "baz");
+        child2State.putProperty("goodbye", "world");
+
+        parentState.putProperty("child1", child1State);
+        parentState.putProperty("child2", child2State);
+
+        ByteBuf buffer = encode( parentState, "*");
+        String encoded = buffer.toString(Charset.defaultCharset());
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(encoded);
+
+        assertThat(root.get(LiveOak.ID).asText()).isEqualTo("parent");
+        assertThat(root.get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/parent");
+        assertThat(root.size()).isEqualTo(6);
+        assertThat(root.get("B").asInt()).isEqualTo(2);
+
+        ObjectNode child1Node = (ObjectNode)root.get("child1");
+        assertThat(child1Node.get(LiveOak.ID).asText()).isEqualTo("child1");
+        assertThat(child1Node.get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/parent/child1");
+        assertThat(child1Node.size()).isEqualTo(2);
+
+        ObjectNode child2Node = (ObjectNode)root.get("child2");
+        assertThat(child2Node.get(LiveOak.ID).asText()).isEqualTo("child2");
+        assertThat(child2Node.get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/parent/child2");
+        assertThat(child2Node.size()).isEqualTo(2);
+    }
+
+    @Test
+    public void testResourceWithReferenceReturnFields() throws Exception {
+        DefaultResourceState parentState = new DefaultResourceState("parent");
+        parentState.uri(new URI("/parent"));
+        parentState.putProperty("A", 1);
+        parentState.putProperty("B", 2);
+
+        DefaultResourceState child1State = new DefaultResourceState("child1");
+        child1State.uri(new URI("/parent/child1"));
+        child1State.putProperty("foo", "bar");
+        child1State.putProperty("hello", "world");
+
+        DefaultResourceState child2State = new DefaultResourceState("child2");
+        child2State.uri(new URI("/parent/child2"));
+        child2State.putProperty("foo", "baz");
+        child2State.putProperty("goodbye", "world");
+
+        parentState.putProperty("child1", child1State);
+        parentState.putProperty("child2", child2State);
+
+        ByteBuf buffer = encode( parentState, "*,child1(foo,hello),child2(foo)");
+        String encoded = buffer.toString(Charset.defaultCharset());
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(encoded);
+
+        assertThat(root.get(LiveOak.ID).asText()).isEqualTo("parent");
+        assertThat(root.get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/parent");
+        assertThat(root.size()).isEqualTo(6);
+        assertThat(root.get("B").asInt()).isEqualTo(2);
+
+        ObjectNode child1Node = (ObjectNode)root.get("child1");
+        assertThat(child1Node.get(LiveOak.ID).asText()).isEqualTo("child1");
+        assertThat(child1Node.get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/parent/child1");
+        assertThat(child1Node.size()).isEqualTo(4);
+        assertThat(child1Node.get("foo").asText()).isEqualTo("bar");
+        assertThat(child1Node.get("hello").asText()).isEqualTo("world");
+
+        ObjectNode child2Node = (ObjectNode)root.get("child2");
+        assertThat(child2Node.get(LiveOak.ID).asText()).isEqualTo("child2");
+        assertThat(child2Node.get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/parent/child2");
+        assertThat(child2Node.size()).isEqualTo(3);
+        assertThat(child2Node.get("foo").asText()).isEqualTo("baz");
+    }
+
+    @Test
+    public void testResourceWithReferenceExcludeReturnFields() throws Exception {
+        DefaultResourceState parentState = new DefaultResourceState("parent");
+        parentState.uri(new URI("/parent"));
+        parentState.putProperty("A", 1);
+        parentState.putProperty("B", 2);
+
+        DefaultResourceState child1State = new DefaultResourceState("child1");
+        child1State.uri(new URI("/parent/child1"));
+        child1State.putProperty("foo", "bar");
+        child1State.putProperty("hello", "world");
+
+        DefaultResourceState child2State = new DefaultResourceState("child2");
+        child2State.uri(new URI("/parent/child2"));
+        child2State.putProperty("foo", "baz");
+        child2State.putProperty("goodbye", "world");
+
+        parentState.putProperty("child1", child1State);
+        parentState.putProperty("child2", child2State);
+
+        ByteBuf buffer = encode( parentState, "*,child1(*,-hello,-id),child2(*,-self,-foo)");
+        String encoded = buffer.toString(Charset.defaultCharset());
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(encoded);
+
+        assertThat(root.get(LiveOak.ID).asText()).isEqualTo("parent");
+        assertThat(root.get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/parent");
+        assertThat(root.size()).isEqualTo(6);
+        assertThat(root.get("B").asInt()).isEqualTo(2);
+
+        ObjectNode child1Node = (ObjectNode)root.get("child1");
+        assertThat(child1Node.get(LiveOak.ID)).isNull();
+        assertThat(child1Node.get(LiveOak.SELF).get(LiveOak.HREF).asText()).isEqualTo("/parent/child1");
+        assertThat(child1Node.size()).isEqualTo(2);
+        assertThat(child1Node.get("foo").asText()).isEqualTo("bar");
+
+        ObjectNode child2Node = (ObjectNode)root.get("child2");
         assertThat(child2Node.get(LiveOak.ID).asText()).isEqualTo("child2");
         assertThat(child2Node.get(LiveOak.SELF)).isNull();
         assertThat(child2Node.size()).isEqualTo(2);
