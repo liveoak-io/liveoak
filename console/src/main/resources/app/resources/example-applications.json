@@ -2,6 +2,7 @@
   {
     "id": "chat-html",
     "url": "https://github.com/liveoak-io/liveoak-example-chat-html.git",
+    "branch": "${example.branch}",
     "name": "HTML Chat",
     "description": "Get HTTP REST for creating new chat messages and receive list of existing messages; Stomp over Websockets used for subscription request to receive notifications about changes.",
     "icon": "chat-html.svg",
@@ -10,6 +11,7 @@
   {
     "id": "chat-html-secured",
     "url": "https://github.com/liveoak-io/liveoak-example-chat-html-secured.git",
+    "branch": "${example.branch}",
     "name": "Secured Chat",
     "description": "HTTP REST including authentication and authorization. Keycloak integration. Stomp over websockets used for subscription requests. Subscription requests allowed just for authorized users; Authorized subscription responses received for newly added chat messages and also for deleted or updated messages. Users with role _admin_ can delete any chat message.",
     "icon": "chat-secured.svg",
@@ -18,26 +20,29 @@
   {
     "id": "chat-android",
     "url": "https://github.com/liveoak-io/liveoak-example-chat-android.git",
+    "branch": "${example.branch}",
     "name": "Android Chat",
     "description": "Get native Android integration with resources stored in a LiveOak instance; Native notifications of resource subscription from Google Cloud Messaging (GCM) via integration with the Aerogear Unified Push Server (UPS); System notifications when the application is in the background; Uses GCM for updated chats when the application has focus.",
     "icon": "chat-android.svg",
     "icon-alt": "Illustration: Ballons with the Android logo",
     "depends": [["chat-html"],["chat-html-secured"]],
-    "instructions": "https://github.com/liveoak-io/liveoak-example-chat-android#readme"
+    "instructions": "https://github.com/liveoak-io/liveoak-example-chat-android/tree/${example.branch}#readme"
   },
   {
     "id": "chat-ios",
     "url": "https://github.com/liveoak-io/liveoak-example-chat-ios.git",
+    "branch": "${example.branch}",
     "name": "iOS Chat",
     "description": "Get native iOS integration with resources stored in a LiveOak instance; Native notifications of resource subscription from Apple Push Notification Service (APNS) via integration with the Aerogear Unified Push Server (UPS); System notifications when the application is in the background (using the 'content-available' flag for immediate fetch of new chat messages).",
     "icon": "chat-ios.svg",
     "icon-alt": "Illustration: Ballons with the iOS logo",
     "depends": [["chat-html"],["chat-html-secured"]],
-    "instructions": "https://github.com/liveoak-io/liveoak-example-chat-ios#readme"
+    "instructions": "https://github.com/liveoak-io/liveoak-example-chat-ios/tree/${example.branch}#readme"
   },
   {
     "id": "gallery",
     "url": "https://github.com/liveoak-io/liveoak-example-gallery.git",
+    "branch": "${example.branch}",
     "name": "Gallery",
     "description": "The Gallery demo application runs in desktop, and mobile browser, and also provides REST endpoints for gallery-cordova application.",
     "icon": "gallery.svg",
@@ -46,6 +51,7 @@
   {
     "id": "todomvc",
     "url": "https://github.com/liveoak-io/liveoak-example-todomvc.git",
+    "branch": "${example.branch}",
     "name": "TodoMVC",
     "description": "The TodoMVC example is based on the example https://todomvc.com/architecture-examples/angularjs/#/ . Our example is integrated with [Keycloak](https://www.keycloak.org) and it's showing security possibilities of [LiveOak](https://liveoak.io) (among other things).",
     "icon": "todomvc.svg",
@@ -54,6 +60,7 @@
   {
     "id": "helloscript",
     "url": "https://github.com/liveoak-io/liveoak-example-helloscript.git",
+    "branch": "${example.branch}",
     "name": "Messages",
     "description": "The Hello Messages example shows a simple usage of Business Logic by outputting a message to the log before and after any resource of the application is read.",
     "icon": "script.svg",
@@ -62,6 +69,7 @@
   {
     "id": "metadatascript",
     "url": "https://github.com/liveoak-io/liveoak-example-metadatascript.git",
+    "branch": "${example.branch}",
     "name": "Metadata for Data",
     "description": "The Add Metadata example shows how Business Logic can add a 'last-modified' field to any data being created or updated within the 'storage' resource of the application.",
     "icon": "script.svg",
@@ -70,6 +78,7 @@
   {
     "id": "formatscript",
     "url": "https://github.com/liveoak-io/liveoak-example-formatscript.git",
+    "branch": "${example.branch}",
     "name": "Data Validation",
     "description": "The Data Validation example utilizes Business Logic for validating data received on a create or update, and throws appropriate errors back to the client if validation failed",
     "icon": "script.svg",
@@ -78,6 +87,7 @@
   {
     "id": "useragentscript",
     "url": "https://github.com/liveoak-io/liveoak-example-useragentscript.git",
+    "branch": "${example.branch}",
     "name": "Request Headers",
     "description": "Utilize Business Logic to read/query/write/update LiveOak resources. In this case it uses the headers from the request to track how many times the same User Agent has accessed the resource.",
     "icon": "script.svg",
@@ -86,6 +96,7 @@
   {
     "id": "auth-html",
     "url": "https://github.com/liveoak-io/liveoak-example-auth-html.git",
+    "branch": "${example.branch}",
     "name": "Auth",
     "description": "Basic functionality related to authentication to Keycloak/LiveOak. It's simple Javascript application, which you can use to login into Keycloak and obtain OAuth access token in JWT format from Keycloak. You can also try to send ajax request to 'storage' resource with access token attached in Authorization header. Storage request will be successful just in case that you are authenticated.",
     "icon": "auth.svg",
@@ -94,22 +105,24 @@
   {
     "id": "gallery-cordova",
     "url": "https://github.com/liveoak-io/liveoak-example-gallery-cordova.git",
+    "branch": "${example.branch}",
     "name": "Android Gallery",
     "description": "The Android Gallery demo application runs as a native application on a mobile device or emulator. It connects remotely to LiveOak endpoints provided by 'gallery' example application.",
     "icon": "gallery-android.svg",
     "icon-alt": "Illustration: Pictures with the Android logo",
     "depends": [["gallery"]],
-    "instructions": "https://github.com/liveoak-io/liveoak-example-gallery-cordova#readme"
+    "instructions": "https://github.com/liveoak-io/liveoak-example-gallery-cordova/tree/${example.branch}#readme"
   },
   {
     "id": "todomvc-cordova",
     "url": "https://github.com/liveoak-io/liveoak-example-todomvc-cordova.git",
+    "branch": "${example.branch}",
     "name": "TodoMVC (Cordova)",
     "description": "The Cordova version of TodoMVC demo application runs as a native application on a mobile device or emulator. It connects remotely to LiveOak endpoints provided by 'todomvc' example application.",
     "icon": "todomvc-android.svg",
     "icon-alt": "Illustration: A list with the Android logo",
     "depends": [["todomvc"]],
-    "instructions": "https://github.com/liveoak-io/liveoak-example-todomvc-cordova#readme"
+    "instructions": "https://github.com/liveoak-io/liveoak-example-todomvc-cordova/tree/${example.branch}#readme"
   }
 
 ]

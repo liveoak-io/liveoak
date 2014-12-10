@@ -437,7 +437,7 @@ var importApp = function(app, LoAppExamples, Notifications, $modalInstance, $rou
   };
 
   if (app.hasOwnProperty('url')) {
-    new LoAppExamples({ id: app.id, url: app.url }).$importGit({}, installSuccess, installFailure);
+    new LoAppExamples({ id: app.id, url: app.url, branch: app.branch }).$importGit({}, installSuccess, installFailure);
   }
   else if (app.hasOwnProperty('path')) {
     new LoAppExamples({ id: app.id, localPath: app.path }).$install({}, installSuccess, installFailure);

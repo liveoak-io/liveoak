@@ -20,6 +20,7 @@
 
     <properties>
         <module-name/>
+        <example.branch>master</example.branch>
         <console.app.res>${project.basedir}/target/</console.app.res>
         <console.test>${project.basedir}/src/main/resources/test</console.test>
         <html.unit.version>2.13</html.unit.version>
@@ -101,7 +102,6 @@
                 <executions>
                     <execution>
                         <id>copy-resources</id>
-
                         <phase>compile</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -116,11 +116,27 @@
                                         <exclude>test/</exclude>
                                         <exclude>**/.git*</exclude>
                                         <exclude>**/*.md</exclude>
-                                        <!--exclude>node/</exclude>
-                                        <exclude>node_modules/</exclude>
-                                        <exclude>Gruntfile.js</exclude>
-                                        <exclude>%regex[.*/\.?bower\.json]</exclude-->
+                                        <exclude>app/resources/example-applications.json</exclude>
                                     </excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>filter-resources</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>app/resources/example-applications.json</include>
+                                    </includes>
                                 </resource>
                             </resources>
                         </configuration>
@@ -227,13 +243,6 @@
                 </executions>
             </plugin>
         </plugins>
-
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-            </testResource>
-        </testResources>
     </build>
 
     <!-- Use this profile to keep cache directories downloaded with frontend-maven-plugin in the target directory -->
@@ -271,6 +280,9 @@
         <!-- This profile doesn't do anything, other than cause the above 'development' profile not to be activated when we're performing a release -->
         <profile>
             <id>release</id>
+            <properties>
+                <example.branch>${release_version}</example.branch>
+            </properties>
         </profile>
     </profiles>
 
