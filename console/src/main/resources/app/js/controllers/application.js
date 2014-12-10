@@ -56,7 +56,7 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
           htmlapp: filtered[i]['html-app'],
           example: filtered[i].example
         };
-        app.url = $location.protocol() + '://' + $location.host() + ':' + $location.port() + '/' + app.id;
+        app.url = $location.protocol() + '://' + $location.host() + ':' + $location.port() + '/' + app.id + '/';
         app.storage = LoStorage.getList({appId: app.id});
         app.mongoStorages = 0;
         app.storage.$promise.then(increaseStorages(app));

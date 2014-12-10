@@ -6,7 +6,7 @@ loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, $fi
 
   $rootScope.curApp = currentApp;
 
-  $scope.appUrl = $location.protocol() + '://' + $location.host() + ':' + $location.port() + '/' + currentApp.id;
+  $scope.appUrl = $location.protocol() + '://' + $location.host() + ':' + $location.port() + '/' + currentApp.id + '/';
 
   $scope.storageList = [];
 
