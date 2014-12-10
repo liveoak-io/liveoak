@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.liveoak.container.extension.ConfigVersioningResponder;
-import io.liveoak.container.zero.ApplicationExtensionsResource;
+import io.liveoak.container.extension.application.ApplicationExtensionsResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.exceptions.PropertyException;

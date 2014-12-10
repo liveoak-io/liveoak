@@ -10,7 +10,7 @@ import io.liveoak.container.service.MountService;
 import io.liveoak.container.service.ClientService;
 import io.liveoak.container.tenancy.service.ApplicationsDeployerService;
 import io.liveoak.container.tenancy.service.ApplicationsDirectoryService;
-import io.liveoak.container.zero.ApplicationExtensionsResource;
+import io.liveoak.container.extension.application.ApplicationExtensionsResource;
 import io.liveoak.container.zero.ApplicationsResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;

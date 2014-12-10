@@ -1,4 +1,4 @@
-package io.liveoak.container.zero;
+package io.liveoak.container.extension.application;
 
 import io.liveoak.common.MediaTypeMountPointResource;
 import io.liveoak.container.extension.ConfigVersioningResponder;
