@@ -16,21 +16,23 @@ public final class FileHelper {
     }
 
     public static void deleteNonEmpty(File directory) throws IOException {
-        Path directoryPath = directory.toPath();
-        Files.walkFileTree(directoryPath, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                if (!file.toFile().delete()) {
-                    throw new IOException("Failed to delete file: " + file);
+        if (directory.exists()) {
+            Path directoryPath = directory.toPath();
+            Files.walkFileTree(directoryPath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    if (!file.toFile().delete()) {
+                        throw new IOException("Failed to delete file: " + file);
+                    }
+                    return FileVisitResult.CONTINUE;
                 }
-                return FileVisitResult.CONTINUE;
-            }
 
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                java.nio.file.Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
-        });
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    java.nio.file.Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        }
     }
 }

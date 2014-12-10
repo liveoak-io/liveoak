@@ -1,7 +1,7 @@
 package io.liveoak.container;
 
 import io.liveoak.common.codec.ResourceCodecManager;
-import io.liveoak.container.extension.ExtensionInstaller;
+import io.liveoak.container.extension.system.ExtensionInstaller;
 import io.liveoak.container.resource.PropertiesResource;
 import io.liveoak.container.resource.ServersResource;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;

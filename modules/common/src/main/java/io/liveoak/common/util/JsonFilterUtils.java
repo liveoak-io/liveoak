@@ -16,11 +16,13 @@ public final class JsonFilterUtils {
     }
 
     public static ResourceState filter(ResourceState src, Properties environmentProperties) {
-        ResourceState dest = new DefaultResourceState();
+        ResourceState dest = new DefaultResourceState(src.id());
 
         for (String name : src.getPropertyNames()) {
             dest.putProperty(name, filter(src.getProperty(name), environmentProperties));
         }
+
+        src.members().forEach(member -> dest.addMember(filter(member, environmentProperties)));
 
         return dest;
     }

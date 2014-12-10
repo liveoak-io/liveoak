@@ -1,9 +1,10 @@
-package io.liveoak.container.tenancy;
+package io.liveoak.container.extension.application;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
-import io.liveoak.container.tenancy.service.ApplicationExtensionRemovalService;
+import io.liveoak.container.tenancy.InternalApplication;
+import io.liveoak.container.extension.application.service.ApplicationExtensionRemovalService;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.resource.async.Resource;

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.InitializationException;

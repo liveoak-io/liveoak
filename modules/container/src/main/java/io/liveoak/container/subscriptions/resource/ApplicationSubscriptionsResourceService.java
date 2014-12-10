@@ -1,7 +1,7 @@
 package io.liveoak.container.subscriptions.resource;
 
 import io.liveoak.common.codec.ResourceCodecManager;
-import io.liveoak.container.extension.MountService;
+import io.liveoak.container.service.MountService;
 import io.liveoak.container.subscriptions.DefaultSubscriptionManager;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.spi.resource.MountPointResource;

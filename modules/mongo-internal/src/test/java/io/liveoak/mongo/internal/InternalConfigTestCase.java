@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.mongo.config.BaseMongoConfigTest;
 import io.liveoak.mongo.extension.MongoExtension;

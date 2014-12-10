@@ -18,11 +18,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
-import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.container.tenancy.InternalApplicationRegistry;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.tenancy.InternalApplicationExtension;
+import io.liveoak.container.extension.application.InternalApplicationExtension;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.mongo.launcher.MongoInstaller;
 import io.liveoak.mongo.launcher.MongoLauncher;
@@ -78,7 +79,7 @@ public class AbstractTestCase {
     }
 
     @ClassRule
-    public static ExternalResource mongoLauncher = new LiveOakSetup();
+    public static ExternalResource liveOakSetup = new LiveOakSetup();
 
     @After
     public void postTestWait() throws InterruptedException {

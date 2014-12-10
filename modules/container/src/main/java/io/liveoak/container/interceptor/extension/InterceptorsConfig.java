@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
-import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.spi.state.ResourceState;
 
 import java.io.IOException;

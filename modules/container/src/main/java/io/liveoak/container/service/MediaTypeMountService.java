@@ -1,6 +1,5 @@
-package io.liveoak.container.extension.service;
+package io.liveoak.container.service;
 
-import io.liveoak.container.extension.MountService;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.resource.RootResource;
 

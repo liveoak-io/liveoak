@@ -1,10 +1,10 @@
-package io.liveoak.container.tenancy.service;
+package io.liveoak.container.extension.application.service;
 
 import java.util.concurrent.CountDownLatch;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import io.liveoak.container.extension.ApplicationExtensionContextImpl;
-import io.liveoak.container.tenancy.InternalApplicationExtension;
+import io.liveoak.container.extension.application.ApplicationExtensionContextImpl;
+import io.liveoak.container.extension.application.InternalApplicationExtension;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;

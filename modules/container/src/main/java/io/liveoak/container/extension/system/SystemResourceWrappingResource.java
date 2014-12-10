@@ -1,7 +1,9 @@
-package io.liveoak.container.extension;
+package io.liveoak.container.extension.system;
 
 import java.util.Properties;
 
+import io.liveoak.container.extension.ConfigPersistingWrappingResource;
+import io.liveoak.container.extension.ConfigVersioningResponder;
 import io.liveoak.container.tenancy.ConfigurationManager;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
@@ -12,7 +14,7 @@ import io.liveoak.spi.resource.async.Responder;
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  * @author Ken Finnigan
  */
-public class SystemResourceWrappingResource extends ConfigResourceWrappingResource {
+public class SystemResourceWrappingResource extends ConfigPersistingWrappingResource {
 
     public SystemResourceWrappingResource(ConfigurationManager configManager, RootResource delegate, Properties envProps, Client client) {
         super(configManager, delegate, envProps, client);

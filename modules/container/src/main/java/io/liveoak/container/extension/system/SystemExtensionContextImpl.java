@@ -1,11 +1,12 @@
-package io.liveoak.container.extension;
+package io.liveoak.container.extension.system;
 
 import java.util.Properties;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.container.service.MountService;
 import io.liveoak.container.extension.service.InitializeResourceService;
 import io.liveoak.container.extension.service.RootResourceLifecycleService;
-import io.liveoak.container.extension.service.SystemResourceWrappingResourceService;
+import io.liveoak.container.extension.system.service.SystemResourceWrappingResourceService;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.SystemExtensionContext;

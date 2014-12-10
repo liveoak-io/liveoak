@@ -10,11 +10,11 @@ import org.jboss.logging.Logger;
 /**
  * @author Bob McWhirter
  */
-public class ResourceConfigPersistingResponder extends DelegatingResponder {
+public class RootResourceConfigPersistingResponder extends DelegatingResponder {
 
-    private static final Logger log = Logger.getLogger(ResourceConfigPersistingResponder.class);
+    private static final Logger log = Logger.getLogger(RootResourceConfigPersistingResponder.class);
 
-    public  ResourceConfigPersistingResponder(ConfigResourceWrappingResource resource, ResourceState state, Responder delegate) {
+    public RootResourceConfigPersistingResponder(ConfigPersistingWrappingResource resource, ResourceState state, Responder delegate) {
         super(delegate);
         this.resource = resource;
         this.state = state;
@@ -30,6 +30,6 @@ public class ResourceConfigPersistingResponder extends DelegatingResponder {
         }
     }
 
-    private final ConfigResourceWrappingResource resource;
+    private final ConfigPersistingWrappingResource resource;
     private final ResourceState state;
 }

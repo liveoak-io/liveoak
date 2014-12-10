@@ -2,6 +2,7 @@ package io.liveoak.container.extension;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultMountPointResource;
+import io.liveoak.container.extension.system.ExtensionInstaller;
 import io.liveoak.container.service.ClientService;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;
@@ -12,7 +13,6 @@ import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 import org.junit.After;

@@ -1,4 +1,4 @@
-package io.liveoak.common.util;
+package io.liveoak.spi.util;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;

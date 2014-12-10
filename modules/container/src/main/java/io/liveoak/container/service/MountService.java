@@ -1,4 +1,4 @@
-package io.liveoak.container.extension;
+package io.liveoak.container.service;
 
 import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.resource.RootResource;

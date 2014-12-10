@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.DefaultResourceState;
+import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.state.ResourceState;
 
 /**
@@ -19,18 +20,12 @@ import io.liveoak.spi.state.ResourceState;
 public class ConversionUtils {
 
     public static ResourceState convert(ObjectNode src) {
-        ResourceState dest = new DefaultResourceState();
-        Iterator<String> fieldIter = src.fieldNames();
-
-        while (fieldIter.hasNext()) {
-            copy(src, dest, fieldIter.next());
-        }
-
-        return dest;
+        return convert((JsonNode)src);
     }
 
     public static ResourceState convert(JsonNode src) {
-        ResourceState dest = new DefaultResourceState();
+        String id = (src != null && src.isObject()) ? id((ObjectNode)src) : null;
+        ResourceState dest = new DefaultResourceState(id);
         Iterator<String> fieldIter = src.fieldNames();
 
         while (fieldIter.hasNext()) {
@@ -104,5 +99,13 @@ public class ConversionUtils {
     private static void copy(JsonNode src, ResourceState dest, String name) {
         JsonNode value = src.get(name);
         dest.putProperty( name, toRS( value ));
+    }
+
+    private static String id(ObjectNode node) {
+        JsonNode idNode = node.remove(LiveOak.ID);
+        if (idNode != null) {
+            return idNode.asText();
+        }
+        return null;
     }
 }

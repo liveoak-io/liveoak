@@ -3,7 +3,7 @@ package io.liveoak.testtools.assertions;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.util.EntityUtils;
 import org.fest.assertions.GenericAssert;

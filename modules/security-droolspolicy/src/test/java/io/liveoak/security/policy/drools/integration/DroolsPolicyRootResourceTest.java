@@ -20,7 +20,7 @@ import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.common.security.DefaultSecurityContext;
-import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.security.policy.drools.extension.DroolsPolicyExtension;
 import io.liveoak.spi.RequestAttributes;
 import io.liveoak.spi.RequestContext;

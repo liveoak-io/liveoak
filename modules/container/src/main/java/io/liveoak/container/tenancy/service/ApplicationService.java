@@ -11,15 +11,14 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.json.JSONDecoder;
-import io.liveoak.common.util.ObjectMapperFactory;
-import io.liveoak.container.extension.service.MediaTypeMountService;
+import io.liveoak.spi.util.ObjectMapperFactory;
+import io.liveoak.container.service.MediaTypeMountService;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.ApplicationContext;
 import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.container.zero.extension.ZeroExtension;
-import io.liveoak.container.zero.service.ApplicationClientsInstallService;
 import io.liveoak.container.zero.service.GitResourceInstallService;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.MediaType;
@@ -129,6 +128,12 @@ public class ApplicationService implements Service<InternalApplication> {
 
         this.app = new InternalApplication(target, this.id, appName, appDir, htmlApp, appVisible, appExample, versionResourceId);
 
+        // Create config directory, if needed
+        File configDir = this.app.configurationDirectory();
+        if (!configDir.exists()) {
+            configDir.mkdir();
+        }
+
         ServiceName configManagerName = Services.applicationConfigurationManager(this.id);
         ApplicationConfigurationService configManager = new ApplicationConfigurationService(applicationJson);
         target.addService(configManagerName, configManager)
@@ -138,17 +143,6 @@ public class ApplicationService implements Service<InternalApplication> {
                 .install();
 
         ServiceName appContextName = Services.applicationContext(this.id);
-
-        // Configure application-clients resource if it's not present
-        boolean appClientInstalled = false;
-        if (resourcesTree == null || !resourcesTree.getPropertyNames().contains(LiveOak.APPLICATION_CLIENTS_RESOURCE_TYPE)) {
-            ApplicationClientsInstallService appClientInstaller = new ApplicationClientsInstallService();
-            target.addService(Services.application(this.app.id()).append("app-client-install"), appClientInstaller)
-                    .addDependency(configManagerName)
-                    .addInjectionValue(appClientInstaller.applicationInjector(), this)
-                    .install();
-            appClientInstalled = true;
-        }
 
         // Configure git resource if it's not present and git extension is installed
         boolean gitInstalled = false;
@@ -192,9 +186,6 @@ public class ApplicationService implements Service<InternalApplication> {
         ServiceBuilder<Void> resourceStartup = target.addService(Services.application(this.id).append("resources"), resources)
                 .addInjectionValue(resources.applicationInjector(), this);
 
-        if (appClientInstalled) {
-            resourceStartup.addDependency(Services.application(this.app.id()).append("app-client-install"));
-        }
         if (gitInstalled) {
             resourceStartup.addDependency(Services.application(this.app.id()).append("git-install"));
         }

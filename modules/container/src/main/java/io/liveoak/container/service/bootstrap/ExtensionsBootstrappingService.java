@@ -2,8 +2,8 @@ package io.liveoak.container.service.bootstrap;
 
 import java.io.File;
 
-import io.liveoak.container.extension.ExtensionInstaller;
-import io.liveoak.container.extension.ExtensionLoader;
+import io.liveoak.container.extension.system.ExtensionInstaller;
+import io.liveoak.container.extension.system.ExtensionLoader;
 import io.liveoak.container.zero.service.ZeroBootstrapper;
 import io.liveoak.spi.Services;
 import org.jboss.msc.inject.Injector;

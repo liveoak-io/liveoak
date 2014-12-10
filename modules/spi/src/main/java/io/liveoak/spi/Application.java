@@ -11,6 +11,5 @@ public interface Application {
     String name();
     File directory();
     Boolean visible();
-    Boolean versioned();
-    String versionResourceId();
+    File configurationDirectory();
 }

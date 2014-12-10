@@ -15,7 +15,7 @@ import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.security.AuthzConstants;
 import io.liveoak.common.security.AuthzDecision;
 import io.liveoak.common.util.ConversionUtils;
-import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.interceptor.extension.InterceptorExtension;
 import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.mongo.internal.extension.MongoInternalExtension;

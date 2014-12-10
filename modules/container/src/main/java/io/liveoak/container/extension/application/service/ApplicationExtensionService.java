@@ -1,11 +1,11 @@
-package io.liveoak.container.tenancy.service;
+package io.liveoak.container.extension.application.service;
 
 import java.util.Properties;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.container.extension.ApplicationExtensionContextImpl;
+import io.liveoak.container.extension.application.ApplicationExtensionContextImpl;
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.tenancy.InternalApplicationExtension;
+import io.liveoak.container.extension.application.InternalApplicationExtension;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.logging.Logger;
@@ -16,8 +16,6 @@ import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.jboss.msc.service.ValueService;
-import org.jboss.msc.value.ImmediateValue;
 import org.jboss.msc.value.InjectedValue;
 
 /**

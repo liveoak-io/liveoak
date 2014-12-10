@@ -1,4 +1,4 @@
-package io.liveoak.container.extension;
+package io.liveoak.container.extension.system;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.container.tenancy.ConfigurationManager;
 import org.jboss.logging.Logger;
 

@@ -1,7 +1,7 @@
-package io.liveoak.container.extension;
+package io.liveoak.container.extension.system.service;
 
-import io.liveoak.container.extension.ExtensionConfigurationManager;
-import io.liveoak.container.extension.ModuleResourceRegistry;
+import io.liveoak.container.extension.system.ExtensionConfigurationManager;
+import io.liveoak.container.extension.system.ModuleResourceRegistry;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceTarget;

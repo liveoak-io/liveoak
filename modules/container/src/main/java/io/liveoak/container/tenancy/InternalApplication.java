@@ -5,7 +5,8 @@ import java.io.File;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
-import io.liveoak.container.tenancy.service.ApplicationExtensionService;
+import io.liveoak.container.extension.application.InternalApplicationExtension;
+import io.liveoak.container.extension.application.service.ApplicationExtensionService;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.ResourcePath;
@@ -60,11 +61,15 @@ public class InternalApplication implements Application {
         return this.visible;
     }
 
+    @Override
+    public File configurationDirectory() {
+        return new File(this.directory, "config");
+    }
+
     public void setVisible(Boolean visible) {
         this.visible = visible;
     }
 
-    @Override
     public Boolean versioned() {
         return this.versionResourceId != null && this.versionResourceId.length() > 0;
     }
@@ -73,7 +78,6 @@ public class InternalApplication implements Application {
         return "/" + ZeroExtension.APPLICATION_ID + "/applications/" + this.id() + "/resources/" + this.versionResourceId() + "/commits";
     }
 
-    @Override
     public String versionResourceId() {
         return this.versionResourceId;
     }

@@ -1,12 +1,14 @@
-package io.liveoak.container.extension.service;
+package io.liveoak.container.extension.application.service;
 
 import java.util.Properties;
 
-import io.liveoak.container.extension.AdminResourceWrappingResource;
+import io.liveoak.container.extension.application.AdminResourceWrappingResource;
+import io.liveoak.container.extension.application.ConfigRootResourceWrappingResource;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
-import io.liveoak.container.tenancy.InternalApplicationExtension;
+import io.liveoak.container.extension.application.InternalApplicationExtension;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.RootResource;
+import io.liveoak.spi.resource.config.ConfigRootResource;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -28,11 +30,11 @@ public class AdminResourceWrappingResourceService implements Service<RootResourc
     public void start(StartContext context) throws StartException {
         RootResource resource = resourceInjector.getValue();
 
-//        if (resource instanceof ConfigRootResource) {
-//            this.persistingResource = new ConfigResourceRootWrappingResource(this.extension, this.managerInjector.getValue(), resource, environmentPropertiesInjector.getValue(), clientInjector.getValue());
-//        } else {
+        if (resource instanceof ConfigRootResource) {
+            this.persistingResource = new ConfigRootResourceWrappingResource(this.extension, this.managerInjector.getValue(), resource, environmentPropertiesInjector.getValue(), clientInjector.getValue());
+        } else {
             this.persistingResource = new AdminResourceWrappingResource(this.extension, this.managerInjector.getValue(), resource, environmentPropertiesInjector.getValue(), clientInjector.getValue());
-//        }
+        }
     }
 
     @Override

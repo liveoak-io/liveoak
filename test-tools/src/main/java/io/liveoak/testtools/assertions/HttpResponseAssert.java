@@ -1,7 +1,7 @@
 package io.liveoak.testtools.assertions;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import org.apache.http.HttpResponse;
 import org.fest.assertions.GenericAssert;
 

@@ -4,7 +4,7 @@ import io.liveoak.common.MediaTypeMountPointResource;
 import io.liveoak.container.extension.ConfigVersioningResponder;
 import io.liveoak.container.tenancy.ApplicationResource;
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.tenancy.InternalApplicationExtension;
+import io.liveoak.container.extension.application.InternalApplicationExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.BlockingResource;

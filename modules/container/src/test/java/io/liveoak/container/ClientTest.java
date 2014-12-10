@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.container.tenancy.InternalApplication;
-import io.liveoak.container.tenancy.InternalApplicationExtension;
+import io.liveoak.container.extension.application.InternalApplicationExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.client.Client;

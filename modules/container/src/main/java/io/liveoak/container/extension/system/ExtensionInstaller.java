@@ -1,4 +1,4 @@
-package io.liveoak.container.extension;
+package io.liveoak.container.extension.system;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,9 +11,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.json.JSONEncoder;
-import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.common.util.StringPropertyReplacer;
-import io.liveoak.container.extension.service.ExtensionService;
+import io.liveoak.container.extension.system.service.ExtensionService;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.Extension;
 import org.jboss.modules.Module;

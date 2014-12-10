@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.util.ConversionUtils;
-import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.common.util.ResourceConversionUtils;
 import io.liveoak.security.policy.uri.impl.URIPolicy;
 import io.liveoak.security.policy.uri.impl.URIPolicyConfigurator;

@@ -2,7 +2,7 @@ package io.liveoak.scripts.resource.scripting.resource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.liveoak.common.util.ConversionUtils;
-import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.scripts.JavaScriptResourceState;
 import io.liveoak.scripts.resource.scripting.BaseScriptingTestCase;
 import io.liveoak.spi.RequestContext;

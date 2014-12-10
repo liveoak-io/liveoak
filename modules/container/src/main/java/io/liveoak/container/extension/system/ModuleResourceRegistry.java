@@ -1,4 +1,4 @@
-package io.liveoak.container.extension;
+package io.liveoak.container.extension.system;
 
 import java.util.Map;
 import java.util.UUID;
@@ -6,8 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import io.liveoak.common.DefaultMountPointResource;
 import io.liveoak.common.util.ConversionUtils;
-import io.liveoak.container.extension.ExtensionConfigurationManager;
-import io.liveoak.container.extension.SystemExtensionContextImpl;
+import io.liveoak.container.extension.system.ExtensionConfigurationManager;
+import io.liveoak.container.extension.system.SystemExtensionContextImpl;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Services;

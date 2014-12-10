@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
-import io.liveoak.common.util.ObjectMapperFactory;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.scripts.resource.ScriptResource;
 import io.liveoak.scripts.resource.ScriptsResource;
 import io.liveoak.scripts.resource.ScriptsRootResource;

@@ -5,15 +5,13 @@ import java.util.Collection;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultMountPointResource;
-import io.liveoak.container.extension.ExtensionInstaller;
-import io.liveoak.container.extension.service.ExtensionService;
-import io.liveoak.container.extension.MountService;
+import io.liveoak.container.extension.system.service.ExtensionService;
+import io.liveoak.container.service.MountService;
 import io.liveoak.container.service.ClientService;
 import io.liveoak.container.tenancy.service.ApplicationsDeployerService;
 import io.liveoak.container.tenancy.service.ApplicationsDirectoryService;
 import io.liveoak.container.zero.ApplicationExtensionsResource;
 import io.liveoak.container.zero.ApplicationsResource;
-import io.liveoak.container.zero.extension.ApplicationClientsExtension;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Services;
@@ -57,9 +55,6 @@ public class TenancyTest {
                 .install();
 
         this.serviceContainer.addService(Services.SERVICE_REGISTRY, new ValueService<>(new ImmediateValue<>(this.serviceContainer))).install();
-
-        ExtensionInstaller installer = new ExtensionInstaller(this.serviceContainer.subTarget());
-        installer.load("application-clients", new ApplicationClientsExtension());
 
         this.serviceContainer.addService(Services.CLIENT, new ClientService()).install();
 
