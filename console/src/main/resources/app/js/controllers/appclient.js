@@ -129,6 +129,16 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
 
   $scope.changed = false;
 
+  // Check if we have application-clients resource, create if not
+  LoClient.getResource({appId: currentApp.name},
+    // success
+    angular.noop,
+    // error
+    function (/*httpResponse*/) {
+      new LoClient({ id: 'application-clients', type: 'application-clients' }).$createResource({appId: currentApp.name});
+    }
+  );
+
   $scope.availableRoles = $filter('orderBy')(loRealmAppRoles, 'name');//loRealmRoles.concat(loRealmAppRoles);
   $scope.noRoles = ['The application has no Roles'];
 

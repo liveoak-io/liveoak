@@ -500,6 +500,16 @@ loMod.factory('LoClient', function($resource) {
       method : 'POST',
       params : { appId : '@appId' }
     },
+    createResource : {
+      method : 'POST',
+      url : '/admin/applications/:appId/resources',
+      params : { appId : '@appId' }
+    },
+    getResource : {
+      method : 'GET',
+      url: '/admin/applications/:appId/resources/application-clients',
+      params : { appId : '@appId' }
+    },
     delete : {
       method : 'DELETE'
     }
