@@ -1,7 +1,6 @@
-package io.liveoak.container.zero.extension;
+package io.liveoak.application.clients.extension;
 
-import io.liveoak.container.tenancy.ApplicationConfigurationManager;
-import io.liveoak.container.zero.service.ApplicationClientsResourceService;
+import io.liveoak.application.clients.service.ApplicationClientsResourceService;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
@@ -21,7 +20,6 @@ public class ApplicationClientsExtension implements Extension {
         ApplicationClientsResourceService service = new ApplicationClientsResourceService();
         ServiceName serviceName = Services.adminResource(context.application().id(), context.resourceId());
         context.target().addService(serviceName, service)
-                .addDependency(Services.applicationConfigurationManager(context.application().id()), ApplicationConfigurationManager.class, service.configManagerInjector())
                 .install();
 
         context.mountPrivate(serviceName);

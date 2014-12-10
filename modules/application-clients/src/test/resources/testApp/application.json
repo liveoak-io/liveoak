@@ -1,0 +1,7 @@
+{
+  "resources" : {
+    "application-clients" : {
+      "type" : "application-clients"
+    }
+  }
+}

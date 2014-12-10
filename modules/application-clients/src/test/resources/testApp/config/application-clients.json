@@ -1,0 +1,12 @@
+[
+  {
+    "id" : "html-app-client",
+    "type" : "html5",
+    "security-key" : "keycloak-key-html"
+  },
+  {
+    "id" : "ios-app-client",
+    "type" : "ios",
+    "security-key" : "keycloak-key-ios"
+  }
+]

@@ -119,5 +119,6 @@
         <module>scripts-scheduled</module>
         <module>ups</module>
         <module>https-redirect</module>
+        <module>application-clients</module>
     </modules>
 </project>

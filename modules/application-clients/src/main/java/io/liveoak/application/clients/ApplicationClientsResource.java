@@ -1,29 +1,21 @@
-package io.liveoak.container.zero;
+package io.liveoak.application.clients;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.spi.RequestContext;
-import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.resource.config.ConfigRootResource;
 import io.liveoak.spi.state.ResourceState;
 import org.jboss.logging.Logger;
 
 /**
  * @author Ken Finnigan
  */
-public class ApplicationClientsResource implements RootResource, SynchronousResource {
-
-    public ApplicationClientsResource(ApplicationConfigurationManager configManager) {
-        this.configManager = configManager;
-    }
+public class ApplicationClientsResource implements ConfigRootResource, SynchronousResource {
 
     @Override
     public void parent(Resource parent) {
@@ -42,8 +34,12 @@ public class ApplicationClientsResource implements RootResource, SynchronousReso
 
     @Override
     public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        if (this.applicationClients.containsKey(state.id())) {
+            responder.resourceAlreadyExists(state.id());
+            return;
+        }
+
         SimpleApplicationClientResource client = createApplicationClient(state);
-        updateConfig();
         responder.resourceCreated(client);
     }
 
@@ -70,24 +66,20 @@ public class ApplicationClientsResource implements RootResource, SynchronousReso
         return client;
     }
 
-    public void updateConfig() {
-        ObjectNode json = JsonNodeFactory.instance.objectNode();
-        this.applicationClients.values().stream().forEach((client) -> json.put(client.id(), client.toJson()));
-        try {
-            this.configManager.updateResource(id(), null, json);
-        } catch (IOException e) {
-            log.error("Unable to write to 'application.json'.", e);
+    @Override
+    public void delete(RequestContext ctx, Responder responder) throws Exception {
+        if (this.applicationClients != null) {
+            this.applicationClients.clear();
         }
+        responder.resourceDeleted(this);
     }
 
     public void delete(SimpleApplicationClientResource applicationClient) {
         this.applicationClients.remove(applicationClient.id());
-        updateConfig();
     }
 
     private Resource parent;
-    private ApplicationConfigurationManager configManager;
-    private Map<String,SimpleApplicationClientResource> applicationClients = new ConcurrentHashMap<>();
+    private Map<String, SimpleApplicationClientResource> applicationClients = new ConcurrentHashMap<>();
 
     private static final Logger log = Logger.getLogger(ApplicationClientsResource.class);
 }

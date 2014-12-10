@@ -1,25 +1,24 @@
-package io.liveoak.container.zero;
+package io.liveoak.application.clients;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
+import io.liveoak.spi.resource.config.ConfigResource;
 import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author Ken Finnigan
  */
-public class SimpleApplicationClientResource implements SynchronousResource {
+public class SimpleApplicationClientResource implements SynchronousResource, ConfigResource {
 
     public SimpleApplicationClientResource(ApplicationClientsResource parent, ResourceState state) {
         this.parent = parent;
-        this.id = (String) state.getProperty(LiveOak.ID);
+        this.id = state.id();
         this.type = (String) state.getProperty("type");
         this.securityKey = (String) state.getProperty("security-key");
     }
@@ -46,7 +45,6 @@ public class SimpleApplicationClientResource implements SynchronousResource {
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         this.type = (String) state.getProperty("type");
         this.securityKey = (String) state.getProperty("security-key");
-        this.parent.updateConfig();
         responder.resourceUpdated(this);
     }
 
@@ -54,14 +52,6 @@ public class SimpleApplicationClientResource implements SynchronousResource {
     public void delete(RequestContext ctx, Responder responder) throws Exception {
         this.parent.delete(this);
         responder.resourceDeleted(this);
-    }
-
-    public ObjectNode toJson() {
-        ObjectNode json = JsonNodeFactory.instance.objectNode();
-        json.put(LiveOak.ID, this.id);
-        json.put("type", this.type);
-        json.put("security-key", this.securityKey);
-        return json;
     }
 
     private ApplicationClientsResource parent;
