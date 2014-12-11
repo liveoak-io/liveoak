@@ -155,7 +155,7 @@ public class ScriptManager {
     }
 
     protected void configureGlobalObject(GlobalObject globalObject) {
-        Map<String, Class> liveoakMap = new HashMap<String, Class>();
+        Map<String, Object> liveoakMap = new HashMap<String, Object>();
         liveoakMap.put("Resource", LiveOakResource.class);
         liveoakMap.put("Error", LiveOakException.class);
         liveoakMap.put("NotAcceptableError", LiveOakNotAcceptableException.class);
@@ -166,6 +166,8 @@ public class ScriptManager {
         liveoakMap.put("NotAuthorizedError", LiveOakNotAuthorizedException.class);
         liveoakMap.put("DeleteNotSupportedError", LiveOakDeleteNotSupportedException.class);
         liveoakMap.put("CreateNotSupportedError", LiveOakCreateNotSupportedException.class);
+
+        liveoakMap.put("Client", libraryManager.getLibrary("client").object());
 
         globalObject.put("liveoak", liveoakMap);
     }
