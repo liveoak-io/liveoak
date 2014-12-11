@@ -1,29 +1,32 @@
 package io.liveoak.container.zero;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.function.Function;
 
+import io.liveoak.common.util.FileHelper;
 import io.liveoak.common.util.StringPropertyReplacer;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.container.zero.git.GitHelper;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.resource.BlockingResource;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 import org.eclipse.jgit.api.Git;
-import org.vertx.java.core.Vertx;
 
 /**
  * @author Ken Finnigan
  */
-public class LocalApplicationsResource implements RootResource, SynchronousResource {
+public class LocalApplicationsResource implements RootResource, SynchronousResource, BlockingResource {
 
-    public LocalApplicationsResource(InternalApplicationRegistry applicationRegistry, File applicationsDirectory, Vertx vertx) {
+    public LocalApplicationsResource(InternalApplicationRegistry applicationRegistry, File applicationsDirectory) {
         this.applicationRegistry = applicationRegistry;
         this.applicationsDirectory = applicationsDirectory;
-        this.vertx = vertx;
     }
 
     public void parent(Resource parent) {
@@ -67,25 +70,25 @@ public class LocalApplicationsResource implements RootResource, SynchronousResou
         final String copyFromPath = localPath;
         final Git gitRepo = GitHelper.initRepo(installDir);
 
-        this.vertx.fileSystem().copy(localDir.getAbsolutePath(), installDir.getAbsolutePath(), true, event -> {
-            if (event.succeeded()) {
+        try {
+            FileHelper.copy(localDir, installDir, true, path -> path.getFileName().toString().equals(".git") ? true : false);
+        } catch (IOException e) {
+            responder.internalError(e);
+        }
+
+        try {
+            InternalApplication app = this.applicationRegistry.createApplication(id, (String) state.getProperty("name"), installDir, d -> {
                 try {
-                    InternalApplication app = this.applicationRegistry.createApplication(id, (String) state.getProperty("name"), installDir, d -> {
-                        try {
-                            GitHelper.addAllAndCommit(gitRepo, ctx.securityContext().getUser(), "Import LiveOak application from: " + copyFromPath);
-                            gitRepo.close();
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                    responder.resourceCreated(app.resource());
+                    GitHelper.addAllAndCommit(gitRepo, ctx.securityContext().getUser(), "Import LiveOak application from: " + copyFromPath);
+                    gitRepo.close();
                 } catch (Exception e) {
-                    responder.internalError(e);
+                    throw new RuntimeException(e);
                 }
-            } else if (event.failed()) {
-                responder.internalError(event.cause());
-            }
-        });
+            });
+            responder.resourceCreated(app.resource());
+        } catch (Exception e) {
+            responder.internalError(e);
+        }
     }
 
     @Override
@@ -106,7 +109,6 @@ public class LocalApplicationsResource implements RootResource, SynchronousResou
     private Resource parent;
     private final InternalApplicationRegistry applicationRegistry;
     private final File applicationsDirectory;
-    private final Vertx vertx;
 
     private static final String INVALID_REQUEST_MESSAGE = "'localPath' must contain a valid path to a LiveOak application on the system. %s is invalid.";
 }

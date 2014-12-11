@@ -22,11 +22,9 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 import org.jboss.msc.value.InjectedValue;
-import org.vertx.java.core.Vertx;
 
 import static io.liveoak.spi.Services.APPLICATIONS_DIR;
 import static io.liveoak.spi.Services.APPLICATION_REGISTRY;
-import static io.liveoak.spi.Services.VERTX;
 
 /**
  * @author Bob McWhirter
@@ -66,7 +64,6 @@ public class ZeroResourcesService implements Service<Void> {
         target.addService(localApplicationsName, localAppsResourceService)
                 .addDependency(APPLICATION_REGISTRY, InternalApplicationRegistry.class, localAppsResourceService.applicationRegistryInjector())
                 .addDependency(APPLICATIONS_DIR, File.class, localAppsResourceService.applicationDirectoryInjector())
-                .addDependency(VERTX, Vertx.class, localAppsResourceService.vertxInjector())
                 .install();
 
         MediaTypeMountService<RootResource> localAppMediaTypeMount = new MediaTypeMountService<>(null, MediaType.LOCAL_APP_JSON, false);
