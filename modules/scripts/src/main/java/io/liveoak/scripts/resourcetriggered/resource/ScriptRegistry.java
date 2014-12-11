@@ -94,6 +94,7 @@ public class ScriptRegistry {
     /**
      * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
      */
+    //TODO: move this over to ObjectTree.java?
     private class ScriptMap {
 
         private Map<String, ResourceTriggeredScript> idMap = new HashMap<String, ResourceTriggeredScript>();
@@ -177,17 +178,27 @@ public class ScriptRegistry {
 
             ResourcePath resourcePath = new ResourcePath(uri);
             paths.add(resourcePath.toString());
+            paths.add(resourcePath.toString() + "*");
+            paths.add(resourcePath.toString() + "**");
 
             if (!resourcePath.segments().isEmpty()) {
                 resourcePath = resourcePath.parent();
                 if (!uri.endsWith("/*")) {
                     paths.add(resourcePath.toString() + "/*");
                     paths.add(resourcePath.toString() + "/**");
+
+                    if (!resourcePath.segments().isEmpty()) {
+                        paths.add(resourcePath.toString() + "*");
+                        paths.add(resourcePath.toString() + "**");
+                    }
                 }
             }
             while (!resourcePath.segments().isEmpty()) {
                 resourcePath = resourcePath.parent();
                 paths.add(resourcePath.toString() + "/**");
+                if (resourcePath.toString() != null && !resourcePath.toString().isEmpty()) {
+                    paths.add(resourcePath.toString() + "**");
+                }
             }
             return paths;
         }
