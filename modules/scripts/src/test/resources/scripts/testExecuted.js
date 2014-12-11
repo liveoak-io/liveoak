@@ -1,9 +1,9 @@
-function preRead(request, libraries) {
-  preOperation(request, libraries, "executed");
+function preRead(request) {
+  preOperation(request, "executed");
 }
 
-function preOperation (request, libraries, name) {
-  var client = libraries.client;
+function preOperation (request, name) {
+  var client = liveoak.Client;
 
   var resource = new liveoak.Resource(name);
   resource.properties = {
