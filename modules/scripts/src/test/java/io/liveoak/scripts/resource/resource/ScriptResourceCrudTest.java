@@ -24,30 +24,30 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
         assertThat(node.get("members")).isNull();
 
         // Test #2 - extension installed with script resource
-        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"basic\", \"target-path\": \"targetPath\" }")).hasStatus(201);
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"basic\", \"target-path\": \"/testApp\" }")).hasStatus(201);
         node = (ObjectNode) toJSON(httpResponse.getEntity());
         assertThat(node.get("id").asText()).isEqualTo("basic");
-        assertThat(node.get("target-path").asText()).isEqualTo("targetPath");
+        assertThat(node.get("target-path").asText()).isEqualTo("/testApp");
 
         node = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/basic");
 
         assertThat(node).isNotNull();
         assertThat(node.get("id").asText()).isEqualTo("basic");
-        assertThat(node.get("target-path").asText()).isEqualTo("targetPath");
+        assertThat(node.get("target-path").asText()).isEqualTo("/testApp");
 
         // Test #3 - script resource create fails with duplicate
-        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"basic\", \"target-path\": \"targetPath\" }")).hasStatus(406).isDuplicate();
+        assertThat(execPost(RESOURCE_SCRIPT_PATH, "{ \"id\": \"basic\", \"target-path\": \"/testApp\" }")).hasStatus(406).isDuplicate();
 
         // Test #4 - delete fails as script resource does not exist
         assertThat(execDelete(RESOURCE_SCRIPT_PATH + "/unknown")).hasStatus(404).hasNoSuchResource();
 
         // Test #5 - update is converted to create if it doesn't exist
-        assertThat(execPut(RESOURCE_SCRIPT_PATH + "/updatetocreate", "{ \"target-path\": \"targetPath\" }")).hasStatus(201);
+        assertThat(execPut(RESOURCE_SCRIPT_PATH + "/updatetocreate", "{ \"target-path\": \"/testApp\" }")).hasStatus(201);
 
         // Test #6 - update script resource metadata
         node = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/basic");
         assertThat(node.get("id").asText()).isEqualTo("basic");
-        assertThat(node.get("target-path").asText()).isEqualTo("targetPath");
+        assertThat(node.get("target-path").asText()).isEqualTo("/testApp");
         assertThat(node.get("priority").asInt()).isEqualTo(5);
         assertThat(node.get("name").isNull()).isTrue();
         assertThat(node.get("description").isNull()).isTrue();
@@ -58,19 +58,19 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
 
         node = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/basic");
         assertThat(node.get("id").asText()).isEqualTo("basic");
-        assertThat(node.get("target-path").asText()).isEqualTo("targetPath");
+        assertThat(node.get("target-path").asText()).isEqualTo("/testApp");
         assertThat(node.get("priority").asInt()).isEqualTo(5);
         assertThat(node.get("name").asText()).isEqualTo("some name");
         assertThat(node.get("description").isNull()).isTrue();
         assertThat(node.get("enabled").asBoolean()).isTrue();
 
-        node.put("target-path", "newTargetPath");
+        node.put("target-path", "/testApp/foo");
         node.put("enabled", false);
         assertThat(put(RESOURCE_SCRIPT_PATH + "/basic").data(node).execute()).hasStatus(200);
 
         node = (ObjectNode) getJSON(RESOURCE_SCRIPT_PATH + "/basic");
         assertThat(node.get("id").asText()).isEqualTo("basic");
-        assertThat(node.get("target-path").asText()).isEqualTo("newTargetPath");
+        assertThat(node.get("target-path").asText()).isEqualTo("/testApp/foo");
         assertThat(node.get("priority").asInt()).isEqualTo(5);
         assertThat(node.get("name").asText()).isEqualTo("some name");
         assertThat(node.get("description").isNull()).isTrue();
@@ -95,7 +95,7 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
 
     public void testCreateTimeout() throws Exception {
         String id = "testTimeout";
-        HttpResponse createResponse =   execPost(RESOURCE_SCRIPT_PATH, "{ 'id': '" + id + "', 'target-path': 'targetPath', 'timeout': 1234 }");
+        HttpResponse createResponse =   execPost(RESOURCE_SCRIPT_PATH, "{ 'id': '" + id + "', 'target-path': '/testApp', 'timeout': 1234 }");
         assertThat(createResponse).hasStatus(201);
         ObjectNode createNode = (ObjectNode) toJSON(createResponse.getEntity());
         Assertions.assertThat(createNode.get("id").asText()).isEqualTo(id);
@@ -112,7 +112,7 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
     public void testUpdateTimeout() throws Exception {
         //testCreateTimeout();
         String id = "testTimeout";
-        HttpResponse updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': 'targetPath', 'timeout': 4567 }");
+        HttpResponse updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp', 'timeout': 4567 }");
         assertThat(updateResponse).hasStatus(200);
         ObjectNode createNode = (ObjectNode) toJSON(updateResponse.getEntity());
         Assertions.assertThat(createNode.get("id").asText()).isEqualTo(id);
@@ -128,7 +128,7 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
 
     public void testCreateInvalidTimeout() throws Exception {
         String id = "testInvalidTimeoutCreate";
-        HttpResponse createResponse =   execPost(RESOURCE_SCRIPT_PATH, "{ 'id': '" + id + "', 'target-path': 'targetPath', 'timeout': -1234 }");
+        HttpResponse createResponse =   execPost(RESOURCE_SCRIPT_PATH, "{ 'id': '" + id + "', 'target-path': '/testApp', 'timeout': -1234 }");
         assertThat(createResponse).hasStatus(406);
         ObjectNode createNode = (ObjectNode) toJSON(createResponse.getEntity());
         assertThat(createNode.get("error-type").asText()).isEqualTo("NOT_ACCEPTABLE");
@@ -138,7 +138,7 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
     public void testUpdateInvalidTimeout() throws Exception {
         //testCreateTimeout();
         String id = "testInvalidTimeoutUpdate";
-        HttpResponse updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': 'targetPath', 'timeout': 'foo' }");
+        HttpResponse updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp', 'timeout': 'foo' }");
         assertThat(updateResponse).hasStatus(406);
         ObjectNode createNode = (ObjectNode) toJSON(updateResponse.getEntity());
         assertThat(createNode.get("error-type").asText()).isEqualTo("NOT_ACCEPTABLE");
@@ -148,7 +148,7 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
     //@Test
     public void testCreateEmptyLibraries() throws Exception {
         String id = "testCreateEmptyLibraries";
-        HttpResponse createResponse =   execPost(RESOURCE_SCRIPT_PATH, "{ 'id': '" + id + "', 'target-path': 'targetPath'}");
+        HttpResponse createResponse =   execPost(RESOURCE_SCRIPT_PATH, "{ 'id': '" + id + "', 'target-path': '/testApp'}");
         assertThat(createResponse).hasStatus(201);
         ObjectNode createNode = (ObjectNode) toJSON(createResponse.getEntity());
         Assertions.assertThat(createNode.get("id").asText()).isEqualTo(id);
@@ -166,7 +166,7 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
     //@Test
     public void testLibraries() throws Exception {
         String id = "testLibraries";
-        HttpResponse createResponse =   execPost(RESOURCE_SCRIPT_PATH, "{ 'id': '" + id + "', 'target-path': 'targetPath', 'libraries': ['foo', 'bar']}");
+        HttpResponse createResponse =   execPost(RESOURCE_SCRIPT_PATH, "{ 'id': '" + id + "', 'target-path': '/testApp', 'libraries': ['foo', 'bar']}");
         assertThat(createResponse).hasStatus(201);
         ObjectNode createNode = (ObjectNode) toJSON(createResponse.getEntity());
         Assertions.assertThat(createNode.get("id").asText()).isEqualTo(id);
@@ -189,7 +189,7 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
         //testLibraries();
         String id = "testLibraries";
 
-        HttpResponse updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': 'targetPath'}");
+        HttpResponse updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp'}");
         assertThat(updateResponse).hasStatus(200);
 
         ObjectNode updateNode = (ObjectNode) toJSON(updateResponse.getEntity());
@@ -203,5 +203,86 @@ public class ScriptResourceCrudTest extends BaseResourceTriggeredTestCase {
         assertThat(readNode.get("id").asText()).isEqualTo(id);
         assertThat(readNode.get("libraries").isArray()).isTrue();
         assertThat(readNode.get("libraries").size()).isEqualTo(0);
+    }
+
+    @Test
+    public void testTargetPath() throws Exception {
+        String id = "testTargetPath";
+
+        //
+        HttpResponse updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp'}");
+        assertThat(updateResponse).hasStatus(201);
+        ObjectNode updateNode = (ObjectNode) toJSON(updateResponse.getEntity());
+        assertThat(updateNode.get("target-path").asText()).isEqualTo("/testApp");
+
+
+        //
+        updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp*'}");
+        assertThat(updateResponse).hasStatus(200);
+        updateNode = (ObjectNode) toJSON(updateResponse.getEntity());
+        assertThat(updateNode.get("target-path").asText()).isEqualTo("/testApp*");
+
+        //
+        updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp**'}");
+        assertThat(updateResponse).hasStatus(200);
+        updateNode = (ObjectNode) toJSON(updateResponse.getEntity());
+        assertThat(updateNode.get("target-path").asText()).isEqualTo("/testApp**");
+
+        //
+        updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp/*'}");
+        assertThat(updateResponse).hasStatus(200);
+        updateNode = (ObjectNode) toJSON(updateResponse.getEntity());
+        assertThat(updateNode.get("target-path").asText()).isEqualTo("/testApp/*");
+
+        //
+        updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp/**'}");
+        assertThat(updateResponse).hasStatus(200);
+        updateNode = (ObjectNode) toJSON(updateResponse.getEntity());
+        assertThat(updateNode.get("target-path").asText()).isEqualTo("/testApp/**");
+
+        //
+        updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp/foo'}");
+        assertThat(updateResponse).hasStatus(200);
+        updateNode = (ObjectNode) toJSON(updateResponse.getEntity());
+        assertThat(updateNode.get("target-path").asText()).isEqualTo("/testApp/foo");
+
+        //
+        updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp/foo*'}");
+        assertThat(updateResponse).hasStatus(200);
+        updateNode = (ObjectNode) toJSON(updateResponse.getEntity());
+        assertThat(updateNode.get("target-path").asText()).isEqualTo("/testApp/foo*");
+
+        //
+        updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp/foo**'}");
+        assertThat(updateResponse).hasStatus(200);
+        updateNode = (ObjectNode) toJSON(updateResponse.getEntity());
+        assertThat(updateNode.get("target-path").asText()).isEqualTo("/testApp/foo**");
+
+        //
+        updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp**'}");
+        assertThat(updateResponse).hasStatus(200);
+        updateNode = (ObjectNode) toJSON(updateResponse.getEntity());
+        assertThat(updateNode.get("target-path").asText()).isEqualTo("/testApp**");
+
+        //
+        updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': 'testApp'}");
+        assertThat(updateResponse).hasStatus(406);
+
+        //
+        updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp/'}");
+        assertThat(updateResponse).hasStatus(406);
+
+        //
+        updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/foo*'}");
+        assertThat(updateResponse).hasStatus(406);
+
+        //
+        updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/testApp/bar/'}");
+        assertThat(updateResponse).hasStatus(406);
+
+        //
+        updateResponse = execPut(RESOURCE_SCRIPT_PATH + "/" + id, "{ 'id': '" + id + "', 'target-path': '/foo/bar*'}");
+        assertThat(updateResponse).hasStatus(406);
+
     }
 }

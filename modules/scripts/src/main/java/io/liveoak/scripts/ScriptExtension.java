@@ -82,7 +82,7 @@ public class ScriptExtension implements Extension {
                 .install();
 
 
-        ResourceScriptService resourceScriptsService = new ResourceScriptService();
+        ResourceScriptService resourceScriptsService = new ResourceScriptService(applicationId);
         context.target().addService(RESOURCE_SCRIPTS_SERVICE_NAME.append(applicationId), resourceScriptsService)
                 .addDependency(RESOURCE_SCRIPT_REGISTRY_SERVICE_NAME.append(applicationId), ScriptRegistry.class, resourceScriptsService.getScriptRegistryInjector())
                 .addDependency(Services.VERTX, Vertx.class, resourceScriptsService.getVertxInjector())

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.spi.exceptions.InvalidPropertyTypeException;
 import io.liveoak.spi.exceptions.PropertyException;
 import io.liveoak.spi.RequestContext;
@@ -60,6 +61,10 @@ public class ResourceScript implements Resource {
         }
 
         String target = (String) getProperty(TARGET_PATH, state, true, String.class);
+
+        if (!target.matches("^/" + parent.applicationId + "(\\**|/.*)(?<!/)$")) {
+            throw new PropertyException("Invalid format for 'target'. It must start with '/' and the application id, and must not end in a '/'");
+        }
 
         ResourceTriggeredScript.Builder builder = new ResourceTriggeredScript.Builder(id, target);
 
@@ -163,6 +168,7 @@ public class ResourceScript implements Resource {
                 // since we don't do partial updates, we need to overwrite everything here with the new state
                 this.script = createScript(state, script.getScriptBuffer());
                 parent.updateChild(this);
+                parent.writeMetadataFile(this.id(), ConversionUtils.convert(state));
                 responder.resourceUpdated(this);
             }
         } catch (PropertyException pe) {

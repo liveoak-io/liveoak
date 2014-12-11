@@ -39,9 +39,12 @@ public class ResourceScripts extends ScriptsResource {
 
     private File resourceDirectory;
 
-    public ResourceScripts(ScriptRegistry scriptRegistry, Vertx vertx) {
+    String applicationId;
+
+    public ResourceScripts(String applicationId, ScriptRegistry scriptRegistry, Vertx vertx) {
         super(vertx);
         this.scripts = scriptRegistry;
+        this.applicationId = applicationId;
     }
 
     protected File getScriptsDirectory() {
