@@ -253,7 +253,7 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
             });
         },
         function(httpResponse) {
-          Notifications.httpError('The application ' + data.name + ' could not be created.', httpResponse);
+          Notifications.httpError('The application ' + data.name + ' could not be created in Keycloak.', httpResponse);
         }
       );
 
