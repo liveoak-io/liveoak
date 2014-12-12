@@ -12,10 +12,8 @@
     </resources>
 
     <dependencies>
-        <module name="io.liveoak.spi"/>
         <module name="io.liveoak.common"/>
-        <module name="io.liveoak.jgit.wrapper"/>
-        <module name="io.liveoak.filesystem"/>
+        <module name="org.eclipse.jgit" export="true"/>
     </dependencies>
 
 </module>

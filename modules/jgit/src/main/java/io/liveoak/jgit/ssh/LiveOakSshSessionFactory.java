@@ -1,4 +1,4 @@
-package io.liveoak.container.zero.git;
+package io.liveoak.jgit.ssh;
 
 import java.io.File;
 

@@ -2,6 +2,7 @@ package io.liveoak.git;
 
 import java.util.Collection;
 
+import io.liveoak.jgit.GitHandler;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -76,11 +77,10 @@ public class CommitsResource implements SynchronousResource {
             commitCmd.setMessage(commitMsg);
         }
 
-        synchronized (this) {
-            // Execute add and commit
+        commit = GitHandler.commit(() -> {
             addCmd.call();
-            commit = commitCmd.call();
-        }
+            return commitCmd.call();
+        });
 
         responder.resourceCreated(new GitCommitResource(this, commit));
     }

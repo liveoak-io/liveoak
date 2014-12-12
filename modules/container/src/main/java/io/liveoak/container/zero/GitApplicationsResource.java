@@ -6,7 +6,7 @@ import io.liveoak.common.util.FileHelper;
 import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.container.zero.git.GitHelper;
-import io.liveoak.container.zero.git.LiveOakSshSessionFactory;
+import io.liveoak.jgit.ssh.LiveOakSshSessionFactory;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;

@@ -2,7 +2,9 @@ package io.liveoak.container.zero.git;
 
 import java.io.File;
 
+import io.liveoak.jgit.GitHandler;
 import io.liveoak.spi.security.UserProfile;
+import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -19,10 +21,9 @@ public interface GitHelper {
     }
 
     static void addAllAndCommit(Git git, UserProfile user, String commitMsg) throws GitAPIException {
-        git.add()
+        AddCommand addCommand = git.add()
             .addFilepattern(".")
-            .addFilepattern("application.json")
-            .call();
+            .addFilepattern("application.json");
 
         CommitCommand commitCmd = git.commit();
 
@@ -33,6 +34,9 @@ public interface GitHelper {
             commitCmd.setMessage(commitMsg);
         }
 
-        commitCmd.call();
+        GitHandler.commit(() -> {
+            addCommand.call();
+            return commitCmd.call();
+        });
     }
 }
