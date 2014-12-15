@@ -1,24 +1,27 @@
 package io.liveoak.filesystem;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.RequestType;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import org.vertx.java.core.Vertx;
 
 /**
  * @author Bob McWhirter
  */
 public class FileSystemAdminResource implements RootResource, SynchronousResource {
 
-    public FileSystemAdminResource(String id, File directory) {
+    public FileSystemAdminResource(String id, File directory, Vertx vertx) {
         this.id = id;
         this.directory = directory;
+        this.vertx = vertx;
     }
 
     @Override
@@ -61,6 +64,26 @@ public class FileSystemAdminResource implements RootResource, SynchronousResourc
         responder.resourceUpdated(this);
     }
 
+    @Override
+    public void createMember(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
+        //TODO: handle creating the child member here once LIVEOAK-719 is completed
+        responder.createNotSupported(this);
+    }
+
+    @Override
+    public Resource member(RequestContext ctx, String id) throws Exception {
+        //TODO: remove this hack once LIVEOAK-719 is completed
+        if (id.equals(UPLOAD) && ctx.requestType() == RequestType.UPDATE) {
+            return new ZipResource(this, UPLOAD);
+        } else {
+            return null;
+        }
+    }
+
+    public Vertx vertx() {
+        return vertx;
+    }
+
     public File directory() {
         return this.directory;
     }
@@ -68,4 +91,8 @@ public class FileSystemAdminResource implements RootResource, SynchronousResourc
     private final String id;
     private Resource parent;
     private File directory;
+
+    private Vertx vertx;
+
+    public static final String UPLOAD = "upload";
 }

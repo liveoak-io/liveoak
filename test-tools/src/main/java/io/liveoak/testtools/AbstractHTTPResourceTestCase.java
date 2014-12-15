@@ -154,6 +154,13 @@ public class AbstractHTTPResourceTestCase extends AbstractTestCase {
             return this;
         }
 
+        public HttpRequest setEntity(HttpEntity httpEntity) {
+            if (builder != null) {
+                builder.setEntity(httpEntity);
+            }
+            return this;
+        }
+
         public HttpResponse execute() throws Exception {
             try (CloseableHttpResponse response = httpClient.execute(builder.build())) {
                 assertThat(response).isNotNull();
