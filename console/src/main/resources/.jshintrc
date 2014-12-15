@@ -21,6 +21,7 @@
   "globals": {
     "LiveOak": false,
     "angular": false,
-    "$": false
+    "$": false,
+    "_": false
   }
 }
