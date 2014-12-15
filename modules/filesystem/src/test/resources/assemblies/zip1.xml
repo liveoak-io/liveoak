@@ -1,0 +1,47 @@
+<!--
+  ~ Copyright 2014 Red Hat, Inc. and/or its affiliates.
+  ~
+  ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<assembly>
+    <id>openshift-liveoak-cartridge</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>${project.build.directory}/test-classes/zips/zip1</directory>
+            <outputDirectory>/</outputDirectory>
+<!--            <excludes>
+              <exclude>modules/system/layers/base/io/undertow/core/main/undertow-core-1.0.15.Final.jar</exclude>
+              <exclude>**/standalone.xml</exclude>
+              <exclude>conf/extensions/keycloak.json</exclude>
+              <exclude>apps/admin/application.json</exclude>
+              <exclude>conf/extensions/mongo-launcher.json</exclude>
+              <exclude>conf/extensions/https-redirect.json</exclude>
+            </excludes> -->
+        </fileSet>
+<!--        <fileSet>
+            <directory>./src/main/resources/openshift</directory>
+            <outputDirectory></outputDirectory>
+            <excludes>
+              <exclude>versions/**</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>./src/main/resources/openshift/versions</directory>
+            <outputDirectory>versions/1.0.0</outputDirectory>
+        </fileSet> -->
+    </fileSets>
+<!--    <dependencySets>
+      <dependencySet>
+        <includes>
+          <include>io.liveoak:liveoak-openshift-undertow:jar:${project.version}</include>
+        </includes>
+        <outputDirectory>versions/1.0.0/modules/system/layers/base/io/undertow/core/main</outputDirectory>      
+        <outputFileNameMapping>undertow-core-1.0.15.Final.jar</outputFileNameMapping> 
+      </dependencySet>
+    </dependencySets> -->
+</assembly>
+
