@@ -85,6 +85,7 @@
 */
 
 body {
+  overflow: hidden;
   line-height: 1.909em;
   font-family: @exo;
   color: @c_gray;
@@ -100,15 +101,6 @@ html, body {
 
 #lo-content-row {
   min-height: calc(~"100% - 80px");
-}
-
-#lo-content-row {
-  overflow: hidden;
-  
-  > div {
-    margin-bottom: -99999px;
-    padding-bottom: 99999px;
-  }
 }
 
 /* Fix the background for Business Logic pages */
