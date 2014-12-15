@@ -292,10 +292,12 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
     $scope.app = {};
 
     $scope.cancel = function () {
-      $modalInstance.dismiss('cancel');
+      $modalInstance.close('cancel');
+      $modalInstance.loClosed = true;
     };
 
     $scope.import = function () {
+      $modalInstance.freeze(true);
       importApp($scope.app, LoAppExamples, Notifications, $modalInstance, $route);
     };
 
@@ -423,7 +425,8 @@ var importApp = function(app, LoAppExamples, Notifications, $modalInstance, $rou
     Notifications.success('The application "' + value.name + '" has been installed.');
     app.installing = false;
     app.installed = true;
-    if ($modalInstance) {
+
+    if ($modalInstance && !$modalInstance.loClosed) {
       $modalInstance.close();
     }
     if ($route) {
