@@ -6,7 +6,7 @@
       <span>Go to Application</span>
     </a>
     <div class="pull-right" >
-      <a href data-toggle="modal" data-target="#upload-page-app"><i class="fa fa-upload" data-tooltip-placement="top" data-tooltip="Upload Single Page App"></i></a><!-- FIXME: make it dynamic -->
+      <a href ng-click="$parent.modalUploadSPA(app)"><i class="fa fa-upload" data-tooltip-placement="top" data-tooltip="Upload Single Page App"></i></a>
       <a href ng-click="$parent.modalApplicationDelete(app.id)"><i class="fa fa-trash-o" data-tooltip-placement="top" data-tooltip="Delete App"></i></a>
     </div>
   </div>
