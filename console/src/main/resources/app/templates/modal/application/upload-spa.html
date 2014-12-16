@@ -1,0 +1,39 @@
+<div class="modal-header">
+  <button type="button" class="close" ng-click="cancel()">
+    <span class="pficon pficon-close"></span>
+  </button>
+  <h4 class="modal-title">Upload Single Page Application</h4>
+</div>
+<form class="horizontal-form" name="uploadForm" ng-init="setFormScope(this)" >
+  <div class="modal-body">
+    <form lo-autofocus="">
+      <div class="form-group clearfix">
+        <label for="data-file" class="col-sm-4 control-label">Upload File</label>
+        <div class="button-input-file" ng-show="!inProgress">
+          <a href="#" class="btn btn-default"><i class="fa fa-upload"></i> {{ (fileName && ("Selected '" + fileName + "'")) || "Choose a ZIP file..." }}</a>
+          <input type="file" class="input-file" ng-file-select="onFileSelect($files)" id="data-file" accept="application/zip" required>
+        </div>
+        <div ng-show="inProgress" class="uploaded-file">
+          <div ng-show="progress < 1 && !isError">
+            <i class="lo-color-success fa fa-spinner fa-spin"></i>
+            Uploading {{fileName}} ...
+          </div>
+          <div ng-show="(progress === 1) && !isError">
+            <i class="lo-color-success fa fa-check" ></i>
+            Uploaded {{fileName}} successfully.
+          </div>
+          <div ng-show="isError">
+            <i class="lo-color-error fa fa-warning"></i>
+            Failed to upload/process {{fileName}}.
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-hide="inProgress && progress === 1" ng-click="cancel()">Cancel</button>
+    <button type="button" class="btn btn-primary" ng-hide="(inProgress && progress === 1) || isError" ng-disabled="!fileName || inProgress" ng-click="uploadSPA(spaFile)">Upload</button>
+    <button type="button" class="btn btn-primary" ng-show="isError" ng-click="clear()">Retry</button>
+    <button type="button" class="btn btn-primary" ng-show="inProgress && progress === 1" ng-click="cancel()">Close</button>
+  </div>
+</form>

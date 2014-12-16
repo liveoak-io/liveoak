@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.application', []);
 
-loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $location, $modal, $filter, $route, Notifications, loAppList, LoApp, LoStorage, LoPush, LoRealmApp, LoBusinessLogicScripts) {
+loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $location, $modal, $filter, $http, $route, Notifications, loAppList, LoApp, LoStorage, LoPush, LoRealmApp, LoBusinessLogicScripts) {
 
   $rootScope.hideSidebar = true;
 
@@ -12,6 +12,76 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
   $scope.exampleApplications = [];
 
   $scope.createdId = $routeParams.created;
+
+  $scope.modalUploadSPA = function(app) {
+    $scope.uploadApp = app;
+    $modal.open({
+      templateUrl: '/admin/console/templates/modal/application/upload-spa.html',
+      controller: UploadSPAModalCtrl,
+      scope: $scope
+    });
+  };
+
+  var UploadSPAModalCtrl = function ($scope, $modalInstance, $log, LoApp) {
+
+    $scope.setFormScope= function(scope){
+      $scope.modalScope = scope;
+      $scope.modalScope.progress = 0;
+
+      $scope.modalScope.$on('fileProgress', function(e, progress) {
+        $scope.modalScope.progress = progress.loaded / progress.total;
+      });
+    };
+
+    $scope.getFile = function () {
+      $scope.fileName = $scope.modalScope.file.name;
+      $scope.$apply();
+    };
+
+    $scope.uploadSPA = function() {
+      $scope.modalScope.progress = 0;
+      $scope.modalScope.inProgress = true;
+
+      if (!$scope.uploadApp.hasAppResource) {
+        new LoApp({type:'filesystem', config:{directory:'${application.dir}/app/'}}).$addResource({appId: $scope.uploadApp.id, resourceId: 'app'});
+        new LoApp({'html-app':'/app/index.html'}).$save({appId: $scope.uploadApp.id});
+      }
+
+      var uploadUrl = '/admin/applications/' + $scope.uploadApp.id +  '/resources/app/upload?clean=true&overwrite=true';
+      $http.put(uploadUrl, $scope.modalScope.file, {
+        headers: {
+          'content-type': 'application/zip',
+          'accept': 'application/zip'
+        },
+        transformRequest: angular.identity
+      }).success(
+        function() {
+          $scope.modalScope.progress = 1;
+        }
+      ).error(
+        function() {
+          Notifications.error('An error occured while uploading/processing the file.');
+          $scope.modalScope.progress = 0;
+          $scope.modalScope.isError = true;
+        }
+      );
+    };
+
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+
+    $scope.clear = function () {
+      angular.element('#data-file').val(null);
+      $scope.modalScope.file = undefined;
+      $scope.fileName = '';
+      $scope.modalScope.inProgress = false;
+      $scope.modalScope.isError = false;
+      $scope.modalScope.progress = 0;
+    };
+
+  };
+
 
   var increaseStorages = function(app) {
     return function (resources) {
@@ -25,6 +95,9 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
           }
           else if (resources.members[j].hasOwnProperty('script-directory')) {
             LoBusinessLogicScripts.get({appId: app.id}).$promise.then(getScriptsInfo(app));
+          }
+          else if (resources.members[j].id === 'app') {
+            app.hasAppResource = true;
           }
         }
       }
@@ -305,7 +378,6 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
 
     $scope.updateAppId = function() {
       if (idAuto) {
-        console.log($scope.$parent.source);
         if ($scope.source === 'local') {
           $scope.app.id = $scope.app.path.replace(/\/$/, '').split('/').pop();
         }
