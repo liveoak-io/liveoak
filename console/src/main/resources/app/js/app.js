@@ -73,9 +73,6 @@ loMod.config(['$routeProvider', function($routeProvider) {
       resolve: {
         loAppList : function(loLiveLoader, LoLiveAppList) {
           return loLiveLoader(LoLiveAppList.getList, '/admin/applications/');
-        },
-        examplesList : function(LoAppExamples) {
-          return LoAppExamples.query().$promise;
         }
       }
     })
