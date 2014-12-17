@@ -8,15 +8,15 @@
   <div class="modal-body">
     <form lo-autofocus="">
       <div class="form-group clearfix">
-        <label for="data-file" class="col-sm-4 control-label">Upload File</label>
+        <label ng-hide="inProgress" for="data-file" class="col-sm-4 control-label">Upload File</label>
         <div class="button-input-file" ng-show="!inProgress">
           <a href="#" class="btn btn-default"><i class="fa fa-upload"></i> {{ (fileName && ("Selected '" + fileName + "'")) || "Choose a ZIP file..." }}</a>
           <input type="file" class="input-file" ng-file-select="onFileSelect($files)" id="data-file" accept="application/zip" required>
         </div>
         <div ng-show="inProgress" class="uploaded-file">
-          <div ng-show="progress < 1 && !isError">
-            <i class="lo-color-success fa fa-spinner fa-spin"></i>
-            Uploading {{fileName}} ...
+          <div class="loading-step" ng-show="progress < 1 && !isError">
+            <div class="spinner spinner-lg"></div>
+            <span class="spinner-label">Uploading {{fileName}} ...</span>
           </div>
           <div ng-show="(progress === 1) && !isError">
             <i class="lo-color-success fa fa-check" ></i>

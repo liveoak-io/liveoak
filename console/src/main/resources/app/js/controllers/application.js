@@ -39,14 +39,27 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
     };
 
     $scope.uploadSPA = function() {
+      $modalInstance.freeze(true);
+
       $scope.modalScope.progress = 0;
       $scope.modalScope.inProgress = true;
 
       if (!$scope.uploadApp.hasAppResource) {
-        new LoApp({type:'filesystem', config:{directory:'${application.dir}/app/'}}).$addResource({appId: $scope.uploadApp.id, resourceId: 'app'});
-        new LoApp({'html-app':'/app/index.html'}).$save({appId: $scope.uploadApp.id});
+        new LoApp({type:'filesystem', config:{directory:'${application.dir}/app/'}}).$addResource({appId: $scope.uploadApp.id, resourceId: 'app'}, function() {
+          new LoApp({'html-app':'/app/index.html'}).$save({appId: $scope.uploadApp.id}, function() {
+            /* FIXME: ammendonca: this must be removed.. but live reload doens't seem to be picking it... */
+            $scope.uploadApp.htmlapp = '/' + $scope.uploadApp.id + '/app/index.html';
+            /* FIXME: end */
+            doUploadSPA();
+          });
+        });
       }
+      else {
+        doUploadSPA();
+      }
+    };
 
+    var doUploadSPA = function() {
       var uploadUrl = '/admin/applications/' + $scope.uploadApp.id +  '/resources/app/upload?clean=true&overwrite=true';
       $http.put(uploadUrl, $scope.modalScope.file, {
         headers: {
@@ -56,7 +69,11 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
         transformRequest: angular.identity
       }).success(
         function() {
-          $scope.modalScope.progress = 1;
+          Notifications.success('The single page application for "' + $scope.uploadApp.id + '" has been uploaded.');
+
+          if ($modalInstance && !$modalInstance.loClosed) {
+            $modalInstance.close();
+          }
         }
       ).error(
         function() {
@@ -120,6 +137,7 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
   $scope.$watchCollection('liveMembers', function(){
     loAppList.live.then(function(){
       $scope.applications = [];
+      $scope.exampleApplications = [];
       var filtered = $filter('orderBy')($filter('filter')(loAppList.live.members, {'visible': true}), 'name');
       for (var i = 0; i < filtered.length; i++) {
         var app = {
@@ -163,7 +181,7 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
         function(/*value, responseHeaders*/) {
           Notifications.success('The application "' + appId + '" has been deleted.');
           LoRealmApp.delete({appId: appId});
-          $route.reload();
+          //$route.reload(); -- ammendonca: removed, since it's live refreshed
           $modalInstance.close();
         },
         // error
