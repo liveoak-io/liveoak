@@ -389,6 +389,8 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
 
     $scope.import = function () {
       $modalInstance.freeze(true);
+      if($scope.source === 'git') { delete $scope.app.localPath; }
+      else if($scope.source === 'local') { delete $scope.app.url; }
       importApp($scope.app, LoAppExamples, Notifications, $modalInstance, $route);
     };
 
@@ -454,8 +456,8 @@ loMod.controller('ExampleListCtrl', function($scope, $rootScope, $location, $fil
   for (var i = 0; i < examplesList.length; i++) {
     var example = examplesList[i];
 
-    for(var appIndex in loAppList.members){
-      var app = loAppList.members[appIndex];
+    for(var appIndex in loAppList.live.members){
+      var app = loAppList.live.members[appIndex];
       if (app.example === example.id){
         example.installed = true;
         example.path = app.id;
