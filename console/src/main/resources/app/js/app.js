@@ -1,5 +1,7 @@
 'use strict';
 
+/* global _ */
+
 // Declare app level module which depends on filters, and services
 var loMod = angular.module('loApp', [
   'ngRoute',
