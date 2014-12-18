@@ -6,12 +6,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.container.zero.extension.ZeroExtension;
-import io.liveoak.mongo.config.BaseMongoConfigTest;
 import io.liveoak.mongo.extension.MongoExtension;
 import io.liveoak.mongo.internal.extension.MongoInternalExtension;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.DeleteNotSupportedException;
 import io.liveoak.spi.state.ResourceState;
+import io.liveoak.testtools.AbstractTestCaseWithTestApp;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -23,7 +23,7 @@ import static org.fest.assertions.Fail.fail;
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
  */
-public class InternalConfigTestCase extends BaseMongoConfigTest  {
+public class InternalConfigTestCase extends AbstractTestCaseWithTestApp {
 
     static final String SYSTEM_CONFIG_PATH = "/" + ZeroExtension.APPLICATION_ID + "/system/mongo-internal/module";
 

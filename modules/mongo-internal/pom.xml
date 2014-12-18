@@ -44,14 +44,6 @@
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-test-tools</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-mongo</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-            <version>${project.version}</version>
-        </dependency>
-
     </dependencies>
     <build>
         <plugins>
