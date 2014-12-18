@@ -26,6 +26,7 @@
         <strong>To secure a client, you need roles.</strong> <a href="" ng-click="modalAddRole()">Create a role</a>.
       </div>
 
+      <!--
       <form class="lo-form-horizontal clearfix" name="securityForm" novalidate>
         <fieldset>
           <legend lo-collapse class="collapsible"><span class="text">Client Settings</span></legend>
@@ -148,6 +149,17 @@
           <button lo-button-save="save()" ng-disabled="!changed || !securityForm.$valid">Save</button>
         </div>
       </form>
+      -->
+
+      <div class="panel">
+        <div class="panel-body text-center empty-instance">
+          <i class="fa fa-globe"></i>
+          <span>
+            <p>The roles allowed to access clients can be defined in the "Scope" field in Client configuration.</p>
+            <a class="btn btn-primary btn-lg" href="#/applications/{{curApp.id}}/application-clients">View Clients</a>
+          </span>
+        </div>
+      </div>
 
     </div>
   </div>
