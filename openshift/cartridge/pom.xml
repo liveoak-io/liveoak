@@ -65,6 +65,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>assemble</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/resources/assemblies/assembly.xml</descriptor>
+                            </descriptors>
+                            <finalName>openshift-liveoak-cartridge-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <outputDirectory>target</outputDirectory>
+                            <workDirectory>target/assembly/work</workDirectory>
+                            <tarLongFileMode>gnu</tarLongFileMode>
+                        </configuration>
+                    </execution>
+                 </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
