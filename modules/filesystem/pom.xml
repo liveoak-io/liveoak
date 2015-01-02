@@ -48,11 +48,6 @@
                     <execution>
                         <id>assemble-module</id>
                     </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
                     <execution>
                         <id>build-zip</id>
                         <phase>test-compile</phase>
