@@ -35,11 +35,6 @@
             <artifactId>liveoak-common</artifactId>
             <scope>provided</scope>
         </dependency>
-<!--        <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-container</artifactId>
-            <scope>provided</scope>
-        </dependency> -->
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
@@ -71,6 +66,11 @@
         <dependency>
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-test-tools</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-jgit-wrapper</artifactId>
+            <scope>test</scope>
         </dependency>
 
        <!-- Remove this when LIVEOAK-457 is resolved -->

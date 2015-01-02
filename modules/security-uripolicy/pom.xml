@@ -45,6 +45,11 @@
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-test-tools</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-jgit-wrapper</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
