@@ -106,11 +106,11 @@ public class StateEncodingDriver extends AbstractEncodingDriver {
 
     protected void encodeState(ResourceState resourceState, ReturnFields returnFields) throws Exception {
 
-        if (returnFields.excluded("id")) {
+        if (returnFields.excluded(LiveOak.ID)) {
             resourceState.id(null);
         }
 
-        if (returnFields.excluded("self")) {
+        if (returnFields.excluded(LiveOak.SELF)) {
             resourceState.uri(null);
         }
 

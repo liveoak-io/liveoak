@@ -89,12 +89,20 @@ public abstract class MongoResource implements SynchronousResource, BlockingReso
     }
 
     protected BasicDBObject createObject(ResourceState resourceState) throws Exception {
+        return createObject(resourceState, false);
+    }
+
+    protected BasicDBObject createObject(ResourceState resourceState, boolean nested) throws Exception {
         BasicDBObject basicDBObject = new BasicDBObject();
 
         // if the state already has an id set, use it here. Otherwise one will be autocreated on insert
         String rid = resourceState.id();
         if (rid != null) {
-            basicDBObject.append(MONGO_ID_FIELD, getMongoID(rid));
+            if (!nested) {
+                basicDBObject.append(MONGO_ID_FIELD, getMongoID(rid));
+            } else {
+                basicDBObject.append(LiveOak.ID, getMongoID(rid));
+            }
         }
 
         Set<String> keys = resourceState.getPropertyNames();
@@ -103,7 +111,7 @@ public abstract class MongoResource implements SynchronousResource, BlockingReso
             if (key.equalsIgnoreCase("$dbref")) {
                 DBRef dbRef = getDBRef((String) resourceState.getProperty("$dbref"));
                 basicDBObject.append(key, dbRef);
-            } else if (!key.equals(LiveOak.ID)) { // don't append the ID field again
+            } else if (nested || !key.equals(LiveOak.ID)) { // don't append the ID field again
                 Object value = resourceState.getProperty(key);
                 if (value instanceof ResourceState) {
                     Object dbrefObject = ((ResourceState) value).getProperty("$dbref");
@@ -111,7 +119,7 @@ public abstract class MongoResource implements SynchronousResource, BlockingReso
                         String uri = (String) dbrefObject;
                         value = getDBRef(uri);
                     } else {
-                        value = createObject((ResourceState) value);
+                        value = createObject((ResourceState) value, true);
                     }
                 } else if (value instanceof Collection) {
                     value = createObjectList((Collection) value);
@@ -127,7 +135,7 @@ public abstract class MongoResource implements SynchronousResource, BlockingReso
         BasicDBList dbList = new BasicDBList();
         for (Object object : collection) {
             if (object instanceof ResourceState) {
-                dbList.add(createObject((ResourceState) object));
+                dbList.add(createObject((ResourceState) object, true));
             } else if (object instanceof Collection) {
                 dbList.add(createObjectList((Collection) object));
             } else {

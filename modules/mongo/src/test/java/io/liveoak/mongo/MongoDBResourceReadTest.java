@@ -78,7 +78,7 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         // create the object using the mongo driver directly
         BasicDBObject object = new BasicDBObject();
         object.append("foo", "bar");
-        object.append("child", new BasicDBObject().append("ABC", "XYZ"));
+        object.append("child", new BasicDBObject().append("ABC", "XYZ").append("id", "child"));
         db.getCollection(methodName).insert(object);
         assertEquals(1, db.getCollection(methodName).getCount());
         String id = "ObjectId(\"" + object.getObjectId("_id").toString() + "\")";
@@ -90,6 +90,8 @@ public class MongoDBResourceReadTest extends BaseMongoDBTest {
         assertThat(result.getProperty("foo")).isEqualTo("bar");
         ResourceState resultChild = (ResourceState) result.getProperty("child");
         assertThat(resultChild.getProperty("ABC")).isEqualTo("XYZ");
+        assertThat(resultChild.getProperty("id")).isEqualTo("child");
+        assertThat(resultChild.getProperty("_id")).isNull();
     }
 
     @Test
