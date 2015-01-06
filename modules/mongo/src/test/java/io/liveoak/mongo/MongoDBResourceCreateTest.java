@@ -305,4 +305,67 @@ public class MongoDBResourceCreateTest extends BaseMongoDBTest {
         assertThat(grandchildDBObject.get("_id")).isNull();
         assertThat(grandchildDBObject.get("abc")).isEqualTo("xyz");
     }
+
+    @Test
+    public void createWithNestedID() throws Exception {
+        String methodName = "testCreateWithNestedID";
+        assertFalse(db.collectionExists(methodName));
+        db.createCollection(methodName, new BasicDBObject());
+
+        ResourceState state = new DefaultResourceState("testIDNested");
+
+        ResourceState nestedState = new DefaultResourceState();
+        nestedState.putProperty("id", "foo");
+        nestedState.putProperty("test", 123);
+
+        ResourceState nestedNestedState =new DefaultResourceState();
+        nestedNestedState.putProperty("id", "bar");
+        nestedNestedState.putProperty("testing", "one-two-three");
+
+        nestedState.putProperty("bar", nestedNestedState);
+
+        state.putProperty("foo", nestedState);
+
+        RequestContext requestContext = new RequestContext.Builder().build();
+        ResourceState result = client.create(requestContext, "/testApp/" + BASEPATH + "/" + methodName, state);
+
+        // verify the result
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo("testIDNested");
+        assertThat(result.getProperty("foo")).isNotNull();
+
+        ResourceState fooResult = result.getProperty("foo", true, ResourceState.class);
+        assertThat(fooResult.id()).isNull();
+        assertThat(fooResult.getProperty("id")).isEqualTo("foo");
+        assertThat(fooResult.getProperty("test")).isEqualTo(123);
+        assertThat(fooResult.getProperty("bar")).isNotNull();
+
+        ResourceState barResult = fooResult.getProperty("bar", true, ResourceState.class);
+        assertThat(barResult.id()).isNull();
+        assertThat(barResult.getProperty("id")).isEqualTo("bar");
+        assertThat(barResult.getProperty("testing")).isEqualTo("one-two-three");
+
+        // verify what is in the database
+        DBObject dbObject = db.getCollection(methodName).findOne();
+        assertThat(dbObject).isNotNull();
+        assertThat(dbObject.keySet().size()).isEqualTo(2);
+        assertThat(dbObject.get("_id")).isEqualTo("testIDNested");
+        assertThat(dbObject.get("foo")).isNotNull();
+
+        DBObject fooObject = (DBObject) dbObject.get("foo");
+        assertThat(fooObject).isNotNull();
+        assertThat(fooObject.keySet().size()).isEqualTo(3);
+        assertThat(fooObject.get("_id")).isNull();
+        assertThat(fooObject.get("id")).isEqualTo("foo");
+        assertThat(fooObject.get("test")).isEqualTo(123);
+
+        DBObject barObject = (DBObject) fooObject.get("bar");
+        assertThat(barObject).isNotNull();
+        assertThat(barObject.keySet().size()).isEqualTo(2);
+        assertThat(barObject.get("_id")).isNull();
+        assertThat(barObject.get("id")).isEqualTo("bar");
+        assertThat(barObject.get("testing")).isEqualTo("one-two-three");
+    }
+
+
 }
