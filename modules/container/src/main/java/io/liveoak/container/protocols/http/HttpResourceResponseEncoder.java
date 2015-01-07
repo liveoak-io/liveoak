@@ -59,6 +59,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
         HttpHeaders responseHeaders = new DefaultHttpHeaders();
 
         boolean shouldEncodeState = false;
+        boolean shouldCheckForHtmlApp = true;
         switch (msg.responseType()) {
             case CREATED:
                 responseStatusCode = HttpResponseStatus.CREATED.code();
@@ -83,6 +84,7 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
             case ERROR:
                 if (msg instanceof ResourceErrorResponse) {
                     shouldEncodeState = true;
+                    shouldCheckForHtmlApp = false;
                     switch (((DefaultResourceErrorResponse) msg).errorType()) {
                         case NOT_AUTHORIZED:
                             responseStatusCode = HttpResponseStatus.UNAUTHORIZED.code();
@@ -157,24 +159,26 @@ public class HttpResourceResponseEncoder extends MessageToMessageEncoder<Default
                 break;
         }
 
-        DefaultHttpResponse response = null;
-        HttpResponseStatus responseStatus = null;
+        DefaultHttpResponse response;
+        HttpResponseStatus responseStatus;
 
         EncodingResult encodingResult = null;
         if (shouldEncodeState) {
             MediaTypeMatcher matcher = msg.inReplyTo().mediaTypeMatcher();
 
-            Application app = msg.inReplyTo().requestContext().application();
-            if (app != null && app instanceof InternalApplication) {
-                ResourcePath htmlAppPath = ((InternalApplication)app).htmlApplicationResourcePath();
-                if ((!(msg.resource() instanceof BinaryResource)) && (htmlAppPath != null)) {
-                    MediaType bestMatch = matcher.findBestMatch(this.codecManager.mediaTypes());
-                    if (bestMatch == MediaType.HTML) {
-                        // HTML was requested and we have an HTML app
-                        ResourceRequest htmlAppRequest = new DefaultResourceRequest.Builder(RequestType.READ, htmlAppPath).mediaTypeMatcher(msg.inReplyTo().mediaTypeMatcher())
-                                .requestAttributes(msg.inReplyTo().requestContext().requestAttributes()).build();
-                        ctx.channel().pipeline().fireChannelRead(htmlAppRequest);
-                        return;
+            if (shouldCheckForHtmlApp) {
+                Application app = msg.inReplyTo().requestContext().application();
+                if (app != null && app instanceof InternalApplication) {
+                    ResourcePath htmlAppPath = ((InternalApplication)app).htmlApplicationResourcePath();
+                    if ((!(msg.resource() instanceof BinaryResource)) && (htmlAppPath != null)) {
+                        MediaType bestMatch = matcher.findBestMatch(this.codecManager.mediaTypes());
+                        if (bestMatch == MediaType.HTML) {
+                            // HTML was requested and we have an HTML app
+                            ResourceRequest htmlAppRequest = new DefaultResourceRequest.Builder(RequestType.READ, htmlAppPath).mediaTypeMatcher(msg.inReplyTo().mediaTypeMatcher())
+                                    .requestAttributes(msg.inReplyTo().requestContext().requestAttributes()).build();
+                            ctx.channel().pipeline().fireChannelRead(htmlAppRequest);
+                            return;
+                        }
                     }
                 }
             }
