@@ -218,7 +218,7 @@
             <default-security-domain value="other"/>
             <default-missing-method-permissions-deny-access value="true"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:io:1.0">
+        <subsystem xmlns="urn:jboss:domain:io:1.1">
             <worker name="default" io-threads="3"/>
             <buffer-pool name="default" buffer-size="16384" buffers-per-slice="128"/>
         </subsystem>
@@ -356,7 +356,7 @@
                 <file name="welcome-content" path="${jboss.home.dir}/welcome-content" directory-listing="true"/>
             </handlers>
             <filters>
-                <response-header name="server-header" header-name="Server" header-value="Wildfly/8"/>
+                <response-header name="server-header" header-name="Server" header-value="WildFly/8"/>
                 <response-header name="x-powered-by-header" header-name="X-Powered-By" header-value="Undertow/1"/>
             </filters>
         </subsystem>
