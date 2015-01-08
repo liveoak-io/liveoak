@@ -20,6 +20,7 @@
     <dependencies>
         <module name="io.liveoak.spi"/>
         <module name="io.liveoak.mongo"/>
+        <module name="io.liveoak.mongo.internal"/>
         <module name="net.iharder"/>
         <system>
             <paths>
