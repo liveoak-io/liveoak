@@ -10,16 +10,16 @@
           <div class="pull-left">
             <img alt="{{ example['icon-alt'] }}" src="/admin/console/img/example-apps/{{example.icon}}">
 
-            <button class="btn btn-lg" type="button" onclick="event.stopPropagation();" ng-hide="example.instructions" ng-class="{installing: example.installing, 'btn-default': !example.installed, 'btn-primary': example.installed}" ng-click="example.installed ? goto(example) : install(example)" ng-disabled="example.installing">
+            <button class="btn btn-lg" type="button" onclick="event.stopPropagation();" ng-show="example.installable" ng-class="{installing: example.installing, 'btn-default': !example.installed, 'btn-primary': example.installed}" ng-click="example.installed ? goto(example) : install(example)" ng-disabled="example.installing">
               <span class="spinner spinner-xs spinner-inline"></span>
               <span class="text" ng-hide="example.installing || example.installed">Install</span>
               <span class="text" ng-show="example.installing">Installing...</span>
               <span class="text" ng-show="example.installed">Open</span>
             </button>
-            <a class="btn btn-lg btn-default" href="{{example.instructions}}" onclick="event.stopPropagation();" target="_blank" ng-show="example.instructions">
-              <span class="text">Instructions</span>
+            <a class="btn btn-lg btn-default" href="{{example.instructions}}" onclick="event.stopPropagation();" target="_blank" ng-hide="example.installable">
+              <span class="text">View README</span>
             </a>
-            <a href="#" target="_blank" class="link">View README.md</a>
+            <a href="{{example.instructions}}" target="_blank" class="link" ng-show="example.installable">View README</a>
           </div>
           <div class="pull-right">
             <h3>{{example.name}}</h3>

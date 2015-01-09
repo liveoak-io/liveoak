@@ -6,7 +6,9 @@
     "name": "HTML Chat",
     "description": "Get HTTP REST for creating new chat messages and receive list of existing messages; Stomp over Websockets used for subscription request to receive notifications about changes.",
     "icon": "chat-html.svg",
-    "icon-alt": "Illustration: Ballons with the HTML5 logo"
+    "icon-alt": "Illustration: Ballons with the HTML5 logo",
+    "instructions": "https://github.com/liveoak-io/liveoak-example-chat-html/tree/${example.branch}#readme",
+    "installable": true
   },
   {
     "id": "chat-html-secured",
@@ -15,7 +17,9 @@
     "name": "Secured Chat",
     "description": "HTTP REST including authentication and authorization. Keycloak integration. Stomp over websockets used for subscription requests. Subscription requests allowed just for authorized users; Authorized subscription responses received for newly added chat messages and also for deleted or updated messages. Users with role _admin_ can delete any chat message.",
     "icon": "chat-secured.svg",
-    "icon-alt": "Illustration: Ballons with a lock symbol"
+    "icon-alt": "Illustration: Ballons with a lock symbol",
+    "instructions": "https://github.com/liveoak-io/liveoak-example-chat-html-secured/tree/${example.branch}#readme",
+    "installable": true
   },
   {
     "id": "chat-android",
@@ -46,7 +50,9 @@
     "name": "Gallery",
     "description": "The Gallery demo application runs in desktop, and mobile browser, and also provides REST endpoints for gallery-cordova application.",
     "icon": "gallery.svg",
-    "icon-alt": "Illustration: A series of pictures"
+    "icon-alt": "Illustration: A series of pictures",
+    "instructions": "https://github.com/liveoak-io/liveoak-example-gallery/tree/${example.branch}#readme",
+    "installable": true
   },
   {
     "id": "todomvc",
@@ -55,7 +61,9 @@
     "name": "TodoMVC",
     "description": "The TodoMVC example is based on the example https://todomvc.com/architecture-examples/angularjs/#/ . Our example is integrated with [Keycloak](https://www.keycloak.org) and it's showing security possibilities of [LiveOak](https://liveoak.io) (among other things).",
     "icon": "todomvc.svg",
-    "icon-alt": "Illustration: A list with one item checked"
+    "icon-alt": "Illustration: A list with one item checked",
+    "instructions": "https://github.com/liveoak-io/liveoak-example-todomvc/tree/${example.branch}#readme",
+    "installable": true
   },
   {
     "id": "helloscript",
@@ -64,7 +72,9 @@
     "name": "Messages",
     "description": "The Hello Messages example shows a simple usage of Business Logic by outputting a message to the log before and after any resource of the application is read.",
     "icon": "script.svg",
-    "icon-alt": "Illustration: An XML empty tag element"
+    "icon-alt": "Illustration: An XML empty tag element",
+    "instructions": "https://github.com/liveoak-io/liveoak-example-helloscript/tree/${example.branch}#readme",
+    "installable": true
   },
   {
     "id": "metadatascript",
@@ -73,7 +83,9 @@
     "name": "Metadata for Data",
     "description": "The Add Metadata example shows how Business Logic can add a 'last-modified' field to any data being created or updated within the 'storage' resource of the application.",
     "icon": "script.svg",
-    "icon-alt": "Illustration: An XML empty tag element"
+    "icon-alt": "Illustration: An XML empty tag element",
+    "instructions": "https://github.com/liveoak-io/liveoak-example-metadatascript/tree/${example.branch}#readme",
+    "installable": true
   },
   {
     "id": "formatscript",
@@ -82,7 +94,9 @@
     "name": "Data Validation",
     "description": "The Data Validation example utilizes Business Logic for validating data received on a create or update, and throws appropriate errors back to the client if validation failed",
     "icon": "script.svg",
-    "icon-alt": "Illustration: An XML empty tag element"
+    "icon-alt": "Illustration: An XML empty tag element",
+    "instructions": "https://github.com/liveoak-io/liveoak-example-formatscript/tree/${example.branch}#readme",
+    "installable": true
   },
   {
     "id": "useragentscript",
@@ -91,7 +105,9 @@
     "name": "Request Headers",
     "description": "Utilize Business Logic to read/query/write/update LiveOak resources. In this case it uses the headers from the request to track how many times the same User Agent has accessed the resource.",
     "icon": "script.svg",
-    "icon-alt": "Illustration: An XML empty tag element"
+    "icon-alt": "Illustration: An XML empty tag element",
+    "instructions": "https://github.com/liveoak-io/liveoak-example-useragentscript/tree/${example.branch}#readme",
+    "installable": true
   },
   {
     "id": "auth-html",
@@ -100,7 +116,9 @@
     "name": "Auth",
     "description": "Basic functionality related to authentication to Keycloak/LiveOak. It's simple Javascript application, which you can use to login into Keycloak and obtain OAuth access token in JWT format from Keycloak. You can also try to send ajax request to 'storage' resource with access token attached in Authorization header. Storage request will be successful just in case that you are authenticated.",
     "icon": "auth.svg",
-    "icon-alt": "Illustration: Two keys"
+    "icon-alt": "Illustration: Two keys",
+    "instructions": "https://github.com/liveoak-io/liveoak-example-auth-html/tree/${example.branch}#readme",
+    "installable": true
   },
   {
     "id": "gallery-cordova",
