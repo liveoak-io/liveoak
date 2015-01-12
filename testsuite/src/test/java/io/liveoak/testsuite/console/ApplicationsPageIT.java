@@ -3,6 +3,7 @@ package io.liveoak.testsuite.console;
 import io.liveoak.testsuite.AbstractLiveOakTest;
 import org.jboss.arquillian.junit.InSequence;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -19,6 +20,7 @@ import static org.junit.Assert.*;
 /**
  * @author <a href="mailto:amendonc@redhat.com">Alexandre Mendonca</a>
  */
+@Ignore
 public class ApplicationsPageIT extends AbstractLiveOakTest {
 
     @FindBy(className = "empty-instance")

@@ -1,29 +1,22 @@
 package io.liveoak.testsuite;
 
-import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
-@Ignore
-public class KeycloakAdminIT extends AbstractLiveOakTest {
+public class KeycloakAdminConsoleIT extends AbstractLiveOakTest {
 
     protected String keycloakUrl;
-
-    @Drone
-    private WebDriver browser;
 
     @Before
     public void before() throws Exception {
         super.before();
 
-        keycloakUrl = BASE_URL.replace("8080", "8383") + "/auth/rest";
+        keycloakUrl = BASE_URL + "/auth/rest";
     }
 
     @Test
