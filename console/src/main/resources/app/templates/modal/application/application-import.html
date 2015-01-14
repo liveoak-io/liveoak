@@ -17,9 +17,9 @@
 
   <form lo-autofocus>
     <div class="form-group clearfix" ng-show="!app.installing">
-      <label for="url" class="col-sm-4 control-label">Import method</label>
-      <div class="col-sm-6">
-        <select ng-options="src.id as src.name for src in sources" ng-model="$parent.source" lo-select>
+      <label for="source" class="col-sm-4 control-label">Import method</label>
+      <div class="col-sm-8">
+        <select id="source" ng-options="src.id as src.name for src in sources" ng-model="$parent.source" lo-select>
         </select>
       </div>
     </div>
@@ -27,22 +27,50 @@
     <!-- When local file system is selected -->
     <div class="form-group clearfix" ng-if="source === 'local' && !app.installing">
       <label for="path" class="col-sm-4 control-label">Root Directory</label>
-      <div class="col-sm-6">
+      <div class="col-sm-8">
         <input type="text" class="form-control" id="path" ng-model="app.path" ng-change="updateAppId()" placeholder="e.g.: /home/liveoak/apps/sample-app">
       </div>
     </div>
 
     <!-- When Git is select -->
-    <div class="form-group clearfix" ng-if="source === 'git' && !app.installing">
-      <label for="url" class="col-sm-4 control-label">HTTP(S) GIT URL</label>
+    <div class="form-group clearfix" ng-if="source === 'git' && !app.installing" ng-init="app.protocol = 'https'" ng-show="false">
+      <label class="col-sm-4 control-label">Protocol</label>
       <div class="col-sm-6">
-        <input type="text" class="form-control" id="url" ng-model="app.url" ng-change="updateAppId()" placeholder="e.g.: https://github.com/liveoak-io/liveoak-chat-html.git">
+          <label class="checkbox-inline">
+            <input id="radio-prot-https" ng-model="app.protocol" value="https" type="radio"> HTTP(S)
+          </label>
+          <label class="checkbox-inline">
+            <input id="radio-prot-ssh" ng-model="app.protocol" value="ssh" type="radio"> SSH
+          </label>
       </div>
     </div>
 
+    <div class="form-group clearfix" ng-if="source === 'git' && !app.installing">
+      <label for="url" class="col-sm-4 control-label">GIT URL / Branch</label>
+      <div class="col-sm-5" style="padding-right: 0px;">
+        <input type="text" class="form-control" id="url" ng-model="app.url" ng-change="updateAppId()" placeholder="e.g.: https://github.com/liveoak-io/liveoak-chat-html.git">
+      </div>
+      <div class="col-sm-3">
+        <input type="text" class="form-control" id="branch" ng-model="app.branch" ng-change="updateAppId()" placeholder="master">
+      </div>
+    </div>
+
+    <div class="form-group clearfix" ng-show="source === 'git' && !app.installing">
+      <label for="username" class="col-sm-4 control-label">Authentication</label>
+      <div ng-class="(app.protocol === 'ssh') ? 'col-sm-6' : 'col-sm-8'">
+        <input type="text" ng-hide="app.usePassphrase" class="col-sm-6" class="form-control" id="username" ng-model="app.username" placeholder="Username">
+        <input type="password" ng-hide="app.usePassphrase" class="col-sm-6"class="form-control" id="password" ng-model="app.password" placeholder="Password">
+        <input type="password" ng-show="app.usePassphrase" class="col-sm-12"class="form-control" id="passphrase" ng-model="app.passphrase" placeholder="Passphrase">
+      </div>
+      <span ng-show="app.protocol === 'ssh'" style="margin-left: -15px;">
+        <button class="btn btn-link" ng-hide="app.usePassphrase" ng-click="app.usePassphrase = true">Passphrase</button>
+        <button class="btn btn-link" ng-show="app.usePassphrase" ng-click="app.usePassphrase = false">User/Pass</button>
+      </span>
+    </div>
+
     <div class="form-group clearfix" ng-show="!app.installing">
-      <label for="url" class="col-sm-4 control-label">Application ID</label>
-      <div class="col-sm-6">
+      <label for="id" class="col-sm-4 control-label">Application ID</label>
+      <div class="col-sm-8">
         <input type="text" class="form-control" id="id" ng-model="app.id" ng-change="manualChange()" placeholder="e.g.: MyChatHTML">
       </div>
     </div>

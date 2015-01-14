@@ -402,8 +402,11 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
           $scope.app.id = $scope.app.path.replace(/\/$/, '').split('/').pop();
         }
         else {
-          $scope.app.id = $scope.app.url.replace(/\/$/, '').replace(/\.git$/, '').split('/').pop();
+          $scope.app.id = $scope.app.url.replace(/\/$/, '').replace(/\.git$/, '').split('/').pop() + ($scope.app.branch ? ('_' + $scope.app.branch) : '');
         }
+      }
+      if ($scope.source === 'git' && $scope.app.url) {
+        $scope.app.protocol = ($scope.app.url.indexOf('ssh://') === 0) ? 'ssh' : 'https';
       }
     };
 
@@ -532,7 +535,14 @@ var importApp = function(app, LoAppExamples, Notifications, $modalInstance, $rou
   };
 
   if (app.hasOwnProperty('url')) {
-    new LoAppExamples({ id: app.id, url: app.url, branch: app.branch }).$importGit({}, installSuccess, installFailure);
+    if (app.usePassphrase) {
+      delete app.username;
+      delete app.password;
+    }
+    else {
+      delete app.passphrase;
+    }
+    new LoAppExamples({ id: app.id, url: app.url, branch: app.branch, user: app.username, pwd: app.password, passphrase: app.passphrase }).$importGit({}, installSuccess, installFailure);
   }
   else if (app.hasOwnProperty('path')) {
     new LoAppExamples({ id: app.id, localPath: app.path }).$install({}, installSuccess, installFailure);
