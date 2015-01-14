@@ -1087,6 +1087,10 @@ p.form-info {
     
     > div {
       padding-left: 0.5em;
+      
+      &.side {
+        padding-right: 0;
+      }
     }
 
     table {
@@ -1833,8 +1837,14 @@ legend {
   margin-left: .5em;
 }
 
-.btn-primary
-{
+.btn-link {
+  color: @c_green;
+  &:hover {
+    color: @c_greendark;
+  }
+}
+
+.btn-primary {
   background-color: @c_green;
   border-color: @c_greendark;
   background-image: linear-gradient(to bottom, @c_green 0%, @c_green 100%);
@@ -2055,7 +2065,6 @@ legend {
     color: @c_graylight;
   }
 
-  
   li {
     margin-bottom: 4px;
     
@@ -2072,6 +2081,13 @@ legend {
 
 .import-applications .bootstrap-select.btn-group:not(.input-group-btn) {
   margin-bottom: 0;
+}
+.col-sm-offset-4.link {
+  margin-bottom: -5px;
+  .btn {
+    margin-left: 0;
+    padding-left: 0;
+  }
 }
 
 
