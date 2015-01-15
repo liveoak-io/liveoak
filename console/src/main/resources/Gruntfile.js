@@ -41,7 +41,7 @@ module.exports = function (grunt) {
           '===================================================================\n' +
           '--- codemirror.js\n' +
           '+++ codemirror.js\n' +
-          '@@ -3346,7 +3346,9 @@\n' +
+          '@@ -3450,7 +3450,9 @@\n' +
           '       (ie ? "rgba(255, 255, 255, .05)" : "transparent") +\n' +
           '       "; outline: none; border-width: 0; outline: none; overflow: hidden; opacity: .05; filter: alpha(opacity=5);";\n' +
           '     if (webkit) var oldScrollY = window.scrollY; // Work around Chrome issue (#2712)\n' +

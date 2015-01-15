@@ -3,8 +3,8 @@
     "version": "0.0.1",
     "authors": [
         "Viliam Rockai <vrockai@redhat.com>",
-        "Alexandre Mendonca",
-        "Gabriel Cardoso",
+        "Alexandre Mendonca <amendonca@redhat.com>",
+        "Gabriel Cardoso <gcardoso@redhat.com>",
         "Ken Finnigan <ken@kenfinnigan.me>"
     ],
     "description": "LiveOak console interface",
@@ -29,6 +29,7 @@
         "lodash": "2.4.1",
         "jquery": "2.0.3",
         "patternfly": "1.1.1",
+        "codemirror": "4.11.0",
         "angular-ui-codemirror": "0.1.6",
         "jshint": "2.5.6"
     },
