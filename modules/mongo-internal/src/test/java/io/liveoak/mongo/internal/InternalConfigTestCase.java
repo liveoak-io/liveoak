@@ -27,6 +27,9 @@ public class InternalConfigTestCase extends AbstractTestCaseWithTestApp {
 
     static final String SYSTEM_CONFIG_PATH = "/" + ZeroExtension.APPLICATION_ID + "/system/mongo-internal/module";
 
+    static final String RUNNING_MONGO_HOST = System.getProperty("mongo.host", "localhost");
+    static final Integer RUNNING_MONGO_PORT = new Integer(System.getProperty("mongo.port", "27017"));
+
     ResourceState original;
 
     @BeforeClass
@@ -45,7 +48,7 @@ public class InternalConfigTestCase extends AbstractTestCaseWithTestApp {
 
         JsonNode internalConfig = ObjectMapperFactory.create().readTree(
                 "{  db: 'internal'," +
-                        " servers: [{}]" +
+                        " servers: [{host: '" + RUNNING_MONGO_HOST + "', port: " + RUNNING_MONGO_PORT  +  "}]" +
                         "}"
         );
         loadExtension("mongo-internal", new MongoInternalExtension(), (ObjectNode)internalConfig);
@@ -68,8 +71,8 @@ public class InternalConfigTestCase extends AbstractTestCaseWithTestApp {
         assertThat(systemConfigState.getProperty("db")).isEqualTo("internal");
 
         ResourceState server = (ResourceState)systemConfigState.getProperty("servers", true, List.class).get(0);
-        assertThat(server.getProperty("host")).isEqualTo("127.0.0.1");
-        assertThat(server.getProperty("port")).isEqualTo(27017);
+        assertThat(server.getProperty("host")).isEqualTo(RUNNING_MONGO_HOST);
+        assertThat(server.getProperty("port")).isEqualTo(RUNNING_MONGO_PORT);
     }
 
     @Test

@@ -6,6 +6,7 @@ import java.util.List;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.InitializationException;
+import io.liveoak.spi.exceptions.NotAcceptableException;
 import io.liveoak.spi.state.ResourceState;
 import org.junit.Test;
 
@@ -457,6 +458,38 @@ public class MongoServersConfigTest extends BaseMongoConfigTest {
         assertThat(result.members().size()).isEqualTo(0);
 
         client.update(new RequestContext.Builder().build(), ADMIN_PATH, result);
+    }
+
+    @Test
+    public void updateInvalidConfiguration() throws Exception {
+        ResourceState config = new DefaultResourceState();
+        config.putProperty("db", "testUpdateInvalidConfiguration");
+        setUpSystem(config);
+
+
+        ResourceState updatedConfig = new DefaultResourceState();
+        List<ResourceState> updatedServers = new ArrayList<ResourceState>();
+        updatedConfig.putProperty("db", "testUpdateServersDB");
+
+        ResourceState updatedServer = new DefaultResourceState();
+        updatedServer.putProperty("host", RUNNING_MONGO_HOST);
+        updatedServer.putProperty("port", RUNNING_MONGO_PORT); // the port the test mongo instance is running on
+        updatedServers.add(updatedServer);
+
+        updatedConfig.putProperty("servers", updatedServers);
+
+        // This configuration is valid and should not throw an exception
+        client.update(new RequestContext.Builder().build(), ADMIN_PATH, updatedConfig);
+
+        // change it to use a port value which should be invalid.
+        updatedServer.putProperty("port", 8080);
+        try {
+            client.update(new RequestContext.Builder().build(), ADMIN_PATH, updatedConfig);
+            fail();
+        } catch (NotAcceptableException e) {
+            // expected
+        }
+
     }
 
 }

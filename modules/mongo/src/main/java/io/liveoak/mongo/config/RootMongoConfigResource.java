@@ -53,9 +53,9 @@ public class RootMongoConfigResource implements RootResource {
     @Override
     public void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
         MongoConfig updatedConfig = new MongoConfig(this, mongoDatastoresResource, state, false);
-
-        DB db = updatedConfig.getDB();
         try {
+            DB db = updatedConfig.getDB();
+            db.getCollectionNames();
             this.mongoConfig = updatedConfig;
             responder.resourceUpdated(this);
         } catch (Exception e) {
