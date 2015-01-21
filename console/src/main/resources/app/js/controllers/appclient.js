@@ -418,6 +418,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
      $route.reload();
      }
      */
+    $scope.changed = false; // required due to LIVEOAK-736
     if ($scope.create) {
       $location.search('created', $scope.appClient.name).path('applications/' + currentApp.name + '/application-clients');
     }
@@ -425,4 +426,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
       $location.path('applications/' + currentApp.name + '/application-clients');
     }
   };
+
+  $rootScope.preventLoseChanges($scope/*, $scope.save, $scope.clear*/);
+
 });

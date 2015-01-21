@@ -164,6 +164,7 @@ loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $route
         //$scope.script.$setSource({'appId': currentApp.id, 'type':'resource-triggered-scripts'});
         saveCode(scriptCode);
         if(!codeOnly) {
+          $scope.changed = false; // required due to LIVEOAK-736
           $location.search(($scope.create ? 'created' : 'updated'), $scope.script.id).path('/applications/' + currentApp.id + '/business-logic');
         }
       },
@@ -193,4 +194,5 @@ loMod.controller('BusinessLogicDetailsCtrl', function($scope, $rootScope, $route
     });
   };
 
+  $rootScope.preventLoseChanges($scope/*, $scope.save, $scope.clear*/);
 });

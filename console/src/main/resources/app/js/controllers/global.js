@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.global', []);
 
-loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, $route, LiveOak) {
+loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, $route, $modal, LiveOak) {
 
   $log.debug('GlobalCtrl' + LiveOak);
 
@@ -25,6 +25,61 @@ loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, $ro
   $rootScope.$on('$routeChangeSuccess', function() {
     delete $rootScope.hideSidebar;
   });
+
+  // show prevent lose change
+  $rootScope.preventLoseChanges = function(theScope/*, saveFun, discardFun*/) {
+    //$scope.saveFun = saveFun;
+    //$scope.discardFun = discardFun;
+    theScope.$on('$locationChangeStart', function(event, next) {
+      theScope.next = next.substr(next.indexOf('#')+1, next.length);
+      if (theScope.changed) {
+        event.preventDefault();
+        $modal.open({
+          templateUrl: '/admin/console/templates/modal/unsaved-changes.html',
+          controller: UnsavedChangesCtrl,
+          scope: theScope
+        });
+      }
+    });
+  };
+
+  var UnsavedChangesCtrl = function ($scope, $modalInstance, $log) {
+    $scope.cancel = function () {
+      $modalInstance.dismiss('cancel');
+    };
+
+    // Not being used yet. Requires changes:
+    // - Need promise on save method for knowing when completed;
+    // - Need to handle save method redirect;
+    // - Possibly more...
+    /*
+    $scope.save = function() {
+      $modalInstance.close();
+      $scope.$parent.saveFun();
+      isStillChanged(0, 10);
+    };
+
+    $scope.discard = function() {
+      $modalInstance.close();
+      $scope.$parent.discardFun();
+      isStillChanged(0, 10);
+    };
+
+    var isStillChanged = function(count, max) {
+      if ($scope.$parent.changed) {
+        if (count <= max) {
+          $timeout(function() { isStillChanged(count++, max) }, 250);
+        }
+        else {
+          // do what? notification?
+        }
+      }
+      else {
+        $location.path($scope.$parent.next);
+      }
+    }
+    */
+  };
 
   /* jshint ignore:start */
   $scope.auth = LiveOak.auth;

@@ -143,4 +143,5 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
     });
   };
 
+  $rootScope.preventLoseChanges($scope/*, $scope.save, $scope.clear*/);
 });

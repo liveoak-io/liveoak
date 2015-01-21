@@ -92,6 +92,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $routePa
   };
 
   $scope.cancelCreate = function() {
+    $scope.changed = false; // required due to LIVEOAK-736
     $location.path('applications/' + currentApp.id + '/storage');
   };
 
@@ -185,6 +186,7 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $routePa
       LoStorage.update({appId: $scope.curApp.id, storageId: storageModelBackup.id}, $scope.storageModel,
       function(){
         // Update success
+        $scope.changed = false; // required due to LIVEOAK-736
         Notifications.success('The storage "' + storageModelBackup.id + '" has been updated.');
         $location.path('applications/' + currentApp.id + '/storage');
       },
@@ -194,6 +196,8 @@ loMod.controller('StorageCtrl', function($scope, $rootScope, $location, $routePa
       });
     }
   };
+
+  $rootScope.preventLoseChanges($scope/*, $scope.save, $scope.clear*/);
 
 });
 
@@ -1015,4 +1019,6 @@ loMod.controller('StorageCollectionCtrl', function($scope, $rootScope, $log, $ro
     $scope.searchColumns = [];
     $scope.searchConditions = [angular.copy(defaultSearchCondition)];
   }
+
+  $rootScope.preventLoseChanges($scope/*, $scope.save, $scope.reset*/);
 });
