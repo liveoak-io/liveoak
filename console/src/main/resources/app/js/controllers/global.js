@@ -48,6 +48,12 @@ loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, $ro
       $modalInstance.dismiss('cancel');
     };
 
+    $scope.discard = function() {
+      $modalInstance.close();
+      $scope.$parent.changed = false;
+      $location.path($scope.$parent.next);
+    };
+
     // Not being used yet. Requires changes:
     // - Need promise on save method for knowing when completed;
     // - Need to handle save method redirect;
@@ -56,12 +62,6 @@ loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, $ro
     $scope.save = function() {
       $modalInstance.close();
       $scope.$parent.saveFun();
-      isStillChanged(0, 10);
-    };
-
-    $scope.discard = function() {
-      $modalInstance.close();
-      $scope.$parent.discardFun();
       isStillChanged(0, 10);
     };
 
