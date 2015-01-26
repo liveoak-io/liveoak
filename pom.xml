@@ -60,7 +60,7 @@
         <hibernate.version>4.2.7.SP1</hibernate.version>
         <hibernate.annotations.version>4.0.2.Final</hibernate.annotations.version>
         <hibernate.jpa.version>1.0.0.Final</hibernate.jpa.version>
-        <aerogear.ups.version>0.5.0</aerogear.ups.version>
+        <aerogear.ups.version>1.0.0</aerogear.ups.version>
         <net.iharder.base64.version>2.3.8</net.iharder.base64.version>
         <jboss.spec.javax.servlet.version>1.0.0.Final</jboss.spec.javax.servlet.version>
         <jboss.spec.javax.transaction.version>1.0.0.Final</jboss.spec.javax.transaction.version>
