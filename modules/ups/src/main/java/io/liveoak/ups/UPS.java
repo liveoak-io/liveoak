@@ -58,7 +58,7 @@ public class UPS {
      * @param subscription The object containing the message and specified recipients
      */
     public void send(URI URI, EventType eventType, UPSSubscription subscription) {
-        JavaSender sender = new SenderClient(upsRootConfigResource.getUPSServerURL());
+        SenderClient sender = SenderClient.withRootServerURL(upsRootConfigResource.getUPSServerURL()).build();
 
         // setup the application specifics
         UnifiedMessage.Builder builder = new UnifiedMessage.Builder()
