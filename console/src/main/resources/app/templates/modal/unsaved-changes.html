@@ -1,0 +1,19 @@
+<div class="modal-header">
+  <button type="button" class="close" ng-click="cancel()">
+    <span class="pficon pficon-close"></span>
+  </button>
+  <h4 class="modal-title">Unsaved Changes</h4>
+</div>
+<div class="modal-body">
+  <div class="form-group">
+    <p class="primary-message">You haven't saved your changes yet. Do you want to leave without saving ?</p>
+    <p>Leaving the page will discard changes.</p>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" ng-click="cancel()">Stay on Page</button>
+  <button type="button" class="btn btn-danger" ng-click="discard()">Leave Page</button>
+  <!--
+  <button type="button" class="btn btn-primary" ng-click="save()">Save Changes</button>
+  -->
+</div>

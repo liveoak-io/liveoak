@@ -501,6 +501,8 @@ loMod.controller('SecurityCollectionsCtrl', function($scope, $rootScope, $locati
       }
     });
   };
+
+  $rootScope.preventLoseChanges($scope/*, $scope.save, $scope.clear*/);
 });
 
 // -- Security / Storage -------------------------------------------------------
@@ -639,6 +641,7 @@ loMod.controller('SecurityStorageCtrl', function($scope, $rootScope, $location, 
     modalAddRole($modal, $scope, LoRealmAppRoles, currentApp);
   };
 
+  $rootScope.preventLoseChanges($scope/*, $scope.save, $scope.clear*/);
 });
 
 // -- Security / Push ----------------------------------------------------------
@@ -765,6 +768,7 @@ loMod.controller('SecurityPushCtrl', function($scope, $rootScope, $location, $ro
     modalAddRole($modal, $scope, LoRealmAppRoles, currentApp);
   };
 
+  $rootScope.preventLoseChanges($scope/*, $scope.save, $scope.clear*/);
 });
 
 // -- Security / Clients -------------------------------------------------------
@@ -892,6 +896,7 @@ loMod.controller('SecurityClientsCtrl', function($scope, $rootScope, $location, 
     modalAddRole($modal, $scope, LoRealmAppRoles, currentApp);
   };
 
+  $rootScope.preventLoseChanges($scope/*, $scope.save, $scope.clear*/);
 });
 
 // -- Security / Business Logic ------------------------------------------------
@@ -1133,6 +1138,7 @@ loMod.controller('SecurityRolesCtrl', function($scope, $rootScope, $log, $route,
     };
   };
 
+  $rootScope.preventLoseChanges($scope/*, $scope.save, $scope.clear*/);
 });
 
 loMod.controller('AddRoleModalCtrl', function($scope, $modalInstance, Notifications, LoRealmAppRoles, currentApp, roles) {
