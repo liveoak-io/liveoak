@@ -8,6 +8,7 @@ import io.liveoak.keycloak.interceptor.AuthInterceptorService;
 import io.liveoak.keycloak.service.KeycloakConfigResourceService;
 import io.liveoak.keycloak.service.KeycloakConfigService;
 import io.liveoak.keycloak.service.KeycloakResourceService;
+import io.liveoak.keycloak.client.SecurityClientService;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
@@ -20,6 +21,7 @@ import org.jboss.msc.service.ServiceTarget;
 
 /**
  * @author Bob McWhirter
+ * @author Ken Finnigan
  */
 public class KeycloakExtension implements Extension {
 
@@ -44,6 +46,11 @@ public class KeycloakExtension implements Extension {
                 .addDependency(Services.CLIENT, Client.class, authInterceptor.clientInjector())
                 .install();
         InterceptorRegistrationHelper.installInterceptor(target, authController);
+
+        // Install Security Client
+        SecurityClientService securityClientService = new SecurityClientService();
+        target.addService(Services.SECURITY_CLIENT, securityClientService)
+                .addDependency(KeycloakServices.address(), KeycloakConfig.class, securityClientService.configInjector());
     }
 
     @Override

@@ -33,6 +33,7 @@ public final class Services {
     public static final ServiceName LOCAL_SERVER = SERVER.append("local");
 
     public static final ServiceName CLIENT = LIVEOAK.append("client");
+    public static final ServiceName SECURITY_CLIENT = LIVEOAK.append("security-client");
 
     public static final ServiceName CODEC = LIVEOAK.append("codec");
 

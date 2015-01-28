@@ -14,11 +14,7 @@ public class KeycloakAdminConsoleIT extends AbstractLiveOakSecurityTest {
 
         performLoginWithConfirm("admin", "admin");
 
-        String getToken = "return angular.element(document).injector().get('LiveOak').auth.token";
-
-        JavascriptExecutor js = (JavascriptExecutor) browser;
-        String token = (String) js.executeScript(getToken);
-
+        String token = authToken();
         System.out.println("Auth Token: " + token);
     }
 
