@@ -12,7 +12,7 @@
             <span ng-show="configuredUrlPing"><i class="fa fa-spinner fa-spin"></i> </span>
             <span ng-show="connected">AeroGear UPS connection defined: </span>
             <span ng-show="!connected">Unable to reach pre-configured AeroGear UPS server: </span>
-            <a ng-href="{{pushModel.upsURL}}/#/mobileApps/variants/{{pushModel.applicationId}}">{{pushAppName}}</a>
+            <a ng-href="{{pushModel.upsURL}}/#/detail/{{pushModel.applicationId}}">{{pushAppName}}</a>
           </h3>
           <button class="btn btn-link btn-icon pull-right" ng-hide="changed" ng-click="modalPushDelete()"
                   tooltip="Delete Push">
