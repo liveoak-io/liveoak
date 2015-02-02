@@ -51,22 +51,22 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
     // Turns on the spinner in push url input message;
     $scope.pushUrlPing = true;
 
-    var _res = loPushPing(pushUrl + '/rest/ping/');
+    var _res = loPushPing(pushUrl);
     var _resMethod = _res.ping;
 
     var _callbacks = {
-      success: function(){
+      success: function(data){
         $scope.pushUrlPing = false;
-        // Hides the message about URL not reachable under the url input;
-        $scope.pushUrlInvalid = false;
-      },
-      error: function(error){
-        $scope.pushUrlPing = false;
-        if( error.status === 401 ) {
+        if (data.valid) {
+          // Hides the message about URL not reachable under the url input;
           $scope.pushUrlInvalid = false;
         } else {
           $scope.pushUrlInvalid = true;
         }
+      },
+      error: function(error){
+        $scope.pushUrlPing = false;
+        $scope.pushUrlInvalid = true;
       }
     };
 

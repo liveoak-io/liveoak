@@ -48,6 +48,11 @@
             <artifactId>base64</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-test-tools</artifactId>
         </dependency>

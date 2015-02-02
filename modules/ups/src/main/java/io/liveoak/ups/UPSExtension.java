@@ -7,17 +7,22 @@ import io.liveoak.spi.container.SubscriptionManager;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.extension.SystemExtensionContext;
+import io.liveoak.spi.resource.RootResource;
 import io.liveoak.ups.resource.config.UPSRootConfigResource;
+import io.liveoak.ups.system.UPSSystemRootResource;
 import org.jboss.msc.service.ServiceName;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+ * @author Ken Finnigan
  */
 public class UPSExtension implements Extension {
 
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
-        //Do nothing for now
+        RootResource systemUpsResource = new UPSSystemRootResource(context.id());
+
+        context.mountPrivate(systemUpsResource);
     }
 
     @Override

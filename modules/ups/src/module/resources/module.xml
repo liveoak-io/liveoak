@@ -14,7 +14,7 @@
         <artifact name="org.jboss.aerogear:unifiedpush-java-client:${aerogear.ups.version}"/>
         <artifact name="org.jboss.resteasy:resteasy-jackson-provider:3.0.8.Final"/>
         <artifact name="org.codehaus.jackson:jackson-core-asl:1.9.12"/> 
-        <artifact name="org.codehaus.jackson:jackson-mapper-asl:1.9.12"/> 
+        <artifact name="org.codehaus.jackson:jackson-mapper-asl:1.9.12"/>
     </resources>
 
     <dependencies>
@@ -22,6 +22,7 @@
         <module name="io.liveoak.mongo"/>
         <module name="io.liveoak.mongo.internal"/>
         <module name="net.iharder"/>
+        <module name="org.apache.httpcomponents" slot="4.3"/>
         <system>
             <paths>
                 <path name="javax/net"/>

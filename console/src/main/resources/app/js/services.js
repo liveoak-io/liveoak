@@ -518,9 +518,10 @@ loMod.factory('LoClient', function($resource) {
 
 loMod.factory('loPushPing', function($resource) {
   return function(url){
-    return $resource(url, {}, {
+    return $resource('/admin/system/ups/module/ping', {}, {
       ping : {
-        method : 'GET'
+        method : 'GET',
+        params : { url : url }
       }
     });
   };
