@@ -31,16 +31,21 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
     $scope.configuredUrlPing = true;
     $scope.connected = false;
 
-    $resource($scope.pushModel.upsURL + '/rest/ping/').get({}, function(){
-      $scope.configuredUrlPing = false;
-      $scope.connected = true;
-    }, function(error){
-      $scope.configuredUrlPing = false;
-      $scope.connected = false;
-      if( error.status === 401 ) {
-        $scope.connected = true;
+    LoPush.ping({appId: $scope.curApp.id},
+      // success
+      function(data) {
+        $scope.configuredUrlPing = false;
+        if (data.valid) {
+          $scope.connected = true;
+        } else {
+          $scope.connected = false;
+        }
+      },
+      // error
+      function(httpResponse) {
+        $log.error('Error verifying push url: ' + httpResponse);
       }
-    });
+    );
   };
 
   if($scope.pushModel.upsURL) {
@@ -67,6 +72,7 @@ loMod.controller('PushCtrl', function($scope, $rootScope, $log, LoPush, loPush, 
       error: function(error){
         $scope.pushUrlPing = false;
         $scope.pushUrlInvalid = true;
+        $log.error('Error verifying push url: ' + error);
       }
     };
 

@@ -2,12 +2,11 @@ package io.liveoak.ups.util;
 
 import java.io.IOException;
 
-import io.liveoak.spi.ResourceErrorResponse;
-import io.liveoak.spi.exceptions.ResourceProcessingException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.jboss.logging.Logger;
 
 /**
  * @author Ken Finnigan
@@ -29,10 +28,12 @@ public final class UPSHostCheck {
                         valid = true;
                     }
                 } catch (IOException e) {
-                    throw new ResourceProcessingException(ResourceErrorResponse.ErrorType.INTERNAL_ERROR, "Error trying to access UPS endpoint: " + upsUrl, e);
+                    log.warn("Error trying to access UPS endpoint: " + upsUrl, e);
                 }
             }
         }
         return valid;
     }
+
+    private static final Logger log = Logger.getLogger(UPSHostCheck.class);
 }

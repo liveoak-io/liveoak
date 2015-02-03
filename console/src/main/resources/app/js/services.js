@@ -255,6 +255,10 @@ loMod.factory('LoPush', function($resource) {
     delete : {
       method : 'DELETE',
       params : { appId : '@appId'}
+    },
+    ping : {
+      method : 'GET',
+      url : '/admin/applications/:appId/resources/push/ping'
     }
   });
 });

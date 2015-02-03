@@ -4,16 +4,19 @@ import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
+import io.liveoak.spi.resource.async.ResourceSink;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:mwringe@redhat.com">Matt Wringe</a>
+ * @author Ken Finnigan
  */
 public class UPSRootConfigResource implements RootResource {
 
     Resource parent;
     String id;
+    UPSPingResource pingResource;
 
     public static final String UPS_SERVER_URL = "upsURL";
     public static final String APPLICATION_ID = "applicationId";
@@ -25,6 +28,7 @@ public class UPSRootConfigResource implements RootResource {
 
     public UPSRootConfigResource(String id) {
         this.id = id;
+        this.pingResource = new UPSPingResource(this);
     }
 
     @Override
@@ -76,6 +80,11 @@ public class UPSRootConfigResource implements RootResource {
         responder.resourceUpdated(this);
     }
 
+    @Override
+    public void readMembers(RequestContext ctx, ResourceSink sink) throws Exception {
+        sink.accept(this.pingResource);
+        sink.complete();
+    }
 
     public String getUPSServerURL() {
         return upsServerURL;
