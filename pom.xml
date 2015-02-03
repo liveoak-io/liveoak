@@ -69,7 +69,7 @@
         <antlr.version>2.7.7</antlr.version>
         <keycloak.version>1.0.4.Final</keycloak.version>
         <resteasy.version>3.0.8.Final</resteasy.version>
-        <jboss.xnio.version>3.2.0.Beta3</jboss.xnio.version>
+        <jboss.xnio.version>3.3.0.Final</jboss.xnio.version>
         <h2.version>1.3.161</h2.version>
         <dynjs.version>0.3.0</dynjs.version>
         <pgsql.version>9.3-1101-jdbc41</pgsql.version>
@@ -102,6 +102,7 @@
         <module>keycloak</module>
         <module>dist</module>
         <module>testsuite</module>
+        <module>undertow</module>
     </modules>
     <developers>
         <developer>
@@ -548,6 +549,7 @@
             <dependency>
                 <groupId>org.jboss.xnio</groupId>
                 <artifactId>xnio-nio</artifactId>
+                <scope>runtime</scope>
                 <version>${jboss.xnio.version}</version>
             </dependency>
             <dependency>
@@ -630,6 +632,15 @@
                 <version>${arquillian.angularjs.version}</version>
                 <type>pom</type>
             </dependency>
+
+
+            <!-- TO BE REMOVED WHEN IS https://issues.jboss.org/browse/UNDERTOW-380 IS RESOLVED -->
+            <dependency>
+                <groupId>io.liveoak</groupId>
+                <artifactId>liveoak-undertow</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- /TO BE REMOVED -->
         </dependencies>
     </dependencyManagement>
     <dependencies>

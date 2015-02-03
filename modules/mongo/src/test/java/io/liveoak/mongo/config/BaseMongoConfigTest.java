@@ -5,6 +5,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
+import com.mongodb.WriteConcern;
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.container.extension.application.InternalApplicationExtension;
@@ -28,6 +31,7 @@ public abstract class BaseMongoConfigTest extends AbstractTestCaseWithTestApp {
     static final String RUNNING_MONGO_HOST = System.getProperty("mongo.host", "localhost");
     static final Integer RUNNING_MONGO_PORT = new Integer(System.getProperty("mongo.port", "27017"));
 
+    protected static Mongo mongoClient;
 
     @BeforeClass
     public static void loadExtensions() throws Exception {
@@ -39,6 +43,12 @@ public abstract class BaseMongoConfigTest extends AbstractTestCaseWithTestApp {
                         "}]}");
 
         loadExtension("mongo", new MongoExtension(), (ObjectNode) configNode);
+
+        try {
+            mongoClient = new MongoClient(RUNNING_MONGO_HOST, RUNNING_MONGO_PORT);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @After

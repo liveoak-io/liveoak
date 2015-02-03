@@ -17,7 +17,18 @@
               <exclude>**/standalone.xml</exclude>
               <exclude>**/standalone.sh</exclude>
               <exclude>**/standalone.bat</exclude>
+              <exclude>**/undertow-core-1.1.0.Final.jar</exclude> <!-- UNDERTOW-380 -->
             </excludes>
         </fileSet>
     </fileSets>
+    <dependencySets>
+        <dependencySet>
+          <!-- UNDERTOW-380 -->
+          <includes>
+            <include>io.liveoak:liveoak-undertow:jar:${project.version}</include>
+          </includes>
+          <outputDirectory>modules/system/layers/base/io/undertow/core/main</outputDirectory>
+          <outputFileNameMapping>undertow-core-1.1.0.Final.jar</outputFileNameMapping>
+        </dependencySet>
+    </dependencySets>
 </assembly>

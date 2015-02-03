@@ -38,7 +38,7 @@ public class MongoConfig extends EmbeddedConfigResource {
         String database = resourceState.getProperty(DATABASE, true, String.class);
         String datastore = resourceState.getProperty(DATASTORE, false, String.class);
 
-        this.databaseName = database;
+        this.databaseName = encodeDatabaseName(database);
 
         if (resourceState.getPropertyNames().contains(DATASTORE) && (datastore == null || datastore.isEmpty() )) {
             throw new PropertyException("A datastore cannot accept a null value.");
@@ -72,7 +72,7 @@ public class MongoConfig extends EmbeddedConfigResource {
            properties = dataStore.properties(ctx);
         }
 
-        properties.put(DATABASE, this.databaseName);
+        properties.put(DATABASE, decodeDatabaseName(this.databaseName));
 
         return properties;
     }
@@ -91,5 +91,66 @@ public class MongoConfig extends EmbeddedConfigResource {
         if (datastoreName == null && dataStore != null) {
             dataStore.mongoClient.close();
         }
+    }
+
+
+    //TODO: fix this up a bit better
+    private String encodeDatabaseName(String databaseName) {
+        if (databaseName == null || databaseName.isEmpty()) {
+            return databaseName;
+        }
+
+        StringBuffer buffer = new StringBuffer();
+        for (int i = 0; i< databaseName.length(); i++){
+            String character = databaseName.substring(i, i+1);
+            switch (character) {
+                case "/":
+                    buffer.append("%2F");
+                    break;
+                case "\\":
+                    buffer.append("%5C");
+                    break;
+                case ".":
+                    buffer.append("%2E");
+                    break;
+                case " ":
+                    buffer.append("%20");
+                    break;
+                case "*":
+                    buffer.append("%2A");
+                    break;
+                case "<":
+                    buffer.append("%3C");
+                    break;
+                case ">":
+                    buffer.append("%3E");
+                    break;
+                case ":":
+                    buffer.append("%3A");
+                    break;
+                case "?":
+                    buffer.append("%3F");
+                    break;
+                default:
+                    buffer.append(character);
+            }
+        }
+
+        return buffer.toString();
+    }
+
+    //TODO: fix this up a bit better
+    private String decodeDatabaseName(String databaseName) {
+        String decoded = databaseName.replace("%2F", "/");
+        decoded = decoded.replace("%5C", "\\");
+        decoded = decoded.replace("%2E", ".");
+        decoded = decoded.replace("%20", " ");
+        decoded = decoded.replace("%2A", "*");
+        decoded = decoded.replace("%3C", "<");
+        decoded = decoded.replace("%3E", ">");
+        decoded = decoded.replace("%3A", ":");
+        decoded = decoded.replace("%3F", "?");
+
+        return decoded;
     }
 }

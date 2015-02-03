@@ -75,6 +75,39 @@ public class MongoServersConfigTest extends BaseMongoConfigTest {
     }
 
     @Test
+    public void dbNameWithSpace() throws Exception {
+        // check initial creation
+        assertThat(mongoClient.getDatabaseNames().contains("foo bar")).isFalse();
+        assertThat(mongoClient.getDatabaseNames().contains("foo%20bar")).isFalse();
+        ResourceState config = new DefaultResourceState();
+        config.putProperty("db", "foo bar");
+
+        setUpSystem(config);
+
+        // check via reading from LiveOak
+        ResourceState result = client.read(new RequestContext.Builder().build(), ADMIN_PATH);
+        assertThat(result.getProperty("db")).isEqualTo("foo bar");
+
+        // we need to write something to the database, otherwise its not created in the database server
+        client.create(new RequestContext.Builder().build(), "/testApp/storage/", new DefaultResourceState());
+
+        // check via what is in mongo
+        assertThat(mongoClient.getDatabaseNames().contains("foo%20bar")).isTrue();
+        assertThat(mongoClient.getDatabaseNames().contains("foo bar")).isFalse();
+        mongoClient.dropDatabase("foo%20bar");
+
+        // check on update
+        result.putProperty("db", "hello <world>");
+        ResourceState updatedResult = client.update(new RequestContext.Builder().build(), ADMIN_PATH, result);
+        assertThat(updatedResult.getProperty("db")).isEqualTo("hello <world>");
+
+        // check what is in mongo
+        assertThat(mongoClient.getDatabaseNames().contains("hello%20%3Cworld%3E")).isTrue();
+        assertThat(mongoClient.getDatabaseNames().contains("foo <world>")).isFalse();
+        mongoClient.dropDatabase("hello%20%3Cworld%3E");
+    }
+
+    @Test
     public void embeddedResources() throws Exception {
         ResourceState config = new DefaultResourceState();
         config.putProperty("db", "testOnlyDBDatabase");
