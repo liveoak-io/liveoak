@@ -5,9 +5,8 @@
  */
 package io.liveoak.spi.resource.async;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLEncoder;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,18 +48,6 @@ public interface Resource {
             if (currentId == null) {
                 return null;
             }
-            try {
-                // if the id starts with a ';', then don't encode this part
-                int pos = currentId.indexOf(";");
-                if (pos != -1) {
-                    currentId = currentId.substring(0, pos+1) + URLEncoder.encode(current.id().substring(pos+1), "UTF-8");
-                } else {
-                    currentId = URLEncoder.encode(current.id(), "UTF-8");
-                }
-            } catch (UnsupportedEncodingException e) {
-                // if we cant encode the uri, then log the error message and use the unencoded value
-                log.error( "Error trying to encode URI value [" + currentId + "] to UTF-8. Attempting to use unencoded value", e );
-            }
             segments.add(0, currentId);
             current = current.parent();
         }
@@ -88,7 +75,13 @@ public interface Resource {
             }
         }
 
-        return URI.create(buf.toString());
+        try {
+            URI uri = new URI(null, null, buf.toString(), null);
+            return uri;
+        } catch (URISyntaxException e) {
+            log.error("Error trying to form URI with path [" + buf.toString() + "]. Attempting to use the value directly.", e);
+            return URI.create(buf.toString());
+        }
     }
 
     /**

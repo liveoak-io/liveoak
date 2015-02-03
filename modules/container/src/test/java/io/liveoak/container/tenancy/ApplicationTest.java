@@ -21,7 +21,7 @@ import static org.fest.assertions.Assertions.assertThat;
 /**
  * @author Ken Finnigan
  */
-public class ApplicationDeleteTest extends AbstractContainerTest {
+public class ApplicationTest extends AbstractContainerTest {
 
     private CloseableHttpClient httpClient;
 
@@ -133,5 +133,34 @@ public class ApplicationDeleteTest extends AbstractContainerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
         response.close();
+    }
+
+    @Test
+    public void createAppWithSpace() throws Exception{
+
+        HttpPost postRequest = new HttpPost("http://localhost:8080/admin/applications");
+        postRequest.setEntity(new StringEntity("{ 'id': 'my app' }"));
+        postRequest.setHeader("Content-Type", MediaType.JSON.toString());
+
+        CloseableHttpResponse response = httpClient.execute(postRequest);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(201);
+        assertThat(response.getFirstHeader("Location").getValue()).isEqualTo("/admin/applications/my%20app");
+        response.close();
+        awaitStability();
+
+        assertThat(system.applicationRegistry().application("my app")).isNotNull();
+
+
+        //now test that we can delete it
+        HttpDelete deleteRequest = new HttpDelete("http://localhost:8080/admin/applications/my%20app");
+        response = httpClient.execute(deleteRequest);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+        response.close();
+        awaitStability();
+
+        assertThat(system.applicationRegistry().application("my app")).isNull();
+
     }
 }
