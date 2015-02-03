@@ -43,7 +43,7 @@ loMod.controller('GlobalCtrl', function($log, $rootScope, $scope, $location, $ro
     });
   };
 
-  var UnsavedChangesCtrl = function ($scope, $modalInstance, $log) {
+  var UnsavedChangesCtrl = function ($scope, $modalInstance) {
     $scope.cancel = function () {
       $modalInstance.dismiss('cancel');
     };
