@@ -126,7 +126,6 @@ public class UPSSubscriptionTestCase extends BaseUPSTestCase {
 
         //verify response
         assertThat(result).isNotNull();
-        assertThat(result.members()).isEmpty();
         assertThat(result.getPropertyNames()).isNotEmpty();
         assertThat(result.getProperty("upsURL")).isEqualTo("http://localhost:8080/my_ups_server");
         assertThat(result.getProperty("applicationId")).isEqualTo("my-application-id");
