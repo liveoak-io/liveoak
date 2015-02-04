@@ -16,13 +16,13 @@ public class WriteConcernState extends EmbeddedConfigResource{
 
     private WriteConcern writeConcern;
 
-    public static final String ID = "WriteConcern";
+    public static final String ID = "write-concern";
 
     public static final String W = "w";
-    public static final String WTIMEOUT = "wTimeout";
+    public static final String WTIMEOUT = "wtimeout";
     public static final String J = "j";
     public static final String FSYNC = "fsync";
-    public static final String CONTINUEONERRORFORINSERT = "continueOnErrorForInsert";
+    public static final String CONTINUEONERRORFORINSERT = "continue-on-error-for-insert";
 
     public WriteConcernState(Resource parent, ResourceState state) throws Exception {
         super(parent);

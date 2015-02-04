@@ -19,16 +19,18 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class ReadPreferenceState extends EmbeddedConfigResource {
 
-    public static final String ID = "ReadPreference";
+    public static final String ID = "read-preference";
+    
+    // property names
+    public static final String TAGS = "tags";
+    public static final String TYPE = "type";
 
+    // read preference values
     public static final String PRIMARY = "primary";
     public static final String PRIMARY_PREFERRED = "primaryPreferred";
     public static final String SECONDARY = "secondary";
     public static final String SECONDARY_PREFERRED = "secondaryPreferred";
     public static final String NEAREST = "nearest";
-
-    public static final String TAGS = "tags";
-    public static final String TYPE = "type";
 
     ReadPreference readPreference;
 
