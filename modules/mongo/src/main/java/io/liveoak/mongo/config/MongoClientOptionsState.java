@@ -13,18 +13,18 @@ import io.liveoak.spi.state.ResourceState;
  */
 public class MongoClientOptionsState extends EmbeddedConfigResource {
 
-    public static final String ID = "MongoClientOptions";
+    public static final String ID = "mongo-client-options";
 
     public static final String DESCRIPTION = "description";
-    public static final String CONNECTIONS_PER_HOST="connectionsPerHost";
-    public static final String THREADS_ALLOWED_TO_BLOCK_FOR_CONNECTION_MULTIPLIER="threadsAllowedToBlockForConnectionMultiplier";
-    public static final String MAX_WAIT_TIME="maxWaitTime";
-    public static final String CONNECT_TIMEOUT="connectTimeout";
-    public static final String SOCKET_KEEP_ALIVE="socketKeepAlive";
-    public static final String AUTOCONNECT_RETRY = "autoConnectRetry";
-    public static final String MAX_AUTOCONNECT_RETRY_TIME = "maxAutoConnectRetryTime";
-    public static final String CURSOR_FINALIZER_ENABLED ="cursorFinalizerEnabled";
-    public static final String ALWAYS_USE_MBEANS = "alwaysUseMBeans";
+    public static final String CONNECTIONS_PER_HOST="connections-per-host";
+    public static final String THREADS_ALLOWED_TO_BLOCK_FOR_CONNECTION_MULTIPLIER="threads-allowed-to-block-for-connection-multiplier";
+    public static final String MAX_WAIT_TIME="max-wait-time";
+    public static final String CONNECT_TIMEOUT="connect-timeout";
+    public static final String SOCKET_KEEP_ALIVE="socket-keep-alive";
+    public static final String AUTOCONNECT_RETRY = "autoconnect-retry";
+    public static final String MAX_AUTOCONNECT_RETRY_TIME = "max-autoconnect-retry-time";
+    public static final String CURSOR_FINALIZER_ENABLED ="cursor-finalizer-enabled";
+    public static final String ALWAYS_USE_MBEANS = "always-use-mbeans";
 
     public static final String DEFAULT_DESCRIPTION = "liveoak"; //TODO: make this configurable
 
