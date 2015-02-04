@@ -16,3 +16,4 @@ log
 npm-debug.log
 .DS_Store
 phantomjsdriver.log
+dependency-reduced-pom.xml
