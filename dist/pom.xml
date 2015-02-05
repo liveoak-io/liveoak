@@ -138,7 +138,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>src/main/resources/scripts/admin-git-repo${script.extension}</executable>
+                            <executable>./src/main/resources/scripts/admin-git-repo${script.extension}</executable>
                         </configuration>
                     </execution>
                 </executions>
