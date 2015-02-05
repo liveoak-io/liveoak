@@ -127,6 +127,22 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>git-repo</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>src/main/resources/scripts/admin-git-repo${script.extension}</executable>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -182,6 +198,28 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>Windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <script.extension>.bat</script.extension>
+            </properties>
+        </profile>
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <properties>
+                <script.extension>.sh</script.extension>
+            </properties>
         </profile>
     </profiles>
 </project>
