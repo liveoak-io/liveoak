@@ -26,13 +26,15 @@ public class MongoInternalExtension implements Extension {
 
         InternalMongoService internalMongoService = new InternalMongoService();
         context.target().addService(INTERNAL_MONGO_SERVICE_NAME, internalMongoService)
-                .addDependency(MongoExtension.SYSTEM_MONGO_CONFIG_SERVICE, RootMongoConfigResource.class, internalMongoService.configResourceInjector)
+                .addDependency(SYSTEM_MONGO_CONFIG_SERVICE, RootMongoConfigResource.class, internalMongoService.configResourceInjector)
+                .addDependency(SYSTEM_MONGO_CONFIG_SERVICE.append("mount"))
                 .install();
 
         //Create a rootMongoConfigResource here which configures the internal root mongo resource
         MongoConfigResourceService mongoConfigResourceService = new MongoConfigResourceService(context.id());
         context.target().addService(SYSTEM_MONGO_CONFIG_SERVICE, mongoConfigResourceService)
                 .addDependency(MongoExtension.SYSTEM_MONGO_DATASTORE_CONFIG_SERVICE, MongoDatastoresRegistry.class, mongoConfigResourceService.mongoDatastoreInjector)
+                .addDependency(MongoExtension.SYSTEM_MONGO_SERVICE_RESOURCE.append("mount"))
                 .install();
         context.mountPrivate(SYSTEM_MONGO_CONFIG_SERVICE);
     }

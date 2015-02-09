@@ -35,13 +35,13 @@ public class InternalConfigTestCase extends AbstractTestCaseWithTestApp {
     @BeforeClass
     public static void loadExtensions() throws Exception {
         JsonNode configNode = ObjectMapperFactory.create().readTree(
-                "{}");
+                "{name:'default'}");
 
         JsonNode instancesNode = ObjectMapperFactory.create().readTree(
                 "{" +
-                        "    foo: {servers: [{ host: 'localhost', port: 27018}]}," +
-                        "    bar: {servers: [{ port: 27017}]}," +
-                        "    baz: {}" +
+                        "    foo: {name: 'foo', servers: [{ host: 'localhost', port: 27018}]}," +
+                        "    bar: {name: 'bar', servers: [{ port: 27017}]}," +
+                        "    baz: {name: 'baz'}" +
                         "}");
 
         loadExtension("mongo", new MongoExtension(), (ObjectNode) configNode, (ObjectNode) instancesNode);

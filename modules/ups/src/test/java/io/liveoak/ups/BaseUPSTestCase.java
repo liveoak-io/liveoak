@@ -47,7 +47,7 @@ public class BaseUPSTestCase extends AbstractTestCaseWithTestApp {
         server.put("port", port);
 
         config.putArray("servers").add(server);
-        loadExtension("mongo", new MongoExtension(), JsonNodeFactory.instance.objectNode());
+        loadExtension("mongo", new MongoExtension(), JsonNodeFactory.instance.objectNode().put("name", "default"));
         loadExtension("mongo-internal", new MongoInternalExtension(), config);
 
         try {

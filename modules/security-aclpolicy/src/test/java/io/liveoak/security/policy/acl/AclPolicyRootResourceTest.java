@@ -43,7 +43,7 @@ public class AclPolicyRootResourceTest extends AbstractTestCaseWithTestApp {
     @BeforeClass
     public static void loadExtensions() throws Exception {
         loadExtension("interceptor", new InterceptorExtension(), createInterceptorConfig());
-        loadExtension("mongo", new MongoExtension(), JsonNodeFactory.instance.objectNode());
+        loadExtension("mongo", new MongoExtension(), JsonNodeFactory.instance.objectNode().put("name", "default"));
         loadExtension("mongo-internal", new MongoInternalExtension(), createMongoInternalConfig());
         loadExtension("acl-policy", new SecurityACLPolicyExtension());
         loadExtension("mock-storage", new MockExtension(MockAclTestStorageResource.class));
