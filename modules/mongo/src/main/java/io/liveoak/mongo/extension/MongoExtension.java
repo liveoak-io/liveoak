@@ -19,16 +19,13 @@ import org.jboss.msc.value.ImmediateValue;
  */
 public class MongoExtension implements Extension {
 
-    public static final ServiceName SYSTEM_MONGO_CONFIG_SERVICE = Services.LIVEOAK.append("system").append("mongo");
-    public static final ServiceName SYSTEM_MONGO_ROOT_RESOURCE = Services.LIVEOAK.append("system").append("mongo").append("root");
     public static final ServiceName SYSTEM_MONGO_DATASTORE_CONFIG_SERVICE = Services.LIVEOAK.append("system").append("mongo").append("datastores");
 
-    public static final ServiceName SYSTEM_MONGO_DATASTORE = Services.LIVEOAK.append("system").append("mongo").append("datastore");
-
+    public static final ServiceName SYSTEM_MONGO_SERVICE_RESOURCE = Services.systemResource("mongo", "module");
 
     @Override
     public void extend(SystemExtensionContext context) throws Exception {
-        ServiceName serviceName = Services.systemResource(context.moduleId(), context.id());
+        ServiceName serviceName = SYSTEM_MONGO_SERVICE_RESOURCE;
         MongoDatastoreService mongoDatastoreService = new MongoDatastoreService();
         context.target().addService(serviceName, mongoDatastoreService)
                 .addDependency(SYSTEM_MONGO_DATASTORE_CONFIG_SERVICE, MongoDatastoresRegistry.class, mongoDatastoreService.mongoDatastoreInjector)
