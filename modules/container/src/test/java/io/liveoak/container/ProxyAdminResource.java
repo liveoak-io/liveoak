@@ -42,7 +42,7 @@ public class ProxyAdminResource implements SynchronousResource, RootResource, Pr
     }
 
     @Override
-    public void properties(ResourceState props) throws Exception {
+    public void properties(RequestContext ctx, ResourceState props) throws Exception {
         if ( (boolean) props.getProperty( "blocking" ) ) {
             this.blocking = true;
         } else {

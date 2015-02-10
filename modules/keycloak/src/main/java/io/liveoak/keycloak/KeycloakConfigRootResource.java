@@ -56,7 +56,7 @@ public class KeycloakConfigRootResource implements RootResource, SynchronousReso
     }
 
     @Override
-    public void properties(ResourceState props) throws Exception {
+    public void properties(RequestContext ctx, ResourceState props) throws Exception {
         Set<String> keys = props.getPropertyNames();
 
         if (keys.contains(KEYCLOAK_URL)) {

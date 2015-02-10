@@ -35,7 +35,7 @@ public class MongoDatastoreResource implements RootResource, SynchronousResource
 
     public MongoDatastoreResource(Resource parent, ResourceState state) throws Exception {
         this.parent = parent;
-        properties(state);
+        properties(new RequestContext.Builder().build(), state);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class MongoDatastoreResource implements RootResource, SynchronousResource
     }
 
     @Override
-    public void properties(ResourceState datastorestate) throws Exception {
+    public void properties(RequestContext ctx, ResourceState datastorestate) throws Exception {
         List<ServerAddress> serverAddresses = new ArrayList<>();
         List<ResourceState> servers = datastorestate.getProperty(SERVERS, false, List.class);
         if (servers != null) {

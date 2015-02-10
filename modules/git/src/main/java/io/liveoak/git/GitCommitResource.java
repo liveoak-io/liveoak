@@ -1,5 +1,6 @@
 package io.liveoak.git;
 
+import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.exceptions.UpdateNotSupportedException;
 import io.liveoak.spi.resource.SynchronousResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -27,7 +28,7 @@ public class GitCommitResource implements SynchronousResource {
     }
 
     @Override
-    public void properties(ResourceState props) throws Exception {
+    public void properties(RequestContext ctx, ResourceState props) throws Exception {
         throw new UpdateNotSupportedException(this.uri().getPath());
     }
 

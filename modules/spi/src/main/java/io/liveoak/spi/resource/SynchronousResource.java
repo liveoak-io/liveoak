@@ -37,7 +37,7 @@ public interface SynchronousResource extends Resource {
         return null;
     }
 
-    default void properties(ResourceState props) throws Exception {
+    default void properties(RequestContext ctx, ResourceState props) throws Exception {
         // nothing
     }
 
@@ -83,7 +83,7 @@ public interface SynchronousResource extends Resource {
 
     @Override
     default void updateProperties(RequestContext ctx, ResourceState state, Responder responder) throws Exception {
-        properties(state);
+        properties(ctx, state);
         responder.resourceUpdated(this);
     }
 }

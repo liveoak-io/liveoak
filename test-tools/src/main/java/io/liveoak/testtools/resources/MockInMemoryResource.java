@@ -72,7 +72,7 @@ public class MockInMemoryResource implements SynchronousResource {
     }
 
     @Override
-    public void properties(ResourceState props) throws Exception {
+    public void properties(RequestContext ctx, ResourceState props) throws Exception {
         properties.clear();
         for (String key : props.getPropertyNames()) {
             putProperty(key, props.getProperty(key));

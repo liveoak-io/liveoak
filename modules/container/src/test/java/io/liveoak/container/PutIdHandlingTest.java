@@ -117,7 +117,7 @@ public class PutIdHandlingTest extends AbstractContainerTest {
             this.parent = parent;
             this.id = id;
             try {
-                properties(state);
+                properties(new RequestContext.Builder().build(), state);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -134,7 +134,7 @@ public class PutIdHandlingTest extends AbstractContainerTest {
         }
 
         @Override
-        public void properties(ResourceState props) throws Exception {
+        public void properties(RequestContext ctx, ResourceState props) throws Exception {
             if (props != null) {
                 for (String key : props.getPropertyNames()) {
                     this.props.put(key, props.getProperty(key));

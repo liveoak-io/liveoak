@@ -20,7 +20,7 @@ public class GitRootResource extends DefaultMountPointResource implements GitRes
     }
 
     @Override
-    public void properties(ResourceState props) throws Exception {
+    public void properties(RequestContext ctx, ResourceState props) throws Exception {
         Boolean value = props.getPropertyAsBoolean("createIfAbsentOnStart");
         if (value != null) {
             this.create = value;

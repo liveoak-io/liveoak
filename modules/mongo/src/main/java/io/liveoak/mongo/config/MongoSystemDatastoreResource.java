@@ -29,8 +29,8 @@ public class MongoSystemDatastoreResource extends MongoDatastoreResource {
     }
 
     @Override
-    public void properties(ResourceState datastorestate) throws Exception {
+    public void properties(RequestContext ctx, ResourceState datastorestate) throws Exception {
         this.name = datastorestate.getProperty(NAME, true, String.class);
-        super.properties(datastorestate);
+        super.properties(ctx, datastorestate);
     }
 }

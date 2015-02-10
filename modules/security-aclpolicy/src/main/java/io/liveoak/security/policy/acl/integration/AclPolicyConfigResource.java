@@ -72,7 +72,7 @@ public class AclPolicyConfigResource implements RootResource, SynchronousResourc
     }
 
     @Override
-    public void properties(ResourceState props) throws Exception {
+    public void properties(RequestContext ctx, ResourceState props) throws Exception {
         // Keep just "autoRules" . Other props not important for us
         Set<String> namesCopy = new HashSet<>(props.getPropertyNames());
         for (String propName : namesCopy) {

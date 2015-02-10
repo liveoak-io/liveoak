@@ -30,7 +30,7 @@ public class MongoConfig extends EmbeddedConfigResource {
     }
 
     @Override
-    public void properties(ResourceState configState) throws Exception {
+    public void properties(RequestContext ctx, ResourceState configState) throws Exception {
         generateDataStore(configState, false);
     }
 
