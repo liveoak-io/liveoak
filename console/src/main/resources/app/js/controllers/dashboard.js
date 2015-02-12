@@ -1,8 +1,6 @@
 'use strict';
 
-angular.module('rhqm.directives', ['ui.bootstrap']);
-
-var loMod = angular.module('loApp.controllers.dashboard', ['rhqm.directives']);
+var loMod = angular.module('loApp.controllers.dashboard', []);
 
 loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, $filter, $location, $http, currentApp, loStorageList) {
 
@@ -272,8 +270,8 @@ loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, $fi
     if (query.desc) {
       q += '&desc';
     }
-    if (query.max) {
-      q += '&limit=' + query.max;
+    if (query.limit) {
+      q += '&limit=' + query.limit;
     }
 
     console.log('GET /rhq-metrics/event-log?' + q);

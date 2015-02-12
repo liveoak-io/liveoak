@@ -16,7 +16,8 @@ var loMod = angular.module('loApp', [
   'patternfly.select',
   'patternfly.validation',
   'ui.bootstrap',
-  'ui.codemirror'
+  'ui.codemirror',
+  'hawkularCharts'
 ]);
 
 var liveOak = new LiveOak({
@@ -881,4 +882,28 @@ loMod.config(function($provide) {
     return $delegate;
   });
 
+});
+
+loMod.filter('orderObjectBy', function() {
+  return function(items, field, reverse) {
+    var filtered = [];
+    angular.forEach(items, function(item) {
+      filtered.push(item);
+    });
+    filtered.sort(function (a, b) {
+      return (a[field] > b[field] ? 1 : -1);
+    });
+    if(reverse) filtered.reverse();
+    return filtered;
+  };
+});
+
+loMod.filter('unwrapFirst', function() {
+  return function(items) {
+    var filtered = [];
+    angular.forEach(items, function(item) {
+      filtered.push(item[0]);
+    });
+    return filtered;
+  }
 });

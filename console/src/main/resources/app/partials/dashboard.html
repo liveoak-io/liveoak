@@ -57,7 +57,7 @@
             <h3>Most popular resources</h3>
           </div>
           <ul class="panel-body">
-            <li ng-repeat="(key, value) in logData.topPathsRequested">{{key}} - ({{value[0].count}} requests)</li>
+            <li ng-repeat="item in logData.topPathsRequested | unwrapFirst | orderObjectBy:'count':true">{{item.segment}} - ({{item.count}} requests)</li>
           </ul>
         </div>
 
@@ -68,10 +68,10 @@
           </div>
           <div id="stackedBarChart_requests" style="height:255px">
             <!-- HINT: colors for the chart can be changed in the d3-chart.css -->
-            <rhqm-chart
+            <hawkular-chart
                     data="{{chartData[range].requests.chartData}}"
                     chart-type="{{chartData[range].requests.chartType}}"
-                    chart-height="250"></rhqm-chart>
+                    chart-height="250"></hawkular-chart>
           </div>
         </div>
       </div>
@@ -82,10 +82,10 @@
         </div>
         <div id="stackedBarChart_traffic" style="height:255px">
           <!-- HINT: colors for the chart can be changed in the d3-chart.css -->
-          <rhqm-chart
+          <hawkular-chart
                   data="{{chartData[range].bandwidth.chartData}}"
                   chart-type="{{chartData[range].bandwidth.chartType}}"
-                  chart-height="250"></rhqm-chart>
+                  chart-height="250"></hawkular-chart>
         </div>
       </div>
 
@@ -95,10 +95,10 @@
         </div>
         <div id="stackedBarChart_notifications" style="height:255px">
           <!-- HINT: colors for the chart can be changed in the d3-chart.css -->
-          <rhqm-chart
+          <hawkular-chart
                   data="{{chartData[range].notifications.chartData}}"
                   chart-type="{{chartData[range].notifications.chartType}}"
-                  chart-height="250"></rhqm-chart>
+                  chart-height="250"></hawkular-chart>
         </div>
       </div>
 
