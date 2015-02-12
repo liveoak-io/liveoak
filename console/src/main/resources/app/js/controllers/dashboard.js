@@ -1,9 +1,8 @@
 'use strict';
 
-angular.module('rhqm.directives', ['ui.bootstrap', 'd3']);
-angular.module('rhqm.services', ['ngStorage']);
+angular.module('rhqm.directives', ['ui.bootstrap']);
 
-var loMod = angular.module('loApp.controllers.dashboard', ['rhqm.directives', 'rhqm.services']);
+var loMod = angular.module('loApp.controllers.dashboard', ['rhqm.directives']);
 
 loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, $filter, $location, $http, currentApp, loStorageList) {
 
