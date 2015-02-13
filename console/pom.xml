@@ -277,7 +277,10 @@
                 </plugins>
             </build>
         </profile>
-        <!-- This profile doesn't do anything, other than cause the above 'development' profile not to be activated when we're performing a release -->
+        <!-- Note: we should probably rethink having the development profile active by default -->
+        <profile>
+            <id>clean-all</id>
+        </profile>
         <profile>
             <id>release</id>
             <properties>
