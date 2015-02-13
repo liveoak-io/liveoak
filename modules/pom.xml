@@ -122,5 +122,6 @@
         <module>https-redirect</module>
         <module>application-clients</module>
         <module>analytics</module>
+        <module>application-templates</module>
     </modules>
 </project>

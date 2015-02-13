@@ -1,23 +1,33 @@
 <?xml version="1.0"?>
+<!--
+  ~ Copyright 2014 Red Hat, Inc. and/or its affiliates.
+  ~
+  ~ Licensed under the Eclipse Public License version 1.0, available at http://www.eclipse.org/legal/epl-v10.html
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>io.liveoak</groupId>
         <artifactId>liveoak-modules</artifactId>
         <version>1.0.0.Beta03-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>liveoak-application-clients</artifactId>
-    <name>liveoak-application-clients</name>
-    <packaging>jar</packaging>
     <properties>
-        <module-name>io.liveoak.application.clients</module-name>
+        <module-name>io.liveoak.applications.templates</module-name>
     </properties>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>liveoak-application-templates</artifactId>
+    <name>liveoak-application-templates</name>
+    <packaging>jar</packaging>
     <dependencies>
         <dependency>
             <groupId>io.liveoak</groupId>
             <artifactId>liveoak-spi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-common</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -31,24 +41,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <scope>test</scope>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-test-tools</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-jgit-wrapper</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.liveoak</groupId>
-            <artifactId>liveoak-application-templates</artifactId>
-            <scope>test</scope>
-        </dependency>
+
     </dependencies>
     <build>
         <plugins>
@@ -57,6 +54,9 @@
                 <executions>
                     <execution>
                         <id>assemble-module</id>
+                    </execution>
+                    <execution>
+                        <id>assemble-m2-repo</id>
                     </execution>
                 </executions>
             </plugin>

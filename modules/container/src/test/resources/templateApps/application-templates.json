@@ -1,0 +1,30 @@
+{
+  "config": {
+    "name" : "Default Application Template",
+    "tokens" : {
+      "mongo-storage-path" : "The path under which to add the mongo storage (Defaults to 'storage').",
+      "database-name" : "The name of the database to use or create."
+    },
+    "template" : {
+      "name" : "#{name,id}",
+      "resources" : {
+        "#{mongo-storage-path:storage}" : {
+          "type" : "mongo",
+          "config" : {
+            "db" : "#{database-name:default}"
+          }
+        }
+      }
+    }
+  },
+  "instances" : {
+    "foo" : {
+      "name" : "The foo template",
+      "tokens" : {},
+      "template" : {
+        "html-app" : "foo"
+      }
+    }
+  }
+}
+

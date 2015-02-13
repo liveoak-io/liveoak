@@ -31,6 +31,8 @@ import org.jboss.msc.value.ImmediateValue;
  */
 public class ExtensionService implements Service<Extension> {
 
+    public static String MODULE = "module";
+
     public ExtensionService(String id, Extension extension, ObjectNode fullConfig, ExtensionConfigurationManager manager) {
         this.id = id;
         this.extension = extension;
@@ -54,7 +56,7 @@ public class ExtensionService implements Service<Extension> {
         }
 
 
-        ServiceName moduleName = Services.resource(ZeroExtension.APPLICATION_ID, "system").append("module").append(id);
+        ServiceName moduleName = Services.resource(ZeroExtension.APPLICATION_ID, "system").append(MODULE).append(id);
 
         ModuleResourceRegistry moduleResourceRegistry =  new ModuleResourceRegistry(this.id, this.extension, target, configurationManager);
         target.addService(moduleName, new ValueService<>(new ImmediateValue<>(moduleResourceRegistry))).install();
@@ -65,7 +67,7 @@ public class ExtensionService implements Service<Extension> {
                 .addDependency(moduleName, RootResource.class, instanceMount.resourceInjector())
                 .install();
 
-        SystemExtensionContext moduleContext = new SystemExtensionContextImpl(target, this.id, "module", moduleName, extConfig, moduleResourceRegistry);
+        SystemExtensionContext moduleContext = new SystemExtensionContextImpl(target, this.id, MODULE, moduleName, extConfig, moduleResourceRegistry);
 
         try {
             this.extension.extend(moduleContext);
