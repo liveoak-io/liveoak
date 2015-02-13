@@ -60,47 +60,6 @@
                     </execution>
                 </executions>
             </plugin>
-<!--            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>test</id>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <mongo.db>${mongo.db}</mongo.db>
-                                <mongo.port>${mongo.port}</mongo.port>
-                                <mongo.host>${mongo.host}</mongo.host>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>default-test</id>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin> -->
         </plugins>
     </build>
-<!--    <profiles>
-        <profile>
-            <id>embeddedMongo</id>
-            <activation>
-                <property>
-                    <name>!mongo.db</name>
-                </property>
-            </activation>
-            <properties>
-                <mongo.db>ups-test</mongo.db>
-                <mongo.port>27018</mongo.port>
-                <mongo.host>localhost</mongo.host>
-            </properties>
-        </profile>
-    </profiles> -->
 </project>
