@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.liveoak.container.extension.system.service.ExtensionService;
 import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.container.tenancy.ConfigurationManager;
 import org.jboss.logging.Logger;
@@ -38,7 +39,7 @@ public class ExtensionConfigurationManager implements ConfigurationManager {
         if (file != null) {
             ObjectNode tree = read();
 
-            if (id.equals("module")) {
+            if (id.equals(ExtensionService.MODULE)) {
                 throw new Exception("Cannot delete main module resource");
             } else {
                 ObjectNode instances = (ObjectNode) tree.get("instances");
@@ -60,7 +61,7 @@ public class ExtensionConfigurationManager implements ConfigurationManager {
 
             ((ObjectNode) config).remove("id");
 
-            if (id.equals("module")) {
+            if (id.equals(ExtensionService.MODULE)) {
                 tree.put("config", config);
             } else {
                 ObjectNode instances = (ObjectNode) tree.get("instances");
@@ -80,7 +81,7 @@ public class ExtensionConfigurationManager implements ConfigurationManager {
         if (file != null) {
             ObjectNode tree = read();
 
-            if (id.equals("module")) {
+            if (id.equals(ExtensionService.MODULE)) {
                 return (ObjectNode) tree.get("config");
             } else {
                 return (ObjectNode) tree.get("instances").get(id);
@@ -95,7 +96,7 @@ public class ExtensionConfigurationManager implements ConfigurationManager {
             ObjectNode tree = read();
 
 
-            if (id.equals("module")) {
+            if (id.equals(ExtensionService.MODULE)) {
                 throw new Exception("Cannot create a main module resource over REST");
             } else {
                 ObjectNode instances = (ObjectNode) tree.get("instances");

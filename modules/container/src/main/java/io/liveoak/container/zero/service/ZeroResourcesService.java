@@ -2,6 +2,8 @@ package io.liveoak.container.zero.service;
 
 import java.io.File;
 
+import io.liveoak.applications.templates.TemplateExtension;
+import io.liveoak.applications.templates.TemplateRegistry;
 import io.liveoak.container.service.MediaTypeMountService;
 import io.liveoak.container.service.MountService;
 import io.liveoak.container.tenancy.InternalApplication;
@@ -85,6 +87,23 @@ public class ZeroResourcesService implements Service<Void> {
                 .addDependency(Services.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, gitAppMediaTypeMount.mountPointInjector())
                 .addDependency(gitApplicationsName, RootResource.class, gitAppMediaTypeMount.resourceInjector())
                 .install();
+
+
+        // Install Templated Applications Resource
+        ServiceName templateApplicationName = Services.resource(ZeroExtension.APPLICATION_ID, "templated-applications");
+        TemplateApplicationResourceService templateAppResourceService = new TemplateApplicationResourceService();
+        target.addService(templateApplicationName, templateAppResourceService)
+                .addDependency(APPLICATION_REGISTRY, InternalApplicationRegistry.class, templateAppResourceService.applicationRegistryInjector())
+                .addDependency(APPLICATIONS_DIR, File.class, templateAppResourceService.applicationDirectoryInjector())
+                .addDependency(TemplateExtension.SYSTEM_APPLICATION_TEMPLATE_REGISTRY, TemplateRegistry.class, templateAppResourceService.applicationTemplateRegistryInjector())
+                .install();
+
+        MediaTypeMountService<RootResource> templateAppMediaTypeMount = new MediaTypeMountService<>(null, MediaType.TEMPLATE_APP_JSON, false);
+        target.addService(Services.defaultMount(templateApplicationName), templateAppMediaTypeMount)
+                .addDependency(Services.applicationContext(ZeroExtension.APPLICATION_ID), MountPointResource.class, templateAppMediaTypeMount.mountPointInjector())
+                .addDependency(templateApplicationName, RootResource.class, templateAppMediaTypeMount.resourceInjector())
+                .install();
+
     }
 
     @Override

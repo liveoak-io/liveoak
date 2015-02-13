@@ -46,6 +46,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-application-templates</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <scope>provided</scope>

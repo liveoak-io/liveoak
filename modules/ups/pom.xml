@@ -61,6 +61,11 @@
             <artifactId>liveoak-jgit-wrapper</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-application-templates</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

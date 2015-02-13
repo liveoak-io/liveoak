@@ -23,6 +23,7 @@
         <module name="io.liveoak.client"/>
         <module name="io.liveoak.security"/>
         <module name="io.liveoak.security.uripolicy"/>
+        <module name="io.liveoak.applications.templates"/>
         <module name="org.jboss.msc"/>
         <module name="org.jboss.logging"/>
         <system>

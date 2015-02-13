@@ -1,0 +1,128 @@
+{
+  "module-id":  "io.liveoak.applications.templates",
+  "dependencies": [],
+  "config": {
+    "name" : "Default Application Template",
+    "tokens" : {
+        "mongo-storage-path" : "The path underwhich to add the mongo storage (Defaults to 'storage')."
+    },
+    "template" : {
+      "name" : "#{name,id}",
+      "resources" : {
+        "git" : {
+          "type" : "git",
+          "config" : { }
+        },
+        "auth" : {
+          "type" : "keycloak",
+          "config" : { }
+        },
+        "client" : {
+          "type" : "aggregating-filesystem",
+          "config" : {
+            "directory" : "#{io.liveoak.js.dir}"
+          }
+        },
+        "uri-policy" : {
+          "type" : "uri-policy",
+          "config" : {
+            "rules" : [ {
+              "uriPattern" : "*",
+              "requestTypes" : [ "*" ],
+              "allowedUsers" : [ "*" ]
+            } ]
+          }
+        },
+        "authz" : {
+          "type" : "security",
+          "config" : {
+            "policies" : [ {
+              "policyName" : "URIPolicy",
+              "policyResourceEndpoint" : "/#{id}/uri-policy/authzCheck"
+            }, {
+              "policyName" : "ACLPolicy",
+              "policyResourceEndpoint" : "/#{id}/acl-policy/authzCheck",
+              "includedResourcePrefixes" : [ "/#{id}" ]
+            } ]
+          }
+        },
+        "#{mongo-storage-path:storage}" : {
+          "type" : "mongo",
+          "config" : {
+            "db" : "#{id}"
+          }
+        },
+        "acl-policy" : {
+          "type" : "acl-policy",
+          "config" : {
+            "autoRules" : [ ]
+          }
+        }
+      },
+      "visible" : true,
+      "version-resource-id" : "git"
+    }
+  },
+  "instances" : {
+    "DIY" : {
+      "name": "DIY Application Template",
+      "tokens": {
+      },
+      "template": {
+        "name": "#{name:id}",
+        "resources": {
+          "git": {
+            "type": "git",
+            "config": {}
+          },
+          "client": {
+            "type": "aggregating-filesystem",
+            "config": {
+              "directory": "#{io.liveoak.js.dir}"
+            }
+          },
+          "auth": {
+            "type": "keycloak",
+            "config": {}
+          },
+          "authz": {
+            "type": "security",
+            "config": {
+              "policies": [
+                {
+                  "policyName": "URIPolicy",
+                  "policyResourceEndpoint": "/#{id}/uri-policy/authzCheck"
+                },
+                {
+                  "policyName": "ACLPolicy",
+                  "policyResourceEndpoint": "/#{id}/acl-policy/authzCheck",
+                  "includedResourcePrefixes": ["/#{id}"]
+                }
+              ]
+            }
+          },
+          "uri-policy": {
+            "type": "uri-policy",
+            "config": {
+              "rules": [
+                {
+                  "uriPattern": "*",
+                  "requestTypes": ["*"],
+                  "allowedUsers": ["*"]
+                }
+              ]
+            }
+          },
+          "acl-policy": {
+            "type": "acl-policy",
+            "config": {
+              "autoRules": []
+            }
+          }
+        },
+        "visible": true,
+        "version-resource-id": "git"
+      }
+    }
+  }
+}

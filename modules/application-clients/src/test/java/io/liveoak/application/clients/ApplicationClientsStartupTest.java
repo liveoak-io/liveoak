@@ -24,6 +24,8 @@ public class ApplicationClientsStartupTest extends AbstractHTTPResourceTestCase 
         system.extensionInstaller().load("application-clients", new ApplicationClientsExtension());
 
         system.applicationRegistry().createApplication("testApp", "Test Application", new File(ApplicationClientsStartupTest.class.getClassLoader().getResource("testApp").getFile()));
+
+        system.awaitStability();
     }
 
     @Test

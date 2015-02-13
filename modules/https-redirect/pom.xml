@@ -52,6 +52,11 @@
         </dependency>
         <dependency>
             <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-application-templates</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
             <artifactId>liveoak-security-uripolicy</artifactId>
             <scope>test</scope>
         </dependency>
