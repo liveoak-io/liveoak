@@ -1,6 +1,5 @@
 package io.liveoak.applications.templates;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.MapResource;
@@ -43,7 +42,7 @@ public class ApplicationTemplateResource implements RootResource, SynchronousRes
     }
 
     @Override
-    public void properties(ResourceState configState) throws Exception {
+    public void properties(RequestContext ctx, ResourceState configState) throws Exception {
         config = ConversionUtils.convert(configState);
     }
 

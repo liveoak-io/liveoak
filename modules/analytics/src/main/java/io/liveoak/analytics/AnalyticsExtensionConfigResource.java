@@ -54,7 +54,7 @@ public class AnalyticsExtensionConfigResource implements RootResource, Synchrono
     }
 
     @Override
-    public void properties(ResourceState props) throws Exception {
+    public void properties(RequestContext ctx, ResourceState props) throws Exception {
         Boolean val = props.getPropertyAsBoolean("enabled");
         if (val != null) {
             config.enabled(val);
