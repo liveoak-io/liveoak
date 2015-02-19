@@ -1,6 +1,8 @@
 package io.liveoak.application.clients.extension;
 
 import io.liveoak.application.clients.service.ApplicationClientsResourceService;
+import io.liveoak.keycloak.client.DirectAccessClient;
+import io.liveoak.keycloak.client.SecurityClient;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
@@ -17,9 +19,11 @@ public class ApplicationClientsExtension implements Extension {
 
     @Override
     public void extend(ApplicationExtensionContext context) throws Exception {
-        ApplicationClientsResourceService service = new ApplicationClientsResourceService();
+        ApplicationClientsResourceService service = new ApplicationClientsResourceService(context.application());
         ServiceName serviceName = Services.adminResource(context.application().id(), context.resourceId());
         context.target().addService(serviceName, service)
+                .addDependency(Services.SECURITY_CLIENT, SecurityClient.class, service.securityClientInjector())
+                .addDependency(Services.SECURITY_DIRECT_ACCESS_CLIENT, DirectAccessClient.class, service.directAccessClientInjector())
                 .install();
 
         context.mountPrivate(serviceName);

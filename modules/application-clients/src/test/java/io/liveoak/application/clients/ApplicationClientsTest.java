@@ -8,9 +8,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.application.clients.extension.ApplicationClientsExtension;
+import io.liveoak.keycloak.KeycloakConfig;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.testtools.AbstractHTTPResourceTestCaseWithTestApp;
+import org.jboss.msc.service.ValueService;
+import org.jboss.msc.value.ImmediateValue;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,6 +30,9 @@ public class ApplicationClientsTest extends AbstractHTTPResourceTestCaseWithTest
 
     @BeforeClass
     public static void setUp() throws Exception {
+        KeycloakConfig config = new KeycloakConfig();
+        system.serviceTarget().addService(Services.SECURITY_CLIENT, new ValueService<>(new ImmediateValue<>(new MockSecurityClient(config)))).install();
+        system.serviceTarget().addService(Services.SECURITY_DIRECT_ACCESS_CLIENT, new ValueService<>(new ImmediateValue<>(new MockDirectAccessClient(config)))).install();
         loadExtension("application-clients", new ApplicationClientsExtension());
     }
 
@@ -83,11 +90,25 @@ public class ApplicationClientsTest extends AbstractHTTPResourceTestCaseWithTest
         installResource();
 
         // Add application client
-        assertThat(execPost("/admin/applications/testApp/resources/application-clients", "{ \"id\" : \"html-app-client\", \"type\" : \"html5\", \"security-key\" : \"keycloak-key\" }")).hasStatus(201);
+        assertThat(execPost("/admin/applications/testApp/resources/application-clients",
+                "{ " +
+                        "\"id\" : \"html-app-client\", " +
+                        "\"type\" : \"html5\", " +
+                        "\"redirect-uris\" : [" +
+                            "\"/html-client/*\"," +
+                            "\"/html-client\"" +
+                        "]," +
+                        "\"web-origins\" : [" +
+                            "\"http://localhost:8080\" " +
+                        "]," +
+                        "\"app-roles\" : [" +
+                            "\"user\"" +
+                        "]" +
+                "}"))
+                .hasStatus(201);
         JsonNode result = toJSON(httpResponse.getEntity());
-        assertThat(result.get("id").asText()).isEqualTo("html-app-client");
-        assertThat(result.get("type").asText()).isEqualTo("html5");
-        assertThat(result.get("security-key").asText()).isEqualTo("keycloak-key");
+
+        Verify.appClient(result, "html-app-client", "html5", new String[]{"/html-client/*", "/html-client"}, new String[]{"http://localhost:8080"}, new String[]{"user"});
 
         // Verify JSON file
         assertThat(appConfigFile.exists()).isTrue();
@@ -96,9 +117,7 @@ public class ApplicationClientsTest extends AbstractHTTPResourceTestCaseWithTest
         ArrayNode array = (ArrayNode) node;
         assertThat(array.size()).isEqualTo(1);
         ObjectNode configNode = (ObjectNode) array.get(0);
-        assertThat(configNode.get("id").asText()).isEqualTo("html-app-client");
-        assertThat(configNode.get("type").asText()).isEqualTo("html5");
-        assertThat(configNode.get("security-key").asText()).isEqualTo("keycloak-key");
+        Verify.appClient(configNode, "html-app-client", "html5", new String[]{"/html-client/*", "/html-client"}, new String[]{"http://localhost:8080"}, new String[]{"user"});
     }
 
     @Test
@@ -107,11 +126,25 @@ public class ApplicationClientsTest extends AbstractHTTPResourceTestCaseWithTest
         installResource();
 
         // Add application client
-        assertThat(execPost("/admin/applications/testApp/resources/application-clients", "{ \"id\" : \"html-app-client\", \"type\" : \"html5\", \"security-key\" : \"keycloak-key\" }")).hasStatus(201);
+        assertThat(execPost("/admin/applications/testApp/resources/application-clients",
+                "{ " +
+                        "\"id\" : \"html-app-client\", " +
+                        "\"type\" : \"html5\", " +
+                        "\"redirect-uris\" : [" +
+                            "\"/html-client/*\"," +
+                            "\"/html-client\"" +
+                        "]," +
+                        "\"web-origins\" : [" +
+                            "\"http://localhost:8080\" " +
+                        "]," +
+                        "\"app-roles\" : [" +
+                            "\"user\"" +
+                        "]" +
+                        "}"))
+                .hasStatus(201);
         JsonNode result = toJSON(httpResponse.getEntity());
-        assertThat(result.get("id").asText()).isEqualTo("html-app-client");
-        assertThat(result.get("type").asText()).isEqualTo("html5");
-        assertThat(result.get("security-key").asText()).isEqualTo("keycloak-key");
+
+        Verify.appClient(result, "html-app-client", "html5", new String[]{"/html-client/*", "/html-client"}, new String[]{"http://localhost:8080"}, new String[]{"user"});
 
         // Verify JSON file
         assertThat(appConfigFile.exists()).isTrue();
@@ -120,12 +153,25 @@ public class ApplicationClientsTest extends AbstractHTTPResourceTestCaseWithTest
         ArrayNode array = (ArrayNode) node;
         assertThat(array.size()).isEqualTo(1);
         ObjectNode configNode = (ObjectNode) array.get(0);
-        assertThat(configNode.get("id").asText()).isEqualTo("html-app-client");
-        assertThat(configNode.get("type").asText()).isEqualTo("html5");
-        assertThat(configNode.get("security-key").asText()).isEqualTo("keycloak-key");
+        Verify.appClient(configNode, "html-app-client", "html5", new String[]{"/html-client/*", "/html-client"}, new String[]{"http://localhost:8080"}, new String[]{"user"});
 
         // Add application client that should fail
-        assertThat(execPost("/admin/applications/testApp/resources/application-clients", "{ \"id\" : \"html-app-client\", \"type\" : \"ios\", \"security-key\" : \"ios-key\" }")).hasStatus(406);
+        assertThat(execPost("/admin/applications/testApp/resources/application-clients",
+                "{ " +
+                        "\"id\" : \"html-app-client\", " +
+                        "\"type\" : \"html5\", " +
+                        "\"redirect-uris\" : [" +
+                            "\"/html-client/*\"," +
+                            "\"/html-client\"" +
+                        "]," +
+                        "\"web-origins\" : [" +
+                            "\"http://localhost:8080\" " +
+                        "]," +
+                        "\"app-roles\" : [" +
+                            "\"user\"" +
+                        "]" +
+                        "}"))
+                .hasStatus(406);
     }
 
     @Test
@@ -134,11 +180,25 @@ public class ApplicationClientsTest extends AbstractHTTPResourceTestCaseWithTest
         installResource();
 
         // Add application client
-        assertThat(execPost("/admin/applications/testApp/resources/application-clients", "{ \"id\" : \"html-app-client\", \"type\" : \"html5\", \"security-key\" : \"keycloak-key\" }")).hasStatus(201);
+        assertThat(execPost("/admin/applications/testApp/resources/application-clients",
+                "{ " +
+                        "\"id\" : \"html-app-client\", " +
+                        "\"type\" : \"html5\", " +
+                        "\"redirect-uris\" : [" +
+                            "\"/html-client/*\"," +
+                            "\"/html-client\"" +
+                        "]," +
+                        "\"web-origins\" : [" +
+                            "\"http://localhost:8080\" " +
+                        "]," +
+                        "\"app-roles\" : [" +
+                            "\"user\"" +
+                        "]" +
+                        "}"))
+                .hasStatus(201);
         JsonNode result = toJSON(httpResponse.getEntity());
-        assertThat(result.get("id").asText()).isEqualTo("html-app-client");
-        assertThat(result.get("type").asText()).isEqualTo("html5");
-        assertThat(result.get("security-key").asText()).isEqualTo("keycloak-key");
+
+        Verify.appClient(result, "html-app-client", "html5", new String[]{"/html-client/*", "/html-client"}, new String[]{"http://localhost:8080"}, new String[]{"user"});
 
         // Verify JSON file
         assertThat(appConfigFile.exists()).isTrue();
@@ -147,16 +207,26 @@ public class ApplicationClientsTest extends AbstractHTTPResourceTestCaseWithTest
         ArrayNode array = (ArrayNode) node;
         assertThat(array.size()).isEqualTo(1);
         ObjectNode configNode = (ObjectNode) array.get(0);
-        assertThat(configNode.get("id").asText()).isEqualTo("html-app-client");
-        assertThat(configNode.get("type").asText()).isEqualTo("html5");
-        assertThat(configNode.get("security-key").asText()).isEqualTo("keycloak-key");
+        Verify.appClient(configNode, "html-app-client", "html5", new String[]{"/html-client/*", "/html-client"}, new String[]{"http://localhost:8080"}, new String[]{"user"});
 
         // Update application client
-        assertThat(execPut("/admin/applications/testApp/resources/application-clients/html-app-client", "{ \"type\" : \"ios\", \"security-key\" : \"keycloak-key-ios\" }")).hasStatus(200);
+        assertThat(execPut("/admin/applications/testApp/resources/application-clients/html-app-client",
+                "{ " +
+                        "\"type\" : \"ios\", " +
+                        "\"redirect-uris\" : [" +
+                            "\"/html-ios/*\"," +
+                            "\"/html-client\"" +
+                        "]," +
+                        "\"web-origins\" : [" +
+                            "\"http://localhost:8080\" " +
+                        "]," +
+                        "\"app-roles\" : [" +
+                            "\"user\"" +
+                        "]" +
+                        "}"))
+                .hasStatus(200);
         result = toJSON(httpResponse.getEntity());
-        assertThat(result.get("id").asText()).isEqualTo("html-app-client");
-        assertThat(result.get("type").asText()).isEqualTo("ios");
-        assertThat(result.get("security-key").asText()).isEqualTo("keycloak-key-ios");
+        Verify.appClient(result, "html-app-client", "ios", new String[]{"/html-ios/*", "/html-client"}, new String[]{"http://localhost:8080"}, new String[]{"user"});
 
         // Verify JSON file
         assertThat(appConfigFile.exists()).isTrue();
@@ -165,9 +235,7 @@ public class ApplicationClientsTest extends AbstractHTTPResourceTestCaseWithTest
         array = (ArrayNode) node;
         assertThat(array.size()).isEqualTo(1);
         configNode = (ObjectNode) array.get(0);
-        assertThat(configNode.get("id").asText()).isEqualTo("html-app-client");
-        assertThat(configNode.get("type").asText()).isEqualTo("ios");
-        assertThat(configNode.get("security-key").asText()).isEqualTo("keycloak-key-ios");
+        Verify.appClient(configNode, "html-app-client", "ios", new String[]{"/html-ios/*", "/html-client"}, new String[]{"http://localhost:8080"}, new String[]{"user"});
     }
 
     @Test
@@ -178,11 +246,24 @@ public class ApplicationClientsTest extends AbstractHTTPResourceTestCaseWithTest
         assertThat(execDelete("/admin/applications/testApp/resources/application-clients/my-html-client")).hasStatus(404);
 
         // Add application client
-        assertThat(execPost("/admin/applications/testApp/resources/application-clients", "{ \"id\" : \"html-app-client\", \"type\" : \"html5\", \"security-key\" : \"keycloak-key\" }")).hasStatus(201);
+        assertThat(execPost("/admin/applications/testApp/resources/application-clients",
+                "{ " +
+                        "\"id\" : \"html-app-client\", " +
+                        "\"type\" : \"html5\", " +
+                        "\"redirect-uris\" : [" +
+                            "\"/html-client/*\"," +
+                            "\"/html-client\"" +
+                        "]," +
+                        "\"web-origins\" : [" +
+                            "\"http://localhost:8080\" " +
+                        "]," +
+                        "\"app-roles\" : [" +
+                            "\"user\"" +
+                        "]" +
+                        "}"))
+                .hasStatus(201);
         JsonNode result = toJSON(httpResponse.getEntity());
-        assertThat(result.get("id").asText()).isEqualTo("html-app-client");
-        assertThat(result.get("type").asText()).isEqualTo("html5");
-        assertThat(result.get("security-key").asText()).isEqualTo("keycloak-key");
+        Verify.appClient(result, "html-app-client", "html5", new String[]{"/html-client/*", "/html-client"}, new String[]{"http://localhost:8080"}, new String[]{"user"});
 
         assertThat(execDelete("/admin/applications/testApp/resources/application-clients/my-html-client")).hasStatus(404);
     }
@@ -193,11 +274,24 @@ public class ApplicationClientsTest extends AbstractHTTPResourceTestCaseWithTest
         installResource();
 
         // Add application client
-        assertThat(execPost("/admin/applications/testApp/resources/application-clients", "{ \"id\" : \"html-app-client\", \"type\" : \"html5\", \"security-key\" : \"keycloak-key\" }")).hasStatus(201);
+        assertThat(execPost("/admin/applications/testApp/resources/application-clients",
+                "{ " +
+                        "\"id\" : \"html-app-client\", " +
+                        "\"type\" : \"html5\", " +
+                        "\"redirect-uris\" : [" +
+                            "\"/html-client/*\"," +
+                            "\"/html-client\"" +
+                        "]," +
+                        "\"web-origins\" : [" +
+                            "\"http://localhost:8080\" " +
+                        "]," +
+                        "\"app-roles\" : [" +
+                            "\"user\"" +
+                        "]" +
+                        "}"))
+                .hasStatus(201);
         JsonNode result = toJSON(httpResponse.getEntity());
-        assertThat(result.get("id").asText()).isEqualTo("html-app-client");
-        assertThat(result.get("type").asText()).isEqualTo("html5");
-        assertThat(result.get("security-key").asText()).isEqualTo("keycloak-key");
+        Verify.appClient(result, "html-app-client", "html5", new String[]{"/html-client/*", "/html-client"}, new String[]{"http://localhost:8080"}, new String[]{"user"});
 
         // Verify JSON file
         assertThat(appConfigFile.exists()).isTrue();
@@ -206,9 +300,7 @@ public class ApplicationClientsTest extends AbstractHTTPResourceTestCaseWithTest
         ArrayNode array = (ArrayNode) node;
         assertThat(array.size()).isEqualTo(1);
         ObjectNode configNode = (ObjectNode) array.get(0);
-        assertThat(configNode.get("id").asText()).isEqualTo("html-app-client");
-        assertThat(configNode.get("type").asText()).isEqualTo("html5");
-        assertThat(configNode.get("security-key").asText()).isEqualTo("keycloak-key");
+        Verify.appClient(configNode, "html-app-client", "html5", new String[]{"/html-client/*", "/html-client"}, new String[]{"http://localhost:8080"}, new String[]{"user"});
 
         removeResource();
 

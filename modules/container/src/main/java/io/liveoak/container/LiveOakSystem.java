@@ -15,6 +15,7 @@ import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceTarget;
 import org.vertx.java.core.Vertx;
 
 import java.util.Collection;
@@ -73,6 +74,10 @@ public class LiveOakSystem implements SynchronousResource {
 
     public Object service(ServiceName name) throws InterruptedException, TimeoutException {
         return this.serviceContainer.getService(name).awaitValue(5, TimeUnit.SECONDS);
+    }
+
+    public ServiceTarget serviceTarget() {
+        return this.serviceContainer;
     }
 
     public void awaitStability() throws InterruptedException {

@@ -6,9 +6,12 @@ import java.util.Iterator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.liveoak.application.clients.extension.ApplicationClientsExtension;
+import io.liveoak.keycloak.KeycloakConfig;
 import io.liveoak.spi.LiveOak;
+import io.liveoak.spi.Services;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
-import org.fest.assertions.Assertions;
+import org.jboss.msc.service.ValueService;
+import org.jboss.msc.value.ImmediateValue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -21,6 +24,9 @@ public class ApplicationClientsStartupTest extends AbstractHTTPResourceTestCase 
 
     @BeforeClass
     public static void installExtension() throws Exception {
+        KeycloakConfig config = new KeycloakConfig();
+        system.serviceTarget().addService(Services.SECURITY_CLIENT, new ValueService<>(new ImmediateValue<>(new MockSecurityClient(config)))).install();
+        system.serviceTarget().addService(Services.SECURITY_DIRECT_ACCESS_CLIENT, new ValueService<>(new ImmediateValue<>(new MockDirectAccessClient(config)))).install();
         system.extensionInstaller().load("application-clients", new ApplicationClientsExtension());
 
         system.applicationRegistry().createApplication("testApp", "Test Application", new File(ApplicationClientsStartupTest.class.getClassLoader().getResource("testApp").getFile()));
@@ -46,21 +52,15 @@ public class ApplicationClientsStartupTest extends AbstractHTTPResourceTestCase 
         while (nodeIterator.hasNext()) {
             JsonNode node = nodeIterator.next();
             if (node.get(LiveOak.ID).asText().equals("html-app-client")) {
-                verifyAppClient(node, "html-app-client", "html5", "keycloak-key-html");
+                Verify.appClient(node, "html-app-client", "html5", new String[]{"/html-client/*", "/html-client"}, new String[]{"http://localhost:8080"}, new String[]{"user"});
                 foundHtmlClient = true;
             } else if (node.get(LiveOak.ID).asText().equals("ios-app-client")) {
-                verifyAppClient(node, "ios-app-client", "ios", "keycloak-key-ios");
+                Verify.appClient(node, "ios-app-client", "ios", new String[]{"/ios-client/*"}, new String[]{"http://localhost:8080"}, new String[]{"ios-user"});
                 foundiOSClient = true;
             }
         }
 
         assertThat(foundHtmlClient).isTrue();
         assertThat(foundiOSClient).isTrue();
-    }
-
-    private void verifyAppClient(JsonNode node, String id, String type, String securityKey) throws Exception {
-        Assertions.assertThat(node.get("id").asText()).isEqualTo(id);
-        Assertions.assertThat(node.get("type").asText()).isEqualTo(type);
-        Assertions.assertThat(node.get("security-key").asText()).isEqualTo(securityKey);
     }
 }

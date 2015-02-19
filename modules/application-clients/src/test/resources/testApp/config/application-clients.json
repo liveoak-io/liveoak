@@ -2,11 +2,28 @@
   {
     "id" : "html-app-client",
     "type" : "html5",
-    "security-key" : "keycloak-key-html"
+    "redirect-uris" : [
+      "/html-client/*",
+      "/html-client"
+    ],
+    "web-origins" : [
+      "http://localhost:8080"
+    ],
+    "app-roles" : [
+      "user"
+    ]
   },
   {
     "id" : "ios-app-client",
     "type" : "ios",
-    "security-key" : "keycloak-key-ios"
+    "redirect-uris" : [
+      "/ios-client/*"
+    ],
+    "web-origins" : [
+      "http://localhost:8080"
+    ],
+    "app-roles" : [
+      "ios-user"
+    ]
   }
 ]
