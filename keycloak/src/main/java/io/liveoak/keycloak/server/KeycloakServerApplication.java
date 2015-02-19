@@ -105,7 +105,7 @@ public class KeycloakServerApplication extends KeycloakApplication {
             oauthClient.setPublicClient(true);
 
             // Add 'realm-admin' role to OAuth client
-            ApplicationModel realmApp = realm.getApplicationByName("realm-application");
+            ApplicationModel realmApp = realm.getApplicationByName("realm-management");
             RoleModel realmAdminRole = realmApp.getRole(AdminRoles.REALM_ADMIN);
             oauthClient.addScopeMapping(realmAdminRole);
 
