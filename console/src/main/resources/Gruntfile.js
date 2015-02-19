@@ -34,6 +34,7 @@ module.exports = function (grunt) {
       }
     },
     patch: {
+      /*jshint camelcase: false */
       default_options: {
         options: {
           patch:

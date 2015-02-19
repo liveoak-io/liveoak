@@ -32,7 +32,7 @@
         "codemirror": "4.11.0",
         "angular-ui-codemirror": "0.1.6",
         "jshint": "2.5.6",
-        "hawkular-charts": "0.1.14"
+        "hawkular-charts": "0.1.15"
 
     },
   "exportsOverride": {

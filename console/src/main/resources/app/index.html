@@ -20,7 +20,9 @@
   <link rel="stylesheet" href="/admin/console/lib/codemirror/codemirror.css">
   <link rel="stylesheet" href="/admin/console/lib/codemirror/addon/hint/show-hint.css">
   <link rel="stylesheet" href="/admin/console/lib/codemirror/addon/lint/lint.css">
-  <link rel="stylesheet" href="/admin/console/css/d3-chart.css">
+
+  <!-- Charts styles -->
+  <link rel="stylesheet" href="/admin/console/lib/hawkular-charts/hawkular-chart.css">
 
 
   <!-- Page styles -->
@@ -70,9 +72,11 @@
 <script src="/admin/console/lib/angular-ui-codemirror/ui-codemirror.js"></script>
 
 <!-- charting libs -->
-<script src="/admin/console/lib/hawkular-charts/hawkular-charts.js"></script>
+<script src="/admin/console/lib/numeral/numeral.js"></script>
+<script src="/admin/console/lib/moment/moment.js"></script>
 <script src="/admin/console/lib/d3/d3.js"></script>
 <script src="/admin/console/lib/d3-tip/index.js"></script>
+<script src="/admin/console/lib/hawkular-charts/hawkular-charts.js"></script>
 
 <!-- app logic -->
 <script src="/admin/console/js/controllers.js"></script>
@@ -97,7 +101,7 @@
    */
 
   // Change this var whenever you add new custom css file
-  var myStyleFiles = ["console.css"]
+  var myStyleFiles = ["console.css"];
 
   //JS magic for turning our custom styles on/off
   var myStyles = [];

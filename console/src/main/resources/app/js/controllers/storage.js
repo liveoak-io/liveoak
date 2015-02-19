@@ -246,7 +246,6 @@ loMod.controller('StorageListCtrl', function($scope, $rootScope, $log, $routePar
   $scope.$watch('resources', function(){
     for (var i in $scope.resources) {
       var res = $scope.resources[i];
-      console.log(res);
       if (res.collections && res.collections.length > 0) {
         $scope.hasCollections = true;
         return;

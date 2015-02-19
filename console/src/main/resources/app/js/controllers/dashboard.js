@@ -2,7 +2,7 @@
 
 var loMod = angular.module('loApp.controllers.dashboard', []);
 
-loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, $filter, $location, $http, currentApp, loStorageList) {
+loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, $filter, $location, $http, currentApp, loStorageList, LoMetrics) {
 
   $rootScope.curApp = currentApp;
 
@@ -159,8 +159,6 @@ loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, $fi
 
 
   $scope.rangeSelected = function(newRange) {
-    console.log('current range: ' + $scope.range);
-    console.log('new range: ' + newRange);
     if ($scope.range !== newRange) {
       initMetrics(newRange);
     }
@@ -239,8 +237,8 @@ loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, $fi
     }
 
     //if (val >= 1) {
-      val = Math.round(val * 100) / 100;
-      return { 'value': val, 'unit': unitName, 'per': unitPer };
+    val = Math.round(val * 100) / 100;
+    return { 'value': val, 'unit': unitName, 'per': unitPer };
     //}
   }
 
@@ -253,50 +251,25 @@ loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, $fi
   }
   */
 
-  function fetchMetrics(query, success) {
-    var q = 'tag=path:/' + currentApp.id;
-    if (query.start) {
-      q += '&start=' + query.start;
-    }
-    if (query.end) {
-      q += '&end=' + query.end;
-    }
-    if (query.buckets) {
-      q += '&buckets=' + query.buckets;
-    }
-    if (query.id) {
-      q += '&id=' + query.id;
-    }
-    if (query.desc) {
-      q += '&desc';
-    }
-    if (query.limit) {
-      q += '&limit=' + query.limit;
-    }
 
-    console.log('GET /rhq-metrics/event-log?' + q);
-
-    $http( {
-      method: 'GET',
-      url: '/rhq-metrics/event-log?' + q
-    })
-    .success(success)
-    .error(function (httpResponse, status) {
-      console.error('Failed to retreive metrics for ' + currentApp.id + ' (query: ' + query + ')');
-    });
+  function fetchMetrics(query, success, isArray) {
+    var queryParams = {
+      dataType:'event-log',
+      tag: 'path:/' + currentApp.id,
+      start: query.start,
+      end: query.end,
+      buckets: query.buckets,
+      id: query.id,
+      desc: query.desc,
+      limit: query.limit
+    };
+    $scope.myMetric = LoMetrics[isArray ? 'query' : 'get'](queryParams).$promise.then(success);
   }
 
   function fetchTime(success) {
-    $http( {
-      method: 'GET',
-      url: '/rhq-metrics/time'
-    })
-    .success(function(data) {
+    LoMetrics.get({dataType:'time'}).$promise.then(function(data) {
       $scope.timediff = data.time - new Date().getTime();
       success.apply();
-    })
-    .error(function() {
-      console.log('Failed to fetch server time!');
     });
   }
 
@@ -306,111 +279,119 @@ loMod.controller('DashboardCtrl', function($scope, $rootScope, $routeParams, $fi
     var start = now - millisForRange[range];
 
     fetchMetrics({
-          start: start,
-          end: now,
-          id: 'requests',
-          buckets: 1
-        },
-        function(data) {
-          rawData.metrics[range].requests = data._default[0].speed;
-          $scope.displayData[range].requests = bestValueWithUnitForMetric('requests', range);
-        }
+        start: start,
+        end: now,
+        id: 'requests',
+        buckets: 1
+      },
+      function(data) {
+        rawData.metrics[range].requests = data._default[0].speed;
+        $scope.displayData[range].requests = bestValueWithUnitForMetric('requests', range);
+      },
+      false
     );
 
     fetchMetrics({
-          start: start,
-          end: now,
-          id: 'requests',
-          buckets: 60
-        },
-        function(data) {
-          $scope.chartData[range].requests.rawData = data;
-          $scope.rawToChartData(range, 'requests');
-        }
+        start: start,
+        end: now,
+        id: 'requests',
+        buckets: 60
+      },
+      function(data) {
+        $scope.chartData[range].requests.rawData = data;
+        $scope.rawToChartData(range, 'requests');
+      },
+      false
     );
 
     fetchMetrics({
-          start: start,
-          end: now,
-          id: 'unique-users',
-          buckets: 1
-        },
-        function(data) {
-          rawData.metrics[range].users = data._default[0].speed;
-          $scope.displayData[range].users = bestValueWithUnitForMetric('users', range);
-        }
+        start: start,
+        end: now,
+        id: 'unique-users',
+        buckets: 1
+      },
+      function(data) {
+        rawData.metrics[range].users = data._default[0].speed;
+        $scope.displayData[range].users = bestValueWithUnitForMetric('users', range);
+      },
+      false
     );
 
     fetchMetrics({
-          start: start,
-          end: now,
-          id: 'bandwidth',
-          buckets: 1
-        },
-        function(data) {
-          rawData.metrics[range].storage = data._default[0].speed / 1024;
-          $scope.displayData[range].storage = bestValueWithUnitForMetric('storage', range);
-        }
+        start: start,
+        end: now,
+        id: 'bandwidth',
+        buckets: 1
+      },
+      function(data) {
+        rawData.metrics[range].storage = data._default[0].speed / 1024;
+        $scope.displayData[range].storage = bestValueWithUnitForMetric('storage', range);
+      },
+      false
     );
 
     fetchMetrics({
-          start: start,
-          end: now,
-          id: 'bandwidth',
-          buckets: 60
-        },
-        function(data) {
-          $scope.chartData[range].bandwidth.rawData = data;
-          $scope.rawToChartData(range, 'bandwidth');
-        }
+        start: start,
+        end: now,
+        id: 'bandwidth',
+        buckets: 60
+      },
+      function(data) {
+        $scope.chartData[range].bandwidth.rawData = data;
+        $scope.rawToChartData(range, 'bandwidth');
+      },
+      false
     );
 
     fetchMetrics({
-          start: start,
-          end: now,
-          id: 'notifications',
-          buckets: 1
-        },
-        function(data) {
-          rawData.metrics[range].notifications = data._default[0].speed;
-          $scope.displayData[range].notifications = bestValueWithUnitForMetric('notifications', range);
-        }
+        start: start,
+        end: now,
+        id: 'notifications',
+        buckets: 1
+      },
+      function(data) {
+        rawData.metrics[range].notifications = data._default[0].speed;
+        $scope.displayData[range].notifications = bestValueWithUnitForMetric('notifications', range);
+      }
     );
 
     fetchMetrics({
-          start: start,
-          end: now,
-          id: 'notifications',
-          buckets: 60
-        },
-        function(data) {
-          $scope.chartData[range].notifications.rawData = data;
-          $scope.rawToChartData(range, 'notifications');
-        }
+        start: start,
+        end: now,
+        id: 'notifications',
+        buckets: 60
+      },
+      function(data) {
+        $scope.chartData[range].notifications.rawData = data;
+        $scope.rawToChartData(range, 'notifications');
+      },
+      false
     );
 
     fetchMetrics({
-          start: start,
-          end: now,
-          id: 'errors',
-          desc: '',
-          limit: 5
-        },
-        function(data) {
-          $scope.logData.errors = data;
-        }
+        start: start,
+        end: now,
+        id: 'errors',
+        desc: '',
+        limit: 5
+      },
+      function(data) {
+        $scope.logData.errors = data;
+      },
+      true
     );
 
     fetchMetrics({
-          start: start,
-          end: now,
-          id: 'requests-by-path',
-          buckets: 1,
-          limit: 5
-        },
-        function(data) {
-          $scope.logData.topPathsRequested = data;
-        }
+        start: start,
+        end: now,
+        id: 'requests-by-path',
+        buckets: 1,
+        limit: 5
+      },
+      function(data) {
+        $scope.logData.topPathsRequested = data;
+      },
+      false
     );
   }
 
