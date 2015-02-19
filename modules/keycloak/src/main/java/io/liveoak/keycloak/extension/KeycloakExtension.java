@@ -3,6 +3,7 @@ package io.liveoak.keycloak.extension;
 import io.liveoak.interceptor.service.InterceptorRegistrationHelper;
 import io.liveoak.keycloak.KeycloakConfig;
 import io.liveoak.keycloak.KeycloakServices;
+import io.liveoak.keycloak.client.DirectAccessClientService;
 import io.liveoak.keycloak.interceptor.AuthInterceptor;
 import io.liveoak.keycloak.interceptor.AuthInterceptorService;
 import io.liveoak.keycloak.service.KeycloakConfigResourceService;
@@ -50,7 +51,14 @@ public class KeycloakExtension implements Extension {
         // Install Security Client
         SecurityClientService securityClientService = new SecurityClientService();
         target.addService(Services.SECURITY_CLIENT, securityClientService)
-                .addDependency(KeycloakServices.address(), KeycloakConfig.class, securityClientService.configInjector());
+                .addDependency(KeycloakServices.address(), KeycloakConfig.class, securityClientService.configInjector())
+                .install();
+
+        // Install Direct Access Client
+        DirectAccessClientService directAccessClientService = new DirectAccessClientService();
+        target.addService(Services.SECURITY_DIRECT_ACCESS_CLIENT, directAccessClientService)
+                .addDependency(KeycloakServices.address(), KeycloakConfig.class, directAccessClientService.configInjector())
+                .install();
     }
 
     @Override

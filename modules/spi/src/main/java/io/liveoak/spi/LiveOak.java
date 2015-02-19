@@ -18,5 +18,5 @@ public final class LiveOak {
 
     public static final String RESOURCE_TYPE = "type";
 
-    public static final String APPLICATION_CLIENTS_RESOURCE_TYPE = "application-clients";
+    public static final String LIVEOAK_APP_REALM = "liveoak-apps";
 }
