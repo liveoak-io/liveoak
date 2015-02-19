@@ -9,11 +9,15 @@ import io.liveoak.keycloak.theme.LiveOakLoginThemeProviderFactory;
 import org.jboss.resteasy.core.Dispatcher;
 import org.keycloak.Config;
 import org.keycloak.enums.SslRequired;
+import org.keycloak.models.AdminRoles;
 import org.keycloak.models.ApplicationModel;
 import org.keycloak.models.ClaimMask;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.OAuthClientModel;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserCredentialModel;
+import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.services.managers.ApplicationManager;
@@ -45,6 +49,7 @@ public class KeycloakServerApplication extends KeycloakApplication {
     protected void configureLiveOakConsole(KeycloakSession session) {
         RealmManager manager = new RealmManager(session);
         RealmModel adminRealm = manager.getRealm(Config.getAdminRealm());
+        UserCredentialModel adminCredential = null;
 
         ApplicationModel consoleApp = adminRealm.getApplicationByName("console");
         if (consoleApp == null) {
@@ -60,11 +65,11 @@ public class KeycloakServerApplication extends KeycloakApplication {
             String initialPassword = System.getProperty(LIVEOAK_INITIAL_PASSWORD_PARAMETER);
             if (initialPassword != null) {
                 //Create a new, initial password for the admin user
-                UserCredentialModel password = new UserCredentialModel();
-                password.setType(UserCredentialModel.PASSWORD);
-                password.setValue(initialPassword);
+                adminCredential = new UserCredentialModel();
+                adminCredential.setType(UserCredentialModel.PASSWORD);
+                adminCredential.setValue(initialPassword);
 
-                session.users().getUserByUsername("admin", adminRealm).updateCredential(password);
+                session.users().getUserByUsername("admin", adminRealm).updateCredential(adminCredential);
             }
 
             consoleApp.addScopeMapping(adminRealm.getRole("admin"));
@@ -77,6 +82,7 @@ public class KeycloakServerApplication extends KeycloakApplication {
 
             realm.setEnabled(true);
             realm.setRegistrationAllowed(true);
+            realm.setPasswordCredentialGrantAllowed(true);
             realm.setSslRequired(SslRequired.EXTERNAL);
             realm.addRequiredCredential(CredentialRepresentation.PASSWORD);
 
@@ -92,6 +98,26 @@ public class KeycloakServerApplication extends KeycloakApplication {
             adminRealm.setLoginTheme(LiveOakLoginThemeProviderFactory.ID);
             adminRealm.setAccountTheme(LiveOakLoginThemeProviderFactory.ID);
             adminRealm.setSsoSessionIdleTimeout(6000);
+
+            // Add OAuth client for accessing Keycloak on LiveOak startup
+            OAuthClientModel oauthClient = realm.addOAuthClient("liveoak-admin-client");
+            oauthClient.setDirectGrantsOnly(true);
+            oauthClient.setPublicClient(true);
+
+            // Add 'realm-admin' role to OAuth client
+            ApplicationModel realmApp = realm.getApplicationByName("realm-application");
+            RoleModel realmAdminRole = realmApp.getRole(AdminRoles.REALM_ADMIN);
+            oauthClient.addScopeMapping(realmAdminRole);
+
+            // Create user for OAuth client usage
+            UserModel user = session.users().addUser(realm, "liveoak-server");
+            if (adminCredential == null) {
+                adminCredential = new UserCredentialModel();
+                adminCredential.setType(UserCredentialModel.PASSWORD);
+                adminCredential.setValue("password");
+            }
+            user.updateCredential(adminCredential);
+            user.grantRole(realmAdminRole);
         }
     }
 
