@@ -156,3 +156,21 @@ loFilters.filter('unique', ['$parse', function ($parse) {
     return items;
   };
 }]);
+
+loFilters.filter('orderObjectBy', function() {
+  return function(items, field, reverse) {
+    var filtered = [];
+    angular.forEach(items, function(item) {
+      if (item.hasOwnProperty(field) || (item[0] && item[0].hasOwnProperty(field))) {
+        filtered.push(item);
+      }
+    });
+    filtered.sort(function (a, b) {
+      return (a[field] > b[field] ? 1 : -1);
+    });
+    if(reverse) {
+      filtered.reverse();
+    }
+    return filtered;
+  };
+});

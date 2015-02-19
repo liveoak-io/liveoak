@@ -819,3 +819,9 @@ loMod.service('loJSON', function() {
   };
 
 });
+
+loMod.factory('LoMetrics', function($resource) {
+  return $resource('/rhq-metrics/:dataType', {
+  });
+});
+
