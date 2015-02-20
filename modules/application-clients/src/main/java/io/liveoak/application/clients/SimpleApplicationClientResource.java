@@ -31,11 +31,6 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
         this.webOrigins = state.getPropertyAsList("web-origins");
         this.applicationRoles = state.getPropertyAsList("app-roles");
 
-        String realm = securityContext != null ? securityContext.getRealm() : null;
-        if (realm == null) {
-            realm = LiveOak.LIVEOAK_APP_REALM;
-        }
-
         String appKey = (String) state.getProperty("app-key");
         if (appKey != null && appKey.length() > 0) {
             this.appKey = appKey;
@@ -45,12 +40,12 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
             this.webOrigins.clear();
             this.applicationRoles.clear();
 
-            ApplicationRepresentation app = this.parent.securityClient().application(securityContext.getToken(), realm, appKey);
+            ApplicationRepresentation app = this.parent.securityClient().application(securityContext.getToken(), LiveOak.LIVEOAK_APP_REALM, appKey);
             if (app != null) {
                 this.redirectUris = app.getRedirectUris();
                 this.webOrigins = app.getWebOrigins();
 
-                MappingsRepresentation mapRep = this.parent.securityClient().clientScopeMappings(securityContext.getToken(), realm, appKey);
+                MappingsRepresentation mapRep = this.parent.securityClient().clientScopeMappings(securityContext.getToken(), LiveOak.LIVEOAK_APP_REALM, appKey);
                 mapRep.getApplicationMappings().values().stream()
                         .filter(key -> key.equals(this.application.id()))
                         .forEach(appMap -> appMap.getMappings().forEach(roleRep -> this.applicationRoles.add(roleRep.getName())));
@@ -70,18 +65,18 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
             }
 
             // Create client application in Keycloak
-            this.parent.securityClient().createApplication(token, realm, this.appKey);
+            this.parent.securityClient().createApplication(token, LiveOak.LIVEOAK_APP_REALM, this.appKey);
 
             // Update Keycloak application with: non full scope, redirect uris and web origins
-            ApplicationRepresentation app = this.parent.securityClient().application(token, realm, this.appKey);
+            ApplicationRepresentation app = this.parent.securityClient().application(token, LiveOak.LIVEOAK_APP_REALM, this.appKey);
             app.setFullScopeAllowed(false);
             app.setRedirectUris(this.redirectUris);
             app.setWebOrigins(this.webOrigins);
-            this.parent.securityClient().updateApplication(token, realm, app);
+            this.parent.securityClient().updateApplication(token, LiveOak.LIVEOAK_APP_REALM, app);
 
             // Create scope mappings in Keycloak
-            checkApplicationRoles(token, realm, this.application.id());
-            updateScopeMappings(token, realm, this.application.id());
+            checkApplicationRoles(token, LiveOak.LIVEOAK_APP_REALM, this.application.id());
+            updateScopeMappings(token, LiveOak.LIVEOAK_APP_REALM, this.application.id());
         }
     }
 
