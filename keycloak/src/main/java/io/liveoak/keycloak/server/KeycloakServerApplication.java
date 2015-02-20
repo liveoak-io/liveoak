@@ -103,6 +103,7 @@ public class KeycloakServerApplication extends KeycloakApplication {
             OAuthClientModel oauthClient = realm.addOAuthClient("liveoak-admin-client");
             oauthClient.setDirectGrantsOnly(true);
             oauthClient.setPublicClient(true);
+            oauthClient.setEnabled(true);
 
             // Add 'realm-admin' role to OAuth client
             ApplicationModel realmApp = realm.getApplicationByName("realm-management");

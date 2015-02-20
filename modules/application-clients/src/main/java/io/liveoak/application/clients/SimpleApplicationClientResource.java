@@ -62,7 +62,12 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
             state.putProperty("app-key", this.appKey);
 
             // Get access token
-            String token = this.parent.directAccessClient().accessToken();
+            String token;
+            if (securityContext != null && securityContext.getToken() != null) {
+                token = securityContext.getToken();
+            } else {
+                token = this.parent.directAccessClient().accessToken();
+            }
 
             // Create client application in Keycloak
             this.parent.securityClient().createApplication(token, realm, this.appKey);
