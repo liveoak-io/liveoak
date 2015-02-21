@@ -30,7 +30,7 @@ public class SecurityClientIT extends AbstractLiveOakSecurityTest {
     @Before
     public void securityClient() throws Exception {
         KeycloakConfig config = new KeycloakConfig();
-        config.setBaseUrl(BASE_SECURITY_ADMIN_URL);
+        config.setBaseUrl(BASE_SECURITY_URL);
         this.client = new SecurityClient(config);
 
         if (token == null) {

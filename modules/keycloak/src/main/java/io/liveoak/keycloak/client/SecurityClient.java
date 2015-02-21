@@ -212,7 +212,7 @@ public class SecurityClient {
     }
 
     private String realmEndpoint(String realmName) {
-        return this.config.getBaseUrl() + "/realms/" + realmName;
+        return this.config.getBaseUrl() + "/admin/realms/" + realmName;
     }
 
     private String realmApplicationsEndpoint(String realmName) {
