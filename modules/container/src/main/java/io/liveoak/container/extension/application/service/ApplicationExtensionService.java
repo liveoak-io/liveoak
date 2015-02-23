@@ -89,20 +89,6 @@ public class ApplicationExtensionService implements Service<InternalApplicationE
         return this.extensionInjector;
     }
 
-    protected Properties properties() {
-        InternalApplication app = this.applicationInjector.getValue();
-
-        Properties props = new Properties();
-        props.put("application.name", app.name());
-        props.put("application.id", app.id());
-        props.put("application.url", "/" + app.id());
-
-        props.put("application.dir", app.directory().getAbsolutePath());
-
-        return props;
-    }
-
-
     private final String extensionId;
     private final String resourceId;
 
