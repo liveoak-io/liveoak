@@ -3,6 +3,7 @@ package io.liveoak.container.extension.service;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.container.extension.ServiceUpdateResponder;
+import io.liveoak.spi.Application;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
@@ -30,7 +31,7 @@ public class InitializeResourceService implements Service<Void> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        RequestContext reqContext = new RequestContext.Builder().build();
+        RequestContext reqContext = new RequestContext.Builder().application(applicationInjector.getOptionalValue());
         context.asynchronous();
         try {
             this.resourceInjector.getValue().initializeProperties(reqContext, ConversionUtils.convert(this.configurationInjector.getValue()), new ServiceUpdateResponder(context));
@@ -62,8 +63,13 @@ public class InitializeResourceService implements Service<Void> {
         return this.resourceInjector;
     }
 
+    public Injector<Application> applicationInjector() {
+        return this.applicationInjector;
+    }
+
     private InjectedValue<ObjectNode> configurationInjector = new InjectedValue<>();
     private InjectedValue<RootResource> resourceInjector = new InjectedValue<>();
+    private InjectedValue<Application> applicationInjector = new InjectedValue<>();
     private Consumer<Exception> exceptionConsumer;
 
 }

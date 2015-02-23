@@ -136,6 +136,7 @@ public class ApplicationExtensionContextImpl implements ApplicationExtensionCont
         InitializeResourceService configApply = new InitializeResourceService(this.appExtension);
         target.addService(privateName.append("apply-config"), configApply)
                 .addDependency(privateName.append("wrapper"), RootResource.class, configApply.resourceInjector())
+                .addInjection(configApply.applicationInjector(), this.application())
                 .addInjection(configApply.configurationInjector(), this.configuration)
                 .install();
 
