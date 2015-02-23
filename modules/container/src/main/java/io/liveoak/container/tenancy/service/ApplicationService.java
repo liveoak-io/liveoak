@@ -1,7 +1,8 @@
 package io.liveoak.container.tenancy.service;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
 
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.json.JSONDecoder;
+import io.liveoak.common.util.StringPropertyReplacer;
 import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.container.service.MediaTypeMountService;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
@@ -82,13 +84,19 @@ public class ApplicationService implements Service<InternalApplication> {
         ResourcePath htmlApp = null;
         ResourceState resourcesTree = null;
 
+        List<String> configurationFiles = new ArrayList<>();
+
+        Properties properties = new Properties();
+        properties.setProperty("application.id", this.id);
+
         if (applicationJson.exists()) {
             JSONDecoder decoder = new JSONDecoder();
             try {
                 ResourceState state = decoder.decode(applicationJson);
                 Object value;
                 if ((value = state.getProperty(LiveOak.NAME)) != null) {
-                    appName = (String) value;
+                    appName = StringPropertyReplacer.replaceProperties((String) value, properties);
+                    properties.put("application.name", appName);
                 }
                 if ((value = state.getProperty("html-app")) != null) {
                     htmlApp = new ResourcePath((String) value);
@@ -108,6 +116,10 @@ public class ApplicationService implements Service<InternalApplication> {
                 if ((value = state.getProperty(LiveOak.RESOURCES)) != null) {
                     resourcesTree = (ResourceState) value;
                 }
+                if ((value = state.getProperty(CONFIG_FILES)) != null) {
+                    configurationFiles = (ArrayList) value;
+                }
+
             } catch (IOException e) {
                 log.error("Error decoding content of application.json for " + appName, e);
             }
@@ -155,6 +167,10 @@ public class ApplicationService implements Service<InternalApplication> {
                     .install();
             gitInstalled = true;
         }
+
+        ApplicationConfigurationFileService applicationConfigurationFileService = new ApplicationConfigurationFileService(directory, configurationFiles, envProperties());
+        target.addService(Services.applicationConfigurationFile(this.id), applicationConfigurationFileService)
+                .install();
 
         // context resource
         ApplicationContextService appContext = new ApplicationContextService(this.app);
@@ -220,6 +236,8 @@ public class ApplicationService implements Service<InternalApplication> {
     private Consumer<File> gitCommit;
     private InjectedValue<File> applicationsDirectoryInjector = new InjectedValue<>();
     private InternalApplication app;
+
+    private static final String CONFIG_FILES = "configuration-files";
 
     private static final Logger log = Logger.getLogger(ApplicationService.class);
 }

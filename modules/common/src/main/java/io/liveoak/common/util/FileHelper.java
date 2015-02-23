@@ -2,12 +2,7 @@ package io.liveoak.common.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.FileVisitOption;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
 import java.util.function.Function;
@@ -55,7 +50,7 @@ public final class FileHelper {
                             }
 
                             try {
-                                Files.copy(dir, newDir);
+                                Files.copy(dir, newDir, StandardCopyOption.COPY_ATTRIBUTES);
                             } catch(FileAlreadyExistsException e) {
                                 if (!Files.isDirectory(newDir)) {
                                     throw e;
@@ -66,13 +61,13 @@ public final class FileHelper {
 
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                            Files.copy(file, target.resolve(source.relativize(file)));
+                            Files.copy(file, target.resolve(source.relativize(file)), StandardCopyOption.COPY_ATTRIBUTES);
                             return FileVisitResult.CONTINUE;
                         }
                     }
             );
         } else {
-            Files.copy(source, target);
+            Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES);
         }
     }
 }
