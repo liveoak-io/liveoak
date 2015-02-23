@@ -73,6 +73,10 @@ public final class Services {
         return application(appId).append("env-props");
     }
 
+    public static ServiceName applicationConfigurationFile(String appId) {
+        return application(appId).append("config-files");
+    }
+
     public static ServiceName resource(String appId, String resourceId) {
         return LIVEOAK.append("application-resource", appId, resourceId);
     }

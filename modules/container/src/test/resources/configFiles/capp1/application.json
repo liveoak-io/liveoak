@@ -1,0 +1,4 @@
+{
+  "name" : "config-app-1",
+  "configuration-files" : ["/conf/test"]
+}

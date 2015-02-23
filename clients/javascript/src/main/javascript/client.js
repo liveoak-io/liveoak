@@ -78,6 +78,63 @@ var LiveOak = function( options ) {
     this.update = http.update;
     this.remove = http.remove;
 
+    this.app = function( appId ) {
+        // The path for the application, defaults to the options.appId
+        // if none specified
+        appPath = appId;
+        if ( !appId ) {
+          appPath = options.appId;
+          appId = appPath;
+        }
+
+        // the path expects to start with a '/' so prepend it here
+        appPath = "/" + appPath;        
+
+        //app = new Object();
+
+        this.create = function ( path, data, options ) {
+          http.create( appPath + path, data, options );
+        }    	
+
+        this.read = function ( path, options ) {
+          http.read( appPath + path, options );
+        }     
+
+        this.readMembers = function( path, options ) {
+          http.readMembers( appPath + path, options );
+        }
+
+        this.save = function( path, data, options ) {
+          http.save( appPath + path, data, options );
+        }
+
+        this.update = function( path, data, options ) {
+          http.update( appPath + path, data, options );
+        }
+
+        this.remove = function( path, data, options ) {
+          http.remove( appPath + path, data, options );
+        }
+
+        this.subscribe = function( path, callback ) {
+          var id = stomp_client.subscribe( appPath + path, function(msg) {
+          var data = JSON.parse( msg.body );
+            callback( data, msg.headers.action );
+          });
+          return id;
+        }
+ 
+        this.unsubscribe = function(id, headers) {
+          // don't need to do any manipulation of the path here
+          stomp_client.unsubscribe(id, headers);
+        }
+
+        this.applicationId = appId;
+
+        return this;
+	//return app;
+    }
+
     this.subscribe = function( path, callback ) {
         var id = stomp_client.subscribe( path, function(msg) {
             var data = JSON.parse( msg.body );
@@ -90,9 +147,13 @@ var LiveOak = function( options ) {
         stomp_client.unsubscribe( id, headers );
     };
 
-    if (options.clientId) {
+    if (options.clientId || options.appClientId) {
         options.auth = options.auth || {};
-        options.auth.clientId = options.clientId;
+        if (options.clientId) {
+            options.auth.clientId = options.clientId;
+        } else {
+            options.auth.clientId = "liveoak.client." + options.appId + "." + options.auth.appClientId;
+        }
     }
 
     if (options.auth) {
@@ -106,6 +167,10 @@ var LiveOak = function( options ) {
               scheme = 'https://';
             }
             options.auth.url = scheme + options.host + (options.port ? ':' + options.port : '') + '/auth';
+        }
+
+        if (options.auth.appClientId) {
+          options.auth.clientId = "liveoak.client." + options.appId + "." + options.auth.appClientId;
         }
 
         auth = new Keycloak(options.auth);
