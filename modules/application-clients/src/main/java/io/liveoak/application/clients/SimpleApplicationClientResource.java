@@ -111,18 +111,18 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
         this.webOrigins = state.getPropertyAsList("web-origins");
 
         // Update keycloak application
-        ApplicationRepresentation app = this.parent.securityClient().application(ctx.securityContext().getToken(), ctx.securityContext().getRealm(), this.appKey);
+        ApplicationRepresentation app = this.parent.securityClient().application(ctx.securityContext().getToken(), LiveOak.LIVEOAK_APP_REALM, this.appKey);
         app.setRedirectUris(redirectUris);
         app.setWebOrigins(this.webOrigins);
-        this.parent.securityClient().updateApplication(ctx.securityContext().getToken(), ctx.securityContext().getRealm(), app);
+        this.parent.securityClient().updateApplication(ctx.securityContext().getToken(), LiveOak.LIVEOAK_APP_REALM, app);
 
         this.applicationRoles = state.getPropertyAsList("app-roles");
 
         // Check keycloak roles
-        checkApplicationRoles(ctx.securityContext().getToken(), ctx.securityContext().getRealm(), this.appKey);
+        checkApplicationRoles(ctx.securityContext().getToken(), LiveOak.LIVEOAK_APP_REALM, this.appKey);
 
         // Update keycloak scope mappings
-        updateScopeMappings(ctx.securityContext().getToken(), ctx.securityContext().getRealm(), this.appKey);
+        updateScopeMappings(ctx.securityContext().getToken(), LiveOak.LIVEOAK_APP_REALM, this.appKey);
 
         responder.resourceUpdated(this);
     }
