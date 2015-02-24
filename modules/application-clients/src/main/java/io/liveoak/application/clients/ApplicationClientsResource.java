@@ -7,9 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import io.liveoak.keycloak.client.DirectAccessClient;
 import io.liveoak.keycloak.client.SecurityClient;
 import io.liveoak.spi.Application;
-import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;
+import io.liveoak.spi.resource.async.DelegatingResponder;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
 import io.liveoak.spi.resource.config.ConfigRootResource;
@@ -87,16 +87,20 @@ public class ApplicationClientsResource implements ConfigRootResource, Synchrono
     public void delete(RequestContext ctx, Responder responder) throws Exception {
         if (this.applicationClients != null) {
             for (SimpleApplicationClientResource resource : this.applicationClients.values()) {
-                deleteMember(ctx, resource);
+                resource.delete(ctx, new DelegatingResponder(responder) {
+                    @Override
+                    public void resourceDeleted(Resource resource) {
+                        // Do nothing
+                    }
+                });
             }
             this.applicationClients.clear();
         }
         responder.resourceDeleted(this);
     }
 
-    public void deleteMember(RequestContext ctx, SimpleApplicationClientResource applicationClient) throws Exception {
-        this.applicationClients.remove(applicationClient.id());
-        this.securityClient.deleteApplication(ctx.securityContext().getToken(), LiveOak.LIVEOAK_APP_REALM, applicationClient.id());
+    public void deleteMember(String appClientId) {
+        this.applicationClients.remove(appClientId);
     }
 
     public SecurityClient securityClient() {

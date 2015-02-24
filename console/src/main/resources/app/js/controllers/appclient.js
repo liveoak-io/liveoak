@@ -131,7 +131,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
   $scope.settings.hadPrefix = $scope.create || $scope.settings.displayName !== $scope.settings.name;
   var originalName = $scope.settings.name;
 
-  angular.forEach(scopeMappings, function(role) {$scope.settings.scopeMappings.push(role.id);});
+  angular.forEach(scopeMappings, function(role) {$scope.settings.scopeMappings.push(role.name);});
 
   var settingsBackup = angular.copy($scope.settings);
 

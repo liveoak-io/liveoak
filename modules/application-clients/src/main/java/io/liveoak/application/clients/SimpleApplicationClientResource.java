@@ -31,6 +31,14 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
         this.webOrigins = state.getPropertyAsList("web-origins");
         this.applicationRoles = state.getPropertyAsList("app-roles");
 
+        // Get access token
+        String token;
+        if (securityContext != null && securityContext.getToken() != null) {
+            token = securityContext.getToken();
+        } else {
+            token = this.parent.directAccessClient().accessToken();
+        }
+
         String appKey = (String) state.getProperty("app-key");
         if (appKey != null && appKey.length() > 0) {
             this.appKey = appKey;
@@ -40,12 +48,12 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
             this.webOrigins.clear();
             this.applicationRoles.clear();
 
-            ApplicationRepresentation app = this.parent.securityClient().application(securityContext.getToken(), LiveOak.LIVEOAK_APP_REALM, appKey);
+            ApplicationRepresentation app = this.parent.securityClient().application(token, LiveOak.LIVEOAK_APP_REALM, appKey);
             if (app != null) {
                 this.redirectUris = app.getRedirectUris();
                 this.webOrigins = app.getWebOrigins();
 
-                MappingsRepresentation mapRep = this.parent.securityClient().clientScopeMappings(securityContext.getToken(), LiveOak.LIVEOAK_APP_REALM, appKey);
+                MappingsRepresentation mapRep = this.parent.securityClient().clientScopeMappings(token, LiveOak.LIVEOAK_APP_REALM, appKey);
                 mapRep.getApplicationMappings().values().stream()
                         .filter(key -> key.equals(this.application.id()))
                         .forEach(appMap -> appMap.getMappings().forEach(roleRep -> this.applicationRoles.add(roleRep.getName())));
@@ -56,27 +64,20 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
             constructAppKey();
             state.putProperty("app-key", this.appKey);
 
-            // Get access token
-            String token;
-            if (securityContext != null && securityContext.getToken() != null) {
-                token = securityContext.getToken();
-            } else {
-                token = this.parent.directAccessClient().accessToken();
-            }
-
             // Create client application in Keycloak
             this.parent.securityClient().createApplication(token, LiveOak.LIVEOAK_APP_REALM, this.appKey);
 
-            // Update Keycloak application with: non full scope, redirect uris and web origins
+            // Update Keycloak application with: public client, non full scope, redirect uris and web origins
             ApplicationRepresentation app = this.parent.securityClient().application(token, LiveOak.LIVEOAK_APP_REALM, this.appKey);
+            app.setPublicClient(true);
             app.setFullScopeAllowed(false);
             app.setRedirectUris(this.redirectUris);
             app.setWebOrigins(this.webOrigins);
             this.parent.securityClient().updateApplication(token, LiveOak.LIVEOAK_APP_REALM, app);
 
             // Create scope mappings in Keycloak
-            checkApplicationRoles(token, LiveOak.LIVEOAK_APP_REALM, this.application.id());
-            updateScopeMappings(token, LiveOak.LIVEOAK_APP_REALM, this.application.id());
+            checkApplicationRoles(token);
+            updateScopeMappings(token);
         }
     }
 
@@ -119,28 +120,37 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
         this.applicationRoles = state.getPropertyAsList("app-roles");
 
         // Check keycloak roles
-        checkApplicationRoles(ctx.securityContext().getToken(), LiveOak.LIVEOAK_APP_REALM, this.appKey);
+        checkApplicationRoles(ctx.securityContext().getToken());
 
         // Update keycloak scope mappings
-        updateScopeMappings(ctx.securityContext().getToken(), LiveOak.LIVEOAK_APP_REALM, this.appKey);
+        updateScopeMappings(ctx.securityContext().getToken());
 
         responder.resourceUpdated(this);
     }
 
-    private void checkApplicationRoles(String token, String realm, String appName) throws Exception {
-        List<RoleRepresentation> appRoles = this.parent.securityClient().applicationRoles(token, realm, appName);
+    private void checkApplicationRoles(String token) throws Exception {
+        List<RoleRepresentation> appRoles = this.parent.securityClient().applicationRoles(token, LiveOak.LIVEOAK_APP_REALM, this.application.id());
 
         if (this.applicationRoles != null) {
             for (String role : this.applicationRoles) {
-                if (!appRoles.contains(role)) {
+                boolean roleFound = false;
+
+                for (RoleRepresentation appRole : appRoles) {
+                    if (appRole.getName().equals(role)) {
+                        roleFound = true;
+                        break;
+                    }
+                }
+
+                if (!roleFound) {
                     // Create role in Keycloak
-                    this.parent.securityClient().createApplicationRole(token, realm, appName, role);
+                    this.parent.securityClient().createApplicationRole(token, LiveOak.LIVEOAK_APP_REALM, this.application.id(), role);
                 }
             }
         }
     }
 
-    private void updateScopeMappings(String token, String realm, String appName) throws Exception {
+    private void updateScopeMappings(String token) throws Exception {
         List<RoleRepresentation> rolesList = null;
 
         if (this.applicationRoles != null) {
@@ -149,12 +159,13 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
                     .collect(Collectors.toList());
         }
 
-        this.parent.securityClient().addClientScopeRolesForApplication(token, realm, this.appKey, appName, rolesList);
+        this.parent.securityClient().addClientScopeRolesForApplication(token, LiveOak.LIVEOAK_APP_REALM, this.appKey, this.application.id(), rolesList);
     }
 
     @Override
     public void delete(RequestContext ctx, Responder responder) throws Exception {
-        this.parent.deleteMember(ctx, this);
+        this.parent.securityClient().deleteApplication(ctx.securityContext().getToken(), LiveOak.LIVEOAK_APP_REALM, this.appKey);
+        this.parent.deleteMember(this.id);
         responder.resourceDeleted(this);
     }
 
