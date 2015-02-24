@@ -1,16 +1,16 @@
-<div class="panel" ng-class="{'animated rollIn': created == client.kcClient.name}">
+<div class="panel" ng-class="{'animated rollIn': (created && created === client['app-key'])}">
   <div class="panel-heading">
-    <h2 class="panel-title"><span ng-show="!showFQDN && client.kcClient.name.indexOf($parent.$parent.namePrefix) === 0" ng-click="showFQDN = true;"><span data-tooltip="Click to expand">(...)</span></span><a href="#/applications/{{app.id}}/application-clients/{{ client.kcClient.name }}"><span ng-show="showFQDN">{{$parent.$parent.namePrefix}}</span>{{ client.kcClient.name|clientname:app.id }}</a></h2>
+    <h2 class="panel-title"><span ng-show="!showFQDN && client['app-key'].indexOf($parent.$parent.namePrefix) === 0" ng-click="showFQDN = true;"><span data-tooltip="Click to expand">(...)</span></span><a href="#/applications/{{app.id}}/application-clients/{{ client.id }}"><span ng-show="showFQDN">{{$parent.$parent.namePrefix}}</span>{{ client.id }}</a></h2>
     <div class="pull-right">
-      <a href ng-click="$parent.modalClientDelete(client.kcClient.name, client.kcClient.id)"><i class="fa fa-trash-o" tooltip="Delete Client"></i></a>
+      <a href ng-click="$parent.modalClientDelete(client.id, client['app-key'])"><i class="fa fa-trash-o" tooltip="Delete Client"></i></a>
     </div>
   </div>
   <div class="panel-body">
     <ul class="lo-app-opts">
       <li><i class="fa fa-rocket" tooltip="Platform"></i>{{client.type || 'custom'}}</li>
-      <li><i class="fa fa-link" tooltip="Redirect URIs"></i><span ng-class="{'text-muted': client.kcClient.redirectUris.length == 0}">{{ client.kcClient.redirectUris.length > 0 && client.kcClient.redirectUris.join(", ") || "No Redirect URIs defined" }}</span></li>
-      <li><i class="fa fa-globe" tooltip="Web Origins"></i><span ng-class="{'text-muted': client.kcClient.webOrigins.length == 0}">{{ client.kcClient.webOrigins.length > 0 && client.kcClient.webOrigins.join(", ") || "No Web Origins defined" }}</span></li>
-      <li><i class="fa fa-unlock" tooltip="Scope"></i><span ng-hide="client.realmRoles.length > 0" class="text-muted">No Roles specified</span><span ng-repeat="realmRole in client.realmRoles">{{ realmRole.name + ($last ? '' : ', ')}}</span></li>
+      <li><i class="fa fa-link" tooltip="Redirect URIs"></i><span ng-class="{'text-muted': client['redirect-uris'].length == 0}">{{ client['redirect-uris'].length > 0 && client['redirect-uris'].join(", ") || "No Redirect URIs defined" }}</span></li>
+      <li><i class="fa fa-globe" tooltip="Web Origins"></i><span ng-class="{'text-muted': client['web-origins'].length == 0}">{{ client['web-origins'].length > 0 && client['web-origins'].join(", ") || "No Web Origins defined" }}</span></li>
+      <li><i class="fa fa-unlock" tooltip="Scope"></i><span ng-hide="client['app-roles'].length > 0" class="text-muted">No Roles specified</span><span ng-repeat="appRole in client['app-roles']">{{($parent.$parent.availableRoles|filter:{id:appRole})[0].name + ($last ? '' : ', ')}}</span></li>
     </ul>
   </div>
 </div>

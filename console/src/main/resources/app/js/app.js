@@ -152,8 +152,15 @@ loMod.config(['$routeProvider', function($routeProvider) {
         loClients: function(LoClient, $route){
           return LoClient.getList({appId: $route.current.params.appId});
         },
-        loRealmAppClients : function(LoRealmAppListLoader) {
-          return new LoRealmAppListLoader();
+        loRealmAppRoles: function(LoRealmAppRoles, $route) {
+          // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
+          return LoRealmAppRoles.query({appId: $route.current.params.appId}).$promise.then(function(data) {
+              return data;
+            },
+            function() {
+              return [];
+            }
+          );
         }
       }
     })
@@ -177,16 +184,17 @@ loMod.config(['$routeProvider', function($routeProvider) {
           );
         },
         loRealmAppClient: function(LoRealmApp, $route) {
-          return LoRealmApp.get({appId: $route.current.params.clientId}).$promise.then(function (data) {
-            return data;
-          });
+          //return LoRealmApp.get({appId: $route.current.params.clientId}).$promise.then(function (data) {
+          //  return data;
+          //});
+          return {};
         },
         loClient: function(LoClient, LoRealmApp, $route) {
-          return LoRealmApp.get({appId: $route.current.params.clientId}).$promise.then(function (data) {
-            return LoClient.get({appId: $route.current.params.appId, clientId: data.id}).$promise.then(function(data){
+          //return LoRealmApp.get({appId: $route.current.params.clientId}).$promise.then(function (data) {
+            return LoClient.get({appId: $route.current.params.appId, clientId: $route.current.params.clientId}).$promise.then(function(data){
               return data;
             });
-          });
+          //});
         },
         loClients: function(LoClient, $route){
           return LoClient.getList({appId: $route.current.params.appId});
@@ -205,6 +213,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
           return new LoRealmRolesLoader();
         },
         scopeMappings: function(LoRealmAppClientScopeMapping, $route){
+          /*
           // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
           return LoRealmAppClientScopeMapping.query({appId: $route.current.params.appId, clientId: $route.current.params.clientId}).$promise.then(function(data) {
               return data;
@@ -213,6 +222,7 @@ loMod.config(['$routeProvider', function($routeProvider) {
               return [];
             }
           );
+          */ return {};
         }
       }
     })
