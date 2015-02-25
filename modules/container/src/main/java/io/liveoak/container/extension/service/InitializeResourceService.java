@@ -6,7 +6,6 @@ import io.liveoak.container.extension.ServiceUpdateResponder;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
-import io.liveoak.spi.resource.async.Resource;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -23,24 +22,47 @@ import java.util.function.Consumer;
 public class InitializeResourceService implements Service<Void> {
 
     public InitializeResourceService() {
+        this.async = false;
     }
 
     public InitializeResourceService(Consumer<Exception> exceptionConsumer) {
         this.exceptionConsumer = exceptionConsumer;
+        this.async = true;
     }
 
     @Override
     public void start(StartContext context) throws StartException {
         RequestContext reqContext = new RequestContext.Builder().application(applicationInjector.getOptionalValue());
+
         context.asynchronous();
-        try {
-            this.resourceInjector.getValue().initializeProperties(reqContext, ConversionUtils.convert(this.configurationInjector.getValue()), new ServiceUpdateResponder(context));
-        } catch (Exception e) {
-            if (this.exceptionConsumer != null) {
-                this.exceptionConsumer.accept(e);
-                context.complete();
-            } else {
-                throw new StartException(e);
+
+        if (async) {
+            try {
+                new Thread(() -> {
+                    try {
+                        this.resourceInjector.getValue().initializeProperties(reqContext, ConversionUtils.convert(this.configurationInjector.getValue()), new ServiceUpdateResponder(context));
+                    } catch (Exception e) {
+                        if (this.exceptionConsumer != null) {
+                            this.exceptionConsumer.accept(e);
+                            context.complete();
+                        } else {
+                            context.failed(new StartException(e));
+                        }
+                    }
+                }, "InitializeResourceService starter - " + this.resourceInjector.getValue().id()).start();
+            } catch (Throwable t) {
+                context.failed(new StartException(t));
+            }
+        } else {
+            try {
+                this.resourceInjector.getValue().initializeProperties(reqContext, ConversionUtils.convert(this.configurationInjector.getValue()), new ServiceUpdateResponder(context));
+            } catch (Exception e) {
+                if (this.exceptionConsumer != null) {
+                    this.exceptionConsumer.accept(e);
+                    context.complete();
+                } else {
+                    throw new StartException(e);
+                }
             }
         }
     }
@@ -71,5 +93,6 @@ public class InitializeResourceService implements Service<Void> {
     private InjectedValue<RootResource> resourceInjector = new InjectedValue<>();
     private InjectedValue<Application> applicationInjector = new InjectedValue<>();
     private Consumer<Exception> exceptionConsumer;
+    private boolean async;
 
 }
