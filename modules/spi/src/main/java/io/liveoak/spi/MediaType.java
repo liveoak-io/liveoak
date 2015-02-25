@@ -91,7 +91,7 @@ public class MediaType {
         }
         int slashLoc = type.indexOf(FORWARD_SLASH);
         if (slashLoc < 0) {
-            throw new IllegalArgumentException("media-type must be in the form of 'type/subtype'");
+            throw new IllegalArgumentException("media-type must be in the form of 'type/subtype'. '" + type + "' was received.");
         }
 
         this.type = type.substring(0, slashLoc);
