@@ -119,6 +119,7 @@ public class KeycloakServerApplication extends KeycloakApplication {
             }
             user.updateCredential(adminCredential);
             user.grantRole(realmAdminRole);
+            user.setEnabled(true);
         }
     }
 
