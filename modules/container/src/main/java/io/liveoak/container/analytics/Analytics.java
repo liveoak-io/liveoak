@@ -97,6 +97,7 @@ public class Analytics {
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("POST");
                 con.setRequestProperty("Content-Type", "application/json");
+                con.setRequestProperty("Accept", "*/*");
                 con.setDoOutput(true);
 
                 ByteArrayOutputStream buffed = new ByteArrayOutputStream();
