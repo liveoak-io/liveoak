@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.liveoak.keycloak.KeycloakConfig;
+import io.liveoak.spi.LiveOak;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -31,39 +32,61 @@ public class DirectAccessClient {
 
     public String accessToken() throws IOException {
         if (openConnections.get() == 0 && accessTokenResponse == null) {
-            // Not connected
-            try(CloseableHttpClient client = HttpClientBuilder.create().build()) {
-                HttpPost post = new HttpPost(KeycloakUriBuilder.fromUri(config.getBaseUrl())
-                        .path(ServiceUrlConstants.TOKEN_SERVICE_DIRECT_GRANT_PATH).build("liveoak-apps"));
 
-                List<NameValuePair> formparams = new ArrayList<>();
-                formparams.add(new BasicNameValuePair("username", "liveoak-server"));
+            synchronized (this) {
+                if (accessTokenResponse == null) {
+                    // Not connected
+                    int attempts = 0;
+                    boolean intr = false;
 
-                String initialPassword = System.getProperty("liveoak.initial.password");
-                if (initialPassword != null) {
-                    formparams.add(new BasicNameValuePair("password", initialPassword));
-                } else {
-                    formparams.add(new BasicNameValuePair("password", "password"));
+                    try {
+                        while (accessTokenResponse == null && attempts < MAX_RETRIES) {
+
+                            try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+
+                                HttpPost post = new HttpPost(KeycloakUriBuilder.fromUri(config.getBaseUrl())
+                                        .path(ServiceUrlConstants.TOKEN_SERVICE_DIRECT_GRANT_PATH).build(LiveOak.LIVEOAK_APP_REALM));
+
+                                List<NameValuePair> formparams = new ArrayList<>();
+                                formparams.add(new BasicNameValuePair("username", "liveoak-server"));
+
+                                String initialPassword = System.getProperty("liveoak.initial.password");
+                                if (initialPassword != null) {
+                                    formparams.add(new BasicNameValuePair("password", initialPassword));
+                                } else {
+                                    formparams.add(new BasicNameValuePair("password", "password"));
+                                }
+
+                                formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID, "liveoak-admin-client"));
+                                UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
+                                post.setEntity(form);
+
+                                HttpResponse response = client.execute(post);
+                                int status = response.getStatusLine().getStatusCode();
+                                HttpEntity entity = response.getEntity();
+
+                                if (status == 404) {
+                                    attempts++;
+                                    wait(TIMEOUT);
+                                    continue;
+                                } else if (status != 200) {
+                                    String json = EntityUtils.toString(entity);
+                                    throw new IOException("Bad status: " + status + ", response: " + json);
+                                }
+
+                                if (entity == null) {
+                                    throw new IOException("No Entity");
+                                }
+
+                                accessTokenResponse = JsonSerialization.readValue(EntityUtils.toString(entity), AccessTokenResponse.class);
+                            } catch (InterruptedException e) {
+                                intr = true;
+                            }
+                        }
+                    } finally {
+                        if (intr) Thread.currentThread().interrupt();
+                    }
                 }
-
-                formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID, "liveoak-admin-client"));
-                UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
-                post.setEntity(form);
-
-                HttpResponse response = client.execute(post);
-                int status = response.getStatusLine().getStatusCode();
-                HttpEntity entity = response.getEntity();
-
-                if (status != 200) {
-                    String json = EntityUtils.toString(entity);
-                    throw new IOException("Bad status: " + status + " response: " + json);
-                }
-
-                if (entity == null) {
-                    throw new IOException("No Entity");
-                }
-
-                accessTokenResponse = JsonSerialization.readValue(EntityUtils.toString(entity), AccessTokenResponse.class);
             }
         }
 
@@ -102,8 +125,12 @@ public class DirectAccessClient {
         this.accessTokenResponse = null;
     }
 
+    private volatile Object lock = new Object();
     private AccessTokenResponse accessTokenResponse;
     private AtomicInteger openConnections = new AtomicInteger(0);
     private KeycloakConfig config;
 
+    //TODO Make configurable?
+    private static final int MAX_RETRIES = 3;
+    private static final long TIMEOUT = 3 * 1000;
 }
