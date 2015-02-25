@@ -55,7 +55,7 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
 
                 MappingsRepresentation mapRep = this.parent.securityClient().clientScopeMappings(token, LiveOak.LIVEOAK_APP_REALM, appKey);
                 mapRep.getApplicationMappings().values().stream()
-                        .filter(key -> key.equals(this.application.id()))
+                        .filter(value -> value.getApplication().equals(this.application.id()))
                         .forEach(appMap -> appMap.getMappings().forEach(roleRep -> this.applicationRoles.add(roleRep.getName())));
             }
         } else {

@@ -10,7 +10,7 @@
       <li><i class="fa fa-rocket" tooltip="Platform"></i>{{client.type || 'custom'}}</li>
       <li><i class="fa fa-link" tooltip="Redirect URIs"></i><span ng-class="{'text-muted': client['redirect-uris'].length == 0}">{{ client['redirect-uris'].length > 0 && client['redirect-uris'].join(", ") || "No Redirect URIs defined" }}</span></li>
       <li><i class="fa fa-globe" tooltip="Web Origins"></i><span ng-class="{'text-muted': client['web-origins'].length == 0}">{{ client['web-origins'].length > 0 && client['web-origins'].join(", ") || "No Web Origins defined" }}</span></li>
-      <li><i class="fa fa-unlock" tooltip="Scope"></i><span ng-hide="client['app-roles'].length > 0" class="text-muted">No Roles specified</span><span ng-repeat="appRole in client['app-roles']">{{($parent.$parent.availableRoles|filter:{id:appRole})[0].name + ($last ? '' : ', ')}}</span></li>
+      <li><i class="fa fa-unlock" tooltip="Scope"></i><span ng-hide="client['app-roles'].length > 0" class="text-muted">No Roles specified</span><span ng-repeat="appRole in client['app-roles']">{{($parent.$parent.availableRoles|filter:{name:appRole})[0].name + ($last ? '' : ', ')}}</span></li>
     </ul>
   </div>
 </div>
