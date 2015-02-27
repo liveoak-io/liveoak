@@ -2,8 +2,8 @@
 
 var loMod = angular.module('loApp.controllers.appclient', []);
 
-loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal, $routeParams, Notifications, LoRealmApp,
-                                            loClients, LoRealmAppClientScopeMapping, currentApp, loRealmAppRoles) {
+loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal, $routeParams, Notifications,
+                                            loClients, currentApp, loRealmAppRoles) {
 
   $rootScope.curApp = currentApp;
 
@@ -23,16 +23,15 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
   });
 
   // Delete Client
-  $scope.modalClientDelete = function(clientId, kcId) {
+  $scope.modalClientDelete = function(clientId) {
     $scope.deleteClientId = clientId;
-    $scope.deleteKcId = kcId;
     $modal.open({
       templateUrl: '/admin/console/templates/modal/application/client-delete.html',
       controller: DeleteClientModalCtrl,
       scope: $scope
     }).result.then(
       function() {
-        var _deletedClient = $filter('filter')($scope.appClients, {'id' : kcId})[0];
+        var _deletedClient = $filter('filter')($scope.appClients, {'id' : clientId})[0];
         var _deletedIndex = $scope.appClients.indexOf(_deletedClient);
 
         $scope.appClients.splice(_deletedIndex, 1);
@@ -40,7 +39,7 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
     );
   };
 
-  var DeleteClientModalCtrl = function ($scope, $modalInstance, $log, LoRealmApp, LoClient) {
+  var DeleteClientModalCtrl = function ($scope, $modalInstance, $log, LoClient) {
 
     $scope.clientDelete = function (clientId) {
       LoClient.delete({appId: currentApp.name, clientId: clientId},
@@ -53,7 +52,7 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
         function (httpResponse) {
           Notifications.httpError('Failed to delete the client "' + clientId + '".', httpResponse);
         }
-      )
+      );
     };
 
     $scope.cancel = function () {
@@ -63,10 +62,8 @@ loMod.controller('AppClientsCtrl', function($scope, $rootScope, $filter, $modal,
   };
 });
 
-loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, $location, $http, Notifications,
-                                           LoRealmApp, LoRealmAppRoles, LoRealmAppClientScopeMapping, currentApp,
-                                           loRealmRoles, loRealmAppRoles, scopeMappings, LoClient,
-                                           loClient, LiveOak, $modal, $q, loClients) {
+loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, $location, Notifications, currentApp,
+                                           loRealmRoles, loRealmAppRoles, LoClient, loClient, $modal, loClients) {
 
   $rootScope.curApp = currentApp;
 
@@ -130,8 +127,6 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
 
   $scope.settings.hadPrefix = $scope.create || $scope.settings.displayName !== $scope.settings.name;
   var originalName = $scope.settings.name;
-
-  angular.forEach(scopeMappings, function(role) {$scope.settings.scopeMappings.push(role.name);});
 
   var settingsBackup = angular.copy($scope.settings);
 
@@ -232,10 +227,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
     };
 
     $scope.checkPlatform = function (platform){
-      if ($scope.$parent.platformsBasic.indexOf(platform) > -1 || $scope.$parent.platformsCustom.indexOf(platform) > -1){
-        return false;
-      }
-      return true;
+      return $scope.$parent.platformsBasic.indexOf(platform) === -1 && $scope.$parent.platformsCustom.indexOf(platform) === -1;
     };
   };
 
@@ -279,7 +271,7 @@ loMod.controller('AppClientCtrl', function($scope, $rootScope, $filter, $route, 
       },
       function(httpResponse) {
         if (httpResponse) {
-          Notifications.httpError('The LO client "' + ($scope.create ? $scope.appClient.name : originalName) + '" could not be ' + ($scope.create ? 'created' : 'updated') + '.', httpResponse);
+          Notifications.httpError('The application client "' + ($scope.create ? $scope.loClient.id : originalName) + '" could not be ' + ($scope.create ? 'created' : 'updated') + '.', httpResponse);
         }
       }
     );
