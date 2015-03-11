@@ -1,11 +1,13 @@
 package io.liveoak.application.clients;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import io.liveoak.spi.Application;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
+import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.resource.async.PropertySink;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.async.Responder;
@@ -73,11 +75,17 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
             app.setFullScopeAllowed(false);
             app.setRedirectUris(this.redirectUris);
             app.setWebOrigins(this.webOrigins);
-            this.parent.securityClient().updateApplication(token, LiveOak.LIVEOAK_APP_REALM, app);
 
             // Create scope mappings in Keycloak
-            checkApplicationRoles(token);
+            checkApplicationRoles(token, true);
             updateScopeMappings(token);
+
+            // Set default role to 'user' if present
+            if (this.applicationRoles.contains("user")) {
+                app.setDefaultRoles(new String[]{"user"});
+            }
+
+            this.parent.securityClient().updateApplication(token, LiveOak.LIVEOAK_APP_REALM, app);
         }
     }
 
@@ -120,7 +128,7 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
         this.applicationRoles = state.getPropertyAsList("app-roles");
 
         // Check keycloak roles
-        checkApplicationRoles(ctx.securityContext().getToken());
+        checkApplicationRoles(ctx.securityContext().getToken(), false);
 
         // Update keycloak scope mappings
         updateScopeMappings(ctx.securityContext().getToken());
@@ -128,17 +136,26 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
         responder.resourceUpdated(this);
     }
 
-    private void checkApplicationRoles(String token) throws Exception {
-        List<RoleRepresentation> appRoles = this.parent.securityClient().applicationRoles(token, LiveOak.LIVEOAK_APP_REALM, this.application.id());
+    private void checkApplicationRoles(String token, boolean bootstrap) throws Exception {
+        List<RoleRepresentation> appRoles = null;
+
+        try {
+            appRoles = this.parent.securityClient().applicationRoles(token, LiveOak.LIVEOAK_APP_REALM, this.application.id());
+        } catch (ResourceProcessingException e) {
+            // If we're bootstrapping the application client, it probably won't exist in Keycloak so may throw an error from SecurityClient
+            if (!bootstrap) throw e;
+        }
 
         if (this.applicationRoles != null) {
             for (String role : this.applicationRoles) {
                 boolean roleFound = false;
 
-                for (RoleRepresentation appRole : appRoles) {
-                    if (appRole.getName().equals(role)) {
-                        roleFound = true;
-                        break;
+                if (appRoles != null) {
+                    for (RoleRepresentation appRole : appRoles) {
+                        if (appRole.getName().equals(role)) {
+                            roleFound = true;
+                            break;
+                        }
                     }
                 }
 
