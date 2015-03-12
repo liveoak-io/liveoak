@@ -152,7 +152,7 @@ var LiveOak = function( options ) {
         if (options.clientId) {
             options.auth.clientId = options.clientId;
         } else {
-            options.auth.clientId = "liveoak.client." + options.appId + "." + options.auth.appClientId;
+            options.auth.clientId = options.appId + ".client." + options.appClientId;
         }
     }
 
@@ -170,7 +170,9 @@ var LiveOak = function( options ) {
         }
 
         if (options.auth.appClientId) {
-          options.auth.clientId = "liveoak.client." + options.appId + "." + options.auth.appClientId;
+            if (!options.auth.clientId) {
+                options.auth.clientId = options.appId + ".client." + options.auth.appClientId;
+            }
         }
 
         auth = new Keycloak(options.auth);
