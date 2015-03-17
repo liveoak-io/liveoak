@@ -248,6 +248,14 @@
     <!-- Use this profile to keep cache directories downloaded with frontend-maven-plugin in the target directory -->
     <profiles>
         <profile>
+            <id>ci-build</id>
+            <activation>
+                <property>
+                    <name>cloudbees</name>
+                </property>
+            </activation>
+        </profile>
+        <profile>
             <id>development</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -276,10 +284,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <!-- Note: we should probably rethink having the development profile active by default -->
-        <profile>
-            <id>clean-all</id>
         </profile>
         <profile>
             <id>release</id>
