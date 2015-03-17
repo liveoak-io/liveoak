@@ -96,7 +96,6 @@ public class ApplicationService implements Service<InternalApplication> {
                 Object value;
                 if ((value = state.getProperty(LiveOak.NAME)) != null) {
                     appName = StringPropertyReplacer.replaceProperties((String) value, properties);
-                    properties.put("application.name", appName);
                 }
                 if ((value = state.getProperty("html-app")) != null) {
                     htmlApp = new ResourcePath((String) value);
