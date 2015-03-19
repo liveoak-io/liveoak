@@ -44,7 +44,7 @@
         </thead>
         <tbody>
           <tr ng-repeat="user in users | filter: userQuery">
-            <td><a href="#/applications/{{curApp.name}}/security/users/{{user.username}}">{{user.username}}</a> <i class="fa fa-ban pull-right clearfix" tooltip="No Access" ng-hide="user.enabled"></i></td>
+            <td><a href="#/applications/{{curApp.id}}/security/users/{{user.username}}">{{user.username}}</a> <i class="fa fa-ban pull-right clearfix" tooltip="No Access" ng-hide="user.enabled"></i></td>
             <td>{{user.lastName}}</td>
             <td>{{user.firstName}}</td>
             <td>{{user.email}}</td>
