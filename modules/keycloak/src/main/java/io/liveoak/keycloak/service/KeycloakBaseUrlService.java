@@ -1,4 +1,4 @@
-package io.liveoak.keycloak.client;
+package io.liveoak.keycloak.service;
 
 import io.liveoak.keycloak.KeycloakConfig;
 import org.jboss.msc.inject.Injector;
@@ -11,28 +11,26 @@ import org.jboss.msc.value.InjectedValue;
 /**
  * @author Ken Finnigan
  */
-public class DirectAccessClientService implements Service<DirectAccessClient> {
+public class KeycloakBaseUrlService implements Service<String> {
+
     @Override
     public void start(StartContext context) throws StartException {
-        client = new DirectAccessClient(configInjector.getValue());
+
     }
 
     @Override
     public void stop(StopContext context) {
-        client.shutdown();
-        client = null;
+
     }
 
     @Override
-    public DirectAccessClient getValue() throws IllegalStateException, IllegalArgumentException {
-        return client;
+    public String getValue() throws IllegalStateException, IllegalArgumentException {
+        return this.config.getValue().getBaseUrl();
     }
-
 
     public Injector<KeycloakConfig> configInjector() {
-        return this.configInjector;
+        return this.config;
     }
 
-    private DirectAccessClient client;
-    private InjectedValue<KeycloakConfig> configInjector = new InjectedValue<>();
+    private InjectedValue<KeycloakConfig> config = new InjectedValue<>();
 }

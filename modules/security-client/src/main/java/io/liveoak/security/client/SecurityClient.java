@@ -1,4 +1,4 @@
-package io.liveoak.keycloak.client;
+package io.liveoak.security.client;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,7 +6,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.liveoak.keycloak.KeycloakConfig;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.exceptions.ResourceProcessingException;
 import org.apache.http.HttpEntity;
@@ -35,8 +34,8 @@ import static io.liveoak.spi.ResourceErrorResponse.ErrorType;
  */
 public class SecurityClient {
 
-    public SecurityClient(KeycloakConfig config) {
-        this.config = config;
+    public SecurityClient(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     // Application methods
@@ -212,7 +211,7 @@ public class SecurityClient {
     }
 
     private String realmEndpoint(String realmName) {
-        return this.config.getBaseUrl() + "/admin/realms/" + realmName;
+        return this.baseUrl + "/admin/realms/" + realmName;
     }
 
     private String realmApplicationsEndpoint(String realmName) {
@@ -249,7 +248,7 @@ public class SecurityClient {
                 .build();
     }
 
-    private KeycloakConfig config;
+    private String baseUrl;
 
     @FunctionalInterface
     interface ExecReturn<T, R> {

@@ -1,4 +1,4 @@
 {
     module-id:   'io.liveoak.application.clients',
-    dependencies: ['keycloak']
+    dependencies: ['security-client']
 }

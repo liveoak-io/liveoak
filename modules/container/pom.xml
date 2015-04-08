@@ -42,6 +42,16 @@
         </dependency>
         <dependency>
             <groupId>io.liveoak</groupId>
+            <artifactId>liveoak-security-client</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.liveoak</groupId>
             <artifactId>liveoak-jgit-wrapper</artifactId>
             <scope>provided</scope>
         </dependency>

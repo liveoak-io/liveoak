@@ -13,7 +13,7 @@
 
     <dependencies>
         <module name="io.liveoak.spi"/>
-        <module name="io.liveoak.keycloak"/>
+        <module name="io.liveoak.security.client"/>
         <module name="org.keycloak.core"/>
         <module name="org.jboss.resteasy.resteasy-jackson-provider"/>
     </dependencies>

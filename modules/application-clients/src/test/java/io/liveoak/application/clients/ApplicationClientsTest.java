@@ -8,10 +8,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.application.clients.extension.ApplicationClientsExtension;
-import io.liveoak.keycloak.KeycloakConfig;
+import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.util.ObjectMapperFactory;
-import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.testtools.AbstractHTTPResourceTestCaseWithTestApp;
 import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
@@ -30,9 +29,8 @@ public class ApplicationClientsTest extends AbstractHTTPResourceTestCaseWithTest
 
     @BeforeClass
     public static void setUp() throws Exception {
-        KeycloakConfig config = new KeycloakConfig();
-        system.serviceTarget().addService(Services.SECURITY_CLIENT, new ValueService<>(new ImmediateValue<>(new MockSecurityClient(config)))).install();
-        system.serviceTarget().addService(Services.SECURITY_DIRECT_ACCESS_CLIENT, new ValueService<>(new ImmediateValue<>(new MockDirectAccessClient(config)))).install();
+        system.serviceTarget().addService(Services.SECURITY_CLIENT, new ValueService<>(new ImmediateValue<>(new MockSecurityClient()))).install();
+        system.serviceTarget().addService(Services.SECURITY_DIRECT_ACCESS_CLIENT, new ValueService<>(new ImmediateValue<>(new MockDirectAccessClient()))).install();
         loadExtension("application-clients", new ApplicationClientsExtension());
     }
 

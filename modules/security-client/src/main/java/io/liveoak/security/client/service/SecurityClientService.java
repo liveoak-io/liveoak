@@ -1,7 +1,6 @@
-package io.liveoak.keycloak.client;
+package io.liveoak.security.client.service;
 
-import io.liveoak.keycloak.KeycloakConfig;
-import io.liveoak.keycloak.client.SecurityClient;
+import io.liveoak.security.client.SecurityClient;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -15,7 +14,7 @@ import org.jboss.msc.value.InjectedValue;
 public class SecurityClientService implements Service<SecurityClient> {
     @Override
     public void start(StartContext context) throws StartException {
-        client = new SecurityClient(configInjector.getValue());
+        client = new SecurityClient(sedcurityBaseUrl.getValue());
     }
 
     @Override
@@ -28,10 +27,10 @@ public class SecurityClientService implements Service<SecurityClient> {
         return client;
     }
 
-    public Injector<KeycloakConfig> configInjector() {
-        return this.configInjector;
+    public Injector<String> securityBaseUrlInjector() {
+        return this.sedcurityBaseUrl;
     }
 
     private SecurityClient client;
-    private InjectedValue<KeycloakConfig> configInjector = new InjectedValue<>();
+    private InjectedValue<String> sedcurityBaseUrl = new InjectedValue<>();
 }

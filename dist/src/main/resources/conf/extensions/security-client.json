@@ -1,0 +1,4 @@
+{
+    "module-id": "io.liveoak.security.client",
+    "dependencies": ['keycloak']
+}

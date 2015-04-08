@@ -1,6 +1,7 @@
 package io.liveoak.container.tenancy.service;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -13,7 +14,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.codec.json.JSONDecoder;
 import io.liveoak.common.util.StringPropertyReplacer;
-import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.container.service.MediaTypeMountService;
 import io.liveoak.container.tenancy.ApplicationConfigurationManager;
 import io.liveoak.container.tenancy.ApplicationContext;
@@ -22,13 +22,17 @@ import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.tenancy.InternalApplicationRegistry;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.container.zero.service.GitResourceInstallService;
+import io.liveoak.security.client.DirectAccessClient;
+import io.liveoak.security.client.SecurityClient;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.ResourcePath;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.client.Client;
+import io.liveoak.spi.exceptions.ResourceProcessingException;
 import io.liveoak.spi.resource.MountPointResource;
 import io.liveoak.spi.state.ResourceState;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import org.jboss.logging.Logger;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -41,6 +45,7 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
 import org.jboss.msc.value.InjectedValue;
+import org.keycloak.representations.idm.ApplicationRepresentation;
 
 /**
  * @author Bob McWhirter
@@ -145,6 +150,28 @@ public class ApplicationService implements Service<InternalApplication> {
             configDir.mkdir();
         }
 
+        // Create Keycloak application if needed
+        if (this.app.visible()) {
+            try {
+                String authToken = directAccessClientInjector.getValue().accessToken();
+                SecurityClient securityClient = securityClientInjector.getValue();
+
+                try {
+                    securityClient.application(authToken, LiveOak.LIVEOAK_APP_REALM, this.app.id());
+                } catch (ResourceProcessingException e) {
+                    // App doesn't exist, so create it
+                    securityClient.createApplication(authToken, LiveOak.LIVEOAK_APP_REALM, this.app.id());
+
+                    // Set application to Public
+                    ApplicationRepresentation securityApp = securityClient.application(authToken, LiveOak.LIVEOAK_APP_REALM, this.app.id());
+                    securityApp.setPublicClient(true);
+                    securityClient.updateApplication(authToken, LiveOak.LIVEOAK_APP_REALM, securityApp);
+                }
+            } catch (Exception e) {
+                log.error("Error creating Keycloak application", e);
+            }
+        }
+
         ServiceName configManagerName = Services.applicationConfigurationManager(this.id);
         ApplicationConfigurationService configManager = new ApplicationConfigurationService(applicationJson);
         target.addService(configManagerName, configManager)
@@ -229,11 +256,21 @@ public class ApplicationService implements Service<InternalApplication> {
         return this.applicationsDirectoryInjector;
     }
 
+    public Injector<DirectAccessClient> directAccessClientInjector() {
+        return this.directAccessClientInjector;
+    }
+
+    public Injector<SecurityClient> securityClientInjector() {
+        return this.securityClientInjector;
+    }
+
     private String id;
     private String name;
     private File directory;
     private Consumer<File> gitCommit;
     private InjectedValue<File> applicationsDirectoryInjector = new InjectedValue<>();
+    private InjectedValue<DirectAccessClient> directAccessClientInjector = new InjectedValue<>();
+    private InjectedValue<SecurityClient> securityClientInjector = new InjectedValue<>();
     private InternalApplication app;
 
     private static final String CONFIG_FILES = "configuration-files";

@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import io.liveoak.container.tenancy.service.ApplicationRemovalService;
 import io.liveoak.container.tenancy.service.ApplicationService;
+import io.liveoak.security.client.DirectAccessClient;
+import io.liveoak.security.client.SecurityClient;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.Services;
 import org.jboss.msc.service.ServiceController;
@@ -38,6 +40,8 @@ public class InternalApplicationRegistry implements ApplicationRegistry {
         ApplicationService app = new ApplicationService(id, name, directory, gitCommit);
         ServiceController<InternalApplication> controller = this.target.addService(Services.application(id), app)
                 .addDependency(Services.APPLICATIONS_DIR, File.class, app.applicationsDirectoryInjector())
+                .addDependency(Services.SECURITY_DIRECT_ACCESS_CLIENT, DirectAccessClient.class, app.directAccessClientInjector())
+                .addDependency(Services.SECURITY_CLIENT, SecurityClient.class, app.securityClientInjector())
                 .install();
 
         this.applications.put(id, controller);

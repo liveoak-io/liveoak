@@ -3,13 +3,12 @@ package io.liveoak.keycloak.extension;
 import io.liveoak.interceptor.service.InterceptorRegistrationHelper;
 import io.liveoak.keycloak.KeycloakConfig;
 import io.liveoak.keycloak.KeycloakServices;
-import io.liveoak.keycloak.client.DirectAccessClientService;
 import io.liveoak.keycloak.interceptor.AuthInterceptor;
 import io.liveoak.keycloak.interceptor.AuthInterceptorService;
+import io.liveoak.keycloak.service.KeycloakBaseUrlService;
 import io.liveoak.keycloak.service.KeycloakConfigResourceService;
 import io.liveoak.keycloak.service.KeycloakConfigService;
 import io.liveoak.keycloak.service.KeycloakResourceService;
-import io.liveoak.keycloak.client.SecurityClientService;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
@@ -48,16 +47,11 @@ public class KeycloakExtension implements Extension {
                 .install();
         InterceptorRegistrationHelper.installInterceptor(target, authController);
 
-        // Install Security Client
-        SecurityClientService securityClientService = new SecurityClientService();
-        target.addService(Services.SECURITY_CLIENT, securityClientService)
-                .addDependency(KeycloakServices.address(), KeycloakConfig.class, securityClientService.configInjector())
-                .install();
-
-        // Install Direct Access Client
-        DirectAccessClientService directAccessClientService = new DirectAccessClientService();
-        target.addService(Services.SECURITY_DIRECT_ACCESS_CLIENT, directAccessClientService)
-                .addDependency(KeycloakServices.address(), KeycloakConfig.class, directAccessClientService.configInjector())
+        // Install Keycloak URL Service
+        KeycloakBaseUrlService baseUrlService = new KeycloakBaseUrlService();
+        target.addService(Services.SECURITY_BASE_URL, baseUrlService)
+                .addDependency(KeycloakServices.address(), KeycloakConfig.class, baseUrlService.configInjector())
+                .addDependency(serviceName.append("apply-config"))
                 .install();
     }
 

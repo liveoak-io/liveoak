@@ -1,11 +1,10 @@
-package io.liveoak.keycloak.client;
+package io.liveoak.security.client;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.liveoak.keycloak.KeycloakConfig;
 import io.liveoak.spi.LiveOak;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -26,8 +25,8 @@ import org.keycloak.util.KeycloakUriBuilder;
  * @author Ken Finnigan
  */
 public class DirectAccessClient {
-    public DirectAccessClient(KeycloakConfig config) {
-        this.config = config;
+    public DirectAccessClient(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     public String accessToken() throws IOException {
@@ -44,7 +43,7 @@ public class DirectAccessClient {
 
                             try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
 
-                                HttpPost post = new HttpPost(KeycloakUriBuilder.fromUri(config.getBaseUrl())
+                                HttpPost post = new HttpPost(KeycloakUriBuilder.fromUri(baseUrl)
                                         .path(ServiceUrlConstants.TOKEN_SERVICE_DIRECT_GRANT_PATH).build(LiveOak.LIVEOAK_APP_REALM));
 
                                 List<NameValuePair> formparams = new ArrayList<>();
@@ -108,8 +107,8 @@ public class DirectAccessClient {
 
     private void logout(AccessTokenResponse accessTokenResponse) {
         try(CloseableHttpClient client = HttpClientBuilder.create().build()) {
-            HttpPost post = new HttpPost(KeycloakUriBuilder.fromUri(config.getBaseUrl())
-                    .path(ServiceUrlConstants.TOKEN_SERVICE_LOGOUT_PATH).build("liveoak-apps"));
+            HttpPost post = new HttpPost(KeycloakUriBuilder.fromUri(baseUrl)
+                    .path(ServiceUrlConstants.TOKEN_SERVICE_LOGOUT_PATH).build(LiveOak.LIVEOAK_APP_REALM));
 
             List<NameValuePair> formparams = new ArrayList<>();
             formparams.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN, accessTokenResponse.getRefreshToken()));
@@ -128,7 +127,7 @@ public class DirectAccessClient {
     private volatile Object lock = new Object();
     private AccessTokenResponse accessTokenResponse;
     private AtomicInteger openConnections = new AtomicInteger(0);
-    private KeycloakConfig config;
+    private String baseUrl;
 
     //TODO Make configurable?
     private static final int MAX_RETRIES = 3;

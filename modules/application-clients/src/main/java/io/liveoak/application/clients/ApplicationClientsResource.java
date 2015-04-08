@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.liveoak.keycloak.client.DirectAccessClient;
-import io.liveoak.keycloak.client.SecurityClient;
+import io.liveoak.security.client.DirectAccessClient;
+import io.liveoak.security.client.SecurityClient;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.SynchronousResource;

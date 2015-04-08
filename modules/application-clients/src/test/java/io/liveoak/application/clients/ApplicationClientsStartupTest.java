@@ -6,7 +6,6 @@ import java.util.Iterator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.liveoak.application.clients.extension.ApplicationClientsExtension;
-import io.liveoak.keycloak.KeycloakConfig;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.Services;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
@@ -24,9 +23,8 @@ public class ApplicationClientsStartupTest extends AbstractHTTPResourceTestCase 
 
     @BeforeClass
     public static void installExtension() throws Exception {
-        KeycloakConfig config = new KeycloakConfig();
-        system.serviceTarget().addService(Services.SECURITY_CLIENT, new ValueService<>(new ImmediateValue<>(new MockSecurityClient(config)))).install();
-        system.serviceTarget().addService(Services.SECURITY_DIRECT_ACCESS_CLIENT, new ValueService<>(new ImmediateValue<>(new MockDirectAccessClient(config)))).install();
+        system.serviceTarget().addService(Services.SECURITY_CLIENT, new ValueService<>(new ImmediateValue<>(new MockSecurityClient()))).install();
+        system.serviceTarget().addService(Services.SECURITY_DIRECT_ACCESS_CLIENT, new ValueService<>(new ImmediateValue<>(new MockDirectAccessClient()))).install();
         system.extensionInstaller().load("application-clients", new ApplicationClientsExtension());
 
         system.applicationRegistry().createApplication("testApp", "Test Application", new File(ApplicationClientsStartupTest.class.getClassLoader().getResource("testApp").getFile()));

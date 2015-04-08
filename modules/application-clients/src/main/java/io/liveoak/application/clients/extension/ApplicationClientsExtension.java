@@ -1,8 +1,8 @@
 package io.liveoak.application.clients.extension;
 
 import io.liveoak.application.clients.service.ApplicationClientsResourceService;
-import io.liveoak.keycloak.client.DirectAccessClient;
-import io.liveoak.keycloak.client.SecurityClient;
+import io.liveoak.security.client.DirectAccessClient;
+import io.liveoak.security.client.SecurityClient;
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;

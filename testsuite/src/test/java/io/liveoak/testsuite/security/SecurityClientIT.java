@@ -3,8 +3,7 @@ package io.liveoak.testsuite.security;
 import java.util.List;
 import java.util.Map;
 
-import io.liveoak.keycloak.KeycloakConfig;
-import io.liveoak.keycloak.client.SecurityClient;
+import io.liveoak.security.client.SecurityClient;
 import io.liveoak.spi.exceptions.ResourceProcessingException;
 import org.fest.assertions.Fail;
 import org.junit.After;
@@ -29,9 +28,7 @@ public class SecurityClientIT extends AbstractLiveOakSecurityTest {
 
     @Before
     public void securityClient() throws Exception {
-        KeycloakConfig config = new KeycloakConfig();
-        config.setBaseUrl(BASE_SECURITY_URL);
-        this.client = new SecurityClient(config);
+        this.client = new SecurityClient(BASE_SECURITY_URL);
 
         if (token == null) {
             browser.navigate().to(BASE_ADMIN_URL);
@@ -60,9 +57,7 @@ public class SecurityClientIT extends AbstractLiveOakSecurityTest {
 
     @Test(expected = ResourceProcessingException.class)
     public void badRealmApplicationRequest() throws Exception {
-        KeycloakConfig config = new KeycloakConfig();
-        config.setBaseUrl("http://nowhere:8080/auth");
-        new SecurityClient(config).applications(this.authToken(), APPS_REALM);
+        new SecurityClient("http://nowhere:8080/auth").applications(this.authToken(), APPS_REALM);
         Fail.fail();
     }
 

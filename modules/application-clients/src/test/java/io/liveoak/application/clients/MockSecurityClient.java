@@ -3,8 +3,7 @@ package io.liveoak.application.clients;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.liveoak.keycloak.KeycloakConfig;
-import io.liveoak.keycloak.client.SecurityClient;
+import io.liveoak.security.client.SecurityClient;
 import org.keycloak.representations.idm.ApplicationRepresentation;
 import org.keycloak.representations.idm.MappingsRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -13,8 +12,8 @@ import org.keycloak.representations.idm.RoleRepresentation;
  * @author Ken Finnigan
  */
 public class MockSecurityClient extends SecurityClient {
-    public MockSecurityClient(KeycloakConfig config) {
-        super(config);
+    public MockSecurityClient() {
+        super("");
     }
 
     @Override

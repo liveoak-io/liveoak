@@ -1,8 +1,8 @@
 package io.liveoak.application.clients.service;
 
 import io.liveoak.application.clients.ApplicationClientsResource;
-import io.liveoak.keycloak.client.DirectAccessClient;
-import io.liveoak.keycloak.client.SecurityClient;
+import io.liveoak.security.client.DirectAccessClient;
+import io.liveoak.security.client.SecurityClient;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.inject.Injector;

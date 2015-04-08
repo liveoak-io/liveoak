@@ -2,15 +2,14 @@ package io.liveoak.application.clients;
 
 import java.io.IOException;
 
-import io.liveoak.keycloak.KeycloakConfig;
-import io.liveoak.keycloak.client.DirectAccessClient;
+import io.liveoak.security.client.DirectAccessClient;
 
 /**
  * @author Ken Finnigan
  */
 public class MockDirectAccessClient extends DirectAccessClient {
-    public MockDirectAccessClient(KeycloakConfig config) {
-        super(config);
+    public MockDirectAccessClient() {
+        super("");
     }
 
     @Override
