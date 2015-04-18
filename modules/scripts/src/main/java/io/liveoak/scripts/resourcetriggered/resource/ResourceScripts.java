@@ -2,9 +2,11 @@ package io.liveoak.scripts.resourcetriggered.resource;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
+import io.liveoak.common.util.JsonFilterUtils;
 import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.scripts.resource.ScriptResource;
 import io.liveoak.scripts.resource.ScriptsResource;
@@ -100,6 +102,9 @@ public class ResourceScripts extends ScriptsResource {
                             ResourceState state = ConversionUtils.convert(objectNode);
                             state.id(resourceID);
 
+                            // TODO This is temporary until proper handling of config resources with their own directory structure is implemented
+                            state = JsonFilterUtils.filter(state, buildProperties());
+
                             ResourceScript resourceScript = new ResourceScript(this, state);
                             // add this resource to the list of scripts available.
                             this.scripts.add(resourceScript.getScript());
@@ -123,6 +128,12 @@ public class ResourceScripts extends ScriptsResource {
         });
 
 
+    }
+
+    private Properties buildProperties() {
+        Properties props = new Properties();
+        props.put("application.id", this.applicationId);
+        return props;
     }
 
     @Override
