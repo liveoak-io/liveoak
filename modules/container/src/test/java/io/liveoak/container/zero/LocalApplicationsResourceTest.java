@@ -47,7 +47,7 @@ public class LocalApplicationsResourceTest extends AbstractContainerTest {
     @BeforeClass
     public static void setUpServer() throws Exception {
         appDir = new File(LocalApplicationsResourceTest.class.getClassLoader().getResource("apps").getFile());
-        system = LiveOakFactory.create(null, appDir, null);
+        system = LiveOakFactory.create(null, appDir, preWaitSetupConsumer());
         system.extensionInstaller().load("dummy", new InMemoryDBExtension());
 
         awaitStability();

@@ -5,8 +5,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import io.liveoak.spi.MediaType;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
@@ -14,6 +16,9 @@ import io.netty.buffer.Unpooled;
 import org.apache.http.HttpResponse;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.service.ValueService;
+import org.jboss.msc.value.ImmediateValue;
 
 /**
  * @author Ken Finnigan
@@ -21,6 +26,19 @@ import org.jboss.msc.service.ServiceController;
 public class AbstractContainerTest {
 
     protected static LiveOakSystem system;
+
+    protected static Consumer<ServiceTarget> preWaitSetupConsumer() {
+        return AbstractContainerTest::createMocks;
+    }
+
+    protected static void setupMocks() {
+        createMocks(system.serviceTarget());
+    }
+
+    private static void createMocks(ServiceTarget target) {
+        target.addService(Services.SECURITY_CLIENT, new ValueService<>(new ImmediateValue<>(new MockSecurityClient()))).install();
+        target.addService(Services.SECURITY_DIRECT_ACCESS_CLIENT, new ValueService<>(new ImmediateValue<>(new MockDirectAccessClient()))).install();
+    }
 
     protected static boolean awaitStability() throws InterruptedException {
         // Default all calls to a 7 second timeout if not specified

@@ -8,6 +8,7 @@ package io.liveoak.container;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.function.Consumer;
 
 import io.liveoak.container.service.bootstrap.ClientBootstrappingService;
 import io.liveoak.container.service.bootstrap.CodecBootstrappingService;
@@ -48,7 +49,7 @@ public class LiveOakFactory {
     private static final Logger log = Logger.getLogger(LiveOakFactory.class);
 
     public static LiveOakSystem create() throws Exception {
-        return create(null, null, null);
+        return create(null, null, (Vertx) null);
     }
 
     public static LiveOakSystem create(ServiceContainer serviceContainer, ServiceTarget serviceTarget) throws Exception {
@@ -60,11 +61,19 @@ public class LiveOakFactory {
     }
 
     public static LiveOakSystem create(File configDir, File applicationsDir) throws Exception {
-        return create(configDir, applicationsDir, null);
+        return create(configDir, applicationsDir, (Vertx) null);
+    }
+
+    public static LiveOakSystem create(File configDir, File applicationsDir, Consumer<ServiceTarget> preWaitSetup) throws Exception {
+        return create(configDir, applicationsDir, preWaitSetup, null);
     }
 
     public static LiveOakSystem create(File configDir, File applicationsDir, Vertx vertx) throws Exception {
         return new LiveOakFactory(configDir, applicationsDir, vertx, "localhost").createInternal();
+    }
+
+    public static LiveOakSystem create(File configDir, File applicationsDir, Consumer<ServiceTarget> preWaitSetup, Vertx vertx) throws Exception {
+        return new LiveOakFactory(configDir, applicationsDir, vertx, "localhost").createInternal(preWaitSetup);
     }
 
     public static LiveOakSystem create(File configDir, File applicationsDir, Vertx vertx, String bindAddress) throws Exception {
@@ -103,15 +112,25 @@ public class LiveOakFactory {
         this.serviceTarget.addMonitor(this.stabilityMonitor);
     }
 
-    public LiveOakSystem createInternal() throws Exception {
+    public LiveOakSystem createInternal(Consumer<ServiceTarget> preWaitSetup) throws Exception {
         prolog();
         createTenancy();
         createServers();
         createClient();
         createExtensions();
         createVertx();
+
+        // Handle any actions that need to be performed before awaiting stability
+        if (preWaitSetup != null) {
+            preWaitSetup.accept(this.serviceTarget);
+        }
+
         this.stabilityMonitor.awaitStability();
         return (LiveOakSystem) serviceContainer.getService(LIVEOAK).awaitValue();
+    }
+
+    public LiveOakSystem createInternal() throws Exception {
+        return createInternal(null);
     }
 
     protected void prolog() {

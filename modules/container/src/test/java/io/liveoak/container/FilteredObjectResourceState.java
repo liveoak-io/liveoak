@@ -5,13 +5,13 @@
  */
 package io.liveoak.container;
 
-import io.liveoak.spi.ReturnFields;
-import io.liveoak.spi.state.ResourceState;
-
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import io.liveoak.spi.ReturnFields;
+import io.liveoak.spi.state.ResourceState;
 
 /**
  * @author <a href="mailto:marko.strukelj@gmail.com">Marko Strukelj</a>

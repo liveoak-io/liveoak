@@ -29,6 +29,7 @@ public class PutIdHandlingTest extends AbstractContainerTest {
     @BeforeClass
     public static void setUp() throws Exception {
         system = LiveOakFactory.create();
+        setupMocks();
         client = system.client();
 
         awaitStability();

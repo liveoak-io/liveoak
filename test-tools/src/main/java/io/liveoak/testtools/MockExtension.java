@@ -1,5 +1,7 @@
 package io.liveoak.testtools;
 
+import java.lang.reflect.Constructor;
+
 import io.liveoak.spi.Services;
 import io.liveoak.spi.extension.ApplicationExtensionContext;
 import io.liveoak.spi.extension.Extension;
@@ -10,8 +12,6 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.ValueService;
 import org.jboss.msc.value.ImmediateValue;
-
-import java.lang.reflect.Constructor;
 
 /**
  * @author Bob McWhirter

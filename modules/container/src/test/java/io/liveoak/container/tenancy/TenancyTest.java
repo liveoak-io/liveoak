@@ -5,12 +5,14 @@ import java.util.Collection;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultMountPointResource;
+import io.liveoak.container.MockDirectAccessClient;
+import io.liveoak.container.MockSecurityClient;
+import io.liveoak.container.extension.application.ApplicationExtensionsResource;
 import io.liveoak.container.extension.system.service.ExtensionService;
-import io.liveoak.container.service.MountService;
 import io.liveoak.container.service.ClientService;
+import io.liveoak.container.service.MountService;
 import io.liveoak.container.tenancy.service.ApplicationsDeployerService;
 import io.liveoak.container.tenancy.service.ApplicationsDirectoryService;
-import io.liveoak.container.extension.application.ApplicationExtensionsResource;
 import io.liveoak.container.zero.ApplicationsResource;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.spi.RequestContext;
@@ -57,6 +59,9 @@ public class TenancyTest {
         this.serviceContainer.addService(Services.SERVICE_REGISTRY, new ValueService<>(new ImmediateValue<>(this.serviceContainer))).install();
 
         this.serviceContainer.addService(Services.CLIENT, new ClientService()).install();
+
+        this.serviceContainer.addService(Services.SECURITY_CLIENT, new ValueService<>(new ImmediateValue<>(new MockSecurityClient()))).install();
+        this.serviceContainer.addService(Services.SECURITY_DIRECT_ACCESS_CLIENT, new ValueService<>(new ImmediateValue<>(new MockDirectAccessClient()))).install();
 
         this.serviceContainer.awaitStability();
     }

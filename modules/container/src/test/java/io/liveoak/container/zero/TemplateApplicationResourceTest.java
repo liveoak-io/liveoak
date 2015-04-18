@@ -1,5 +1,8 @@
 package io.liveoak.container.zero;
 
+import java.io.File;
+import java.io.InputStream;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -16,10 +19,11 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.junit.*;
-
-import java.io.File;
-import java.io.InputStream;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -34,7 +38,7 @@ public class TemplateApplicationResourceTest extends AbstractContainerTest {
     @BeforeClass
     public static void setUpServer() throws Exception {
         appDir = new File(LocalApplicationsResourceTest.class.getClassLoader().getResource("apps").getFile());
-        system = LiveOakFactory.create(null, appDir, null);
+        system = LiveOakFactory.create(null, appDir, preWaitSetupConsumer());
 
         system.extensionInstaller().load("aggregating-filesystem", new MockExtension("aggr-filesystem"));
         system.extensionInstaller().load("filesystem", new MockExtension("filesystem"));

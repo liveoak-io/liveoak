@@ -18,20 +18,24 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.common.util.ConversionUtils;
-import io.liveoak.container.tenancy.InternalApplicationRegistry;
-import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.container.LiveOakSystem;
-import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.extension.application.InternalApplicationExtension;
+import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.zero.extension.ZeroExtension;
 import io.liveoak.mongo.launcher.MongoInstaller;
 import io.liveoak.mongo.launcher.MongoLauncher;
+import io.liveoak.spi.Services;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.extension.Extension;
 import io.liveoak.spi.state.ResourceState;
+import io.liveoak.spi.util.ObjectMapperFactory;
+import io.liveoak.testtools.resources.MockDirectAccessClient;
+import io.liveoak.testtools.resources.MockSecurityClient;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ValueService;
+import org.jboss.msc.value.ImmediateValue;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
@@ -264,6 +268,9 @@ public class AbstractTestCase {
             system = LiveOakFactory.create();
             client = system.client();
             vertx = system.vertx();
+
+            system.serviceTarget().addService(Services.SECURITY_CLIENT, new ValueService<>(new ImmediateValue<>(new MockSecurityClient()))).install();
+            system.serviceTarget().addService(Services.SECURITY_DIRECT_ACCESS_CLIENT, new ValueService<>(new ImmediateValue<>(new MockDirectAccessClient()))).install();
 
             awaitStability();
 

@@ -7,10 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.liveoak.application.clients.extension.ApplicationClientsExtension;
 import io.liveoak.spi.LiveOak;
-import io.liveoak.spi.Services;
 import io.liveoak.testtools.AbstractHTTPResourceTestCase;
-import org.jboss.msc.service.ValueService;
-import org.jboss.msc.value.ImmediateValue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,8 +20,6 @@ public class ApplicationClientsStartupTest extends AbstractHTTPResourceTestCase 
 
     @BeforeClass
     public static void installExtension() throws Exception {
-        system.serviceTarget().addService(Services.SECURITY_CLIENT, new ValueService<>(new ImmediateValue<>(new MockSecurityClient()))).install();
-        system.serviceTarget().addService(Services.SECURITY_DIRECT_ACCESS_CLIENT, new ValueService<>(new ImmediateValue<>(new MockDirectAccessClient()))).install();
         system.extensionInstaller().load("application-clients", new ApplicationClientsExtension());
 
         system.applicationRegistry().createApplication("testApp", "Test Application", new File(ApplicationClientsStartupTest.class.getClassLoader().getResource("testApp").getFile()));

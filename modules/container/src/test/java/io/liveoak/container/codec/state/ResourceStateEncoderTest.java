@@ -5,12 +5,16 @@
  */
 package io.liveoak.container.codec.state;
 
-import io.liveoak.common.codec.state.ResourceStateEncoder;
-import io.liveoak.container.InMemoryObjectResource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import io.liveoak.common.codec.DefaultResourceState;
 import io.liveoak.common.codec.NonEncodableValueException;
 import io.liveoak.common.codec.driver.EncodingDriver;
 import io.liveoak.common.codec.driver.RootEncodingDriver;
+import io.liveoak.common.codec.state.ResourceStateEncoder;
+import io.liveoak.container.InMemoryObjectResource;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.state.ResourceRef;
@@ -19,10 +23,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fest.assertions.Fail;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static org.fest.assertions.Assertions.assertThat;
 

@@ -8,7 +8,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.util.EntityUtils;
 import org.fest.assertions.GenericAssert;
 
-import static org.fest.assertions.Formatting.*;
+import static org.fest.assertions.Formatting.format;
 
 /**
  * @author Ken Finnigan

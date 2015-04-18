@@ -66,6 +66,7 @@ public class ResourcePropertyMappingTest extends AbstractContainerTest {
     @BeforeClass
     public static void setUp() throws Exception {
         system = LiveOakFactory.create();
+        setupMocks();
         client = system.client();
         system.extensionInstaller().load("config", new InMemoryConfigExtension());
 

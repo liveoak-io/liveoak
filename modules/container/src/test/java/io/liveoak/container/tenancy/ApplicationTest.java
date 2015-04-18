@@ -28,7 +28,7 @@ public class ApplicationTest extends AbstractContainerTest {
     @Before
     public void setUpServer() throws Exception {
         File appsDir = new File(getClass().getClassLoader().getResource("apps").getFile());
-        system = LiveOakFactory.create(null, appsDir, null);
+        system = LiveOakFactory.create(null, appsDir, preWaitSetupConsumer());
         system.extensionInstaller().load("dummy", new InMemoryDBExtension());
 
         awaitStability();

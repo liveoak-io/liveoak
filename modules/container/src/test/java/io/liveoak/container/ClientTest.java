@@ -11,8 +11,8 @@ import java.util.concurrent.CompletableFuture;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import io.liveoak.common.DefaultReturnFields;
 import io.liveoak.common.codec.DefaultResourceState;
-import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.container.extension.application.InternalApplicationExtension;
+import io.liveoak.container.tenancy.InternalApplication;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.ReturnFields;
 import io.liveoak.spi.client.Client;
@@ -36,6 +36,7 @@ public class ClientTest extends AbstractContainerTest {
     @BeforeClass
     public static void setUp() throws Exception {
         system = LiveOakFactory.create();
+        setupMocks();
         client = system.client();
 
         awaitStability();

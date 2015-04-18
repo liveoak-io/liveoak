@@ -1,6 +1,5 @@
 package io.liveoak.container;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.liveoak.spi.client.Client;
 import io.liveoak.spi.resource.RootResource;
 import org.jboss.msc.inject.Injector;

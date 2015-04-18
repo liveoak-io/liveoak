@@ -32,7 +32,7 @@ public class ExtensionWrappingTest extends AbstractContainerTest {
     @BeforeClass
     public static void setup() throws Exception {
         appDir = new File(ExtensionWrappingTest.class.getClassLoader().getResource("apps").getFile());
-        system = LiveOakFactory.create(null, appDir, null);
+        system = LiveOakFactory.create(null, appDir, preWaitSetupConsumer());
         system.extensionInstaller().load("mock", new MockExtension());
 
         awaitStability();

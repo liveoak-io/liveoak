@@ -1,4 +1,4 @@
-package io.liveoak.application.clients;
+package io.liveoak.testtools.resources;
 
 import java.util.ArrayList;
 import java.util.List;

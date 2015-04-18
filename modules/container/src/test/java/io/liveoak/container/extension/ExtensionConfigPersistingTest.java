@@ -8,11 +8,11 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.container.AbstractContainerTest;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.state.ResourceState;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
@@ -41,7 +41,7 @@ public class ExtensionConfigPersistingTest extends AbstractContainerTest {
     public static void setup() throws Exception {
         appDir = new File(ExtensionWrappingTest.class.getClassLoader().getResource("apps").getFile());
         File tempDir = Files.createTempDirectory("liveoak").toFile();
-        system = LiveOakFactory.create(null, appDir, null);
+        system = LiveOakFactory.create(null, appDir, preWaitSetupConsumer());
         mockExtensionFile = new File(tempDir, "mock.json");
         write(mockExtensionFile, getMockConfig());
         dummyExtensionFile = new File(tempDir, "dummy.json");

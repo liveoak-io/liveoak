@@ -1,23 +1,24 @@
 package io.liveoak.container.zero;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+
 import io.liveoak.common.util.FileHelper;
 import io.liveoak.container.AbstractContainerTest;
 import io.liveoak.container.InMemoryDBExtension;
 import io.liveoak.container.LiveOakFactory;
 import io.liveoak.spi.MediaType;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.junit.*;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -38,7 +39,7 @@ public class ApplicationConfigFileTest extends AbstractContainerTest {
         File configFileApp = new File(ApplicationConfigFileTest.class.getClassLoader().getResource("configFiles/capp1").getFile());
         FileHelper.copy(configFileApp, appDir, true, path -> false);
 
-        system = LiveOakFactory.create(null, appsDir, null);
+        system = LiveOakFactory.create(null, appsDir, preWaitSetupConsumer());
         system.extensionInstaller().load("dummy", new InMemoryDBExtension());
 
         awaitStability();

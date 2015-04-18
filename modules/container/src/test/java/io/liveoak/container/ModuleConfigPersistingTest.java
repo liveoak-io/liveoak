@@ -55,6 +55,7 @@ public class ModuleConfigPersistingTest extends AbstractContainerTest {
         CONFIG_FILE = file;
 
         system = LiveOakFactory.create();
+        setupMocks();
         client = system.client();
 
         system.extensionInstaller().load(new MockExtension(), CONFIG_FILE);

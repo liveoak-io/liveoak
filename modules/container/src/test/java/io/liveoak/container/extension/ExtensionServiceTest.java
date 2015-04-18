@@ -4,12 +4,12 @@ import java.util.Properties;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.liveoak.spi.util.ObjectMapperFactory;
-import io.liveoak.container.extension.system.service.ExtensionService;
 import io.liveoak.container.extension.system.ExtensionConfigurationManager;
+import io.liveoak.container.extension.system.service.ExtensionService;
 import io.liveoak.container.service.ClientService;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.Services;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ValueService;

@@ -36,7 +36,7 @@ public class CollectionSubscriptionsTest extends AbstractContainerTest {
     @Before
     public void setUpServer() throws Exception {
         File appDir = new File(getClass().getClassLoader().getResource("apps").getFile());
-        system = LiveOakFactory.create(null, appDir, null);
+        system = LiveOakFactory.create(null, appDir, preWaitSetupConsumer());
     }
 
     @Before

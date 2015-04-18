@@ -1,9 +1,9 @@
 package io.liveoak.container.resource.mapping;
 
+import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.Resource;
 import io.liveoak.spi.resource.mapper.MappingResource;
 import io.liveoak.spi.resource.mapper.Property;
-import io.liveoak.spi.resource.RootResource;
 
 /**
  * @author Ken Finnigan

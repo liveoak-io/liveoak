@@ -39,6 +39,7 @@ public class MemberEncodingDriverTest extends AbstractContainerTest {
     @BeforeClass
     public static void setUp() throws Exception {
         system = LiveOakFactory.create();
+        setupMocks();
         client = system.client();
         system.extensionInstaller().load(RESOURCE_ID, new TestReadingMembersExtension());
         awaitStability();

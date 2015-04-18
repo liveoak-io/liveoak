@@ -39,17 +39,17 @@ public class GitApplicationsResourceTest extends AbstractContainerTest {
     @Before
     public void setUpServer() throws Exception {
         appsDir = new File(getClass().getClassLoader().getResource("apps").getFile());
-        this.system = LiveOakFactory.create(null, appsDir, null);
-        this.system.extensionInstaller().load("aggregating-filesystem", new MockExtension("aggr-filesystem"));
-        this.system.extensionInstaller().load("filesystem", new MockExtension("filesystem"));
-        this.system.extensionInstaller().load("mongo", new MockExtension("mongo"));
+        system = LiveOakFactory.create(null, appsDir, preWaitSetupConsumer());
+        system.extensionInstaller().load("aggregating-filesystem", new MockExtension("aggr-filesystem"));
+        system.extensionInstaller().load("filesystem", new MockExtension("filesystem"));
+        system.extensionInstaller().load("mongo", new MockExtension("mongo"));
 
         awaitStability();
     }
 
     @After
     public void tearDownServer() throws Exception {
-        this.system.stop();
+        system.stop();
         System.err.flush();
     }
 
@@ -76,11 +76,11 @@ public class GitApplicationsResourceTest extends AbstractContainerTest {
         response.getEntity().writeTo(out);
         out.flush();
         out.close();
-        return this.system.codecManager().decode(MediaType.GIT_APP_JSON, buffer);
+        return system.codecManager().decode(MediaType.GIT_APP_JSON, buffer);
     }
 
     protected ResourceState decode(ByteBuf buffer) throws Exception {
-        return this.system.codecManager().decode(MediaType.GIT_APP_JSON, buffer);
+        return system.codecManager().decode(MediaType.GIT_APP_JSON, buffer);
     }
 
     @Test

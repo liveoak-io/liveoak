@@ -42,6 +42,7 @@ public class ErrorsTest extends AbstractContainerTest {
     public static void setUpSystem() throws Exception {
         try {
             system = LiveOakFactory.create();
+            setupMocks();
             client = system.client();
 
             ErrorsTestResource root = new ErrorsTestResource("errors");

@@ -5,7 +5,7 @@ import io.liveoak.spi.util.ObjectMapperFactory;
 import org.apache.http.HttpResponse;
 import org.fest.assertions.GenericAssert;
 
-import static org.fest.assertions.Formatting.*;
+import static org.fest.assertions.Formatting.format;
 
 /**
  * @author Ken Finnigan

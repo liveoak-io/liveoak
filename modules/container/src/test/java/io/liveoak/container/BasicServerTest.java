@@ -43,6 +43,7 @@ public class BasicServerTest extends AbstractContainerTest {
     @Before
     public void setUpServer() throws Exception {
         system = LiveOakFactory.create();
+        setupMocks();
         system.extensionInstaller().load("memory", new InMemoryDBExtension());
 
         awaitStability();

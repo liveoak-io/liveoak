@@ -5,13 +5,13 @@
  */
 package io.liveoak.container.mime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.liveoak.common.DefaultMediaTypeMatcher;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.MediaTypeMatcher;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
 

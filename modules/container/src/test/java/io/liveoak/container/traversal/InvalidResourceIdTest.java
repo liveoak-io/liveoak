@@ -42,6 +42,7 @@ public class InvalidResourceIdTest extends AbstractContainerTest {
     @BeforeClass
     public static void setUpServer() throws Exception {
         system = LiveOakFactory.create();
+        setupMocks();
         system.extensionInstaller().load("dummy", new BadResourceExtension());
         awaitStability();
 

@@ -22,6 +22,7 @@ public class ExtensionTest extends AbstractContainerTest {
     @Before
     public void setUp() throws Exception {
         system = LiveOakFactory.create();
+        setupMocks();
         this.client = system.client();
         awaitStability();
 

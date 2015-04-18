@@ -3,9 +3,9 @@ package io.liveoak.testtools;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.liveoak.spi.util.ObjectMapperFactory;
 import io.liveoak.spi.MediaType;
 import io.liveoak.spi.state.ResourceState;
+import io.liveoak.spi.util.ObjectMapperFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;

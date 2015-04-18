@@ -5,14 +5,13 @@
  */
 package io.liveoak.container.codec.form;
 
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+
 import io.liveoak.common.codec.form.FormURLDecoder;
 import io.liveoak.spi.state.ResourceState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-
 import org.junit.Assert;
 import org.junit.Test;
 

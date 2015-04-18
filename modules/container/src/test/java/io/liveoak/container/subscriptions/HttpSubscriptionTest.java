@@ -28,6 +28,7 @@ public class HttpSubscriptionTest extends AbstractContainerTest {
     @Before
     public void setUp() throws Exception {
         system = LiveOakFactory.create();
+        setupMocks();
         system.extensionInstaller().load("memory", new InMemoryDBExtension());
 
         awaitStability();

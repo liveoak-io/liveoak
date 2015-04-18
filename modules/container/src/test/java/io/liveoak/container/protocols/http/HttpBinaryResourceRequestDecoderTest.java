@@ -5,6 +5,8 @@
  */
 package io.liveoak.container.protocols.http;
 
+import java.nio.charset.Charset;
+
 import io.liveoak.common.DefaultResourceRequest;
 import io.liveoak.common.codec.ResourceCodecManager;
 import io.liveoak.spi.RequestType;
@@ -17,8 +19,6 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.nio.charset.Charset;
 
 import static org.fest.assertions.Assertions.assertThat;
 
