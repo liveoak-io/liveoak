@@ -1045,7 +1045,6 @@ loMod.controller('SecurityRolesCtrl', function($scope, $rootScope, $log, $route,
     {'label': 'Security Roles', 'href': '#/applications/' + currentApp.id + '/security/roles'}
   ];
 
-  // FIXME: LIVEOAK-339 - Remove this once it's done properly on server-side
   var loRealmAppRoles;
   LoRealmAppRoles.query({appId: currentApp.id}).$promise.then(function(data) {
       loRealmAppRoles = data;
