@@ -3,6 +3,7 @@ package io.liveoak.application.clients;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.liveoak.common.util.ConversionUtils;
 import io.liveoak.spi.Application;
 import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
@@ -85,6 +86,7 @@ public class SimpleApplicationClientResource implements Resource, ConfigResource
             }
 
             this.parent.securityClient().updateApplication(token, LiveOak.LIVEOAK_APP_REALM, app);
+            persistConfig(this, ConversionUtils.convert(state), this.parent.baseConfig(this.application.configurationDirectory()));
         }
     }
 

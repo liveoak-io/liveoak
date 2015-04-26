@@ -3,7 +3,6 @@ package io.liveoak.spi.resource.config;
 import java.io.File;
 import java.util.List;
 
-import io.liveoak.spi.LiveOak;
 import io.liveoak.spi.RequestContext;
 import io.liveoak.spi.resource.RootResource;
 import io.liveoak.spi.resource.async.DelegatingResponder;
@@ -48,7 +47,7 @@ public interface ConfigRootResource extends RootResource {
         responder.resourceUpdated(this);
     }
 
-    static class EmptyResponder extends DelegatingResponder {
+    class EmptyResponder extends DelegatingResponder {
         public EmptyResponder(Responder delegate) {
             super(delegate);
         }
@@ -59,5 +58,5 @@ public interface ConfigRootResource extends RootResource {
         }
     }
 
-    static final Logger log = Logger.getLogger(ConfigRootResource.class);
+    Logger log = Logger.getLogger(ConfigRootResource.class);
 }
