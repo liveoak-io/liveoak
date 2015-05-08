@@ -177,7 +177,7 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
     $scope.applicationDelete = function (appId) {
       $log.debug('Deleting application: ' + appId);
       LoClient.getList({appId: appId},
-      // success
+      // success - client apps found
         function (clientApps) {
           LoApp.delete({appId: appId},
             // success
@@ -187,6 +187,22 @@ loMod.controller('AppListCtrl', function($scope, $rootScope, $routeParams, $loca
               for (var i = 0; i < clientApps.members.length; i++) {
                 LoRealmApp.delete({appId: clientApps.members[i]['app-key']});
               }
+              //$route.reload(); -- ammendonca: removed, since it's live refreshed
+              $modalInstance.close();
+            },
+            // error
+            function (httpResponse) {
+              Notifications.httpError('Failed to delete the application "' + appId + '".', httpResponse);
+            }
+          );
+        },
+        // error - no client apps found
+        function () {
+          LoApp.delete({appId: appId},
+            // success
+            function (/*value, responseHeaders*/) {
+              Notifications.success('The application "' + appId + '" has been deleted.');
+              LoRealmApp.delete({appId: appId});
               //$route.reload(); -- ammendonca: removed, since it's live refreshed
               $modalInstance.close();
             },
